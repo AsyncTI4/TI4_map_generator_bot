@@ -29,7 +29,7 @@ class DeckModelTest extends BaseTi4Test {
             case PUBLIC_STAGE_1_OBJECTIVE, PUBLIC_STAGE_2_OBJECTIVE -> validatePublicObjectiveDecks(deckModel);
             case RELIC -> validateRelicDeck(deckModel);
             case EXPLORE -> validateExploreDecks(deckModel);
-            default -> false;
+            case OTHER -> true;
         };
     }
 

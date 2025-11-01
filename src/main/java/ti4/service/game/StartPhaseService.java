@@ -24,6 +24,7 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.DisplayType;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
@@ -72,7 +73,6 @@ public class StartPhaseService {
         switch (phase) {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
-            case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
                 game.setPhaseOfGame("agenda");
@@ -90,8 +90,12 @@ public class StartPhaseService {
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
+            case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
+            case "finFixScrewedRelics" -> game.fixScrewedRelics();
+            case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
+            case "offerSetup" -> CreateGameService.presentSetupToPlayers(game);
             case "cptiExplores" -> {
                 game.setCptiExploreMode(true);
                 DeckModel deckModel = Mapper.getDeck("explores_cpti");
@@ -252,6 +256,11 @@ public class StartPhaseService {
                     && game.getStoredValue("Deflection").contains(player2.getFaction())
                     && player2.getActionCards().containsKey("deflection")) {
                 ActionCardHelper.playAC(event, game, player2, "deflection", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("Tartarus") != null
+                    && game.getStoredValue("Tartarus").contains(player2.getFaction())
+                    && player2.getActionCards().containsKey("tf-tartarus")) {
+                ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
             }
             if (player2.hasLeader("zealotshero")
                     && player2.getLeader("zealotshero").get().isActive()
@@ -560,7 +569,7 @@ public class StartPhaseService {
                             }
                         }));
 
-        if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
+        if (game.isAcd2() && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
         }
     }

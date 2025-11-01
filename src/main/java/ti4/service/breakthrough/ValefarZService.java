@@ -35,13 +35,13 @@ public class ValefarZService {
 
     public boolean hasFlagshipAbility(Game game, Player player, String flagship) {
         if (player == null) return false;
-        if (player.hasUnit(flagship)) return true;
+        if (player.getUnitsOwned().contains(flagship)) return true;
 
         // Check for Valefar Z
         if (player.hasUnlockedBreakthrough("nekrobt")) {
             String valefarZ = game.getStoredValue("valefarZ");
             for (Player p : game.getPlayers().values()) {
-                if (p.hasUnit(flagship) && valefarZ.contains(p.getFaction())) {
+                if (p.getUnitsOwned().contains(flagship) && valefarZ.contains(p.getFaction())) {
                     return true;
                 }
             }

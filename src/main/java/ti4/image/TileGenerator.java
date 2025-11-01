@@ -294,7 +294,7 @@ public class TileGenerator {
 
         switch (step) {
             case Setup -> {} // do nothing
-            case Tile -> {
+            case Tile, TileUnannotated -> {
                 BufferedImage image;
                 if (CustomHyperlaneService.isCustomHyperlaneTile(tile)) {
                     image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
@@ -320,6 +320,11 @@ public class TileGenerator {
                         default:
                             tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                     }
+                }
+
+                // We've drawn the basic tile; that's all that's needed for some of these
+                if (step == TileStep.TileUnannotated) {
+                    break;
                 }
 
                 // ADD HEX BORDERS FOR CONTROL
@@ -1205,7 +1210,7 @@ public class TileGenerator {
                 }
                 boolean anySkips = false;
                 for (Planet planet : tile.getPlanetUnitHolders()) {
-                    Set<String> skips = planet.getTechSpecialities();
+                    List<String> skips = planet.getTechSpecialities();
                     int number = skips.size();
                     if (number == 0) {
                         continue;
@@ -1695,7 +1700,8 @@ public class TileGenerator {
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
             float scale = 0.95f;
-            List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
+            List<String> smallLegendaries =
+                    List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "industrex");
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;

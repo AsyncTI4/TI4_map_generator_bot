@@ -43,6 +43,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.metadata.TechSummariesMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -67,7 +68,6 @@ public class PlayerTechService {
         }
         if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("mentakbt")) {
-                player.addOwnedUnitByID("mentak_cruiser3");
                 message += "\nAutomatically added Mentak's cruiser 3.";
             }
         }
@@ -88,6 +88,14 @@ public class PlayerTechService {
         MessageHelper.sendMessageToEventChannel(
                 event,
                 player.getRepresentation(false, false) + " purged technology: "
+                        + Mapper.getTech(techID).getRepresentation(false) + ".");
+    }
+
+    public static void unpurgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
+        player.unpurgeTech(techID);
+        MessageHelper.sendMessageToEventChannel(
+                event,
+                player.getRepresentation(false, false) + " un-purged technology: "
                         + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
@@ -422,6 +430,7 @@ public class PlayerTechService {
                     player.refreshTech("lgf");
                 }
             }
+            case "planesplitter-obs" -> TeHelperTechs.initializePlanesplitterStep1(game, player);
             case "det", "absol_det" -> {
                 deleteIfButtonEvent(event);
                 ButtonHelper.starChartStep1(game, player, "unknown");
@@ -506,6 +515,8 @@ public class PlayerTechService {
         boolean isResearch = !buttonID.contains("__comp");
         boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
+        boolean shareKnowledge = false;
+        boolean dwsBreakthrough = false;
 
         List<String> buttonIDComponents = Arrays.asList(PatternHelper.DOUBLE_UNDERSCORE_PATTERN.split(buttonID));
         buttonID = buttonIDComponents.getFirst();
@@ -514,6 +525,19 @@ public class PlayerTechService {
         if (buttonIDComponents.contains("comp")) {
             isResearch = false;
             isStrat = false;
+        }
+        if (buttonIDComponents.contains("shareKnowledge")) {
+            paymentRequired = false;
+            shareKnowledge = true;
+            isResearch = false;
+            isStrat = false;
+        }
+        if (buttonIDComponents.contains("dwsbt")) {
+            paymentRequired = true;
+            paymentType = "tgsonly";
+            isResearch = true;
+            isStrat = false;
+            dwsBreakthrough = true;
         }
 
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
@@ -610,6 +634,10 @@ public class PlayerTechService {
                     buttons);
         }
 
+        if (shareKnowledge) {
+            game.setStoredValue("ShareKnowledge_" + player.getFaction(), techID);
+            message.append(" - This tech will be automatically removed at the end of the next status phase");
+        }
         if (isResearch) {
             ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
         }
@@ -681,6 +709,9 @@ public class PlayerTechService {
                 }
             }
         }
+        if (dwsBreakthrough) {
+            VisionariaSelectService.resolveTechResearch(game, player, techID);
+        }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -706,6 +737,15 @@ public class PlayerTechService {
         }
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
+        // TODO: Make this fog safe
+        List<Button> dwsCommanders = game.getPlayers().values().stream()
+                .filter(p1 -> p1 != player)
+                .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
+                .map(p1 -> Buttons.gray(
+                        "useDwsDiscount_" + p1.getFaction(),
+                        "Use " + p1.getFaction() + "'s DWS Commander Discount",
+                        p1.getFactionEmoji()))
+                .toList();
         if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {
             Button aiDEVButton = Buttons.red("exhaustTech_aida", "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
@@ -717,6 +757,9 @@ public class PlayerTechService {
             }
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
+        }
+        if (payType.equals("res")) {
+            buttons.addAll(dwsCommanders);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
@@ -752,8 +795,12 @@ public class PlayerTechService {
             buttons.add(Buttons.red("prophetsTears_AC", "Exhaust Prophet's Tears for Action Card"));
             buttons.add(Buttons.red("prophetsTears_TechSkip", "Exhaust Prophet's Tears for Technology Prerequisite"));
         }
-        if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
+        if (player.hasUnexhaustedLeader("jolnaragent")) {
             buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
+        }
+        if (player.hasUnexhaustedLeader("experimentalagent")) {
+            buttons.add(
+                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
             buttons.add(Buttons.red(

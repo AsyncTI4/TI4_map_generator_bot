@@ -499,13 +499,15 @@ class PlayerAreaGenerator {
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
 
         // EQUALIZE AND CONTINUE
-        xDeltaTop = xDeltaBottom = Math.max(xDeltaTop, xDeltaBottom);
+        xDeltaTop = xDeltaBottom = plotCards(player, Math.max(xDeltaTop, xDeltaBottom), yPlayArea);
 
         // Row 1
         xDeltaTop = speakerToken(player, xDeltaTop, yPlayArea);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
         xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
+        xDeltaBottom = galvanizeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = valefarZTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -638,6 +640,51 @@ class PlayerAreaGenerator {
         return xDeltaFromRightSide;
     }
 
+    private int plotCards(Player player, int xDelta, int yDelta) {
+        boolean faceup = player.hasAbility("bladesorchestra");
+        if (player.hasAbility("bladesorchestra") || player.hasAbility("plotsplots")) {
+            xDelta += 230;
+
+            Graphics2D g2 = (Graphics2D) graphics;
+            DrawingUtil.drawRectWithTwoColorGradient(
+                    g2,
+                    ColorUtil.getPlayerMainColor(player),
+                    ColorUtil.getPlayerAccentColor(player),
+                    mapWidth - xDelta,
+                    yDelta,
+                    210,
+                    300);
+
+            graphics.setColor(Color.white);
+            graphics.setFont(Storage.getFont20());
+            yDelta += 20;
+
+            List<Entry<String, Integer>> plots =
+                    new ArrayList<>(player.getPlotCards().entrySet());
+            Collections.sort(
+                    plots,
+                    Comparator.comparing(
+                            Entry::getValue)); // sort by number to keep a consistent and anonymous ordering
+            for (Entry<String, Integer> entry : plots) {
+                String alias = entry.getKey();
+                Integer id = entry.getValue();
+                int x = mapWidth - xDelta + 5;
+
+                String name = faceup ? Mapper.getPlot(alias).getName() : "Plot " + id;
+                DrawingUtil.superDrawString(
+                        graphics, name, x, yDelta, Color.white, HorizontalAlign.Left, null, null, null);
+                yDelta += 5;
+                for (String faction : player.getPuppetedFactionsForPlot(alias)) {
+                    Player p = game.getPlayerFromColorOrFaction(faction);
+                    DrawingUtil.getAndDrawControlToken(graphics, p, x, yDelta, isFoWPrivate, 0.6f);
+                    x += 40;
+                }
+                yDelta += 55;
+            }
+        }
+        return xDelta;
+    }
+
     private int displayRemainingFactionTokens(
             List<Point> points, BufferedImage img, int tokensRemaining, int xDeltaFromRight, int yDelta) {
         if (img != null) {
@@ -670,7 +717,7 @@ class PlayerAreaGenerator {
     }
 
     private int sleeperTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (!player.hasAbility("awaken")) {
+        if (!player.hasAbility("awaken") || player.hasTech("tf-awaken")) {
             return xDeltaFromRightSide;
         }
         String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
@@ -685,6 +732,71 @@ class PlayerAreaGenerator {
 
         int numToDisplay = 5 - game.getSleeperTokensPlacedCount();
         return displayRemainingFactionTokens(points, bufferedImage, numToDisplay, xDeltaFromRightSide, yDelta);
+    }
+
+    private int crimsonRebellionTokens(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (player.hasAbility("incursion")) {
+            String breachFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_BREACH_ACTIVE);
+            BufferedImage breachImage = ImageHelper.read(breachFile);
+            int maxBreachTokens = 7;
+            List<Point> points = new ArrayList<>();
+            IntStream.range(0, maxBreachTokens).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
+            int totalBreaches = (int) game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .flatMap(uh -> uh.getTokenList().stream())
+                    .filter(tok ->
+                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                    .count();
+            if (totalBreaches > maxBreachTokens) {
+                String msg = player.getRepresentation()
+                        + " there are too many breach tokens on the board. Please review and resolve manually.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+            xDeltaFromRightSide = displayRemainingFactionTokens(
+                    points, breachImage, maxBreachTokens - totalBreaches, xDeltaFromRightSide, yDelta);
+        }
+
+        if (player.ownsPromissoryNote("sever")) {
+            String severFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SEVER);
+            BufferedImage severImage = ImageHelper.read(severFile);
+            int maxSeverTokens = 1;
+            List<Point> points = new ArrayList<>();
+            IntStream.range(0, maxSeverTokens).forEach(i -> points.add(new Point(i * 20, 0)));
+            int severtokens = (int) game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .filter(uh -> uh.getTokenList().contains(Constants.TOKEN_SEVER))
+                    .count();
+
+            if (severtokens > maxSeverTokens) {
+                String msg = player.getRepresentation()
+                        + " there are too many sever tokens on the board. Please review and resolve manually.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+            xDeltaFromRightSide = displayRemainingFactionTokens(
+                    points, severImage, maxSeverTokens - severtokens, xDeltaFromRightSide, yDelta);
+        }
+        return xDeltaFromRightSide;
+    }
+
+    private int galvanizeTokens(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (player.hasAbility("galvanize")) {
+            String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_galvanize.png");
+            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+            int maxGalvanizeTokens = 7;
+            List<Point> points = new ArrayList<>();
+            IntStream.range(0, maxGalvanizeTokens).forEach(i -> points.add(new Point(i * 20, 20 * ((i + 1) % 2))));
+            int totGalvanized = game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+            if (totGalvanized > maxGalvanizeTokens) {
+                String msg = player.getRepresentation()
+                        + " there are too many galvanized units on the board. Please review and resolve manually.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+            return displayRemainingFactionTokens(
+                    points, bufferedImage, maxGalvanizeTokens - totGalvanized, xDeltaFromRightSide, yDelta);
+        }
+        return xDeltaFromRightSide;
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
@@ -1468,11 +1580,15 @@ class PlayerAreaGenerator {
 
             if (reinforcementsPosition != null) {
                 int unitCap = player.getUnitCap(unitID);
-                boolean onlyPaintOneUnit = true;
                 if (unitCap == 0) {
                     unitCap = reinforcementsPosition.getPositionCount(unitID);
-                    onlyPaintOneUnit = false;
                 }
+
+                // Load voltron data
+                UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
+                boolean voltron = model == null ? false : model.getAlias().equals("naaz_voltron");
+                BufferedImage voltronDecal =
+                        ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
@@ -1483,11 +1599,15 @@ class PlayerAreaGenerator {
                 }
                 for (int i = 0; i < numInReinforcements; i++) {
                     Point position = reinforcementsPosition.getPosition(unitID);
+                    if (position == null) break;
+
                     graphics.drawImage(image, x + position.x, y + position.y, null);
                     if (decalImage != null) {
                         graphics.drawImage(decalImage, x + position.x, y + position.y, null);
                     }
-                    if (onlyPaintOneUnit) break;
+                    if (voltron && voltronDecal != null) {
+                        graphics.drawImage(voltronDecal, x + position.x, y + position.y, null);
+                    }
                 }
 
                 String unitName = unitKey.getUnitType().humanReadableName();
@@ -1735,6 +1855,12 @@ class PlayerAreaGenerator {
                     case Mech -> position.translate(mechPoint.x, mechPoint.y);
                     default -> {}
                 }
+                // Load voltron data
+                UnitModel model = p == null ? null : p.getUnitFromUnitKey(unitKey);
+                boolean voltron = model == null ? false : model.getAlias().equals("naaz_voltron");
+                BufferedImage voltronDecal =
+                        ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
+
                 BufferedImage spoopy = null;
                 if (unitKey.getUnitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
@@ -1765,6 +1891,9 @@ class PlayerAreaGenerator {
                     }
                     if (spoopy != null) {
                         graphics.drawImage(spoopy, position.x, position.y + deltaY, null);
+                    }
+                    if (voltron) {
+                        graphics.drawImage(voltronDecal, position.x, position.y + deltaY, null);
                     }
 
                     deltaY += 14;
@@ -2259,10 +2388,14 @@ class PlayerAreaGenerator {
         g2.setStroke(stroke2);
 
         int deltaX = 0;
+        if (game.isTwilightsFallMode()) {
+            deltaX = techField(x, y, techsFiltered.get("none"), exhaustedTechs, deltaX, player);
+        }
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
+
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
         deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
         deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
@@ -2271,7 +2404,7 @@ class PlayerAreaGenerator {
 
     private int breakthroughInfo(Player player, int x, int y, Game game) {
         BreakthroughModel bt = player.getBreakthroughModel();
-        if (bt == null) return x;
+        if (bt == null || !game.isThundersEdge()) return x;
         String name = bt.getDisplayName() == null ? bt.getName() : bt.getDisplayName();
         String faction = bt.getFaction().orElse(null);
         boolean exh = player.isBreakthroughExhausted();
@@ -2290,6 +2423,7 @@ class PlayerAreaGenerator {
             String resource = bt.getBackgroundResource();
 
             BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
+            drawRectWithOverlay(graphics, x, y - 3, 44, 154, bt);
             graphics.drawImage(btBox, x, y - 3, null);
 
             if (player.getBreakthroughTGs() > 0) {
@@ -2829,6 +2963,7 @@ class PlayerAreaGenerator {
                         || unit.getUpgradesToUnitId().isPresent();
                 boolean corsair = unit.getAlias().equals("mentak_cruiser3");
                 if (game.isFrankenGame()
+                        || game.isTwilightsFallMode()
                         || corsair
                         || unitHasUpgrade
                         || "echoes".equals(player.getFactionModel().getAlias())) {
@@ -2840,6 +2975,31 @@ class PlayerAreaGenerator {
                             y + unitFactionOffset.y,
                             32,
                             32);
+                }
+                if (unit.getAlias().equals("naaz_voltron")) {
+                    // paint the special voltron decal
+                    BufferedImage voltronDecal =
+                            ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
+                    graphics.drawImage(voltronDecal, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
+                }
+                if (unit.getAsyncId().equals("fs")) {
+                    String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
+                    if (player.hasUnlockedBreakthrough("nekrobt")) {
+                        List<String> flagships = new ArrayList<>();
+                        flagships.add(unitFaction);
+                        flagships.addAll(
+                                Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
+                        Point offs = new Point(unitFactionOffset.x - 20, unitFactionOffset.y - 20);
+                        for (String fsFaction : flagships) {
+                            drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
+                            offs.translate(15, 12);
+                        }
+                    } else if (game.getStoredValue("valefarZ").contains(unitFaction)) {
+                        String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
+                        BufferedImage valefarZ = ImageHelper.read(tokenFile);
+                        graphics.drawImage(
+                                valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
+                    }
                 }
             }
             if (isPurged) {

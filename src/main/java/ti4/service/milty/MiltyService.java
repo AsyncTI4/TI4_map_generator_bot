@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -28,6 +27,7 @@ import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
@@ -49,9 +49,9 @@ import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
-import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class MiltyService {
@@ -113,7 +113,7 @@ public class MiltyService {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
-        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
 
@@ -132,6 +132,7 @@ public class MiltyService {
         List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> specs.factionSources.contains(f.getSource()))
                 .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+                .filter(f -> !f.getAlias().contains("obsidian"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
@@ -184,6 +185,9 @@ public class MiltyService {
                     MiltyDraftDisplayService.repostDraftInformation(draftManager, game);
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    if (game.isThundersEdge()) {
+                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                    }
                 }
             });
         }
@@ -256,7 +260,7 @@ public class MiltyService {
                     String message = "Player:" + playerInfo.getUserName() + " already uses color:" + color
                             + " - changing color to " + newColor;
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    return;
+                    break;
                 } else if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
@@ -305,22 +309,9 @@ public class MiltyService {
             return;
         }
 
-        if (factionModel.getSource() == Source.ComponentSource.thunders_edge
-                || factionModel.getSource() == Source.ComponentSource.twilights_fall) {
-            if (!CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
-                MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(),
-                        "Thunder's Edge and Twilight Fall Factions Will Not be Ready til October 31st");
-                return;
-            }
-        }
-
+        String breakthrough = factionModel.getBreakthrough();
         // BREAKTHROUGH
-        if (game.isThundersEdge() && Mapper.getBreakthrough(factionModel.getAlias() + "bt") != null) {
-            String breakthrough = factionModel.getAlias() + "bt";
-            if (breakthrough.contains("keleres")) {
-                breakthrough = "keleresbt";
-            }
+        if (Mapper.getBreakthrough(breakthrough) != null) {
             player.setBreakthroughID(breakthrough);
             player.setBreakthroughUnlocked(false);
             player.setBreakthroughExhausted(false);
@@ -344,7 +335,7 @@ public class MiltyService {
         // String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
         player.setPlayerStatsAnchorPosition(positionHS);
 
-        // HANDLE GHOSTS' HOME SYSTEM LOCATION
+        // GHOST AND CRIMSON EXTRA HS TILES
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             String pos = "tr";
@@ -356,6 +347,30 @@ public class MiltyService {
             }
             tile = new Tile("51", pos);
             game.setTile(tile);
+            player.setHomeSystemPosition(pos);
+        }
+
+        // HANDLE Crimson' HOME SYSTEM LOCATION
+        if ("crimson".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
+                    pos = "br";
+                } else {
+                    pos = "tr";
+                }
+            }
+            tile = new Tile("118", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
         }
 
         // STARTING COMMODITIES
@@ -387,24 +402,28 @@ public class MiltyService {
             }
         }
 
-        Map<String, TechnologyModel> techReplacements = Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
-        List<String> playerTechs = new ArrayList<>(player.getTechs());
-        for (String tech : playerTechs) {
-            TechnologyModel model = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
-            if (!playerTechs.contains(model.getAlias())) {
-                player.addTech(model.getAlias());
-                player.removeTech(tech);
-            }
-        }
+        if (!"techs_tf".equals(game.getTechnologyDeckID())) {
 
-        for (String tech : factionModel.getFactionTech()) {
-            if (tech.trim().isEmpty()) continue;
-            if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
-                tech = "executiveorder";
+            Map<String, TechnologyModel> techReplacements =
+                    Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
+            List<String> playerTechs = new ArrayList<>(player.getTechs());
+            for (String tech : playerTechs) {
+                TechnologyModel model = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+                if (!playerTechs.contains(model.getAlias())) {
+                    player.addTech(model.getAlias());
+                    player.removeTech(tech);
+                }
             }
-            TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
 
-            player.addFactionTech(factionTech.getAlias());
+            for (String tech : factionModel.getFactionTech()) {
+                if (tech.trim().isEmpty()) continue;
+                if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
+                    tech = "executiveorder";
+                }
+                TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
+
+                player.addFactionTech(factionTech.getAlias());
+            }
         }
 
         if (setSpeaker) {
@@ -413,29 +432,30 @@ public class MiltyService {
                     player.getCorrectChannel(),
                     MiscEmojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
-
-        // STARTING PNs
-        player.initPNs();
-        Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
-        playerPNs.addAll(factionModel.getPromissoryNotes());
-        player.setPromissoryNotesOwned(playerPNs);
-        if (game.isBaseGameMode()) {
-            Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
-            for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_an")
-                        && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
-                    player.removeOwnedPromissoryNoteByID(pnID);
+        if (!game.isTwilightsFallMode()) {
+            // STARTING PNs
+            player.initPNs();
+            Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+            playerPNs.addAll(factionModel.getPromissoryNotes());
+            player.setPromissoryNotesOwned(playerPNs);
+            if (game.isBaseGameMode()) {
+                Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
+                for (String pnID : pnsOwned) {
+                    if (pnID.endsWith("_an")
+                            && "Alliance".equals(Mapper.getPromissoryNote(pnID).getName())) {
+                        player.removeOwnedPromissoryNoteByID(pnID);
+                    }
                 }
             }
-        }
-        if (game.isAbsolMode()) {
-            Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
-            for (String pnID : pnsOwned) {
-                if (pnID.endsWith("_ps")
-                        && "Political Secret"
-                                .equals(Mapper.getPromissoryNote(pnID).getName())) {
-                    player.removeOwnedPromissoryNoteByID(pnID);
-                    player.addOwnedPromissoryNoteByID("absol_" + pnID);
+            if (game.isAbsolMode()) {
+                Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
+                for (String pnID : pnsOwned) {
+                    if (pnID.endsWith("_ps")
+                            && "Political Secret"
+                                    .equals(Mapper.getPromissoryNote(pnID).getName())) {
+                        player.removeOwnedPromissoryNoteByID(pnID);
+                        player.addOwnedPromissoryNoteByID("absol_" + pnID);
+                    }
                 }
             }
         }
@@ -453,6 +473,12 @@ public class MiltyService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(player, event);
         TechInfoService.sendTechInfo(game, player, event);
+        if (!game.getStoredValue("useOldPok").isEmpty() && player.hasLeader("naaluagent-te")) {
+            player.removeLeader("naaluagent-te");
+            player.addLeader("naaluagent");
+            player.removeOwnedUnitByID("naalu_mech_te");
+            player.addOwnedUnitByID("naalu_mech");
+        }
         if (game.isThundersEdge() && player.hasLeader("xxchahero")) {
             player.removeLeader("xxchahero");
             player.addLeader("xxchahero-te");
@@ -492,6 +518,9 @@ public class MiltyService {
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        if (factionModel.getStartingTechAmount() > 1) {
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        }
                     } else {
                         for (int x = 0; x < bonusOptions; x++) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -665,6 +694,10 @@ public class MiltyService {
             player.removePromissoryNote(player.getColor() + "_sftt");
         }
 
+        if (game.isThundersEdge() && player.getFaction().equalsIgnoreCase("crimson")) {
+            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+        }
+
         if (game.isRapidMobilizationMode()) {
             Tile tile2 = player.getHomeSystemTile();
             if (tile2 != null
@@ -681,6 +714,53 @@ public class MiltyService {
                         "You cannot do Rapid Mobilization now, but once the map is setup, you can click this button to do so.",
                         buttons);
             }
+        }
+    }
+
+    public static void setupExtraFactionTiles(Game game, Player player, String faction, String positionHS, Tile tile) {
+        // HANDLE GHOSTS' HOME SYSTEM LOCATION
+        if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            tile = new Tile("51", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
+            if (game.isTwilightsFallMode()) {
+                player.addAbility("song_of_something");
+            }
+        }
+
+        // HANDLE Crimson' HOME SYSTEM LOCATION
+        if ("crimson".equals(faction)) {
+            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            if (!game.isTwilightsFallMode()) {
+                tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
+            } else {
+                player.addAbility("song_of_something");
+            }
+            String pos = "tr";
+            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
+                pos = "br";
+            }
+            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
+                pos = "bl";
+            }
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
+                    pos = "br";
+                } else {
+                    pos = "tr";
+                }
+            }
+            tile = new Tile("118", pos);
+            game.setTile(tile);
+            player.setHomeSystemPosition(pos);
         }
     }
 

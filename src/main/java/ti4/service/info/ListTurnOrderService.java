@@ -7,7 +7,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -60,7 +59,7 @@ public class ListTurnOrderService {
             if (isPlayed) {
                 textBuilder.append("~~");
             }
-            textBuilder.append(scEmoji).append(Helper.getSCAsMention(sc_, game));
+            textBuilder.append(scEmoji).append(game.getSCEmojiWordRepresentation(sc_));
             if (isPlayed) {
                 textBuilder.append("~~");
             }

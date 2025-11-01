@@ -35,6 +35,39 @@ public class DisasterWatchHelper {
         }
     }
 
+    public static void postTileInFlameWatch(
+            Game game, GenericInteractionCreateEvent event, Tile tile, Integer rings, String message) {
+        if (JdaService.guildPrimary
+                        .getTextChannelsByName("silver-flame-watch-party", true)
+                        .isEmpty()
+                || game.isFowMode()
+                || tile == null) {
+            return;
+        }
+        TextChannel watchParty = JdaService.guildPrimary
+                .getTextChannelsByName("silver-flame-watch-party", true)
+                .getFirst();
+        try (FileUpload systemWithContext =
+                new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload()) {
+            MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
+        } catch (IOException e) {
+            BotLogger.error(new LogOrigin(event, game), "Exception while closing FileUpload", e);
+        }
+    }
+
+    public static void sendMessageInFlameWatch(Game game, String message) {
+        if (JdaService.guildPrimary
+                        .getTextChannelsByName("silver-flame-watch-party", true)
+                        .isEmpty()
+                || game.isFowMode()) {
+            return;
+        }
+        TextChannel watchParty = JdaService.guildPrimary
+                .getTextChannelsByName("silver-flame-watch-party", true)
+                .getFirst();
+        MessageHelper.sendMessageToChannel(watchParty, message);
+    }
+
     public static void sendMessageInDisasterWatch(Game game, String message) {
         if (JdaService.guildPrimary
                         .getTextChannelsByName("disaster-watch-party", true)

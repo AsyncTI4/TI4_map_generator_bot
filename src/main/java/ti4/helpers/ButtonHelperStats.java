@@ -146,6 +146,15 @@ public class ButtonHelperStats {
                     player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (obsidian != null && obsidian.getPuppetedFactionsForPlot("siphon").contains(player.getFaction())) {
+            String siphonMsg = obsidian.getRepresentation()
+                    + " the puppeted player for Syphon has gained commodities, so you gain " + realGain
+                    + " trade goods. ";
+            siphonMsg += "(" + obsidian.getTg() + "->" + (obsidian.getTg() + realGain) + ")";
+            MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), siphonMsg);
+            obsidian.setTg(obsidian.getTg() + realGain);
+        }
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {

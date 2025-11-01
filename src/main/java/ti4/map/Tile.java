@@ -130,6 +130,17 @@ public class Tile {
         return unitHolders.get(spaceHolder) != null;
     }
 
+    public static Predicate<Tile> tileHasNoPlayerShips(Game game) {
+        return tile -> {
+            for (Player p : game.getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+    }
+
     public void addUnit(String spaceHolder, UnitKey unitID, Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
@@ -143,6 +154,14 @@ public class Tile {
             return;
         }
         unitHolder.addDamagedUnit(unitID, count);
+    }
+
+    public void addGalvanize(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder == null || count == null) {
+            return;
+        }
+        unitHolder.addGalvanizedUnit(unitID, count);
     }
 
     public void addCC(String ccID) {
@@ -562,18 +581,31 @@ public class Tile {
     }
 
     @JsonIgnore
-    public Set<WormholeModel.Wormhole> getWormholes() {
+    public List<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
+        List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);
         if (getTileModel().getWormholes() != null) {
             Set<WormholeModel.Wormhole> tileWhs = getTileModel().getWormholes();
-            whs.addAll(tileWhs.stream().filter(Objects::nonNull).toList());
+            whs2.addAll(tileWhs.stream().filter(Objects::nonNull).toList());
         }
         for (String token : getSpaceUnitHolder().getTokenList()) {
-            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.ALPHA);
-            if (token.contains("beta") || token.contains("sigma_weirdway")) whs.add(WormholeModel.Wormhole.BETA);
-            if (token.contains("gamma")) whs.add(WormholeModel.Wormhole.GAMMA);
+            if (token.contains("alpha") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.ALPHA);
+            if (token.contains("beta") || token.contains("sigma_weirdway")) whs2.add(WormholeModel.Wormhole.BETA);
+            if (token.contains("gamma")) whs2.add(WormholeModel.Wormhole.GAMMA);
         }
-        return whs;
+        String ghostFlagshipColor = null;
+        for (Player p : game.getPlayers().values()) {
+            if (p.ownsUnit("ghost_flagship")
+                    || p.ownsUnit("sigma_creuss_flagship_1")
+                    || p.ownsUnit("sigma_creuss_flagship_2")) {
+                ghostFlagshipColor = p.getColor();
+                break;
+            }
+        }
+        if (getSpaceUnitHolder().getUnitCount(UnitType.Flagship, ghostFlagshipColor) > 0) {
+            whs2.add(WormholeModel.Wormhole.DELTA);
+        }
+        return whs2;
     }
 
     @JsonIgnore

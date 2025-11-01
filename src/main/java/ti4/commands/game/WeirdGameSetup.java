@@ -40,8 +40,8 @@ class WeirdGameSetup extends GameStateSubcommand {
                 OptionType.BOOLEAN,
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
-        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may
-        // not be released to all games yet."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.NO_FRACTURE, "True to turn off fracture rolling in TE games."));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
@@ -90,8 +90,11 @@ class WeirdGameSetup extends GameStateSubcommand {
                     "Something went wrong and the game modes could not be set, please see error above.");
         }
 
-        // Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
-        // if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
+        Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
+        if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
+
+        Boolean nofracture = event.getOption(Constants.NO_FRACTURE, null, OptionMapping::getAsBoolean);
+        if (nofracture != null) game.setNoFractureMode(nofracture);
 
         Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
         if (uncharted != null) {

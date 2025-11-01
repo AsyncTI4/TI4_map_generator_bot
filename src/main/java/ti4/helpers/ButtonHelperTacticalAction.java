@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -12,7 +13,9 @@ import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -23,6 +26,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.breakthrough.VoidTetherService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
@@ -80,6 +84,24 @@ public class ButtonHelperTacticalAction {
                                 + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                                 + " agent to place 1 space dock for 2 trade goods or 2 commodities",
                         buttons);
+            }
+            if (player.hasAbility("miniaturization")) {
+                String msg = player.getRepresentation()
+                        + " You can land your structures on planets in the active system using your ability Miniaturization:";
+                List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
+                if (buttons.size() > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                }
+            }
+
+            if (player.hasUnlockedBreakthrough("argentbt")) {
+                String msg = player.getRepresentation()
+                        + " You can use your breakthrough to move ships (and things they transport) between the active system and any adjacent system with only your units and your CC";
+                List<Button> buttons = ButtonHelperHeroes.argentBreakthroughStep1(
+                        game, player, game.getTileByPosition(game.getActiveSystem()));
+                if (buttons.size() > 2) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                }
             }
         }
 
@@ -139,7 +161,15 @@ public class ButtonHelperTacticalAction {
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
+
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        if (player.hasUnit("tf-productionbiomes")) {
+            String msg = player.getRepresentation()
+                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -169,13 +199,44 @@ public class ButtonHelperTacticalAction {
                     empyButtons);
         }
         if (unitsWereMoved
-                && (tile.getUnitHolders().size() == 1)
+                && player.hasUnit("tf-yssarilinfantry")
+                && tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.getAc() == 0) {
+                    continue;
+                }
+                if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.gray(
+                            player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
+                            "Take AC from " + p2.getColor()));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " use this button to resolve the ability of your yssaril infantry.");
+                }
+            }
+        }
+        if (unitsWereMoved
+                && (tile.getPlanetUnitHolders().isEmpty())
                 && player.getPlanets().contains("ghoti")) {
             player.setCommodities(player.getCommodities() + 1);
             String msg = player.getRepresentation()
                     + " gained 1 commodity due to the legendary ability of Ghoti. Your commodities are now "
                     + player.getCommodities() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        }
+
+        if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.getPosition().contains("frac")) {
+            String msg = player.getRepresentation()
+                    + " you should gain 1 command token due to moving in the fracture while the Call of the Void Galactic Event is in play.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String trueIdentity = player.getRepresentationUnfogged();
+            String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain 1 command tokens.";
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         boolean flagshipMoved = game.getTacticalActionDisplacement().values().stream()
                 .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Flagship, player.getColor())));
@@ -185,6 +246,7 @@ public class ButtonHelperTacticalAction {
                     + ", the Maximus (Dih-Mohn Flagship) moved into the active system, so you may produce up to 2 units with a combined cost of 4 or less.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, produce);
         }
+        EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
@@ -192,8 +254,7 @@ public class ButtonHelperTacticalAction {
                 if (player == nonActivePlayer) {
                     continue;
                 }
-                if (nonActivePlayer.getTechs().contains("vw")
-                        && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
+                if (nonActivePlayer.hasTech("vw") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
 
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
@@ -476,6 +537,13 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button3);
         }
 
+        List<Button> button4 = ButtonHelperAgents.getTFAwakenButtons(game, tile, player);
+        if (player.hasTech("tf-awaken") && !button3.isEmpty() && !game.isL1Hero()) {
+            String msg = player.getRepresentationUnfogged()
+                    + ", you can use these buttons to change an infantry into a PDS using awaken.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button4);
+        }
+
         if (tile.isAnomaly() && player.getActionCards().containsKey("harness")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
@@ -490,14 +558,31 @@ public class ButtonHelperTacticalAction {
                             + ", you activated another players ships, and so could now play _Rally_.");
         }
 
-        List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
-        if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn"))
-                && !button2.isEmpty()
-                && !game.isL1Hero()) {
+        if (player.hasUnlockedBreakthrough("argentbt")
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
+                    player.getRepresentation()
+                            + ", you can use this button to place command tokens down via Argent breakthrough ability.",
                     button2);
+        }
+
+        List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
+        if ((player.hasTech("sdn") || player.hasTech("absol_sdn") || player.hasTech("wavelength"))
+                && !button2.isEmpty()
+                && !game.isL1Hero()) {
+            if (game.isTwilightsFallMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", Please resolve a wavelength explore.",
+                        button2);
+            } else {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
+                        button2);
+            }
         }
         if (!game.isL1Hero()) {
             // All players get to use Magen
@@ -527,6 +612,38 @@ public class ButtonHelperTacticalAction {
                 String magenMsg = magenPlayer.getRepresentation()
                         + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+            }
+            if (player.hasPlayablePromissoryInHand("malevolency")) {
+                MessageHelper.sendMessageToPlayerCardsInfoThread(
+                        player,
+                        player.getRepresentationUnfogged()
+                                + " Reminder you have the Malevolency promissory note, and now is the window to pass it on if you so wish.");
+            }
+            Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();
+            if (player.hasAbility("incursion")
+                    && (tokens.contains(Constants.TOKEN_BREACH_ACTIVE)
+                            || tokens.contains(Constants.TOKEN_BREACH_INACTIVE))) {
+                String label = tokens.contains(Constants.TOKEN_BREACH_ACTIVE) ? "inactive" : "active";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "flipBreach_" + pos, "Flip breach to " + label));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                String msg = player.getRepresentation()
+                        + " You can use the buttons to flip the breach in the active system:";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            }
+            if (player.hasPlayablePromissoryInHand("couriertransport")
+                    && activeSystem.getPlanetUnitHolders().size() > 0) {
+                String msg = player.getRepresentation()
+                        + " You can use courier transport to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                List<Button> buttons = List.of(
+                        Buttons.green("startCourierTransport_" + pos, "Play Courier Transport"),
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
+                                .size()
+                        > 1) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                }
             }
         }
         if (player.hasAbility("awaken")
@@ -610,6 +727,10 @@ public class ButtonHelperTacticalAction {
         if (player.hasTech("ffac2")) {
             movableFromPlanets.add(UnitType.Spacedock);
         }
+        if (player.hasAbility("miniaturization")) {
+            movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
+        }
+
         boolean remove = "remove".equalsIgnoreCase(moveOrRemove);
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();

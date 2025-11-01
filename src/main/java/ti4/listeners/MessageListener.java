@@ -36,6 +36,14 @@ public class MessageListener extends ListenerAdapter {
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
     private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
+    // The mention itself is 23 characters long
+    private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 53;
+    private static final String BOTHELPER_MENTION_REMINDER_TEXT =
+            """
+        Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working,
+        there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by
+        allowing the staff to know what you are pinging. Thanks!
+        """;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -57,6 +65,7 @@ public class MessageListener extends ListenerAdapter {
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
+                if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
 
@@ -67,24 +76,6 @@ public class MessageListener extends ListenerAdapter {
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
             }
-            // if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
-            //     TextChannel deletionLogChannel =
-            //             JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
-            //                     .findFirst()
-            //                     .orElse(null);
-            //     if (deletionLogChannel == null) return;
-            //     String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped()
-            //             + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
-            //     if (!message.getComponents().isEmpty()) {
-            //         msg += "\n" + message.getComponents().getFirst().getType().name();
-            //     }
-            //     if (!message.getEmbeds().isEmpty()) {
-            //         MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, msg, message.getEmbeds());
-            //     } else {
-            //         MessageHelper.sendMessageToChannel(deletionLogChannel, msg + "\n No embeds");
-            //     }
-            //     return;
-            // }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
             BotLogger.error(
@@ -92,6 +83,19 @@ public class MessageListener extends ListenerAdapter {
                             + event.getMessage().getJumpUrl(),
                     e);
         }
+    }
+
+    private static boolean respondToBotHelperPing(Message message) {
+        boolean messageLikelyMissingExplanation =
+                message.getContentRaw().length() < BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD;
+        boolean messageMentionsBotHelper = message.getMentions().getRoles().stream()
+                .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
+                        .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
+        boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
+        if (shouldRespondToBotHelperPing) {
+            message.reply(BOTHELPER_MENTION_REMINDER_TEXT).queue();
+        }
+        return shouldRespondToBotHelperPing;
     }
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {

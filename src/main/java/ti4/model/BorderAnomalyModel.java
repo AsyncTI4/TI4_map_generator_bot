@@ -54,6 +54,12 @@ public class BorderAnomalyModel {
         if (allTypes.containsKey(type.toLowerCase())) {
             return allTypes.get(type.toLowerCase());
         }
+
+        for (BorderAnomalyType anomalyType : BorderAnomalyType.values()) {
+            if (anomalyType.getName().equalsIgnoreCase(type)) {
+                return anomalyType;
+            }
+        }
         return null;
     }
 }

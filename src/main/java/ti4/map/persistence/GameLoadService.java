@@ -33,6 +33,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -230,6 +231,10 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
+                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")) {
+                                    // DELETE ME
+                                    unitHolderName = "bozgarbia";
+                                }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
                                             new LogOrigin(game),
@@ -381,7 +386,10 @@ class GameLoadService {
                 case Constants.AGENDAS -> game.setAgendas(getCardList(info));
                 case Constants.MANDATES -> game.setMandates(getCardList(info));
                 case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
-                case Constants.AC_PURGED -> game.setPurgedActionCards(getParsedCards(info));
+                case Constants.AC_STATUS -> game.setDiscardActionCardStatus(getParsedCardStatus(info));
+                case Constants.AC_PURGED ->
+                    game.setPurgedActionCards(
+                            getParsedCards(info).keySet().stream().toList()); // @Deprecated
                 case Constants.DISCARDED_AGENDAS -> game.setDiscardAgendas(getParsedCards(info));
                 case Constants.SENT_AGENDAS -> game.setSentAgendas(getParsedCards(info));
                 case Constants.LAW -> game.setLaws(getParsedCards(info));
@@ -414,6 +422,7 @@ class GameLoadService {
                     game.setScTradeGoods(strategyCardToTradeGoodCount);
                 }
                 case Constants.SPEAKER -> game.setSpeakerUserID(info);
+                case Constants.TYRANT -> game.setTyrantUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.AUTO_PING -> {
@@ -658,6 +667,7 @@ class GameLoadService {
                     game.setJustPlayedComponentAC(loadBooleanOrDefault(info, false));
                 case Constants.BASE_GAME_MODE -> game.setBaseGameMode(loadBooleanOrDefault(info, false));
                 case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(loadBooleanOrDefault(info, false));
+                case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(loadBooleanOrDefault(info, false));
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(loadBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(loadBooleanOrDefault(info, false));
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));
@@ -719,6 +729,8 @@ class GameLoadService {
                     game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
+                case Constants.NO_FRACTURE -> game.setNoFractureMode(loadBooleanOrDefault(info, false));
+                case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(loadBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->
                     game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));
                 case Constants.MONUMENTS_TO_THE_AGES_MODE ->
@@ -830,6 +842,24 @@ class GameLoadService {
             String id = cardInfo.nextToken();
             Integer index = Integer.parseInt(cardInfo.nextToken());
             cards.put(id, index);
+        }
+        return cards;
+    }
+
+    private static Map<String, ACStatus> getParsedCardStatus(String tokenizer) {
+        StringTokenizer actionCardToken = new StringTokenizer(tokenizer, ";");
+        Map<String, ACStatus> cards = new LinkedHashMap<>();
+        while (actionCardToken.hasMoreTokens()) {
+            StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+            String id = cardInfo.nextToken();
+            ACStatus status =
+                    switch (cardInfo.nextToken()) {
+                        case "garbozia" -> ACStatus.garbozia;
+                        case "ralnelbt" -> ACStatus.ralnelbt;
+                        case "purged" -> ACStatus.purged;
+                        default -> null;
+                    };
+            cards.put(id, status);
         }
         return cards;
     }
@@ -959,6 +989,27 @@ class GameLoadService {
                         player.setEvent(id, index);
                     }
                 }
+                case Constants.PLOT_CARDS -> {
+                    StringTokenizer plotCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (plotCardToken.hasMoreTokens()) {
+                        StringTokenizer plotCardInfo = new StringTokenizer(plotCardToken.nextToken(), ",");
+                        String id = plotCardInfo.nextToken();
+                        Integer index = Integer.parseInt(plotCardInfo.nextToken());
+                        player.setPlotCard(id, index);
+                    }
+                }
+                case Constants.PLOT_FACTIONS -> {
+                    StringTokenizer plotCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (plotCardToken.hasMoreTokens()) {
+                        StringTokenizer plotCardInfo = new StringTokenizer(plotCardToken.nextToken(), ",");
+                        String id = plotCardInfo.nextToken();
+                        while (plotCardInfo.hasMoreTokens()) {
+                            String faction = plotCardInfo.nextToken();
+                            player.setPlotCardFaction(id, faction);
+                        }
+                    }
+                }
+
                 case Constants.LIZHO_TRAP_CARDS -> {
                     StringTokenizer trapCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (trapCardToken.hasMoreTokens()) {

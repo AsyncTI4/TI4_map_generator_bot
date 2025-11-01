@@ -58,6 +58,10 @@ public class AddUnits extends GameStateCommand {
                         OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay technology"),
                 new OptionData(
                         OptionType.BOOLEAN,
+                        Constants.COEXIST,
+                        "Coexist with existing units. Default false. True will skip combat."),
+                new OptionData(
+                        OptionType.BOOLEAN,
                         Constants.NO_MAPGEN,
                         "'True' to not generate a map update with this command"));
     }
@@ -70,6 +74,7 @@ public class AddUnits extends GameStateCommand {
         if (tile == null) return;
 
         String color = getPlayer().getColor();
+        boolean coexist = event.getOption(Constants.COEXIST, false, OptionMapping::getAsBoolean);
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean doesTileHaveFloatingGF = false;
@@ -96,7 +101,7 @@ public class AddUnits extends GameStateCommand {
                         buttons);
             }
         }
-        StartCombatService.combatCheck(game, event, tile);
+        if (!coexist) StartCombatService.combatCheck(game, event, tile);
         handleSlingRelayOption(event);
         UnitCommandHelper.handleCcUseOption(event, tile, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);

@@ -50,7 +50,7 @@ public class CommandCounterHelper {
         tile.addCC(ccID);
         for (Player p : player.getGame().getRealPlayers()) {
             if (p.hasUnexhaustedLeader("naaluagent-te")) {
-                TeHelperAgents.serveNaaluAgentButtons(player.getGame(), player, tile);
+                TeHelperAgents.serveNaaluAgentButtons(player.getGame(), p, tile, player);
             }
         }
     }

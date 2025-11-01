@@ -10,6 +10,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -32,6 +33,9 @@ public class TechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
+        if (getTech().getRequirementsEmoji().equalsIgnoreCase("none")) {
+            return getTech().getText();
+        }
         return getTech().getText() + " " + getTech().getRequirementsEmoji();
     }
 
@@ -65,13 +69,22 @@ public class TechDraftItem extends DraftItem {
 
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedTechs"));
-        for (FactionModel faction : factions) {
-            for (var tech : faction.getFactionTech()) {
-                if (Arrays.asList(results).contains(tech)) {
-                    continue;
+        if (game.isTwilightsFallMode()) {
+            for (TechnologyModel tech : Mapper.getTechs().values()) {
+                if (tech.getSource() == ComponentSource.twilights_fall
+                        && tech.getFaction().isPresent()) {
+                    allItems.add(generate(Category.TECH, tech.getID()));
                 }
-                allItems.add(generate(DraftItem.Category.TECH, tech));
+            }
+        } else {
+            String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedTechs"));
+            for (FactionModel faction : factions) {
+                for (var tech : faction.getFactionTech()) {
+                    if (Arrays.asList(results).contains(tech)) {
+                        continue;
+                    }
+                    allItems.add(generate(DraftItem.Category.TECH, tech));
+                }
             }
         }
         return allItems;

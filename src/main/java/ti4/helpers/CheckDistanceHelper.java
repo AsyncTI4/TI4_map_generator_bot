@@ -87,13 +87,16 @@ public class CheckDistanceHelper {
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !player.getAbilities().contains("voidborn")
+                                    && !player.hasAbility("voidborn")
+                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !player.getAbilities().contains("gashlai_physiology"))
+                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !player.hasAbility("gashlai_physiology")
+                                    && !player.hasTech("tf-mr"))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                                     && !player.hasTech("lwd")
@@ -105,15 +108,20 @@ public class CheckDistanceHelper {
                             || (tile.isAsteroidField()
                                     && player != null
                                     && !player.hasAbility("celestial_being")
-                                    && !player.getTechs().contains("amd")
+                                    && !player.hasTech("amd")
+                                    && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !player.getTechs().contains("absol_amd"))) {
+                                    && !player.hasTech("absol_amd")
+                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2))) {
                         continue;
                     }
                 }
                 if (!forMap) {
                     if (tile != null && tile.isGravityRift(game)) {
                         num = -1;
+                        if (game.isCosmicPhenomenaeMode()) {
+                            num = -2;
+                        }
                     }
                 }
                 if (distances.get(existingPosition) != null) {

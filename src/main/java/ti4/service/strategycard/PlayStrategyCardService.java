@@ -114,14 +114,14 @@ public class PlayStrategyCardService {
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
-                        + Helper.getSCRepresentation(game, scToPlay) + ".");
+                        + game.getSCEmojiWordRepresentation(scToPlay));
 
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
         ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getSCRepresentation(game, scToPlay)).append(" played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
@@ -164,7 +164,7 @@ public class PlayStrategyCardService {
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (!winnuHero) {
             if (scModel.hasImageFile()) {
-                MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getScImageUrl(scToPlay, game));
+                MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
             } else {
                 baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
             }
@@ -189,7 +189,9 @@ public class PlayStrategyCardService {
 
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
-        AutoPingMetadataManager.setupQuickPing(game.getName());
+        if (!game.isTwilightsFallMode() || (scToPlay != 6 && scToPlay != 2 && scToPlay != 7)) {
+            AutoPingMetadataManager.setupQuickPing(game.getName());
+        }
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
 
         // Trade Primary
@@ -232,7 +234,10 @@ public class PlayStrategyCardService {
                     + " __after__ assigning speaker, use this button to look at the top agendas, which will be shown to you in your `#cards-info` thread.";
             Button draw2Agenda = Buttons.green(
                     player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", CardEmojis.Agenda);
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
+            if (!game.isTwilightsFallMode()) {
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
+            }
         }
 
         // Cryypter's Additional Look at Top Agenda Buttons
@@ -264,7 +269,7 @@ public class PlayStrategyCardService {
                     player.getCorrectChannel(), assignSpeakerMessage2, forceRefresh);
 
             for (Player p2 : playersToFollow) {
-                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                if (!game.isTwilightsFallMode() && !p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     String message2 = "Heads up, " + p2.getRepresentationUnfogged()
                             + ", **Trade** has just been played and this is a reminder that you do not hold your _Trade Agreement_.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
@@ -287,6 +292,20 @@ public class PlayStrategyCardService {
                         }
                     }
                 }
+            }
+        }
+
+        Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+        if (obsidian != null && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())) {
+            if (!scModel.usesAutomationForSCID("pok1leadership")) {
+                String enervateMsg = obsidian.getRepresentation()
+                        + " the puppeted player for Enervate has played a strategy card, so you have been marked as following for free. ";
+                MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), enervateMsg);
+                obsidian.addFollowedSC(scToPlay, event);
+            } else {
+                String enervateMsg = obsidian.getRepresentation()
+                        + " the puppeted player for Enervate has played leadership, so you can resolve the primary instead of the secondary. ";
+                MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), enervateMsg);
             }
         }
 
@@ -331,18 +350,9 @@ public class PlayStrategyCardService {
         }
 
         List<Button> conclusionButtons = new ArrayList<>();
-        Button endTurn = Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
-        Button deleteButton =
-                Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action");
-        conclusionButtons.add(endTurn);
-
-        if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue(
-                    player.getFinsFactionCheckerPrefix() + "endOfTurnAbilities",
-                    "Do End Of Turn Ability ("
-                            + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
-        }
-        conclusionButtons.add(deleteButton);
+        conclusionButtons.add(ButtonHelper.getEndTurnButton(game, player));
+        conclusionButtons.add(
+                Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action"));
         conclusionButtons.add(Buttons.red(
                 player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
                 "End Turn When All Have Reacted"));
@@ -559,7 +569,7 @@ public class PlayStrategyCardService {
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
-                    MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                    MessageHelper.sendMessageToChannel(m5, scModel.getImageFileUrl());
                     if (ShouldPrintFollowOrder(game, scModel)) {
                         List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
                         StringBuilder playerOrder =
@@ -614,6 +624,7 @@ public class PlayStrategyCardService {
                                 new StringBuilder("__Not__ neighbors with the **Trade** holder:");
                         boolean anyNeighbours = false;
                         boolean allNeighbours = true;
+                        StringBuilder spaceStation = new StringBuilder("");
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
                                 if (player.getNeighbouringPlayers(true).contains(p2)) {
@@ -622,6 +633,9 @@ public class PlayStrategyCardService {
                                 } else {
                                     notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
                                     allNeighbours = false;
+                                }
+                                if (p2.hasSpaceStation()) {
+                                    spaceStation.append(" ").append(p2.getFactionEmoji());
                                 }
                             }
                         }
@@ -633,6 +647,12 @@ public class PlayStrategyCardService {
                                     m5, "The **Trade** player is neighbors with __no__ other players.");
                         } else {
                             MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                        }
+                        if (player.hasSpaceStation() && !allNeighbours) {
+                            MessageHelper.sendMessageToChannel(
+                                    m5,
+                                    "The **Trade** player has a space station and can transact with players who also have a space station ("
+                                            + spaceStation.toString() + ")");
                         }
                     }
                 }
@@ -663,11 +683,17 @@ public class PlayStrategyCardService {
             case "pok6warfare" -> getWarfareButtons(sc);
             case "anarchy1" -> getAnarchy1Buttons(sc);
             case "anarchy2" -> getAnarchy2Buttons(sc);
+            case "tf2" -> getTF2Buttons(sc, player);
+
+            case "tf6" -> getTF6Buttons(sc, player);
+            case "tf7" -> getTF7Buttons(sc, player);
+            case "tf8" -> getTF8Buttons(sc, player);
+
             case "luminous1" -> getLuminous1Buttons(sc);
             case "luminous9" -> getLuminous9Buttons(sc, player);
             case "luminous2" -> getLuminous2Buttons(sc, player);
             case "luminous7" -> getLuminous7Buttons(sc);
-            case "te4construction" -> getThundersEdgeConstructionButtons(sc);
+            case "te4construction" -> getThundersEdgeConstructionButtons(sc, game);
             case "te6warfare" -> getThundersEdgeWarfareButtons(sc);
             case "anarchy3" -> getAnarchy3Buttons(sc, player);
             case "anarchy7" -> getAnarchy7Buttons(sc);
@@ -696,12 +722,16 @@ public class PlayStrategyCardService {
         };
     }
 
-    private static List<Button> getThundersEdgeConstructionButtons(int sc) {
+    private static List<Button> getThundersEdgeConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button buildButton = Buttons.green("constructionPrimary_produce", "[Primary] Use Production");
         Button sdButton = Buttons.green("construction_spacedock", "Place A SD", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isMonumentToTheAgesMode()) {
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5r)");
+            return List.of(followButton, buildButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, buildButton, sdButton, pdsButton, noFollowButton);
     }
 
@@ -795,6 +825,34 @@ public class PlayStrategyCardService {
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
+    }
+
+    private static List<Button> getTF2Buttons(int sc, Player player) {
+        Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_2", "Start Splice");
+        Button refreshButton = Buttons.green(player.getFinsFactionCheckerPrefix() + "diploRefresh2", "Ready 2 Planets");
+        Button participate = Buttons.blue("participateInSplice_2", "Participate In Splice");
+
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(start, refreshButton, participate, noFollowButton);
+    }
+
+    private static List<Button> getTF6Buttons(int sc, Player player) {
+        Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_6", "Start Splice");
+        Button refreshButton = Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "primaryOfAnarchy7", "Resolve PRODUCTION in a system");
+        Button participate = Buttons.blue("participateInSplice_6", "Participate In Splice");
+
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(start, refreshButton, participate, noFollowButton);
+    }
+
+    private static List<Button> getTF7Buttons(int sc, Player player) {
+        Button start = Buttons.red(player.getFinsFactionCheckerPrefix() + "startSplice_7", "Start Splice");
+        Button refreshButton = Buttons.green(
+                player.getFinsFactionCheckerPrefix() + "addMagusSpliceCard", "Spend 3R and 3I to Add a Splice Card");
+        Button participate = Buttons.blue("participateInSplice_7", "Participate In Splice");
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(start, refreshButton, participate, noFollowButton);
     }
 
     private static List<Button> getAnarchy2Buttons(int sc) {
@@ -891,6 +949,10 @@ public class PlayStrategyCardService {
             Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
+        if (game.isMonumentToTheAgesMode()) {
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5r)");
+            return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
 
@@ -950,6 +1012,18 @@ public class PlayStrategyCardService {
         Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
         Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", CardEmojis.Public1);
         return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
+    }
+
+    private static List<Button> getTF8Buttons(int sc, Player player) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+        Button drawP = Buttons.gray("drawParadigm", "Draw Paradigm (hero)");
+        Button scoreImperial = Buttons.gray(
+                player.getFinsFactionCheckerPrefix() + "score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
+        Button scoreAnObjective = Buttons.gray(
+                player.getFinsFactionCheckerPrefix() + "scoreAnObjective", "Score A Public", CardEmojis.Public1);
+        return List.of(followButton, noFollowButton, drawSo, drawP, scoreImperial, scoreAnObjective);
     }
 
     private static List<Button> getAnarchy10Buttons(int sc) {

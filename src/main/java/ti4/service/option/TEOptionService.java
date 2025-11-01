@@ -5,13 +5,68 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.draft.TwilightsFallFrankenDraft;
+import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.franken.FrankenDraftBagService;
 
 @UtilityClass
 public class TEOptionService {
+
+    @ButtonHandler("startTFGame")
+    public static void startTFGame(Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        String msg = "There are currently two draft options for Twilight's Fall.\n\nThere is a bag draft option, "
+                + "where you draft everything (tiles, mahact king faction, speaker position, starting fleet, starting HS initial abilities, etc), "
+                + "and then there is a milty draft option where you draft slice, mahact king faction, and a pack of 3 faction cards (from which you "
+                + "get speaker position, starting home system, and starting fleet.) After you finish the milty draft option, you'll do a bag draft where "
+                + "you draft abilities/units/genomes.\n\nThe second option is closer to Rules As Written, the first is closer to a classic franken draft.";
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
+        buttons.add(Buttons.gray("startDraftSystem_andcatPreset", "Start Milty Draft + Later Bag Draft"));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("startTFDraft")
+    public static void startTFDraft(Game game, ButtonInteractionEvent event) {
+        game.setupTwilightsFallMode(event);
+        FrankenDraftBagService.setUpFrankenFactions(game, event, true);
+        FrankenDraftBagService.clearPlayerHands(game);
+        game.setBagDraft(new TwilightsFallFrankenDraft(game));
+        FrankenDraftBagService.startDraft(game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("chooseExp_")
+    public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
+
+        String choice = buttonID.split("_")[1];
+        switch (choice.toLowerCase()) {
+            case "newpok" -> {
+                game.removeStoredValue("useOldPok");
+                game.setThundersEdge(false);
+            }
+            case "oldpok" -> {
+                game.setStoredValue("useOldPok", "true");
+                game.setThundersEdge(false);
+            }
+            case "te" -> {
+                game.setThundersEdge(true);
+                game.removeStoredValue("useOldPok");
+            }
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "Set game to use "
+                        + (choice.equalsIgnoreCase("newPok")
+                                ? "New PoK"
+                                : choice.equalsIgnoreCase("oldPok") ? "Old PoK" : "Thunder's Edge + New PoK")
+                        + " components.");
+    }
 
     @ButtonHandler("offerTEOptionButtons")
     public static void offerTEOptionButtons(Game game, MessageChannel channel) {
@@ -21,32 +76,37 @@ public class TEOptionService {
                 "Enable or Disable Galactic Events\n-# See [here](https://twilight-imperium.fandom.com/wiki/Galactic_Events) for details",
                 galacticEventButtons);
 
-        String msg =
-                "Thunder's Edge contains a new version of mecatol rex, which is legendary (it's ability allows you to discard and then draw a secret objective). If you want to play with this new version of mecatol rex in your game, press this button and it will be added to the map when secrets are dealt.";
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("addLegendaryMecatol", "Use Legendary Mecatol Rex"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
+        // String msg =
+        //         "Thunder's Edge contains a new version of mecatol rex, which is legendary (it's ability allows you to
+        // discard and then draw a secret objective). If you want to play with this new version of mecatol rex in your
+        // game, press this button and it will be added to the map when secrets are dealt.";
+        // List<Button> buttons = new ArrayList<>();
+        // buttons.add(Buttons.green("addLegendaryMecatol", "Use Legendary Mecatol Rex"));
+        // buttons.add(Buttons.red("deleteButtons", "Decline"));
+        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        msg =
-                "Thunder's Edge contains a new anomaly, called an entropic scar, which gives faction tech in status phase at the cost of a strategy command token. If you want the bot's milty to potentially include this scar (and other TE tiles), press this button.";
-        buttons = new ArrayList<>();
-        buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar & Other Tiles"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
+        // msg =
+        //         "Thunder's Edge contains a new anomaly, called an entropic scar, which gives faction tech in status
+        // phase at the cost of a strategy command token. If you want the bot's milty to potentially include this scar
+        // (and other TE tiles), press this button.";
+        // buttons = new ArrayList<>();
+        // buttons.add(Buttons.green("addEntropicScar", "Use Entropic Scar & Other Tiles"));
+        // buttons.add(Buttons.red("deleteButtons", "Decline"));
+        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        msg =
-                "Thunder's Edge contains two new strategy cards, Construction and Warfare. You can use them in this game by pressing the button below.";
-        buttons = new ArrayList<>();
-        buttons.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
+        // msg =
+        //         "Thunder's Edge contains two new strategy cards, Construction and Warfare. You can use them in this
+        // game by pressing the button below.";
+        // buttons = new ArrayList<>();
+        // buttons.add(Buttons.green("addNewSCs", "Use New Strategy Cards"));
+        // buttons.add(Buttons.red("deleteButtons", "Decline"));
+        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
 
-        msg = "Thunder's Edge contains 7 new relics. You can use them in this game by pressing the button below.";
-        buttons = new ArrayList<>();
-        buttons.add(Buttons.green("addNewRelics", "Use New Relics"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
+        // msg = "Thunder's Edge contains 7 new relics. You can use them in this game by pressing the button below.";
+        // buttons = new ArrayList<>();
+        // buttons.add(Buttons.green("addNewRelics", "Use New Relics"));
+        // buttons.add(Buttons.red("deleteButtons", "Decline"));
+        // MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, msg, buttons);
     }
 
     public static List<Button> getGalacticEventButtons(Game game) {
@@ -112,26 +172,33 @@ public class TEOptionService {
             galacticEventButtons.add(
                     Buttons.green("enableDaneMode_RapidMobilization_enable", "Enable Rapid Mobilization"));
         }
-        // if (game.isCosmicPhenomenaeMode()) {
-        //     daneLinkButtons.add(Buttons.red("enableDaneMode_Cosmic_disable", "Disable Cosmic Phenomenae"));
-        // } else {
-        //     daneLinkButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
-        // }
+        if (game.isCosmicPhenomenaeMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_Cosmic_disable", "Disable Cosmic Phenomenae"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_Cosmic_enable", "Enable Cosmic Phenomenae"));
+        }
         // if (game.isMonumentToTheAgesMode()) {
-        //     daneLinkButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the Ages"));
+        //     galacticEventButtons.add(Buttons.red("enableDaneMode_Monument_disable", "Disable Monuments to the
+        // Ages"));
         // } else {
-        //     daneLinkButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the Ages"));
+        //     galacticEventButtons.add(Buttons.green("enableDaneMode_Monument_enable", "Enable Monuments to the
+        // Ages"));
         // }
         if (game.isWeirdWormholesMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_WeirdWormholes_disable", "Disable Weird Wormholes"));
         } else {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
         }
-        // if (game.isWildWildGalaxyMode()) {
-        //     daneLinkButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
-        // } else {
-        //     daneLinkButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
-        // }
+        if (game.isWildWildGalaxyMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
+        }
+        if (game.isCallOfTheVoidMode()) {
+            galacticEventButtons.add(Buttons.red("enableDaneMode_CallOfTheVoid_disable", "Disable Call of the Void"));
+        } else {
+            galacticEventButtons.add(Buttons.green("enableDaneMode_CallOfTheVoid_enable", "Enable Call of the Void"));
+        }
         if (game.isConventionsOfWarAbandonedMode()) {
             galacticEventButtons.add(
                     Buttons.red("enableDaneMode_Conventions_disable", "Disable Conventions of War Abandoned"));

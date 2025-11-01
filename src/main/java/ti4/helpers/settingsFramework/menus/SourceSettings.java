@@ -29,6 +29,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting pok;
     private final BooleanSetting codexes;
     private final BooleanSetting discoStars;
+    private final BooleanSetting betaTestMode;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting absol;
     private final BooleanSetting ignis;
@@ -50,8 +51,9 @@ public class SourceSettings extends SettingsMenu {
         base = new BooleanSetting("BaseGame", "Base Game", true);
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
+        betaTestMode = new BooleanSetting("Beta", "Beta Mode", game.isTestBetaFeaturesMode());
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
-        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
+        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -59,8 +61,7 @@ public class SourceSettings extends SettingsMenu {
                 "Ignis Aurora Mod",
                 game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
-        actionCardDeck2 = new BooleanSetting(
-                "ActionCardDeck2", "Action Card Deck 2", "action_deck_2".equalsIgnoreCase(game.getAcDeckID()));
+        actionCardDeck2 = new BooleanSetting("ActionCardDeck2", "Action Card Deck 2", game.isAcd2());
         // Emojis
         base.setEmoji(SourceEmojis.TI4BaseGame);
         pok.setEmoji(SourceEmojis.TI4PoK);
@@ -154,6 +155,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
+        if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         return sources;
@@ -192,11 +194,6 @@ public class SourceSettings extends SettingsMenu {
                         .setEphemeral(true)
                         .queue();
             case "ThundersEdge" -> {
-                event.getHook()
-                        .sendMessage(
-                                "This is only a demo of TE. Only the factions that have revealed breakthroughs will be draftable. No Fracture.")
-                        .setEphemeral(true)
-                        .queue();
                 game.setThundersEdge(true);
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
             }
@@ -241,7 +238,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks for Uncharted Space
                 String explore = ds ? "explores_DS" : "explores_pok";
-                String acs = acd2 ? "action_deck_2" : (ds ? "action_cards_ds" : "action_cards_pok");
+                String acs = acd2 ? getAcd2Version(pok, teDemo) : (ds ? "action_cards_ds" : "action_cards_pok");
 
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
@@ -261,5 +258,11 @@ public class SourceSettings extends SettingsMenu {
             }
             case "Eronous" -> {}
         }
+    }
+
+    private String getAcd2Version(BooleanSetting pok, BooleanSetting teDemo) {
+        // when TE is fully implemented, this needs to check for _pok, _pok_te, or _te.
+        String suffix = pok.isVal() ? "_pok" : teDemo.isVal() ? "_te" : "";
+        return "action_deck_2" + suffix;
     }
 }
