@@ -171,11 +171,6 @@
             "HERO:gheminaherolady",
             "HERO:gheminaherolord"
         ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "the_lady_and_the_lord",
         "alternateText": "[Franken only] During setup, place the Lady flagship token in your reinforcements with your chosen drafted Flagship and place both drafted Heroes next to your faction sheet. The Lady flagship token is a second flagship unit with the abilities and attributes listed on the Lady flagship card. You have 2 Heroes.",
         "source": "ds"
     },

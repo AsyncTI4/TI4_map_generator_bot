@@ -83,6 +83,7 @@ public class ListTechService {
                     msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
                     player.setStrategicCC(player.getStrategicCC() - 1);
                     msg += "->" + player.getStrategicCC() + ")";
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -99,7 +100,7 @@ public class ListTechService {
     public void acquireATechWithDwsBt(ButtonInteractionEvent event, Game game, Player player) {
         boolean sc = false;
         boolean dws = true;
-        boolean firstTime = !event.getButton().getId().endsWith("_second");
+        boolean firstTime = !event.getButton().getCustomId().endsWith("_second");
         acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
     }
 
@@ -117,7 +118,7 @@ public class ListTechService {
         String techPrefix = finsFactionCheckerPrefix + "getAllTechOfType_";
         String techSuffix = dwsBt ? "_dwsbt" : "";
 
-        if (sc) {
+        if (sc || dwsBt) {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
@@ -176,6 +177,7 @@ public class ListTechService {
             ButtonInteractionEvent event, Player player, String buttonID, Game game, MessageChannel channel) {
         String techType = buttonID.replace("getAllTechOfType_", "");
         String payType = null;
+        boolean dwsBt = techType.endsWith("_dwsbt");
         if (techType.contains("_")) {
             String[] split = techType.split("_");
             techType = split[0];
@@ -188,16 +190,18 @@ public class ListTechService {
         List<Button> buttons = new ArrayList<>();
         if (techType.contains("allTechResearchable")) {
             for (TechnologyType type : TechnologyType.mainFive) {
-                List<TechnologyModel> techs = getAllTechOfAType(game, type.toString(), player, true);
+                List<TechnologyModel> techs = getAllTechOfAType(game, type.toString(), player, dwsBt, true);
                 buttons.addAll(getTechButtons(techs, player, payType));
             }
         } else {
-            List<TechnologyModel> techs = getAllTechOfAType(game, techType, player);
+            List<TechnologyModel> techs = getAllTechOfAType(game, techType, player, dwsBt);
             buttons.addAll(getTechButtons(techs, player, payType));
         }
 
         if (game.isComponentAction()) {
             buttons.add(Buttons.gray("acquireATech", "Get Other Technology"));
+        } else if (dwsBt) {
+            buttons.add(Buttons.gray("acquireATechWithDwsBt_second", "Get Other Technology"));
         } else {
             buttons.add(Buttons.gray("acquireATechWithSC_second", "Get Other Technology"));
         }
@@ -247,7 +251,7 @@ public class ListTechService {
             }
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 Planet unitHolder = game.getPlanetsInfo().get(planet);
-                Set<String> techTypes = unitHolder.getTechSpecialities();
+                List<String> techTypes = unitHolder.getTechSpecialities();
                 for (String type : techTypes) {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
@@ -364,7 +368,7 @@ public class ListTechService {
 
         String idPrefix = player.finChecker()
                 + switch (buttonPrefixType.toLowerCase()) {
-                    case "normal", "res", "nekro", "nopay", "free", "inf" -> "getTech_";
+                    case "normal", "res", "nekro", "nopay", "free", "inf", "shareknowledge", "dwsbt" -> "getTech_";
                     default -> "swapTechs__" + buttonPrefixType + "__";
                 };
         String idSuffix =
@@ -372,6 +376,8 @@ public class ListTechService {
                     case "nekro", "nopay" -> "__noPay";
                     case "free" -> "__noPay__comp";
                     case "inf" -> "__inf";
+                    case "dwsbt" -> "__dwsbt";
+                    case "shareknowledge" -> "__shareKnowledge";
                     default -> "";
                 };
 
@@ -393,14 +399,21 @@ public class ListTechService {
     }
 
     public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player) {
-        return getAllTechOfAType(game, techType, player, false);
+        return getAllTechOfAType(game, techType, player, false, false);
+    }
+
+    public static List<TechnologyModel> getAllTechOfAType(
+            Game game, String techType, Player player, boolean deepwroughtbt) {
+        return getAllTechOfAType(game, techType, player, deepwroughtbt, false);
     }
 
     private static List<TechnologyModel> getAllTechOfAType(
-            Game game, String techType, Player player, boolean hasToBeResearchable) {
+            Game game, String techType, Player player, boolean deepwroughtbt, boolean hasToBeResearchable) {
         List<TechnologyModel> validTechs = Mapper.getTechs().values().stream()
                 .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
                 .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
+                .filter(tech -> !(tech.getFaction().isPresent() && deepwroughtbt))
+                .filter(tech -> !(tech.getTypes().contains(TechnologyType.UNITUPGRADE) && deepwroughtbt))
                 .filter(tech -> tech.isType(techType)
                         || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
                 .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))

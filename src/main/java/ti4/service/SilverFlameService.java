@@ -32,7 +32,11 @@ import ti4.service.emoji.TileEmojis;
 public class SilverFlameService {
 
     public String rep(boolean includeCardText) {
-        return Mapper.getRelic("silverflame").getSimpleRepresentation();
+        if (includeCardText) {
+            return Mapper.getRelic("thesilverflame").getSimpleRepresentation();
+        } else {
+            return Mapper.getRelic("thesilverflame").getName();
+        }
     }
 
     public void rollSilverFlame(ButtonInteractionEvent event, Game game, Player player) {
@@ -41,10 +45,12 @@ public class SilverFlameService {
 
     private List<Button> silverFlameResolveButtons(Game game, Player player, Die resultDie) {
         List<Button> resolveButtons = new ArrayList<>();
-        Button good = Buttons.green(
-                player.finChecker() + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
-        Button bad = Buttons.red(
-                player.finChecker() + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
+        if (resultDie.getResult() > 8) {
+            resolveButtons.add(Buttons.green(
+                    player.finChecker() + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt));
+        }
+        resolveButtons.add(Buttons.red(
+                player.finChecker() + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack));
 
         // TODO: other mykomentori related buttons
         // if (player.getPromissoryNotesInPlayArea().contains("dspnmyko") &&
@@ -55,7 +61,14 @@ public class SilverFlameService {
     }
 
     private void silverFlameDrumroll(Player prePlayer, int target) {
-        String gameName = prePlayer.getGame().getName();
+        Game gameS = prePlayer.getGame();
+        String gameName = gameS.getName();
+        String watchPartyMsg = prePlayer.getRepresentation() + " is rolling for the silver flame in " + gameS.getName()
+                + "! They are at " + prePlayer.getTotalVictoryPoints() + "/" + gameS.getVp() + " VP!";
+        if (prePlayer.hasRelicReady("heartofixth")) {
+            watchPartyMsg += " They have the heart of ixth, so only need an 8!";
+        }
+        DisasterWatchHelper.postTileInFlameWatch(gameS, null, prePlayer.getHomeSystemTile(), 0, watchPartyMsg);
         String drumrollMessage = prePlayer.getRepresentation() + " is rolling for " + rep(false) + "!";
         DrumrollService.doDrumroll(prePlayer.getCorrectChannel(), drumrollMessage, 5, gameName, game -> {
             Die result = new Die(target);
@@ -63,6 +76,7 @@ public class SilverFlameService {
 
             String resultMsg = "## " + player.getRepresentation() + " rolled a " + result.getResult() + " for "
                     + rep(false) + "! " + result.getGreenDieIfSuccessOrRedDieIfFailure();
+            DisasterWatchHelper.sendMessageInFlameWatch(game, resultMsg);
             resultMsg += "\nUse the button%s to resolve:";
             List<Button> buttons = silverFlameResolveButtons(game, player, result);
             resultMsg = String.format(resultMsg, buttons.size() > 1 ? "s" : "");
@@ -120,7 +134,7 @@ public class SilverFlameService {
             if (owner == null) continue;
 
             int quantity = entry.getValue();
-            owner.setUnitCap(key.asyncID(), player.getUnitCap(key.getOldUnitID()) - quantity);
+            owner.setUnitCap(key.asyncID(), player.getUnitCap(key.asyncID()) - quantity);
             purgedUnitList
                     .append("\n> ")
                     .append(owner.fogSafeEmoji())
@@ -135,7 +149,7 @@ public class SilverFlameService {
                 + game.getName();
 
         message += "\n" + purgedUnitList;
-        DisasterWatchHelper.postTileInDisasterWatch(game, event, homeSystem, 0, message);
+        DisasterWatchHelper.postTileInFlameWatch(game, event, homeSystem, 0, message);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         // remove all planets

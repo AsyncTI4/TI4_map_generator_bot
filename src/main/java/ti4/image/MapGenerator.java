@@ -58,6 +58,7 @@ import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
 import ti4.spring.api.image.GameImageService;
@@ -68,6 +69,7 @@ import ti4.website.model.WebsiteOverlay;
 public class MapGenerator implements AutoCloseable {
 
     private static final int RING_MAX_COUNT = 8;
+
     private static final int RING_MIN_COUNT = 3;
     private static final int PLAYER_STATS_HEIGHT = 650; // + 34 per teammate + 34 if line is long
     private static final int TILE_PADDING = 100;
@@ -106,6 +108,7 @@ public class MapGenerator implements AutoCloseable {
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
+    private int fractureYbump = 0;
     private boolean isFoWPrivate;
     private Player fowPlayer;
 
@@ -161,6 +164,10 @@ public class MapGenerator implements AutoCloseable {
 
         // Height of map section
         int mapHeight = getMapHeight(game);
+        if (FractureService.isFractureInPlay(game) && !game.isNoFractureMode()) {
+            fractureYbump = 400;
+            mapHeight += fractureYbump;
+        }
 
         // Width of map section
         mapWidth = Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, getMapWidth(game));
@@ -271,6 +278,7 @@ public class MapGenerator implements AutoCloseable {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
+        boolean showFracture = FractureService.isFractureInPlay(game) && !game.isNoFractureMode();
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -281,6 +289,7 @@ public class MapGenerator implements AutoCloseable {
             maxY = -1;
             for (String position : PositionMapper.getTilePositions()) {
                 String tileRing = "0";
+                if (position.startsWith("frac") && !showFracture) continue;
                 if (position.length() == 3) {
                     tileRing = position.substring(0, 1);
                 } else if (position.length() == 4) {
@@ -545,7 +554,12 @@ public class MapGenerator implements AutoCloseable {
         int tempY = y;
         tempY = drawScoreTrack(tempY + 20);
         if (game.hasAnyPriorityTrackMode()) {
-            tempY = drawPriorityTrack(tempY);
+            // NOTE: Label width is 360
+            String trackName = "SPEAKER:";
+            if (game.isOmegaPhaseMode()) {
+                trackName = "PRIORITY:";
+            }
+            tempY = drawPriorityTrack(trackName, tempY);
         }
         y = drawObjectives(tempY);
         y = laws(y);
@@ -692,7 +706,7 @@ public class MapGenerator implements AutoCloseable {
         return y;
     }
 
-    private int drawPriorityTrack(int y) {
+    private int drawPriorityTrack(String trackName, int y) {
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke5);
@@ -703,7 +717,7 @@ public class MapGenerator implements AutoCloseable {
         int labelWidth = 360;
         var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
         DrawingUtil.drawCenteredString(
-                g2, "PRIORITY:", new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
+                g2, trackName, new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
         int trackXShift = landscapeShift + labelWidth;
         for (int i = 0; i < priorityTrack.size(); i++) {
             graphics.setColor(Color.WHITE);
@@ -1098,7 +1112,7 @@ public class MapGenerator implements AutoCloseable {
         for (String pos : statTiles) {
             Point p = PositionMapper.getTilePosition(pos);
             if (p == null) return;
-            p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y);
+            p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y, fractureYbump);
             p.translate(EXTRA_X, EXTRA_Y);
             points.put(pos, p);
         }
@@ -1826,7 +1840,7 @@ public class MapGenerator implements AutoCloseable {
             Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
             if (anchorProjectedPoint != null) {
                 Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
-                        game, playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y);
+                        game, playerStatsAnchor, anchorProjectedPoint.x, anchorProjectedPoint.y, fractureYbump);
                 Integer anchorLocationIndex =
                         PositionMapper.getRingSideNumberOfTileID(player.getPlayerStatsAnchorPosition());
                 anchorLocationIndex = anchorLocationIndex == null ? 0 : anchorLocationIndex - 1;
@@ -1959,6 +1973,20 @@ public class MapGenerator implements AutoCloseable {
         if (player.isSpeaker()) {
             String speakerID = Mapper.getTokenID(Constants.SPEAKER);
             String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+            if (speakerFile != null) {
+                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
+                point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
+                int negativeDelta = 0;
+                graphics.drawImage(
+                        bufferedImage,
+                        point.x + deltaX + deltaSplitX + negativeDelta,
+                        point.y + deltaY - deltaSplitY,
+                        null);
+                graphics.setColor(Color.WHITE);
+            }
+        }
+        if (player.isTyrant()) {
+            String speakerFile = ResourceHelper.getInstance().getTokenFile("tyrant");
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
@@ -2342,7 +2370,7 @@ public class MapGenerator implements AutoCloseable {
                 maxY = Math.max(maxY, y);
             }
 
-            positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y);
+            positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y, fractureYbump);
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 

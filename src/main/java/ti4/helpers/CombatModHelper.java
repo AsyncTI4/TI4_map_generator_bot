@@ -1,13 +1,16 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Units.UnitKey;
@@ -15,6 +18,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -186,6 +190,24 @@ public class CombatModHelper {
                         relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
             }
         }
+        if (player.hasTech("tf-zealous")) {
+            Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
+                    .filter(modifier -> modifier.isRelevantTo(Constants.LEADER, "argentcommander"))
+                    .findFirst();
+
+            if (relevantMod.isPresent()
+                    && checkModPassesCondition(
+                            relevantMod.get(),
+                            tile,
+                            player,
+                            opponent,
+                            unitsByQuantity,
+                            opponentUnitsByQuantity,
+                            game)) {
+                modifiers.add(new NamedCombatModifierModel(
+                        relevantMod.get(), Mapper.getLeader("argentcommander").getName()));
+            }
+        }
 
         for (Leader leader : game.playerUnlockedLeadersOrAlliance(player)) {
             if (leader.isExhausted() || leader.isLocked()) {
@@ -337,8 +359,7 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_HAS_FRAGILE ->
-                meetsCondition =
-                        player.getAbilities().contains("fragile") && !ButtonHelper.isLawInPlay(game, "articles_war");
+                meetsCondition = player.hasAbility("fragile") && !ButtonHelper.isLawInPlay(game, "articles_war");
             case Constants.MOD_OPPONENT_NO_CC_FLEET ->
                 meetsCondition = !player.getMahactCC().contains(opponent.getColor());
             case "next_to_structure" ->
@@ -380,6 +401,16 @@ public class CombatModHelper {
             case Constants.MOD_NEBULA_DEFENDER -> {
                 if ((onTile.isNebula() || tile.isNebula())
                         && !game.getActivePlayerID().equals(player.getUserID())
+                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
+                        && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
+                    meetsCondition = true;
+                }
+            }
+            case "nebula_cosmic_defender" -> {
+                if (game.isCosmicPhenomenaeMode()
+                        && (onTile.isNebula() || tile.isNebula())
+                        && !game.getActivePlayerID().equals(player.getUserID())
+                        && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
                     meetsCondition = true;
                 }
@@ -431,8 +462,25 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "galvanized" -> {
+                if (tile != null) {
+                    UnitHolder uh = getCorrectUnitHolder(unitsByQuantity, tile, opponent);
+                    for (UnitKey uk :
+                            uh.getUnitsByStateForPlayer(player.getColorID()).keySet()) {
+                        if (uh.getGalvanizedUnitCount(uk) > 0) {
+                            meetsCondition = true;
+                        }
+                    }
+                }
+            }
             case "opponent_has_sftt" -> {
                 if (player.hasUnlockedBreakthrough("winnubt") && getOpponentSfttCount(opponent) > 0) {
+                    meetsCondition = true;
+                }
+            }
+            case "opponent_has_been_asailed" -> {
+                if (player.hasAbility("marionettes")
+                        && player.getPuppetedFactionsForPlot("assail").contains(opponent.getFaction())) {
                     meetsCondition = true;
                 }
             }
@@ -487,6 +535,13 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "wildMB" -> {
+                if (game.isWildWildGalaxyMode()
+                        && !game.getStoredValue("wildMB" + player.getFaction()).isEmpty()) {
+                    game.removeStoredValue("wildMB" + player.getFaction());
+                    meetsCondition = true;
+                }
+            }
             case "sigma_argent_flagship_1" ->
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere(
                         "sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
@@ -501,6 +556,23 @@ public class CombatModHelper {
             default -> meetsCondition = true;
         }
         return meetsCondition;
+    }
+
+    public static UnitHolder getCorrectUnitHolder(Map<UnitModel, Integer> units, Tile t, Player p) {
+        record UhScore(UnitHolder uh, int score) {}
+        return t.getUnitHolders().values().stream()
+                .map(uh -> {
+                    int score = 0;
+                    for (Entry<UnitModel, Integer> e : units.entrySet()) {
+                        UnitKey uk = Units.getUnitKey(e.getKey().getUnitType(), p.getColorID());
+                        if (uh.getUnitCount(uk) == e.getValue()) score++;
+                    }
+                    return new UhScore(uh, score);
+                })
+                .sorted(Comparator.comparingInt(UhScore::score).reversed())
+                .findFirst()
+                .map(UhScore::uh)
+                .orElse(t.getSpaceUnitHolder());
     }
 
     private static Integer getVariableModValue(
@@ -643,8 +715,18 @@ public class CombatModHelper {
                     scalingCount += count;
                     scalingCount = Math.min(scalingCount, 2);
                 }
-                case "opponent_sftt" -> getOpponentSfttCount(opponent);
-                case "unique_ships" -> getUniqueNonFighterShipCount(game, activeSystem, player);
+                case "opponent_sftt" -> {
+                    scalingCount = getOpponentSfttCount(opponent);
+                }
+                case "nonhome_system_with_planet" -> {
+                    scalingCount = getSystemsWithControlledPlanets(game, player);
+                }
+                case "galvanized_unit_count" -> {
+                    scalingCount = getGalvanizedUnitCount(game, activeSystem, origUnit, player);
+                }
+                case "unique_ships" -> {
+                    scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
+                }
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
@@ -689,5 +771,27 @@ public class CombatModHelper {
                 .map(Mapper::getPromissoryNote)
                 .filter(pn -> pn.getName().equals("Support for the Throne"))
                 .count();
+    }
+
+    public static int getSystemsWithControlledPlanets(Game game, Player player) {
+        return (int) player.getPlanetsAllianceMode().stream()
+                .map(game::getTileFromPlanet)
+                .distinct()
+                .filter(Objects::nonNull)
+                .filter(Predicate.not(Tile::isHomeSystem))
+                .count();
+    }
+
+    public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {
+        UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
+        UnitHolder space = activeSystem.getSpaceUnitHolder();
+        if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+            for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+                if (planet.getUnitCount(uk) > 0) {
+                    space = planet;
+                }
+            }
+        }
+        return space.getGalvanizedUnitCount(uk);
     }
 }

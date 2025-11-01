@@ -2,8 +2,11 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -17,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
+import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -43,6 +47,11 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ActionCardHelper {
+    public enum ACStatus {
+        ralnelbt,
+        garbozia,
+        purged;
+    }
 
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
@@ -55,7 +64,85 @@ public class ActionCardHelper {
                     getPlayActionCardButtons(game, player));
         }
 
+        if (game.isWildWildGalaxyMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "This is a reminder that in Wild Wild Galaxy mode, each of the 4 of a type Action Cards are modified in some way. The text you see may not be entirely accurate as a result.");
+        }
+
         sendTrapCardInfo(player);
+        sendPlotCardInfo(game, player);
+        sendGarboziaInfo(game, player);
+    }
+
+    private static void sendGarboziaInfo(Game game, Player player) {
+        if (player.hasPlanet("garbozia")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    getGarboziaInfo(game, player),
+                    getPurgeGarboziaActionCardButtons(game));
+        }
+    }
+
+    private static String getGarboziaInfo(Game game, Player player) {
+        StringBuilder sb = new StringBuilder();
+        // ACTION CARDS
+        sb.append("### ")
+                .append(MiscEmojis.LegendaryPlanet)
+                .append(" **Garbozia Action Cards:**")
+                .append("\n");
+
+        Map<String, Integer> actionCards = game.getDiscardActionCards();
+        if (actionCards == null || actionCards.isEmpty()) {
+            sb.append("> None");
+            return sb.toString();
+        }
+
+        int index = 1;
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            ACStatus status = game.getDiscardACStatus().getOrDefault(ac.getKey(), null);
+            if (status != ACStatus.garbozia) continue;
+
+            Integer value = ac.getValue();
+            ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
+            sb.append("`")
+                    .append(index)
+                    .append(".")
+                    .append(Helper.leftpad("(" + value, 4))
+                    .append(")`");
+            if (actionCard == null) {
+                sb.append("Something broke here");
+            } else {
+                sb.append(actionCard.getRepresentation());
+            }
+            index++;
+        }
+        return sb.toString();
+    }
+
+    private static Map<String, Integer> getGarboziaActionCards(Game game) {
+        Map<String, Integer> cards = new HashMap<>();
+        for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
+            if (discard.getValue() != ACStatus.garbozia) continue;
+            Integer ident = game.getDiscardActionCards().get(discard.getKey());
+            cards.put(discard.getKey(), ident);
+        }
+        return cards;
+    }
+
+    private static List<Button> getPurgeGarboziaActionCardButtons(Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (Entry<String, Integer> card : getGarboziaActionCards(game).entrySet()) {
+            String key = card.getKey();
+            Integer ident = card.getValue();
+            ACStatus status = game.getDiscardACStatus().get(key);
+            if (status == ACStatus.garbozia) {
+                String id = Constants.AC_PLAY_FROM_HAND + ident;
+                String label = Mapper.getActionCard(card.getKey()).getName();
+                buttons.add(Buttons.red(id, label, CardEmojis.ActionCard));
+            }
+        }
+        return buttons;
     }
 
     private static void sendTrapCardInfo(Player player) {
@@ -110,7 +197,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
+    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
         GenericCardModel trap = Mapper.getTrap(trapID);
         String planet = trapCardsPlanets.get(trapID);
@@ -122,9 +209,93 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("\n> Planet: ").append(representation);
+            sb.append("\n> Planet: ").append(representation).append("");
         }
         sb.append("\n");
+        return sb.toString();
+    }
+
+    public static void sendPlotCardInfo(Game game, Player player) {
+        if (player.hasAbility("plotsplots")
+                || player.hasAbility("bladesorchestra")
+                || player.hasAbility("puppetsoftheblade")) { // firmament/obsidian plot abilities
+            List<Button> buttons = getPlotCardButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(), getPlotCardInfo(game, player), buttons);
+        }
+    }
+
+    public static List<Button> getPlotCardButtons(Game game, Player player) {
+        boolean hasManageAbility = false;
+        if (player.hasAbility("plotsplots")) hasManageAbility = true;
+        if (player.hasLeader("firmamenthero")) hasManageAbility = true;
+        if (!hasManageAbility) return new ArrayList<>();
+
+        List<Button> buttons = new ArrayList<>();
+        player.getPlotCards().entrySet().stream()
+                .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
+                .sorted(Comparator.comparingInt(Entry::getKey))
+                .forEachOrdered(plotEntry -> {
+                    GenericCardModel plot = plotEntry.getValue();
+                    String buttonID = "addFactionTokenToPlot_" + plot.getAlias();
+                    String buttonText = plot.getName();
+                    buttons.add(Buttons.green(buttonID, buttonText));
+                });
+        player.getPlotCards().entrySet().stream()
+                .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
+                .sorted(Comparator.comparingInt(Entry::getKey))
+                .forEachOrdered(plotEntry -> {
+                    GenericCardModel plot = plotEntry.getValue();
+                    String buttonID = "removeFactionTokenFromPlot_" + plot.getAlias();
+                    String buttonText = "Remove from " + plot.getName();
+                    List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
+                    if (factions != null && !factions.isEmpty()) {
+                        buttons.add(Buttons.red(buttonID, buttonText));
+                    }
+                });
+        return buttons;
+    }
+
+    public static List<Button> getFactionButtonsForPlot(Game game, Player player, String plotID, String prefix) {
+        List<Button> buttons = new ArrayList<>();
+        List<String> factions = player.getPuppetedFactionsForPlot(plotID);
+        game.getRealPlayers().stream().forEach(p -> {
+            boolean valid = factions == null || !factions.contains(p.getFaction());
+            if (prefix.startsWith("remove")) valid = factions != null && factions.contains(p.getFaction());
+            if (valid) {
+                String id = prefix + plotID + "_" + p.getFaction();
+                buttons.add(Buttons.gray(id, "", p.getFactionEmoji()));
+            }
+        });
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        return buttons;
+    }
+
+    public static String getPlotCardInfo(Game game, Player player) {
+        StringBuilder sb = new StringBuilder("### **__Plot Cards:__**\n");
+        player.getPlotCards().entrySet().stream()
+                .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
+                .sorted(Comparator.comparingInt(Entry::getKey))
+                .forEachOrdered(plotEntry -> {
+                    GenericCardModel plot = plotEntry.getValue();
+                    Integer value = plotEntry.getKey();
+                    List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
+                    sb.append("`").append(Helper.leftpad("(" + value, 3)).append(")`");
+                    sb.append(getPlotCardRepresentation(game, plot, factions));
+                });
+        return sb.toString();
+    }
+
+    private static String getPlotCardRepresentation(Game game, GenericCardModel plot, List<String> factions) {
+        StringBuilder sb = new StringBuilder(plot.getRepresentation()).append("\n");
+        if (factions != null) {
+            List<String> factionEmojis = factions.stream()
+                    .map(game::getPlayerFromColorOrFaction)
+                    .filter(x -> x != null)
+                    .map(Player::getFactionEmoji)
+                    .toList();
+            sb.append("> ").append(String.join(", ", factionEmojis)).append("\n");
+        }
         return sb.toString();
     }
 
@@ -214,7 +385,33 @@ public class ActionCardHelper {
                 "deflection",
                 "summit",
                 "bounty_contracts");
-        return CollectionUtils.containsAny(prePlayable, player.getActionCards().keySet());
+        List<String> actionCards = new ArrayList<>();
+        actionCards.addAll(player.getActionCards().keySet());
+        if (player.hasPlanet("garbozia")) {
+            actionCards.addAll(getGarboziaActionCards(player.getGame()).keySet());
+        }
+        return CollectionUtils.containsAny(prePlayable, actionCards);
+    }
+
+    public static List<Button> getGarboziaComponentActionCards(Game game, Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> garboziaCards = getGarboziaActionCards(player.getGame());
+        if (player.hasPlanet("garbozia") && !garboziaCards.isEmpty()) {
+            for (Entry<String, Integer> ac : garboziaCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null && "action".equalsIgnoreCase(actionCardWindow)) {
+                    acButtons.add(Buttons.red(
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + ac_name,
+                            MiscEmojis.LegendaryPlanet));
+                }
+            }
+        }
+        return acButtons;
     }
 
     public static List<Button> getActionPlayActionCardButtons(Player player) {
@@ -234,6 +431,32 @@ public class ActionCardHelper {
                 if (acName != null && "action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                }
+            }
+        }
+        acButtons.addAll(getGarboziaComponentActionCards(player.getGame(), player));
+        return acButtons;
+    }
+
+    public static List<Button> getGarboziaCombatActionCards(Game game, Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> garboziaCards = getGarboziaActionCards(player.getGame());
+        if (player.hasPlanet("garbozia") && !garboziaCards.isEmpty()) {
+            for (Entry<String, Integer> ac : garboziaCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null) {
+                    if (actionCardWindow.contains("combat")
+                            || actionCardWindow.contains("roll")
+                            || actionCardWindow.contains("hit")) {
+                        acButtons.add(Buttons.red(
+                                Constants.AC_PLAY_FROM_HAND + value,
+                                "(" + value + ") " + ac_name,
+                                MiscEmojis.LegendaryPlanet));
+                    }
                 }
             }
         }
@@ -262,6 +485,7 @@ public class ActionCardHelper {
                 }
             }
         }
+        acButtons.addAll(getGarboziaCombatActionCards(player.getGame(), player));
         return acButtons;
     }
 
@@ -396,6 +620,27 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 
+    public static String playACFromGarbozia(
+            GenericInteractionCreateEvent event, Game game, Player player, String value) {
+        String acID = null;
+        int acIndex = -1;
+        try {
+            acIndex = Integer.parseInt(value);
+            for (Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
+                if (ac.getValue().equals(acIndex)) {
+                    acID = ac.getKey();
+                }
+            }
+        } catch (Exception e) {
+            return "Error parsing ID";
+        }
+
+        if (acID == null) {
+            return "No such Action Card ID found, please retry";
+        }
+        return resolveActionCard(event, game, player, acID, acIndex, null);
+    }
+
     public static String resolveActionCard(
             GenericInteractionCreateEvent event,
             Game game,
@@ -411,12 +656,14 @@ public class ActionCardHelper {
         String activePlayerID = game.getActivePlayerID();
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = game.getPlayer(activePlayerID);
-            if (activePlayer != null && activePlayer.hasTech("tp")) {
+            if (activePlayer != null && (activePlayer.hasTech("tp") || activePlayer.hasTech("tf-crafty"))) {
                 return "You are passed and the active player owns _Transparasteel Plating_, preventing you from playing action cards.";
             }
         }
 
-        if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
+        if ("Action".equalsIgnoreCase(actionCardWindow)
+                && game.getPlayer(activePlayerID) != player
+                && !game.isTwilightsFallMode()) {
             return "You are trying to play an action card with a component action, and the game does not think you are the active player."
                     + " You may fix this with `/player turn_start`. Until then, you are #denied.";
         }
@@ -452,20 +699,31 @@ public class ActionCardHelper {
         }
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
+        if (game.isWildWildGalaxyMode() && actionCard.getName().toLowerCase().contains("morale boost")) {
+            game.setStoredValue("wildMB" + player.getFaction(), "yes");
+        }
 
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played the _" + actionCardTitle
                         + "_ action card.");
 
-        if (player.hasAbility("cybernetic_madness")) {
+        boolean fromGarbozia = false;
+        if (player.hasPlanet("garbozia") && game.getDiscardACStatus().getOrDefault(acID, null) == ACStatus.garbozia) {
+            game.getDiscardACStatus().put(acID, ACStatus.purged);
+            if (!game.isFowMode()) {
+                fromGarbozia = true;
+            }
+        } else if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
         } else {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation())
-                + " played the action card _" + actionCardTitle + "_.";
+        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation());
+        message += fromGarbozia ? " purged " : " played ";
+        message += "the action card _" + actionCardTitle + "_";
+        message += fromGarbozia ? " using Garbozia." : ".";
 
         List<Button> buttons = new ArrayList<>();
         Button sabotageButton = Buttons.red(
@@ -492,6 +750,23 @@ public class ActionCardHelper {
                             + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
                     empyButtons);
         }
+        Player tfTriune = Helper.getPlayerFromUnit(game, "tf-triune");
+        if (tfTriune != null && ButtonHelperFactionSpecific.isNextToTriunes(game, player, tfTriune)) {
+            Button tfButton = Buttons.gray(
+                    "sabotage_tf_" + actionCardTitle + "_" + player.getFaction(),
+                    "Cancel " + actionCardTitle + " With Triunes",
+                    UnitEmojis.fighter);
+            List<Button> tfButtons = new ArrayList<>();
+            tfButtons.add(tfButton);
+            Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
+            tfButtons.add(refuse);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    tfTriune.getCardsInfoThread(),
+                    tfTriune.getRepresentationUnfogged()
+                            + "You have three fighters adjacent to some units of the player who played _"
+                            + actionCardTitle + "_. Use buttons to decide whether to Shatter this action card.",
+                    tfButtons);
+        }
         String instinctTrainingID = "it";
         for (Player player2 : game.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
@@ -510,18 +785,35 @@ public class ActionCardHelper {
             }
         }
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
-        if (acID.contains("sabo")) {
+        if (!game.isFowMode() && event instanceof ButtonInteractionEvent bEvent) {
+            if (bEvent.getChannel().getName().toLowerCase().contains("-vs-")) {
+                MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
+            }
+        }
+        if (acID.contains("sabo") || acID.contains("shatter")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+            if (game.isWildWildGalaxyMode()) {
+                Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + " You can use this button to pick up the sabod card from the discard, per Wild Wild Galaxy",
+                        List.of(codex1));
+            }
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
             String automationID = actionCard.getAutomationID();
 
             if (Helper.isSaboAllowed(game, player)) {
                 // Can be "sabotaged", basically every card
-                buttons.add(Buttons.blue("no_sabotage", "No Sabotage", MiscEmojis.NoSabo));
+                String sabo = "Sabotage";
+                if (game.isTwilightsFallMode()) {
+                    sabo = "Shatter";
+                }
+                buttons.add(Buttons.blue("no_sabotage", "No " + sabo, MiscEmojis.NoSabo));
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For Sabo"));
+                        "Pause Timer While Waiting For " + sabo));
                 MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
                         mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
@@ -552,7 +844,7 @@ public class ActionCardHelper {
                                 player.finChecker() + "increaseTGonSC_" + sc, Helper.getSCName(sc, game), scEmoji);
                     } else {
                         button = Buttons.gray(
-                                player.finChecker() + "deflectSC_" + sc, sc + " " + Helper.getSCName(sc, game));
+                                player.finChecker() + "increaseTGonSC_" + sc, sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
                 }
@@ -563,7 +855,7 @@ public class ActionCardHelper {
                                 + ", please use buttons to increase trade goods on strategy cards. Each button press adds 1 trade good.",
                         scButtons);
             }
-            if ("deflection".equals(automationID)) {
+            if ("deflection".equals(automationID) || "tf-tartarus".equals(automationID)) {
                 List<Button> scButtons = new ArrayList<>();
                 for (int sc : game.getSCList()) {
                     TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
@@ -579,7 +871,8 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
-                        player.getRepresentation() + " Use buttons to choose which strategy card will be _Deflect_'d.",
+                        player.getRepresentation()
+                                + " Use buttons to choose which strategy card will be the target of your AC.",
                         scButtons);
             }
 
@@ -665,13 +958,6 @@ public class ActionCardHelper {
                         introMsg + " A reminder that since you are researching,"
                                 + " you need not declare what technology you will get until after other players have chosen whether they will Sabo.",
                         codedButtons);
-            }
-
-            if ("spatial_collapse".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "spatialCollapseStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        channel2, introMsg + String.format(targetMsg, "systems"), codedButtons);
             }
 
             if ("side_project".equals(automationID)) {
@@ -861,11 +1147,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
-            if ("parley".equals(automationID)) {
+            if ("parley".equals(automationID) || "tf-pax".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveParleyStep1", buttonLabel));
-                // MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg,
-                // "player"), codedButtons);
             }
 
             if ("f_deployment".equals(automationID)) {
@@ -913,21 +1197,15 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("mercenary_contract".equals(automationID)) {
+            if ("rapid_fulfillment".equals(automationID)) {
                 codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveMercenaryContract", buttonLabel));
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRapidFulfillment", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("chain_reaction".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveChainReaction", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
-            }
-
-            if ("rendezvous".equals(automationID)) {
-                codedButtons.add(
-                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1128,6 +1406,133 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("tf-rise".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", "1 infantry on every planet"));
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 fighter with every ship"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
+                codedButtons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
+                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-evolve".equals(automationID)) {
+                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-helix".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "startSplice_7_all", "Initiate Ability Splice"));
+                codedButtons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome Splice"));
+                codedButtons.add(Buttons.blue(
+                        player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-reverse".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveReverseTF", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-engineer".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveEngineer", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-locust".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveLocust", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-create".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCreate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-scarab".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveScarab", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-irradiate".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveIrradiate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-ignis".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveIgnis", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-atomize".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAtomize", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-flux".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "resolveUnexpected", "Lift a Command Token"));
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "resolveSignalJammingStep1", "Place a Command Token"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-starflare".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveStarFlare", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-converge".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveConverge", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-lash".equals(automationID)) {
+                MessageHelper.sendMessageToChannel(
+                        channel2,
+                        introMsg
+                                + "\nJust tell the opponent what unit to destroy. They can use the assign hits button to do so.");
+            }
+
+            if ("tf-magnificence".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveMagnificence", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if ("tf-genophage".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveGenophage", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-coerce".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCoerce", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-transpose1".equals(automationID) || "tf-transpose2".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveTranspose", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-reflect".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "convertComms_1_stay",
+                        "Convert 1 Commodity to Trade Good",
+                        MiscEmojis.Wash));
+                codedButtons.add(Buttons.blue(
+                        player.getFinsFactionCheckerPrefix() + "gainComms_1_stay",
+                        "Gain 1 Commodity",
+                        MiscEmojis.comm));
+                codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-thieve".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveThieve", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-elevate".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "drawParadigmAC", "Draw Paradigm"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if ("messiah".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1198,6 +1603,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
+            TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
@@ -1209,7 +1615,8 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (actionCardWindow.contains("After an agenda is revealed")) {
+            if (actionCardWindow.contains("After an agenda is revealed")
+                    || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                 // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No
                 // Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
@@ -1233,11 +1640,13 @@ public class ActionCardHelper {
                 }
                 if ("hack".equals(automationID)) {
                     game.setHasHackElectionBeenPlayed(true);
+                    game.setStoredValue("hackElectionFaction", player.getFaction());
                     Button resetHack = Buttons.red("hack_election", "Set the Voting Order as Normal");
                     List<Button> hackButtons = List.of(resetHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(
                             mainGameChannel,
-                            "Voting order has been reversed." + " Please hit this button if _Hack Election_ is Sabo'd.",
+                            "The player who played hack election will now vote last."
+                                    + " Please hit this button if _Hack Election_ is Sabo'd.",
                             game,
                             player,
                             hackButtons);
@@ -1274,7 +1683,7 @@ public class ActionCardHelper {
                 //     "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
 
-            if ("Action".equalsIgnoreCase(actionCardWindow)) {
+            if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) == player) {
                 game.setJustPlayedComponentAC(true);
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -1290,6 +1699,7 @@ public class ActionCardHelper {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
                 serveReverseEngineerButtons(game, player, List.of(acID));
+                serveTwinningButtons(game, player, List.of(acID));
             }
         }
 
@@ -1330,6 +1740,7 @@ public class ActionCardHelper {
                         new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
                 if (actionCards.size() > 1) msg.append("one of the following cards:");
 
+                List<String> ralnel = new ArrayList<>();
                 List<Button> reverseButtons = new ArrayList<>();
                 String reversePrefix =
                         Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_reverse_";
@@ -1338,6 +1749,11 @@ public class ActionCardHelper {
                     ActionCardModel model = Mapper.getActionCard(acID);
                     if (!model.getWindow().toLowerCase().startsWith("action")) {
                         continue;
+                    }
+
+                    if (game.getDiscardACStatus().get(acID) != null) {
+                        if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
+                        continue; // on RN bt or garbozia or purged
                     }
 
                     String id = reversePrefix + model.getName();
@@ -1350,6 +1766,57 @@ public class ActionCardHelper {
                     reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), msg.toString(), reverseButtons);
+                }
+                if (!ralnel.isEmpty()) {
+                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
+                }
+            }
+        }
+    }
+
+    public static void serveTwinningButtons(Game game, Player discardingPlayer, List<String> actionCards) {
+        for (Player player : game.getRealPlayers()) {
+            if (player == discardingPlayer) continue;
+            if (IsPlayerElectedService.isPlayerElected(game, player, "censure")) continue;
+            if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
+
+            String reverseEngineerID = "tf-twinning";
+            if (player.getActionCards().containsKey(reverseEngineerID)) {
+                StringBuilder msg =
+                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
+                if (actionCards.size() > 1) msg.append("one of the following cards:");
+
+                List<String> ralnel = new ArrayList<>();
+                List<Button> reverseButtons = new ArrayList<>();
+                String reversePrefix =
+                        Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_twinning_";
+
+                for (String acID : actionCards) {
+                    ActionCardModel model = Mapper.getActionCard(acID);
+                    if (!model.getWindow().toLowerCase().startsWith("action")) {
+                        continue;
+                    }
+
+                    if (game.getDiscardACStatus().get(acID) != null) {
+                        if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
+                        continue; // on RN bt or garbozia or purged
+                    }
+
+                    String id = reversePrefix + model.getName();
+                    String label = "Twin " + model.getName();
+                    reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+                }
+
+                if (!reverseButtons.isEmpty()) {
+                    reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), msg.toString(), reverseButtons);
+                }
+                if (!ralnel.isEmpty()) {
+                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
                 }
             }
         }
@@ -1373,26 +1840,33 @@ public class ActionCardHelper {
         int acIndex = -1;
         try {
             acIndex = Integer.parseInt(value);
-            for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-                if (so.getValue().equals(acIndex)) {
-                    acID = so.getKey();
+            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+                if (ac.getValue().equals(acIndex)) {
+                    acID = ac.getKey();
                 }
+            }
+            if (acID == null) {
+                acID = getGarboziaACIdentByNumber(game, player, acIndex);
             }
         } catch (Exception e) {
             boolean foundSimilarName = false;
             String cardName = "";
-            for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
-                String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
-                if (actionCardName != null) {
-                    actionCardName = actionCardName.toLowerCase();
-                    if (actionCardName.contains(value) || ac.getKey().equalsIgnoreCase(value)) {
-                        if (foundSimilarName && !cardName.equals(actionCardName)) {
-                            return "Multiple cards with similar name founds, please use ID";
+            if ((acID = getGarboziaACIdentByAlias(game, player, value)) != null) {
+                acIndex = game.getDiscardActionCards().get(acID);
+            } else {
+                for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+                    String actionCardName = Mapper.getActionCard(ac.getKey()).getName();
+                    if (actionCardName != null) {
+                        actionCardName = actionCardName.toLowerCase();
+                        if (actionCardName.contains(value) || ac.getKey().equalsIgnoreCase(value)) {
+                            if (foundSimilarName && !cardName.equals(actionCardName)) {
+                                return "Multiple cards with similar name founds, please use ID";
+                            }
+                            acID = ac.getKey();
+                            acIndex = ac.getValue();
+                            foundSimilarName = true;
+                            cardName = actionCardName;
                         }
-                        acID = ac.getKey();
-                        acIndex = ac.getValue();
-                        foundSimilarName = true;
-                        cardName = actionCardName;
                     }
                 }
             }
@@ -1401,6 +1875,28 @@ public class ActionCardHelper {
             return "No such Action Card ID found, please retry";
         }
         return resolveActionCard(event, game, player, acID, acIndex, channel);
+    }
+
+    private static String getGarboziaACIdentByAlias(Game game, Player player, String key) {
+        if (player.hasPlanet("garbozia")) {
+            for (Entry<String, ACStatus> entry : game.getDiscardACStatus().entrySet()) {
+                if (entry.getValue() != ACStatus.garbozia) continue;
+                if (entry.getKey().equals(key)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    private static String getGarboziaACIdentByNumber(Game game, Player player, int key) {
+        if (player.hasPlanet("garbozia")) {
+            for (Entry<String, ACStatus> entry : game.getDiscardACStatus().entrySet()) {
+                if (entry.getValue() != ACStatus.garbozia) continue;
+                if (game.getDiscardActionCards().get(entry.getKey()).equals(key)) return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public static void sendActionCard(
@@ -1597,7 +2093,7 @@ public class ActionCardHelper {
                 .append(" to each of: ");
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
                 if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;
@@ -1677,16 +2173,23 @@ public class ActionCardHelper {
                     break;
                 }
             }
-
-            if (!blockaded && (hasCap || hasSD)) {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
-                tilesAffected.add(tile);
+            if (game.isTwilightsFallMode()) {
+                if (FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
+                    tilesAffected.add(tile);
+                }
+            } else {
+                if (!blockaded && (hasCap || hasSD)) {
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "ff");
+                    tilesAffected.add(tile);
+                }
             }
         }
 
         String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
         if (!tilesAffected.isEmpty()) {
             msg += " Please check fleet size and capacity in each of the systems: ";
+            ButtonHelper.checkFleetInEveryTile(player, game);
         }
         boolean first = true;
         StringBuilder msgBuilder = new StringBuilder(msg);

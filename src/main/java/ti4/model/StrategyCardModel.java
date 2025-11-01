@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
 
 @Data
 public class StrategyCardModel implements ModelInterface, EmbeddableModel {
@@ -47,12 +49,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
 
         // TITLE
-        sb.append("**")
-                .append(initiative)
-                .append("** __")
-                .append(name)
-                .append("__")
-                .append(source.emoji());
+        sb.append(getEmojiWordRepresentation()).append(source.emoji());
         eb.setTitle(sb.toString());
 
         // PRIMARY
@@ -156,11 +153,60 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null
-                && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
+        return imageFileName != null && getImageFilePath() != null;
     }
 
     public String getImageFilePath() {
         return ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png");
+    }
+
+    @Deprecated
+    public String getImageUrl() {
+        return imageURL;
+    }
+
+    public String getImageFileUrl() {
+        String urlBase =
+                "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/strat_cards/";
+        if (hasImageFile()) {
+            return urlBase + imageFileName + ".png";
+        } else {
+            return urlBase + "sadFace.png";
+        }
+    }
+
+    @Nullable
+    public String getEmojiWordRepresentation() {
+        switch (source) {
+            case pok, base, thunders_edge, codex1 -> {
+                return switch (initiative) {
+                    case 1 -> CardEmojis.SC1Mention();
+                    case 2 -> CardEmojis.SC2Mention();
+                    case 3 -> CardEmojis.SC3Mention();
+                    case 4 -> CardEmojis.SC4Mention();
+                    case 5 -> CardEmojis.SC5Mention();
+                    case 6 -> CardEmojis.SC6Mention();
+                    case 7 -> CardEmojis.SC7Mention();
+                    case 8 -> CardEmojis.SC8Mention();
+                    default -> null;
+                };
+            }
+            case twilights_fall -> {
+                return switch (initiative) {
+                    case 1 -> CardEmojis.TFSC1Mention();
+                    case 2 -> CardEmojis.TFSC2Mention();
+                    case 3 -> CardEmojis.TFSC3Mention();
+                    case 4 -> CardEmojis.TFSC4Mention();
+                    case 5 -> CardEmojis.TFSC5Mention();
+                    case 6 -> CardEmojis.TFSC6Mention();
+                    case 7 -> CardEmojis.TFSC7Mention();
+                    case 8 -> CardEmojis.TFSC8Mention();
+                    default -> null;
+                };
+            }
+            default -> {
+                return "**SC" + initiative + "[" + name + "]**";
+            }
+        }
     }
 }

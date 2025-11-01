@@ -6,10 +6,12 @@ import java.util.function.Consumer;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.map.AddTileListService;
 
 /**
@@ -254,8 +256,8 @@ public class DraftManager extends DraftPlayerManager {
         if (blockingSetup != null) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    "The draft has ended. Some additional setup needs to happen before the game can start: "
-                            + blockingSetup);
+                    game.getPing()
+                            + "The draft has ended. Some additional setup needs to happen before the game can start. Check your cards info threads for details.");
         } else {
             trySetupPlayers(event);
         }
@@ -319,9 +321,13 @@ public class DraftManager extends DraftPlayerManager {
             Player player = game.getPlayer(userId);
 
             // Default color if not set
-            if (playerSetupState.getColor() == null) {
+            boolean playerHasColor =
+                    player.getColor() != null && !player.getColor().equals("null");
+            if (!playerHasColor && playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);
+            } else if (playerHasColor && playerSetupState.getColor() == null) {
+                playerSetupState.setColor(player.getColor());
             }
 
             // Do common setup chores
@@ -337,6 +343,11 @@ public class DraftManager extends DraftPlayerManager {
         game.setPhaseOfGame("playerSetup");
         AddTileListService.finishSetup(game, event);
         ButtonHelper.updateMap(game, event);
+
+        if (game.isTwilightsFallMode()) {
+            game.setBagDraft(new InauguralSpliceFrankenDraft(game));
+            FrankenDraftBagService.startDraft(game);
+        }
     }
 
     public String whatsStoppingSetup() {

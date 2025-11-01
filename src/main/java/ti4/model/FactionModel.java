@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +41,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private String factionReferenceImageURL;
     private String wikiURL;
     private List<String> preferredColours;
+    private Integer priorityNumber;
 
     public boolean isValid() {
         return alias != null
@@ -130,6 +131,14 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     private Optional<String> getWikiURL() {
         return Optional.ofNullable(wikiURL);
+    }
+
+    public String getBreakthrough() {
+        String breakthrough = getAlias() + "bt";
+        if (breakthrough.contains("keleres")) {
+            breakthrough = "keleresbt";
+        }
+        return breakthrough;
     }
 
     public List<String> getPreferredColours() {

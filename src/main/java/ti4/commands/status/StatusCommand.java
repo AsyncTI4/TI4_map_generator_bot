@@ -26,7 +26,8 @@ public class StatusCommand implements ParentCommand {
                     new ListDiceLuck(),
                     new ListSpends(),
                     new MarkFollowed(),
-                    new POInfo())
+                    new POInfo(),
+                    new ShufflePublicDeck())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

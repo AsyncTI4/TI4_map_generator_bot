@@ -7,5 +7,5 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class TeHelperDemo {
     @Getter
-    private static final List<String> ExcludedFactions = List.of("titans", "cabal", "argent");
+    private static final List<String> ExcludedFactions = List.of("cabal");
 }

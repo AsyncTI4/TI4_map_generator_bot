@@ -46,7 +46,6 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
-import ti4.service.option.TEOptionService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
@@ -261,27 +260,31 @@ public class CreateGameService {
         MessageHelper.sendMessageToChannelWithButton(
                 actionsChannel, "Want to change Game options?\n-# `/game options`", offerOptions);
 
-        boolean abbreviateTE = false;
-        for (Player player : game.getPlayers().values()) {
-            if (ButtonHelper.isPlayerNew(player.getUserID())
-                    || player.getUserID().equalsIgnoreCase("481860200169472030")) {
-                abbreviateTE = true;
-                break;
-            }
-        }
-        if (abbreviateTE) {
-            Button teOptions = Buttons.green("offerTEOptionButtons", "Thunder's Edge Settings");
-            MessageHelper.sendMessageToChannelWithButton(
-                    actionsChannel, "Want to demo some of Thunder's Edge features?", teOptions);
-        } else {
-            TEOptionService.offerTEOptionButtons(game, actionsChannel);
-        }
-
         HomebrewService.offerGameHomebrewButtons(actionsChannel);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
         MessageHelper.sendMessageToChannel(
                 actionsChannel,
                 "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
+        Button teOptions = Buttons.green("offerTEOptionButtons", "Galactic Events");
+        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Enable Galactic Events", teOptions);
+
+        Button tfOptions = Buttons.green("startTFGame", "Start Twilight's Fall Game");
+        MessageHelper.sendMessageToChannelWithButton(
+                actionsChannel,
+                "If you want to start a Twilight's Fall Game (alternate game mode included in Thunder's Edge) use this button",
+                tfOptions);
+
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
+        buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
+        buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
+        String expMsg =
+                "Which expansion are you using for this game?\n-# This will adjust available components accordingly. To elaborate on the options:\n"
+                        + "> **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.\n"
+                        + "> **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5\n"
+                        + "> **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge."
+                        + "\n-# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.";
+        MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {

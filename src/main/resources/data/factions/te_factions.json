@@ -45,13 +45,14 @@
             "pds",
             "bastion_spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 21
     },
     {
         "alias": "deepwrought",
         "factionName": "The Deepwrought Scholarate",
         "homeSystem": "95",
-        "startingFleet": "2 inf i, 1 inf o, sd i, 4 ff, cv, dn",
+        "startingFleet": "3 inf i, sd i, 4 ff, cv, dn",
         "commodities": 3,
         "factionTech": [
             "hydrothermal",
@@ -86,23 +87,24 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 7
     },
     {
         "alias": "firmament",
         "factionName": "The Firmament",
         "homeSystem": "96a",
-        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd c",
         "commodities": 3,
         "factionTech": [
             "planesplitter-firm",
             "parasite-firm"
         ],
         "startingTechOptions": [
-            "dxa",
-            "bs",
-            "gls",
-            "pi"
+            "nm",
+            "pa",
+            "st",
+            "sdn"
         ],
         "startingTechAmount": 1,
         "homePlanets": [
@@ -133,25 +135,20 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 30
     },
     {
         "alias": "obsidian",
         "factionName": "The Obsidian",
         "homeSystem": "96b",
-        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd t",
+        "startingFleet": "1 inf c, 2 inf t, cv, 3 ff, ca, dd, sd c",
         "commodities": 3,
         "factionTech": [
             "planesplitter-obs",
             "parasite-obs"
         ],
-        "startingTechOptions": [
-            "dxa",
-            "bs",
-            "gls",
-            "pi"
-        ],
-        "startingTechAmount": 1,
+        "startingTech": [],
         "homePlanets": [
             "cronoshollow",
             "tallinhollow"
@@ -187,13 +184,19 @@
         "alias": "crimson",
         "factionName": "The Crimson Rebellion",
         "homeSystem": "94",
-        "startingFleet": "4 inf a, sd a, 3 ff, cv, 2 dd",
+        "startingFleet": "4 inf a, sd a, 3 ff, pds a, cv, 2 dd",
         "commodities": 2,
         "factionTech": [
             "subatomic",
             "exile2"
         ],
-        "startingTech": [],
+        "startingTechOptions": [
+            "det",
+            "amd",
+            "ps",
+            "aida"
+        ],
+        "startingTechAmount": 1,
         "homePlanets": [
             "ahkcreuxx"
         ],
@@ -222,13 +225,14 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 16
     },
     {
         "alias": "ralnel",
         "factionName": "The Ral Nel Consortium",
-        "homeSystem": "",
-        "startingFleet": "",
+        "homeSystem": "93",
+        "startingFleet": "2 inf m, 2 inf r, cv, 2 ff, dn, pds r, pds m, dd, sd m",
         "commodities": 4,
         "factionTech": [
             "nanomachines",
@@ -241,7 +245,10 @@
             "aida"
         ],
         "startingTechAmount": 1,
-        "homePlanets": [],
+        "homePlanets": [
+            "mez",
+            "rep"
+        ],
         "abilities": [
             "survivalinstinct",
             "miniaturization"
@@ -266,6 +273,7 @@
             "pds",
             "spacedock"
         ],
-        "source": "thunders_edge"
+        "source": "thunders_edge",
+        "priorityNumber": 12
     }
 ]

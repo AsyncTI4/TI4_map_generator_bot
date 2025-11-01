@@ -92,7 +92,7 @@
     },
     {
         "alias": "planesplitter-firm",
-        "name": "Planesplitter",
+        "name": "Planesplitter (Firmament)",
         "types": [
             "CYBERNETIC"
         ],
@@ -103,7 +103,7 @@
     },
     {
         "alias": "parasite-firm",
-        "name": "Neural Parasite",
+        "name": "Neural Parasite (Firmament)",
         "types": [
             "BIOTIC"
         ],
@@ -114,7 +114,7 @@
     },
     {
         "alias": "planesplitter-obs",
-        "name": "Planesplitter",
+        "name": "Planesplitter (Obsidian)",
         "types": [
             "CYBERNETIC"
         ],
@@ -125,7 +125,7 @@
     },
     {
         "alias": "parasite-obs",
-        "name": "Neural Parasite",
+        "name": "Neural Parasite (Obsidian)",
         "types": [
             "BIOTIC"
         ],
@@ -142,7 +142,6 @@
         ],
         "requirements": "Y",
         "faction": "keleres",
-        "homebrewReplacesID": "iihq",
         "text": "ACTION: Exhaust this card and draw the top or bottom card of the Agenda deck. Players immediately vote on this agenda as if you were the speaker; you can spend trade goods and resources on this agenda as if they were votes.",
         "source": "thunders_edge"
     }

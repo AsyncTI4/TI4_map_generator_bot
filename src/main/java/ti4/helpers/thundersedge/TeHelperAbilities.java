@@ -158,6 +158,10 @@ public class TeHelperAbilities {
         }
 
         // Update Buttons
+        if (miniLandingButtons(game, player).isEmpty()) {
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
         MessageHelper.editMessageButtons(event, miniLandingButtons(game, player));
     }
 
@@ -165,6 +169,7 @@ public class TeHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         if (activeSystem != null) {
+            // TODO: galvanize
             int dmgDocks =
                     activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Spacedock, player.getColorID());
             int docks = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, player) - dmgDocks;
@@ -172,6 +177,9 @@ public class TeHelperAbilities {
             int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
 
             for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+                if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
+                    continue;
+                }
                 for (int x = 1; x <= Math.min(2, pds); x++) {
                     String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
                             + planet.getName();

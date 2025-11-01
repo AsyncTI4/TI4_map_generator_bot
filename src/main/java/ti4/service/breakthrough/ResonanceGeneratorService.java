@@ -42,8 +42,9 @@ public class ResonanceGeneratorService {
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         // not having a breach is not *technically* required, but like, why would you place an active breach if you can
         // instead flip the one there ??
-        Predicate<Tile> unitsAndNoBreach =
-                Tile.tileHasPlayerUnits(player).and(Tile.tileHasBreach().negate());
+        Predicate<Tile> unitsAndNoBreach = Tile.tileHasPlayerUnits(player)
+                .and(Tile.tileHasBreach().negate())
+                .and(tile -> !tile.isHomeSystem(game));
         List<Button> place =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeBreach", unitsAndNoBreach, false);
         List<Button> flip =
@@ -86,7 +87,7 @@ public class ResonanceGeneratorService {
 
         String msg = player.getRepresentationNoPing() + " Flipped " + oldState + " breach to " + newState + " in tile "
                 + tile.getRepresentationForButtons(game, player);
-        msg += " using " + resonanceRep() + ".";
+        // msg += " using " + resonanceRep() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -94,6 +95,11 @@ public class ResonanceGeneratorService {
     @ButtonHandler("placeBreach_")
     private static void resolvePlaceBreach(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("placeBreach_", "");
+        String source = resonanceRep();
+        if (pos.contains("_")) {
+            source = "a crimson destroyer";
+            pos = pos.split("_")[1];
+        }
         Tile tile = game.getTileByPosition(pos);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
 
@@ -103,7 +109,26 @@ public class ResonanceGeneratorService {
         }
 
         String msg = "Placed active breach in tile " + tile.getRepresentation();
-        msg += " using " + resonanceRep() + ".";
+        msg += " using " + source + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        checkCrimsonCommanderUnlock(game, player, tile);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("placeInactiveBreach_")
+    private static void resolvePlaceInactiveBreach(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.replace("placeInactiveBreach_", "");
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+
+        // TODO: JAZZ - idk if you can have multiple, so don't double add for now
+        if (!space.getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
+            space.addToken(Constants.TOKEN_BREACH_INACTIVE);
+        }
+
+        String msg = "Placed inactive breach in tile " + tile.getRepresentation();
+        msg += " using the crimson destroyer.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);

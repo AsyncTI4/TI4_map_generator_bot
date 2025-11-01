@@ -53,7 +53,7 @@ public class TeHelperAgents {
         return true;
     }
 
-    private static void postRalNelAgentStep1(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void postRalNelAgentStep1(GenericInteractionCreateEvent event, Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
         ActionCardHelper.drawActionCards(game, player, 2, true);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
@@ -69,7 +69,7 @@ public class TeHelperAgents {
 
         String msg = player.getRepresentation(true, true) + " Choose an action card to send to another player:";
         if (player.getActionCards().size() > ButtonHelper.getACLimit(game, player))
-            msg += "\n> NOTE: This happens BEFORE discarding down to hand limit!!!";
+            msg += "\n> NOTE: This happens BEFORE discarding down to hand limit.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -226,20 +226,25 @@ public class TeHelperAgents {
 
     }
 
-    public static void serveNaaluAgentButtons(Game game, Player player, Tile tile) {
+    public static void serveNaaluAgentButtons(Game game, Player player, Tile tile, Player p2) {
         // Not allowed in fow if you can't see the tile
         if (game.isFowMode() && tile.hasFog(player)) return;
         if (!player.hasUnexhaustedLeader("naaluagent-te")) return;
 
         List<Button> buttons = new ArrayList<>();
-        String id = "useNaaluAgent_" + tile.getPosition() + "_" + player.getFaction();
+        String id = "useNaaluAgent_" + tile.getPosition() + "_" + p2.getFaction();
         String label = "Remove CC from " + tile.getRepresentationForButtons(game, player);
         buttons.add(Buttons.green(id, label, LeaderEmojis.NaaluAgent));
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
 
-        String msg = player.getRepresentation() + " You can use "
-                + Mapper.getLeader("naaluagent-te").getNameRepresentation();
-        msg += " to remove your Command Token from " + tile.getRepresentationForButtons(game, player) + ".";
+        String msg = " You can use " + Mapper.getLeader("naaluagent-te").getNameRepresentation();
+        msg += " to remove a " + p2.getColor() + " Command Token from " + tile.getRepresentationForButtons(game, player)
+                + ".";
+        if (p2 == player) {
+            msg = player.getRepresentation() + msg;
+        } else {
+            msg = player.getRepresentationNoPing() + msg;
+        }
 
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), msg, buttons);
     }
@@ -256,5 +261,6 @@ public class TeHelperAgents {
                 RemoveCommandCounterService.fromTile(event, p2, tile);
             });
         });
+        ButtonHelper.deleteMessage(event);
     }
 }

@@ -177,6 +177,16 @@ class ActionCardHandButtonHandler {
                             + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.",
                     scButtons);
         }
+        if (acID.contains("twinning_")) {
+            String actionCardTitle = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            List<Button> scButtons = new ArrayList<>();
+            scButtons.add(Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Twinning_.",
+                    scButtons);
+        }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
             acID = acID.split("_")[0];
@@ -290,7 +300,9 @@ class ActionCardHandButtonHandler {
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        ButtonHelper.deleteTheOneButton(event);
+        if (!game.isTwilightsFallMode()) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
     }
 
     @ButtonHandler("drawActionCards_")

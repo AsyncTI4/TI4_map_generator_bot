@@ -16,6 +16,7 @@ import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.rules.ThundersEdgeRulesService;
 
 @UtilityClass
 public class DraftSetupService {
@@ -53,7 +54,7 @@ public class DraftSetupService {
             sources.add(ComponentSource.ds);
             sources.add(ComponentSource.uncharted_space);
         }
-        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             sources.add(ComponentSource.thunders_edge);
         }
         // Setup managers and game state
@@ -135,6 +136,9 @@ public class DraftSetupService {
                     draftManager.tryStartDraft();
                     game.setPhaseOfGame("miltydraft");
                     GameManager.save(game, "Milty"); // TODO: We should be locking since we're saving
+                    if (game.isThundersEdge()) {
+                        ThundersEdgeRulesService.alertTabletalkWithRulesAtStartOfDraft(game);
+                    }
                 }
             });
         }
@@ -166,7 +170,7 @@ public class DraftSetupService {
             tileSources.add(ComponentSource.ds);
             tileSources.add(ComponentSource.uncharted_space);
         }
-        if (game.isThundersEdge() || !game.getStoredValue("useEntropicScar").isEmpty()) {
+        if ((!game.isBaseGameMode() && game.getStoredValue("useOldPok").isEmpty()) || game.isTwilightsFallMode()) {
             tileSources.add(ComponentSource.thunders_edge);
         }
         DraftTileManager tileManager = game.getDraftTileManager();

@@ -18,6 +18,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
@@ -70,11 +71,24 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasSpaceStation()) {
+            buttons.add(
+                    Buttons.gray("startTradeStationConvert", "Convert Comms by Exhausting Station", MiscEmojis.comm));
+        }
+        if (player.hasUnexhaustedLeader("researchagent")) {
+            buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
+        }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
+        }
+        if (game.getPlayers().values().stream().anyMatch(p -> p.getAbilities().contains("galvanize"))) {
+            buttons.add(Buttons.gray("getToggleGalvanizeTiles", "Galvanize Units", FactionEmojis.Bastion));
+        }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            buttons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
         if (player.hasUnexhaustedLeader("vadenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_vadenagent", "Use Vaden Agent", FactionEmojis.vaden));
@@ -128,6 +142,20 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
+        }
+        if (player.hasUnexhaustedLeader("deepwroughtagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_deepwroughtagent",
+                    "Use Deepwrought Agent on Someone Else",
+                    FactionEmojis.Deepwrought));
+        }
+        if (player.hasUnexhaustedLeader("hyperagent")) {
+            buttons.add(Buttons.gray(
+                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+        }
+        if (player.hasUnexhaustedLeader("firmamentagent")) {
+            buttons.add(
+                    Buttons.gray("getAgentSelection_firmamentagent", "Use Firmament Agent", FactionEmojis.Firmament));
         }
         if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
             buttons.add(Buttons.gray(

@@ -15,12 +15,12 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
-import ti4.model.UnitModel;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -45,11 +45,16 @@ public class VoidTetherService {
     public boolean meetsCriteria(Game game, Player player, Tile activeSystem) {
         if (!player.hasUnlockedBreakthrough("empyreanbt")) return false;
 
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false);
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true);
         for (String pos : adjTiles) {
             Tile t = game.getTileByPosition(pos);
-            if (t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)) {
+            if (FoWHelper.playerHasUnitsInSystem(player, t)) {
                 return true;
+            }
+            for (Planet planet : t.getPlanetUnitHolders()) {
+                if (player.getPlanetsAllianceMode().contains(planet.getName())) {
+                    return true;
+                }
             }
         }
         return false;

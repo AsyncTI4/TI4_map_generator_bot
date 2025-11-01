@@ -20,15 +20,40 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.TriadService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.tech.BastionTechService;
 import ti4.service.unit.AddUnitService;
 
 public class TeHelperGeneral {
 
     public static void checkTransientInfo(Game game) {
         TriadService.checkAndUpdateTriad(game);
+        BastionTechService.checkHeliosAttachment(game);
+    }
+
+    public static void checkCoexistTransfer(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            List<String> susPlanets = new ArrayList<>();
+            for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
+                UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+                boolean otherPresent = false;
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    if (FoWHelper.playerHasUnitsOnPlanet(p2, uH)) {
+                        otherPresent = true;
+                        break;
+                    }
+                }
+                if (!otherPresent) {
+                    susPlanets.add(planet);
+                }
+            }
+            for (String planet : susPlanets) {
+                AddPlanetService.addPlanet(player, planet, game);
+            }
+        }
     }
 
     @ButtonHandler("expeditionInfo")
@@ -53,6 +78,9 @@ public class TeHelperGeneral {
         if (playersInSpace.isEmpty()) return;
 
         Player newOwner = game.getPlayerThatControlsTile(tile);
+        if (newOwner == null) {
+            return;
+        }
         for (Planet station : tile.getSpaceStations()) {
             Player prevOwner = game.getPlayerThatControlsPlanet(station.getName());
             if (prevOwner != null && FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;
@@ -113,7 +141,7 @@ public class TeHelperGeneral {
                 game.clearPlanetsCache();
 
                 int most = exp.getMostCompleteByAny();
-                AddUnitService.addUnits(event, tile, game, p2.getColor(), most + " inf t");
+                AddUnitService.addUnits(event, tile, game, p2.getColor(), most + " inf thundersedge");
                 ButtonHelper.deleteMessage(event);
                 String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player)
                         + " and added " + most + " " + p2.getRepresentation() + " infantry.";

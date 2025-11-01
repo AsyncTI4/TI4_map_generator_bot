@@ -685,7 +685,7 @@ public class ButtonHelperCommanders {
 
     public static void resolveMuaatCommanderCheck(
             Player player, Game game, GenericInteractionCreateEvent event, String reason) {
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander") || player.hasTech("tf-stellargenesis")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
                 String message = player.getRepresentationUnfogged()
                         + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1)
@@ -717,6 +717,16 @@ public class ButtonHelperCommanders {
                                         + " due to spending a strategy token.");
                     }
                 }
+            }
+        }
+        if (player.hasTech("tf-peaceaccords")) {
+            List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
+                    game, player, event, player.getFinsFactionCheckerPrefix());
+            if (!buttons2.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.",
+                        buttons2);
             }
         }
     }

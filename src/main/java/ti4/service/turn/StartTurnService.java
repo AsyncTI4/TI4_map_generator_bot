@@ -29,6 +29,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -64,6 +65,7 @@ public class StartTurnService {
         game.removeStoredValue("audioSent");
         game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
+        EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
@@ -194,10 +196,13 @@ public class StartTurnService {
             }
         }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
+        if ((game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
+                        || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander"))
+                && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!p2.equals(player)
-                        && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                        && (game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                                || game.playerHasLeaderUnlockedOrAlliance(p2, "crimsoncommander"))
                         && p2.getCommodities() > 0
                         && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
@@ -249,6 +254,7 @@ public class StartTurnService {
                 player.setStasisInfantry(0);
             }
         }
+
         if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
             String msg1 = player.getRepresentation() + "The Starlit path points you towards a "
                     + game.getStoredValue("pathOf" + player.getFaction()) + ".";
@@ -284,7 +290,7 @@ public class StartTurnService {
                 }
             }
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(Helper.getSCRepresentation(game, sc));
+                sb.append("> ").append(game.getSCEmojiWordRepresentation(sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                     sb.append(" ").append(game.getStoredValue("scPlay" + sc));
                 }
@@ -400,15 +406,22 @@ public class StartTurnService {
         }
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
-            Button pass = Buttons.red(finChecker + "passForRound", "Pass");
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (game.getStoredValue("ralnelHero") != null) {}
 
-            int numEndOfTurn = ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1;
-            if (numEndOfTurn > 0) {
-                startButtons.add(Buttons.blue(
-                        finChecker + "endOfTurnAbilities", "Do End Of Turn Ability (" + numEndOfTurn + ")"));
+                String presetRalnelHero =
+                        "You have the ralnel hero unlocked! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
+                presetRalnelHero +=
+                        "to automatically use your hero when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                List<Button> ralnelHeroButtons = new ArrayList<>();
+                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset RalNel Hero"));
+                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
             }
 
-            startButtons.add(pass);
+            startButtons.add(ButtonHelper.getPassButton(game, player));
             if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
@@ -431,15 +444,7 @@ public class StartTurnService {
         }
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
-            if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-                startButtons.add(Buttons.blue(
-                        "endOfTurnAbilities",
-                        "Do End Of Turn Ability ("
-                                + (ButtonHelper.getEndOfTurnAbilities(player, game)
-                                                .size()
-                                        - 1) + ")"));
-            }
-            startButtons.add(Buttons.red(finChecker + "turnEnd", "End Turn"));
+            startButtons.add(ButtonHelper.getEndTurnButton(game, player));
             if (IsPlayerElectedService.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Buttons.gray(finChecker + "ministerOfWar", "Use Minister of War"));
             }
@@ -453,13 +458,23 @@ public class StartTurnService {
                 String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
                 startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
             }
-            if (player.getTechs().contains("parasite-obs")) {
+            if (player.hasTech("parasite-obs") || player.hasTech("tf-neuralparasite")) {
                 startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
             }
 
-            if (player.getTechs().contains("cm")) {
+            if (player.hasTech("cm") || player.hasTech("tf-chaos")) {
                 startButtons.add(
                         Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
+            }
+
+            if (player.ownsUnit("tf-ahksylfier")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 0) {
+                startButtons.add(
+                        Buttons.gray("creussTFCruiserStep1_", "Use Creuss Cruiser Ability", FactionEmojis.Ghost));
+            }
+            if (player.hasUnit("redtf_flagship")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", true) < 1) {
+                startButtons.add(Buttons.gray(finChecker + "startRedTFDeploy", "Deploy Flagship", FactionEmojis.redtf));
             }
             if (game.isOrdinianC1Mode()
                     && !ButtonHelper.isCoatlHealed(game)
@@ -467,14 +482,13 @@ public class StartTurnService {
                 startButtons.add(
                         Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6 Resources)", FactionEmojis.Argent));
             }
-            if (player.getTechs().contains("dspharinf")
+            if (player.hasTech("dspharinf")
                     && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game)
                             .isEmpty()) {
                 startButtons.add(Buttons.gray(
                         finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
-            if (player.getTechs().contains("dscymiy")
-                    && !player.getExhaustedTechs().contains("dscymiy")) {
+            if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(
                         finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
@@ -521,6 +535,9 @@ public class StartTurnService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+        }
+        if (player.hasUnlockedBreakthrough("titansbt")) {
+            startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(

@@ -347,7 +347,7 @@
         "type": "agent",
         "name": "Brother Milor",
         "title": "Purifed by Fire",
-        "abilityWindow": "After a player's unit is destroyed:",
+        "abilityWindow": "After a player's unit is destroyed during combat [Note: \"during combat\" is wording from the latest version of this agent, effective in async 10/23/25]:",
         "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry on its planet if it was a ground force.",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
