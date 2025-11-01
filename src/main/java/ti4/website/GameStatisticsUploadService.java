@@ -27,17 +27,21 @@ public class GameStatisticsUploadService {
     private static final Duration THIRTY_DAYS_DURATION = Duration.ofDays(30);
 
     public static void uploadAllStats() throws IOException {
-        Predicate<ManagedGame> shouldUpload = GameStatisticsUploadService::isValidFinishedGame;
+        Predicate<ManagedGame> shouldUpload = GameStatisticsUploadService::isValidGame;
         uploadStats("statistics", shouldUpload);
     }
 
-    private static boolean isValidFinishedGame(ManagedGame managedGame) {
-        return managedGame.getRound() > 2 && (managedGame.isHasEnded() && managedGame.isHasWinner());
+    private static boolean isValidGame(ManagedGame managedGame) {
+        return managedGame.getRound() >= 2 && !isAbortedGame(managedGame);
+    }
+
+    private static boolean isAbortedGame(ManagedGame managedGame) {
+        return managedGame.isHasEnded() && !managedGame.isHasWinner();
     }
 
     public static void uploadRecentStats() throws IOException {
         Predicate<ManagedGame> shouldUpload =
-                managedGame -> isValidFinishedGame(managedGame) && wasRecentlyUpdated(managedGame);
+                managedGame -> isValidGame(managedGame) && wasRecentlyUpdated(managedGame);
         uploadStats("recently_changed_statistics", shouldUpload);
     }
 
@@ -107,7 +111,7 @@ public class GameStatisticsUploadService {
 
         PutObjectRequest req = PutObjectRequest.builder()
                 .bucket(bucket)
-                .key("statistics/statistics.json")
+                .key("statistics/" + fileName + ".json")
                 .contentType("application/json")
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
