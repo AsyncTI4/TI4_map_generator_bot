@@ -350,7 +350,7 @@ public class WebPlayerArea {
             for (Map.Entry<String, Integer> plotEntry : player.getPlotCards().entrySet()) {
                 String plotAlias = plotEntry.getKey();
                 Integer identifier = plotEntry.getValue();
-                List<String> factions = player.getPlotCardsFactions().getOrDefault(plotAlias, new ArrayList<>());
+                List<String> factions = player.getPuppetedFactionsForPlot(plotAlias);
                 plotCardsList.add(new PlotCardInfo(plotAlias, identifier, factions));
             }
         }

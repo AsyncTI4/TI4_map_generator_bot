@@ -3,6 +3,8 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,8 +15,10 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RegexHelper;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.GameMessageManager;
@@ -23,6 +27,7 @@ import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.PlayHeroService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -135,6 +140,21 @@ public class EndTurnService {
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) {
                 player.setPassed(true);
+            }
+        }
+
+        // First, check for the ralnel hero and play it if it has been preset
+        if (game.getPlayers().values().stream().allMatch(Player::isPassed)
+                && game.getStoredValue("ralnelHero") != null) {
+            String value = game.getStoredValue("ralnelHero");
+            Matcher matcher = Pattern.compile(RegexHelper.factionRegex(game)).matcher(value);
+            if (matcher.find()) {
+                game.removeStoredValue("ralnelHero");
+                String faction = matcher.group("faction");
+                Player ralnel = game.getPlayerFromColorOrFaction(faction);
+                Leader hero =
+                        ralnel == null ? null : ralnel.getLeader("ralnelhero").orElse(null);
+                if (hero != null) PlayHeroService.playHero(event, game, ralnel, hero);
             }
         }
 

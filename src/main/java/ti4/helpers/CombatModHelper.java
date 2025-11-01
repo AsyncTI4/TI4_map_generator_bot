@@ -468,7 +468,7 @@ public class CombatModHelper {
             }
             case "opponent_has_been_asailed" -> {
                 if (player.hasAbility("marionettes")
-                        && player.getPlotCardsFactions().get("assail").contains(opponent.getFaction())) {
+                        && player.getPuppetedFactionsForPlot("assail").contains(opponent.getFaction())) {
                     meetsCondition = true;
                 }
             }
