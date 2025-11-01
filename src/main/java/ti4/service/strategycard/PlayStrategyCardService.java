@@ -624,6 +624,7 @@ public class PlayStrategyCardService {
                                 new StringBuilder("__Not__ neighbors with the **Trade** holder:");
                         boolean anyNeighbours = false;
                         boolean allNeighbours = true;
+                        StringBuilder spaceStation = new StringBuilder("");
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
                                 if (player.getNeighbouringPlayers(true).contains(p2)) {
@@ -632,6 +633,9 @@ public class PlayStrategyCardService {
                                 } else {
                                     notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
                                     allNeighbours = false;
+                                }
+                                if (p2.hasSpaceStation()) {
+                                    spaceStation.append(" ").append(p2.getFactionEmoji());
                                 }
                             }
                         }
@@ -643,6 +647,12 @@ public class PlayStrategyCardService {
                                     m5, "The **Trade** player is neighbors with __no__ other players.");
                         } else {
                             MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                        }
+                        if (player.hasSpaceStation() && !allNeighbours) {
+                            MessageHelper.sendMessageToChannel(
+                                    m5,
+                                    "The **Trade** player has a space station and can transact with players who also have a space station ("
+                                            + spaceStation.toString() + ")");
                         }
                     }
                 }
