@@ -3056,6 +3056,53 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("startTradeStationConvert")
+    public static void startTradeStationConvert(ButtonInteractionEvent event, Player player, Game game) {
+
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getReadiedPlanets()) {
+            if (game.getUnitHolderFromPlanet(planet) == null
+                    || !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                continue;
+            }
+            buttons.add(Buttons.gray("useTradeStation_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                player.getRepresentation()
+                        + " choose the space station you wish to exhaust in order to wash your commodities",
+                buttons);
+    }
+
+    @ButtonHandler("useTradeStation")
+    public static void useTradeStation(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+
+        String planet = buttonID.split("_")[1];
+        player.exhaustPlanet(planet);
+        convertAllComm(event, player, game);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " exhausted th space station of "
+                        + Helper.getPlanetRepresentation(planet, game) + " in order to wash their commodities");
+    }
+
+    @ButtonHandler("convertAllComms")
+    public static void convertAllComm(ButtonInteractionEvent event, Player player, Game game) {
+        String playerRep = player.getFactionEmoji();
+        int commod = player.getCommodities();
+        String message = playerRep + " converted their " + commod
+                + " commodit" + (commod == 1 ? "y" : "ies") + " to "
+                + (commod == 1 ? "a trade good" : commod + " trade goods") + " (trade goods: "
+                + player.getTg() + "->" + (player.getTg() + commod) + ").";
+        player.setTg(player.getTg() + commod);
+        player.setCommodities(0);
+        if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("mallice_2_tg")
     public static void mallice2tg(ButtonInteractionEvent event, Player player, Game game) {
         String playerRep = player.getFactionEmoji();

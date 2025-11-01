@@ -634,6 +634,9 @@ public class ButtonHelperTwilightsFall {
             for (String card : cards) {
                 String name = Mapper.getLeader(card).getName();
                 String faction = Mapper.getLeader(card).getFaction();
+                if (faction.contains("keleres")) {
+                    faction = "keleresm";
+                }
                 FactionModel factionModel = Mapper.getFaction(faction);
                 buttons.add(
                         Buttons.green("selectASpliceCard_" + card, "Select " + name, factionModel.getFactionEmoji()));
