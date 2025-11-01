@@ -148,10 +148,14 @@ public class PuppetSoftHeBladeService {
                 && newFaction.getHomeSystem().equals("te15b")) { // obsidian
             // Resolve control
             for (Player p : game.getPlayers().values()) {
-                if (p.hasPlanet("cronos")) p.addPlanet("cronoshollow");
-                if (p.hasPlanet("tallin")) p.addPlanet("tallinhollow");
-                p.exhaustPlanet("cronoshollow");
-                p.exhaustPlanet("tallinhollow");
+                if (p.hasPlanet("cronos")) {
+                    p.addPlanet("cronoshollow");
+                    p.removePlanet("cronos");
+                }
+                if (p.hasPlanet("tallin")) {
+                    p.addPlanet("tallinhollow");
+                    p.removePlanet("tallin");
+                }
             }
 
             // Then add units and stuff
@@ -240,13 +244,13 @@ public class PuppetSoftHeBladeService {
         oldFaction.getFactionTech().forEach(tech -> {
             if (player.hasTech(tech)) ownedFactionTech.add(Mapper.getTech(tech).getName());
             player.removeFactionTech(tech);
+            player.removeTech(tech);
         });
         newFaction.getFactionTech().forEach(tech -> {
             player.addFactionTech(tech);
 
             String replacableTech = Mapper.getTech(tech).getName().replace("Obsidian", "Firmament");
             if (ownedFactionTech.contains(replacableTech)) {
-                ownedFactionTech.remove(replacableTech);
                 player.addTech(tech);
             }
         });

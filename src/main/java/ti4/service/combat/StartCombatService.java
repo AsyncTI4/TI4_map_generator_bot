@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -14,7 +18,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -881,7 +884,11 @@ public class StartCombatService {
                         + ", a reminder that if you win the combat, you may use the button to resolve your mech ability.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, explore);
             }
-
+            if (player.hasUnlockedBreakthrough("obsidianbt") && player.isOtherPlayerPuppeted(otherPlayer)) {
+                Button reap = Buttons.gray(player.finChecker() + "theReapingAddTg", "Add TG to The Reaping", FactionEmojis.Obsidian);
+                String message = msg + " this is a reminder that if you win this combat, you may use the button to add a trade good onto your breakthrough, " + FactionEmojis.Obsidian + " **The Reaping**.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, reap);
+            }
             if ("space".equalsIgnoreCase(type) && player.hasTech("so")) {
                 buttons = new ArrayList<>();
                 buttons.add(

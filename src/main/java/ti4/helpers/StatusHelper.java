@@ -532,6 +532,7 @@ public class StatusHelper {
         sendNeuralParasiteButtons(game);
         sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
+        SowingReapingService.resolveTheReaping(game);
         // Obligatory abilities
         resolveSolFlagship(game);
     }
