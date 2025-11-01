@@ -245,7 +245,8 @@ public class GameStatsDashboardPayload {
                         Map.entry("Mercenaries for Hire", (Supplier<Boolean>) game::isMercenariesForHireMode),
                         Map.entry("Advent of the Warsun", (Supplier<Boolean>) game::isAdventOfTheWarsunMode),
                         Map.entry("Cultural Exchange Program", (Supplier<Boolean>) game::isCulturalExchangeProgramMode),
-                        Map.entry("Conventions of War Abandoned", (Supplier<Boolean>) game::isConventionsOfWarAbandonedMode),
+                        Map.entry("Conventions of War Abandoned", (Supplier<Boolean>)
+                                game::isConventionsOfWarAbandonedMode),
                         Map.entry("Rapid Mobilization", (Supplier<Boolean>) game::isRapidMobilizationMode),
                         Map.entry("Weird Wormholes", (Supplier<Boolean>) game::isWeirdWormholesMode),
                         Map.entry("Cosmic Phenomenae", (Supplier<Boolean>) game::isCosmicPhenomenaeMode),
@@ -257,19 +258,20 @@ public class GameStatsDashboardPayload {
                         Map.entry("Limited Whispers", (Supplier<Boolean>) game::isLimitedWhispersMode),
                         Map.entry("Age of Commerce", (Supplier<Boolean>) game::isAgeOfCommerceMode),
                         Map.entry("Hidden Agenda", (Supplier<Boolean>) game::isHiddenAgendaMode),
+                        Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
                         Map.entry("Ordinian C1", (Supplier<Boolean>) game::isOrdinianC1Mode),
                         Map.entry("Liberation C4", (Supplier<Boolean>) game::isLiberationC4Mode))
                 .filter(entry -> entry.getValue().get())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        if (!"OFF".equalsIgnoreCase(game.getSpinMode())) {
-            enabledModes.add("Spin: " + game.getSpinMode());
+        if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode())) {
+            enabledModes.add("Spin Mode");
         }
 
         PriorityTrackMode priorityTrackMode = game.getPriorityTrackMode();
         if (priorityTrackMode != null && priorityTrackMode != PriorityTrackMode.NONE) {
-            enabledModes.add("Priority Track: " + priorityTrackMode.name());
+            enabledModes.add(priorityTrackMode.name() + " Priority Track Mode");
         }
 
         return enabledModes;
