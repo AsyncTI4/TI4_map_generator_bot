@@ -19,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -264,6 +265,14 @@ public class ButtonHelperTwilightsFall {
 
         if (!pos.isEmpty() && tileID != null) {
 
+            if (game.getTileByPosition(pos) != null) {
+                for (UnitHolder planet :
+                        game.getTileByPosition(pos).getUnitHolders().values()) {
+                    if (player.getPlanets().contains(planet.getName())) {
+                        player.removePlanet(planet.getName());
+                    }
+                }
+            }
             Tile toAdd = new Tile(tileID, pos);
             game.setTile(toAdd);
             player.setHomeSystemPosition(pos);

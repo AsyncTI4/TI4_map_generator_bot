@@ -494,6 +494,9 @@ public class ButtonHelper {
             return buttons;
         }
         Tile tile = player.getHomeSystemTile();
+        if (tile == null) {
+            return buttons;
+        }
         int middleVal = (int) Math.round(Math.sqrt(infCount));
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
@@ -2746,6 +2749,9 @@ public class ButtonHelper {
 
     public static void resolveTitanShenanigansOnActivation(
             Player player, Game game, Tile tile, ButtonInteractionEvent event) {
+        if (game.isTwilightsFallMode()) {
+            return;
+        }
         List<Button> buttons = getButtonsForTurningPDSIntoFS(player, game, tile);
         if (buttons.size() > 1) {
             MessageHelper.sendMessageToChannelWithButtons(

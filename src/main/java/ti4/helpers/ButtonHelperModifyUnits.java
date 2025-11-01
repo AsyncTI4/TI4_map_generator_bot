@@ -1148,7 +1148,7 @@ public class ButtonHelperModifyUnits {
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("returnFFToSpace_" + tile.getPosition(), "Return Fighters to Space"));
-                if (player.hasUnit("tf-morphwhing")) {
+                if (player.hasUnit("tf-morphwing")) {
                     b2s.add(Buttons.green(
                             "convertFFToInf_" + unitHolder.getName(),
                             "Convert 1 Fighter to Infantry on "
