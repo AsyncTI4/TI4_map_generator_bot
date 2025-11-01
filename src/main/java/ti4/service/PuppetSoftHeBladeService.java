@@ -174,6 +174,7 @@ public class PuppetSoftHeBladeService {
         oldFaction.getHomePlanets().forEach(planet -> player.removePlanet(planet));
         game.removeTile(home.getPosition());
         game.setTile(newHome);
+        player.setHomeSystemPosition(newHome.getPosition());
 
         return returnString;
     }

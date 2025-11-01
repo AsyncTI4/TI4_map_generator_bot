@@ -597,7 +597,7 @@
         "name": "The Scarlet Knife",
         "source": "twilights_fall",
         "faction": "redtf",
-        "moveValue": 1,
+        "moveValue": 2,
         "capacityValue": 3,
         "capacityUsed": 1,
         "cost": 8,

@@ -225,8 +225,7 @@ public class RegexHelper {
 
     /** @return group "tech" */
     public static String techRegex(Game game) {
-        Set<String> techs =
-                new HashSet<>(Mapper.getDeck(game.getTechnologyDeckID()).getNewDeck());
+        Set<String> techs = new HashSet<>(Mapper.getTechs().keySet());
         return regexBuilder("tech", techs);
     }
 
