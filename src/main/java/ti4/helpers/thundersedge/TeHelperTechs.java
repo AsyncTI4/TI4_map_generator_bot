@@ -153,32 +153,30 @@ public class TeHelperTechs {
 
     @ButtonHandler("neuralParasiteS2_")
     private static void neuralParasiteStep2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String part2 = "neuralParasiteS2_" + RegexHelper.factionRegex(game);
-        RegexService.runMatcher(part2, buttonID, matcher -> {
-            String faction = matcher.group("faction");
-            Player victim = game.getPlayerFromColorOrFaction(faction);
-            if (victim == null) return;
+        String faction = buttonID.split("_")[1];
+        Player victim = game.getPlayerFromColorOrFaction(faction);
+        if (victim == null) return;
 
-            List<Button> buttons = new ArrayList<>();
-            for (Tile t : tilesAdjToPlayersInf(game, player)) {
-                for (UnitHolder uh : t.getUnitHolders().values()) {
-                    int count = uh.getUnitCount(UnitType.Infantry, victim);
-                    if (count > 0) {
-                        String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
-                        String label = uh.getName().equals("space")
-                                ? "Space " + t.getPosition()
-                                : Helper.getPlanetRepresentation(uh.getName(), game);
-                        label += " (" + count + ")";
-                        buttons.add(Buttons.red(id, label));
-                    }
+        List<Button> buttons = new ArrayList<>();
+        for (Tile t : tilesAdjToPlayersInf(game, player)) {
+            for (UnitHolder uh : t.getUnitHolders().values()) {
+                int count = uh.getUnitCount(UnitType.Infantry, victim);
+                if (count > 0) {
+                    String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
+                    String label = uh.getName().equals("space")
+                            ? "Space " + t.getPosition()
+                            : Helper.getPlanetRepresentation(uh.getName(), game);
+                    label += " (" + count + ")";
+                    buttons.add(Buttons.red(id, label));
                 }
             }
+        }
 
-            String message = player.getRepresentation() + " choose an infantry belonging to "
-                    + victim.getRepresentation(false, false) + " to destroy:";
-            message += "\n-# The number in parenthesis (#) is the total number of infantry at that location.";
-            MessageHelper.editMessageWithButtons(event, message, buttons);
-        });
+        String message = player.getRepresentation() + " choose an infantry belonging to "
+                + victim.getRepresentation(false, false) + " to destroy:";
+        message += "\n-# The number in parenthesis (#) is the total number of infantry at that location.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveNeuralParasite_")
