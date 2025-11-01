@@ -32,7 +32,7 @@ public class GameStatisticsUploadService {
     }
 
     private static boolean isValidGame(ManagedGame managedGame) {
-        return managedGame.getRound() >= 2 && !isAbortedGame(managedGame);
+        return managedGame.getRound() > 2 && !isAbortedGame(managedGame);
     }
 
     private static boolean isAbortedGame(ManagedGame managedGame) {
