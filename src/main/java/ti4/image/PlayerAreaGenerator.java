@@ -674,7 +674,7 @@ class PlayerAreaGenerator {
                 DrawingUtil.superDrawString(
                         graphics, name, x, yDelta, Color.white, HorizontalAlign.Left, null, null, null);
                 yDelta += 5;
-                for (String faction : player.getPlotCardsFactions().getOrDefault(alias, Collections.emptyList())) {
+                for (String faction : player.getPuppetedFactionsForPlot(alias)) {
                     Player p = game.getPlayerFromColorOrFaction(faction);
                     DrawingUtil.getAndDrawControlToken(graphics, p, x, yDelta, isFoWPrivate, 0.6f);
                     x += 40;

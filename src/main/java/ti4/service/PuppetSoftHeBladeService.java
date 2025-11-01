@@ -51,7 +51,7 @@ public class PuppetSoftHeBladeService {
             GenericCardModel plot = Mapper.getPlot(plotID);
             plotInfo.append("\n").append(plot.getRepresentation());
 
-            List<String> puppetedFactions = player.getPlotCardsFactions().get(plotID);
+            List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && puppetedFactions.size() > 0) {
                 String factions = "";
                 for (String faction : puppetedFactions) {
@@ -69,7 +69,7 @@ public class PuppetSoftHeBladeService {
 
         // Serve relevant plot automation on reveal
         for (String plotID : player.getPlotCards().keySet()) {
-            List<String> puppetedFactions = player.getPlotCardsFactions().get(plotID);
+            List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && puppetedFactions.size() > 0) {
                 List<Player> puppets = new ArrayList<>();
                 for (String faction : puppetedFactions) puppets.add(game.getPlayerFromColorOrFaction(faction));
