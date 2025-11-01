@@ -23,25 +23,26 @@ import ti4.website.model.stats.GameStatsDashboardPayload;
 @UtilityClass
 public class GameStatisticsUploadService {
 
+    private static final int MINIMUM_ROUND = 3;
     private static final int STAT_BATCH_SIZE = 200;
     private static final Duration THIRTY_DAYS_DURATION = Duration.ofDays(30);
 
     public static void uploadAllStats() throws IOException {
-        Predicate<ManagedGame> shouldUpload = GameStatisticsUploadService::isValidGame;
+        Predicate<ManagedGame> shouldUpload = GameStatisticsUploadService::isValidToUpload;
         uploadStats("statistics", shouldUpload);
     }
 
-    private static boolean isValidGame(ManagedGame managedGame) {
-        return managedGame.getRound() > 2 && !isAbortedGame(managedGame);
+    private static boolean isValidToUpload(ManagedGame managedGame) {
+        return managedGame.getRound() >= MINIMUM_ROUND && !isAborted(managedGame);
     }
 
-    private static boolean isAbortedGame(ManagedGame managedGame) {
+    private static boolean isAborted(ManagedGame managedGame) {
         return managedGame.isHasEnded() && !managedGame.isHasWinner();
     }
 
     public static void uploadRecentStats() throws IOException {
         Predicate<ManagedGame> shouldUpload =
-                managedGame -> isValidGame(managedGame) && wasRecentlyUpdated(managedGame);
+                managedGame -> isValidToUpload(managedGame) && wasRecentlyUpdated(managedGame);
         uploadStats("recently_changed_statistics", shouldUpload);
     }
 
