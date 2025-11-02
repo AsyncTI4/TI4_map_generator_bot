@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -16,6 +17,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.AlRaithService;
+import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.breakthrough.StellarGenesisService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -93,6 +95,10 @@ public class BreakthroughCommandHelper {
                 }
                 AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
             }
+            if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
+                SowingReapingService.sendTheSowingButtons(game);
+            }
+
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
