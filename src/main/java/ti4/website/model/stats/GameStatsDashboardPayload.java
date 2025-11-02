@@ -74,7 +74,7 @@ public class GameStatsDashboardPayload {
 
     @JsonProperty("isPoK")
     public boolean isPoK() {
-        return !game.isBaseGameMode();
+        return game.isProphecyOfKings();
     }
 
     public List<String> getLaws() {
@@ -208,7 +208,10 @@ public class GameStatsDashboardPayload {
                         Map.entry("Homebrew Strategy Cards", (Supplier<Boolean>) game::isHomebrewSCMode),
                         Map.entry("Extra Secret", (Supplier<Boolean>) game::isExtraSecretMode),
                         Map.entry("Voice of the Council", (Supplier<Boolean>) game::isVotcMode),
+                        Map.entry("Base Game", (Supplier<Boolean>) game::isBaseGameMode),
+                        Map.entry("Prophecy of Kings", (Supplier<Boolean>) game::isProphecyOfKings),
                         Map.entry("Thunder's Edge", (Supplier<Boolean>) game::isThundersEdge),
+                        Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
                         Map.entry("Age of Exploration", (Supplier<Boolean>) game::isAgeOfExplorationMode),
                         Map.entry("Facilities", (Supplier<Boolean>) game::isFacilitiesMode),
                         Map.entry("Minor Factions", (Supplier<Boolean>) game::isMinorFactionsMode),
@@ -231,7 +234,6 @@ public class GameStatsDashboardPayload {
                         Map.entry("No Support Swap", (Supplier<Boolean>) game::isNoSwapMode),
                         Map.entry("Age of Commerce", (Supplier<Boolean>) game::isAgeOfCommerceMode),
                         Map.entry("Hidden Agenda", (Supplier<Boolean>) game::isHiddenAgendaMode),
-                        Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
                         Map.entry("Ordinian", (Supplier<Boolean>) game::isOrdinianC1Mode),
                         Map.entry("Liberation", (Supplier<Boolean>) game::isLiberationC4Mode))
                 .filter(entry -> entry.getValue().get())
