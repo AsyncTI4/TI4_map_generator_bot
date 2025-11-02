@@ -517,7 +517,7 @@ public class StatusHelper {
 
             Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
             if (obsidian != null
-                    && obsidian.getPlotCardsFactions().get("seethe").contains(p2.getFaction())) {
+                    && obsidian.getPuppetedFactionsForPlot("seethe").contains(p2.getFaction())) {
                 String seetheMsg = obsidian.getRepresentation() + " use the buttons to destroy one of "
                         + p2.getRepresentation() + " infantry using seethe.";
                 List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
@@ -532,6 +532,7 @@ public class StatusHelper {
         sendNeuralParasiteButtons(game);
         sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
+        SowingReapingService.resolveTheReaping(game);
         // Obligatory abilities
         resolveSolFlagship(game);
     }

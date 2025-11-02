@@ -321,6 +321,16 @@ public class AddPlanetService {
                             + " to the planet of " + Helper.getPlanetRepresentation(planet2, game) + ".");
         }
 
+        if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
+            unitHolder.removeToken("token_relictoken.png");
+            if (!alreadyOwned) {
+                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw a relic");
+                String message = player.getRepresentation()
+                        + " has gained control of a planet which allows them to draw a relic!\nUse the button AFTER you have resolved ALL ground combats:";
+                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
+            }
+        }
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);

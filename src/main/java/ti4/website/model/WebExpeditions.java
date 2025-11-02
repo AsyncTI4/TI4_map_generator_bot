@@ -22,6 +22,11 @@ public class WebExpeditions {
             return null;
         }
 
+        // Expeditions should not be returned if the mode is Twilight's Fall
+        if (game.isTwilightsFallMode()) {
+            return null;
+        }
+
         WebExpeditions web = new WebExpeditions();
         Expeditions exp = game.getExpeditions();
 
