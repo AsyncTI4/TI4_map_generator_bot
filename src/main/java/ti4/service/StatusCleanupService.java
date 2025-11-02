@@ -21,6 +21,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.player.RefreshCardsService;
 
@@ -90,6 +91,29 @@ public class StatusCleanupService {
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");
 
+            String shareKnowledgeConst = "ShareKnowledge_" + player.getFaction();
+            String sharedKnowledge = game.getStoredValue(shareKnowledgeConst);
+            if (player.isRealPlayer() && sharedKnowledge != null && !sharedKnowledge.isEmpty()) {
+                game.removeStoredValue(shareKnowledgeConst);
+                if (player.getPromissoryNotesInPlayArea().contains("shareknowledge")) {
+                    player.removeTech(sharedKnowledge);
+                    TechnologyModel tech = Mapper.getTech(sharedKnowledge);
+                    String msg = player.getRepresentation() + " technology " + tech.getRepresentation(false)
+                            + " has been removed, and Share Knowledge has been returned to the owner.";
+                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg);
+
+                    player.removePromissoryNote("shareknowledge");
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.ownsPromissoryNote("shareknowledge")) {
+                            p2.setPromissoryNote("shareknowledge");
+                            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+                            break;
+                        }
+                    }
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
+                }
+            }
+
             if (player.isRealPlayer()
                     && game.getStoredValue("Pre Pass " + player.getFaction()) != null
                     && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
@@ -129,6 +153,7 @@ public class StatusCleanupService {
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("Coup");
         game.removeStoredValue("PublicExecution");
+        game.removeStoredValue("VisionariaResponded");
         game.setHasHadAStatusPhase(true);
         if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode())) {
             if ("ON".equalsIgnoreCase(game.getSpinMode())) {
