@@ -145,6 +145,10 @@ public class Helper {
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return "All _Sabotages_ are in the discard.";
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
+            LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
+            return "Player has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation();
+        }
         if (player.hasTech("tp")
                 && game.getActivePlayerID() != null
                 && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {

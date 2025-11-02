@@ -827,7 +827,7 @@ public class ActionCardHelper {
                         it = true;
                     }
                     if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
+                        noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
                         watcher = true;
                     }
                 }

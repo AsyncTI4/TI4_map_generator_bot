@@ -15,6 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.breakthrough.StellarGenesisService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -80,6 +81,10 @@ public class BreakthroughCommandHelper {
                     player.removeOwnedUnitByID("cruiser2");
                 }
             }
+            if ("firmamentbt".equalsIgnoreCase(bt.getID())) {
+                SowingReapingService.sendTheSowingButtons(game);
+            }
+
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(game, player);
             if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
