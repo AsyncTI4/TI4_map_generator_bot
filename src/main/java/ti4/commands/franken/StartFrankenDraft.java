@@ -58,8 +58,12 @@ class StartFrankenDraft extends GameStateSubcommand {
                 case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
                 case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
                 case TWILIGHTSFALL -> {
-                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
                     game.setupTwilightsFallMode(event);
+                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
+                }
+                case INAUGURALSPLICE -> {
+                    game.setupTwilightsFallMode(event);
+                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
                 }
             }
         }

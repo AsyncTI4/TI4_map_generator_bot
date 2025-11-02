@@ -753,7 +753,7 @@
         "title": "Keleres Tribunii",
         "abilityName": "Operation Archon: Witching Hour",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may cast up to 6 additional votes on this agenda. Predict aloud an outcome of this agenda. For each player that votes for another outcome, gain 1 trade good and 1 command token. Then, purge this card.",
+        "abilityText": "You may cast up to 6 additional votes on this agenda. Predict aloud an outcome of this agenda. For each player that abstains or votes for another outcome, gain 1 trade good and 1 command token. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },

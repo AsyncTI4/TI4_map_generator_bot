@@ -77,6 +77,17 @@
         "source": "twilights_fall"
     },
     {
+        "id": "witchinghero",
+        "faction": "keleresx",
+        "type": "hero",
+        "name": "Witching Hour",
+        "title": "Keleres Xxcha Paradigm",
+        "abilityWindow": "Action",
+        "abilityText": "Choose a player other than the current speaker to gain the speaker token. Choose a player other than the tyrant to gain the benediction token. Then purge this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "twilights_fall"
+    },
+    {
         "id": "forgehero",
         "faction": "naaz",
         "type": "hero",

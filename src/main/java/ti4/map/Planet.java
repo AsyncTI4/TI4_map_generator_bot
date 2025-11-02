@@ -234,6 +234,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public int getHigherofInfluenceOrResource() {
+        return Math.max(getInfluence(), getResources());
+    }
+
+    @JsonIgnore
     public int getMaxResInf() {
         return Math.max(getResources(), getInfluence());
     }

@@ -1627,7 +1627,7 @@ public class UnfiledButtonHandlers {
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
                 }
-                if (!game.isFowMode()) {
+                if (!game.isFowMode() && !game.isTwilightsFallMode()) {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
                 }
             }
