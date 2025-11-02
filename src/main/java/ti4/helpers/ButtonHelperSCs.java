@@ -50,7 +50,7 @@ public class ButtonHelperSCs {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByName("construction").orElse(null);
         if (scModel == null) {
-            game.getStrategyCardModelByInitiative(4).orElse(null);
+            scModel = game.getStrategyCardModelByInitiative(4).orElse(null);
         }
         if (player.getSCs().contains(scModel.getInitiative())) {
             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);

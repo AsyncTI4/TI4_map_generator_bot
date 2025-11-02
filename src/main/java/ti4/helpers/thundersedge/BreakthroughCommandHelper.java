@@ -15,6 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.service.breakthrough.AlRaithService;
 import ti4.service.breakthrough.StellarGenesisService;
 import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -79,6 +80,18 @@ public class BreakthroughCommandHelper {
                     player.addOwnedUnitByID("mentak_cruiser3");
                     player.removeOwnedUnitByID("cruiser2");
                 }
+            }
+
+            if (player.hasBreakthrough("cabalbt")) {
+                if (!FractureService.isFractureInPlay(game)) {
+                    String msg = player.getRepresentation(false, false)
+                            + " has Cabal breakthrough so the Fracture enters automatically"
+                            + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
+                    FractureService.spawnFracture(null, game);
+                    FractureService.spawnIngressTokens(null, game, player, true);
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                }
+                AlRaithService.serveBeginCabalBreakthroughButtons(null, game, player);
             }
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(game, player);

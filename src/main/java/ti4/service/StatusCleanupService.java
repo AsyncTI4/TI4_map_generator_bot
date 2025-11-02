@@ -156,8 +156,9 @@ public class StatusCleanupService {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if (pnModel.getText().contains("eturn this card")
-                        && pnModel.getText().contains("end of the status phase")) {
+                if (pn.equalsIgnoreCase("shareknowledge")
+                        || (pnModel.getText().contains("eturn this card")
+                                && pnModel.getText().contains("end of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);

@@ -96,14 +96,6 @@ public class ListTechService {
         });
     }
 
-    @ButtonHandler("acquireATechWithDwsBt")
-    public void acquireATechWithDwsBt(ButtonInteractionEvent event, Game game, Player player) {
-        boolean sc = false;
-        boolean dws = true;
-        boolean firstTime = !event.getButton().getCustomId().endsWith("_second");
-        acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
-    }
-
     public void acquireATech(
             ButtonInteractionEvent event,
             Game game,
@@ -119,10 +111,11 @@ public class ListTechService {
         String techSuffix = dwsBt ? "_dwsbt" : "";
 
         if (sc || dwsBt) {
-            boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
+            boolean used = dwsBt || ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
             StrategyCardModel scModel =
                     game.getStrategyCardModelByName("technology").orElse(null);
             if (!used
+                    && !dwsBt
                     && scModel != null
                     && scModel.usesAutomationForSCID("pok7technology")
                     && !player.getFollowedSCs().contains(scModel.getInitiative())) {

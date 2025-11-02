@@ -81,6 +81,7 @@ public class VisionariaSelectService {
         boolean sc = false;
         boolean dws = true;
         boolean firstTime = !buttonID.endsWith("_second");
+        game.setComponentAction(true);
         ListTechService.acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
         if (firstTime) {
             respondToVisionaria(event, game, player);

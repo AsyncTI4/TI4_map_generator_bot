@@ -44,8 +44,10 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -461,6 +463,16 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText)
                                 + ", please choose which planet you wish to get a technology and trade goods from (and kill any enemy units).",
                         buttons);
+            }
+            case "witchinghero" -> {
+                String assignSpeakerMessage = player.getRepresentation()
+                        + ", please choose a faction below to receive the Speaker token."
+                        + MiscEmojis.SpeakerToken;
+
+                List<Button> assignSpeakerActionRow =
+                        PlayStrategyCardService.getPoliticsAssignSpeakerButtons(game, player);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
             }
             case "lawshero" -> {
                 ButtonHelperTwilightsFallActionCards.resolveLawsHero(game, player);

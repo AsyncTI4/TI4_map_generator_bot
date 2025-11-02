@@ -4,7 +4,8 @@ public enum FrankenDraftMode {
     POWERED("powered", "Adds 1 extra faction technology/ability to pick from."),
     ONEPICK("onepick", "Draft 1 item a time."),
     POWEREDONEPICK("poweredonepick", "Combines powered and onepick modes."),
-    TWILIGHTSFALL("twilights_fall", "Used for Thunder's Edge Twilights Fall");
+    TWILIGHTSFALL("twilights_fall", "Used for Thunder's Edge Twilights Fall Franken Draft"),
+    INAUGURALSPLICE("inaugural_splice", "Used for Thunder's Edge Twilights Fall RAW Draft");
 
     private final String name;
     private final String description;
