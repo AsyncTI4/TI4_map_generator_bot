@@ -632,12 +632,27 @@ public class ButtonHelperTacticalAction {
                         + " You can use the buttons to flip the breach in the active system:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
-            if (player.hasPlayablePromissoryInHand("couriertransport")
-                    && activeSystem.getPlanetUnitHolders().size() > 0) {
+            if (player.hasPlayablePromissoryInHand("nanolink")
+                    && activeSystem.getPlanetUnitHolders().size() > 0
+                    && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
+                String msg = player.getRepresentation()
+                        + " You can use Nano Link Permit to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                List<Button> buttons = List.of(
+                        Buttons.green("startCourierTransport_" + pos, "Play Nano Link Permit"),
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
+                                .size()
+                        > 1) {
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                }
+            }
+            if (player.hasTech("tf-couriertransport")
+                    && activeSystem.getPlanetUnitHolders().size() > 0
+                    && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
                         + " You can use courier transport to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
                 List<Button> buttons = List.of(
-                        Buttons.green("startCourierTransport_" + pos, "Play Courier Transport"),
+                        Buttons.green("startCourierTransport_" + pos, "Use Courier Transport"),
                         Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
                 if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
                                 .size()

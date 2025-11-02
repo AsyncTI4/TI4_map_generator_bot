@@ -1080,7 +1080,8 @@ public class ExploreService {
 
         if (player.hasAbility("awaken")
                 && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
-                && player.getPlanetsAllianceMode().contains(planetID)) {
+                && player.getPlanetsAllianceMode().contains(planetID)
+                && !game.isTwilightsFallMode()) {
             Button placeSleeper =
                     Buttons.green("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID, MiscEmojis.Sleeper);
             Button declineSleeper = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");

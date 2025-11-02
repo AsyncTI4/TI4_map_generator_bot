@@ -2079,15 +2079,16 @@ public class AgendaHelper {
                 String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 Player keleres = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                 if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
-                    int size = getLosingVoters(outcome, game).size();
+                    int size = getLosingVoters(outcome, game).size()
+                            + getAbainingVoters(winner, game).size();
                     String message = keleres.getRepresentation()
                             + " You have Odlynn Myrr, the Keleres (Xxcha) Hero, to resolve. There were " + size
-                            + " players who voted for a different outcome, so you get that many trade goods and command tokens. ";
+                            + " players who abstained or voted for a different outcome, so you get that many trade goods and command tokens. ";
                     MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), message);
                     if (size > 0) {
                         keleres.setTg(keleres.getTg() + size);
-                        String msg2 = "Gained 3 trade goods (" + (keleres.getTg() - size) + " -> **" + keleres.getTg()
-                                + "**).";
+                        String msg2 = "Gained " + size + " trade goods (" + (keleres.getTg() - size) + " -> **"
+                                + keleres.getTg() + "**).";
                         ButtonHelperAbilities.pillageCheck(keleres, game);
                         ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);
@@ -2488,6 +2489,20 @@ public class AgendaHelper {
             }
         }
         return losers;
+    }
+
+    public static List<Player> getAbainingVoters(String winner, Game game) {
+        List<Player> abstainers = new ArrayList<>();
+        List<Player> losers = getLosingVoters(winner, game);
+        List<Player> winners = getWinningVoters(winner, game);
+        for (Player player : game.getRealPlayers()) {
+            int[] voteInfo = getVoteTotal(player, game);
+            if (!losers.contains(player) && !winners.contains(player) && voteInfo[0] > 0) {
+                abstainers.add(player);
+            }
+        }
+
+        return abstainers;
     }
 
     public static void atokeraCommanderUnlockCheck(Game game) {
@@ -3463,7 +3478,12 @@ public class AgendaHelper {
 
         boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
-            voteCount = Math.max(baseResourceCount, baseInfluenceCount);
+            int baseMixedCount = planets.stream()
+                    .map(planetsInfo::get)
+                    .filter(Objects::nonNull)
+                    .mapToInt(Planet::getHigherofInfluenceOrResource)
+                    .sum();
+            voteCount = baseMixedCount;
         }
 
         if (executive) {

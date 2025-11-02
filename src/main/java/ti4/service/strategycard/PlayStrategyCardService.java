@@ -908,7 +908,7 @@ public class PlayStrategyCardService {
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
-    private static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
+    public static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             if (!player.isSpeaker()) {
