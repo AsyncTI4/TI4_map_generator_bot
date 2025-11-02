@@ -95,6 +95,7 @@ public class Tile {
             if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
             if (tile.getPlanetUnitHolders().size() > 0) return false;
             if (tile.isSupernova()) return false;
+            if (tile.getPosition().contains("frac")) return false;
             if (tile.getTileModel().hasWormhole()) return false;
             return true;
         };

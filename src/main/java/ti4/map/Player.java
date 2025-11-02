@@ -153,9 +153,20 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasSpaceStation() {
-        return getPlanets().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
-                .anyMatch(Planet::isSpaceStation);
+        for (String planet : getPlanets()) {
+            if (!game.getPlanetsInfo().keySet().contains(planet)) {
+                MessageHelper.sendMessageToChannel(
+                        getCorrectChannel(),
+                        getRepresentationNoPing()
+                                + " seems to have planets that dont exist. Try removing them with /planet remove. The planet ID is "
+                                + planet);
+            } else {
+                if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public int numberOfSpaceStations() {
@@ -2205,7 +2216,7 @@ public class Player extends PlayerProperties {
             gainCustodiaVigilia();
         }
 
-        if ("planesplitter-firm".equalsIgnoreCase(techID)) {
+        if ("planesplitter-firm".equalsIgnoreCase(techID) || "tf-planesplitter".equalsIgnoreCase(techID)) {
             FractureService.spawnFracture(null, game);
             FractureService.spawnIngressTokens(null, game, this, false);
         }
