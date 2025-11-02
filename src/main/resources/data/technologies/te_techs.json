@@ -92,7 +92,7 @@
     },
     {
         "alias": "planesplitter-firm",
-        "name": "Planesplitter",
+        "name": "Planesplitter (Firmament)",
         "types": [
             "CYBERNETIC"
         ],
@@ -103,7 +103,7 @@
     },
     {
         "alias": "parasite-firm",
-        "name": "Neural Parasite",
+        "name": "Neural Parasite (Firmament)",
         "types": [
             "BIOTIC"
         ],
@@ -114,7 +114,7 @@
     },
     {
         "alias": "planesplitter-obs",
-        "name": "Planesplitter",
+        "name": "Planesplitter (Obsidian)",
         "types": [
             "CYBERNETIC"
         ],
@@ -125,7 +125,7 @@
     },
     {
         "alias": "parasite-obs",
-        "name": "Neural Parasite",
+        "name": "Neural Parasite (Obsidian)",
         "types": [
             "BIOTIC"
         ],

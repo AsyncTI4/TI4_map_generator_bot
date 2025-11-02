@@ -1,7 +1,7 @@
 [
     {
         "alias": "plus1_for_each_system_with_planets",
-        "type": "result_modifier",
+        "type": "mods",
         "value": "+1",
         "persistenceType": "ALWAYS",
         "valueScalingType": "nonhome_system_with_planet",
@@ -16,9 +16,10 @@
     },
     {
         "alias": "roll_1_for_galvanize_combat",
-        "type": "extra_rolls",
+        "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "galvanized_unit_count",
+        "scope": "",
         "persistenceType": "CONDITIONAL",
         "condition": "galvanized",
         "related": [
@@ -32,9 +33,10 @@
     },
     {
         "alias": "roll_1_for_galvanize_afb",
-        "type": "extra_rolls",
+        "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "galvanized_unit_count",
+        "scope": "",
         "persistenceType": "CONDITIONAL",
         "condition": "galvanized",
         "related": [
@@ -48,9 +50,10 @@
     },
     {
         "alias": "roll_1_for_galvanize_bombard",
-        "type": "extra_rolls",
+        "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "galvanized_unit_count",
+        "scope": "",
         "persistenceType": "CONDITIONAL",
         "condition": "galvanized",
         "related": [
@@ -64,9 +67,10 @@
     },
     {
         "alias": "roll_1_for_galvanize_spacecannon_offense",
-        "type": "extra_rolls",
+        "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "galvanized_unit_count",
+        "scope": "",
         "persistenceType": "CONDITIONAL",
         "condition": "galvanized",
         "related": [
@@ -80,9 +84,10 @@
     },
     {
         "alias": "roll_1_for_galvanized",
-        "type": "extra_rolls",
+        "type": "extrarolls",
         "value": "+1",
         "valueScalingType": "galvanized_unit_count",
+        "scope": "",
         "persistenceType": "CONDITIONAL",
         "condition": "galvanized",
         "related": [
@@ -96,7 +101,7 @@
     },
     {
         "alias": "plusX_letnev_breakthrough",
-        "type": "result_modifier",
+        "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "unique_ships",
         "persistenceType": "CONDITIONAL",

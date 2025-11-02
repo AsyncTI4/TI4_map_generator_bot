@@ -674,7 +674,7 @@ class PlayerAreaGenerator {
                 DrawingUtil.superDrawString(
                         graphics, name, x, yDelta, Color.white, HorizontalAlign.Left, null, null, null);
                 yDelta += 5;
-                for (String faction : player.getPlotCardsFactions().getOrDefault(alias, Collections.emptyList())) {
+                for (String faction : player.getPuppetedFactionsForPlot(alias)) {
                     Player p = game.getPlayerFromColorOrFaction(faction);
                     DrawingUtil.getAndDrawControlToken(graphics, p, x, yDelta, isFoWPrivate, 0.6f);
                     x += 40;
@@ -2423,6 +2423,7 @@ class PlayerAreaGenerator {
             String resource = bt.getBackgroundResource();
 
             BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
+            drawRectWithOverlay(graphics, x, y - 3, 44, 154, bt);
             graphics.drawImage(btBox, x, y - 3, null);
 
             if (player.getBreakthroughTGs() > 0) {

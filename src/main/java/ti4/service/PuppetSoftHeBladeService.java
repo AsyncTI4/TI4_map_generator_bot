@@ -51,7 +51,7 @@ public class PuppetSoftHeBladeService {
             GenericCardModel plot = Mapper.getPlot(plotID);
             plotInfo.append("\n").append(plot.getRepresentation());
 
-            List<String> puppetedFactions = player.getPlotCardsFactions().get(plotID);
+            List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && puppetedFactions.size() > 0) {
                 String factions = "";
                 for (String faction : puppetedFactions) {
@@ -69,7 +69,7 @@ public class PuppetSoftHeBladeService {
 
         // Serve relevant plot automation on reveal
         for (String plotID : player.getPlotCards().keySet()) {
-            List<String> puppetedFactions = player.getPlotCardsFactions().get(plotID);
+            List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
             if (puppetedFactions != null && puppetedFactions.size() > 0) {
                 List<Player> puppets = new ArrayList<>();
                 for (String faction : puppetedFactions) puppets.add(game.getPlayerFromColorOrFaction(faction));
@@ -148,10 +148,14 @@ public class PuppetSoftHeBladeService {
                 && newFaction.getHomeSystem().equals("te15b")) { // obsidian
             // Resolve control
             for (Player p : game.getPlayers().values()) {
-                if (p.hasPlanet("cronos")) p.addPlanet("cronoshollow");
-                if (p.hasPlanet("tallin")) p.addPlanet("tallinhollow");
-                p.exhaustPlanet("cronoshollow");
-                p.exhaustPlanet("tallinhollow");
+                if (p.hasPlanet("cronos")) {
+                    p.addPlanet("cronoshollow");
+                    p.removePlanet("cronos");
+                }
+                if (p.hasPlanet("tallin")) {
+                    p.addPlanet("tallinhollow");
+                    p.removePlanet("tallin");
+                }
             }
 
             // Then add units and stuff
@@ -240,13 +244,13 @@ public class PuppetSoftHeBladeService {
         oldFaction.getFactionTech().forEach(tech -> {
             if (player.hasTech(tech)) ownedFactionTech.add(Mapper.getTech(tech).getName());
             player.removeFactionTech(tech);
+            player.removeTech(tech);
         });
         newFaction.getFactionTech().forEach(tech -> {
             player.addFactionTech(tech);
 
             String replacableTech = Mapper.getTech(tech).getName().replace("Obsidian", "Firmament");
             if (ownedFactionTech.contains(replacableTech)) {
-                ownedFactionTech.remove(replacableTech);
                 player.addTech(tech);
             }
         });

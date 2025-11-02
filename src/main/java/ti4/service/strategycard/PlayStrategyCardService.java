@@ -296,7 +296,7 @@ public class PlayStrategyCardService {
         }
 
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
-        if (obsidian != null && obsidian.getPlotCardsFactions().get("enervate").contains(player.getFaction())) {
+        if (obsidian != null && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())) {
             if (!scModel.usesAutomationForSCID("pok1leadership")) {
                 String enervateMsg = obsidian.getRepresentation()
                         + " the puppeted player for Enervate has played a strategy card, so you have been marked as following for free. ";

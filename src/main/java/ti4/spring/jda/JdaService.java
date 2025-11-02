@@ -38,6 +38,7 @@ import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.ThreadArchiveCron;
+import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.executors.ExecutorServiceManager;
@@ -231,12 +232,12 @@ public class JdaService {
             guildTourney = initGuild(args[15], false);
         }
 
-        // Async: 10th Server
+        // Async: Great Carrier Reef
         if (args.length >= 17) {
             guildDecenary = initGuild(args[16], true);
         }
 
-        // Async: 11th Server
+        // Async: PDStrians
         if (args.length >= 18) {
             guildUndenary = initGuild(args[17], true);
         }
@@ -305,6 +306,7 @@ public class JdaService {
         LogCacheStatsCron.register();
         WinningPathCron.register();
         UploadStatsCron.register();
+        UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
         LogButtonRuntimeStatisticsCron.register();
@@ -410,8 +412,8 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1378702133297414170")); // Async Octonary (What's up Dock)
         adminRoles.add(jda.getRoleById("1410728648817770532")); // Async Nonary (Ship Flag)
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Tourney
-        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
-        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        adminRoles.add(jda.getRoleById("1434180793139204204")); // Async Decenary (Great Carrier Reef)
+        adminRoles.add(jda.getRoleById("1434181175944941655")); // Async Undenary (PDStrians)
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1429853811899502675")); // FoW Server Chapter 2
@@ -450,8 +452,8 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1378702133297414169")); // Async Octonary (What's up Dock)
         developerRoles.add(jda.getRoleById("1410728648817770531")); // Async Nonary (Ship Flag)
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Tourney
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        developerRoles.add(jda.getRoleById("1434180793139204203")); // Async Decenary (Great Carrier Reef)
+        developerRoles.add(jda.getRoleById("1434181175944941654")); // Async Undenary (PDStrians)
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1429853811882594528")); // FoW Server Chapter 2
@@ -483,8 +485,8 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1378702133297414167")); // Async Octonary (What's up Dock)
         bothelperRoles.add(jda.getRoleById("1410728648817770529")); // Async Nonary (Ship Flag)
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Tourney
-        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
-        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        bothelperRoles.add(jda.getRoleById("1434180793139204201")); // Async Decenary (Great Carrier Reef)
+        bothelperRoles.add(jda.getRoleById("1434181175944941652")); // Async Undenary (PDStrians)
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
