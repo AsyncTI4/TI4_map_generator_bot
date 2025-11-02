@@ -74,7 +74,7 @@ public class GameStatsDashboardPayload {
 
     @JsonProperty("isPoK")
     public boolean isPoK() {
-        return !game.isBaseGameMode();
+        return game.isProphecyOfKings();
     }
 
     public List<String> getLaws() {
@@ -193,25 +193,25 @@ public class GameStatsDashboardPayload {
         List<String> enabledModes = Stream.of(
                         Map.entry("Alliance", (Supplier<Boolean>) game::isAllianceMode),
                         Map.entry("Community", (Supplier<Boolean>) game::isCommunityMode),
-                        Map.entry("Competitive TIGL", (Supplier<Boolean>) game::isCompetitiveTIGLGame),
+                        Map.entry("TIGL", (Supplier<Boolean>) game::isCompetitiveTIGLGame),
                         Map.entry("Fog of War", (Supplier<Boolean>) game::isFowMode),
                         Map.entry("Light Fog", (Supplier<Boolean>) game::isLightFogMode),
-                        Map.entry("CPTI Explore", (Supplier<Boolean>) game::isCptiExploreMode),
                         Map.entry("Absol", (Supplier<Boolean>) game::isAbsolMode),
                         Map.entry("Discordant Stars", (Supplier<Boolean>) game::isDiscordantStarsMode),
                         Map.entry("Uncharted Space", (Supplier<Boolean>) game::isUnchartedSpaceStuff),
                         Map.entry("Milty Mod", (Supplier<Boolean>) game::isMiltyModMode),
-                        Map.entry("Promises Promises", (Supplier<Boolean>) game::isPromisesPromisesMode),
+                        Map.entry("Promises, Promises", (Supplier<Boolean>) game::isPromisesPromisesMode),
                         Map.entry("Flagshipping", (Supplier<Boolean>) game::isFlagshippingMode),
                         Map.entry("Red Tape", (Supplier<Boolean>) game::isRedTapeMode),
                         Map.entry("Omega Phase", (Supplier<Boolean>) game::isOmegaPhaseMode),
                         Map.entry("Homebrew", (Supplier<Boolean>) game::hasHomebrew),
                         Map.entry("Homebrew Strategy Cards", (Supplier<Boolean>) game::isHomebrewSCMode),
-                        Map.entry("Fast Strategy Card Follow", (Supplier<Boolean>) game::isFastSCFollowMode),
                         Map.entry("Extra Secret", (Supplier<Boolean>) game::isExtraSecretMode),
                         Map.entry("Voice of the Council", (Supplier<Boolean>) game::isVotcMode),
-                        Map.entry("Reverse Speaker Order", (Supplier<Boolean>) game::isReverseSpeakerOrder),
-                        Map.entry("Thunders Edge", (Supplier<Boolean>) game::isThundersEdge),
+                        Map.entry("Base Game", (Supplier<Boolean>) game::isBaseGameMode),
+                        Map.entry("Prophecy of Kings", (Supplier<Boolean>) game::isProphecyOfKings),
+                        Map.entry("Thunder's Edge", (Supplier<Boolean>) game::isThundersEdge),
+                        Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
                         Map.entry("Age of Exploration", (Supplier<Boolean>) game::isAgeOfExplorationMode),
                         Map.entry("Facilities", (Supplier<Boolean>) game::isFacilitiesMode),
                         Map.entry("Minor Factions", (Supplier<Boolean>) game::isMinorFactionsMode),
@@ -228,16 +228,14 @@ public class GameStatsDashboardPayload {
                         Map.entry("Weird Wormholes", (Supplier<Boolean>) game::isWeirdWormholesMode),
                         Map.entry("Cosmic Phenomenae", (Supplier<Boolean>) game::isCosmicPhenomenaeMode),
                         Map.entry("Monument to the Ages", (Supplier<Boolean>) game::isMonumentToTheAgesMode),
-                        Map.entry("Wild Wild Galaxy", (Supplier<Boolean>) game::isWildWildGalaxyMode),
+                        Map.entry("Wild, Wild Galaxy", (Supplier<Boolean>) game::isWildWildGalaxyMode),
                         Map.entry("Zealous Orthodoxy", (Supplier<Boolean>) game::isZealousOrthodoxyMode),
                         Map.entry("Stellar Atomics", (Supplier<Boolean>) game::isStellarAtomicsMode),
-                        Map.entry("No Swap", (Supplier<Boolean>) game::isNoSwapMode),
-                        Map.entry("Limited Whispers", (Supplier<Boolean>) game::isLimitedWhispersMode),
+                        Map.entry("No Support Swap", (Supplier<Boolean>) game::isNoSwapMode),
                         Map.entry("Age of Commerce", (Supplier<Boolean>) game::isAgeOfCommerceMode),
                         Map.entry("Hidden Agenda", (Supplier<Boolean>) game::isHiddenAgendaMode),
-                        Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
-                        Map.entry("Ordinian C1", (Supplier<Boolean>) game::isOrdinianC1Mode),
-                        Map.entry("Liberation C4", (Supplier<Boolean>) game::isLiberationC4Mode))
+                        Map.entry("Ordinian", (Supplier<Boolean>) game::isOrdinianC1Mode),
+                        Map.entry("Liberation", (Supplier<Boolean>) game::isLiberationC4Mode))
                 .filter(entry -> entry.getValue().get())
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toCollection(ArrayList::new));

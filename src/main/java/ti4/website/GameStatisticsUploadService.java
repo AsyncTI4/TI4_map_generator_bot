@@ -23,9 +23,9 @@ import ti4.website.model.stats.GameStatsDashboardPayload;
 @UtilityClass
 public class GameStatisticsUploadService {
 
-    private static final int MINIMUM_ROUND = 3;
+    private static final int MINIMUM_ROUND = 2;
     private static final int STAT_BATCH_SIZE = 200;
-    private static final Duration THIRTY_DAYS_DURATION = Duration.ofDays(30);
+    private static final Duration THIRTY_DAYS_DURATION = Duration.ofDays(7);
 
     public static void uploadAllStats() throws IOException {
         Predicate<ManagedGame> shouldUpload = GameStatisticsUploadService::isValidToUpload;
