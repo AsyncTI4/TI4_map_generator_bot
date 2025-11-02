@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -94,22 +93,25 @@ public class StatusCleanupService {
 
             String shareKnowledgeConst = "ShareKnowledge_" + player.getFaction();
             String sharedKnowledge = game.getStoredValue(shareKnowledgeConst);
-            if (player.isRealPlayer() && sharedKnowledge != null && !sharedKnowledge.equals("")) {
+            if (player.isRealPlayer() && sharedKnowledge != null && !sharedKnowledge.isEmpty()) {
                 game.removeStoredValue(shareKnowledgeConst);
-                player.removeTech(sharedKnowledge);
-                TechnologyModel tech = Mapper.getTech(sharedKnowledge);
-                String msg = player.getRepresentation() + " technology " + tech.getRepresentation(false) + " has been removed, and Share Knowledge has been returned to the owner.";
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg);
+                if (player.getPromissoryNotesInPlayArea().contains("shareknowledge")) {
+                    player.removeTech(sharedKnowledge);
+                    TechnologyModel tech = Mapper.getTech(sharedKnowledge);
+                    String msg = player.getRepresentation() + " technology " + tech.getRepresentation(false)
+                            + " has been removed, and Share Knowledge has been returned to the owner.";
+                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg);
 
-                player.removePromissoryNote("shareknowledge");
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2.ownsPromissoryNote("shareknowledge")) {
-                        p2.setPromissoryNote("shareknowledge");
-                        PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-                        break;
+                    player.removePromissoryNote("shareknowledge");
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.ownsPromissoryNote("shareknowledge")) {
+                            p2.setPromissoryNote("shareknowledge");
+                            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
+                            break;
+                        }
                     }
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                 }
-                PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
             }
 
             if (player.isRealPlayer()
