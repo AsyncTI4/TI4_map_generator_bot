@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -183,7 +182,7 @@ public class StatusCleanupService {
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                 if ((pnModel.getText().contains("eturn this card")
-                                && pnModel.getText().contains("end of the status phase"))) {
+                        && pnModel.getText().contains("end of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
