@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +77,13 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(tfName);
     }
 
+    public String getTFNameIfAble() {
+        if (tfName != null) {
+            return tfName;
+        }
+        return name;
+    }
+
     public Optional<String> getTFTitle() {
         return Optional.ofNullable(tfTitle);
     }
@@ -129,7 +136,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(
-            boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText, boolean useTwilightsFallText) {
+            boolean includeID,
+            boolean includeFactionType,
+            boolean showUnlockConditions,
+            boolean includeFlavourText,
+            boolean useTwilightsFallText) {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel factionModel = Mapper.getFaction(faction);
         String factionEmoji = FactionEmojis.getFactionIcon(faction).toString();
@@ -149,8 +160,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             title_name_component = name;
             title_subtitle_component = this.title;
         }
-        String title = factionEmoji + " __**" + title_name_component + "**__ " 
-                + LeaderEmojis.getLeaderTypeEmoji(type) + " " + title_subtitle_component + source.emoji();  
+        String title = factionEmoji + " __**" + title_name_component + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type)
+                + " " + title_subtitle_component + source.emoji();
         eb.setTitle(title);
 
         Emoji emoji = getLeaderEmoji().asEmoji();
@@ -170,8 +181,9 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FIELDS
         String abilityName = useTwilightsFallText ? " " : getAbilityName().orElse(" ");
-        String abilityWindow = useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
-        String fieldTitle =  abilityName + "\n**" + abilityWindow + "**";
+        String abilityWindow =
+                useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
+        String fieldTitle = abilityName + "\n**" + abilityWindow + "**";
         String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(this.abilityText) : this.abilityWindow;
         eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);

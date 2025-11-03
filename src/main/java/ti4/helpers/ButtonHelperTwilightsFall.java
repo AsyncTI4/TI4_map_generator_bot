@@ -508,8 +508,8 @@ public class ButtonHelperTwilightsFall {
                     MessageHelper.sendMessageToChannelWithEmbed(
                             game.getActionsChannel(),
                             player.getRepresentation() + " has spliced in the genome: "
-                                    + Mapper.getLeader(cardID).getName(),
-                            Mapper.getLeader(cardID).getRepresentationEmbed());
+                                    + Mapper.getLeader(cardID).getTFNameIfAble(),
+                            Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                 }
                 if (type.equalsIgnoreCase("units")) {
                     UnitModel unitModel = Mapper.getUnit(cardID);
@@ -628,7 +628,7 @@ public class ButtonHelperTwilightsFall {
                 game.getActionsChannel(),
                 player.getRepresentation() + " has drawn a new paradigm: "
                         + Mapper.getLeader(leader).getName(),
-                Mapper.getLeader(leader).getRepresentationEmbed());
+                Mapper.getLeader(leader).getRepresentationEmbed(false, true, false, false, true));
         player.addLeader(leader);
         player.getLeaderByID(leader).get().setLocked(false);
     }
@@ -646,7 +646,7 @@ public class ButtonHelperTwilightsFall {
         }
         if (type.equalsIgnoreCase("genome")) {
             for (String card : cards) {
-                String name = Mapper.getLeader(card).getName();
+                String name = Mapper.getLeader(card).getTFNameIfAble();
                 String faction = Mapper.getLeader(card).getFaction();
                 if (faction.contains("keleres")) {
                     faction = "keleresm";
@@ -685,7 +685,7 @@ public class ButtonHelperTwilightsFall {
         }
         if (type.equalsIgnoreCase("genome") || type.equalsIgnoreCase("paradigm")) {
             for (String card : cards) {
-                embeds.add(Mapper.getLeader(card).getRepresentationEmbed());
+                embeds.add(Mapper.getLeader(card).getRepresentationEmbed(false, true, false, false, true));
             }
         }
         if (type.equalsIgnoreCase("units")) {
@@ -705,7 +705,7 @@ public class ButtonHelperTwilightsFall {
         }
         if (type.equalsIgnoreCase("genome")) {
             for (String card : cards) {
-                embeds.add(Mapper.getLeader(card).getRepresentationEmbed());
+                embeds.add(Mapper.getLeader(card).getRepresentationEmbed(false, true, false, false, true));
             }
         }
         if (type.equalsIgnoreCase("units")) {
@@ -747,7 +747,7 @@ public class ButtonHelperTwilightsFall {
                 }
                 buttons.add(Buttons.red(
                         "discardSpecificSpliceCard_" + type + "_" + leader,
-                        "Discard " + Mapper.getLeader(leader).getName()));
+                        "Discard " + Mapper.getLeader(leader).getTFNameIfAble()));
             }
         }
         if (type.equalsIgnoreCase("units")) {
@@ -783,8 +783,8 @@ public class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
                     player.getRepresentation() + " has lost the genome: "
-                            + Mapper.getLeader(cardID).getName(),
-                    Mapper.getLeader(cardID).getRepresentationEmbed());
+                            + Mapper.getLeader(cardID).getTFNameIfAble(),
+                    Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
         }
         if (type.equalsIgnoreCase("units")) {
             player.removeOwnedUnitByID(cardID);
