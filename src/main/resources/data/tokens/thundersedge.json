@@ -33,6 +33,18 @@
         "source": "thunders_edge"
     },
     {
+        "id": "severed",
+        "imagePath": "token_severed.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "sever",
+            "token_sever",
+            "severed",
+            "token_severed"
+        ],
+        "source": "thunders_edge"
+    },
+    {
         "id": "ingress",
         "imagePath": "token_ingress.png",
         "spaceOrPlanet": "space",
