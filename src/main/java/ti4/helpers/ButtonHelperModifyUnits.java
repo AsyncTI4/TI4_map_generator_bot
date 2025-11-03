@@ -1721,24 +1721,18 @@ public class ButtonHelperModifyUnits {
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
                                 shroadedFleets);
                     }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
+                    if (player.hasLeaderUnlocked("redcreusshero") || player.hasLeaderUnlocked("crimsonhero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
                                 Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
+                                "You may place this produced ship on the Crimson Hero.",
                                 shroadedFleets);
-                    }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
-                        List<Button> shroadedFleets = new ArrayList<>();
-                        shroadedFleets.add(
-                                Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
+                                "You may place this produced ship on the Crimson Hero.",
                                 shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1762,7 +1756,7 @@ public class ButtonHelperModifyUnits {
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
                                 cloakedFleets);
                     }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
+                    if (player.hasLeaderUnlocked("redcreusshero") || player.hasLeaderUnlocked("crimsonhero")) {
                         List<Button> cloakedFleets = new ArrayList<>();
                         cloakedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile.getPosition() + "_" + unitID,
@@ -1770,7 +1764,7 @@ public class ButtonHelperModifyUnits {
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the \"A Tall Stranger\", Red Creuss Hero.",
+                                "You may place this produced ship on the Crimson Hero.",
                                 cloakedFleets);
                     }
                 }
@@ -2074,16 +2068,14 @@ public class ButtonHelperModifyUnits {
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
                                 shroadedFleets);
                     }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
+                    if (player.hasLeaderUnlocked("redcreusshero") || player.hasLeaderUnlocked("crimsonhero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile2.getPosition() + "_" + unitID,
                                 "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
-                                event.getChannel(),
-                                "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
-                                shroadedFleets);
+                                event.getChannel(), "You may place this produced ship on the Crimson.", shroadedFleets);
                     }
                     if (tile2 != null
                             && !willSkipBuild

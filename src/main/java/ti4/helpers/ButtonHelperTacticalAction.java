@@ -559,7 +559,8 @@ public class ButtonHelperTacticalAction {
         }
 
         if (player.hasUnlockedBreakthrough("argentbt")
-                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+                && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
+                && ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
             List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

@@ -345,6 +345,13 @@ public class MiltyService {
             if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
                 pos = "bl";
             }
+            if (game.getTileByPosition(pos) != null) {
+                if (pos.equalsIgnoreCase("tr")) {
+                    pos = "br";
+                } else {
+                    pos = "tr";
+                }
+            }
             tile = new Tile("51", pos);
             game.setTile(tile);
             player.setHomeSystemPosition(pos);
