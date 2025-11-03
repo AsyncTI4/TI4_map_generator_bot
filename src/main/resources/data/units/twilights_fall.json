@@ -540,7 +540,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Keep this card in your play area [it does not count as a real flagship unit]; decrease the combat value of your flagship by 1, increase the number of combat dice it rolls by 1, increase its move value by 1, and increase its capacity by 2."
+        "ability": "Keep this card in your play area [it adcts in addition to your normal flagship]; decrease the combat value of your flagship by 1, increase the number of combat dice it rolls by 1, increase its move value by 1, and increase its capacity by 2."
     },
     {
         "id": "blacktf_mech",

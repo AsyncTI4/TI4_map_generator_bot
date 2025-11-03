@@ -639,7 +639,7 @@ public class ButtonHelperTwilightsFall {
             for (String card : cards) {
                 String name = Mapper.getTech(card).getName();
                 buttons.add(Buttons.green(
-                        "selectASpliceCard_" + card,
+                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_" + card,
                         "Select " + name,
                         Mapper.getTech(card).getSingleTechEmoji()));
             }
@@ -652,8 +652,10 @@ public class ButtonHelperTwilightsFall {
                     faction = "keleresm";
                 }
                 FactionModel factionModel = Mapper.getFaction(faction);
-                buttons.add(
-                        Buttons.green("selectASpliceCard_" + card, "Select " + name, factionModel.getFactionEmoji()));
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_" + card,
+                        "Select " + name,
+                        factionModel.getFactionEmoji()));
             }
         }
         if (type.equalsIgnoreCase("units")) {
@@ -666,11 +668,13 @@ public class ButtonHelperTwilightsFall {
             }
         }
         String lastSplicer = game.getStoredValue("lastSplicer");
-        if (!player.hasTech("wavelength") && !lastSplicer.equalsIgnoreCase(player.getRepresentation())) {
-            buttons.add(Buttons.green("selectASpliceCard_wavelength", "Select Wavelength"));
+        if (!player.hasTech("wavelength") && !lastSplicer.equalsIgnoreCase(player.getFaction())) {
+            buttons.add(Buttons.green(
+                    player.getFinsFactionCheckerPrefix() + "selectASpliceCard_wavelength", "Select Wavelength"));
         }
-        if (!player.hasTech("antimatter") && !lastSplicer.equalsIgnoreCase(player.getRepresentation())) {
-            buttons.add(Buttons.green("selectASpliceCard_antimatter", "Select Antimatter"));
+        if (!player.hasTech("antimatter") && !lastSplicer.equalsIgnoreCase(player.getFaction())) {
+            buttons.add(Buttons.green(
+                    player.getFinsFactionCheckerPrefix() + "selectASpliceCard_antimatter", "Select Antimatter"));
         }
         return buttons;
     }
