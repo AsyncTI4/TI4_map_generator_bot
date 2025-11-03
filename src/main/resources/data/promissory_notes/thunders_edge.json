@@ -41,6 +41,7 @@
         "name": "Sever",
         "faction": "crimson",
         "playArea": true,
+        "playImmediately": false,
         "attachment": false,
         "source": "thunders_edge",
         "text": "ACTION: place this card face up in your play area, and place the sever token in a system that contains your units, wormholes in that system have no effect during movement. Remove the sever token and return this card to the Rebellion player at end of the status phase."
