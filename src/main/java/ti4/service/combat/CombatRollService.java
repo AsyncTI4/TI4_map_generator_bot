@@ -710,7 +710,16 @@ public class CombatRollService {
                     continue;
                 }
             }
-
+            if (unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonlandwaster")) {
+                numRollsPerUnit++;
+            }
+            if (unitModel.getUnitType() == UnitType.Mech && player.ownsUnit("tf-eidolonterminus")) {
+                modifierToHit++;
+            }
+            if (unitModel.getUnitType() == UnitType.Flagship && player.ownsUnit("tf-echoofascension")) {
+                modifierToHit++;
+                numRollsPerUnit++;
+            }
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             int mult = 1;
@@ -1117,10 +1126,43 @@ public class CombatRollService {
                     }
                 }
             } else {
-                output = new HashMap<>(unitsInCombat.entrySet().stream()
-                        .filter(entry ->
-                                entry.getKey() != null && entry.getKey().getIsShip())
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+
+                if (player.hasUnit("purpletf_mech")) {
+                    output = new HashMap<>(unitsInCombat.entrySet().stream()
+                            .filter(entry -> entry.getKey() != null
+                                    && (entry.getKey().getUnitType() == UnitType.Mech
+                                            || entry.getKey().getIsShip()))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                    for (UnitHolder u2 : tile.getUnitHolders().values()) {
+                        if (u2 == unitHolder) {
+                            continue;
+                        }
+                        Map<String, Integer> unitsByAsyncId2 = u2.getUnitAsyncIdsOnHolder(colorID);
+                        Map<UnitModel, Integer> unitsInCombat2 = unitsByAsyncId2.entrySet().stream()
+                                .map(entry -> new ImmutablePair<>(
+                                        player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
+                                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+                        Map<UnitModel, Integer> output2;
+                        output2 = new HashMap<>(unitsInCombat2.entrySet().stream()
+                                .filter(entry -> entry.getKey() != null
+                                        && (entry.getKey().getUnitType() == UnitType.Mech
+                                                || entry.getKey().getIsShip()))
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                        for (Map.Entry<UnitModel, Integer> entry : output2.entrySet()) {
+                            UnitModel unit = entry.getKey();
+                            if (output.containsKey(unit)) {
+                                output.put(unit, output.get(unit) + entry.getValue());
+                            } else {
+                                output.put(unit, entry.getValue());
+                            }
+                        }
+                    }
+                } else {
+                    output = new HashMap<>(unitsInCombat.entrySet().stream()
+                            .filter(entry ->
+                                    entry.getKey() != null && entry.getKey().getIsShip())
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+                }
             }
             if (player.getGame().isCosmicPhenomenaeMode() && tile.isAsteroidField() && !player.hasFF2Tech()) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()

@@ -98,7 +98,7 @@ public class ResonanceGeneratorService {
         String source = resonanceRep();
         if (pos.contains("_")) {
             source = "a crimson destroyer";
-            pos = pos.split("_")[1];
+            pos = pos.split("_")[0];
         }
         Tile tile = game.getTileByPosition(pos);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);

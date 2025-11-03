@@ -348,10 +348,15 @@ public class ButtonHelperTwilightsFall {
 
     public static void sendPlayerSpliceOptions(Game game, Player player) {
         String type = game.getStoredValue("spliceType");
+
         List<String> cards = getSpliceCards(game);
         List<Button> buttons = getSpliceButtons(game, type, cards, player);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
         String msg = player.getRepresentation() + " Select a card to splice into your faction:";
+        String lastSplicer = game.getStoredValue("lastSplicer");
+        if (lastSplicer.equalsIgnoreCase(player.getRepresentation())) {
+            msg = player.getRepresentation() + " select a card to remove from the splice:";
+        }
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
     }
 
@@ -660,13 +665,35 @@ public class ButtonHelperTwilightsFall {
                         Mapper.getUnit(card).getUnitEmoji()));
             }
         }
-        if (!player.hasTech("wavelength")) {
+        String lastSplicer = game.getStoredValue("lastSplicer");
+        if (!player.hasTech("wavelength") && !lastSplicer.equalsIgnoreCase(player.getRepresentation())) {
             buttons.add(Buttons.green("selectASpliceCard_wavelength", "Select Wavelength"));
         }
-        if (!player.hasTech("antimatter")) {
+        if (!player.hasTech("antimatter") && !lastSplicer.equalsIgnoreCase(player.getRepresentation())) {
             buttons.add(Buttons.green("selectASpliceCard_antimatter", "Select Antimatter"));
         }
         return buttons;
+    }
+
+    public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
+        List<MessageEmbed> embeds = new ArrayList<>();
+        List<String> cards = getDeckForSplicing(game, type, 100);
+        if (type.equalsIgnoreCase("ability")) {
+            for (String card : cards) {
+                embeds.add(Mapper.getTech(card).getRepresentationEmbed());
+            }
+        }
+        if (type.equalsIgnoreCase("genome") || type.equalsIgnoreCase("paradigm")) {
+            for (String card : cards) {
+                embeds.add(Mapper.getLeader(card).getRepresentationEmbed());
+            }
+        }
+        if (type.equalsIgnoreCase("units")) {
+            for (String card : cards) {
+                embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
+            }
+        }
+        MessageHelper.sendMessageEmbedsToThread(event.getChannel(), "Remaining cards of type: " + type, embeds);
     }
 
     public static List<MessageEmbed> getSpliceEmbeds(Game game, String type, List<String> cards, Player player) {
@@ -857,6 +884,17 @@ public class ButtonHelperTwilightsFall {
                 for (String tech : p.getLeaderIDs()) {
                     allCards.remove(tech);
                 }
+            }
+            for (int i = 0; i < size && allCards.size() > 0; i++) {
+                cards.add(allCards.remove(0));
+            }
+        }
+        if (type.equalsIgnoreCase("paradigm")) {
+            List<String> allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
+            List<String> alreadyDrawn =
+                    List.of(game.getStoredValue("savedParadigms").split("_"));
+            for (String card : alreadyDrawn) {
+                allCards.remove(card);
             }
             for (int i = 0; i < size && allCards.size() > 0; i++) {
                 cards.add(allCards.remove(0));

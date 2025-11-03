@@ -52,6 +52,8 @@ class WeirdGameSetup extends GameStateSubcommand {
                 OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.TWILIGHTS_FALL_MODE, "True to enable Twilights Fall Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
@@ -83,6 +85,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
         if (fowMode != null) game.setFowMode(fowMode);
+
+        Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
+        if (tfMode != null) game.setTwilightsFallMode(tfMode);
 
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(

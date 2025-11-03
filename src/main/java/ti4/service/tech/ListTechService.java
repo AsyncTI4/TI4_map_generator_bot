@@ -236,6 +236,16 @@ public class ListTechService {
                 if (unit.startsWith(uk.getUnitType().getValue())) return true;
             }
         }
+        Set<TechnologyType> synergies = player.getSynergies();
+        for (TechnologyType synergy : synergies) {
+            requirements = switch (synergy) {
+                case PROPULSION -> requirements.replace("B", "X");
+                case BIOTIC -> requirements.replace("G", "X");
+                case CYBERNETIC -> requirements.replace("Y", "X");
+                case WARFARE -> requirements.replace("R", "X");
+                default -> requirements;
+            };
+        }
 
         for (String planet : player.getPlanets()) {
             if (player.getExhaustedPlanets().contains(planet)
@@ -249,6 +259,13 @@ public class ListTechService {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
                     } else {
+                        if (synergies.contains(TechnologyType.valueOf(type.toUpperCase()))) {
+                            requirements = requirements.replaceFirst("X", "");
+                            if (player.hasAbility("ancient_knowledge")) {
+                                requirements = requirements.replaceFirst("X", "");
+                            }
+                            continue;
+                        }
                         if ("propulsion".equalsIgnoreCase(type)) {
                             requirements = B.matcher(requirements).replaceFirst("");
                             if (player.hasAbility("ancient_knowledge")) {
@@ -303,16 +320,6 @@ public class ListTechService {
 
         // All sources of pre-requisites below can also apply via synergy.
         // - Replace all synergies that the player has with a simple "X"
-        Set<TechnologyType> synergies = player.getSynergies();
-        for (TechnologyType synergy : synergies) {
-            requirements = switch (synergy) {
-                case PROPULSION -> requirements.replace("B", "X");
-                case BIOTIC -> requirements.replace("G", "X");
-                case CYBERNETIC -> requirements.replace("Y", "X");
-                case WARFARE -> requirements.replace("R", "X");
-                default -> requirements;
-            };
-        }
 
         for (String techID : player.getTechs()) {
             TechnologyModel playerTech = Mapper.getTech(techID);
