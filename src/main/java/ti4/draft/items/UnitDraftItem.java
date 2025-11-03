@@ -69,6 +69,11 @@ public class UnitDraftItem extends DraftItem {
             sb.append(unit.getProductionValue());
             sb.append(" ");
         }
+        if (unit.getCapacityValue() > 0) {
+            sb.append("Capacity ");
+            sb.append(unit.getCapacityValue());
+            sb.append(" ");
+        }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get() + " ");
         if (unit.getFaction().isPresent()) {
             sb.append("Faction: " + unit.getFaction().get());

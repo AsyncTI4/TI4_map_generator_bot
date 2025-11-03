@@ -1778,19 +1778,21 @@ public class StartCombatService {
                     finChecker + "purgeKortaliHero_" + p1.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
         }
 
-        if (p1.hasLeaderUnlocked("redcreusshero") && isSpaceCombat) {
+        if ((p1.hasLeaderUnlocked("redcreusshero") || p1.hasLeaderUnlocked("crimsonhero")) && isSpaceCombat) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "purgeRedCreussHero_" + tile.getPosition(),
-                    "Purge Red Creuss Hero",
-                    FactionEmojis.Ghost));
+                    "Purge Crimson Hero",
+                    FactionEmojis.Crimson));
         }
-        if (p2.hasLeaderUnlocked("redcreusshero") && !game.isFowMode() && isSpaceCombat) {
+        if ((p2.hasLeaderUnlocked("redcreusshero") || p2.hasLeaderUnlocked("crimsonhero"))
+                && !game.isFowMode()
+                && isSpaceCombat) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "purgeRedCreussHero_" + tile.getPosition(),
-                    "Purge Red Creuss Hero",
-                    FactionEmojis.Ghost));
+                    "Purge Crimson Hero",
+                    FactionEmojis.Crimson));
         }
         if (p1.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";

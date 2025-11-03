@@ -611,6 +611,10 @@ public class StatusHelper {
         }
         for (Player player : scars.keySet()) {
             List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
+            if (game.isTwilightsFallMode()) {
+                factionTechs.add("antimatter");
+                factionTechs.add("wavelength");
+            }
             player.getTechs().forEach(factionTechs::remove);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {

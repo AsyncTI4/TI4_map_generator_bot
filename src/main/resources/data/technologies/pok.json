@@ -230,7 +230,7 @@
         ],
         "requirements": "RR",
         "source": "base",
-        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round.",
+        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round. [Note: this only occurs after the normal assign hits step in a combat round, which occurs after both sides roll combat dice. It occurs even if the opponent rolled no hits.]",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/duranium_armor.png?raw=true",
         "initials": "DA"
     },

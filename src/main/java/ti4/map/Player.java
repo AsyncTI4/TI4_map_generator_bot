@@ -842,6 +842,10 @@ public class Player extends PlayerProperties {
                 && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
                         || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
+        if (unit.getID().contains("tf-")
+                && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
+            score = 0;
+        }
 
         return score;
     }
@@ -2864,7 +2868,7 @@ public class Player extends PlayerProperties {
         }
         if (getHomeSystemPosition() != null) {
             Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
-            if (frankenHs != null) {
+            if (frankenHs != null && frankenHs.isHomeSystem()) {
                 return frankenHs;
             }
         }
