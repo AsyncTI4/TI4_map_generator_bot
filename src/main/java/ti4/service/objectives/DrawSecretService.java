@@ -131,6 +131,7 @@ public class DrawSecretService {
                     String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
                     game.setupNeutralPlayer(color);
                 }
+                game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
             }
             if (game.isThundersEdge() || game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
