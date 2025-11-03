@@ -347,11 +347,16 @@ public class WebPlayerArea {
         // Plot cards (Firmament/Obsidian)
         List<PlotCardInfo> plotCardsList = new ArrayList<>();
         if (player.hasAbility("bladesorchestra") || player.hasAbility("plotsplots")) {
+            // Only reveal plot names when player has become Obsidian (bladesorchestra ability)
+            // Firmament players (plotsplots only) should not have plot names revealed
+            boolean isObsidian = player.hasAbility("bladesorchestra");
             for (Map.Entry<String, Integer> plotEntry : player.getPlotCards().entrySet()) {
                 String plotAlias = plotEntry.getKey();
                 Integer identifier = plotEntry.getValue();
-                List<String> factions = player.getPuppetedFactionsForPlot(plotAlias);
-                plotCardsList.add(new PlotCardInfo(plotAlias, identifier, factions));
+                List<String> factions = player.getPlotCardsFactions().getOrDefault(plotAlias, new ArrayList<>());
+                // Set plotAlias to null if player hasn't become Obsidian yet
+                String plotAliasToUse = isObsidian ? plotAlias : null;
+                plotCardsList.add(new PlotCardInfo(plotAliasToUse, identifier, factions));
             }
         }
         webPlayerArea.setPlotCards(plotCardsList);
