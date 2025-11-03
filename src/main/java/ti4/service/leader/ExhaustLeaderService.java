@@ -24,7 +24,9 @@ public class ExhaustLeaderService {
         String message = player.getRepresentation() + " exhausted: ";
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCorrectChannel(), message, leaderModel.getRepresentationEmbed());
+                    player.getCorrectChannel(),
+                    message,
+                    leaderModel.getRepresentationEmbed(false, true, false, false, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message + leader.getId());
         }

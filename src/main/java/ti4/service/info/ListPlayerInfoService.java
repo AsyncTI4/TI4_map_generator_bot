@@ -940,7 +940,11 @@ public class ListPlayerInfoService {
                     if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
                         continue;
                     }
-                    if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
+                    if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty() && !game.isTwilightsFallMode()) {
+                        count += 1;
+                    }
+                    if (game.isTwilightsFallMode()
+                            && Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
                         count += 1;
                     }
                 }
