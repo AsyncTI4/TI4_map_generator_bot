@@ -23,12 +23,16 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String type;
     private String faction;
     private String name;
+    private String tfName;
     private String shortName;
     private Boolean shrinkName;
     private String title;
+    private String tfTitle;
     private String abilityName;
     private String abilityWindow;
+    private String tfAbilityWindow;
     private String abilityText;
+    private String tfAbilityText;
     private String unlockCondition;
     private String flavourText;
     private String imageURL;
@@ -69,8 +73,24 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return LeaderEmojis.getLeaderEmoji(ID);
     }
 
+    public Optional<String> getTFName() {
+        return Optional.ofNullable(tfName);
+    }
+
+    public Optional<String> getTFTitle() {
+        return Optional.ofNullable(tfTitle);
+    }
+
     public Optional<String> getAbilityName() {
         return Optional.ofNullable(abilityName);
+    }
+
+    public Optional<String> getTFAbilityWindow() {
+        return Optional.ofNullable(tfAbilityWindow);
+    }
+
+    public Optional<String> getTFAbilityText() {
+        return Optional.ofNullable(tfAbilityText);
     }
 
     private Optional<String> getFlavourText() {
@@ -105,6 +125,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(
             boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
+        return getRepresentationEmbed(includeID, includeFactionType, showUnlockConditions, includeFlavourText, false);
+    }
+
+    public MessageEmbed getRepresentationEmbed(
+            boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText, boolean useTwilightsFallText) {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel factionModel = Mapper.getFaction(faction);
         String factionEmoji = FactionEmojis.getFactionIcon(faction).toString();
@@ -115,8 +140,17 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (factionModel != null) factionName = factionModel.getFactionName();
 
         // TITLE
-        String title = factionEmoji + " __**" + name + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type) + " "
-                + this.title + source.emoji();
+        String title_name_component = "";
+        String title_subtitle_component = "";
+        if (type.equals("agent") && useTwilightsFallText) {
+            title_name_component = getTFName().orElse(name);
+            title_subtitle_component = getTFTitle().orElse(this.tfTitle);
+        } else {
+            title_name_component = name;
+            title_subtitle_component = this.title;
+        }
+        String title = factionEmoji + " __**" + title_name_component + "**__ " 
+                + LeaderEmojis.getLeaderTypeEmoji(type) + " " + title_subtitle_component + source.emoji();  
         eb.setTitle(title);
 
         Emoji emoji = getLeaderEmoji().asEmoji();
@@ -135,8 +169,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         eb.setDescription(description.toString());
 
         // FIELDS
-        String fieldTitle = getAbilityName().orElse(" ") + "\n**" + abilityWindow + "**";
-        String fieldContent = abilityText;
+        String abilityName = useTwilightsFallText ? " " : getAbilityName().orElse(" ");
+        String abilityWindow = useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
+        String fieldTitle =  abilityName + "\n**" + abilityWindow + "**";
+        String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(this.abilityText) : this.abilityWindow;
         eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 
@@ -160,10 +196,14 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         searchString = searchString.toLowerCase();
         return ID.toLowerCase().contains(searchString)
                 || name.toLowerCase().contains(searchString)
+                || getTFName().orElse("").toLowerCase().contains(searchString)
                 || title.toLowerCase().contains(searchString)
+                || getTFTitle().orElse("").toLowerCase().contains(searchString)
                 || getAbilityName().orElse("").toLowerCase().contains(searchString)
                 || abilityWindow.toLowerCase().contains(searchString)
+                || getTFAbilityWindow().orElse("").toLowerCase().contains(searchString)
                 || abilityText.toLowerCase().contains(searchString)
+                || getTFAbilityText().orElse("").toLowerCase().contains(searchString)
                 || unlockCondition.toLowerCase().contains(searchString)
                 || getAutoCompleteName().toLowerCase().contains(searchString)
                 || source.toString().toLowerCase().contains(searchString)
