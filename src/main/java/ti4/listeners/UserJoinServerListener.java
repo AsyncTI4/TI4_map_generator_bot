@@ -51,15 +51,26 @@ public class UserJoinServerListener extends ListenerAdapter {
         if (event.getGuild() == JdaService.guildPrimary) {
             JdaService.guildPrimary.getTextChannelsByName("welcome-and-waving", true).stream()
                     .findFirst()
-                    .ifPresent(
-                            welcomeChannel -> MessageHelper.sendMessageToChannel(
-                                    welcomeChannel,
-                                    "**Welcome** " + event.getUser().getAsMention()
-                                            + "! We're glad you're here as lucky number # "
-                                            + String.format(
-                                                    "%,d", event.getGuild().getMemberCount()) + "!\n"
-                                            + "To get started, check out the how to play documentation here: https://discord.com/channels/943410040369479690/947727176105623642/1349555940340404265. \n"
-                                            + "If you ever have any questions or difficulty, ping the Bothelper role. It's full of helpful people who should be able to assist you."));
+                    .ifPresent(welcomeChannel -> {
+                        int memberCount = event.getGuild().getMemberCount();
+                        String formattedMemberCount = String.format("%,d", memberCount);
+                        if (memberCount % 10 == 0) {
+                            formattedMemberCount = "*" + formattedMemberCount + "*";
+                        } else if (memberCount % 100 == 0) {
+                            formattedMemberCount = "**" + formattedMemberCount + "**";
+                        } else if (memberCount % 1000 == 0) {
+                            formattedMemberCount = "***" + formattedMemberCount + "***";
+                        } else if (memberCount % 10000 == 0) {
+                            formattedMemberCount = "\n# ***#" + formattedMemberCount + "***";
+                        }
+                        MessageHelper.sendMessageToChannel(
+                                welcomeChannel,
+                                "**Welcome** " + event.getUser().getAsMention()
+                                        + "! We're glad you're here as lucky number # "
+                                        + formattedMemberCount + "!\n"
+                                        + "To get started, check out the how to play documentation here: https://discord.com/channels/943410040369479690/947727176105623642/1349555940340404265. \n"
+                                        + "If you ever have any questions or difficulty, ping the Bothelper role. It's full of helpful people who should be able to assist you.");
+                    });
         }
     }
 

@@ -23,6 +23,7 @@ public enum MiscEmojis implements TI4Emoji {
     LegendaryPlanet,
     SpeakerToken,
     DoubleBoom,
+    Ingress,
 
     // Res / Inf
     influence,

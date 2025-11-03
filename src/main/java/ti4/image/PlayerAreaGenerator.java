@@ -757,14 +757,14 @@ class PlayerAreaGenerator {
         }
 
         if (player.ownsPromissoryNote("sever")) {
-            String severFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SEVER);
+            String severFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SEVERED);
             BufferedImage severImage = ImageHelper.read(severFile);
             int maxSeverTokens = 1;
             List<Point> points = new ArrayList<>();
             IntStream.range(0, maxSeverTokens).forEach(i -> points.add(new Point(i * 20, 0)));
             int severtokens = (int) game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
-                    .filter(uh -> uh.getTokenList().contains(Constants.TOKEN_SEVER))
+                    .filter(uh -> uh.getTokenList().contains(Constants.TOKEN_SEVERED))
                     .count();
 
             if (severtokens > maxSeverTokens) {
