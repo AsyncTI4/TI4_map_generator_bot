@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
@@ -167,6 +169,8 @@ public class WebPlayerArea {
     // Special token reinforcements
     private Integer sleeperTokensReinf;
     private List<String> ghostWormholesReinf;
+    private Integer breachTokensReinf;
+    private Integer galvanizeTokensReinf;
 
     // Mahact faction-specific: edict "stolen" fleet supply
     private List<String> mahactEdict;
@@ -408,6 +412,31 @@ public class WebPlayerArea {
             webPlayerArea.setGhostWormholesReinf(ghostWormholesInReinf);
         } else {
             webPlayerArea.setGhostWormholesReinf(new ArrayList<>());
+        }
+
+        // Breach tokens (Crimson Rebellion faction only)
+        if (player.hasAbility("incursion")) {
+            int maxBreachTokens = 7;
+            int totalBreaches = (int) game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .flatMap(uh -> uh.getTokenList().stream())
+                    .filter(tok ->
+                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                    .count();
+            webPlayerArea.setBreachTokensReinf(Math.max(0, maxBreachTokens - totalBreaches));
+        } else {
+            webPlayerArea.setBreachTokensReinf(0);
+        }
+
+        // Galvanize tokens (Bastion faction only)
+        if (player.hasAbility("galvanize")) {
+            int maxGalvanizeTokens = 7;
+            int totGalvanized = game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+            webPlayerArea.setGalvanizeTokensReinf(Math.max(0, maxGalvanizeTokens - totGalvanized));
+        } else {
+            webPlayerArea.setGalvanizeTokensReinf(0);
         }
 
         // get reinforcement count
