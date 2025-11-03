@@ -188,7 +188,7 @@ public class SecretObjectiveHelper {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-            buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+            buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
             buttons.add(Buttons.red("deleteButtons", "Done resolving"));
             String message2 = player.getRepresentationUnfogged() + " use buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);

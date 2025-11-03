@@ -1421,7 +1421,7 @@ public class ActionCardHelper {
             }
             if ("tf-evolve".equals(automationID)) {
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                codedButtons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
                 codedButtons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                 codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1430,7 +1430,7 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "startSplice_7_all", "Initiate Ability Splice"));
                 codedButtons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome Splice"));
+                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome (Agent) Splice"));
                 codedButtons.add(Buttons.blue(
                         player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
                 codedButtons.add(Buttons.gray("deleteButtons", "Done Resolving"));
