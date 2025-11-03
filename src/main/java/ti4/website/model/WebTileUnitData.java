@@ -210,6 +210,41 @@ public class WebTileUnitData {
             planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
         }
 
+        // Serialize space stations (they're excluded from getPlanetUnitHolders)
+        for (Planet spaceStation : tile.getSpaceStations()) {
+            String holderName = spaceStation.getName();
+
+            // Ensure space station data exists
+            WebTilePlanet spaceStationData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
+
+            // Determine controlling player from planets list (space stations don't have control tokens)
+            String controllingFaction = null;
+            for (Player player : game.getRealPlayers()) {
+                if (player.getPlanets().contains(holderName)) {
+                    controllingFaction = player.getFaction();
+                    break;
+                }
+            }
+
+            spaceStationData.setControlledBy(controllingFaction);
+
+            // Set commodities count for Discordant Stars comms on planets functionality
+            String commsStorageKey = "CommsOnPlanet" + holderName;
+            if (!game.getStoredValue(commsStorageKey).isEmpty()) {
+                try {
+                    int comms = Integer.parseInt(game.getStoredValue(commsStorageKey));
+                    if (comms > 0) {
+                        spaceStationData.setCommodities(comms);
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore invalid stored values
+                }
+            }
+
+            // Set planetary shield status
+            spaceStationData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(spaceStation, game));
+        }
+
         // Calculate production and capacity for each player
         for (Player player : game.getRealPlayers()) {
             String color = player.getColor();
