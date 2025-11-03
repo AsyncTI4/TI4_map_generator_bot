@@ -18,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -297,6 +298,9 @@ public class TacticalActionOutputService {
         boolean tileHasBreach = tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
 
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
+            bonusMoveValue++;
+        }
+        if (player.hasUnit("tf-echoofascension") && model.getUnitType() == UnitType.Flagship) {
             bonusMoveValue++;
         }
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {

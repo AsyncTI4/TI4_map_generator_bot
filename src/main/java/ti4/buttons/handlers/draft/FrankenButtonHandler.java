@@ -132,9 +132,16 @@ class FrankenButtonHandler {
         String itemID = draftItem.ItemId;
         switch (draftItem.ItemCategory) {
             case ABILITY -> FrankenAbilityService.removeAbilities(event, player, List.of(itemID));
-            case TECH -> FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
+            case TECH -> {
+                if (player.getGame().isTwilightsFallMode()) {
+                    player.removeTech(itemID);
+                } else {
+                    FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
+                }
+            }
+
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.removeLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
+            case MECH, FLAGSHIP, UNIT -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
             case COMMODITIES ->
                 PlayerStatsService.setTotalCommodities(
                         event,

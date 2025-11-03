@@ -122,7 +122,7 @@ public class DrawSecretService {
                 game.removeRelicFromGame("quantumcore");
                 game.removeRelicFromGame("thesilverflame");
             }
-            if (game.isThundersEdge()) {
+            if (game.isThundersEdge() && !game.isTwilightsFallMode()) {
                 Player neutral = game.getPlayerFromColorOrFaction("neutral");
                 if (neutral == null) {
                     List<String> unusedColors = game.getUnusedColors().stream()
@@ -137,11 +137,18 @@ public class DrawSecretService {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
                     String pos = mr.getPosition();
+                    boolean ingress = false;
+                    if (mr.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+                        ingress = true;
+                    }
                     game.removeTile(pos);
                     Tile tile = new Tile("112", pos);
                     Planet rex = tile.getUnitHolderFromPlanet("mrte");
                     rex.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                     game.setTile(tile);
+                    if (ingress) {
+                        rex.addToken(Constants.TOKEN_INGRESS);
+                    }
                 }
             }
             if (game.isCulturalExchangeProgramMode()) {

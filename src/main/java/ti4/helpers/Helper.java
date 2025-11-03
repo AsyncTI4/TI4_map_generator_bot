@@ -1668,6 +1668,10 @@ public class Helper {
                                 && uH.getUnitCount(UnitType.Mech, player) > 0) {
                             productionValue = Math.max(5, productionValue);
                         }
+                    } else {
+                        if (productionValue == 2 || productionValue == 4) {
+                            productionValue = 0;
+                        }
                     }
                     if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
                         productionValue += 4;
@@ -1997,7 +2001,8 @@ public class Helper {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();
-                if (player.hasUnit("arvaxi_mech") && removedUnit.getUnitType() == UnitType.Mech) {
+                if ((player.hasUnit("arvaxi_mech") || player.hasUnit("tf-valefarprime"))
+                        && removedUnit.getUnitType() == UnitType.Mech) {
                     totalUnits -= entry.getValue();
                 }
             }

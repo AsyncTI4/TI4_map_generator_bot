@@ -1849,7 +1849,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder unitHolder : cabal.getNomboxTile().getUnitHolders().values()) {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
-                for (Player player : game.getRealPlayers()) {
+                for (Player player : game.getRealPlayersNNeutral()) {
                     if (player.unitBelongsToPlayer(unitKey)) {
                         String unitName = unitKey.unitName();
                         String buttonID = "cabalRelease_" + player.getFaction() + "_" + unitName;

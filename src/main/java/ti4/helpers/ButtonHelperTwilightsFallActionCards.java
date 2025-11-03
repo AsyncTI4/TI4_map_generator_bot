@@ -633,9 +633,7 @@ public class ButtonHelperTwilightsFallActionCards {
 
     // dragonfreed
     // linkship is ralnel FS ability
-    // 3 x mech cards
     // cabal carrier
-    // flagship upgrade
     // 3 mech abilities of TF factions
 
     // crimson and smothering suppressing sustains (and production)

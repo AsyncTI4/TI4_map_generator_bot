@@ -1111,6 +1111,16 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
+    @ButtonHandler(value = "showSpliceDecks", save = false)
+    public static void showSpliceDecks(ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("showDeck_genome", "Genomes (Agents)"));
+        buttons.add(Buttons.blue("showDeck_units", "Units", TechEmojis.UnitUpgradeTech));
+        buttons.add(Buttons.red("showDeck_ability", "Abilities (Techs)", TechEmojis.BioticTech));
+        buttons.add(Buttons.green("showDeck_paradigm", "Paradigms (Heroes)"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
+    }
+
     // Implemented in ShowAgendasButtonHandler for some reason!?
     @ButtonHandler(value = "showDeck_", save = false)
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
@@ -1120,6 +1130,8 @@ public class ButtonHelper {
             case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicHelper.showRemaining(event.getMessageChannel(), false, game, player);
             case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
+            case "genome", "ability", "units", "paradigm" ->
+                ButtonHelperTwilightsFall.sendSpliceDeck(game, deck, event);
             case Constants.PROPULSION,
                     Constants.WARFARE,
                     Constants.CYBERNETIC,
@@ -3636,6 +3648,9 @@ public class ButtonHelper {
         if (ButtonHelper.doesPlayerHaveFSHere("blacktf_flagship", player, tile)) {
             capacity += 100;
         }
+        if (ButtonHelper.doesPlayerHaveFSHere("tf-echoofascension", player, tile)) {
+            capacity += 2;
+        }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (Map.Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
@@ -5218,11 +5233,12 @@ public class ButtonHelper {
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos);
             if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, game)
-                    && !CommandCounterHelper.hasCC(player, tile2)) {
+                    && !CommandCounterHelper.hasCC(player, tile2)
+                    && FoWHelper.playerHasUnitsInSystem(player, tile2)) {
                 buttons.add(Buttons.green("placeCC_" + pos, tile2.getRepresentationForButtons(), FactionEmojis.Argent));
             }
-            buttons.add(Buttons.red("deleteButtons", "Done"));
         }
+        buttons.add(Buttons.red("deleteButtons", "Done"));
         return buttons;
     }
 
@@ -5875,6 +5891,7 @@ public class ButtonHelper {
             if (unitHolder instanceof Planet
                     && (spaceCombatish
                             && !(doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                                    || player.hasUnit("purpletf_mech")
                                     || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                     || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile)))) {
                 continue;
@@ -5886,6 +5903,9 @@ public class ButtonHelper {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
+                if (unitModel.getUnitType() == UnitType.Infantry && spaceCombatish && player.hasUnit("purpletf_mech")) {
+                    continue;
+                }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
                         && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry)
                                 .contains(unitKey.getUnitType())) {
@@ -5938,7 +5958,8 @@ public class ButtonHelper {
                         && !game.getLaws().containsKey("articles_war")
                         && player.getUnitsOwned().contains("nomad_mech"))
                 || ("mech".equalsIgnoreCase(unitBaseType)
-                        && (doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                        && (player.ownsUnit("purpletf_mech")
+                                || doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                 || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
                 || (!player.isActivePlayer()
                         && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander")

@@ -1050,8 +1050,27 @@ public class MessageHelper {
                                     "Error creating thread channel: " + threadName + " in channel: "
                                             + channel.getAsMention(),
                                     error));
-        } else if (channel instanceof ThreadChannel) {
-            sendMessageToChannelWithEmbeds(channel, null, embeds);
+        } else if (channel instanceof ThreadChannel thread) {
+            if (embeds.size() > 8 && thread.getParentChannel() instanceof TextChannel chan) {
+                chan.createThreadChannel(threadName)
+                        .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                        .queueAfter(
+                                500,
+                                TimeUnit.MILLISECONDS,
+                                t -> {
+                                    sendMessageToChannelWithEmbeds(t, null, embeds);
+                                    MessageHelper.sendMessageToChannel(
+                                            channel,
+                                            "Redirected your results to the following thread: " + t.getJumpUrl());
+                                },
+                                error -> BotLogger.error(
+                                        "Error creating thread channel: " + threadName + " in channel: "
+                                                + chan.getAsMention(),
+                                        error));
+
+            } else {
+                sendMessageToChannelWithEmbeds(channel, null, embeds);
+            }
         }
     }
 
