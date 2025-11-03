@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.ActionCardHelper.ACStatus;
@@ -39,11 +40,11 @@ public class GameProperties {
     private @ExportableField String soDeckID = "secret_objectives_pok";
     private @ExportableField String stage1PublicDeckID = "public_stage_1_objectives_pok";
     private @ExportableField String stage2PublicDeckID = "public_stage_2_objectives_pok";
-    private @ExportableField String relicDeckID = "relics_pok";
+    private @ExportableField String relicDeckID = "relics_pok_te";
     private @ExportableField String agendaDeckID = "agendas_pok";
     private @ExportableField String explorationDeckID = "explores_pok";
     private @ExportableField String technologyDeckID = "techs_pok_c4";
-    private @ExportableField String scSetID = "pok";
+    private @ExportableField String scSetID = "te";
     private @ExportableField String eventDeckID = "";
 
     // Transient Game Data

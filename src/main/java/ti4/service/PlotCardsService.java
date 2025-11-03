@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -72,7 +74,7 @@ public class PlotCardsService {
                 String msg = "Remove a faction from " + plot.getName();
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             } else {
-                player.setPlotCardFaction(plotID, faction);
+                player.removePlotCardFaction(plotID);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
                 String msg = player.getRepresentation() + " removed a " + player2 + " token from plot "
