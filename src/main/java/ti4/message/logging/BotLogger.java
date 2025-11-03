@@ -169,10 +169,7 @@ public class BotLogger {
     }
 
     public static void errorToThread(
-            @Nullable LogOrigin origin,
-            @Nonnull String message,
-            @Nullable Throwable err,
-            @Nonnull String threadName) {
+            @Nullable LogOrigin origin, @Nonnull String message, @Nullable Throwable err, @Nonnull String threadName) {
         logToChannel(origin, message, err, LogSeverity.Error, threadName);
     }
 
