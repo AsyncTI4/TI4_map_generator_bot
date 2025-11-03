@@ -108,6 +108,7 @@ public class WebPlayerArea {
     private List<Integer> unfollowedSCs;
     private List<Integer> exhaustedSCs;
     private List<String> promissoryNotesInPlayArea;
+    private List<String> customPromissoryNotes;
 
     // Technologies
     private List<String> techs;
@@ -264,6 +265,16 @@ public class WebPlayerArea {
         webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
         webPlayerArea.setExhaustedSCs(player.getExhaustedSCs());
         webPlayerArea.setPromissoryNotesInPlayArea(player.getPromissoryNotesInPlayArea());
+
+        // Custom promissory notes (faction-specific only, excluding generic ones)
+        List<String> customPromissoryNotes = new ArrayList<>();
+        for (String pnID : player.getPromissoryNotesOwned()) {
+            var pnModel = Mapper.getPromissoryNote(pnID);
+            if (pnModel != null && pnModel.getFaction().isPresent()) {
+                customPromissoryNotes.add(pnID);
+            }
+        }
+        webPlayerArea.setCustomPromissoryNotes(customPromissoryNotes);
 
         // Technologies
         webPlayerArea.setTechs(player.getTechs());
