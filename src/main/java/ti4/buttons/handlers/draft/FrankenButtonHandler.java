@@ -110,7 +110,8 @@ class FrankenButtonHandler {
                 FactionModel faction = Mapper.getFaction(itemID);
                 // add Mahact Faction tech
                 player.setFaction(itemID);
-                FrankenUnitService.addUnits(event, player, List.of(itemID + "_flagship", itemID + "_mech"), false);
+                FrankenUnitService.addUnits(
+                        event, player, List.of(itemID + "_flagship", itemID + "_mech", "tf_warsun"), false);
                 PlayerStatsService.setTotalCommodities(
                         event, player, (player.getCommoditiesTotal(true) + faction.getCommodities()));
             }
