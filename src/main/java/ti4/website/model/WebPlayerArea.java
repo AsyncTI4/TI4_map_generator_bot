@@ -187,6 +187,9 @@ public class WebPlayerArea {
     // Faction abilities
     private List<String> abilities;
 
+    // Decal ID
+    private String decalId;
+
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
@@ -342,6 +345,9 @@ public class WebPlayerArea {
 
         // Faction abilities
         webPlayerArea.setAbilities(new ArrayList<>(player.getAbilities()));
+
+        // Decal ID
+        webPlayerArea.setDecalId(player.getDecalSet());
 
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
