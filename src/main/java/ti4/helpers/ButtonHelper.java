@@ -5235,7 +5235,10 @@ public class ButtonHelper {
             if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, game)
                     && !CommandCounterHelper.hasCC(player, tile2)
                     && FoWHelper.playerHasUnitsInSystem(player, tile2)) {
-                buttons.add(Buttons.green("placeCC_" + pos, tile2.getRepresentationForButtons(), FactionEmojis.Argent));
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "placeCC_" + pos,
+                        tile2.getRepresentationForButtons(),
+                        FactionEmojis.Argent));
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Done"));

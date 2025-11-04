@@ -14,7 +14,6 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.image.ImageHelper;
@@ -185,7 +184,6 @@ public class DrawSecretService {
                         event.getMessageChannel(),
                         "Speaker is not yet assigned. Secret objectives have been dealt, but please assign speaker soon (command is `/player speaker`).");
             }
-            Helper.setOrder(game);
         }
     }
 }
