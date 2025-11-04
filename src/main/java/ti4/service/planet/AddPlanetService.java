@@ -412,7 +412,7 @@ public class AddPlanetService {
             List<Button> liberateButtons = new ArrayList<>();
             String planetStr = unitHolder.getName();
             String planetName = Mapper.getPlanet(planetStr).getName();
-            liberateButtons.add(Buttons.gray(
+            liberateButtons.add(Buttons.green(
                     player.getFinsFactionCheckerPrefix() + "liberate_" + planetStr,
                     "Liberate " + planetName,
                     FactionEmojis.Bastion));
