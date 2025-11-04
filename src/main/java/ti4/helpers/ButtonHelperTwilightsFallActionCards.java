@@ -570,7 +570,7 @@ public class ButtonHelperTwilightsFallActionCards {
                                     + "deleteThis_combat",
                             "Destroy Units in " + tile2.getRepresentationForButtons()));
                     String msg = player.getRepresentation() + " use this button to destroy units in "
-                            + tile.getRepresentationForButtons();
+                            + tile2.getRepresentationForButtons();
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }
             }

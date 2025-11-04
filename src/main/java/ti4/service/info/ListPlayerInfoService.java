@@ -556,7 +556,13 @@ public class ListPlayerInfoService {
                 return x;
             }
             case "expand_borders", "subdue", "subdue_omegaphase" -> {
-                int count = player.getPlanetsForScoring(false).size();
+                int count = 0;
+                for (Planet planet : player.getPlanetsForScoring(false)) {
+                    Tile tile = game.getTileFromPlanet(planet.getName());
+                    if (tile != null && !tile.isHomeSystem(game)) {
+                        count++;
+                    }
+                }
                 return count;
             }
             case "research_outposts", "brain_trust", "brain_trust_omegaphase" -> {
