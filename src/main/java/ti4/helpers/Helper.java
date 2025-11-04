@@ -2968,10 +2968,15 @@ public class Helper {
                     && "17"
                             .equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition())
                                     .getTileID());
-            if ((player.getFaction().contains("ghost") && game.getTile("17") != null) && ghostish) {
+            if (((player.getFaction().contains("ghost")
+                                    || (tile != null && tile.getTileID().equalsIgnoreCase("51")))
+                            && game.getTile("17") != null)
+                    && ghostish) {
                 tile = game.getTile("17");
             }
-            if ((player.getFaction().contains("crimson") && game.getTile("94") != null)) {
+            if (((player.getFaction().contains("crimson")
+                            || (tile != null && tile.getTileID().equalsIgnoreCase("118")))
+                    && game.getTile("94") != null)) {
                 tile = game.getTile("94");
             }
             if (tile != null) {

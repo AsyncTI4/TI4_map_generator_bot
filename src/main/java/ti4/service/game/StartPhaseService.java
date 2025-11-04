@@ -226,6 +226,9 @@ public class StartPhaseService {
             round++;
             game.setRound(round);
         }
+        if (game.getRound() == 1) {
+            Helper.setOrder(game);
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());

@@ -64,6 +64,7 @@ import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
@@ -173,6 +174,13 @@ public class Player extends PlayerProperties {
         return (int) getPlanets().stream()
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Planet::isSpaceStation)
+                .count();
+    }
+
+    public int numberOfFakePlanets() {
+        return (int) getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(planet -> planet.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
                 .count();
     }
 
@@ -470,6 +478,7 @@ public class Player extends PlayerProperties {
         return getTechs().contains("pws2")
                 || getTechs().contains("dsrohdws")
                 || getTechs().contains("ws")
+                || hasUnit("tf_warsun")
                 || getTechs().contains("absol_ws")
                 || getTechs().contains("baxanws")
                 || getTechs().contains("absol_pws2")
@@ -2092,6 +2101,39 @@ public class Player extends PlayerProperties {
             }
         }
         return newPlanets;
+    }
+
+    public Set<Planet> getPlanetsForScoring(boolean secret) {
+        Game game = getGame();
+
+        // All planets the player owns count for scoring, except oceans. Oceans are fake
+        Set<Planet> playerPlanets = new HashSet<>(getPlanetsAllianceMode().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(Objects::nonNull)
+                .filter(p -> !p.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
+                .filter(p -> !p.isSpaceStation())
+                .collect(Collectors.toSet()));
+
+        // Current coexisting framework is really very dumb
+        Set<Planet> coexistingPlanets = game.getPlanetsInfo().values().stream()
+                .filter(planet -> planet.hasGroundForces(this) || planet.hasStructures(this))
+                .collect(Collectors.toSet());
+        playerPlanets.addAll(coexistingPlanets);
+
+        // firmament commander allows you to use planets in systems that contain your ships for scoring SECRET
+        // OBJECTIVES
+        if (secret && game.playerHasLeaderUnlockedOrAlliance(this, "firmamentcommander")) {
+            Set<Planet> planetsUnderShips = game.getPlanetsInfo().values().stream()
+                    .filter(planet -> {
+                        Tile t = game.getTileFromPlanet(planet.getName());
+                        return t != null
+                                && t.containsPlayersUnitsWithModelCondition(this, UnitModel::getIsShip)
+                                && !planet.isSpaceStation();
+                    })
+                    .collect(Collectors.toSet());
+            playerPlanets.addAll(planetsUnderShips);
+        }
+        return playerPlanets;
     }
 
     public List<String> getUniquePlanets() {

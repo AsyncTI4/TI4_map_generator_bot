@@ -148,6 +148,14 @@ public class Planet extends UnitHolder {
                 .anyMatch(UnitModel::getIsGroundForce);
     }
 
+    public boolean hasStructures(Player player) {
+        return getUnits().keySet().stream()
+                .filter(player::unitBelongsToPlayer)
+                .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
+                .filter(Objects::nonNull)
+                .anyMatch(UnitModel::getIsStructure);
+    }
+
     public boolean hasGroundForces(Game game) {
         return getUnits().keySet().stream()
                 .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
