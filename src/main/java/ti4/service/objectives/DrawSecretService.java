@@ -14,7 +14,6 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.image.ImageHelper;
@@ -113,6 +112,12 @@ public class DrawSecretService {
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
+            if ((game.getStoredValue("useOldPok").isEmpty())
+                    && !game.isTwilightsFallMode()
+                    && !game.isBaseGameMode()
+                    && !game.isHomebrewSCMode()) {
+                game.setStrategyCardSet("te");
+            }
 
             if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
@@ -131,6 +136,7 @@ public class DrawSecretService {
                     String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
                     game.setupNeutralPlayer(color);
                 }
+                game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
             }
             if (game.isThundersEdge() || game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
@@ -184,7 +190,6 @@ public class DrawSecretService {
                         event.getMessageChannel(),
                         "Speaker is not yet assigned. Secret objectives have been dealt, but please assign speaker soon (command is `/player speaker`).");
             }
-            Helper.setOrder(game);
         }
     }
 }

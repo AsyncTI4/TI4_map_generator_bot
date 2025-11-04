@@ -35,7 +35,7 @@ public class UnlockLeaderService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     channel,
                     player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
-                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
+                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
