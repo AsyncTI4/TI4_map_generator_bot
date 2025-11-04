@@ -309,7 +309,7 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (!scModel.usesAutomationForSCID("pok1leadership")) {
+        if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {

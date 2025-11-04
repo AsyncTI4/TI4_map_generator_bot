@@ -1832,7 +1832,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+            if (tile.getPlanetUnitHolders().size() > 0 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
                 continue;
             }
             empties.add(Buttons.blue(

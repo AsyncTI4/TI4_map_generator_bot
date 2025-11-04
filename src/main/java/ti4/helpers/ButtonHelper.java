@@ -350,6 +350,7 @@ public class ButtonHelper {
     public static List<Button> getForcedPNSendButtons(Game game, Player receiver, Player sender) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         String idNPC = "";
+        List<String> nullOwnerPNs = new ArrayList();
         for (String pnShortHand : sender.getPromissoryNotes().keySet()) {
             if (sender.getPromissoryNotesInPlayArea().contains(pnShortHand)
                     || (receiver.hasAbility("hubris") && pnShortHand.endsWith("_an"))) {
@@ -363,6 +364,10 @@ public class ButtonHelper {
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = game.getPNOwner(pnShortHand);
+            if (owner == null) {
+                nullOwnerPNs.add(pnShortHand);
+                continue;
+            }
             Button transact;
             if (game.isFowMode()) {
                 transact = Buttons.green(
@@ -376,6 +381,9 @@ public class ButtonHelper {
                 transact = Buttons.green(id, promissoryNote.getName(), owner.getFactionEmoji());
             }
             stuffToTransButtons.add(transact);
+        }
+        for (String pn : nullOwnerPNs) {
+            sender.removePromissoryNote(pn);
         }
 
         if (sender.isNpc() && !idNPC.isEmpty()) {
