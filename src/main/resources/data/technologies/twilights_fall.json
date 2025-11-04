@@ -293,7 +293,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "After another player moves ships into a system that contains 1 or more of your ships: You may place 1 token from your strategy pool in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
+        "text": "After another player moves ships into a system that contains 1 or more of your ships: You may place 1 token from your reinforcements in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
         "source": "twilights_fall",
         "faction": "naalu"
     },

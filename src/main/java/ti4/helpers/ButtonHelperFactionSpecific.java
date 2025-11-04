@@ -2575,9 +2575,7 @@ public class ButtonHelperFactionSpecific {
                 p1.getFactionEmoji() + " has chosen to discard an ability or genome to deploy their flagship.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose which system you wish to place the flagship in.", buttons);
-        if (p1.hasUnit("redtf_mech")
-                && !ButtonHelper.isLawInPlay(game, "articles_war")
-                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
+        if (p1.hasUnit("redtf_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
             String message3 = "Use buttons to deploy a mech with the flagship or decline";
             List<Button> buttons2 = new ArrayList<>(
                     Helper.getTileWithShipsPlaceUnitButtons(p1, game, "mech", "placeOneNDone_skipbuild"));
@@ -2864,7 +2862,9 @@ public class ButtonHelperFactionSpecific {
             boolean oneOfThree = planetReal != null
                     && isNotBlank(planetReal.getOriginalPlanetType())
                     && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
-            if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
+            boolean fracture = game.getTileFromPlanet(planet) != null
+                    && game.getTileFromPlanet(planet).getPosition().contains("frac");
+            if (oneOfThree || fracture || extraAllowedPlanets.contains(planet.toLowerCase())) {
                 buttons.add(Buttons.green("terraformPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
         }
