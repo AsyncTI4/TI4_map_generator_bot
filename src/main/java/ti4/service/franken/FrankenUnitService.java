@@ -16,7 +16,11 @@ public class FrankenUnitService {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
-
+            if (player.getGame().isTwilightsFallMode()
+                    && (unitModel.getAsyncId().equalsIgnoreCase("fs")
+                            || unitModel.getAsyncId().equalsIgnoreCase("mf"))) {
+                allowDuplicates = true;
+            }
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {

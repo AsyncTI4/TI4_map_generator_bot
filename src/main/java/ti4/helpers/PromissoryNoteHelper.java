@@ -351,6 +351,8 @@ public class PromissoryNoteHelper {
                     owner.getRepresentation() + " place a plot into play with " + player.getRepresentationNoPing()
                             + " token on it from black ops");
             owner.removeOwnedPromissoryNoteByID(id);
+            player.removePromissoryNote(id);
+            owner.removePromissoryNote(id);
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =
