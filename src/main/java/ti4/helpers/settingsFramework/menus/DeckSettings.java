@@ -61,9 +61,9 @@ public class DeckSettings extends SettingsMenu {
         String defaultACdeck = game.map(Game::getAcDeckID).orElse("action_cards_pok");
         String defaultAgendas = game.map(Game::getAgendaDeckID).orElse("agendas_pok");
         String defaultTechs = game.map(Game::getTechnologyDeckID).orElse("techs_pok_c4");
-        String defaultRelics = game.map(Game::getRelicDeckID).orElse("relics_pok");
+        String defaultRelics = game.map(Game::getRelicDeckID).orElse("relics_pok_te");
         String defaultExplores = game.map(Game::getExplorationDeckID).orElse("explores_pok");
-        String defaultSCs = game.map(Game::getScSetID).orElse("pok");
+        String defaultSCs = game.map(Game::getScSetID).orElse("te");
 
         // Initialize deck settings to default values
         stage1 = deckChoice("Stg1Deck", defaultStage1, DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE);

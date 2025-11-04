@@ -841,9 +841,10 @@ public class PlayStrategyCardService {
         Button refreshButton = Buttons.green(
                 player.getFinsFactionCheckerPrefix() + "primaryOfAnarchy7", "Resolve PRODUCTION in a system");
         Button participate = Buttons.blue("participateInSplice_6", "Participate In Splice");
+        Button homeBuild = Buttons.green("warfareTeBuild", "Build At Home");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
-        return List.of(start, refreshButton, participate, noFollowButton);
+        return List.of(start, refreshButton, homeBuild, participate, noFollowButton);
     }
 
     private static List<Button> getTF7Buttons(int sc, Player player) {

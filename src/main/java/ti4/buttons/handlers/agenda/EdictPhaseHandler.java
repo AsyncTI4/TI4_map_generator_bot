@@ -181,7 +181,7 @@ public class EdictPhaseHandler {
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "startSplice_7_all", "Initiate Ability Splice"));
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome Splice"));
+                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome (Agent) Splice"));
                 buttons.add(Buttons.blue(
                         player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
             }
@@ -194,10 +194,10 @@ public class EdictPhaseHandler {
             case "tf-arbitrate" -> {
                 buttons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
                 buttons.add(Buttons.red("discardSpliceCard_units", "Discard 1 Unit Upgrade"));
-                buttons.add(Buttons.red("discardSpliceCard_genome", "Discard 1 Genome"));
+                buttons.add(Buttons.red("discardSpliceCard_genome", "Discard 1 Genome (Agent)"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
             }
             case "tf-legacy_of_ixth" -> {
                 Die d1 = new Die(6);
@@ -207,7 +207,7 @@ public class EdictPhaseHandler {
                             + TechEmojis.Warfare3;
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
                 } else {
                     msg += "💥 💥 💥 💥";
                     Tile tile = game.getMecatolTile();

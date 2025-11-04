@@ -2608,7 +2608,7 @@ public class UnfiledButtonHandlers {
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getChannel(),
                             "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                                    + " As the Custodians token is still on Mecatol Rex, there will be no Agenda Phase this round."
+                                    + " As the pre-req for an agenda phase has not yet been met, there will be no Agenda Phase this round."
                                     + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
                             buttons);
                 }

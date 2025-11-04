@@ -44,7 +44,7 @@
         "name": "Genophage",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard 1 of your neighbor's genomes.",
+        "text": "Discard 1 of your neighbor's genomes. [Reminder: in TF an agent is called a genome]",
         "source": "twilights_fall"
     },
     {
