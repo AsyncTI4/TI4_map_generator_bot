@@ -1791,14 +1791,19 @@ public class UnfiledButtonHandlers {
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
+            skilled = true;
+        }
         if (buttonID.contains("foresight")) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getFactionEmojiOrColor()
-                            + ", you placed 1 command token from your strategy pool to resolve your "
-                            + FactionEmojis.Naalu
-                            + "**Foresight** ability.");
-            player.setStrategicCC(player.getStrategicCC() - 1);
+            if (!game.isTwilightsFallMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        player.getFactionEmojiOrColor()
+                                + ", you placed 1 command token from your strategy pool to resolve your "
+                                + FactionEmojis.Naalu
+                                + "**Foresight** ability.");
+                player.setStrategicCC(player.getStrategicCC() - 1);
+            }
             skilled = true;
         }
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";

@@ -2108,7 +2108,7 @@ public class Player extends PlayerProperties {
         Game game = getGame();
 
         // All planets the player owns count for scoring, except oceans. Oceans are fake
-        Set<Planet> playerPlanets = new HashSet<>(getPlanetsAllianceMode().stream()
+        Set<Planet> playerPlanets = new HashSet<>(getPlanets().stream()
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Objects::nonNull)
                 .filter(p -> !p.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
