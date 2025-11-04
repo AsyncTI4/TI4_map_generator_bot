@@ -112,6 +112,12 @@ public class DrawSecretService {
                             game.getActionsChannel(), files, message.toString(), true, false);
                 }
             }
+            if ((game.getStoredValue("useOldPok").isEmpty())
+                    && !game.isTwilightsFallMode()
+                    && !game.isBaseGameMode()
+                    && !game.isHomebrewSCMode()) {
+                game.setStrategyCardSet("te");
+            }
 
             if ((!game.getStoredValue("useOldPok").isEmpty()) && !game.isTwilightsFallMode()) {
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"));
