@@ -302,8 +302,11 @@ public class VoteButtonHandler {
 
     public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
-
-        for (Player player : game.getRealPlayers()) {
+        List<Player> players = game.getRealPlayers();
+        if (prefix.contains("yinHero")) {
+            players = game.getRealPlayersNNeutral();
+        }
+        for (Player player : players) {
             String faction = player.getFaction();
             Button button;
             if (!game.isFowMode() && !faction.contains("franken")) {
