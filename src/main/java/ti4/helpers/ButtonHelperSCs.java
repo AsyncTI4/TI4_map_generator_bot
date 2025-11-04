@@ -1396,7 +1396,9 @@ public class ButtonHelperSCs {
             if (scNum == 2 || scNum == 6 || scNum == 7) {
                 game.setStoredValue(
                         "willParticipateInSplice",
-                        game.getStoredValue("willParticipateInSplice").replace("_" + player.getFaction(), ""));
+                        game.getStoredValue("willParticipateInSplice")
+                                .replace("_" + player.getFaction(), "")
+                                .replace(player.getFaction(), ""));
             }
         }
         ReactionService.addReaction(event, game, player, "is not following" + suffix + ".");

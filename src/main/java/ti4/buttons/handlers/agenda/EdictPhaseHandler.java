@@ -163,7 +163,7 @@ public class EdictPhaseHandler {
 
     @ButtonHandler("resolveEdict_")
     public static void resolveEdict(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
-        String edict = buttonID.split("_")[1];
+        String edict = buttonID.replace("resolveEdict_", "");
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> embeds = new ArrayList<>();
         game.removeStoredValue("convenePlayers");
