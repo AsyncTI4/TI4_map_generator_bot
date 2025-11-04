@@ -1991,7 +1991,7 @@ public class ButtonHelperModifyUnits {
         String playerRep = player.getRepresentation();
 
         Tile tile = game.getTileFromPositionOrAlias(planetName);
-        if (ButtonHelper.isNumeric(planetName)) {
+        if (ButtonHelper.isNumeric(planetName) && (unitLong.contains("2gf") || unitLong.contains("mech"))) {
             planetName += "space";
         }
         if ("sd".equalsIgnoreCase(unitID)) {
