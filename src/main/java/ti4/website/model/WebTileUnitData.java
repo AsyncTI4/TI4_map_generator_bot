@@ -106,7 +106,10 @@ public class WebTileUnitData {
                         }
                     }
 
-                    WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage);
+                    // Get unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
+                    List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
+                    WebEntityData entityData =
+                            new WebEntityData(unitId, "unit", unitCount, sustainedDamage, unitStates);
                     factionEntities
                             .computeIfAbsent(faction, k -> new ArrayList<>())
                             .add(entityData);
