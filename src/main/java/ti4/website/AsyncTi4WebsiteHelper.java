@@ -116,6 +116,15 @@ public class AsyncTi4WebsiteHelper {
                 strategyCards.add(webSC);
             }
 
+            // Create map of initiative -> strategy card ID
+            Map<Integer, String> strategyCardIdMap = new HashMap<>();
+            var strategyCardSet = game.getStrategyCardSet();
+            if (strategyCardSet != null) {
+                for (var scModel : strategyCardSet.getStrategyCardModels()) {
+                    strategyCardIdMap.put(scModel.getInitiative(), scModel.getId());
+                }
+            }
+
             Map<String, Object> webData = new HashMap<>();
             webData.put("versionSchema", 5);
             webData.put("objectives", webObjectives);
@@ -123,6 +132,7 @@ public class AsyncTi4WebsiteHelper {
             webData.put("lawsInPlay", lawsInPlay);
             webData.put("cardPool", webCardPool);
             webData.put("strategyCards", strategyCards);
+            webData.put("strategyCardIdMap", strategyCardIdMap);
             webData.put("scoreBreakdowns", playerScoreBreakdowns);
             webData.put("tilePositions", webTilePositions.getTilePositions());
             webData.put("tileUnitData", tileUnitData);
