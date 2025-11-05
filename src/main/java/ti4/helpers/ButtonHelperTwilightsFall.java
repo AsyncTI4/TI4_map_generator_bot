@@ -774,7 +774,7 @@ public class ButtonHelperTwilightsFall {
         for (String card : allCards) {
             embeds.add(Mapper.getTech(card).getRepresentationEmbed());
             if (Mapper.getTech(card).getFirstType() == type) {
-                player.addTech(found);
+                player.addTech(card);
                 found = Mapper.getTech(card).getAutoCompleteName() + "\nIt has been automatically gained";
                 break;
             }
