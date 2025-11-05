@@ -1401,10 +1401,6 @@ public class StartCombatService {
                         "Become Damaged Upon Win To Gain Command Token (Kortali Flagship)",
                         FactionEmojis.kortali));
             }
-            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnlockedBreakthrough("sardakkbt")) {
-                buttons.add(Buttons.gray(
-                        finChecker + "sardakkbtRes", "Resolve Sardakk Breakthrough (Upon Win)", FactionEmojis.Sardakk));
-            }
         }
 
         // Exo 2s
@@ -1418,6 +1414,31 @@ public class StartCombatService {
                         "Use Exotrireme II Ability",
                         FactionEmojis.Sardakk));
             }
+        }
+        if (p1.hasUnlockedBreakthrough("sardakkbt")) {
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "sardakkbtRes",
+                    "Resolve Sardakk Breakthrough (Upon Win)",
+                    FactionEmojis.Sardakk));
+        }
+        if (p1.hasUnit("pinktf_mech") && isGroundCombat) {
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units",
+                    "Draw 1 Unit Upgrade (Upon Win)",
+                    FactionEmojis.pinktf));
+        }
+
+        if (p2.hasUnlockedBreakthrough("sardakkbt") && !game.isFowMode()) {
+            buttons.add(Buttons.gray(
+                    p2.getFinsFactionCheckerPrefix() + "sardakkbtRes",
+                    "Resolve Sardakk Breakthrough (Upon Win)",
+                    FactionEmojis.Sardakk));
+        }
+        if (p2.hasUnit("pinktf_mech") && isGroundCombat && !game.isFowMode()) {
+            buttons.add(Buttons.gray(
+                    p2.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units",
+                    "Draw 1 Unit Upgrade (Upon Win)",
+                    FactionEmojis.pinktf));
         }
         if (p1.hasAbility("data_recovery") && p1 != game.getActivePlayer()) {
             buttons.add(Buttons.gray(

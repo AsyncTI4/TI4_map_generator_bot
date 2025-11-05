@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -29,7 +30,7 @@ import ti4.service.emoji.TechEmojis;
 public class EdictPhaseHandler {
 
     @ButtonHandler("edictPhase")
-    public static void edictPhase(ButtonInteractionEvent event, Game game) {
+    public static void edictPhase(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("agenda");
         List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
         List<Button> buttons = new ArrayList<>();

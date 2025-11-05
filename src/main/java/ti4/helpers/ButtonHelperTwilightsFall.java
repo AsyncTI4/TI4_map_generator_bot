@@ -27,6 +27,7 @@ import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
@@ -570,7 +571,7 @@ public class ButtonHelperTwilightsFall {
     public static void addMagusSpliceCard(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("paid6ForSplice", "yes");
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "Magus Holder chose to pay the 3i/3r for an extra draw.");
+                player.getCorrectChannel(), "Magus Holder chose to pay the 3i+3r for an extra draw.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
         Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
@@ -726,6 +727,63 @@ public class ButtonHelperTwilightsFall {
         return embeds;
     }
 
+    @ButtonHandler("radicalAdvancementStart")
+    public static void startRadicalAdvancement(Game game, Player player, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        ButtonHelper.deleteMessage(event);
+        for (String tech : player.getTechs()) {
+            if (tech.equalsIgnoreCase("antimatter") || tech.equalsIgnoreCase("wavelength")) {
+                continue;
+            }
+            buttons.add(Buttons.red(
+                    "radAdvancementStep2_" + tech,
+                    "Discard " + Mapper.getTech(tech).getName()));
+        }
+        String msg = player.getRepresentation() + " use buttons to discard a card.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("radAdvancementStep2")
+    public static void radAdvancementStep2(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
+
+        String cardID = buttonID.split("_")[1];
+        player.removeTech(cardID);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                game.getActionsChannel(),
+                player.getRepresentation() + " has lost the ability: "
+                        + Mapper.getTech(cardID).getName(),
+                Mapper.getTech(cardID).getRepresentationEmbed());
+        TechnologyType type = Mapper.getTech(cardID).getFirstType();
+
+        List<MessageEmbed> embeds = new ArrayList<>();
+        List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+        for (Player p : game.getRealPlayers()) {
+            for (String tech : p.getTechs()) {
+                allCards.remove(tech);
+            }
+        }
+        List<String> someCardList = new ArrayList<>();
+        someCardList.addAll(allCards);
+        for (String card : someCardList) {
+            if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
+                allCards.remove(card);
+            }
+        }
+        String found = "nothing applicable";
+        Collections.shuffle(allCards);
+        for (String card : allCards) {
+            embeds.add(Mapper.getTech(card).getRepresentationEmbed());
+            if (Mapper.getTech(card).getFirstType() == type) {
+                player.addTech(found);
+                found = Mapper.getTech(card).getAutoCompleteName() + "\nIt has been automatically gained";
+                break;
+            }
+        }
+        String msg = player.getRepresentation() + " searched through the following cards and found: " + found;
+        MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), msg, embeds);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("discardSpliceCard")
     public static void discardSpliceCard(Game game, String buttonID, Player player) {
         String type = buttonID;
@@ -826,7 +884,7 @@ public class ButtonHelperTwilightsFall {
 
     @ButtonHandler("drawSingularNewSpliceCard")
     public static void drawSingularNewSpliceCard(
-            Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+            Game game, String buttonID, Player player, GenericInteractionCreateEvent event) {
         String type = buttonID;
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
