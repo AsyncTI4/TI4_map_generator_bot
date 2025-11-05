@@ -36,7 +36,7 @@ public class AlRaithService {
 
         // Send notice
         String notice = player.getRepresentation()
-                + " you can move up to 2 ingress tokens into systems that contain gravity rifts.";
+                + " you can move up to 2 ingress tokens into systems that contain gravity rifts. For now, please use the command /remove_token and /add_token to accomplish this.";
         if (totalIngress < 2) {
             notice = player.getRepresentation() + " Only " + totalIngress
                     + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain gravity rifts.";
