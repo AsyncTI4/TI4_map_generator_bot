@@ -332,7 +332,8 @@ public class WebScoreBreakdown {
                     if (c1.state == EntryState.QUALIFIES && c2.state == EntryState.QUALIFIES) {
                         return Integer.compare(c2.progress, c1.progress); // Descending
                     }
-                    // If one is QUALIFIES and one is POTENTIAL, QUALIFIES should already be first from previous comparison
+                    // If one is QUALIFIES and one is POTENTIAL, QUALIFIES should already be first from previous
+                    // comparison
                     // So this should only be called when both are same state
                     if (c1.state == EntryState.POTENTIAL && c2.state == EntryState.POTENTIAL) {
                         // Sort POTENTIAL by progress percentage (descending)
