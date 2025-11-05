@@ -175,6 +175,16 @@ public class StatusHelper {
                         player.getRepresentationUnfogged() + " you gained " + maxNum + " trade good"
                                 + (maxNum == 1 ? "" : "s") + " due to the Genetic Research technology.");
             }
+            if (player.hasTech("tf-radicaladvancement")) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "radicalAdvancementStart", "Replace a tech"));
+                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " choose if you want to use Radical Advancement.",
+                        buttons);
+            }
             if (player.hasTech("radical")) {
                 List<Button> buttons = new ArrayList<>();
                 for (String tech : player.getTechs()) {
