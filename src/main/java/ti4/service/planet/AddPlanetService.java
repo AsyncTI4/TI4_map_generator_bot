@@ -412,7 +412,7 @@ public class AddPlanetService {
             List<Button> liberateButtons = new ArrayList<>();
             String planetStr = unitHolder.getName();
             String planetName = Mapper.getPlanet(planetStr).getName();
-            liberateButtons.add(Buttons.gray(
+            liberateButtons.add(Buttons.green(
                     player.getFinsFactionCheckerPrefix() + "liberate_" + planetStr,
                     "Liberate " + planetName,
                     FactionEmojis.Bastion));
@@ -463,6 +463,7 @@ public class AddPlanetService {
 
         if (tile != null
                 && game.getActivePlayer() == player
+                && !setup
                 && game.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander")
                 && !tile.isHomeSystem(game)
                 && FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -494,6 +495,7 @@ public class AddPlanetService {
 
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
+                && !setup
                 && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2"))
                 && !doubleCheck) {
             List<Button> buttons = new ArrayList<>();
@@ -547,6 +549,7 @@ public class AddPlanetService {
         if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                         || game.getPhaseOfGame().contains("agenda"))
                 && player.hasUnit("saar_mech")
+                && !setup
                 && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
@@ -560,7 +563,7 @@ public class AddPlanetService {
                             + " you may pay 1 trade good to place 1 Scavenger mech here. Do not do this prior to exploring. It is an \"after\", while exploring is a \"when\".",
                     saarButton);
         }
-        if (player.hasTech("ie") && unitHolder.getResources() > 0) {
+        if (player.hasTech("ie") && unitHolder.getResources() > 0 && !setup) {
             String message = player.getRepresentation()
                     + " Click the button to resolve an _Integrated Economy_ build on "
                     + Helper.getPlanetRepresentation(planet, game) + ".";

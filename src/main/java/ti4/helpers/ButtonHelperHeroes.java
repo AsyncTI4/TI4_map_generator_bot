@@ -74,14 +74,15 @@ public class ButtonHelperHeroes {
     public static List<Button> argentBreakthroughStep1(Game game, Player player, Tile activeSystem) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                "argentHeroStep2_" + activeSystem.getPosition(),
+                player.getFinsFactionCheckerPrefix() + "argentHeroStep2_" + activeSystem.getPosition(),
                 activeSystem.getRepresentationForButtons(game, player)));
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, activeSystem.getPosition(), player, false)) {
             Tile tile = game.getTileByPosition(pos);
             if (CommandCounterHelper.hasCC(player, tile)
                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 buttons.add(Buttons.green(
-                        "argentHeroStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                        player.getFinsFactionCheckerPrefix() + "argentHeroStep2_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)));
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving"));
@@ -1831,7 +1832,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+            if (tile.getPlanetUnitHolders().size() > 0 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
                 continue;
             }
             empties.add(Buttons.blue(

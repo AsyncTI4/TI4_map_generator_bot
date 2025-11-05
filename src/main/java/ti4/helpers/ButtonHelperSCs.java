@@ -198,7 +198,7 @@ public class ButtonHelperSCs {
         //     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         // }
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
-        if (player.hasAbility("peace_accords")) {
+        if (player.hasAbility("peace_accords") && !game.isTwilightsFallMode()) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.getFinsFactionCheckerPrefix());
             if (!buttons2.isEmpty()) {
@@ -1396,7 +1396,9 @@ public class ButtonHelperSCs {
             if (scNum == 2 || scNum == 6 || scNum == 7) {
                 game.setStoredValue(
                         "willParticipateInSplice",
-                        game.getStoredValue("willParticipateInSplice").replace("_" + player.getFaction(), ""));
+                        game.getStoredValue("willParticipateInSplice")
+                                .replace("_" + player.getFaction(), "")
+                                .replace(player.getFaction(), ""));
             }
         }
         ReactionService.addReaction(event, game, player, "is not following" + suffix + ".");
