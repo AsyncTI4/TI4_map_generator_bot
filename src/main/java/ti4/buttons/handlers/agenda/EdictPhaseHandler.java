@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -29,7 +30,7 @@ import ti4.service.emoji.TechEmojis;
 public class EdictPhaseHandler {
 
     @ButtonHandler("edictPhase")
-    public static void edictPhase(ButtonInteractionEvent event, Game game) {
+    public static void edictPhase(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("agenda");
         List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
         List<Button> buttons = new ArrayList<>();
@@ -163,7 +164,7 @@ public class EdictPhaseHandler {
 
     @ButtonHandler("resolveEdict_")
     public static void resolveEdict(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
-        String edict = buttonID.split("_")[1];
+        String edict = buttonID.replace("resolveEdict_", "").replace("_orangetf", "");
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> embeds = new ArrayList<>();
         game.removeStoredValue("convenePlayers");
@@ -181,7 +182,7 @@ public class EdictPhaseHandler {
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "startSplice_7_all", "Initiate Ability Splice"));
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome Splice"));
+                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome (Agent) Splice"));
                 buttons.add(Buttons.blue(
                         player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
             }
@@ -194,10 +195,10 @@ public class EdictPhaseHandler {
             case "tf-arbitrate" -> {
                 buttons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
                 buttons.add(Buttons.red("discardSpliceCard_units", "Discard 1 Unit Upgrade"));
-                buttons.add(Buttons.red("discardSpliceCard_genome", "Discard 1 Genome"));
+                buttons.add(Buttons.red("discardSpliceCard_genome", "Discard 1 Genome (Agent)"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
             }
             case "tf-legacy_of_ixth" -> {
                 Die d1 = new Die(6);
@@ -207,7 +208,7 @@ public class EdictPhaseHandler {
                             + TechEmojis.Warfare3;
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
                 } else {
                     msg += "💥 💥 💥 💥";
                     Tile tile = game.getMecatolTile();

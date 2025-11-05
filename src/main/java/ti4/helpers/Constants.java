@@ -18,6 +18,7 @@ public class Constants {
     public static final String bambamId = "487030345812672523";
     public static final List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
     public static final String jabberwockyId = "455013002953883651";
+    public static final String solaxId = "380689512621277185";
 
     // Server IDs
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
@@ -32,6 +33,10 @@ public class Constants {
 
     public static String bltPing() {
         return "<@" + bltId + ">";
+    }
+
+    public static String solaxPing() {
+        return "<@" + solaxId + ">";
     }
 
     // Standard Thread Names
@@ -1258,6 +1263,7 @@ public class Constants {
     public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
+    public static final String TF_COMMAND = "tf";
     public static final String ZELIAN_HERO = "zelian_hero";
     public static final String NAALU_COMMANDER = "naalu_commander";
     public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
@@ -1271,6 +1277,11 @@ public class Constants {
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
     public static final String FLIP_GRACE = "flip_grace";
+    public static final String DRAW_RANDOM_ABILITY = "draw_random_ability";
+    public static final String RADICAL_ADVANCEMENT = "radical_advancement";
+    public static final String DO_EDICT_PHASE = "edict_phase";
+    public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
+    public static final String DRAW_RANDOM_GENOME = "draw_random_genome";
     public static final String DRAW_RANDOM_BLUE_TILE = "draw_random_blue_tile";
     public static final String SET_POLICY = "set_policy";
     public static final String SET_PEOPLE = "set_people";

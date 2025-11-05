@@ -20,7 +20,7 @@ public class AlRaithService {
         Button startCabalBreakthrough =
                 Buttons.red(player.finChecker() + "beginCabalBreakthroughMove", "Move Ingress Tokens");
         String message =
-                "After you finish setting the ingress tokens on the map, click this button to move up to 3 of them into systems that contain gravity rifts.";
+                "After you finish setting the ingress tokens on the map, click this button to move up to 2 of them into systems that contain gravity rifts.";
         MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, startCabalBreakthrough);
     }
 
@@ -36,8 +36,8 @@ public class AlRaithService {
 
         // Send notice
         String notice = player.getRepresentation()
-                + " you can move up to 3 ingress tokens into systems that contain gravity rifts.";
-        if (totalIngress < 3) {
+                + " you can move up to 2 ingress tokens into systems that contain gravity rifts. For now, please use the command /remove_token and /add_token to accomplish this.";
+        if (totalIngress < 2) {
             notice = player.getRepresentation() + " Only " + totalIngress
                     + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain gravity rifts.";
         }

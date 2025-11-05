@@ -1791,14 +1791,19 @@ public class UnfiledButtonHandlers {
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
+            skilled = true;
+        }
         if (buttonID.contains("foresight")) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getFactionEmojiOrColor()
-                            + ", you placed 1 command token from your strategy pool to resolve your "
-                            + FactionEmojis.Naalu
-                            + "**Foresight** ability.");
-            player.setStrategicCC(player.getStrategicCC() - 1);
+            if (!game.isTwilightsFallMode()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        player.getFactionEmojiOrColor()
+                                + ", you placed 1 command token from your strategy pool to resolve your "
+                                + FactionEmojis.Naalu
+                                + "**Foresight** ability.");
+                player.setStrategicCC(player.getStrategicCC() - 1);
+            }
             skilled = true;
         }
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
@@ -2608,7 +2613,7 @@ public class UnfiledButtonHandlers {
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getChannel(),
                             "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                                    + " As the Custodians token is still on Mecatol Rex, there will be no Agenda Phase this round."
+                                    + " As the pre-req for an agenda phase has not yet been met, there will be no Agenda Phase this round."
                                     + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
                             buttons);
                 }

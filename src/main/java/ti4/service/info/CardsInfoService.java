@@ -112,6 +112,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("florzenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_florzenagent", "Use Florzen Agent", FactionEmojis.florzen));
         }
+        if (player.hasUnexhaustedLeader("naazagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_naazagent", "Use NRA Agent", FactionEmojis.Naaz));
+        }
         if (player.hasUnexhaustedLeader("nokaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_nokaragent", "Use Nokar Agent", FactionEmojis.nokar));
         }

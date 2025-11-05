@@ -15,8 +15,8 @@ public class AddFrontierTokensService {
     public static void addFrontierTokens(GenericInteractionCreateEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {
-            if (((tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() == 2)
-                            || Mapper.getFrontierTileIds().contains(tile.getTileID()))
+            if (tile.getPlanetUnitHolders().isEmpty()
+                    && Mapper.getFrontierTileIds().contains(tile.getTileID())
                     && !game.isBaseGameMode()) {
                 if (tile.getPlanetUnitHolders().isEmpty())
                     AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);

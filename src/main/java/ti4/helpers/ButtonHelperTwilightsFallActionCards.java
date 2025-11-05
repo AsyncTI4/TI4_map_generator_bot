@@ -161,7 +161,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            buttons.add(Buttons.gray(
+                    "transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to transpose with.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -172,7 +173,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveCoerce(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            buttons.add(Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            buttons.add(
+                    Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to coerce.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -215,7 +217,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolvePoison(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            buttons.add(Buttons.gray("poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            buttons.add(Buttons.gray(
+                    "poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to poison.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -373,7 +376,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            buttons.add(Buttons.gray(
+                    "genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
         }
         String msg = player.getRepresentation() + " choose the neighbor you wish to genophage.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -383,7 +387,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveLawsHero(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            buttons.add(Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            buttons.add(
+                    Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to purge an ability from.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -565,7 +570,7 @@ public class ButtonHelperTwilightsFallActionCards {
                                     + "deleteThis_combat",
                             "Destroy Units in " + tile2.getRepresentationForButtons()));
                     String msg = player.getRepresentation() + " use this button to destroy units in "
-                            + tile.getRepresentationForButtons();
+                            + tile2.getRepresentationForButtons();
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }
             }

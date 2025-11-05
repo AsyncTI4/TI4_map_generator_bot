@@ -1761,9 +1761,9 @@ public class TransactionHelper {
             stuffToTransButtons.add(Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
         }
         if ((p1.hasAbility("arbiters")
-                        || p2.hasAbility("arbiters")
+                        || (!game.isFowMode() && p2.hasAbility("arbiters"))
                         || p1.hasTech("tf-guild_ships")
-                        || p2.hasTech("tf-guild_ships"))
+                        || (!game.isFowMode() && p2.hasTech("tf-guild_ships")))
                 && p1.getAc() > 0) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }

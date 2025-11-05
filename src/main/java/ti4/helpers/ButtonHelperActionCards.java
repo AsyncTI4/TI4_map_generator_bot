@@ -2698,9 +2698,9 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveTwinning_")
+    @ButtonHandler("resolveTwin_")
     public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.replace("resolveTwinning_", "");
+        String acName = buttonID.replace("resolveTwin_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);

@@ -4101,6 +4101,9 @@ public class Game extends GameProperties {
             if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             }
+            if (isThundersEdge()) {
+                planets.get("custodiavigilia").addToken("attachment_negativeinf.png");
+            }
             planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
             planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
             planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
