@@ -711,6 +711,7 @@ public class StatusHelper {
                         && !key.contains("Seed of an")
                         && !key.contains("Mutiny")
                         && !key.contains("Stellar Atomics")
+                        && !key.contains("(Plotted)")
                         && !key.contains("Crown of Emphidia")
                         && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
                     poName = key;

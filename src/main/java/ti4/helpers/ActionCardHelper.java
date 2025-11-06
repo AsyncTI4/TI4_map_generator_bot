@@ -253,7 +253,7 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.green("scoreOtherPlayersSecrets", "Score Other Players Secrets"));
+        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players Secrets"));
         return buttons;
     }
 
