@@ -447,7 +447,7 @@ public class TeHelperActionCards {
             }
         }
         for (Player p : game.getRealPlayers()) {
-            if (p.getBreakthroughID() != null && !player.isBreakthroughUnlocked()) {
+            if (p.getBreakthroughID() != null && !p.isBreakthroughUnlocked()) {
                 String id = "resolveBrillianceUnlock_" + p.getFaction();
                 String label = "Unlock " + p.getBreakthroughModel().getName();
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));

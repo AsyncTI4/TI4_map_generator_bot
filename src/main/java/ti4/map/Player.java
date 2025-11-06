@@ -653,6 +653,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
+        if (ability.equalsIgnoreCase("researchteam") && getAbilities().contains("tf-pacifist")) {
+            return true;
+        }
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
@@ -755,6 +758,10 @@ public class Player extends PlayerProperties {
 
     public boolean hasTheZeroToken() {
         if (hasAbility("telepathic")) {
+            if (game.isTwilightsFallMode()
+                    && !game.getStoredValue("shouldntChangeTurnOrder").isEmpty()) {
+                return false;
+            }
             for (Player p : game.getPlayers().values())
                 if (p.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) return false;
             return true;
@@ -1891,6 +1898,21 @@ public class Player extends PlayerProperties {
 
         getFollowedSCs().add(sc);
         if (game != null && game.getActivePlayer() != null) {
+
+            if (game.isTwilightsFallMode() && (sc == 2 || sc == 6 || sc == 7)) {
+                Player holder = null;
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!p2.hasFollowedSC(sc)) {
+                        return;
+                    }
+                    if (p2.getSCs().contains(sc)) {
+                        holder = p2;
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        holder.getCorrectChannel(),
+                        holder.getRepresentation() + " everyone has reacted to the splice.");
+            }
             if (game.getStoredValue("endTurnWhenSCFinished")
                     .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
@@ -2258,14 +2280,20 @@ public class Player extends PlayerProperties {
             setAtsCount(0);
         }
 
+        if ("tf-telepathic".equalsIgnoreCase(techID)) {
+            game.setStoredValue("shouldntChangeTurnOrder", "true");
+        }
+
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             gainCustodiaVigilia();
         }
 
         if ("planesplitter-firm".equalsIgnoreCase(techID) || "tf-planesplitter".equalsIgnoreCase(techID)) {
-            FractureService.spawnFracture(null, game);
-            FractureService.spawnIngressTokens(null, game, this, false);
+            if (!FractureService.isFractureInPlay(game)) {
+                FractureService.spawnFracture(null, game);
+                FractureService.spawnIngressTokens(null, game, this, false);
+            }
         }
 
         // Update Owned Units when Researching a Unit Upgrade

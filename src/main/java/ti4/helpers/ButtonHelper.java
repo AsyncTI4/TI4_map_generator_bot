@@ -456,14 +456,62 @@ public class ButtonHelper {
     public static MessageChannel getSCFollowChannel(Game game, Player player, int scNum) {
         String threadName = game.getName() + "-round-" + game.getRound() + "-";
         switch (scNum) {
-            case 1 -> threadName += "leadership";
-            case 2 -> threadName += "diplomacy";
-            case 3 -> threadName += "politics";
-            case 4 -> threadName += "construction";
-            case 5 -> threadName += "trade";
-            case 6 -> threadName += "warfare";
-            case 7 -> threadName += "technology";
-            case 8 -> threadName += "imperial";
+            case 1 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "lux";
+                } else {
+                    threadName += "leadership";
+                }
+            }
+            case 2 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "noctis";
+                } else {
+                    threadName += "diplomacy";
+                }
+            }
+            case 3 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "tyrannus";
+                } else {
+                    threadName += "politics";
+                }
+            }
+            case 4 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "civitas";
+                } else {
+                    threadName += "construction";
+                }
+            }
+            case 5 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "amicus";
+                } else {
+                    threadName += "trade";
+                }
+            }
+            case 6 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "calamitus";
+                } else {
+                    threadName += "warfare";
+                }
+            }
+            case 7 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "magus";
+                } else {
+                    threadName += "technology";
+                }
+            }
+            case 8 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "aeterna";
+                } else {
+                    threadName += "imperial";
+                }
+            }
             default -> {
                 return player.getCorrectChannel();
             }
@@ -3453,8 +3501,8 @@ public class ButtonHelper {
             if (button.getCustomId() == null || button.getCustomId().contains("ultimateUndo")) {
                 continue;
             }
-            String builder = player.getFaction() + ";" + button.getCustomId() + ";" + button.getLabel() + ";"
-                    + button.getStyle();
+            String builder = player.getFaction() + ";" + button.getCustomId().replace(";", "fin66") + ";"
+                    + button.getLabel() + ";" + button.getStyle();
             if (button.getEmoji() != null
                     && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
@@ -3470,7 +3518,7 @@ public class ButtonHelper {
             if (game.getPlayerFromColorOrFaction(buttonString.split(";")[x]) != null) {
                 x = 1;
             }
-            String id = buttonString.split(";")[x];
+            String id = buttonString.split(";")[x].replace("fin66", ";");
             String label = buttonString.split(";")[x + 1];
             if (label.isEmpty()) {
                 label = "Edited";
@@ -4095,7 +4143,7 @@ public class ButtonHelper {
         // Expeditions
         String expeditionText = game.getExpeditions().getTopLevelExpeditionButtonText();
         boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
-        if (expeditionText != null && !thundersEdgeOnBoard && game.isThundersEdge()) {
+        if (expeditionText != null && !thundersEdgeOnBoard && game.isThundersEdge() && !game.isTwilightsFallMode()) {
             endButtons.add(Buttons.gray(player.finChecker() + "expeditionInfoAndButtons", expeditionText));
         }
 

@@ -44,7 +44,6 @@ public class TeHelperAgents {
         if (target == null) target = player;
         switch (leaderID) {
             case "crimsonagent" -> postCrimsonAgentStep1(game, target);
-            case "deepwroughtagent" -> postDeepwroughtAgentStep1(game);
             case "ralnelagent" -> postRalNelAgentStep1(event, game, target);
             default -> {
                 return false;
@@ -219,11 +218,6 @@ public class TeHelperAgents {
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
                     .queue();
         }
-    }
-
-    private static void postDeepwroughtAgentStep1(Game game) {
-        // "placeIntoCoexist_[planet]_[unitList]"
-
     }
 
     public static void serveNaaluAgentButtons(Game game, Player player, Tile tile, Player p2) {

@@ -363,6 +363,7 @@ public class StatusHelper {
             if (Helper.checkEndGame(game, player)) {
                 break;
             }
+            ActionCardHelper.sendPlotCardInfo(game, player);
         }
 
         List<Button> poButtons = getScoreObjectiveButtons(game);
