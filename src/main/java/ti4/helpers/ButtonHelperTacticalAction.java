@@ -445,7 +445,7 @@ public class ButtonHelperTacticalAction {
             if (nextDist < 100) {
                 buttons.add(Buttons.gray("getTilesThisFarAway_" + nextDist, "Get Tiles " + nextDist + " Spaces Away"));
             }
-            if (nextDist >= 3 && allDistances.contains(100)) {
+            if (desiredDistance >= 3 && allDistances.stream().anyMatch(i -> i.equals(100))) {
                 buttons.add(Buttons.red("getTilesThisFarAway_" + 100, "Get Tiles Far Far Away", "⚠️"));
             }
         }
