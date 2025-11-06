@@ -1096,6 +1096,7 @@ public class Constants {
     public static final String DRAFT_ANDCAT_REMOVE_PACKAGE = "remove_package";
     public static final String DRAFT_ANDCAT_MODIFY_PACKAGE = "modify_package";
     public static final String DRAFT_ANDCAT_SET_PLAYER_CHOICES = "set_player_choices";
+    public static final String DRAFT_ANDCAT_CLEAR_PLAYER_CHOICES = "clear_player_choices";
 
     // options
     public static final String FORCE_OPTION = "force";

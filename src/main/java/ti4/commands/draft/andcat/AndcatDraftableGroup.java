@@ -21,7 +21,8 @@ public class AndcatDraftableGroup extends SubcommandGroup {
                     new AndcatDraftableAddPackage(),
                     new AndcatDraftableModifyPackage(),
                     new AndcatDraftableRemovePackage(),
-                    new AndcatDraftableSetPlayerChoices())
+                    new AndcatDraftableSetPlayerChoices(),
+                    new AndcatDraftableClearPlayerChoices())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     public AndcatDraftableGroup() {
