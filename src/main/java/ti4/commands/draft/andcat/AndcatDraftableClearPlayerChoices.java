@@ -61,7 +61,7 @@ class AndcatDraftableClearPlayerChoices extends GameStateSubcommand {
                         + ".");
 
         AndcatReferenceCardsMessageHelper refPackageMessageHelper = new AndcatReferenceCardsMessageHelper(draftable);
-        refPackageMessageHelper.updatePackageButtons(event, draftManager, player, refPackage);
+        refPackageMessageHelper.updatePackageButtons(event, draftManager, player, updatedPackage);
         refPackageMessageHelper.updatePackagePickSummary(draftManager);
     }
 }
