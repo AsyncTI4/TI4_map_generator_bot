@@ -65,6 +65,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.PlayerTechService;
@@ -404,7 +405,8 @@ public class ButtonHelperFactionSpecific {
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                "Select the secret you would like to score. The bot has not verified you can score these, so double check.",
+                player.getRepresentation()
+                        + "Select the secret you would like to score. The bot has not verified you can score these, so double check.",
                 buttons);
     }
 
@@ -414,10 +416,12 @@ public class ButtonHelperFactionSpecific {
         SecretObjectiveModel soM = Mapper.getSecretObjective(so);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                " used their plots ability to score the secret " + soM.getName()
+                player.getRepresentation() + " used their plots ability to score the secret "
+                        + soM.getName()
                         + " for 0 VP (but they get to put a plot card into play)");
         int poIndex = game.addCustomPO("(Plotted) " + soM.getName(), 0);
         game.scorePublicObjective(player.getUserID(), poIndex);
+        HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         ActionCardHelper.sendPlotCardInfo(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(
