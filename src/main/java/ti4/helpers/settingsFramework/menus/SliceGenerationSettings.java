@@ -54,7 +54,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
     public SliceGenerationSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super("slice", "Slice value settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
+        super("slice", "Draft settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
 
         // Initialize Settings to default values
         int players = game != null ? game.getPlayers().size() : 6;

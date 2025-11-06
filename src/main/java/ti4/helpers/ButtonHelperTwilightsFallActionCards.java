@@ -27,6 +27,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.map.FractureService;
 import ti4.service.unit.DestroyUnitService;
 
 public class ButtonHelperTwilightsFallActionCards {
@@ -153,7 +154,58 @@ public class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("resolveUnravel")
     public static void resolveUnravel(Game game, Player player, ButtonInteractionEvent event) {
-        RelicHelper.drawRelicAndNotify(player, event, game);
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (player.getRelics().isEmpty()) {
+                continue;
+            }
+            buttons.add(
+                    Buttons.gray("unravelStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+        }
+        String msg = player.getRepresentation() + " choose the player who owns the relic you wish to unravel.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("unravelStep2")
+    public static void unravelStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<>();
+        for (String relic : p2.getRelics()) {
+            if (Mapper.getRelic(relic).isFakeRelic()) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    "unravelStep3_" + p2.getFaction() + "_" + relic,
+                    Mapper.getRelic(relic).getName()));
+        }
+        String msg = player.getRepresentation() + " choose the relic you wish to unravel.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("unravelStep3")
+    public static void unravelStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String relic = buttonID.split("_")[2];
+        p2.removeRelic(relic);
+        String msg = player.getRepresentation() + " choose to unravel "
+                + Mapper.getRelic(relic).getName() + " owned by " + p2.getRepresentation();
+        if (p2 == player) {
+            if (!FractureService.isFractureInPlay(game)) {
+                FractureService.spawnFracture(event, game);
+                FractureService.spawnIngressTokens(event, game, player, false);
+            }
+        } else {
+            Integer poIndex =
+                    game.addCustomPO("Unravel " + Mapper.getRelic(relic).getName(), 1);
+            game.scorePublicObjective(p2.getUserID(), poIndex);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    p2.getRepresentation() + " scored a victory point for the relic they lost.");
+            Helper.checkEndGame(game, p2);
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
 

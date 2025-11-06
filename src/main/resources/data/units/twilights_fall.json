@@ -774,6 +774,7 @@
         "faction": "pinktf",
         "moveValue": 1,
         "capacityUsed": 1,
+        "capacityValue": 3,
         "cost": 8,
         "combatHitsOn": 5,
         "combatDieCount": 2,

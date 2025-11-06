@@ -1366,7 +1366,7 @@ public class ButtonHelperSCs {
         } else {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    "Hey, something went wrong leaving a react, please just hit the no follow button on the strategy card to do so.");
+                    "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with /player cc.");
         }
         ButtonHelper.deleteMessage(event);
     }

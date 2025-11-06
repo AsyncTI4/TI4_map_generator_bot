@@ -253,6 +253,7 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
+        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players Secrets"));
         return buttons;
     }
 
@@ -1453,6 +1454,10 @@ public class ActionCardHelper {
             }
             if ("tf-create".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCreate", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+            if ("tf-unravel".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveUnravel", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-scarab".equals(automationID)) {

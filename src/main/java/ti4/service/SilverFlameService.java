@@ -27,6 +27,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TileEmojis;
+import ti4.service.map.FractureService;
 
 @UtilityClass
 public class SilverFlameService {
@@ -160,6 +161,10 @@ public class SilverFlameService {
         }
 
         game.removeTile(homeSystem.getPosition());
+        if (!FractureService.isFractureInPlay(game)) {
+            FractureService.spawnFracture(null, game);
+            FractureService.spawnIngressTokens(null, game, player, false);
+        }
         ButtonHelper.deleteMessage(event);
     }
 }

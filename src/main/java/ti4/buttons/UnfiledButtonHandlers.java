@@ -82,6 +82,7 @@ import ti4.service.StatusCleanupService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.AutoFactoriesService;
 import ti4.service.breakthrough.EidolonMaximumService;
+import ti4.service.breakthrough.TheIconService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -2112,6 +2113,7 @@ public class UnfiledButtonHandlers {
                     }
                 });
                 AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
+                TheIconService.checkAndSendIconButton(event, game, player, buttonID);
                 EidolonMaximumService.sendEidolonMaximumFlipButtons(game, player);
                 int cost = Helper.calculateCostOfProducedUnits(player, game, true);
                 game.setStoredValue("producedUnitCostFor" + player.getFaction(), "" + cost);

@@ -1003,7 +1003,8 @@ public class ButtonHelperAgents {
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getPlanets()) {
                 if (game.getUnitHolderFromPlanet(planet) != null
-                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)) {
+                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                        && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
                     buttons.add(Buttons.gray(
                             player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));

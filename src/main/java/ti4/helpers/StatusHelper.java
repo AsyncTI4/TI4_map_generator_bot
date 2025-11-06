@@ -363,6 +363,7 @@ public class StatusHelper {
             if (Helper.checkEndGame(game, player)) {
                 break;
             }
+            ActionCardHelper.sendPlotCardInfo(game, player);
         }
 
         List<Button> poButtons = getScoreObjectiveButtons(game);
@@ -710,6 +711,7 @@ public class StatusHelper {
                         && !key.contains("Seed of an")
                         && !key.contains("Mutiny")
                         && !key.contains("Stellar Atomics")
+                        && !key.contains("(Plotted)")
                         && !key.contains("Crown of Emphidia")
                         && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
                     poName = key;
