@@ -112,9 +112,11 @@ public class ButtonHelperTwilightsFall {
                     }
                 }
                 Collections.shuffle(slice);
-                if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()) {
+                if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
+                        || slice.get(1).getTile().isAnomaly()) {
                     Collections.rotate(slice, 1);
-                    if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()) {
+                    if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
+                            || slice.get(1).getTile().isAnomaly()) {
                         Collections.rotate(slice, 1);
                     }
                 }
@@ -467,6 +469,27 @@ public class ButtonHelperTwilightsFall {
                 player.getRepresentation() + " has discarded the genome: "
                         + Mapper.getLeader(cardID).getName(),
                 Mapper.getLeader(cardID).getRepresentationEmbed());
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("fixMahactColors")
+    public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
+
+        // ColorChangeHelper.changePlayerColor(game, player, oldColor, newColor);
+        for (Player player : game.getRealPlayers()) {
+            String factionColor = player.getFaction().replace("tf", "");
+            if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
+                Player p2 = game.getPlayerFromColorOrFaction(factionColor);
+                if (p2 != null) {
+                    ColorChangeHelper.changePlayerColor(
+                            game,
+                            p2,
+                            p2.getColor(),
+                            game.getUnusedColors().getFirst().getAlias());
+                }
+                ColorChangeHelper.changePlayerColor(game, player, player.getColor(), factionColor);
+            }
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -850,6 +873,11 @@ public class ButtonHelperTwilightsFall {
         }
         if (type.equalsIgnoreCase("units")) {
             player.removeOwnedUnitByID(cardID);
+            UnitModel u = Mapper.getUnit(cardID);
+            if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
+                String replacementUnit = u.getBaseType();
+                player.addOwnedUnitByID(replacementUnit);
+            }
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
                     player.getRepresentation() + " has lost the unit: "
