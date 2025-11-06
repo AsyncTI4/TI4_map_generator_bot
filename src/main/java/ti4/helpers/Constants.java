@@ -1049,6 +1049,7 @@ public class Constants {
     public static final String DRAFT_SLICE = "slice";
     public static final String DRAFT_SPEAKER_ORDER = "speaker_order";
     public static final String DRAFT_MANTIS_TILE = "mantis_tile";
+    public static final String DRAFT_ANDCAT_REF_PACKAGES = "andcat_ref_packages";
 
     // subcommands
     public static final String DRAFT_MANAGE_DEBUG = "debug";
@@ -1091,6 +1092,10 @@ public class Constants {
     public static final String DRAFT_MANTIS_TILE_START_BUILDING = "start_building";
     public static final String DRAFT_MANTIS_TILE_CONFIGURE = "configure";
     public static final String DRAFT_MANTIS_TILE_SET_TILES = "set_tiles";
+    public static final String DRAFT_ANDCAT_ADD_PACKAGE = "add_package";
+    public static final String DRAFT_ANDCAT_REMOVE_PACKAGE = "remove_package";
+    public static final String DRAFT_ANDCAT_MODIFY_PACKAGE = "modify_package";
+    public static final String DRAFT_ANDCAT_SET_PLAYER_CHOICES = "set_player_choices";
 
     // options
     public static final String FORCE_OPTION = "force";
@@ -1118,6 +1123,11 @@ public class Constants {
     public static final String DRAFT_NEW_SLICE_OPTION = "new_slice_name";
     public static final String PICK_COUNT_OPTION = "pick_count";
     public static final String PLAYER_PICKS_OPTION = "pick";
+    public static final String PACKAGE_KEY_OPTION = "package_key";
+    public static final String HOMESYSTEM_FACTION_OPTION = "homesystem_faction";
+    public static final String STARTING_FLEET_FACTION_OPTION = "starting_fleet_faction";
+    public static final String PRIORITY_NUMBER_FACTION_OPTION = "priority_number_faction";
+    public static final String LOCK_CHOICES_OPTION = "lock_choices";
 
     // ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET,
     // BLUETILE, REDTILE, DRAFTORDER

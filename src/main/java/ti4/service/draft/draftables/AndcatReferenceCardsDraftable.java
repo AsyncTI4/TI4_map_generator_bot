@@ -148,6 +148,10 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return factions;
     }
 
+    public static String getChoiceKey(Integer packageNum) {
+        return "package" + packageNum;
+    }
+
     public ReferenceCardPackage getPackageByChoiceKey(String choiceKey) {
         if (!choiceKey.startsWith("package")) {
             return null;
@@ -166,7 +170,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         for (Entry<Integer, ReferenceCardPackage> entry : referenceCardPackages.entrySet()) {
             Integer packageKey = entry.getKey();
             List<FactionModel> factionsInPackage = getFactionsInPackage(entry.getValue());
-            String choiceKey = "package" + packageKey;
+            String choiceKey = getChoiceKey(packageKey);
             String unformattedName = "Package " + packageKey;
             String formattedName = "Package " + packageKey + " ("
                     + String.join(
