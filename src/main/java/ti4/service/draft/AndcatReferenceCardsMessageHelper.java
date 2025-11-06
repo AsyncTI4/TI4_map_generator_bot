@@ -191,7 +191,11 @@ public class AndcatReferenceCardsMessageHelper {
 
             if (refPackage.choicesFinal() != null && refPackage.choicesFinal()) {
                 messageBuilder.append(playerRepresentation).append(": 🔒");
-                continue;
+                if (refPackage.homeSystemFaction() != null
+                        && refPackage.startingUnitsFaction() != null
+                        && refPackage.speakerOrderFaction() != null) {
+                    continue;
+                }
             }
 
             messageBuilder.append(playerRepresentation).append(": ");
@@ -379,6 +383,14 @@ public class AndcatReferenceCardsMessageHelper {
         }
 
         if (setupPart.equals("complete")) {
+            // Make sure everything is picked
+            if (refPackage.homeSystemFaction() == null
+                    || refPackage.startingUnitsFaction() == null
+                    || refPackage.speakerOrderFaction() == null) {
+                return DraftButtonService.USER_MISTAKE_PREFIX
+                        + "You must assign all factions before finalizing your choices.";
+            }
+
             // Finalize choices
             refPackage = new ReferenceCardPackage(
                     refPackage.key(),
