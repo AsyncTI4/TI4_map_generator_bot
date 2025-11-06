@@ -13,13 +13,13 @@ import ti4.message.MessageHelper;
 
 class ShowAllAC extends GameStateSubcommand {
 
-    public ShowAllAC() {
+    ShowAllAC() {
         super(Constants.SHOW_ALL, "Show all Action Cards to one player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color being shown cards")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color showing cards").setAutoComplete(true));
     }
 
     @Override

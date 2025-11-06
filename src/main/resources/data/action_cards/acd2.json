@@ -291,7 +291,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Look at another player's action cards. Then, that player gives you 1 action card, secret objective, or promissory note from their hand.",
+        "text": "Look at another player's action cards. Then, that player gives you 1 action card, promissory note, or secret objective from their hand.",
         "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
         "source": "action_deck_2"
     },
@@ -989,7 +989,7 @@
         "name": "Heist",
         "phase": "Action",
         "window": "After you gain control of a planet that was controlled by another player",
-        "text": "Take any combination of up to 2 of that player's relic fragments, trade goods, or commodities.",
+        "text": "Take up to 2 of that player's relic fragments, trade goods, or commodities.",
         "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
         "source": "action_deck_2"
     },
@@ -1195,7 +1195,7 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After you lose a ground combat",
-        "text": "Place 2 infantry from your reinforcements into coexistence on any non-home planets your opponent controls. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets your opponent controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
         "flavorText": "",
         "source": "action_deck_2"
     },
@@ -1254,12 +1254,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "settlement",
-        "name": "Settlement",
+        "alias": "settlements",
+        "name": "Settlements",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place 2 infantry from your reinforcements on any non-home planet controlled by a player that voted for that outcome; if that planet contains that player's ground forces, place your infantry into coexistence.",
-        "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
+        "flavorText": "",
         "source": "action_deck_2"
     },
     {
