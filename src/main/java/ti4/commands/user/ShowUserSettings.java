@@ -1,15 +1,14 @@
 package ti4.commands.user;
 
-import java.util.List;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.List;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
@@ -20,7 +19,7 @@ class ShowUserSettings extends Subcommand {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    public ShowUserSettings() {
+    ShowUserSettings() {
         super("show_settings", "Show your User Settings");
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
@@ -30,7 +29,9 @@ class ShowUserSettings extends Subcommand {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 null,
-                List.of(getSettingEmbed(event, UserSettingsManager.get(event.getUser().getId()))), getUserSettingsButtons());
+                List.of(getSettingEmbed(
+                        event, UserSettingsManager.get(event.getUser().getId()))),
+                getUserSettingsButtons());
     }
 
     private static MessageEmbed getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {
@@ -49,7 +50,7 @@ class ShowUserSettings extends Subcommand {
         }
     }
 
-    public static List<Button> getUserSettingsButtons() {
+    private static List<Button> getUserSettingsButtons() {
         return List.of(Buttons.OFFER_PING_OPTIONS_BUTTON, Buttons.DONE_DELETE_BUTTONS);
     }
 }

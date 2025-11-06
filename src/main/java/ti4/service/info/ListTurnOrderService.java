@@ -3,12 +3,10 @@ package ti4.service.info;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -29,7 +27,7 @@ public class ListTurnOrderService {
             return;
         }
 
-        HashMap<Integer, String> order = new HashMap<>();
+        Map<Integer, String> order = new HashMap<>();
         for (Player player : game.getRealPlayers()) {
             order.put(player.getInitiative(), buildPlayerScText(game, player, pingPeople));
         }
@@ -61,7 +59,7 @@ public class ListTurnOrderService {
             if (isPlayed) {
                 textBuilder.append("~~");
             }
-            textBuilder.append(scEmoji).append(Helper.getSCAsMention(sc_, game));
+            textBuilder.append(scEmoji).append(game.getSCEmojiWordRepresentation(sc_));
             if (isPlayed) {
                 textBuilder.append("~~");
             }
@@ -74,7 +72,7 @@ public class ListTurnOrderService {
         if (pingPeople || game.isFowMode()) {
             textBuilder.append(player.getRepresentation());
         } else {
-            textBuilder.append(player.getFactionEmoji() + " " + player.getUserName());
+            textBuilder.append(player.getFactionEmoji()).append(" ").append(player.getUserName());
         }
 
         if (passed) {

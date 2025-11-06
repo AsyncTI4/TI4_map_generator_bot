@@ -2,8 +2,8 @@ package ti4.service.player;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -26,8 +26,9 @@ public class RefreshCardsService {
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()) {
-                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")) {
+                    if (leader.isActive() && !"zealotshero".equalsIgnoreCase(leader.getId())) {
                         player.removeLeader(leader.getId());
+                        ButtonHelperHeroes.checkForMykoHero(game, leader.getId(), player);
                     } else {
                         RefreshLeaderService.refreshLeader(player, leader, game);
                     }

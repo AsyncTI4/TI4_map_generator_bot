@@ -10,10 +10,11 @@ import ti4.service.explore.ExploreService;
 @UtilityClass
 class LegendaryPlanetButtonHandler {
 
-    @ButtonHandler("garboziaAbilityExhaust_")
-    static void garboziaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
-        String planet = "garbozia";
+    @ButtonHandler("bozgarbiaAbilityExhaust_")
+    static void bozgarbiaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
+        String planet = "bozgarbia";
         player.exhaustPlanetAbility(planet);
-        ExploreService.explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
+        ExploreService.explorePlanet(
+                event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
     }
 }

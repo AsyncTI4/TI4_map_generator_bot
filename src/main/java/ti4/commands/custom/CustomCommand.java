@@ -3,7 +3,6 @@ package ti4.commands.custom;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -21,7 +20,6 @@ public class CustomCommand implements ParentCommand {
                     new PoSetDeck(),
                     new DiscardSpecificAgenda(),
                     new SetThreadName(),
-                    new PeekAtObjectiveDeck(),
                     new PeekAtSecretDeck(),
                     new PeekAtStage1(),
                     new PeekAtStage2(),

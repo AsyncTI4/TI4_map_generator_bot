@@ -29,11 +29,13 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArgentFlight",
         "preferredColours": ["org", "pch", "spr"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 25
     },
     {
         "alias": "cabal",
         "factionName": "The Vuil'raith Cabal",
+        "shortName": "Vuil'raith",
         "shortTag": "VRC",
         "homeSystem": "54",
         "startingFleet": "dn,cv,cr,3 ff,3 inf a,sd a",
@@ -61,7 +63,8 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheVuilRaithCabal",
         "preferredColours": ["bld", "red", "psn"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 6
     },
     {
         "alias": "empyrean",
@@ -92,7 +95,8 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmpyrean_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmpyrean",
         "preferredColours": ["sns", "ppl", "eth"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 9
     },
     {
         "alias": "mahact",
@@ -124,7 +128,8 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMahactGeneSorcerers_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMahactGeneSorcerers",
         "preferredColours": ["gld", "ylw", "lvn"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 1
     },
     {
         "alias": "nomad",
@@ -162,11 +167,13 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheetBack.webp",
         "wikiURL": "",
         "preferredColours": ["nvy", "blu", "gcr"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 2
     },
     {
         "alias": "naaz",
         "factionName": "The Naaz-Rokha Alliance",
+        "shortName": "Naaz-Rokha",
         "shortTag": "NRA",
         "homeSystem": "57",
         "startingFleet": "2 cv,dd,2 ff,3 inf n,mech r,sd n",
@@ -195,11 +202,13 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaazRokhaAlliance",
         "preferredColours": ["lme", "grn", "sbt"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 19
     },
     {
         "alias": "titans",
         "factionName": "The Titans of Ul",
+        "shortName": "Ul",
         "shortTag": "UL",
         "homeSystem": "55",
         "startingFleet": "dn,2 cr,2 ff,3 inf elysium,sd elysium",
@@ -227,6 +236,7 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheTitansOfUl",
         "preferredColours": ["pnk", "rse", "vpw"],
-        "source": "pok"
+        "source": "pok",
+        "priorityNumber": 13
     }
 ]

@@ -1,10 +1,10 @@
 package ti4.service.unit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -17,14 +17,15 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-public class CaptureUnitService {
+class CaptureUnitService {
 
-    public static List<Player> listCapturingMechPlayers(Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
-        if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return List.of();
-        if (!(removedUnitType.uh() instanceof Planet planet)) return List.of();
-        if (ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
+    public static List<Player> listCapturingMechPlayers(
+            Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
+        if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return Collections.emptyList();
+        if (!(removedUnitType.uh() instanceof Planet planet)) return Collections.emptyList();
+        if (ButtonHelper.isLawInPlay(game, "articles_war")) return Collections.emptyList();
         Player destroyedPlayer = removedUnitType.getPlayer(game);
-        if (destroyedPlayer == null) return List.of();
+        if (destroyedPlayer == null) return Collections.emptyList();
 
         List<Player> capturing = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
@@ -35,16 +36,19 @@ public class CaptureUnitService {
         return capturing;
     }
 
-    public static List<Player> listCapturingFlagshipPlayers(Game game, List<RemovedUnit> allUnits, RemovedUnit removed) {
+    public static List<Player> listCapturingFlagshipPlayers(
+            Game game, List<RemovedUnit> allUnits, RemovedUnit removed) {
         Tile tile = removed.tile();
 
         // "sigma_vuilraith_flagship_1" does not capture your own units
         List<Player> cabals = game.getRealPlayers().stream()
-            .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2")).toList();
+                .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2"))
+                .toList();
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {
             // Flagship cannot capture itself
-            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().getUnitType() == UnitType.Flagship) continue;
+            if (p.unitBelongsToPlayer(removed.unitKey()) && removed.unitKey().getUnitType() == UnitType.Flagship)
+                continue;
 
             // If the flagship was not destroyed
             if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, p) > 0) {
@@ -92,7 +96,9 @@ public class CaptureUnitService {
                 playerOpponents.add(p2);
             }
         }
-        if (owner != game.getActivePlayer() && game.getActivePlayer() != null && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
+        if (owner != game.getActivePlayer()
+                && game.getActivePlayer() != null
+                && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
             playerOpponents.add(game.getActivePlayer());
         }
         return playerOpponents;

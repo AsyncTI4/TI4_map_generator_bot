@@ -1,11 +1,9 @@
 package ti4.draft;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
@@ -15,6 +13,7 @@ import ti4.draft.items.CommoditiesDraftItem;
 import ti4.draft.items.FlagshipDraftItem;
 import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
 import ti4.draft.items.PNDraftItem;
 import ti4.draft.items.RedTileDraftItem;
@@ -22,6 +21,7 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
+import ti4.draft.items.UnitDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
@@ -41,7 +41,23 @@ public abstract class DraftItem implements ModelInterface {
     }
 
     public enum Category {
-        ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET, BLUETILE, REDTILE, DRAFTORDER
+        ABILITY,
+        TECH,
+        AGENT,
+        COMMANDER,
+        HERO,
+        MECH,
+        FLAGSHIP,
+        COMMODITIES,
+        PN,
+        HOMESYSTEM,
+        STARTINGTECH,
+        STARTINGFLEET,
+        BLUETILE,
+        REDTILE,
+        DRAFTORDER,
+        MAHACTKING,
+        UNIT
     }
 
     public final Category ItemCategory;
@@ -52,23 +68,26 @@ public abstract class DraftItem implements ModelInterface {
     public DraftErrataModel Errata;
 
     public static DraftItem generate(Category category, String itemId) {
-        DraftItem item = switch (category) {
-            case ABILITY -> item = new AbilityDraftItem(itemId);
-            case TECH -> item = new TechDraftItem(itemId);
-            case AGENT -> item = new AgentDraftItem(itemId);
-            case COMMANDER -> item = new CommanderDraftItem(itemId);
-            case HERO -> item = new HeroDraftItem(itemId);
-            case MECH -> item = new MechDraftItem(itemId);
-            case FLAGSHIP -> item = new FlagshipDraftItem(itemId);
-            case COMMODITIES -> item = new CommoditiesDraftItem(itemId);
-            case PN -> item = new PNDraftItem(itemId);
-            case HOMESYSTEM -> item = new HomeSystemDraftItem(itemId);
-            case STARTINGTECH -> item = new StartingTechDraftItem(itemId);
-            case STARTINGFLEET -> item = new StartingFleetDraftItem(itemId);
-            case BLUETILE -> item = new BlueTileDraftItem(itemId);
-            case REDTILE -> item = new RedTileDraftItem(itemId);
-            case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
-        };
+        DraftItem item =
+                switch (category) {
+                    case ABILITY -> item = new AbilityDraftItem(itemId);
+                    case TECH -> item = new TechDraftItem(itemId);
+                    case AGENT -> item = new AgentDraftItem(itemId);
+                    case COMMANDER -> item = new CommanderDraftItem(itemId);
+                    case HERO -> item = new HeroDraftItem(itemId);
+                    case MECH -> item = new MechDraftItem(itemId);
+                    case FLAGSHIP -> item = new FlagshipDraftItem(itemId);
+                    case COMMODITIES -> item = new CommoditiesDraftItem(itemId);
+                    case PN -> item = new PNDraftItem(itemId);
+                    case HOMESYSTEM -> item = new HomeSystemDraftItem(itemId);
+                    case STARTINGTECH -> item = new StartingTechDraftItem(itemId);
+                    case STARTINGFLEET -> item = new StartingFleetDraftItem(itemId);
+                    case BLUETILE -> item = new BlueTileDraftItem(itemId);
+                    case REDTILE -> item = new RedTileDraftItem(itemId);
+                    case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
+                    case MAHACTKING -> item = new MahactKingDraftItem(itemId);
+                    case UNIT -> item = new UnitDraftItem(itemId);
+                };
 
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;
@@ -94,6 +113,8 @@ public abstract class DraftItem implements ModelInterface {
         items.addAll(StartingFleetDraftItem.buildAllDraftableItems(factions));
         items.addAll(FlagshipDraftItem.buildAllDraftableItems(factions));
         items.addAll(MechDraftItem.buildAllDraftableItems(factions));
+        items.addAll(UnitDraftItem.buildAllDraftableItems());
+        items.addAll(MahactKingDraftItem.buildAllDraftableItems());
         return items;
     }
 
@@ -112,6 +133,8 @@ public abstract class DraftItem implements ModelInterface {
         items.addAll(StartingFleetDraftItem.buildAllItems(factions));
         items.addAll(FlagshipDraftItem.buildAllItems(factions));
         items.addAll(MechDraftItem.buildAllItems(factions));
+        items.addAll(UnitDraftItem.buildAllItems());
+        items.addAll(MahactKingDraftItem.buildAllItems());
         return items;
     }
 
@@ -170,9 +193,13 @@ public abstract class DraftItem implements ModelInterface {
     public boolean isDraftable(Player player) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
-        boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory) + player.getDraftQueue().getCategoryCount(ItemCategory) >= draftRules.getItemLimitForCategory(ItemCategory);
+        boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory)
+                        + player.getDraftQueue().getCategoryCount(ItemCategory)
+                >= draftRules.getItemLimitForCategory(ItemCategory);
         if (draftRules instanceof FrankenDraft) {
-            isAtHandLimit = draftHand.getCategoryCount(ItemCategory) + player.getDraftQueue().getCategoryCount(ItemCategory) >= FrankenDraft.getItemLimitForCategory(ItemCategory, player.getGame());
+            isAtHandLimit = draftHand.getCategoryCount(ItemCategory)
+                            + player.getDraftQueue().getCategoryCount(ItemCategory)
+                    >= FrankenDraft.getItemLimitForCategory(ItemCategory, player.getGame());
         }
         if (isAtHandLimit) {
             return false;
@@ -185,9 +212,11 @@ public abstract class DraftItem implements ModelInterface {
                 continue;
             }
             if (draftRules instanceof FrankenDraft) {
-                allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= FrankenDraft.getItemLimitForCategory(cat, player.getGame());
+                allOtherCategoriesAtHandLimit &=
+                        draftHand.getCategoryCount(cat) >= FrankenDraft.getItemLimitForCategory(cat, player.getGame());
             } else {
-                allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= draftRules.getItemLimitForCategory(cat);
+                allOtherCategoriesAtHandLimit &=
+                        draftHand.getCategoryCount(cat) >= draftRules.getItemLimitForCategory(cat);
             }
         }
 

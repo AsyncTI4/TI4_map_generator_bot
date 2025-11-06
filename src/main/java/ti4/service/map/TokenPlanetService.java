@@ -2,7 +2,6 @@ package ti4.service.map;
 
 import java.awt.Point;
 import java.util.Map;
-
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -18,23 +17,24 @@ public class TokenPlanetService {
     public enum TokenPlanets {
         mirage,
 
-        cradle, oasis,
-
-        illusion, phantasm,
+        cradle,
+        oasis,
+        avernus,
+        thundersedge,
+        illusion,
+        phantasm,
     }
 
     public static String adsf() {
         return TokenPlanets.mirage.name();
     }
 
-    public static boolean isTokenPlanet(String tokenOrPlanetName) {
+    private static boolean isTokenPlanet(String tokenOrPlanetName) {
         if (tokenOrPlanetName == null || tokenOrPlanetName.isBlank()) return false;
         if (Constants.TOKEN_PLANETS.contains(tokenOrPlanetName)) return true;
 
         TokenModel token = Mapper.getToken(tokenOrPlanetName);
-        if (token.getTokenPlanetName() != null && Constants.TOKEN_PLANETS.contains(token.getTokenPlanetName()))
-            return true;
-        return false;
+        return token.getTokenPlanetName() != null && Constants.TOKEN_PLANETS.contains(token.getTokenPlanetName());
     }
 
     public static void moveTokenPlanet(Game game, Player player, Tile destination, String planetName) {
@@ -58,7 +58,9 @@ public class TokenPlanetService {
 
         // Inform the player
         if (player != null) {
-            String message = player.getRepresentation() + " moved " + model.getName() + " from " + oldTile.getRepresentationForButtons(game, player) + " to " + destination.getRepresentationForButtons(game, player) + ".";
+            String message = player.getRepresentation() + " moved " + model.getName() + " from "
+                    + oldTile.getRepresentationForButtons(game, player) + " to "
+                    + destination.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
     }
@@ -73,7 +75,12 @@ public class TokenPlanetService {
         }
 
         Point tokenPlanetCenter = Constants.TOKEN_PLANET_CENTER_OFFSET;
-        Point planetCenter = new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
+
+        Point planetCenter =
+                new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
+        if (planetName.equalsIgnoreCase("thundersedge")) {
+            planetCenter = Constants.SPACE_CENTER_POSITION;
+        }
         Planet planetObject = new Planet(planetName, planetCenter);
         unitHolders.put(planetName, planetObject);
     }
@@ -86,5 +93,4 @@ public class TokenPlanetService {
         tile.getUnitHolders().remove(planetName);
         tile.getSpaceUnitHolder().removeToken(tokenPath);
     }
-
 }

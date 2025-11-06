@@ -521,8 +521,8 @@
         "id": "facsimile",
         "name": "Facsimile",
         "faction": "mortheus",
-        "window": "At the start of a space combat while you are not the active player",
-        "windowEffect": "Choose 1 of your opponent's ships in the active system, you may produce 1 unit of that type in that system, spending influence instead of resources.",
+        "window": "At the start of a space combat while you are the defender",
+        "windowEffect": "You may spend influence equal to the cost value of 1 of your opponent's ships in the active system to place 1 unit of that type from your reinforcements in that system.",
         "source": "ds"
     },
     {
@@ -925,7 +925,7 @@
         "id": "pride",
         "name": "Pride",
         "faction": "toldar",
-        "permanentEffect": "When you win a combat as the attacker against a player who has more victory points than you, gain 1 honor; if that player has fewer victory points than you, gain 1 dishonor.",
+        "permanentEffect": "When you win a combat as the attacker, gain 1 honor if your opponent has more victory points than you, or gain 1 dishonor if they have fewer victory points than you; otherwise, gain 1 honor or 1 dishonor and ignore this ability until the end of your turn.",
         "source": "ds"
     },
     {

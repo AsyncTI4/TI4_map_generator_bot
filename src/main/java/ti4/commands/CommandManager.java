@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.breakthrough.BreakthroughCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
@@ -16,6 +16,7 @@ import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.combat.CombatCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.developer.DeveloperCommand;
+import ti4.commands.draft.DraftCommand;
 import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.event.EventCommand;
 import ti4.commands.explore.ExploreCommand;
@@ -32,11 +33,14 @@ import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;
 import ti4.commands.search.SearchCommand;
+import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
+import ti4.commands.tf.TwilightFallCommand;
+import ti4.commands.tigl.TiglCommand;
 import ti4.commands.tokens.AddCCCommand;
 import ti4.commands.tokens.AddFrontierTokensCommand;
 import ti4.commands.tokens.AddTokenCommand;
@@ -59,70 +63,70 @@ import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
-import ti4.commands.tigl.TiglCommand;
 
 public class CommandManager {
 
-    public static final Map<String, ParentCommand> commands = Stream.of(
-        new AddUnits(),
-        new RemoveUnits(),
-        new RemoveAllUnits(),
-        new AllInfoCommand(),
-        new CardsInfoCommand(),
-        new ShowGameCommand(),
-        new ShowDistancesCommand(),
-        new AddCCCommand(),
-        new RemoveCCCommand(),
-        new RemoveAllCC(),
-        new AddFrontierTokensCommand(),
-        new MoveUnits(),
-        new ModifyUnitsButtons(),
-        new RemoveTokenCommand(),
-        new AddTokenCommand(),
-        new AddUnitDamage(),
-        new RemoveUnitDamage(),
-        new RemoveAllUnitDamage(),
-        new Transaction(),
-
-        new MapCommand(),
-        new HelpCommand(),
-        new SearchCommand(),
-        new ExploreCommand(),
-        new RelicCommand(),
-
-        new AdminCommand(),
-        new DeveloperCommand(),
-        new BothelperCommand(),
-        new PlayerCommand(),
-        new GameCommand(),
-
-        new ACCardsCommand(),
-        new PNCardsCommand(),
-        new SOCardsCommand(),
-        new StatusCommand(),
-        new AgendaCommand(),
-        new EventCommand(),
-
-        new SpecialCommand(),
-        new Special2Command(),
-        new LeaderCommand(),
-        new CombatCommand(),
-        new CustomCommand(),
-        new FOWCommand(),
-        new InstallationCommand(),
-        new MiltyCommand(),
-        new FrankenCommand(),
-        new CaptureCommand(),
-        new GenericButtonCommand(),
-        new DiscordantStarsCommand(),
-        new StatisticsCommand(),
-        new TechCommand(),
-        new PlanetCommand(),
-        new SelectionBoxDemoCommand(),
-        new UserCommand(),
-        new TiglCommand(),
-        new AsyncCommand(),
-        new OmegaPhaseCommand()).collect(Collectors.toMap(ParentCommand::getName, command -> command));
+    private static final Map<String, ParentCommand> commands = Stream.of(
+                    new AddUnits(),
+                    new RemoveUnits(),
+                    new RemoveAllUnits(),
+                    new AllInfoCommand(),
+                    new CardsInfoCommand(),
+                    new ShowGameCommand(),
+                    new ShowDistancesCommand(),
+                    new AddCCCommand(),
+                    new RemoveCCCommand(),
+                    new RemoveAllCC(),
+                    new SearchCommand2(),
+                    new AddFrontierTokensCommand(),
+                    new MoveUnits(),
+                    new ModifyUnitsButtons(),
+                    new RemoveTokenCommand(),
+                    new AddTokenCommand(),
+                    new AddUnitDamage(),
+                    new RemoveUnitDamage(),
+                    new RemoveAllUnitDamage(),
+                    new Transaction(),
+                    new MapCommand(),
+                    new HelpCommand(),
+                    new SearchCommand(),
+                    new ExploreCommand(),
+                    new RelicCommand(),
+                    new AdminCommand(),
+                    new DeveloperCommand(),
+                    new BothelperCommand(),
+                    new PlayerCommand(),
+                    new GameCommand(),
+                    new ACCardsCommand(),
+                    new PNCardsCommand(),
+                    new SOCardsCommand(),
+                    new StatusCommand(),
+                    new AgendaCommand(),
+                    new EventCommand(),
+                    new SpecialCommand(),
+                    new Special2Command(),
+                    new LeaderCommand(),
+                    new CombatCommand(),
+                    new CustomCommand(),
+                    new FOWCommand(),
+                    new InstallationCommand(),
+                    new MiltyCommand(),
+                    new FrankenCommand(),
+                    new CaptureCommand(),
+                    new GenericButtonCommand(),
+                    new DiscordantStarsCommand(),
+                    new TwilightFallCommand(),
+                    new StatisticsCommand(),
+                    new TechCommand(),
+                    new BreakthroughCommand(),
+                    new PlanetCommand(),
+                    new SelectionBoxDemoCommand(),
+                    new UserCommand(),
+                    new TiglCommand(),
+                    new AsyncCommand(),
+                    new OmegaPhaseCommand(),
+                    new DraftCommand())
+            .collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {
         return commands.get(name);

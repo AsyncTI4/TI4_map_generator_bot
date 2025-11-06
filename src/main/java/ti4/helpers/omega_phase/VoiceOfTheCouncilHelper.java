@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class VoiceOfTheCouncilHelper {
     public static void ResetVoiceOfTheCouncil(Game game) {
-        //Clean everything in case it got put somewhere weird
+        // Clean everything in case it got put somewhere weird
         game.getLaws().remove(Constants.VOICE_OF_THE_COUNCIL_ID);
         game.getLawsInfo().remove(Constants.VOICE_OF_THE_COUNCIL_ID);
         game.getDiscardAgendas().remove(Constants.VOICE_OF_THE_COUNCIL_ID);
@@ -29,8 +29,9 @@ public class VoiceOfTheCouncilHelper {
         var lawID = game.getLaws().get(Constants.VOICE_OF_THE_COUNCIL_ID);
         var poID = game.getRevealedPublicObjectives().get(Constants.VOICE_OF_THE_COUNCIL_PO);
         if (lawID == null || poID == null) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                "Cannot elect _Voice of the Council_; missing agenda or custom public objective. Consider running `/omegaphase reset_voice_of_the_council`.");
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    "Cannot elect _Voice of the Council_; missing agenda or custom public objective. Consider running `/omegaphase reset_voice_of_the_council`.");
             return;
         }
 

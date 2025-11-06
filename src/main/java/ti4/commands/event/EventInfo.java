@@ -3,7 +3,6 @@ package ti4.commands.event;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
@@ -31,7 +30,7 @@ class EventInfo extends GameStateSubcommand {
         sendEventInfo(player);
     }
 
-    public static void sendEventInfo(Player player) {
+    private static void sendEventInfo(Player player) {
         MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Events in Hand:__", getEventMessageEmbeds(player));
     }
 

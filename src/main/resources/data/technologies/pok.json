@@ -143,6 +143,7 @@
         "requirements": "GGG",
         "source": "codex4",
         "text": "Double the hits produced by your units' BOMBARDMENT and ground combat rolls.\nExhaust each planet you use BOMBARDMENT against.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/x89_bacterial_weapon_omega_omega.png?raw=true",
         "initials": "X89",
         "shortName": "X-89 Bact. Weapon"
     },
@@ -196,6 +197,19 @@
         "shortName": "Magen Def. Grid"
     },
     {
+        "alias": "md_c1",
+        "name": "Magen Defense Grid Ω",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "source": "codex1",
+        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/magen_defense_grid_omega.png?raw=true",
+        "initials": "MDG",
+        "shortName": "Magen Def. Grid"
+    },
+    {
         "alias": "md",
         "name": "Magen Defense Grid ΩΩ",
         "types": [
@@ -204,6 +218,7 @@
         "requirements": "R",
         "source": "codex4",
         "text": "When any player activates a system that contains 1 or more of your structures, place 1 infantry from your reinforcements with each of those structures.\nAt the start of ground combat on a planet that contains 1 or more of your structures, produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/magen_defense_grid_omega_omega.png?raw=true",
         "initials": "MDG",
         "shortName": "Magen Def. Grid"
     },
@@ -215,7 +230,7 @@
         ],
         "requirements": "RR",
         "source": "base",
-        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round.",
+        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round. [Note: this only occurs after the normal assign hits step in a combat round, which occurs after both sides roll combat dice. It occurs even if the opponent rolled no hits.]",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/duranium_armor.png?raw=true",
         "initials": "DA"
     },
@@ -987,7 +1002,7 @@
         "requirements": "YY",
         "faction": "winnu",
         "source": "base",
-        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn.",
+        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control during that use of Production.",
         "shrinkName": true,
         "shortName": "Hegemonic Trade Plcy",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hegemonic_trade_policy.jpg?raw=true"
@@ -1073,7 +1088,6 @@
         "shrinkName": false,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network.jpg?raw=true"
     },
-    
     {
         "alias": "nekroc4y",
         "name": "???\\_NULL\\_REFERENCE\\_???",

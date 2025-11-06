@@ -1,0 +1,145 @@
+[
+    {
+        "alias": "age_commerce",
+        "name": "Age of Commerce",
+        "text": "- Players do not have to be neighbors to perform transactions with each other.\n- Players do not have a maximum number of commodities; when they refresh commodities, they gain a number of commodities equal to their commodity value instead.\n- Players can share non-faction technology with other players as part of a transaction. When sharing tech in this way, the receiving player gains that technology from their own deck; the sharing player does not lose the technology.",
+        "complexity": 1,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "call_of_the_void",
+        "name": "Call of the Void",
+        "text": "After you move 1 or more units into the active system, if that system is in the fracture, gain 1 command token.\n- When you activate a system in the Fracture, apply +1 to the move values of each of your ships.",
+        "complexity": 1,
+        "flavorText": "This place... it is a graveyard. I can't see it but I can feel it. Souls all around me, yelling, screaming at me to leave. But I can't leave. Not yet. Maybe not ever. There is something here, I know it. I can find what happened here, I can. - Last log of Kel Zin, explorer",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "dangerous_wilds",
+        "name": "Dangerous Wilds",
+        "text": "- During setup, place neutral infantry on each hazardous planet equal to that planet's resource value.\n- At the end of each round, for each hazardous planet that is not controlled, replenish any neutral units that were destroyed during the game round.\n- When a player gains control of a hazardous planet from the deck, they may research 1 technology; they may ignore a number of pre-requisites equal to that planet's resource value.",
+        "complexity": 1,
+        "flavorText": "A thundering crash signaled the arrival of a garach - two in fact - and the huntress gripped her rifle tight. No room for error now. She hoped the others had heard the commotion and were header her way, but deep down she knew. She was on her own.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "hidden_agenda",
+        "name": "Hidden Agenda",
+        "text": "- During the agenda phase, only the speaker can talk; all other players must remain silent except when declaring action cards/abilities. Transactions cannot be performed during this phase.\n- When voting, players secretly and simultaneously write their desired outcome and number of votes and pass them to the speaker. After all players have voted, the speaker secretly tallys the results and reveals only the totals to the other players.\n- The Argent Flight's votes are public and are known before the other players vote.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "age_exploration",
+        "name": "Age of Exploration",
+        "text": "- Relics require only 2 matching fragments be purged instead of 3.\n- The Naaz-Rokha Alliance's ***Fabrication*** faction ability and ***Black Market Forgery*** promissory note do not require purged fragments to match.\n- All players can perform the following action:\n> - ACTION: Exhaust ***Dark Energy Tap*** and choose a non-home edge system that contains your ships to roll 1 die. On a result of 1-4, draw a random unused red tile; on a result of 5-10, draw a random unused blue tile. Place that tile adjacent to the chosen system so that it is touching at least 2 non-home systems. Place a frontier token in the system if it does not contain any planets.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "civilized_society",
+        "name": "Civilized Society",
+        "text": "- During setup, turn all public objectives face up.\n- There is no limit on the number of public objectives a player may score during the status phase.\n- The game does not immediately end when a player reaches the required number of victory points; instead, it ends at the end of that round's status phase, and the player with the most victory points wins. In the case of a tie, the tied players total the influence values of their controlled planets and their unspent trade goods; the player or players with the highest total win the game.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "minor_factions",
+        "name": "Minor Factions",
+        "text": "- During setup, players are dealt 1 fewer blue tile. Before creating the galaxy, shuffle the reference cards for factions not being played and deal 1 to each player. In speaker order, each player places that faction's home system in the second ring, equidistant from players' home systems (See page xx in the rulebook). Then, that player places 3 neutral infantry on that system's planets, split as evenly as possible. These systems are minor faction systems and do not count as home systems.\n- When a player controls each planet in a minor faction system, they take that faction's alliance card from the deck or from the player that owned it previously.\n- Planets in minor faction systems gain all three planet traits (cultural, industrial, hazardous).",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "stellar_atomics",
+        "name": "Stellar Atomics",
+        "text": "- During setup, each player places one of their control markers on this card.\n- All players can perform the following action:\n> - **Action:** Discard your control marker from this card to destroy all ground forces and structures on any non-home planet.\n- If you do not have a control marker on this card, you cannot vote or play action cards during the agenda phase.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "age_fighters",
+        "name": "Age of Fighters",
+        "text": "- During setup, all players gain the Fighter II unit upgrade technology; the Naalu Collective player gains Hybrid Crystal Fighter II technology instead.\n- All fighters that are counting against fleet pool gain CAPACITY 1 that cannot be used to support fighters.\n- Non-fighter ships are purged when they are destroyed",
+        "complexity": 3,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "total_war",
+        "name": "Total War",
+        "text": "- When a player destroys another player's units [Note: neutral units count for this], they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
+        "complexity": 3,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "wild_wild_galaxy",
+        "name": "Wild Wild Galaxy",
+        "text": "Action cards are adjusted as follows:\n> - Direct hit: Can be used against mechs.\n> - Flank Speed: Applies +2 move instead of +1.\n> - Maneuvering Jets: Cancels all SPACE CANNON hits\n> - Morale Boost: Applies +2 to die rolls instead of +1\n> - Sabotage: Also take the canceled action card\n> - Shields Holding: Can be used in ground combat\n> - Skilled Retreat: Does not place a command token\n> - War Machine: Reduces cost by 5 instead of 1\n> - Diplomatic Pressure: Player must give 3 notes\n- Additionally, Stellar Converter and Nova Seed can be used against any planets and systems.",
+        "complexity": 3,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "weird_wormholes",
+        "name": "Weird Wormholes",
+        "text": "- After a ship moves using at least 1 alpha, beta, or gamma wormhole, roll 1 die and consult the following list:\n> - [ Fighter -> Destroyer -> Cruiser -> Dreadnought -> Carrier -> Flagship -> War Sun (if researched) ]\n- For each result of 1-5, replace that ship with the ship BEFORE it from your reinforcements, if able.\n- For each result of 6-10, replace that ship with the ship AFTER it from your reinforcements, if able.\n- If there are no ships of that type remaining in your reinforcements, skip that type and replace it with the next available type.",
+        "complexity": 3,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "monuments_ages",
+        "name": "Monuments to the Ages",
+        "text": "- When you would place a structure on a non-home planet, you may spend 5 trade goods to place a neutral space dock instead; this is a monument, and is not considered to be a unit of any type. There can only be 3 monuments in play at once.\n- At the start of the status phase, place 1 commodity beneath each monument. A monument is worth 1 victory point to the player who controls it for every 3 commodities placed beneath it.\n- When a player gains control of a planet that contains a monument, they may destroy it.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "cosmic_phenomenae",
+        "name": "Cosmic Phenomenae",
+        "text": "Anomalies have the following additional rules:\n> - ***Nebulae:*** Defending ships in nebulae apply an additional +3 to their combat rolls instead of +1.\n> - ***Asteroid Fields:*** Fighter I's do not participate in space combat in asteroid fields.\n> - ***Supernovas:*** Units with PRODUCTION in or adjacent to supernovas have their PRODUCTION values increased by 1.\n> - ***Gravity Rifts:*** You may apply an additional +1 to the MOVE value of any of your ships moving out of gravity rifts; if you do, those ships are destroyed on a roll of 5 or lower.\n> - ***Entropic Scars:*** Systems that contain entropic scars are adjacent to each other.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "cultural_exchange",
+        "name": "Cultural Exchange Program",
+        "text": "- At the end of setup, shuffle the reference cards that correspond to each faction in play. Each player draws 1 of those cards and takes all leaders that correspond to that faction. They belong to that player for the remainder of the game. Then, each player unlocks their commander.\n- The Obsidian/Firmament player does not participate in the Cultural Exchange Program. Instead, they begin the game with \"The Obsidian\" relic.",
+        "complexity": 2,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mercenaries",
+        "name": "Mercenaries for Hire",
+        "text": "- At the start of the game, shuffle the alliance cards that correspond to the factions not in play and place them in the common play area; this is the Mercenary deck.\n- All players can perform the following action: ACTION: Spend 3 trade goods to gain the top card of the mercenary deck and place it in your play area. Players can use the abilities of the mercenaries in their play area.",
+        "complexity": 1,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "mobilization",
+        "name": "Rapid Mobilization",
+        "text": "- After setup, put the Fracture into play. Then, each player simultaneously resolves the following effects in order:\n> - Place 1 infantry onto each planet adjacent to your home system (or the creuss gate/sorrow); do not explore those planets. Then, ready each of those planets.\n> - Place 1 space dock on any planet you control and place your flagship and 3 fighters in its system.\n> - Gain your breakthrough.\n> - Research 1 technology; if you are the Nomad player, research 1 additional technology.",
+        "complexity": 1,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "zealous_orthodoxy",
+        "name": "Zealous Orthodoxy",
+        "text": "- The first player to score 2 secret objectives gains 1 victory point.\n- Then, place that faction's alliance card on this card; all players gain that ability. That faction's alliance promissory note is then purged.",
+        "complexity": 1,
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "advent_war_sun",
+        "name": "Advent of the War Sun",
+        "text": "- At the end of setup, all players other than the Embers of Muaat player gain the War Sun unit upgrade technology.\n- The Embers of Muaat player purges their faction specific promissory note, unlocks their commander, and places 1 additional War Sun in their home system.",
+        "complexity": 1,
+        "flavorText": "The looming monstrosity looked more like an island than it did weapon. Still, if the reports were to be believed, this... thing... was capable of incredible destruction on a scale possible surpassing that of the Gashlai's own weapon. Magmus flared in frustration. How had the Arborec managed to build something so massive undetected? Someone was to blame for this, and he meant to find out who.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "cowabunga",
+        "name": "Conventions of War Abandoned",
+        "text": "- Each hit produced by ***BOMBARDMENT*** rolls destroys 3 units instead of 1.\n- ***X-89 BACTERIAL WEAPON*** technology gains the following ACTION: Exhaust to choose 1 planet in a system that contains 1 of your units that has bombardment; purge its planet card and all attachments or legendary planet ability cards associated with it. \n- You are eliminated if all your home system's planet cards are purged.",
+        "complexity": 3,
+        "source": "thunders_edge"
+    }
+]

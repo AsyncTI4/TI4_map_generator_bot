@@ -1,12 +1,18 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
@@ -16,6 +22,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.SusSlashCommandService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.player.PlayerStatsService;
@@ -26,20 +33,41 @@ class Stats extends GameStateSubcommand {
     public Stats() {
         super(Constants.STATS, "Player Stats: Command tokens, trade goods, commodities", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command token - example: 3/3/2 or +1/-1/+0"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactic pool command token count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet pool command token count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade good count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_BASE, "Base commodity value"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a strategy card's played status; enter the initiative number"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
-            .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
-            .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color").setAutoComplete(true));
+                .addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.TACTICAL,
+                        "Tactic pool command token count - can use +1/-1 etc. to add/subtract"))
+                .addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.FLEET,
+                        "Fleet pool command token count - can use +1/-1 etc. to add/subtract"))
+                .addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.STRATEGY,
+                        "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
+                .addOptions(new OptionData(
+                        OptionType.STRING, Constants.TG, "Trade good count - can use +1/-1 etc. to add/subtract"))
+                .addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.COMMODITIES,
+                        "Commodity count - can use +1/-1 etc. to add/subtract"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_BASE, "Base commodity value"))
+                .addOptions(
+                        new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round"))
+                .addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.SC_PLAYED,
+                        "Flip a strategy card's played status; enter the initiative number"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TYRANT, "Set whether player is tyrant y/n"))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NPC, "Player is an NPC"))
+                .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
+                .addOptions(new OptionData(
+                                OptionType.STRING, Constants.FACTION_COLOR, "Set stats for another Faction or Color")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -53,10 +81,11 @@ class Stats extends GameStateSubcommand {
         // NO OPTIONS SELECTED, JUST DISPLAY STATS
         if (optionMappings.isEmpty()) {
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    PlayerStatsService.getPlayersCurrentStatsText(player, game));
+                MessageHelper.sendMessageToChannel(
+                        player.getPrivateChannel(), PlayerStatsService.getPlayersCurrentStatsText(player, game));
             } else {
-                MessageHelper.sendMessageToEventChannel(event, PlayerStatsService.getPlayersCurrentStatsText(player, game));
+                MessageHelper.sendMessageToEventChannel(
+                        event, PlayerStatsService.getPlayersCurrentStatsText(player, game));
             }
             return;
         }
@@ -67,10 +96,11 @@ class Stats extends GameStateSubcommand {
         OptionMapping optionF = event.getOption(Constants.FLEET);
         OptionMapping optionS = event.getOption(Constants.STRATEGY);
         if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
-            MessageHelper.sendMessageToEventChannel(event, "Use format 3/3/3 for command counters or individual values, not both");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Use format 3/3/3 for command counters or individual values, not both");
         } else {
-            String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/"
-                + player.getStrategicCC();
+            String originalCCString =
+                    player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
             if (optionCC != null) {
                 String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
                 StringTokenizer tokenizer = new StringTokenizer(cc, "/");
@@ -78,30 +108,57 @@ class Stats extends GameStateSubcommand {
                     MessageHelper.sendMessageToEventChannel(event, "Wrong format for tokens count. Must be 3/3/3.");
                 } else {
                     try {
-                        PlayerStatsService.setValue(event, game, player, "Tactic Token", player::setTacticalCC, player::getTacticalCC,
-                            tokenizer.nextToken(), true);
-                        PlayerStatsService.setValue(event, game, player, "Fleet Token", player::setFleetCC, player::getFleetCC,
-                            tokenizer.nextToken(), true);
-                        PlayerStatsService.setValue(event, game, player, "Strategy Token", player::setStrategicCC,
-                            player::getStrategicCC, tokenizer.nextToken(), true);
+                        PlayerStatsService.setValue(
+                                event,
+                                game,
+                                player,
+                                "Tactic Token",
+                                player::setTacticalCC,
+                                player::getTacticalCC,
+                                tokenizer.nextToken(),
+                                true);
+                        PlayerStatsService.setValue(
+                                event,
+                                game,
+                                player,
+                                "Fleet Token",
+                                player::setFleetCC,
+                                player::getFleetCC,
+                                tokenizer.nextToken(),
+                                true);
+                        PlayerStatsService.setValue(
+                                event,
+                                game,
+                                player,
+                                "Strategy Token",
+                                player::setStrategicCC,
+                                player::getStrategicCC,
+                                tokenizer.nextToken(),
+                                true);
                     } catch (Exception e) {
-                        MessageHelper.sendMessageToEventChannel(event, "Not number entered, check command token count again.");
+                        MessageHelper.sendMessageToEventChannel(
+                                event, "Not number entered, check command token count again.");
                     }
                 }
                 Helper.isCCCountCorrect(player);
             }
             if (optionT != null) {
-                PlayerStatsService.setValue(event, game, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
+                PlayerStatsService.setValue(
+                        event, game, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
             }
             if (optionF != null) {
                 PlayerStatsService.setValue(event, game, player, optionF, player::setFleetCC, player::getFleetCC, true);
             }
             if (optionS != null) {
-                PlayerStatsService.setValue(event, game, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
+                PlayerStatsService.setValue(
+                        event, game, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
             }
             if (optionT != null || optionF != null || optionS != null || optionCC != null) {
                 String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-                MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated command tokens: " + originalCCString + " -> " + newCCString + ".");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        player.getRepresentation() + " updated command tokens: " + originalCCString + " -> "
+                                + newCCString + ".");
             }
             if (optionT != null || optionF != null || optionS != null) {
                 Helper.isCCCountCorrect(player);
@@ -111,8 +168,7 @@ class Stats extends GameStateSubcommand {
         optionMappings.remove(optionT);
         optionMappings.remove(optionF);
         optionMappings.remove(optionS);
-        if (optionMappings.isEmpty())
-            return;
+        if (optionMappings.isEmpty()) return;
 
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentationUnfogged() + " player stats changed:");
 
@@ -131,10 +187,11 @@ class Stats extends GameStateSubcommand {
         if (optionC != null) {
             PlayerStatsService.setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
             if (player.hasAbility("military_industrial_complex")
-                && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
-                    ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+                    && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", you have the opportunity to buy _Axis Orders_.",
+                        ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
             CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         }
@@ -175,6 +232,18 @@ class Stats extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
 
+        OptionMapping optionTyrant = event.getOption(Constants.TYRANT);
+        if (optionTyrant != null) {
+            StringBuilder message = new StringBuilder(getGeneralMessage(optionTyrant));
+            String value = optionTyrant.getAsString().toLowerCase();
+            if ("y".equals(value) || "yes".equals(value)) {
+                game.setTyrantUserID(player.getUserID());
+            } else {
+                message.append(", which is not a valid input. Please use one of: y/yes");
+            }
+            MessageHelper.sendMessageToEventChannel(event, message.toString());
+        }
+
         OptionMapping optionPassed = event.getOption(Constants.PASSED);
         if (optionPassed != null) {
             StringBuilder message = new StringBuilder(getGeneralMessage(optionPassed));
@@ -202,8 +271,11 @@ class Stats extends GameStateSubcommand {
                 Boolean scIsPlayed = game.getScPlayed().get(sc);
                 if (scIsPlayed == null || !scIsPlayed) {
                     game.setSCPlayed(sc, true);
-                    message.append("> flipped ").append(CardEmojis.getSCFrontFromInteger(sc)).append(" to ")
-                        .append(CardEmojis.getSCBackFromInteger(sc)).append(" (played)");
+                    message.append("> flipped ")
+                            .append(CardEmojis.getSCFrontFromInteger(sc))
+                            .append(" to ")
+                            .append(CardEmojis.getSCBackFromInteger(sc))
+                            .append(" (played)");
                 } else {
                     game.setSCPlayed(sc, false);
                     for (Player player_ : game.getPlayers().values()) {
@@ -211,16 +283,18 @@ class Stats extends GameStateSubcommand {
                             continue;
                         }
                         String faction = player_.getFaction();
-                        if (faction == null || faction.isEmpty() || "null".equals(faction))
-                            continue;
+                        if (faction == null || faction.isEmpty() || "null".equals(faction)) continue;
                         player_.addFollowedSC(sc);
                     }
-                    message.append("> flipped ").append(CardEmojis.getSCBackFromInteger(sc)).append(" to ")
-                        .append(CardEmojis.getSCFrontFromInteger(sc)).append(" (unplayed)");
+                    message.append("> flipped ")
+                            .append(CardEmojis.getSCBackFromInteger(sc))
+                            .append(" to ")
+                            .append(CardEmojis.getSCFrontFromInteger(sc))
+                            .append(" (unplayed)");
                 }
             } else {
-                message.append(
-                    "> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an strategy card (SC = 0).");
+                message.append("> attempted to change " + Constants.SC_PLAYED
+                        + ", but player has not picked an strategy card (SC = 0).");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -230,6 +304,43 @@ class Stats extends GameStateSubcommand {
             boolean value = optionDummy.getAsBoolean();
             player.setDummy(value);
             MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionDummy));
+        }
+
+        OptionMapping optionNPC = event.getOption(Constants.NPC);
+        if (optionNPC != null) {
+            boolean value = optionNPC.getAsBoolean();
+            player.setNpc(value);
+            MessageHelper.sendMessageToEventChannel(event, getGeneralMessage(optionNPC));
+            if (value) {
+                if (!game.isFowMode()) {
+                    Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game.getName());
+                }
+
+                var userSettings = UserSettingsManager.get(player.getUserID());
+
+                userSettings.setTrackRecord(
+                        userSettings.getTrackRecord() + " was set as an NPC in " + game.getName() + ". ");
+
+                UserSettingsManager.save(userSettings);
+
+                Guild guild = event.getGuild();
+                Member removedMember = guild.getMemberById(player.getUserID());
+                List<Role> roles = guild.getRolesByName(game.getName(), true);
+                if (removedMember != null && roles.size() == 1) {
+                    guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
+                }
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "removePlayerPermissions_" + player.getFaction(),
+                        "Remove View Permissions For " + player.getUserName()));
+                buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
+                String msg = player.getRepresentation()
+                        + " do you want to remove yourself from the game channels? If so, press this button.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                if (event.getChannel() instanceof TextChannel channel) {
+                    SusSlashCommandService.reportSusSlashCommand(event, channel.getJumpUrl());
+                }
+            }
         }
     }
 

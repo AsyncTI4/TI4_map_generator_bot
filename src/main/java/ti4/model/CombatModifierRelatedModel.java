@@ -8,8 +8,7 @@ public class CombatModifierRelatedModel implements ModelInterface {
     private String alias;
     private String message;
 
-  public boolean isValid() {
-        return type != null
-                && alias != null;
+    public boolean isValid() {
+        return type != null && alias != null;
     }
 }

@@ -1,0 +1,17 @@
+{
+    "id": "114",
+    "name": "Entropic Scar",
+    "aliases": [
+        "te27",
+        "scar",
+        "entropicscar",
+        "entropic"
+    ],
+    "imagePath": "114_EntropicScar.png",
+    "shipPositionsType": "TYPE08",
+    "planets": [],
+    "wormholes": [],
+    "tileBack": "red",
+    "isScar": true,
+    "source": "thunders_edge"
+}

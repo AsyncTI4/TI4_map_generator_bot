@@ -1,0 +1,51 @@
+[
+    {
+        "alias": "heartofixth",
+        "name": "Heart of Ixth",
+        "text": "After any die is rolled, you may exhaust this card to add or subtract 1 from its result.",
+        "flavourText": "\"It should be impossible.\" Feng glanced sidelong at his compatriot. The Thundarian merely stared ahead, as if he did not hear. Feng snorted. \"One day I mean to know the source of this so-called power of yours.\"",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "lightrailordnance",
+        "name": "Lightrail Ordnance",
+        "text": "Your space docks gain SPACE CANNON 5 (x2). You may use your space dock's SPACE CANNON against ships that are adjacent to their systems.",
+        "flavourText": "A single sparkle was the only warning the Yin fleet had before a massive hole had been punched through the hull of the Van Hague.\nThen, searing light.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "metalivoidarmaments",
+        "name": "Metali Void Armaments",
+        "text": "During the \"Anti-Fighter Barrage\" step of space combat, you may resolve ANTI-FIGHTER BARRAGE 6 (x3) against your opponent's units.",
+        "flavourText": "The Metali, Empyrean artificers of legend, were said to have created weapons that harnessed the power of space itself.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "metalivoidshielding",
+        "name": "Metali Void Shielding",
+        "text": "Each time hits are produced against 1 or more of your non-fighter ships, 1 of those ships may use SUSTAIN DAMAGE as if it had that ability.",
+        "flavourText": "Capable of more than destruction, the Metali also wrapped their ships in nigh-indestructable plating unable to be replicated using today's methods.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "quantumcore",
+        "name": "The Quantumcore",
+        "text": "When you gain this card, gain your breakthrough. You have SYNERGY for all technology types.",
+        "flavourText": "The core burned with the heat of a thousand stars, connections forming and reforming a thousand times per second.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "thesilverflame",
+        "name": "The Silver Flame",
+        "text": "The Silver Flame may be exchanged as part of a transaction.\n> ACTION: Roll 1 die and purge this card; if the result is a 10, gain 1 victory point. Otherwise, purge your home system and all units in it; you cannot score public objectives. Put The Fracture into play if it is not already. [Note: Per Dane, you can score become a martyr off of this, and Saar can still score public objectives]",
+        "flavourText": "Shen're Ix Ianovar. The flame beyond time and space.",
+        "source": "thunders_edge"
+    },
+    {
+        "alias": "thetriad",
+        "name": "The Triad",
+        "text": "This card can be readied and spent as if it were a planet card. Its resource and influence values are equal to 3 plus the number of different types of relic fragments you own.",
+        "flavourText": "The light that shines without reflects the dark it harbors within.",
+        "source": "thunders_edge"
+    }
+]

@@ -2,12 +2,11 @@ package ti4.buttons.handlers.info;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -40,7 +39,8 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Technologies"));
         buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Technologies"));
         buttons.add(Buttons.REFRESH_INFO);
-        String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info, or every faction's.";
+        String msg =
+                "Select the category you'd like more info on. You will then be able to select either a specific faction's info, or every faction's.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
@@ -49,7 +49,7 @@ class ListPlayerInfoButtonHandler {
         String category = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         String msg = "";
-        if (category.equalsIgnoreCase("objective")) {
+        if ("objective".equalsIgnoreCase(category)) {
             buttons.add(Buttons.green("showObjInfo_both", "All Objectives in Game"));
             buttons.add(Buttons.blue("showObjInfo_1", "All Stage 1s Possible"));
             buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
@@ -66,7 +66,8 @@ class ListPlayerInfoButtonHandler {
     }
 
     @ButtonHandler(value = "offerInfoButtonStep3_", save = false)
-    public static void resolveOfferInfoButtonStep3(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+    public static void resolveOfferInfoButtonStep3(
+            ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String category = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
@@ -88,7 +89,7 @@ class ListPlayerInfoButtonHandler {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                     }
                     for (String unit : p2.getUnitsOwned()) {
-                        if (unit.contains("_")) {
+                        if (unit.contains("_") || unit.contains("tf-")) {
                             messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
                         }
                     }
@@ -96,7 +97,8 @@ class ListPlayerInfoButtonHandler {
                         messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
                     }
                     for (String planet : p2.getPlanets()) {
-                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)).append("\n");
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
+                                .append("\n");
                     }
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -130,7 +132,8 @@ class ListPlayerInfoButtonHandler {
                 }
                 case "planet" -> {
                     for (String planet : p2.getPlanets()) {
-                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)).append("\n");
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game))
+                                .append("\n");
                     }
                 }
                 case "pn" -> {
@@ -143,7 +146,8 @@ class ListPlayerInfoButtonHandler {
                 case "agent", "commander", "hero" -> {
                     for (Leader lead : p2.getLeaders()) {
                         if (lead.getId().contains(category)) {
-                            messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
+                            messageEmbeds.add(
+                                    lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
                         }
                     }
                 }
@@ -158,7 +162,7 @@ class ListPlayerInfoButtonHandler {
     @ButtonHandler(value = "showObjInfo_", save = false)
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game game) {
         String extent = buttonID.split("_")[1];
-        if (extent.equalsIgnoreCase("both")) {
+        if ("both".equalsIgnoreCase(extent)) {
             ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
             ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), extent);

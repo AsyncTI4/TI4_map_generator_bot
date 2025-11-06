@@ -3,8 +3,14 @@
         "id": "creussgamma",
         "imagePath": "token_creussgamma.png",
         "spaceOrPlanet": "space",
-        "aliasList": ["creussgamma", "token_creussgamma", "ghostgamma"],
-        "wormholes": ["GAMMA"],
+        "aliasList": [
+            "creussgamma",
+            "token_creussgamma",
+            "ghostgamma"
+        ],
+        "wormholes": [
+            "GAMMA"
+        ],
         "source": "pok"
     },
     {
@@ -12,22 +18,36 @@
         "imagePath": "token_dmz_large.png",
         "spaceOrPlanet": "planet",
         "attachmentID": "dmz",
-        "aliasList": ["dmz_large", "token_dmz_large", "dmz"],
-        "source": "pok"
+        "aliasList": [
+            "dmz_large",
+            "token_dmz_large",
+            "dmz"
+        ],
+        "source": "pok",
+        "placement": "center"
     },
     {
         "id": "frontier",
         "imagePath": "token_frontier.png",
         "spaceOrPlanet": "space",
-        "aliasList": ["frontier", "token_frontier"],
+        "aliasList": [
+            "frontier",
+            "token_frontier"
+        ],
         "source": "pok"
     },
     {
         "id": "gamma",
         "imagePath": "token_gamma.png",
         "spaceOrPlanet": "space",
-        "aliasList": ["gamma", "token_gamma", "grandma"],
-        "wormholes": ["GAMMA"],
+        "aliasList": [
+            "gamma",
+            "token_gamma",
+            "grandma"
+        ],
+        "wormholes": [
+            "GAMMA"
+        ],
         "source": "pok"
     },
     {
@@ -37,23 +57,39 @@
         "isAnomaly": true,
         "isRift": true,
         "isNebula": false,
-        "aliasList": ["gravityrift", "token_gravityrift", "gravrift", "rift"],
+        "aliasList": [
+            "gravityrift",
+            "token_gravityrift",
+            "gravrift",
+            "rift"
+        ],
         "source": "pok"
     },
     {
         "id": "ionalpha",
         "imagePath": "token_ionalpha.png",
         "spaceOrPlanet": "space",
-        "aliasList": ["ionalpha", "token_ionalpha", "ion"],
-        "wormholes": ["ALPHA"],
+        "aliasList": [
+            "ionalpha",
+            "token_ionalpha",
+            "ion"
+        ],
+        "wormholes": [
+            "ALPHA"
+        ],
         "source": "pok"
     },
     {
         "id": "ionbeta",
         "imagePath": "token_ionbeta.png",
         "spaceOrPlanet": "space",
-        "aliasList": ["ionbeta", "token_ionbeta"],
-        "wormholes": ["BETA"],
+        "aliasList": [
+            "ionbeta",
+            "token_ionbeta"
+        ],
+        "wormholes": [
+            "BETA"
+        ],
         "source": "pok"
     },
     {
@@ -61,15 +97,24 @@
         "imagePath": "token_mirage.png",
         "spaceOrPlanet": "space",
         "tokenPlanetName": "mirage",
-        "aliasList": ["mirage", "token_mirage"],
-        "source": "pok"
+        "aliasList": [
+            "mirage",
+            "token_mirage"
+        ],
+        "source": "pok",
+        "isPlanet": true
     },
     {
         "id": "sleeper",
         "imagePath": "token_sleeper.png",
         "spaceOrPlanet": "planet",
-        "aliasList": ["sleeper", "token_sleeper"],
-        "source": "pok"
+        "aliasList": [
+            "sleeper",
+            "token_sleeper"
+        ],
+        "source": "pok",
+        "scale": 0.7,
+        "placement": "center"
     },
     {
         "id": "worlddestroyed",

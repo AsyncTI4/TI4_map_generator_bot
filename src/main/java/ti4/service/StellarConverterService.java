@@ -35,14 +35,20 @@ public class StellarConverterService {
             return;
         }
 
-        String message1 = (RandomHelper.isOneInX(20) ? "# _Hey, Stellar!_" : "# There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
-        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName() + ".");
+        String message1 = (RandomHelper.isOneInX(20)
+                ? "# _Hey, Stellar!_"
+                : "# There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
+        DisasterWatchHelper.postTileInDisasterWatch(
+                game, event, tile, 1, "Moments before disaster in game " + game.getName() + ".");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
-
+        Player p = null;
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                    p2.getRepresentationUnfogged() + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been _Stellar Converter_'d.");
+                p = p2;
+                MessageHelper.sendMessageToChannel(
+                        p2.getCorrectChannel(),
+                        p2.getRepresentationUnfogged() + " we regret to inform you but "
+                                + Mapper.getPlanet(planetName).getName() + " has been _Stellar Converter_'d.");
                 DestroyUnitService.destroyAllUnits(event, tile, game, unitHolder, false);
             }
         }
@@ -58,5 +64,13 @@ public class StellarConverterService {
         message2.append(" by ");
         message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");
+        if (game.isConventionsOfWarAbandonedMode()
+                && tile.isHomeSystem(game)
+                && tile.getPlanetUnitHolders().isEmpty()
+                && p != null) {
+            if (event instanceof ButtonInteractionEvent buttonEvent) {
+                ButtonHelper.eliminatePlayer(game, buttonEvent, "eliminatePlayer_" + p.getFaction());
+            }
+        }
     }
 }

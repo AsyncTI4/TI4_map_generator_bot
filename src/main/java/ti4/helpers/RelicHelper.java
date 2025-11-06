@@ -5,16 +5,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
@@ -37,9 +38,14 @@ public class RelicHelper {
         for (int x = 0; x < advantage && x < relics.size(); x++) {
             RelicModel relicData = Mapper.getRelic(relics.get(x));
             buttons.add(Buttons.green("drawRelicAtPosition_" + x, relicData.getName()));
-            info.append("_").append(relicData.getName()).append("_: ").append(relicData.getText()).append("\n");
+            info.append("_")
+                    .append(relicData.getName())
+                    .append("_: ")
+                    .append(relicData.getText())
+                    .append("\n");
         }
-        String msg = player.getRepresentationUnfogged() + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
+        String msg = player.getRepresentationUnfogged()
+                + ", please choose the relic that you wish to draw. The relic text is reproduced for your convenience.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }
@@ -48,18 +54,27 @@ public class RelicHelper {
         drawRelicAndNotify(player, event, game, 0, false);
     }
 
-    public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
-        if (!checked && (player.hasAbility("data_leak") || (player.getPromissoryNotes().containsKey("dspnflor") && game.getPNOwner("dspnflor") != player))) {
+    public static void drawRelicAndNotify(
+            Player player, GenericInteractionCreateEvent event, Game game, int position, boolean checked) {
+        if (!checked
+                && (player.hasAbility("data_leak")
+                        || (player.getPromissoryNotes().containsKey("dspnflor")
+                                && game.getPNOwner("dspnflor") != player))) {
             drawWithAdvantage(player, game, 2);
             return;
         }
         if (player.hasAbility("a_new_edifice")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                + "Due to your **A New Edifice** ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + "Due to your **A New Edifice** ability, you get to explore 3 planets rather than get a relic. Reminder that they should be different planets. ");
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #1 ", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #2 ", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), player.getRepresentation() + "Explore planet #3 ", buttons);
             return;
         }
 
@@ -77,17 +92,20 @@ public class RelicHelper {
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
         resolveRelicEffects(event, game, player, relicID);
+        TeHelperUnits.serveIconoclastDeployAbility(game, player);
 
         if (checked) game.shuffleRelics();
     }
 
-    public static void resolveRelicEffects(GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
+    public static void resolveRelicEffects(
+            GenericInteractionCreateEvent event, Game game, Player player, String relicID) {
         StringBuilder helpMessage = new StringBuilder();
-        //Append helpful commands after relic draws and resolve effects:
+        // Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "obsidian" -> {
+            case "obsidian", "absol_obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
                 if (game.isFowMode()) {
@@ -104,34 +122,58 @@ public class RelicHelper {
             case "shard" -> {
                 Integer poIndex = game.addCustomPO("Shard of the Throne", 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                helpMessage.append("Custom objective _Shard of the Throne_ has been added.\n")
-                    .append(player.getRepresentation()).append(" scored _Shard of the Throne_.");
+                helpMessage
+                        .append("Custom objective _Shard of the Throne_ has been added.\n")
+                        .append(player.getRepresentation())
+                        .append(" scored _Shard of the Throne_.");
             }
+            case "quantumcore" -> {
+                if (player.getBreakthroughID() != null && !player.isBreakthroughUnlocked() && game.isThundersEdge()) {
+                    BreakthroughCommandHelper.unlockBreakthrough(game, player);
+                }
+            }
+            case "thetriad" -> {
+                for (Player p : game.getPlayers().values()) p.removePlanet("triad");
+                player.addPlanet("triad");
+                Planet triad = game.getPlanetsInfo().get("triad");
+                if (triad != null) triad.updateTriadStats(player);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), "Added the Triad \"planet card\" to your play area.");
+            }
+
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 String customPOName = "Shard of the Throne (" + absolShardNum + ")";
                 Integer poIndex = game.addCustomPO(customPOName, 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                helpMessage.append("Custom objective _").append(customPOName).append("_ has been added.\n")
-                    .append(player.getRepresentation()).append(" scored _").append(customPOName).append("_.");
+                helpMessage
+                        .append("Custom objective _")
+                        .append(customPOName)
+                        .append("_ has been added.\n")
+                        .append(player.getRepresentation())
+                        .append(" scored _")
+                        .append(customPOName)
+                        .append("_.");
             }
             case "bookoflatvinia" -> {
                 if (player.hasAbility("propagation")) {
                     List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                     String message2 = player.getRepresentation()
-                        + ", you would research two technologies, but because of **Propagation**, you instead gain 6 command tokens."
-                        + " Your current command tokens are " + player.getCCRepresentation()
-                        + ". Use buttons to gain command tokens.";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        message2, buttons);
+                            + ", you would research two technologies, but because of **Propagation**, you instead gain 6 command tokens."
+                            + " Your current command tokens are " + player.getCCRepresentation()
+                            + ". Use buttons to gain command tokens.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
                     game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 } else {
-                    List<String> startingTechOptions = new ArrayList<>(Arrays.asList("amd", "det", "nm", "pa", "st", "sdn", "ps", "aida"));
+                    List<String> startingTechOptions =
+                            new ArrayList<>(Arrays.asList("amd", "det", "nm", "pa", "st", "sdn", "ps", "aida"));
                     List<TechnologyModel> techs = new ArrayList<>();
                     if (!startingTechOptions.isEmpty()) {
                         for (String tech : game.getTechnologyDeck()) {
                             TechnologyModel model = Mapper.getTech(tech);
-                            boolean homebrewReplacesAnOption = model.getHomebrewReplacesID().map(startingTechOptions::contains).orElse(false);
+                            boolean homebrewReplacesAnOption = model.getHomebrewReplacesID()
+                                    .map(startingTechOptions::contains)
+                                    .orElse(false);
                             if (startingTechOptions.contains(model.getAlias()) || homebrewReplacesAnOption) {
                                 if (!player.getTechs().contains(tech)) {
                                     techs.add(model);
@@ -141,7 +183,8 @@ public class RelicHelper {
                     }
 
                     List<Button> buttons = ListTechService.getTechButtons(techs, player, "free");
-                    String msg = player.getRepresentationUnfogged() + ", please use the buttons to research a technology with no prerequisites:";
+                    String msg = player.getRepresentationUnfogged()
+                            + ", please use the buttons to research a technology with no prerequisites:";
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -151,7 +194,6 @@ public class RelicHelper {
                         }
                     }
                 }
-
             }
         }
 
@@ -162,7 +204,7 @@ public class RelicHelper {
     public static void offerInitialNeuraLoopChoice(Game game, String poID) {
         for (Player player : game.getRealPlayers()) {
             if (player.hasRelic("neuraloop")) {
-                String name = "";
+                String name;
                 if (Mapper.getPublicObjective(poID) != null) {
                     name = Mapper.getPublicObjective(poID).getName();
                 } else {
@@ -172,13 +214,19 @@ public class RelicHelper {
                         name = poID;
                     }
                 }
-                String msg = player.getRepresentation() + " you have the opportunity to use the _Neuraloop_ relic to replace the objective " + name
-                    + " with a random objective from __any__ of the objective decks. Doing so will cause you to purge one of your relics."
-                    + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from..";
+                String msg = player.getRepresentationUnfogged()
+                        + " you have the opportunity to use the _Neuraloop_ relic to replace the objective " + name
+                        + " with a random objective from __any__ of the objective decks. Doing so will cause you to purge one of your relics."
+                        + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from..";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";stage1", "Replace with Stage 1", CardEmojis.Public1));
-                buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";stage2", "Replace with Stage 2", CardEmojis.Public2));
-                buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";secret", "Replace with Secret Objective", CardEmojis.SecretObjective));
+                buttons.add(
+                        Buttons.gray("neuraloopPart1;" + poID + ";stage1", "Replace with Stage 1", CardEmojis.Public1));
+                buttons.add(
+                        Buttons.gray("neuraloopPart1;" + poID + ";stage2", "Replace with Stage 2", CardEmojis.Public2));
+                buttons.add(Buttons.gray(
+                        "neuraloopPart1;" + poID + ";secret",
+                        "Replace with Secret Objective",
+                        CardEmojis.SecretObjective));
                 buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
@@ -192,12 +240,15 @@ public class RelicHelper {
             if (Mapper.getRelic(relic) == null || Mapper.getRelic(relic).isFakeRelic()) {
                 continue;
             }
-            buttons.add(Buttons.gray("neuraloopPart2;" + poID + ";" + type + ";" + relic, Mapper.getRelic(relic).getName()));
+            buttons.add(Buttons.gray(
+                    "neuraloopPart2;" + poID + ";" + type + ";" + relic,
+                    Mapper.getRelic(relic).getName()));
         }
         return buttons;
     }
 
-    public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
+    public void sendFrags(
+            GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
         List<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
             ExploreModel card = Mapper.getExplore(cardID);
@@ -219,7 +270,8 @@ public class RelicHelper {
 
         String p1 = sender.getRepresentation();
         String p2 = receiver.getRepresentation();
-        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment" + (count == 1 ? "" : "s");
+        String fragString = count + " " + trait + " " + ExploreEmojis.getFragEmoji(trait) + " relic fragment"
+                + (count == 1 ? "" : "s");
         String message = p1 + " sent " + fragString + " to " + p2;
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
@@ -253,16 +305,32 @@ public class RelicHelper {
         if (allRelics.isEmpty()) {
             text = new StringBuilder("There are no more cards in the relic deck.");
         } else {
-            text = new StringBuilder("__Relics remaining in deck__ (").append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append("):");
+            text = new StringBuilder("__Relics remaining in deck__ (")
+                    .append(deckCount)
+                    .append(" - ")
+                    .append(formatPercent.format(deckDrawChance))
+                    .append("):");
             Collections.sort(allRelics);
+            int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n1. ").append(ExploreEmojis.Relic).append(" _").append(relicName).append("_");
+                text.append("\n" + x + ". ")
+                        .append(ExploreEmojis.Relic)
+                        .append(" _")
+                        .append(relicName)
+                        .append("_ ")
+                        .append(Mapper.getRelic(relicId)
+                                .getText()
+                                .replace("\n", " ")
+                                .replace("> ", ""));
+                x++;
             }
         }
 
         if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && !over && game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(channel, "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            MessageHelper.sendMessageToChannel(
+                    channel,
+                    "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
             MessageHelper.sendMessageToChannel(channel, text.toString());
         }

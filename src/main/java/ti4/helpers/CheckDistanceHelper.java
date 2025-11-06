@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -15,7 +14,8 @@ import ti4.map.Tile;
 @UtilityClass
 public class CheckDistanceHelper {
 
-    public static int getDistanceBetweenTwoTiles(Game game, Player player, String tilePosition1, String tilePosition2, boolean countsRiftsAsNormal) {
+    public static int getDistanceBetweenTwoTiles(
+            Game game, Player player, String tilePosition1, String tilePosition2, boolean countsRiftsAsNormal) {
         Map<String, Integer> distances = getTileDistances(game, player, tilePosition1, 8, countsRiftsAsNormal);
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
@@ -24,8 +24,7 @@ public class CheckDistanceHelper {
     }
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
-        if (ButtonHelper.nomadHeroAndDomOrbCheck(player, game))
-            return true;
+        if (ButtonHelper.nomadHeroAndDomOrbCheck(player, game)) return true;
         return !CommandCounterHelper.hasCC(player, tile);
     }
 
@@ -40,15 +39,20 @@ public class CheckDistanceHelper {
         }
         for (Tile tile : originTiles) {
             Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 15, true);
-            for (String tilePos : someDistances.keySet()) {
+            for (Map.Entry<String, Integer> entry : someDistances.entrySet()) {
+                String tilePos = entry.getKey();
                 if (!ButtonHelper.canActivateTile(game, player, game.getTileByPosition(tilePos))) {
                     continue;
                 }
-                if (distances.get(tilePos) == null && someDistances.get(tilePos) != null) {
-                    distances.put(tilePos, someDistances.get(tilePos));
+                if (distances.get(tilePos) == null && entry.getValue() != null) {
+                    distances.put(tilePos, entry.getValue());
                 } else {
-                    if (distances.get(tilePos) != null && someDistances.get(tilePos) != null && distances.get(tilePos) > someDistances.get(tilePos)) {
-                        distances.put(tilePos, someDistances.get(tilePos));
+                    if (distances.get(tilePos) != null
+                            && entry.getValue() != null
+                            && distances.get(tilePos) > entry.getValue()) {
+                        distances.put(tilePos, entry.getValue());
+                    } else if (entry.getValue() == null && distances.get(tilePos) == null) {
+                        distances.put(tilePos, 100);
                     }
                 }
             }
@@ -56,21 +60,23 @@ public class CheckDistanceHelper {
         return distances;
     }
 
-    public static List<String> getAllTilesACertainDistanceAway(Game game, Player player, Map<String, Integer> distances, int target) {
+    public static List<String> getAllTilesACertainDistanceAway(
+            Game game, Player player, Map<String, Integer> distances, int target) {
         List<String> tiles = new ArrayList<>();
-        for (String pos : distances.keySet()) {
-            if (distances.get(pos) != null && distances.get(pos) == target) {
-                tiles.add(pos);
+        for (Map.Entry<String, Integer> entry : distances.entrySet()) {
+            if (entry.getValue() != null && entry.getValue() == target) {
+                tiles.add(entry.getKey());
             }
         }
         Collections.sort(tiles);
         return tiles;
     }
 
-    public static Map<String, Integer> getTileDistances(Game game, Player player, String tilePosition, int maxDistance, boolean forMap) {
+    public static Map<String, Integer> getTileDistances(
+            Game game, Player player, String tilePosition, int maxDistance, boolean forMap) {
         Map<String, Integer> distances = new HashMap<>();
         distances.put(tilePosition, 0);
-
+        Tile tile2 = game.getTileByPosition(tilePosition);
         for (int i = 1; i <= maxDistance; i++) {
             Map<String, Integer> distancesCopy = new HashMap<>(distances);
             for (String existingPosition : distancesCopy.keySet()) {
@@ -79,15 +85,45 @@ public class CheckDistanceHelper {
                 int distance = i;
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
-                        || (tile.isNebula() && player != null && !player.hasAbility("celestial_being") && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
-                        || (tile.isSupernova() && player != null && !player.hasAbility("celestial_being") && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("gashlai_physiology"))
-                        || (tile.isAsteroidField() && player != null && !player.hasAbility("celestial_being") && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid") && !player.getTechs().contains("absol_amd"))) {
+                            || (tile.isNebula()
+                                    && player != null
+                                    && !player.hasAbility("celestial_being")
+                                    && !player.getRelics().contains("circletofthevoid")
+                                    && !player.hasAbility("voidborn")
+                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.isLawInPlay(game, "shared_research"))
+                            || (tile.isSupernova()
+                                    && player != null
+                                    && !player.hasAbility("celestial_being")
+                                    && !player.getRelics().contains("circletofthevoid")
+                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !player.hasAbility("gashlai_physiology")
+                                    && !player.hasTech("tf-mr"))
+                            || (player != null
+                                    && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
+                                    && !player.hasTech("lwd")
+                                    && !player.hasTech("absol_lwd")
+                                    && tile2 != null
+                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
+                            || (player != null
+                                    && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
+                            || (tile.isAsteroidField()
+                                    && player != null
+                                    && !player.hasAbility("celestial_being")
+                                    && !player.hasTech("amd")
+                                    && !player.hasTech("wavelength")
+                                    && !player.getRelics().contains("circletofthevoid")
+                                    && !player.hasTech("absol_amd")
+                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2))) {
                         continue;
                     }
                 }
                 if (!forMap) {
                     if (tile != null && tile.isGravityRift(game)) {
                         num = -1;
+                        if (game.isCosmicPhenomenaeMode()) {
+                            num = -2;
+                        }
                     }
                 }
                 if (distances.get(existingPosition) != null) {
@@ -105,7 +141,8 @@ public class CheckDistanceHelper {
         return distances;
     }
 
-    private static void addAdjacentPositionsIfNotThereYet(Game game, String position, Map<String, Integer> distances, Player player, int distance) {
+    private static void addAdjacentPositionsIfNotThereYet(
+            Game game, String position, Map<String, Integer> distances, Player player, int distance) {
         for (String tilePosition : adjacentPositions(game, position, player)) {
             if (distances.get(tilePosition) != null && distances.get(tilePosition) > distance) {
                 distances.remove(tilePosition);

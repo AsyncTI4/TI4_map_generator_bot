@@ -14,12 +14,16 @@ class ShowMapString extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        showMapString(event, getGame());
+        Game game = getGame();
+        if (game.isFowMode() && event.getChannel().getName().endsWith("private")) {
+            MessageHelper.replyToMessage(event, "Command not available in private channel.");
+            return;
+        }
+        showMapString(event, game);
     }
 
-    public static void showMapString(GenericInteractionCreateEvent event, Game game) {
+    private static void showMapString(GenericInteractionCreateEvent event, Game game) {
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " map string below:");
         MessageHelper.sendMessageToEventChannel(event, game.getMapString());
     }
-
 }

@@ -1,0 +1,119 @@
+[
+    {
+        "alias": "plus1_for_each_system_with_planets",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "nonhome_system_with_planet",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bastion_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_galvanize_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "galvanized_unit_count",
+        "scope": "",
+        "persistenceType": "CONDITIONAL",
+        "condition": "galvanized",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Galvanized units roll 1 additional die for combat and all unit abilities."
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_galvanize_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "galvanized_unit_count",
+        "scope": "",
+        "persistenceType": "CONDITIONAL",
+        "condition": "galvanized",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Galvanized units roll 1 additional die for combat and all unit abilities."
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "roll_1_for_galvanize_bombard",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "galvanized_unit_count",
+        "scope": "",
+        "persistenceType": "CONDITIONAL",
+        "condition": "galvanized",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Galvanized units roll 1 additional die for combat and all unit abilities."
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "roll_1_for_galvanize_spacecannon_offense",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "galvanized_unit_count",
+        "scope": "",
+        "persistenceType": "CONDITIONAL",
+        "condition": "galvanized",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Galvanized units roll 1 additional die for combat and all unit abilities."
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "roll_1_for_galvanized",
+        "type": "extrarolls",
+        "value": "+1",
+        "valueScalingType": "galvanized_unit_count",
+        "scope": "",
+        "persistenceType": "CONDITIONAL",
+        "condition": "galvanized",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Galvanized units roll 1 additional die for combat and all unit abilities."
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "plusX_letnev_breakthrough",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "unique_ships",
+        "persistenceType": "CONDITIONAL",
+        "condition": "spacecombat",
+        "scope": "_mostdice_",
+        "singleUnitMod": true,
+        "related": [
+            {
+                "type": "breakthrough",
+                "alias": "letnevbt"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    }
+]

@@ -25,5 +25,14 @@
         "playImmediately": true,
         "source": "oath_of_kings",
         "text": "When you receive this card, you must place it face-up in your play area, you are now the \"Viceroy\". Take 1 relic from the Emperor's play area if available. Anytime you score a Public Objective, the Emperor also scores this objective. Both the Emperor and you are considered in control of Mecatol Rex while it is under either's control. Place the \"Galactic Consulate\" token onto a non-home, non-Mecatol Rex planet you control, this planet becomes a Legendary Planet. Any player who controls this planet gains 1 Victory Point while this planet is under their control. This planet can never be invaded by the Emperor player.\n\nIf the Viceroy activates a system that contains 1 or more of the Emperor player's units, or if the Emperor player is eliminated, remove this card from the play area and the \"Galactic Consulate\" token and return it to the Emperor player."
+    },
+    {
+        "alias": "arachianpn",
+        "name": "Stringwalk Teachings",
+        "color": "",
+        "faction": "arachian",
+        "playArea": false,
+        "source": "other",
+        "text": "When you activate a system: Apply +1 to the move value of one of your ships that moves through a system that contains one of your command tokens. Then, return this card to the Arachian Player."
     }
 ]

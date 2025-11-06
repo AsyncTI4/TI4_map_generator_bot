@@ -1,0 +1,24 @@
+{
+    "id": "fracture7",
+    "name": "Lethe/Phlegethon",
+    "aliases": [
+        "fracture7",
+        "lethe",
+        "phlegethon",
+        "phlegm",
+        "pleg",
+        "leath",
+        "leth",
+        "plegeth",
+        "phleg",
+        "lathe"
+    ],
+    "imagePath": "fracture7.png",
+    "planets": [
+        "lethe",
+        "phlegethon"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "fracture",
+    "source": "thunders_edge"
+}

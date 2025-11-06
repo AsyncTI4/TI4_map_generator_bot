@@ -1,19 +1,18 @@
 package ti4.helpers.settingsFramework.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "val" })
+@JsonIncludeProperties({"id", "val"})
 public class BooleanSetting extends SettingInterface {
     private boolean val;
     private String whenFalse;
@@ -23,16 +22,16 @@ public class BooleanSetting extends SettingInterface {
     public BooleanSetting(String id, String name, boolean val) {
         super(id, name);
 
-        this.defaultValue = val;
+        defaultValue = val;
         this.val = val;
-        this.whenFalse = "Enable";
-        this.whenTrue = "Disable";
+        whenFalse = "Enable";
+        whenTrue = "Disable";
     }
 
     public BooleanSetting(String id, String name, boolean val, String whenFalse, String whenTrue) {
         super(id, name);
 
-        this.defaultValue = val;
+        defaultValue = val;
         this.val = val;
         this.whenFalse = whenFalse;
         this.whenTrue = whenTrue;
@@ -76,7 +75,7 @@ public class BooleanSetting extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public String toggle() {
+    private String toggle() {
         val = !val;
         return null;
     }

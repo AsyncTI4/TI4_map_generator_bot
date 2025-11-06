@@ -3,7 +3,6 @@ package ti4.commands.explore;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -22,7 +21,8 @@ public class ExploreCommand implements ParentCommand {
                     new ExploreFrontier(),
                     new ExploreUse(),
                     new ExploreShuffle(),
-                    new ExploreLookAtTop())
+                    new ExploreLookAtTop(),
+                    new ExploreDiscardFragment())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

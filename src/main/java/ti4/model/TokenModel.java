@@ -1,7 +1,6 @@
 package ti4.model;
 
 import java.util.List;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -21,17 +20,18 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private List<String> aliasList;
     private List<Wormhole> wormholes;
     private ComponentSource source;
+    private String placement;
+    private Double scale;
+    private Boolean isPlanet;
 
     @Override
     public boolean isValid() {
-        return id != null
-            && imagePath != null
-            && source != null;
+        return id != null && imagePath != null && source != null;
     }
 
     @Override
     public String getAlias() {
-        return getId(); // looks like were using the attachment_<name>.png for identification for now.
+        return id; // looks like were using the attachment_<name>.png for identification for now.
     }
 
     public boolean allowedInSpace() {
@@ -43,14 +43,14 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean searchSource(ComponentSource searchSource) {
-        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+        return (searchSource == null || (source != null && source == searchSource));
     }
 
     @Override
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getId());
-        if(getSpaceOrPlanet() != null) sb.append(" [").append(getSpaceOrPlanet()).append("]");
+        sb.append(id);
+        if (spaceOrPlanet != null) sb.append(" [").append(spaceOrPlanet).append("]");
         return sb.toString();
     }
 
@@ -59,42 +59,43 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("__").append(getId()).append("__");
+        sb.append("__").append(id).append("__");
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if(getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet()).append("\n");
-        if(getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName()).append("\n");
-        if(getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID()).append("\n");
-        if(getWormholes() != null) sb.append("Wormhole(s): ").append(getWormholes().toString()).append("\n");
-        if(getIsAnomaly() != null) sb.append("Anomaly ");
-        if(getIsRift() != null) sb.append("Rift ");
-        if(getIsNebula() != null) sb.append("Nebula ");
+        if (spaceOrPlanet != null) sb.append("Location: ").append(spaceOrPlanet).append("\n");
+        if (tokenPlanetName != null)
+            sb.append("Planet: ").append(tokenPlanetName).append("\n");
+        if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append("\n");
+        if (wormholes != null) sb.append("Wormhole(s): ").append(wormholes).append("\n");
+        if (isAnomaly != null) sb.append("Anomaly ");
+        if (isRift != null) sb.append("Rift ");
+        if (isNebula != null) sb.append("Nebula ");
         eb.setDescription(sb.toString());
 
         sb = new StringBuilder();
-        sb.append("ID: ").append(getId());
-        sb.append(" Source: ").append(getSource());
-        if (getAliasList() != null) sb.append("\nAlias list: ").append(getAliasList().toString());
+        sb.append("ID: ").append(id);
+        sb.append(" Source: ").append(source);
+        if (aliasList != null) sb.append("\nAlias list: ").append(aliasList);
         eb.setFooter(sb.toString());
 
-        eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + getImagePath() + "?raw=true");
+        eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
+                + imagePath + "?raw=true");
 
         return eb.build();
     }
 
     @Override
     public boolean search(String searchString) {
-        return getId().toLowerCase().contains(searchString.toLowerCase())
-            || (getAliasList() != null && getAliasList().toString().toLowerCase().contains(searchString.toLowerCase()))
-            || (getSpaceOrPlanet() != null && getSpaceOrPlanet().toLowerCase().contains(searchString.toLowerCase()))
-            || (getTokenPlanetName() != null && getTokenPlanetName().toLowerCase().contains(searchString.toLowerCase()))
-            || (getAttachmentID() != null && getAttachmentID().toLowerCase().contains(searchString.toLowerCase()))
-            || (getWormholes() != null && getWormholes().toString().toLowerCase().contains(searchString.toLowerCase()))
-            || (getIsAnomaly() != null && getIsAnomaly() && "anomaly".contains(searchString.toLowerCase()))
-            || (getIsRift() != null && getIsRift() && "gravity rift".contains(searchString.toLowerCase()))
-            || (getIsNebula() != null && getIsNebula() && "nebula".contains(searchString.toLowerCase()))
-            || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
+        return id.toLowerCase().contains(searchString.toLowerCase())
+                || (aliasList != null && aliasList.toString().toLowerCase().contains(searchString.toLowerCase()))
+                || (spaceOrPlanet != null && spaceOrPlanet.toLowerCase().contains(searchString.toLowerCase()))
+                || (tokenPlanetName != null && tokenPlanetName.toLowerCase().contains(searchString.toLowerCase()))
+                || (attachmentID != null && attachmentID.toLowerCase().contains(searchString.toLowerCase()))
+                || (wormholes != null && wormholes.toString().toLowerCase().contains(searchString.toLowerCase()))
+                || (isAnomaly != null && isAnomaly && "anomaly".contains(searchString.toLowerCase()))
+                || (isRift != null && isRift && "gravity rift".contains(searchString.toLowerCase()))
+                || (isNebula != null && isNebula && "nebula".contains(searchString.toLowerCase()))
+                || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
-
 }

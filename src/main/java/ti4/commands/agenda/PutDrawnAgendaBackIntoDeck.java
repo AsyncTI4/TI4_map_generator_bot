@@ -13,7 +13,8 @@ class PutDrawnAgendaBackIntoDeck extends GameStateSubcommand {
 
     public PutDrawnAgendaBackIntoDeck() {
         super(Constants.PUT_IN_DECK, "Put a drawn agenda back into the deck", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
+                .setRequired(true));
         addOption(OptionType.BOOLEAN, Constants.PUT_ON_BOTTOM, "Put the agenda on the bottom of the deck");
     }
 

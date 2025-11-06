@@ -1,0 +1,27 @@
+{
+    "id": "thewatchtower",
+    "tileId": "117",
+    "name": "The Watchtower",
+    "shortName": "Watchtower",
+    "aliases": [
+        "watch",
+        "tower",
+        "watchtower",
+        "thewatch",
+        "thewatchtower"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "thewatchtower",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "thunders_edge"
+}

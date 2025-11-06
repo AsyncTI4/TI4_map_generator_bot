@@ -3,7 +3,6 @@ package ti4.commands.uncategorized;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -18,7 +17,7 @@ import ti4.message.MessageHelper;
 
 public class ServerPromoteCommand implements ParentCommand {
 
-    public static final String DEV_CHANNEL = "947520255826198549";
+    private static final String DEV_CHANNEL = "947520255826198549";
     public static final Map<String, String> Servers = new HashMap<>() {
         {
             put(Constants.ASYNCTI4_HUB_SERVER_ID, "Async Hub");
@@ -72,40 +71,42 @@ public class ServerPromoteCommand implements ParentCommand {
             return false;
         }
 
-        OptionMapping target_opt = event.getOption(Constants.PROMOTE_TARGET);
-        if (target_opt == null || !Servers.containsKey(target_opt.getAsString())) {
+        OptionMapping targetOpt = event.getOption(Constants.PROMOTE_TARGET);
+        if (targetOpt == null || !Servers.containsKey(targetOpt.getAsString())) {
             MessageHelper.replyToMessage(event, "Server does not exist.");
             return false;
         }
 
-        OptionMapping rank_opt = event.getOption(Constants.PROMOTE_RANK);
-        if (rank_opt != null && !Ranks.containsKey(rank_opt.getAsString())) {
+        OptionMapping rankOpt = event.getOption(Constants.PROMOTE_RANK);
+        if (rankOpt != null && !Ranks.containsKey(rankOpt.getAsString())) {
             MessageHelper.replyToMessage(event, "Rank does not exist.");
             return false;
         }
 
-        if (!Servers.get(target_opt.getAsString()).startsWith("Emoji Farm")) {
-            if (rank_opt == null || rank_opt.getAsString().isEmpty()) {
+        if (!Servers.get(targetOpt.getAsString()).startsWith("Emoji Farm")) {
+            if (rankOpt == null || rankOpt.getAsString().isEmpty()) {
                 MessageHelper.replyToMessage(event, "Rank required (for non Emoji Farm servers).");
                 return false;
             }
             Member member = event.getMember();
             boolean allowed = false;
-            if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("admin")) {
+            if ("admin".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072")) {
+                    if ("943596173896323072".equals(r.getId())) {
                         allowed = true;
                     }
                 }
-            } else if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("developer")) {
+            } else if ("developer".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072") || r.getId().equals("947648366056185897")) {
+                    if ("943596173896323072".equals(r.getId()) || "947648366056185897".equals(r.getId())) {
                         allowed = true;
                     }
                 }
-            } else if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("bothelper")) {
+            } else if ("bothelper".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072") || r.getId().equals("947648366056185897") || r.getId().equals("1166011604488425482")) {
+                    if ("943596173896323072".equals(r.getId())
+                            || "947648366056185897".equals(r.getId())
+                            || "1166011604488425482".equals(r.getId())) {
                         allowed = true;
                     }
                 }
@@ -122,21 +123,23 @@ public class ServerPromoteCommand implements ParentCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping target_opt = event.getOption(Constants.PROMOTE_TARGET);
-        OptionMapping rank_opt = event.getOption(Constants.PROMOTE_RANK);
-        OptionMapping demote_opt = event.getOption(Constants.PROMOTE_DEMOTE);
+        OptionMapping targetOpt = event.getOption(Constants.PROMOTE_TARGET);
+        OptionMapping rankOpt = event.getOption(Constants.PROMOTE_RANK);
+        OptionMapping demoteOpt = event.getOption(Constants.PROMOTE_DEMOTE);
 
-        String target = target_opt.getAsString();
-        String rank = rank_opt == null ? "" : rank_opt.getAsString();
-        boolean demote = demote_opt != null && demote_opt.getAsBoolean();
+        String target = targetOpt.getAsString();
+        String rank = rankOpt == null ? "" : rankOpt.getAsString();
+        boolean demote = demoteOpt != null && demoteOpt.getAsBoolean();
         User user = event.getUser();
 
-        MessageHelper.replyToMessage(event, (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));
+        MessageHelper.replyToMessage(
+                event,
+                (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));
 
         if (target.startsWith("Emoji Farm")) {
             Guild guild = event.getJDA().getGuildById(Long.parseLong(target));
             guild.getRoles().forEach(r -> {
-                if (r.getName().equalsIgnoreCase("admin")) {
+                if ("admin".equalsIgnoreCase(r.getName())) {
                     if (demote) {
                         guild.removeRoleFromMember(user, r);
                     } else {
@@ -161,11 +164,10 @@ public class ServerPromoteCommand implements ParentCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
-                .setRequired(true).setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank")
-                .setAutoComplete(true),
-             new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote")
-                 .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setAutoComplete(true),
+                new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setAutoComplete(true));
     }
 }

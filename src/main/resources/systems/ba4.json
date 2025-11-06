@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "ba4",
+    "name": "Velarune -- Onyxxa",
+    "aliases": [
+        "onyxxa",
+        "ba4",
+        "velarune"
+    ],
+    "imagePath": "BA4_Velarune.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "velarune"
+    ],
+    "source": "balacasi"
+}

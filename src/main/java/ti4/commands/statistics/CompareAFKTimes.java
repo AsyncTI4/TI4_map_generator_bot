@@ -2,7 +2,6 @@ package ti4.commands.statistics;
 
 import java.util.List;
 import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,8 +16,14 @@ import ti4.settings.users.UserSettingsManager;
 class CompareAFKTimes extends Subcommand {
 
     private static final List<String> PLAYER_OPTIONS_TO_CHECK = List.of(
-        Constants.PLAYER1, Constants.PLAYER2, Constants.PLAYER3, Constants.PLAYER4,
-        Constants.PLAYER5, Constants.PLAYER6, Constants.PLAYER7, Constants.PLAYER8);
+            Constants.PLAYER1,
+            Constants.PLAYER2,
+            Constants.PLAYER3,
+            Constants.PLAYER4,
+            Constants.PLAYER5,
+            Constants.PLAYER6,
+            Constants.PLAYER7,
+            Constants.PLAYER8);
 
     public CompareAFKTimes() {
         super(Constants.COMPARE_AFK_TIMES, "Compare different players set AFK Times");
@@ -37,18 +42,25 @@ class CompareAFKTimes extends Subcommand {
         StringBuilder stringBuilder = new StringBuilder();
 
         PLAYER_OPTIONS_TO_CHECK.stream()
-            .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
-            .filter(Objects::nonNull)
-            .map(User::getId)
-            .map(GameManager::getManagedPlayer)
-            .forEach(player -> {
-                var afkTime = UserSettingsManager.get(player.getId()).getAfkHours();
-                if (afkTime != null) {
-                    stringBuilder.append(player.getName()).append(" afk hours are: ").append(afkTime.replace(";", ", ")).append("\n");
-                } else {
-                    stringBuilder.append("AFK hours are not set for: ").append(player.getName()).append("\n");
-                }
-            });
+                .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
+                .filter(Objects::nonNull)
+                .map(User::getId)
+                .map(GameManager::getManagedPlayer)
+                .forEach(player -> {
+                    var afkTime = UserSettingsManager.get(player.getId()).getAfkHours();
+                    if (afkTime != null) {
+                        stringBuilder
+                                .append(player.getName())
+                                .append(" afk hours are: ")
+                                .append(afkTime.replace(";", ", "))
+                                .append("\n");
+                    } else {
+                        stringBuilder
+                                .append("AFK hours are not set for: ")
+                                .append(player.getName())
+                                .append("\n");
+                    }
+                });
 
         MessageHelper.sendMessageToChannel(event.getChannel(), stringBuilder.toString());
     }

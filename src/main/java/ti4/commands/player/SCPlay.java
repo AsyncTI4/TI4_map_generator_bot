@@ -2,7 +2,6 @@ package ti4.commands.player;
 
 import java.util.Collections;
 import java.util.Set;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,12 +19,13 @@ class SCPlay extends GameStateSubcommand {
 
     public SCPlay() {
         super(Constants.SC_PLAY, "Play a Strategy Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD,
-            "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
+        addOptions(new OptionData(
+                OptionType.INTEGER,
+                Constants.STRATEGY_CARD,
+                "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player"));
         addOptions(
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
-                .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -43,11 +43,14 @@ class SCPlay extends GameStateSubcommand {
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { // Only one SC selected
-            MessageHelper.sendMessageToEventChannel(event, "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
             return;
         }
 
-        Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        Integer scToPlay =
+                event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         PlayStrategyCardService.playSC(event, scToPlay, game, mainGameChannel, player);
     }
 }

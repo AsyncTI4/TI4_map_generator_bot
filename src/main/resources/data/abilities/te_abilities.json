@@ -1,0 +1,123 @@
+[
+    {
+        "id": "liberate",
+        "name": "Liberate",
+        "faction": "bastion",
+        "window": "When you gain control of a planet",
+        "windowEffect": "ready that planet if it contains a number of your infantry equal to or greater than that planet's resource value; otherwise, place 1 infantry on that planet.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "galvanize",
+        "name": "Galvanize",
+        "faction": "bastion",
+        "permanentEffect": "Galvanized units roll 1 additional die for combat rolls and unit abilities.",
+        "window": "When a game effect instructs a player to galvanize a unit",
+        "windowEffect": "they place a galvanize token beneath it if it does not have one. ",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "phoenixstandard",
+        "name": "Phoenix Standard",
+        "faction": "bastion",
+        "window": "At the end of combat",
+        "windowEffect": "you may galvanize 1 of your units that participated.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "survivalinstinct",
+        "name": "Survival Instinct",
+        "faction": "ralnel",
+        "window": "After a player activates a system that contains your ships",
+        "windowEffect": "you may move up to 2 of your ships into the active system from adjacent systems that do not contain your command tokens.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "researchteam",
+        "name": "Research Team",
+        "faction": "deepwrought",
+        "window": "When ground forces are committed",
+        "windowEffect": "if your units on that planet are not already coexisting, you may choose for your units to coexist.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "oceanbound",
+        "name": "Oceanbound",
+        "faction": "deepwrought",
+        "permanentEffect": "Any time you have more ocean cards than there are planets that contain your coexisting units, discard ocean cards until you do not.",
+        "window": "When your units begin coexisting on a planet",
+        "windowEffect": "gain an ocean card and ready it.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "sundered",
+        "name": "Sundered",
+        "faction": "crimson",
+        "permanentEffect": "You cannot use wormholes other than epsilon wormholes. Other players' units that move or are placed into your home system are destroyed.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "incursion",
+        "name": "Incursion",
+        "faction": "crimson",
+        "permanentEffect": "When you activate a system that contains a breach, you may flip that breach; systems that contain active breaches are adjacent. at the end of the status phase, any player with ships in a system that contain an active breach may remove that breach.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "miniaturization",
+        "name": "Miniaturization",
+        "faction": "ralnel",
+        "permanentEffect": "Your structures can be transported by any ship; this does not require or count against capacity. While your structures are in the space area, they cannot use their unit abilities.",
+        "window": "At the end of your tactical actions",
+        "windowEffect": "you may place your structures that are in space areas onto planets you control in their respective systems.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "sorrow",
+        "name": "Sorrow",
+        "faction": "crimson",
+        "permanentEffect": "When you create the game board, place the Sorrow (tile 94) where your home system would normally be placed, then place a inactive breach there. The Sorrow is not a home system. Then, place your home system (tile 118) in your play area.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "plotsplots",
+        "name": "Plots Within Plots",
+        "faction": "firmament",
+        "permanentEffect": "You can score secret objectives already scored by other players if you fulfill their requirements; this does not count against your secret objective limit or the number you can score in a round.",
+        "window": "When you score another player's secret objective",
+        "windowEffect": "do not gain a victory point; instead, place a facedown plot card into your play area with that player's control token on it.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "puppetsoftheblade",
+        "name": "Puppets of the Blade",
+        "shortName": "Puppet Soft\nHe Blade",
+        "faction": "firmament",
+        "window": "If you have at least 1 plot card in your play area, gain the following ability:",
+        "windowEffect": "ACTION: Purge The Firmament's faction sheet, leaders, planet cards, and promissory note. Then, gain all of the faction components for The Obsidian.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "nocturne",
+        "name": "Nocturne",
+        "faction": "obsidian",
+        "permanentEffect": "This faction cannot be chosen during setup.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "bladesorchestra",
+        "name": "The Blade's Orchestra",
+        "shortName": "Blade's\nOrchestra",
+        "faction": "obsidian",
+        "window": "When this faction comes into play",
+        "windowEffect": "flip your home system, double-sided faction components, and all of your in-play plot cards. Then, ready Cronos Hollow and Tallin Hollow if you control them.",
+        "source": "thunders_edge"
+    },
+    {
+        "id": "marionettes",
+        "name": "Marionettes",
+        "faction": "obsidian",
+        "permanentEffect": "The player or players whose control tokens are on each plot card are the puppeted players for that plot.",
+        "source": "thunders_edge"
+    }
+]

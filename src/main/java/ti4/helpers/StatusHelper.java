@@ -1,18 +1,17 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
+import java.util.function.Function;
+import java.util.function.Predicate;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
@@ -21,36 +20,94 @@ import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.planet.EronousPlanetService;
 import ti4.service.turn.StartTurnService;
+import ti4.settings.users.UserSettingsManager;
 
 public class StatusHelper {
 
     public static void AnnounceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
-            BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel(), game.isOmegaPhaseMode() ? "omega" : null);
+            BannerGenerator.drawPhaseBanner(
+                    "status", game.getRound(), game.getActionsChannel(), game.isOmegaPhaseMode() ? "omega" : null);
+        }
+    }
+
+    public static void offerPreScoringButtons(Game game, Player player) {
+        if (game.getPhaseOfGame().contains("action")) {
+            List<Button> buttons = new ArrayList<>();
+            for (String obbie : game.getRevealedPublicObjectives().keySet()) {
+                List<String> scoredPlayerList =
+                        game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
+                if (player.isRealPlayer()
+                        && !scoredPlayerList.contains(player.getUserID())
+                        && Mapper.getPublicObjective(obbie) != null) {
+                    int threshold = ListPlayerInfoService.getObjectiveThreshold(obbie, game);
+                    int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(obbie, game, player);
+                    boolean toldarHero = false;
+                    if (Mapper.getPublicObjective(obbie)
+                            .getName()
+                            .equalsIgnoreCase(game.getStoredValue("toldarHeroObj"))) {
+                        if (!game.getStoredValue("toldarHeroPlayer").equalsIgnoreCase(player.getFaction())
+                                && AgendaHelper.getPlayersWithLeastPoints(game).contains(player)) {
+                            toldarHero = true;
+                        }
+                    }
+                    if ((playerProgress >= threshold && threshold > 0) || toldarHero) {
+                        buttons.add(Buttons.green(
+                                "preScoreObbie_PO_"
+                                        + game.getRevealedPublicObjectives().get(obbie),
+                                Mapper.getPublicObjective(obbie).getName()));
+                    }
+                }
+            }
+            if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                String msg = player.getRepresentation()
+                        + " you can use these buttons to queue a public objective to score, to speed up the status phase";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            }
+
+            buttons = new ArrayList<>();
+            for (String soID : player.getSecretsUnscored().keySet()) {
+                if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
+                        && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
+                                > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
+                        && !"dp".equalsIgnoreCase(soID)) {
+
+                    buttons.add(Buttons.green(
+                            "preScoreObbie_SO_" + player.getSecretsUnscored().get(soID),
+                            Mapper.getSecretObjective(soID).getName()));
+                }
+            }
+            if (!buttons.isEmpty()) {
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                String msg = player.getRepresentation()
+                        + " you can use these buttons to queue a secret objective to score, to speed up the status phase";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            }
         }
     }
 
     public static void BeginScoring(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         String messageText = "Please score objectives, " + game.getPing() + ".";
-
-        if (!game.isFowMode()) {
-            game.setStoredValue("newStatusScoringMode", "Yes");
-            messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
-        }
 
         if (game.isOmegaPhaseMode()) {
             // Show the effects of the Agendas while scoring
@@ -70,32 +127,6 @@ public class StatusHelper {
             }
         }
 
-        List<Button> poButtons = getScoreObjectiveButtons(game);
-        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
-        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
-        Button scoreAnObjective = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
-        poButtons.add(noPOScoring);
-        poButtons.add(scoreAnObjective);
-        poButtons.add(noSOScoring);
-        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
-            poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
-        }
-        if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
-            && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
-            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
-        }
-        poButtons.removeIf(Objects::isNull);
-        List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
-        List<ActionRow> actionRows = new ArrayList<>();
-        for (List<Button> partition : partitions) {
-            actionRows.add(ActionRow.of(partition));
-        }
-        MessageCreateData messageObject = new MessageCreateBuilder()
-            .addContent(messageText)
-            .addComponents(actionRows).build();
-
-        gameChannel.sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
-
         int maxVP = 0;
         for (Player player : game.getRealPlayers()) {
             if (player.getTotalVictoryPoints() > maxVP) {
@@ -110,13 +141,71 @@ public class StatusHelper {
                     ButtonHelperAgents.resolveArtunoCheck(player, numScoredSOs);
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good" + (numScoredSOs == 1 ? "" : "s")
-                        + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good"
+                                + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit"
+                                + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
-            if (player.getPromissoryNotes().containsKey("dspnuyda") && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", a reminder this is the window to use the _Eerie Predictions_.");
+            if (player.hasTech("hydrothermal")) {
+                int oceans = 0;
+                for (Player p2 : game.getRealPlayers()) {
+                    oceans = Math.max(oceans, p2.getOceans().size());
+                }
+                if (oceans > 0) {
+                    player.setTg(player.getTg() + oceans);
+                    ButtonHelperAbilities.pillageCheck(player, game);
+                    ButtonHelperAgents.resolveArtunoCheck(player, oceans);
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
+                                    + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
+                }
+            }
+            if (player.hasTech("tf-geneticresearch")) {
+                int maxNum = 0;
+                for (TechnologyType type : TechnologyType.mainFour) {
+                    maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
+                }
+                player.setTg(player.getTg() + maxNum);
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " you gained " + maxNum + " trade good"
+                                + (maxNum == 1 ? "" : "s") + " due to the Genetic Research technology.");
+            }
+            if (player.hasTech("tf-radicaladvancement")) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "radicalAdvancementStart", "Replace a tech"));
+                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " choose if you want to use Radical Advancement.",
+                        buttons);
+            }
+            if (player.hasTech("radical")) {
+                List<Button> buttons = new ArrayList<>();
+                for (String tech : player.getTechs()) {
+                    TechnologyModel techModel = Mapper.getTech(tech);
+                    if (techModel != null && !techModel.isUnitUpgrade()) {
+                        buttons.add(Buttons.green(
+                                "jnHeroSwapOut_" + tech, techModel.getName(), techModel.getCondensedReqsEmojis(true)));
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + " choose a technology to replace due to Radical Advancement.",
+                        buttons);
+            }
+            if (player.getPromissoryNotes().containsKey("dspnuyda")
+                    && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged()
+                                + ", a reminder this is the window to use the _Eerie Predictions_.");
             }
         }
         String key2 = "queueToScorePOs";
@@ -128,58 +217,86 @@ public class StatusHelper {
         game.setStoredValue(key3, "");
         game.setStoredValue(key2b, "");
         game.setStoredValue(key3b, "");
-        if (game.getHighestScore() + 4 > game.getVp()) {
+        if (game.isZealousOrthodoxyMode()
+                || (game.getHighestScore() + 4 > game.getVp() && !game.isCivilizedSocietyMode())) {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn Off Forced Scoring Order"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game   .getPing() +
-                ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    game.getPing()
+                            + ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.",
+                    buttons);
             for (Player player : GetPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
 
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             List<String> scorables = new ArrayList<>();
+            List<Integer> scorableInts = new ArrayList<>();
+            String keyV = player.getFaction() + "Round" + game.getRound() + "PreScoredPO";
+
+            if (game.getStoredValue("BountyContracts").contains(player.getFaction())
+                    && player.getActionCards().containsKey("bounty_contracts")) {
+                ActionCardHelper.playAC(event, game, player, "bounty_contracts", game.getMainGameChannel());
+            }
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
-                List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
-                if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
+                List<String> scoredPlayerList =
+                        game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
+                if (player.isRealPlayer()
+                        && !scoredPlayerList.contains(player.getUserID())
+                        && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(obbie, game, player);
                     boolean toldarHero = false;
-                    if (Mapper.getPublicObjective(obbie).getName().equalsIgnoreCase(game.getStoredValue("toldarHeroObj"))) {
-                        if (!game.getStoredValue("toldarHeroPlayer").equalsIgnoreCase(player.getFaction()) && AgendaHelper.getPlayersWithLeastPoints(game).contains(player)) {
+                    if (Mapper.getPublicObjective(obbie)
+                            .getName()
+                            .equalsIgnoreCase(game.getStoredValue("toldarHeroObj"))) {
+                        if (!game.getStoredValue("toldarHeroPlayer").equalsIgnoreCase(player.getFaction())
+                                && AgendaHelper.getPlayersWithLeastPoints(game).contains(player)) {
                             toldarHero = true;
                         }
                     }
                     if ((playerProgress >= threshold && threshold > 0) || toldarHero) {
                         scorables.add(Mapper.getPublicObjective(obbie).getRepresentation(false));
+                        scorableInts.add(game.getRevealedPublicObjectives().get(obbie));
                     }
                 }
             }
-            if (scorables.isEmpty()) {
-                messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
+            if (!game.getStoredValue(keyV).isEmpty()
+                    && Helper.canPlayerScorePOs(game, player)
+                    && scorableInts.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
+                UnfiledButtonHandlers.poScoring(
+                        null, player, game.getStoredValue(keyV), game, player.getCorrectChannel());
             } else {
-                if (Helper.canPlayerScorePOs(game, player)) {
-                    messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objective" 
-                        + (scorables.size() == 1 ? "" : "s") + ":\n";
-                    messageText += String.join("\n", scorables);
+                if (scorables.isEmpty()) {
+                    messageText = player.getRepresentation()
+                            + ", the bot does not believe that you can score any public objectives.";
                 } else {
-                    messageText = player.getRepresentation() + ", you cannot score public objectives because you do not control your home system.";
+                    if (Helper.canPlayerScorePOs(game, player)) {
+                        messageText = player.getRepresentation()
+                                + ", as a reminder, the bot believes you are capable of scoring the following public objective"
+                                + (scorables.size() == 1 ? "" : "s") + ":\n";
+                        messageText += String.join("\n", scorables);
+                    } else {
+                        messageText = player.getRepresentation()
+                                + ", you cannot score public objectives because you do not control your home system.";
+                    }
                 }
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             }
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
+
             if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
                 String message = player.getRepresentation()
-                    + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
+                        + " cannot score any public objectives according to the bot, and has been marked as not scoring a public objective.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
                 key2 = "queueToScorePOs";
                 key3 = "potentialScorePOBlockers";
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                    game.setStoredValue(key2,
-                        game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                    game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 }
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
@@ -187,58 +304,130 @@ public class StatusHelper {
             }
 
             int count = 0;
-            String message3a = "";
+            StringBuilder message3a = new StringBuilder();
+            List<Integer> sos = new ArrayList<>();
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
-                        && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
-                        && !soID.equalsIgnoreCase("dp")) {
-                    message3a += "\n" + Mapper.getSecretObjective(soID).getRepresentation(false);
+                        && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
+                                > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
+                        && !"dp".equalsIgnoreCase(soID)) {
+                    message3a
+                            .append("\n")
+                            .append(Mapper.getSecretObjective(soID).getRepresentation(false));
                     count++;
+                    sos.add(player.getSecretsUnscored().get(soID));
                 }
             }
-            if (count > 0 && player.isRealPlayer()) {
-                message3a = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following secret objective" 
-                    + (count == 1 ? "" : "s") + ":" + message3a;
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
-            } else if (player.getSo() == 0) {
-                String message = player.getRepresentation()
-                    + " has no secret objectives to score at this time.";
-                game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                key2 = "queueToScoreSOs";
-                key3 = "potentialScoreSOBlockers";
-                if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                    game.setStoredValue(key2,
-                        game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+            var userSettings = UserSettingsManager.get(player.getUserID());
+            keyV = player.getFaction() + "Round" + game.getRound() + "PreScoredSO";
+
+            if (!game.getStoredValue(keyV).isEmpty() && sos.contains(Integer.parseInt(game.getStoredValue(keyV)))) {
+                UnfiledButtonHandlers.soScoreFromHand(
+                        null,
+                        game.getStoredValue(keyV),
+                        game,
+                        player,
+                        player.getCorrectChannel(),
+                        gameChannel,
+                        gameChannel);
+            } else {
+                if (count > 0 && player.isRealPlayer() && !player.isNpc()) {
+                    message3a.insert(
+                            0,
+                            player.getRepresentation()
+                                    + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
+                                    + (count == 1 ? "" : "s") + ":");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
+                } else if (player.getSo() == 0
+                        || player.isNpc()
+                        || userSettings.getSandbagPref().contains("bot")) {
+                    String message = player.getRepresentation()
+                            + " has opted not to score a secret objective at this point in time.";
+                    game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    key2 = "queueToScoreSOs";
+                    key3 = "potentialScoreSOBlockers";
+                    if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                        game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                    }
+                    if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+                        game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                    }
+                } else if (player.isRealPlayer()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            player.getRepresentation()
+                                    + ", the bot does not believe that you can score any of your secret objectives.");
                 }
-                if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                    game.setStoredValue(key3,
-                        game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-                }
-            } else if (player.isRealPlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), 
-                    player.getRepresentation() + ", the bot does not believe that you can score any of your secret objectives.");
             }
+            if (Helper.checkEndGame(game, player)) {
+                break;
+            }
+            ActionCardHelper.sendPlotCardInfo(game, player);
         }
 
+        List<Button> poButtons = getScoreObjectiveButtons(game);
+        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
+        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
+        Button scoreAnObjective = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
+        poButtons.add(noPOScoring);
+        poButtons.add(scoreAnObjective);
+        poButtons.add(noSOScoring);
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.isFowMode()) {
+            poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
+        }
+        if (game.getActionCards().size() > 130
+                && game.getPlayerFromColorOrFaction("hacan") != null
+                && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(
+                                game.getPlayerFromColorOrFaction("hacan"), game, false)
+                        .isEmpty()) {
+            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
+        }
+        poButtons.removeIf(Objects::isNull);
+        messageText = "Please score objectives, " + game.getPing() + ".";
+        if (!game.isFowMode()) {
+            game.setStoredValue("newStatusScoringMode", "Yes");
+            messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+        }
+        MessageHelper.sendMessageToChannelWithPersistentReacts(
+                gameChannel, messageText, game, poButtons, GameMessageType.STATUS_SCORING);
+
+        boolean allReacted = true;
+        for (Player player : game.getRealPlayers()) {
+            String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+            String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+            if (po.isEmpty()
+                    || so.isEmpty()
+                    || game.getPhaseOfGame().contains("action")
+                    || game.getPhaseOfGame().contains("agenda")) {
+                allReacted = false;
+            }
+        }
+        if (allReacted) {
+            UnfiledButtonHandlers.respondAllHaveScored(game);
+        }
     }
 
     public static List<Player> GetPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
-            return PriorityTrackHelper.GetPriorityTrack(game)
-                .stream().filter(Objects::nonNull).toList();
-        } else {
-            return game.getActionPhaseTurnOrder();
+            return PriorityTrackHelper.GetPriorityTrack(game).stream()
+                    .filter(Objects::nonNull)
+                    .toList();
+        } else if (game.getPlanets().contains(EronousPlanetService.CANTRIS_ID)) {
+            return EronousPlanetService.resolveCantrisScoringOrder(game);
         }
+        return game.getActionPhaseTurnOrder();
     }
 
-    public static void HandleStatusPhaseMiddle(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
+    public static void HandleStatusPhaseMiddle(
+            GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers(true)) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentationUnfogged() + ", you have the opportunity to pay off **Binding Debts** here."
-                        + " You may pay 1 trade good to get 2 debt tokens forgiven.";
+                    String msg = p2.getRepresentationUnfogged()
+                            + ", you have the opportunity to pay off **Binding Debts** here."
+                            + " You may pay 1 trade good to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
                     buttons.add(Buttons.red("deleteButtons", "Stay Indebted"));
@@ -248,6 +437,7 @@ public class StatusHelper {
         }
 
         for (Player player : game.getRealPlayers()) {
+
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
             for (String pn : pns) {
                 Player pnOwner = game.getPNOwner(pn);
@@ -255,29 +445,39 @@ public class StatusHelper {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if (pnModel.getText().contains("eturn this card") && (pnModel.getText().contains("start of the status phase") || pnModel.getText().contains("beginning of the status phase"))) {
+                if (pnModel.getText().contains("eturn this card")
+                        && (pnModel.getText().contains("start of the status phase")
+                                || pnModel.getText().contains("beginning of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing() + ".");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
+                                    + ".");
                 }
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.", List.of(Buttons.GET_A_TECH));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.",
+                        List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
-            if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
-                && playerLeader != null && !playerLeader.isLocked()) {
+            if (player.hasLeader("kyrohero")
+                    && player.getLeaderByID("kyrohero").isPresent()
+                    && playerLeader != null
+                    && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("kyroHeroInitiation", "Play Kyro Hero"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentation()
-                        + ", a reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentation()
+                                + ", a reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
+                        buttons);
             }
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
@@ -287,16 +487,25 @@ public class StatusHelper {
                         continue;
                     }
                     UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                    if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                    if (unitHolder != null
+                            && unitHolder.getTokenList() != null
+                            && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + ", a reminder this is __not__ the window to use _The Crown of Emphidia_."
-                                    + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCardsInfoThread(),
+                                    player.getRepresentation()
+                                            + ", a reminder this is __not__ the window to use _The Crown of Emphidia_."
+                                            + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + ", a reminder this is the window to use _The Crown of Emphidia_.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                                player.getRepresentation() + ", you may use these buttons to resolve _The Crown of Emphidia_.", ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCardsInfoThread(),
+                                    player.getRepresentation()
+                                            + ", a reminder this is the window to use _The Crown of Emphidia_.");
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCardsInfoThread(),
+                                    player.getRepresentation()
+                                            + ", you may use these buttons to resolve _The Crown of Emphidia_.",
+                                    ButtonHelper.getCrownButtons());
                         }
                     }
                 }
@@ -311,17 +520,66 @@ public class StatusHelper {
 
             Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
             String endOfRoundMessage = p2.getRepresentation();
-            endOfRoundMessage += ", you may write down your end of round thoughts, to be shared at the end of the game.";
-            endOfRoundMessage += " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing).";
+            endOfRoundMessage +=
+                    ", you may write down your end of round thoughts, to be shared at the end of the game.";
+            endOfRoundMessage +=
+                    " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing).";
             MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), endOfRoundMessage, editSummary);
+
+            Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
+            if (obsidian != null
+                    && obsidian.getPuppetedFactionsForPlot("seethe").contains(p2.getFaction())) {
+                String seetheMsg = obsidian.getRepresentation() + " use the buttons to destroy one of "
+                        + p2.getRepresentation() + " infantry using seethe.";
+                List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
+                MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), seetheMsg, removeButtons);
+            }
         }
 
         // Optional abilities
         sendMitosisButtons(game);
         sendHoldingCompanyButtons(game);
-
+        sendEntropicScarButtons(game);
+        sendNeuralParasiteButtons(game);
+        sendRemoveBreachButtons(game);
+        SowingReapingService.sendTheSowingButtons(game);
+        SowingReapingService.resolveTheReaping(game);
         // Obligatory abilities
         resolveSolFlagship(game);
+    }
+
+    public static void sendRemoveBreachButtons(Game game) {
+        Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
+        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasShipsInSystem(p, t));
+        for (Player p : game.getRealPlayers()) {
+            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(
+                    p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
+            if (!buttons.isEmpty()) {
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done removing"));
+                String msg =
+                        p.getRepresentation() + " You may remove active breaches from systems that contain your ships:";
+                MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
+            }
+        }
+    }
+
+    private static void sendNeuralParasiteButtons(Game game) {
+        List<Player> firmaments = Helper.getPlayersFromTech(game, "parasite-firm");
+        if (firmaments == null || firmaments.isEmpty()) return;
+
+        for (Player player : firmaments) {
+            Tile home = player.getHomeSystemTile();
+            List<Button> buttons = new ArrayList<>();
+            for (Planet planet : home.getPlanetUnitHolders()) {
+                String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
+                String label = Helper.getUnitHolderRepresentation(home, planet.getName(), game, player);
+                buttons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmoji(planet.getName())));
+            }
+            TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
+            String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
+                    + parasiteModel.getNameRepresentation() + ".";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), parasiteMsg, buttons);
+        }
     }
 
     private static void sendMitosisButtons(Game game) {
@@ -329,7 +587,70 @@ public class StatusHelper {
         if (arborec == null) return;
 
         String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
-        MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+        MessageHelper.sendMessageToChannelWithButtons(
+                arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+    }
+
+    private static void handleMonumentToTheAges(Game game) {
+        if (!game.isMonumentToTheAgesMode()) {
+            return;
+        }
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        for (Tile tile : game.getTileMap().values()) {
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.getUnitCount(UnitType.Spacedock, neutral) > 0) {
+
+                    int remaining = game.changeCommsOnPlanet(1, planet.getName());
+
+                    String msg = "A commodity was placed on the Monument to the Ages at " + planet.getName() + ".";
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                }
+            }
+        }
+    }
+
+    public static void sendEntropicScarButtons(Game game) {
+        Map<Player, Integer> scars = new HashMap<>();
+        for (Tile t : game.getTileMap().values()) {
+            if (t.getTileModel().isScar()) {
+                for (Player p : game.getRealPlayers()) {
+                    if (Tile.tileHasPlayerShips(p).test(t)) {
+                        scars.put(p, scars.getOrDefault(p, 0) + 1);
+                    }
+                }
+            }
+        }
+        for (Player player : scars.keySet()) {
+            List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
+            if (game.isTwilightsFallMode()) {
+                factionTechs.add("antimatter");
+                factionTechs.add("wavelength");
+            }
+            player.getTechs().forEach(factionTechs::remove);
+            List<Button> buttons = new ArrayList<>(factionTechs.stream()
+                    .map(tech -> {
+                        TechnologyModel model = Mapper.getTech(tech);
+                        return Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "entropicScar_" + tech,
+                                model.getName(),
+                                model.getCondensedReqsEmojis(true));
+                    })
+                    .toList());
+            buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+
+            int ccs = player.getStrategicCC();
+            int techs = buttons.size() - 1;
+            String scarMessage = player.getRepresentation()
+                    + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
+            scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";
+            if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
+                scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
+                        + " available to exhaust (This will be spent first)";
+            for (int i = 0; i < techs && i < scars.get(player); i++) {
+                if (i > 0) scarMessage = "Get another one!";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
+            }
+        }
     }
 
     private static void sendHoldingCompanyButtons(Game game) {
@@ -350,7 +671,8 @@ public class StatusHelper {
                     if (!unitHolder.hasUnits()) continue;
                     if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
-                        String genesisMessage = player.getRepresentationUnfogged() + ", 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
+                        String genesisMessage = player.getRepresentationUnfogged()
+                                + ", 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), genesisMessage);
                     }
                 }
@@ -358,7 +680,7 @@ public class StatusHelper {
         }
     }
 
-    public static List<Button> getScoreObjectiveButtons(Game game) {
+    private static List<Button> getScoreObjectiveButtons(Game game) {
         return getScoreObjectiveButtons(game, "");
     }
 
@@ -374,31 +696,41 @@ public class StatusHelper {
         int poStatus;
         for (Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
             String key = objective.getKey();
-            String po_name = publicObjectivesState1.get(key);
+            String poName = publicObjectivesState1.get(key);
             poStatus = 0;
-            if (po_name == null) {
-                po_name = publicObjectivesState2.get(key);
+            if (poName == null) {
+                poName = publicObjectivesState2.get(key);
                 poStatus = 1;
             }
-            if (po_name == null) {
+            if (poName == null) {
                 Integer integer = customPublicVP.get(key);
-                if (integer != null && !key.toLowerCase().contains("custodian") && !key.toLowerCase().contains("imperial")
-                    && !key.contains("Shard of the Throne") && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
-                    po_name = key;
+                if (integer != null
+                        && !key.toLowerCase().contains("custodian")
+                        && !key.toLowerCase().contains("imperial")
+                        && !key.contains("Shard of the Throne")
+                        && !key.contains("Seed of an")
+                        && !key.contains("Mutiny")
+                        && !key.contains("Stellar Atomics")
+                        && !key.contains("(Plotted)")
+                        && !key.contains("Crown of Emphidia")
+                        && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+                    poName = key;
                     poStatus = 2;
                 }
             }
-            if (po_name != null) {
+            if (poName != null) {
                 Integer value = objective.getValue();
                 Button objectiveButton;
-                if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public1alt);
+                if (poStatus == 0) { // Stage 1 Objectives
+                    objectiveButton = Buttons.green(
+                            prefix + Constants.PO_SCORING + value, "(" + value + ") " + poName, CardEmojis.Public1alt);
                     poButtons1.add(objectiveButton);
-                } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, CardEmojis.Public2alt);
+                } else if (poStatus == 1) { // Stage 2 Objectives
+                    objectiveButton = Buttons.blue(
+                            prefix + Constants.PO_SCORING + value, "(" + value + ") " + poName, CardEmojis.Public2alt);
                     poButtons2.add(objectiveButton);
-                } else { //Other Objectives
-                    objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                } else { // Other Objectives
+                    objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + poName);
                     poButtonsCustom.add(objectiveButton);
                 }
             }
@@ -409,7 +741,10 @@ public class StatusHelper {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw Secret Objective Instead of Scoring Public Objective", FactionEmojis.edyn));
+                poButtons.add(Buttons.gray(
+                        "edynCommanderSODraw",
+                        "Draw Secret Objective Instead of Scoring Public Objective",
+                        FactionEmojis.edyn));
                 break;
             }
         }

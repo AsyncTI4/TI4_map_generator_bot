@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -57,8 +56,7 @@ class PersonalCleanup extends GameStateSubcommand {
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
-            if (player.getSCs().contains(sc.getKey()))
-                sc.setValue(false);
+            if (player.getSCs().contains(sc.getKey())) sc.setValue(false);
         }
 
         player.setPassed(false);

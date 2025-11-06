@@ -1,0 +1,207 @@
+[
+    {
+        "alias": "baxanws",
+        "name": "Stellar Architect II ",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RRRY",
+        "faction": "xan",
+        "baseUpgrade": "ws",
+        "source": "balacasi",
+        "text": "During space combat, this unit rolls 1 additional die for each space dock in this system. Other players' units in this system lose PLANETARY SHIELD. SUSTAIN DAMAGE BOMBARDMENT 3 (3) Cost 12 Combat 3*** Move 2 Capacity 8"
+    },
+    {
+        "alias": "baxansd",
+        "name": "Galactic Citadel II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "xan",
+        "baseUpgrade": "sd2",
+        "source": "balacasi",
+        "text": "Up to 3 non-fighter ships in this system do not count against your fleet limit. This unit’s PRODUCTION value is equal to 4 more than the resource value of this planet.Up to 3 fighters in this system do not count against your ships' capacity"
+    },
+    {
+        "alias": "baarvag",
+        "name": "Unyielding Will",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "arvaxi",
+        "source": "balacasi",
+        "text": "Your action cards cannot be canceled. ACTION: Exhaust this card and discard 1 action card to draw 1 action card."
+    },
+    {
+        "alias": "baarvay",
+        "name": "Wartime Innovation",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "arvaxi",
+        "source": "balacasi",
+        "text": "At the start of a combat, you may spend 4 influence to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat."
+    },
+    {
+        "alias": "araracg",
+        "name": "Void Weave Implants",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "arachian",
+        "source": "other",
+        "text": "ACTION: Exhaust this card to perform a tactical action in a non-home system that contains your units and one of your Command Tokens. "
+    },
+    {
+        "alias": "araracy",
+        "name": "Weave Spinner",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "arachian",
+        "source": "other",
+        "text": "At the end of your turn, you may exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens. "
+    },
+    {
+        "alias": "bakalodn",
+        "name": "Stinger II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "kalora",
+        "baseUpgrade": "dn2",
+        "source": "balacasi",
+        "text": "This unit cannot be destroyed by \"Direct Hit\" action cards. When this unit makes a BOMBARDMENT roll against another player’s units, if it produces 1 or more hits, you may gain 1 trade good. SUSTAIN DAMAGE BOMBARDMENT 5 Cost 4 Combat 5 Move 2 Capacity 1"
+    },
+    {
+        "alias": "bakalor",
+        "name": "Chitin Shielding",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "kalora",
+        "source": "balacasi",
+        "text": "After you win a space combat in a non-home system, you may exhaust this card to place 1 command token from your opponent’s reinforcements into the active system."
+    },
+    {
+        "alias": "balunacv",
+        "name": "Cryptic Hauler II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BB",
+        "faction": "lunarium",
+        "baseUpgrade": "cv2",
+        "source": "balacasi",
+        "text": "After you activate this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. Cost 3 Combat 9 Move 2 Capacity X"
+    },
+    {
+        "alias": "balunag",
+        "name": "Subliminal Intuition",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "lunarium",
+        "source": "balacasi",
+        "text": "When another player activates a system that contains 1 or more of your ships, you may draw 1 secret objective or gain 2 command tokens. If you gained command tokens, exhaust this card."
+    },
+    {
+        "alias": "baconcy",
+        "name": "Sacrificial Command",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "onyxxa",
+        "source": "balacasi",
+        "text": "Once per action, when you would spend a token from your strategy pool to resolve the primary or secondary ability of a strategy card, you may destroy 1 of your non-fighter ships in or adjacent to a system that contains the active player's units. If you do, spend that token from your reinforcements instead."
+    },
+    {
+        "alias": "baconcg",
+        "name": "Strategic Inversion",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "onyxxa",
+        "source": "balacasi",
+        "text": "When you perform a strategic action, you may gain 1 command token instead of resolving any ability. While you do not have any control tokens on your commander, apply +1 to your units' combat rolls."
+    },
+    {
+        "alias": "batyriy",
+        "name": "Temporal Displacement",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "tyris",
+        "source": "balacasi",
+        "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 5 of your fighters from the game board and place them in 1 or more systems that contain your ships."
+    },
+    {
+        "alias": "batyriinf",
+        "name": "Phase Trooper II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "tyris",
+        "baseUpgrade": "inf2",
+        "source": "balacasi",
+        "text": "This unit counts as 1/2 capacity if it is being transported or if it is in a space area with 1 or more of your ships that have capacity values. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control, or in the space area of a system that contains 1 or more of your ships. Combat 7"
+    },
+    {
+        "alias": "bavyseb",
+        "name": "Conduit Matrix",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "vyserix",
+        "source": "balacasi",
+        "text": "During your turn, you consider all systems that contain 1 or more planets with a technology specialty as adjacent to each other."
+    },
+    {
+        "alias": "bavysepds",
+        "name": "Harmonic Bastion II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RY",
+        "faction": "vyserix",
+        "baseUpgrade": "pds2",
+        "source": "balacasi",
+        "text": "SPACE CANNON: 5 ANTI-FIGHTER BARRAGE: 7** PLANETARY SHIELD You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system. This unit cannot lose its PLANETARY SHIELD ability."
+    },
+    {
+        "alias": "bazephy",
+        "name": "Hunting Grounds",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "zephyrion",
+        "source": "balacasi",
+        "text": "ACTION: Exhaust this card to place or move any number of bounty tokens from other players' faction sheets to unit spaces of non-fighter ships on other players' faction sheets. During space combat, your opponent cannot announce retreat unless you allow it."
+    },
+    {
+        "alias": "bazephcr",
+        "name": "Zephyr Hound II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RYG",
+        "faction": "zephyrion",
+        "baseUpgrade": "cr2",
+        "source": "balacasi",
+        "text": "SPACE CANNON 5 Cost 2 Combat 6 Move 3 Capacity 1"
+    }
+]

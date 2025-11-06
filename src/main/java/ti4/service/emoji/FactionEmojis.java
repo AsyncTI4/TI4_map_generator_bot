@@ -1,40 +1,188 @@
 package ti4.service.emoji;
 
 import java.util.Objects;
-
 import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
 
 public enum FactionEmojis implements TI4Emoji {
 
-    //base
-    Arborec, Ghost, Hacan, Jolnar, L1Z1X, Letnev, Mentak, Muaat, Naalu, Nekro, Saar, Sardakk, Sol, Winnu, Xxcha, Yin, Yssaril,
+    // base
+    Arborec,
+    Ghost,
+    Hacan,
+    Jolnar,
+    L1Z1X,
+    Letnev,
+    Mentak,
+    Muaat,
+    Naalu,
+    Nekro,
+    Saar,
+    Sardakk,
+    Sol,
+    Winnu,
+    Xxcha,
+    Yin,
+    Yssaril,
 
     // Prophecy of Kings
-    Argent, Cabal, Empyrean, Mahact, Naaz, Nomad, Titans, Keleres, RedCreuss,
+    Argent,
+    Cabal,
+    Empyrean,
+    Mahact,
+    Naaz,
+    Nomad,
+    Titans,
+    Keleres,
+    RedCreuss,
+
+    // Thunder's Edge
+    Ralnel,
+    Crimson,
+    Bastion,
+    Deepwrought,
+    Firmament,
+    Obsidian,
+
+    // Twilight's Fall
+
+    redtf,
+    greentf,
+    blacktf,
+    pinktf,
+    purpletf,
+    yellowtf,
+    bluetf,
+    orangetf,
 
     // Discordant Stars
-    augers, axis, bentor, celdauri, cheiran, cymiae, dihmohn, edyn, florzen, freesystems, ghemina, //
-    ghoti, gledge, khrask, kjalengard, kollecc, kolume, kortali, kyro, lanefir, lizho, mirveda, mortheus, //
-    mykomentori, nivyn, nokar, olradin, rohdhna, tnelis, vaden, vaylerian, veldyr, zealots, zelian, uydai, pharadn, qhet, atokera, belkosea, toldar, //
+    augers,
+    axis,
+    bentor,
+    celdauri,
+    cheiran,
+    cymiae,
+    dihmohn,
+    edyn,
+    florzen,
+    freesystems,
+    ghemina, //
+    ghoti,
+    gledge,
+    khrask,
+    kjalengard,
+    kollecc,
+    kolume,
+    kortali,
+    kyro,
+    lanefir,
+    lizho,
+    mirveda,
+    mortheus, //
+    mykomentori,
+    nivyn,
+    nokar,
+    olradin,
+    rohdhna,
+    tnelis,
+    vaden,
+    vaylerian,
+    veldyr,
+    zealots,
+    zelian,
+    uydai,
+    pharadn,
+    qhet,
+    atokera,
+    belkosea,
+    toldar, //
+
+    // balacasi
+    arvaxi,
+    xan,
+    kalora,
+    lunarium,
+    onyxxa,
+    tyris,
+    vyserix,
+    zephyrion,
+    arachian,
 
     // Franken
-    Franken1, Franken2, Franken3, Franken4, Franken5, Franken6, Franken7, Franken8, //
-    Franken9, Franken10, Franken11, Franken12, Franken13, Franken14, Franken15, Franken16, //
-    Franken17, Franken18, Franken19, Franken20, Franken21, Franken22, Franken23, Franken24, Franken25, Franken26, //
+    Franken1,
+    Franken2,
+    Franken3,
+    Franken4,
+    Franken5,
+    Franken6,
+    Franken7,
+    Franken8, //
+    Franken9,
+    Franken10,
+    Franken11,
+    Franken12,
+    Franken13,
+    Franken14,
+    Franken15,
+    Franken16, //
+    Franken17,
+    Franken18,
+    Franken19,
+    Franken20,
+    Franken21,
+    Franken22,
+    Franken23,
+    Franken24,
+    Franken25,
+    Franken26, //
     // Franken Emblems
-    franken_aurilian_vanguard, franken_aelorian_clans, franken_dakari_hegemony, franken_durethian_shard, franken_elyndor_consortium, //
-    franken_fal_kesh_covenant, franken_ghaldir_union, franken_helian_imperium, franken_jhoran_brotherhood, franken_kyrenic_republic, //
-    franken_lysarian_order, franken_mydran_assembly, franken_nyridian_coalition, franken_olthax_collective, franken_qalorian_federation, //
-    franken_prayers_of_trudval, franken_rak_thul_tribes, franken_sol_tari_dynasty, franken_syrketh_conclave, franken_thalassian_guild, //
-    franken_thraxian_imperium, franken_thymarian_league, franken_valxian_pact, franken_var_sul_syndicate, franken_veridian_empire, //
-    franken_zel_tharr_dominion, franken_zircon_ascendancy, franken_zor_thul_matriarchate, //
+    franken_aurilian_vanguard,
+    franken_aelorian_clans,
+    franken_dakari_hegemony,
+    franken_durethian_shard,
+    franken_elyndor_consortium, //
+    franken_fal_kesh_covenant,
+    franken_ghaldir_union,
+    franken_helian_imperium,
+    franken_jhoran_brotherhood,
+    franken_kyrenic_republic, //
+    franken_lysarian_order,
+    franken_mydran_assembly,
+    franken_nyridian_coalition,
+    franken_olthax_collective,
+    franken_qalorian_federation, //
+    franken_prayers_of_trudval,
+    franken_rak_thul_tribes,
+    franken_sol_tari_dynasty,
+    franken_syrketh_conclave,
+    franken_thalassian_guild, //
+    franken_thraxian_imperium,
+    franken_thymarian_league,
+    franken_valxian_pact,
+    franken_var_sul_syndicate,
+    franken_veridian_empire, //
+    franken_zel_tharr_dominion,
+    franken_zircon_ascendancy,
+    franken_zor_thul_matriarchate, //
 
     // Other (random homebrew)
-    canto, eidolon, mechi, saera, shadows, //Eronous
-    Lazax, Neutral, RandomFaction, AdminsFaction, netharii, Drahn, //misc
-    Qulane, echoes, enclave, raven, syndicate, terminator; // baldrick
+    canto,
+    eidolon,
+    mechi,
+    saera,
+    shadows, // Eronous
+    Lazax,
+    Neutral,
+    RandomFaction,
+    AdminsFaction,
+    netharii,
+    Drahn, // misc
+    Qulane,
+    echoes,
+    enclave,
+    raven,
+    syndicate,
+    terminator; // baldrick
 
     @Override
     public String toString() {
@@ -48,7 +196,7 @@ public enum FactionEmojis implements TI4Emoji {
     }
 
     @Nullable
-    public static TI4Emoji getFactionEmoji(String faction) {
+    private static TI4Emoji getFactionEmoji(String faction) {
         if (faction == null) return null;
         return switch (faction.toLowerCase()) {
             case "arborec" -> Arborec;
@@ -82,6 +230,12 @@ public enum FactionEmojis implements TI4Emoji {
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
             case "redcreuss", "redghost" -> RedCreuss;
 
+            case "ralnel" -> Ralnel;
+            case "bastion" -> Bastion;
+            case "crimson" -> Crimson;
+            case "deepwrought" -> Deepwrought;
+            case "obsidian" -> Obsidian;
+            case "firmament" -> Firmament;
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;
@@ -117,6 +271,15 @@ public enum FactionEmojis implements TI4Emoji {
             case "zealots" -> zealots;
             case "zelian" -> zelian;
             case "uydai" -> uydai;
+            case "arvaxi" -> arvaxi;
+            case "xan" -> xan;
+            case "kalora" -> kalora;
+            case "lunarium" -> lunarium;
+            case "onyxxa" -> onyxxa;
+            case "tyris" -> tyris;
+            case "arachian" -> arachian;
+            case "vyserix" -> vyserix;
+            case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;
             case "qhet" -> qhet;
             case "atokera" -> atokera;
@@ -129,7 +292,14 @@ public enum FactionEmojis implements TI4Emoji {
             case "mechi" -> mechi;
             case "saera" -> saera;
             case "shadows" -> shadows;
-
+            case "redtf" -> redtf;
+            case "greentf" -> greentf;
+            case "blacktf" -> blacktf;
+            case "pinktf" -> pinktf;
+            case "purpletf" -> purpletf;
+            case "yellowtf" -> yellowtf;
+            case "bluetf" -> bluetf;
+            case "orangetf" -> orangetf;
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;
             case "franken3" -> Franken3;

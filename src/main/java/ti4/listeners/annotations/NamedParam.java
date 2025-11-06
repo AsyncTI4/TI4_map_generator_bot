@@ -1,11 +1,11 @@
 package ti4.listeners.annotations;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Use this annotation for potentially duplicated parameter types, because annotation handler cannot read the parameter names
@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Documented
 @Retention(RUNTIME)
-@Target({ ElementType.PARAMETER })
+@Target(ElementType.PARAMETER)
 public @interface NamedParam {
     String value();
 }

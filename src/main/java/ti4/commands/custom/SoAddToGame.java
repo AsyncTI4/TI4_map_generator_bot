@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
@@ -13,7 +13,9 @@ class SoAddToGame extends GameStateSubcommand {
 
     public SoAddToGame() {
         super(Constants.ADD_SO_TO_GAME, "Add a secret objective to the game", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
@@ -29,7 +31,8 @@ class SoAddToGame extends GameStateSubcommand {
         if (game.getSecretObjectives().contains(soID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective added to game deck.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective was not added for an unknown reason.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Secret objective was not added for an unknown reason.");
         }
     }
 }

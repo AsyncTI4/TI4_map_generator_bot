@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   workflow_call:
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
 name: ForceSaveFileBackup
 concurrency:
   group: "Start Bot"
@@ -14,21 +14,33 @@ jobs:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         env:
-          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
-          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
-          envs: AWS_KEY, AWS_SECRET, DISCORD_WEBHOOK_URL
+          envs: DISCORD_WEBHOOK_URL
           script: |
+            set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
-            rm -f ${{ vars.HOST_TI4_SAVES_DIR }}/.git/index.lock
-            git add . -A
-            git commit -m "save files"
+            rm -f .git/index.lock
+            git add -A
+            if git diff-index --quiet HEAD; then
+              echo "No changes to commit"
+            else
+              git commit -m "save files"
+            fi
             git push
             curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
             echo "DONE!"
+
+      - name: Notify Discord on failure
+        if: ${{ always() && (failure() || cancelled()) }}
+        env:
+          DISCORD_ERROR_WEBHOOK_URL: ${{ secrets.DISCORD_ERROR_WEBHOOK_URL }}
+        run: |
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            -d "{\"content\":\"⚠️ ForceSaveFileBackup failed or was cancelled for ${{ github.repository }} on ref ${{ github.ref_name }}. See run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            "$DISCORD_ERROR_WEBHOOK_URL"

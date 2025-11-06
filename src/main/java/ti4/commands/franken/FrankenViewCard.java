@@ -22,6 +22,7 @@ class FrankenViewCard extends GameStateSubcommand {
 
         DraftItem item = DraftItem.generateFromAlias(alias);
 
-        MessageHelper.sendMessageToEventChannel(event, item.getItemEmoji() + " " + item.getShortDescription() + "\n" + item.getLongDescription());
+        MessageHelper.sendMessageToEventChannel(
+                event, item.getItemEmoji() + " " + item.getShortDescription() + "\n" + item.getLongDescription());
     }
 }

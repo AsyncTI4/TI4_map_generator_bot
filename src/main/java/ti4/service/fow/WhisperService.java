@@ -13,20 +13,32 @@ import ti4.service.emoji.ColorEmojis;
 @UtilityClass
 public class WhisperService {
 
-    public static void sendWhisper(Game game, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
+    public static void sendWhisper(
+            Game game,
+            Player player,
+            Player player_,
+            String msg,
+            String anonY,
+            MessageChannel feedbackChannel,
+            Guild guild) {
         String message;
         String realIdentity = player_.getRepresentationUnfogged();
         String player1 = ColorEmojis.getColorEmojiWithName(player.getColor());
         if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
-            MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation()
-                + " Reminder you should start all whispers from your `#cards-info` thread, and do not need to use the `/fow whisper` command,"
-                + " you can just start a message with `toblue message...` or something.");
+            MessageHelper.sendMessageToChannel(
+                    feedbackChannel,
+                    player.getRepresentation()
+                            + " Reminder you should start all whispers from your `#cards-info` thread, and do not need to use the `/fow whisper` command,"
+                            + " you can just start a message with `toblue message...` or something.");
         }
         if (!game.isFowMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
         for (Player player2 : game.getRealPlayers()) {
+            if ("".equalsIgnoreCase(player2.getPing())) {
+                continue;
+            }
             msg = msg.replace(player2.getPing(), player2.getUserName());
         }
 
@@ -46,7 +58,8 @@ public class WhisperService {
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
             if (!player.getNeighbouringPlayers(true).contains(player_)) {
-                MessageHelper.sendMessageToChannel(feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
+                MessageHelper.sendMessageToChannel(
+                        feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
             }
         } else {
             String fail = "Could not notify receiving player.";
@@ -60,16 +73,22 @@ public class WhisperService {
             }
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
             String whisperHistory = game.getStoredValue(key);
-            if (!game.getName().equalsIgnoreCase("pbd1000")) {
+            if (!"pbd1000".equalsIgnoreCase(game.getName())) {
                 if (whisperHistory.isEmpty()) {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is whispering for the first time this turn to " + player_.getFactionEmoji());
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getFactionEmoji() + " is whispering for the first time this turn to "
+                                    + player_.getFactionEmoji());
                     game.setStoredValue(key, "1");
                 } else {
                     int num = Integer.parseInt(whisperHistory);
                     num += 1;
                     game.setStoredValue(key, "" + num);
                     if ((num == 5 || num == 10)) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to "
+                                        + player_.getFactionEmoji());
                     }
                 }
             }

@@ -1,0 +1,81 @@
+[
+    {
+        "id": "avernus",
+        "imagePath": "token_avernus.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "avernus",
+            "token_avernus",
+            "stargate"
+        ],
+        "tokenPlanetName": "avernus",
+        "isPlanet": true,
+        "source": "thunders_edge"
+    },
+    {
+        "id": "breachactive",
+        "imagePath": "token_breachActive.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "breachactive",
+            "token_breachactive"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "breachinactive",
+        "imagePath": "token_breachInactive.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "breachinactive",
+            "token_breachinactive"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "severed",
+        "imagePath": "token_severed.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "sever",
+            "token_sever",
+            "severed",
+            "token_severed"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "ingress",
+        "imagePath": "token_ingress.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "ingress",
+            "token_ingress"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "relictoken",
+        "imagePath": "token_relictoken.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": [
+            "relic",
+            "token_relic",
+            "relictoken",
+            "token_relictoken"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "thundersedge",
+        "imagePath": "token_thundersedge.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "thundersedge",
+            "token_thundersedge"
+        ],
+        "tokenPlanetName": "thundersedge",
+        "isPlanet": true,
+        "source": "thunders_edge"
+    }
+]

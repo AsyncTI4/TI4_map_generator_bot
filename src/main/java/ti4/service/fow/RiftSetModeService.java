@@ -5,11 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
@@ -39,6 +37,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.spring.jda.JdaService;
 
 /*
  * For Eronous to run fow300
@@ -69,17 +68,12 @@ public class RiftSetModeService {
 
     private static final int CHANCE_TO_SPAWN_RIFT = 8; // 1/8
     private static final int CHANCE_TO_SPAWN_VORTEX = 16; // 1/16
-    private static final int CHANCE_TO_STELLAR_CONVERT = 100; // 1/100
-    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
+    private static final int CHANCE_TO_STELLAR_CONVERT = 20; // 1/20 = 5%
+    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 5; // 1/5  = 20%
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
-        if (game.getPlayer(Constants.eronousId) == null && !AsyncTI4DiscordBot.fowServers.isEmpty()) {
+        if (game.getPlayer(Constants.eronousId) == null && !JdaService.fowServers.isEmpty()) {
             MessageHelper.replyToMessage(event, "Can only use RiftSetMode if Eronous is in the game.");
-            return false;
-        }
-
-        if (!game.isFowMode()) {
-            MessageHelper.replyToMessage(event, "Can only use RiftSetMode in FoW");
             return false;
         }
 
@@ -89,6 +83,12 @@ public class RiftSetModeService {
         game.setStrategyCardSet("riftset");
         game.addTag("RiftSet");
         game.setFowOption(FOWOption.RIFTSET_MODE, true);
+
+        StringBuilder sb = new StringBuilder("RiftSet Mode activated.\n");
+        sb.append("* Agenda deck set as `agendas_riftset`.\n");
+        sb.append("* Explore deck set as `explores_riftset`.\n");
+        sb.append("* Strategy cards set as `riftset`.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         return true;
     }
 
@@ -100,7 +100,8 @@ public class RiftSetModeService {
         return isActive(game) ? game.getPlayerFromColorOrFaction("cabal") : null;
     }
 
-    public static String riftSetCabalEatsUnit(String msg, Player player, Game game, String unit, GenericInteractionCreateEvent event) {
+    public static String riftSetCabalEatsUnit(
+            String msg, Player player, Game game, String unit, GenericInteractionCreateEvent event) {
         if (!isActive(game)) return msg;
 
         Player cabal = getCabalPlayer(game);
@@ -146,15 +147,18 @@ public class RiftSetModeService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
 
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
-        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you received " + CardEmojis.PN + pnModel.getName() + ".");
+        MessageHelper.sendMessageToChannel(
+                winner.getCorrectChannel(),
+                winner.getRepresentation(true, true) + ", you received " + CardEmojis.PN + pnModel.getName() + ".");
     }
 
     public static void resolveExplore(String exploreCardId, Player player, Game game) {
         if (!isActive(game)) return;
 
         if (exploreCardId.startsWith(RIFTSET_INVASION_EXPLORE)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "-# GM ping: " + getGMs(game) + " Unstable Rifts Event waiting for resolving!");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "-# GM ping: " + getGMs(game) + " Unstable Rifts Event waiting for resolving!");
         }
     }
 
@@ -172,29 +176,36 @@ public class RiftSetModeService {
 
         if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
             AddTokenCommand.addToken(event, tile, "vortex", game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
-                + "\n-# " + getGMs(game));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## A strange Vortex has formed in " + tile.getPosition() + "\n-# " + getGMs(game));
         } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
-                + "\n-# " + getGMs(game));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## A new Gravity Rift has formed in " + tile.getPosition() + "\n-# " + getGMs(game));
         }
     }
 
     /* Round  Probability (%)
-     *  1     1.00%
-     *  2     1.19%
-     *  3     1.47%
-     *  4     1.92%
-     *  5     2.78%
-     *  6     4.00% (capped)
+     *  1     5%
+     *  2     5.9%
+     *  3     7.1%
+     *  4     9.1%
+     *  5     12.5%
+     *  6     20% (capped)
      */
-    public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
+    public static boolean willPlanetGetStellarConverted(
+            String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
-        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int) (16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous..."
-                + "\n-# " + getGMs(game));
+        if (RandomHelper.isOneInX(Math.max(
+                CHANCE_TO_STELLAR_CONVERT - (int) (3 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)),
+                CHANCE_TO_STELLAR_CONVERT_MIN))) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## While trying to explore the planet, you find something dark and dangerous..." + "\n-# "
+                            + getGMs(game));
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
             Tile tile = game.getTileFromPlanet(planetName);
             UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
@@ -209,23 +220,14 @@ public class RiftSetModeService {
     public static void swappedSystems(Game game) {
         if (!isActive(game)) return;
 
-        String msg = "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
+        String msg =
+                "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
         switch (game.getRound()) {
-            case 1, 2 -> {
-                msg = "Time and space begin to unravel.";
-            }
-            case 3 -> {
-                msg = "Tíme and space bégin tto unravl...";
-            }
-            case 4 -> {
-                msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
-            }
-            case 5 -> {
-                msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
-            }
-            case 6 -> {
-                msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
-            }
+            case 1, 2 -> msg = "Time and space begin to unravel.";
+            case 3 -> msg = "Tíme and space bégin tto unravl...";
+            case 4 -> msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
+            case 5 -> msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
+            case 6 -> msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# " + msg);
     }
@@ -240,9 +242,10 @@ public class RiftSetModeService {
         if (!isActive(game)) return;
 
         String capturedUnits = getCapturedUnitsAsEmojis(game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n"
-                + (capturedUnits.isEmpty() ? "None" : capturedUnits));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n"
+                        + (capturedUnits.isEmpty() ? "None" : capturedUnits));
     }
 
     private static String getCapturedUnitsAsEmojis(Game game, Player player) {
@@ -257,7 +260,8 @@ public class RiftSetModeService {
     }
 
     @ButtonHandler("resolveSacrificeSecondary")
-    public static void resolveSacrificeSecondary(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+    public static void resolveSacrificeSecondary(
+            ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         if (!isActive(game)) return;
 
         ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
@@ -267,15 +271,21 @@ public class RiftSetModeService {
         List<Button> buttonsWithTilesWithShips = new LinkedList<>();
         for (Tile tile : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {
             if (ButtonHelper.checkNumberNonFighterShips(player, tile) > 0) {
-                buttonsWithTilesWithShips.add(Buttons.red("rollSacrifice_" + tile.getPosition(), tile.getRepresentationForButtons(), FactionEmojis.Cabal));
+                buttonsWithTilesWithShips.add(Buttons.red(
+                        "rollSacrifice_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(),
+                        FactionEmojis.Cabal));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), player.getRepresentation(true, true)
-            + " choose a system to **Sacrifice**.", buttonsWithTilesWithShips);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getPrivateChannel(),
+                player.getRepresentation(true, true) + " choose a system to **Sacrifice**.",
+                buttonsWithTilesWithShips);
     }
 
     @ButtonHandler("rollSacrifice_")
-    public static void resolveSacrificeSecondaryPart2(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+    public static void resolveSacrificeSecondaryPart2(
+            ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String pos = buttonID.replace("rollSacrifice_", "");
         Tile tile = game.getTileByPosition(pos);
         String ident = player.getFactionEmoji();
@@ -289,11 +299,11 @@ public class RiftSetModeService {
                     UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                     UnitKey key = unitEntry.getKey();
                     if (unitModel == null
-                        || key.getUnitType() == UnitType.Infantry
-                        || key.getUnitType() == UnitType.Mech
-                        || key.getUnitType() == UnitType.Fighter
-                        || key.getUnitType() == UnitType.Spacedock
-                        || key.getUnitType() == UnitType.Pds) {
+                            || key.getUnitType() == UnitType.Infantry
+                            || key.getUnitType() == UnitType.Mech
+                            || key.getUnitType() == UnitType.Fighter
+                            || key.getUnitType() == UnitType.Spacedock
+                            || key.getUnitType() == UnitType.Pds) {
                         continue;
                     }
 
@@ -301,7 +311,8 @@ public class RiftSetModeService {
                     int totalUnits = unitEntry.getValue();
                     String unitAsyncID = unitModel.getAsyncId();
                     int damagedUnits = 0;
-                    if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
+                    if (unitHolder.getUnitDamage() != null
+                            && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
                     for (int x = 1; x < damagedUnits + 1; x++) {
@@ -325,8 +336,13 @@ public class RiftSetModeService {
             }
         }
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "**Sacrifice** was performed. "
-            + player.getRepresentation() + " gained " + (totalTGsGained == 0 ? "0" : MiscEmojis.tg(totalTGsGained) + " " + player.gainTG(totalTGsGained)) + " trade goods.");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "**Sacrifice** was performed. " + player.getRepresentation() + " gained "
+                        + (totalTGsGained == 0
+                                ? "0"
+                                : MiscEmojis.tg(totalTGsGained) + " " + player.gainTG(totalTGsGained))
+                        + " trade goods.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -335,19 +351,26 @@ public class RiftSetModeService {
 
         Player cabal = getCabalPlayer(game);
         UnitHolder nombox = cabal.getNomboxTile().getSpaceUnitHolder();
-        String sb = player.getRepresentation(true, true) + " is resolving **Sacrifice**.\n\n" +
-            "Following units are currently captured: " + nombox.getPlayersUnitListEmojisOnHolder(player) +
-            "\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.";
+        String sb = player.getRepresentation(true, true) + " is resolving **Sacrifice**.\n\n"
+                + "Following units are currently captured: "
+                + nombox.getPlayersUnitListEmojisOnHolder(player)
+                + "\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
 
         List<Button> buttonsToReleaseUnits = new LinkedList<>();
-        for (Map.Entry<String, Integer> unit : nombox.getUnitAsyncIdsOnHolder(player.getColorID()).entrySet()) {
+        for (Map.Entry<String, Integer> unit :
+                nombox.getUnitAsyncIdsOnHolder(player.getColorID()).entrySet()) {
             UnitModel model = player.getUnitFromAsyncID(unit.getKey());
-            buttonsToReleaseUnits.add(Buttons.gray("riftsetCabalRelease_" + player.getFaction() + "_" + model.getBaseType(), model.getBaseType(), model.getUnitEmoji()));
+            buttonsToReleaseUnits.add(Buttons.gray(
+                    "riftsetCabalRelease_" + player.getFaction() + "_" + model.getBaseType(),
+                    model.getBaseType(),
+                    model.getUnitEmoji()));
         }
         buttonsToReleaseUnits.add(Buttons.red("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            "Use buttons to release up to 3 of your non-fighter units from the Cabal.", buttonsToReleaseUnits);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                "Use buttons to release up to 3 of your non-fighter units from the Cabal.",
+                buttonsToReleaseUnits);
     }
 
     @ButtonHandler("riftsetCabalRelease")
@@ -363,18 +386,23 @@ public class RiftSetModeService {
     }
 
     public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) || player == null || Constants.eronousId.equals(player.getUserID()) || game.getPlayersWithGMRole().contains(player)) return true;
+        if (!isActive(game)
+                || player == null
+                || Constants.eronousId.equals(player.getUserID())
+                || game.getPlayersWithGMRole().contains(player)) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
         return false;
     }
 
-    //Cabal Hero works in every tile with a rift or adjacent to a rift
+    // Cabal Hero works in every tile with a rift or adjacent to a rift
     public static List<Tile> getAllTilesWithRift(Game game) {
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# All " + MiscEmojis.GravityRift + " tremble violently!\n"
-            + "## Ships nearby shake as a terrifying " + MiscEmojis.GravityRift + " force builds — danger is imminent.");
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "# All " + MiscEmojis.GravityRift + " tremble violently!\n" + "## Ships nearby shake as a terrifying "
+                        + MiscEmojis.GravityRift + " force builds — danger is imminent.");
         return game.getTileMap().values().stream()
-            .filter(tile -> tile.isGravityRift(game))
-            .collect(Collectors.toList());
+                .filter(tile -> tile.isGravityRift(game))
+                .collect(Collectors.toList());
     }
 }

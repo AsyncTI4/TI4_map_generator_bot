@@ -25,7 +25,8 @@ class ListAllScored extends GameStateSubcommand {
         for (Player player : game.getPlayers().values().stream().toList()) {
             if (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer)) {
                 for (String objective : player.getSecretsScored().keySet()) {
-                    sb.append(player.getFactionEmoji()).append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(objective));
+                    sb.append(player.getFactionEmoji())
+                            .append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(objective));
                 }
             }
         }

@@ -1,24 +1,23 @@
 package ti4.map.persistence;
 
+import static java.util.stream.Collectors.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import javax.annotation.Nullable;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.map.Game;
-import ti4.map.Player;
-
-import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Getter
-public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
+public class ManagedGame {
+    // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN EASILY BALLOON THE DATA ON THE HEAP BY MEGABYTES PER FIELD
 
     private final String name;
     private final boolean hasEnded;
@@ -26,8 +25,11 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean vpGoalReached;
     private final boolean fowMode;
     private final boolean factionReactMode;
+    private final boolean thundersEdgeMode;
+    private final boolean twilightsFallMode;
     private final boolean colorReactMode;
     private final boolean stratReactMode;
+    private final boolean fastScFollowMode;
     private final boolean injectRules;
     private final String creationDate;
     private final long lastModifiedDate;
@@ -48,16 +50,22 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         name = game.getName();
         hasEnded = game.isHasEnded();
         hasWinner = game.hasWinner();
-        vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
+        vpGoalReached =
+                game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
+        thundersEdgeMode = game.isThundersEdge();
+        twilightsFallMode = game.isTwilightsFallMode();
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
+        fastScFollowMode = game.isFastSCFollowMode();
         injectRules = game.isInjectRulesLinks();
         creationDate = game.getCreationDate();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
-        lastActivePlayerChange = game.getLastActivePlayerChange() == null ? 0 : game.getLastActivePlayerChange().getTime();
+        lastActivePlayerChange = game.getLastActivePlayerChange() == null
+                ? 0
+                : game.getLastActivePlayerChange().getTime();
         endedDate = game.getEndedDate();
         round = game.getRound();
         guild = game.getGuild();
@@ -66,8 +74,13 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         tableTalkChannel = game.getTableTalkChannel();
         launchPostThread = game.getLaunchPostThread();
 
-        players = game.getPlayers().values().stream().map(p -> GameManager.addOrMergePlayer(this, p)).collect(toUnmodifiableSet());
-        playerToIsReal = game.getPlayers().values().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
+        players = game.getPlayers().values().stream()
+                .map(p -> GameManager.addOrMergePlayer(this, p))
+                .collect(toUnmodifiableSet());
+        playerToIsReal = game.getPlayers().values().stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        p -> getPlayer(p.getUserID()),
+                        p -> ((p.isRealPlayer() && !p.isNpc()) || (p.isEliminated() && game.isHasEnded()))));
 
         final long sixtyDays = 1000L * 60 * 60 * 24 * 60;
         stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;
@@ -98,7 +111,10 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     }
 
     public List<ManagedPlayer> getRealPlayers() {
-        return playerToIsReal.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
+        return playerToIsReal.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     public boolean matches(Game game) {

@@ -16,8 +16,12 @@ class ExhaustLeader extends GameStateSubcommand {
 
     public ExhaustLeader() {
         super(Constants.EXHAUST_LEADER, "Exhaust leader", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count to add to leader"));
     }
 
@@ -39,7 +43,8 @@ class ExhaustLeader extends GameStateSubcommand {
         }
 
         if (playerLeader.isExhausted()) {
-            MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is exhausted already");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Leader '" + playerLeader.getId() + "' is exhausted already");
             return;
         }
 

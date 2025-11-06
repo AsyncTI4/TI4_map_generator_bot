@@ -1,34 +1,32 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
 import ti4.image.Mapper;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.spring.jda.JdaService;
 
 public class Units {
 
     private static final String EMDASH = "—";
-    private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
-    private static final Map<UnitType, Map<String, UnitKey>> keys = new HashMap<>();
+    private static final Pattern UNIT_PATTERN =
+            Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
+    private static final Map<UnitType, Map<String, UnitKey>> keys = new ConcurrentHashMap<>();
 
     /**
      * <H3> DO NOT ADD NEW VALUES TO THIS OBJECT. </H3>
      * <p>
-     * It is being used as a key in some major hashmaps which causes issues when we attempt to
-     * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
-     * us to use custom mappers to resolve.
+     * It is being used as a key in some major hashmaps which causes issues when we attempt to save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces us to use custom mappers to resolve.
      * </p>
      */
     @Data
@@ -50,13 +48,17 @@ public class Units {
             return unitType.plainName();
         }
 
+        public String humanReadableName() {
+            return unitType.humanReadableName();
+        }
+
         public TI4Emoji unitEmoji() {
             return unitType.getUnitTypeEmoji();
         }
 
         @JsonIgnore
         public String getFileName() {
-            if (AsyncTI4DiscordBot.testingMode) return getFileName(false);
+            if (JdaService.testingMode) return getFileName(false);
             return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 
@@ -64,16 +66,16 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
-            if (UnitType.TyrantsLament == unitType) {
+            if (unitType == UnitType.TyrantsLament) {
                 return "TyrantsLament.png";
             }
-            if (UnitType.PlenaryOrbital == unitType) {
+            if (unitType == UnitType.PlenaryOrbital) {
                 return "PlenaryOrbital.png";
             }
-            if (UnitType.Monument == unitType) {
+            if (unitType == UnitType.Monument) {
                 return getColor() + "_monument.png";
             }
 
@@ -100,9 +102,22 @@ public class Units {
     }
 
     public enum UnitType {
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), Monument("monument"), // ground based
-        Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
-        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"), //relics
+        Infantry("gf"),
+        Mech("mf"),
+        Pds("pd"),
+        Spacedock("sd"),
+        Monument("monument"), // ground based
+        Fighter("ff"),
+        Destroyer("dd"),
+        Cruiser("ca"),
+        Carrier("cv"),
+        Dreadnought("dn"),
+        Flagship("fs"),
+        Warsun("ws"), // ships
+        PlenaryOrbital("plenaryorbital"),
+        TyrantsLament("tyrantslament"),
+        Lady("lady"),
+        Cavalry("cavalry"), // relics
         StarfallPds("starfallpds");
 
         @Getter
@@ -124,7 +139,7 @@ public class Units {
                 case Carrier -> "Carrier";
                 case Dreadnought -> "Dreadnought";
                 case Flagship -> "Flagship";
-                case Warsun -> "War Sun";
+                case Warsun -> "Warsun";
                 case PlenaryOrbital -> "Plenary Orbital";
                 case TyrantsLament -> "Tyrant's Lament";
                 case Cavalry -> "The Cavalry";
@@ -180,36 +195,46 @@ public class Units {
     }
 
     public enum UnitState {
-        none, //. . 0000
+        none, // . . 0000
         dmg, // . . 0001
+        glv, // . . 0010
+        dmg_glv, // 0011
         ;
 
         public static final int DMG = 0b0000001;
+        public static final int GLV = 0b0000010;
 
         public boolean isDamaged() {
             return (ordinal() & DMG) > 0;
         }
 
-        public static List<UnitState> defaultAddOrder() {
-            return List.of(none, dmg);
+        public boolean isGalvanized() {
+            return (ordinal() & GLV) > 0;
         }
 
         public static List<UnitState> defaultRemoveOrder() {
-            return List.of(dmg, none);
+            return List.of(dmg, none, dmg_glv, glv);
+        }
+
+        public static List<UnitState> defaultAddOrder() {
+            return List.of(glv, dmg_glv, none, dmg);
         }
 
         public static List<UnitState> defaultAddStatusOrder() {
-            return List.of(none, dmg);
+            return List.of(none, dmg, glv, dmg_glv);
         }
 
         public static List<UnitState> defaultRemoveStatusOrder() {
-            return List.of(dmg, none);
+            return List.of(dmg, dmg_glv, glv, none);
+        }
+
+        public static List<UnitState> unitRenderOrder() {
+            return List.of(none, dmg, glv, dmg_glv);
         }
 
         public static List<Integer> emptyList() {
             List<Integer> ls = new ArrayList<>();
-            for (int i = 0; i < values().length; i++)
-                ls.add(0);
+            for (int i = 0; i < values().length; i++) ls.add(0);
             return ls;
         }
 
@@ -217,16 +242,19 @@ public class Units {
             return switch (this) {
                 case none -> "";
                 case dmg -> "damaged";
+                case glv -> "galvanized";
+                case dmg_glv -> "Dmg+Glv";
             };
         }
     }
 
     public static UnitState findUnitState(String state) {
-        if (state == null) return null;
-        return switch (state.toLowerCase()) {
+        return switch (state) {
             case "none" -> UnitState.none;
             case "dmg", "damaged", "damage" -> UnitState.dmg;
-            default -> null;
+            case "glv", "galvanized", "galv" -> UnitState.glv;
+            case "dmg_glv" -> UnitState.dmg_glv;
+            case null, default -> null;
         };
     }
 
@@ -264,10 +292,12 @@ public class Units {
     }
 
     private static UnitKey lookupKey(UnitType type, String color) {
-        String colorID = Mapper.getColorID(color); // trust, but verify
-        keys.putIfAbsent(type, new HashMap<>());
-        keys.get(type).putIfAbsent(colorID, new UnitKey(type, colorID));
-        return keys.get(type).get(colorID);
+        String colorID = Mapper.getColorID(color);
+        if (type == null || colorID == null) {
+            return null;
+        }
+        var map = keys.computeIfAbsent(type, k -> new ConcurrentHashMap<>());
+        return map.computeIfAbsent(colorID, k -> new UnitKey(type, colorID));
     }
 
     @Nullable

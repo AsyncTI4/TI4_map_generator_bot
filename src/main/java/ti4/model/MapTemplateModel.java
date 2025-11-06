@@ -3,12 +3,14 @@ package ti4.model;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
-
+import java.util.Set;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Helper;
 import ti4.image.PositionMapper;
 
@@ -19,7 +21,7 @@ public class MapTemplateModel implements ModelInterface {
         // This field is for when you want a specific tile on the map, in the same position every time
         // Such as Mecatol Rex in the middle, or hyperlanes for a 3,4,5,7,8 player game, etc.
         private String staticTileId;
-        private Boolean custodians; //add custodian to this tile (presently only works with MR)
+        private Boolean custodians; // add custodian to this tile (presently only works with MR)
 
         // These three fields control if a particular tile is a placeholder for a milty draft tile.
         private Integer playerNumber;
@@ -29,6 +31,13 @@ public class MapTemplateModel implements ModelInterface {
 
         // This is the position the tile should be on the map
         private String pos;
+
+        // Nucleus specific
+        // This field indicates which nucleus pseudo-slices the tile belongs to.
+        // In a 6p standard layout, the tiles adjacent to mecatol rex are in one pseudo-slice,
+        // but the tiles in equidistants are in both of the nearest pseudo-slices.
+        // This field should be mutually exclusive with playerNumber, miltyTileIndex, home, staticTileId.
+        private List<Integer> nucleusNumbers;
     }
 
     private String alias;
@@ -41,24 +50,35 @@ public class MapTemplateModel implements ModelInterface {
     private boolean toroidal;
     private List<String> sliceEmulateTiles; // [homePos, tile0pos, tile1pos, ...]
     private List<MapTemplateTile> templateTiles; // MECATOL REX IS NOT INCLUDED BY DEFAULT
+    private Integer nucleusSliceCount;
+    private Integer tilesPerNucleusSlice;
 
     public boolean isValid() {
         return alias != null
-            && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
-            && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer());
+                && (tileDisplayCoords().size() == (1 + tilesPerPlayer()))
+                && ((bluePerPlayer() + redPerPlayer()) == tilesPerPlayer())
+                && nucleusValidation()
+                && validatePlayerNumbers();
+    }
+
+    public boolean isNucleusTemplate() {
+        if (nucleusSliceCount == null) return false;
+        if (tilesPerNucleusSlice == null) return false;
+        return true;
     }
 
     public String autoCompleteString() {
-        return getAlias() + ": " + getPlayerCount() + " player map by " + getAuthor();
+        return alias + ": " + playerCount + " player map by " + author;
     }
 
     // ---------------------------------------------------------------------------------------------
     // Helper Functions
     // ---------------------------------------------------------------------------------------------
-    public int tilesPerPlayer() {
+
+    private int tilesPerPlayer() {
         int calculated = (int) templateTiles.stream()
-            .filter(t -> t.playerNumber != null && t.miltyTileIndex != null && t.playerNumber == 1)
-            .count();
+                .filter(t -> t.playerNumber != null && t.miltyTileIndex != null && t.playerNumber == 1)
+                .count();
         return tilesPerPlayer == null ? calculated : tilesPerPlayer;
     }
 
@@ -71,18 +91,19 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public List<String> emulatedTiles() {
-        List<String> emulate = getSliceEmulateTiles();
+        List<String> emulate = sliceEmulateTiles;
         if (emulate == null || emulate.isEmpty()) {
-            emulate = List.of("310", "311", "207", "309", "208", "104");
+            if (isNucleusTemplate()) {
+                emulate = List.of("310", "311", "207", "309");
+            } else {
+                emulate = List.of("310", "311", "207", "309", "208", "104");
+            }
         }
         return emulate;
     }
 
     public List<Point> tileDisplayCoords() {
-        List<String> emulate = getSliceEmulateTiles();
-        if (emulate == null || emulate.isEmpty()) {
-            emulate = List.of("310", "311", "207", "309", "208", "104");
-        }
+        List<String> emulate = emulatedTiles();
         List<Point> displayCoords = new ArrayList<>();
         int minx = 10000, miny = 10000;
         for (String pos : emulate) {
@@ -93,8 +114,7 @@ public class MapTemplateModel implements ModelInterface {
             minx = Math.min(minx, p.x);
             miny = Math.min(miny, p.y);
         }
-        for (Point p : displayCoords)
-            p.translate(-1 * minx, -1 * miny);
+        for (Point p : displayCoords) p.translate(-1 * minx, -1 * miny);
         return displayCoords;
     }
 
@@ -107,10 +127,11 @@ public class MapTemplateModel implements ModelInterface {
     }
 
     public int numRings() {
-        String highestPosition = getTemplateTiles().stream().map(MapTemplateTile::getPos)
-            .filter(Helper::isInteger)
-            .max(Comparator.comparingInt(Integer::parseInt))
-            .orElse(null);
+        String highestPosition = templateTiles.stream()
+                .map(MapTemplateTile::getPos)
+                .filter(Helper::isInteger)
+                .max(Comparator.comparingInt(Integer::parseInt))
+                .orElse(null);
         if (highestPosition == null) return 0;
 
         String firstTwoDigits = StringUtils.left(highestPosition, highestPosition.length() - 2);
@@ -128,9 +149,54 @@ public class MapTemplateModel implements ModelInterface {
 
                 try {
                     locations.add(Integer.parseInt(t.getPos()));
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
         }
         return locations;
+    }
+
+    private boolean validatePlayerNumbers() {
+        // Ensure they adhere to the convention of being 1-indexed, contiguous, and matching playerCount
+        Set<Integer> playerNumbers = new HashSet<>();
+        for (MapTemplateTile t : templateTiles) {
+            if (t.playerNumber == null) continue;
+            playerNumbers.add(t.playerNumber);
+        }
+        for (int i = 1; i <= playerCount; i++) {
+            if (!playerNumbers.contains(i)) return false;
+        }
+        if (playerNumbers.size() != playerCount) return false;
+        return true;
+    }
+
+    private boolean nucleusValidation() {
+        if (!isNucleusTemplate()) return true;
+        if (nucleusSlicesActual() != nucleusSliceCount) return false;
+        return nucleusSliceTilesMatch();
+    }
+
+    private int nucleusSlicesActual() {
+        Set<Integer> sliceNumbers = new HashSet<>();
+        for (MapTemplateTile t : templateTiles) {
+            if (t.nucleusNumbers == null || t.nucleusNumbers.isEmpty()) continue;
+            sliceNumbers.addAll(t.nucleusNumbers);
+        }
+        return sliceNumbers.size();
+    }
+
+    private boolean nucleusSliceTilesMatch() {
+        if (!isNucleusTemplate()) return true;
+        Map<Integer, Integer> sliceTileCounts = new HashMap<>();
+        for (MapTemplateTile t : templateTiles) {
+            if (t.nucleusNumbers == null || t.nucleusNumbers.isEmpty()) continue;
+            for (Integer slice : t.nucleusNumbers) {
+                sliceTileCounts.put(slice, sliceTileCounts.getOrDefault(slice, 0) + 1);
+            }
+        }
+        for (int i = 1; i <= nucleusSliceCount; i++) {
+            if (sliceTileCounts.getOrDefault(i, 0) != tilesPerNucleusSlice) return false;
+        }
+        return true;
     }
 }

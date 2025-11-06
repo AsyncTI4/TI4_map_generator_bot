@@ -9,6 +9,7 @@ import ti4.draft.FrankenDraft;
 import ti4.draft.OnePickFrankenDraft;
 import ti4.draft.PoweredFrankenDraft;
 import ti4.draft.PoweredOnePickFrankenDraft;
+import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -20,7 +21,10 @@ class StartFrankenDraft extends GameStateSubcommand {
 
     public StartFrankenDraft() {
         super(Constants.START_FRANKEN_DRAFT, "Start a franken draft", true, false);
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FORCE, "'True' to forcefully overwrite existing faction setups (Default: False)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.FORCE,
+                "'True' to forcefully overwrite existing faction setups (Default: False)"));
         addOptions(new OptionData(OptionType.STRING, Constants.DRAFT_MODE, "Special draft mode").setAutoComplete(true));
     }
 
@@ -30,7 +34,8 @@ class StartFrankenDraft extends GameStateSubcommand {
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
         if (!force && game.getPlayers().values().stream().anyMatch(Player::isRealPlayer)) {
-            String message = "There are players that are currently set up already. Please rerun the command with the force option set to True to overwrite them.";
+            String message =
+                    "There are players that are currently set up already. Please rerun the command with the force option set to True to overwrite them.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             return;
         }
@@ -38,8 +43,8 @@ class StartFrankenDraft extends GameStateSubcommand {
         String draftOption = event.getOption(Constants.DRAFT_MODE, "", OptionMapping::getAsString);
         FrankenDraftMode draftMode = FrankenDraftMode.fromString(draftOption);
         if (!"".equals(draftOption) && draftMode == null) {
-          MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid draft mode.");
-          return;
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid draft mode.");
+            return;
         }
 
         FrankenDraftBagService.setUpFrankenFactions(game, event, force);
@@ -52,11 +57,17 @@ class StartFrankenDraft extends GameStateSubcommand {
                 case POWERED -> game.setBagDraft(new PoweredFrankenDraft(game));
                 case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
                 case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
+                case TWILIGHTSFALL -> {
+                    game.setupTwilightsFallMode(event);
+                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
+                }
+                case INAUGURALSPLICE -> {
+                    game.setupTwilightsFallMode(event);
+                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
+                }
             }
         }
 
         FrankenDraftBagService.startDraft(game);
     }
 }
-
-

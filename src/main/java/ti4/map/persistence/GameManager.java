@@ -1,25 +1,26 @@
 package ti4.map.persistence;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
-import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class GameManager {
 
-    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
+    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame =
+            new ConcurrentHashMap<>(); // TODO: We can evaluate dropping the managed objects entirely
     private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
 
     public static void initialize() {
-        GameLoadService.loadManagedGames().forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
+        GameLoadService.loadManagedGames()
+                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
     }
 
     private static Game load(String gameName) {
@@ -62,15 +63,19 @@ public class GameManager {
     }
 
     public static boolean save(Game game, String reason) {
-        boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName())).map(ManagedGame::isActive).orElse(false);
+        boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
+                .map(ManagedGame::isActive)
+                .orElse(false);
         if (!GameSaveService.save(game, reason)) {
             return false;
         }
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
 
-        boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName())).map(ManagedGame::isActive).orElse(false);
+        boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName()))
+                .map(ManagedGame::isActive)
+                .orElse(false);
         if (wasActive != isActive) {
-            AsyncTI4DiscordBot.updatePresence();
+            JdaService.updatePresence();
         }
         return true;
     }

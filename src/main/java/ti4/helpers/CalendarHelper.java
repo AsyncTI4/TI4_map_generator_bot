@@ -17,10 +17,39 @@ public class CalendarHelper {
      * @return
      */
     public static boolean isBetween(int startMonth, int startDay, int endMonth, int endDay) {
-        int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
-        int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        return currentMonth >= startMonth && currentDay >= startDay
-            && currentMonth <= endMonth && currentDay <= endDay;
+        Calendar checkDate = Calendar.getInstance();
+        return isBetween(
+                startMonth,
+                startDay,
+                checkDate.get(Calendar.MONTH),
+                checkDate.get(Calendar.DAY_OF_MONTH),
+                endMonth,
+                endDay);
+    }
+
+    public static boolean isBetween(
+            int startMonth, int startDay, int checkMonth, int checkDay, int endMonth, int endDay) {
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        int checkYear = currentYear;
+        int endYear = currentYear;
+        if (endMonth < startMonth) endYear++;
+        if (checkMonth < startMonth) checkYear++;
+
+        // Start Date
+        Calendar startDate = Calendar.getInstance();
+        startDate.set(currentYear, startMonth, startDay);
+
+        // Check Date
+        Calendar checkDate = Calendar.getInstance();
+        checkDate.set(checkYear, checkMonth, checkDay);
+
+        // End Date
+        Calendar endDate = Calendar.getInstance();
+        endDate.set(endYear, endMonth, endDay);
+
+        // BotLogger.info("Checking Dates:\n" + startDate.getTime() + "\n" + checkDate.getTime() + "\n" +
+        // endDate.getTime());
+        return checkDate.after(startDate) && checkDate.before(endDate);
     }
 
     public static boolean isNearNewYearsDay() {

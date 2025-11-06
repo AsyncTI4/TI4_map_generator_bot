@@ -1,17 +1,17 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import javax.annotation.Nullable;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
 
 @Data
 public class StrategyCardModel implements ModelInterface, EmbeddableModel {
@@ -22,7 +22,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String name;
     private List<String> primaryTexts;
     private List<String> secondaryTexts;
-    private String botSCAutomationID; //ID of another SCModel to use the automation/button suite of
+    private String botSCAutomationID; // ID of another SCModel to use the automation/button suite of
     private String imageFileName;
     private String flavourText;
     private String colourHexCode;
@@ -32,11 +32,11 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-            && name != null
-            && initiative >= 0
-            && primaryTexts != null
-            && secondaryTexts != null
-            && source != null;
+                && name != null
+                && initiative >= 0
+                && primaryTexts != null
+                && secondaryTexts != null
+                && source != null;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
 
         // TITLE
-        sb.append("**").append(initiative).append("** __").append(name).append("__").append(getSource().emoji());
+        sb.append(getEmojiWordRepresentation()).append(source.emoji());
         eb.setTitle(sb.toString());
 
         // PRIMARY
@@ -70,7 +70,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         if (includeID) {
             sb = new StringBuilder();
             sb.append("ID: ").append(id).append("  source: ").append(source.toString());
-            if (!getId().equals(getBotSCAutomationID())) {
+            if (!id.equals(getBotSCAutomationID())) {
                 sb.append("\nUses automation of SCID: ").append(getBotSCAutomationID());
             }
             eb.setFooter(sb.toString());
@@ -99,8 +99,8 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return id.contains(searchString)
-            || name.contains(searchString)
-            || source.toString().contains(searchString);
+                || name.contains(searchString)
+                || source.toString().contains(searchString);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(group);
     }
 
-    public Optional<String> getFlavourText() {
+    private Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
     }
 
@@ -125,11 +125,12 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         return Color.decode(getColourHexCode());
     }
 
-    public String getColourHexCode() {
-        if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
+    private String getColourHexCode() {
+        if (colourHexCode == null && id.equals(getBotSCAutomationID())) {
             return "#ffffff";
         } else if (colourHexCode == null) {
-            if(Mapper.getStrategyCard(getBotSCAutomationID()) == null || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null){
+            if (Mapper.getStrategyCard(getBotSCAutomationID()) == null
+                    || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null) {
                 return "#ffffff";
             }
             return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
@@ -144,7 +145,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
      * Then set botSCAutomationID = "pok1leadership".
      */
     public String getBotSCAutomationID() {
-        return Optional.ofNullable(botSCAutomationID).orElse(getId());
+        return Optional.ofNullable(botSCAutomationID).orElse(id);
     }
 
     public boolean usesAutomationForSCID(String scID) {
@@ -152,10 +153,60 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
+        return imageFileName != null && getImageFilePath() != null;
     }
 
     public String getImageFilePath() {
-        return ResourceHelper.getResourceFromFolder("strat_cards/", getImageFileName() + ".png");
+        return ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png");
+    }
+
+    @Deprecated
+    public String getImageUrl() {
+        return imageURL;
+    }
+
+    public String getImageFileUrl() {
+        String urlBase =
+                "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/strat_cards/";
+        if (hasImageFile()) {
+            return urlBase + imageFileName + ".png";
+        } else {
+            return urlBase + "sadFace.png";
+        }
+    }
+
+    @Nullable
+    public String getEmojiWordRepresentation() {
+        switch (source) {
+            case pok, base, thunders_edge, codex1 -> {
+                return switch (initiative) {
+                    case 1 -> CardEmojis.SC1Mention();
+                    case 2 -> CardEmojis.SC2Mention();
+                    case 3 -> CardEmojis.SC3Mention();
+                    case 4 -> CardEmojis.SC4Mention();
+                    case 5 -> CardEmojis.SC5Mention();
+                    case 6 -> CardEmojis.SC6Mention();
+                    case 7 -> CardEmojis.SC7Mention();
+                    case 8 -> CardEmojis.SC8Mention();
+                    default -> null;
+                };
+            }
+            case twilights_fall -> {
+                return switch (initiative) {
+                    case 1 -> CardEmojis.TFSC1Mention();
+                    case 2 -> CardEmojis.TFSC2Mention();
+                    case 3 -> CardEmojis.TFSC3Mention();
+                    case 4 -> CardEmojis.TFSC4Mention();
+                    case 5 -> CardEmojis.TFSC5Mention();
+                    case 6 -> CardEmojis.TFSC6Mention();
+                    case 7 -> CardEmojis.TFSC7Mention();
+                    case 8 -> CardEmojis.TFSC8Mention();
+                    default -> null;
+                };
+            }
+            default -> {
+                return "**SC" + initiative + "[" + name + "]**";
+            }
+        }
     }
 }

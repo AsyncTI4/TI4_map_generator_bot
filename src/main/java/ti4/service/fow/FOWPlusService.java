@@ -1,20 +1,20 @@
 package ti4.service.fow;
 
+import com.nimbusds.jose.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -44,21 +44,22 @@ import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 /*
-  To activate FoW+ mode use /fow fow_options
+ To activate FoW+ mode use /game weird_game_setup fow_plus:True
 
-  * 0b tiles are hidden
-  * Adjacent hyperlanes that don't connect to the viewing tile are hidden
-  * Can only activate tiles you can see
-    * Can activate any other tile with Blind Tile button including tiles without a tile
-      -> Will send ships into the Void
-  * Other players stats areas are visible only by seeing their HS - PNs don't count
-  * To remove a token from the board, you need to see it
-  * Prevents looking at explore/relic decks
- */
+ * 0b tiles are hidden
+ * Adjacent hyperlanes that don't connect to the viewing tile are hidden
+ * Can only activate tiles you can see
+   * Can activate any other tile with Blind Tile button including tiles without a tile
+     -> Will send ships into the Void
+ * Other players stats areas are visible only by seeing their HS - PNs don't count
+ * To remove a token from the board, you need to see it
+ * Prevents looking at explore/relic decks
+*/
 public class FOWPlusService {
-    public static final String FOWPLUS_TAG = "FoW+";
-    public static final String VOID_TILEID = "-1";
+    private static final String FOWPLUS_TAG = "FoW+";
+    private static final String VOID_TILEID = "-1";
 
+    private static final String FOWPLUS_EXPLORE_DECK = "explores_fowplus";
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
     private static final String FOWPLUS_EXPLORE_VORTEX = "fowplus_vortex";
     private static final String FOWPLUS_EXPLORE_CLARITY = "fowplus_clarity";
@@ -66,26 +67,63 @@ public class FOWPlusService {
     private static final String FOWPLUS_EXPLORE_SPOOR = "fowplus_spoor";
     private static final String FOWPLUS_EXPLORE_SACRIFICE = "fowplus_sacrifice";
 
+    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = Arrays.asList(
+            Pair.of(FOWOption.ALLOW_AGENDA_COMMS, false),
+            Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
+            Pair.of(FOWOption.HIDE_VOTE_ORDER, true),
+            Pair.of(FOWOption.STATS_FROM_HS_ONLY, true),
+            Pair.of(FOWOption.HIDE_EXPLORES, true),
+            Pair.of(FOWOption.HIDE_MAP, true),
+            Pair.of(FOWOption.HIDE_PLAYER_INFOS, true));
+
     public static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.FOW_PLUS);
     }
 
-    public static void toggleTag(Game game, boolean active) {
+    public static void setActive(Game game, boolean active) {
+        game.setFowOption(FOWOption.FOW_PLUS, active);
+
         if (active) {
+            for (var option : FORCED_FOWPLUS_OPTIONS) {
+                game.setFowOption(option.getLeft(), option.getRight());
+            }
+            game.setExplorationDeckID(FOWPLUS_EXPLORE_DECK);
             game.addTag(FOWPLUS_TAG);
+
+            MessageHelper.sendMessageToChannel(
+                    GMService.getGMChannel(game),
+                    "### FoW+ mode activated. Following options are forced:\n"
+                            + "- No comms in agenda phase\n"
+                            + "- Hide total votes and vote order\n"
+                            + "- Player stats only visible from HS\n"
+                            + "- Hide explore/relic decks\n"
+                            + "- Hide unexplored (0b) map tiles\n"
+                            + "- Hide anchored player info areas\n"
+                            + "### In addition, following changes are in effect:\n"
+                            + "- Can only activate tiles you can see (Blind Tile button to activate any other tile)\n"
+                            + "- Activating a tile without a tile is valid and will send ships into The Void\n"
+                            + "- Cannot remove tokens from tiles you cannot see\n"
+                            + "- Explore deck set to `explores_fowplus`");
         } else {
             game.removeTag(FOWPLUS_TAG);
+            MessageHelper.sendMessageToChannel(
+                    GMService.getGMChannel(game),
+                    "### FoW+ mode disabled.\n"
+                            + "Use `/fow fow_options` to reset options.\n"
+                            + "Use `/game set_deck` to reset explore deck.");
         }
     }
 
-    //Only allow activating positions player can see
+    // Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
         return !isActive(game) || FoWHelper.getTilePositionsToShow(game, player).contains(position);
     }
 
-    //Hide all 0b tiles from FoW map
+    // Hide all 0b tiles from FoW map
     public static boolean hideFogTile(String tileID, String label, Game game) {
-        return (isActive(game) || game.getFowOption(FOWOption.HIDE_MAP)) && tileID.equals("0b") && StringUtils.isEmpty(label);
+        return (isActive(game) || game.getFowOption(FOWOption.HIDE_MAP))
+                && "0b".equals(tileID)
+                && StringUtils.isEmpty(label);
     }
 
     public static boolean isVoid(Game game, String position) {
@@ -98,13 +136,13 @@ public class FOWPlusService {
 
     @ButtonHandler("blindTileSelection~MDL")
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        TextInput position = TextInput.create(Constants.POSITION, "Position to activate", TextInputStyle.SHORT)
-            .setRequired(true)
-            .build();
+        TextInput position = TextInput.create(Constants.POSITION, TextInputStyle.SHORT)
+                .setRequired(true)
+                .build();
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
-            .addActionRow(position)
-            .build();
+                .addComponents(Label.of("Position to activate", position))
+                .build();
 
         event.replyModal(blindActivationModal).queue();
     }
@@ -127,28 +165,36 @@ public class FOWPlusService {
         }
 
         List<Button> chooseTileButtons = new ArrayList<>();
-        chooseTileButtons.add(Buttons.green(finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
+        chooseTileButtons.add(Buttons.green(
+                finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("ChooseDifferentDestination", "Get a Different Ring"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }
 
-    //Remove ring buttons player has no tiles they can activate
+    // Remove ring buttons player has no tiles they can activate
     public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
         Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
         Tile centerTile = game.getTileByPosition("000");
-        if (!visiblePositions.contains("000") || centerTile != null && centerTile.getTileModel() != null && centerTile.getTileModel().isHyperlane()) {
-            ringButtons.removeIf(b -> b.getId().contains("ringTile_000"));
+        if (!visiblePositions.contains("000")
+                || centerTile != null
+                        && centerTile.getTileModel() != null
+                        && centerTile.getTileModel().isHyperlane()) {
+            ringButtons.removeIf(b -> b.getCustomId().contains("ringTile_000"));
         }
         if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
-            ringButtons.removeIf(b -> b.getId().contains("ring_corners"));
+            ringButtons.removeIf(b -> b.getCustomId().contains("ring_corners"));
         }
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left").size()
-                    + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right").size() - 2;
+                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left")
+                                .size()
+                        + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right")
+                                .size()
+                        - 2;
                 if (availableTiles == 0) {
                     ringButtons.remove(button);
                 }
@@ -157,19 +203,21 @@ public class FOWPlusService {
     }
 
     public static void resolveVoidActivation(Player player, Game game) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Your ships continued their journey into The Void "
-            + MiscEmojis.GravityRift + " never to be seen again...");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "## Your ships continued their journey into The Void " + MiscEmojis.GravityRift
+                        + " never to be seen again...");
 
         Map<String, Map<UnitKey, List<Integer>>> unitsGoingToVoid = game.getTacticalActionDisplacement();
-        float valueOfUnitsLost = 0f;
-        String unitEmojis = "";
+        float valueOfUnitsLost = 0.0f;
+        StringBuilder unitEmojis = new StringBuilder();
         for (var unitHolder : unitsGoingToVoid.values()) {
             for (var unit : unitHolder.entrySet()) {
-                int total = unit.getValue().stream().collect(Collectors.summingInt(x -> x));
+                int total = unit.getValue().stream().mapToInt(x -> x).sum();
                 UnitModel model = player.getUnitFromUnitKey(unit.getKey());
                 if (model != null) {
                     valueOfUnitsLost += model.getCost() * total;
-                    unitEmojis += StringUtils.repeat("" + model.getUnitEmoji(), total);
+                    unitEmojis.append(StringUtils.repeat("" + model.getUnitEmoji(), total));
                 }
             }
         }
@@ -180,15 +228,15 @@ public class FOWPlusService {
         game.getTacticalActionDisplacement().clear();
     }
 
-    //If the target position is void or hyperlane that does not connect to tile we are checking from
+    // If the target position is void or hyperlane that does not connect to tile we are checking from
     public static boolean shouldTraverseAdjacency(Game game, String position, int dirFrom) {
-        if (!isActive(game)) return true;
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_MAP)) return true;
 
-        if (isVoid(game, position)) {
+        Tile targetTile = game.getTileByPosition(position);
+        if (isVoid(game, position) || targetTile == null) {
             return false;
         }
 
-        Tile targetTile = game.getTileByPosition(position);
         if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
             boolean hasHyperlaneConnection = false;
             for (int i = 0; i < 6; i++) {
@@ -204,21 +252,28 @@ public class FOWPlusService {
         return true;
     }
 
-    //Can only remove CCs from tiles that can be seen
+    // Can only remove CCs from tiles that can be seen
     public static boolean preventRemovingCCFromTile(Game game, Player player, Tile tile) {
         return isActive(game) && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
     }
 
-    //Hide explore and relic decks
+    // Hide explore and relic decks
     public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES) || game.getPlayersWithGMRole().contains(player)) return true;
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES)
+                || game.getPlayersWithGMRole().contains(player)) return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available.");
         return false;
     }
 
-    //FOWPlus specific explores
-    public static void resolveExplore(GenericInteractionCreateEvent event, String exploreCardId, Tile tile, String planetID, Player player, Game game) {
+    // FOWPlus specific explores
+    public static void resolveExplore(
+            GenericInteractionCreateEvent event,
+            String exploreCardId,
+            Tile tile,
+            String planetID,
+            Player player,
+            Game game) {
         if (!isActive(game)) return;
 
         switch (exploreCardId) {
@@ -226,13 +281,18 @@ public class FOWPlusService {
                 List<Button> waveButtons = new ArrayList<>();
                 for (String adjacentPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                     Tile adjacentTile = game.getTileByPosition(adjacentPos);
-                    if (!adjacentTile.getTileModel().isHyperlane()) {
-                        waveButtons.add(Buttons.green("fowplus_wave_" + adjacentPos + "_" + tile.getPosition(),
-                            adjacentTile.getRepresentationForButtons(game, player)));
+                    if (!adjacentTile.getTileModel().isHyperlane()
+                            && !FoWHelper.otherPlayersHaveShipsInSystem(player, adjacentTile, game)) {
+                        waveButtons.add(Buttons.green(
+                                "fowplus_wave_" + adjacentPos + "_" + tile.getPosition(),
+                                adjacentTile.getRepresentationForButtons(game, player)));
                     }
                 }
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", please choose a system to eject your non-infantry units.", waveButtons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", please choose a system to eject your non-infantry units.",
+                        waveButtons);
                 break;
 
             case FOWPLUS_EXPLORE_VORTEX:
@@ -240,46 +300,63 @@ public class FOWPlusService {
                 FoWHelper.pingSystem(game, tile.getPosition(), "Space warps unnaturally.");
                 int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[4];
                 if (nonCarriedFF > 0) {
-                    RemoveUnitService.removeUnit(event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
-                        + " You lost " + nonCarriedFF + " " + UnitEmojis.fighter + " Fighters to the Vortex.");
+                    RemoveUnitService.removeUnit(
+                            event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + " You lost " + nonCarriedFF + " " + UnitEmojis.fighter
+                                    + " Fighters to the Vortex.");
                 }
                 break;
 
             case FOWPLUS_EXPLORE_CLARITY:
                 RemoveCommandCounterService.fromTile(event, player, tile);
-                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", use the button to gain one command token.",
-                    Buttons.green(player.finChecker() + "redistributeCCButtons_deleteThisMessage","Gain Command Token"));
+                MessageHelper.sendMessageToChannelWithButton(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", use the button to gain one command token.",
+                        Buttons.green(
+                                player.finChecker() + "redistributeCCButtons_deleteThisMessage", "Gain Command Token"));
                 break;
 
             case FOWPLUS_EXPLORE_FRACTURE:
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use `/move_units tile_name:"
-                    + tile.getPosition() + " unit_names:cv tile_name_to:"
-                    + tile.getPosition() + " unit_names_to:2 cr` to fracture a Carrier into 2 Cruisers for example.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Use `/move_units tile_name:"
+                                + tile.getPosition() + " unit_names:cv tile_name_to:"
+                                + tile.getPosition()
+                                + " unit_names_to:2 cr` to fracture a Carrier into 2 Cruisers for example.");
                 break;
 
             case FOWPLUS_EXPLORE_SPOOR:
                 List<Button> buttons = ButtonHelperActionCards.getPlagiarizeButtons(game, player);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    !buttons.isEmpty() ? "Please choose the technology you wish to gain." : "No valid technologies to gain.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        !buttons.isEmpty()
+                                ? "Please choose the technology you wish to gain."
+                                : "No valid technologies to gain.",
+                        buttons);
                 break;
 
             case FOWPLUS_EXPLORE_SACRIFICE:
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " Use buttons to resolve Founder's Sacrifice",
-                    Arrays.asList(
-                        Buttons.green("winnuStructure_sd_" + planetID,
-                            "Place 1 space dock on " + Helper.getPlanetRepresentation(planetID, game), UnitEmojis.spacedock),
-                        Buttons.gray("fowplus_sacrifice_" + planetID,
-                            "Destroy ground forces on " + Helper.getPlanetRepresentation(planetID, game)),
-                        Buttons.red("deleteButtons", "Done Resolving")));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " Use buttons to resolve Founder's Sacrifice",
+                        Arrays.asList(
+                                Buttons.green(
+                                        "winnuStructure_sd_" + planetID,
+                                        "Place 1 space dock on " + Helper.getPlanetRepresentation(planetID, game),
+                                        UnitEmojis.spacedock),
+                                Buttons.gray(
+                                        "fowplus_sacrifice_" + planetID,
+                                        "Destroy ground forces on " + Helper.getPlanetRepresentation(planetID, game)),
+                                Buttons.red("deleteButtons", "Done Resolving")));
                 break;
         }
     }
 
     @ButtonHandler("fowplus_sacrifice_")
-    public static void resolveSacrificeExplore(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void resolveSacrificeExplore(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planetID = buttonID.replace("fowplus_sacrifice_", "");
         Tile tile = game.getTileFromPlanet(planetID);
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetID);
@@ -289,9 +366,11 @@ public class FOWPlusService {
         if (mechs > 0) RemoveUnitService.removeUnit(event, tile, game, player, unitHolder, UnitType.Mech, mechs);
         if (infs > 0) RemoveUnitService.removeUnit(event, tile, game, player, unitHolder, UnitType.Infantry, infs);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            "Destroyed all ground forces " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs) + StringUtils.repeat(UnitEmojis.mech.toString(), mechs)
-            + " on " + Helper.getPlanetRepresentation(planetID, game));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "Destroyed all ground forces " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)
+                        + StringUtils.repeat(UnitEmojis.mech.toString(), mechs) + " on "
+                        + Helper.getPlanetRepresentation(planetID, game));
     }
 
     @ButtonHandler("fowplus_wave_")
@@ -307,13 +386,19 @@ public class FOWPlusService {
         if (infs > 0) RemoveUnitService.removeUnit(event, currentTile, game, player, space, UnitType.Infantry, infs);
 
         String unitList = space.getPlayersUnitListOnHolder(player);
-        List<RemovedUnit> removed = RemoveUnitService.removeUnits(event, currentTile, game, player.getColor(), unitList, false);
+        List<RemovedUnit> removed =
+                RemoveUnitService.removeUnits(event, currentTile, game, player.getColor(), unitList, false);
         AddUnitService.addUnits(event, targetTile, game, player.getColor(), unitList, removed);
         StartCombatService.combatCheck(game, event, targetTile);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-            + " Units ejected to " + targetPos + " due to Gravity Wave."
-            + (infs > 0 ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs) + " was left behind." : ""));
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " Units ejected to " + targetPos + " due to Gravity Wave."
+                        + (infs > 0
+                                ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs)
+                                        + " was left behind."
+                                : ""));
 
         if (!currentTile.isGravityRift()) {
             AddTokenCommand.addToken(event, currentTile, "gravityrift", game);
@@ -322,5 +407,4 @@ public class FOWPlusService {
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
         event.getMessage().delete().queue();
     }
-
 }

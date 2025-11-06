@@ -1,0 +1,260 @@
+[
+    {
+        "id": "fractureOverview",
+        "title": "The Fracture Overview",
+        "description": [
+            "*The Fracture is an enigmatic area of space that is not ",
+            "connected to the rest of the galaxy. When The Fracture comes ",
+            "into play, the player that brought it into play places it ",
+            "along any edge of the game board, based on player count, as ",
+            "shown in \"The Fracture\" diagram. They then place **NEUTRAL UNITS** ",
+            "as indicated on the back of The Fracture's tiles."
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "ingressPlacement",
+        "title": "<misc:ingress> Rules for placing Ingress Tokens",
+        "description": [
+            "If the Fracture was brought into play by a breakthrough roll:",
+            "\n> - For each synergy color on that player's breakthrough, they must place 3 tokens in systems with a matching technology specialty, if able.",
+            "\n> - No more than 6 ingress tokens can be placed in this way.",
+            "\nIf the Fracture was brought into play by another ability, or by a breakthrough that does not have synergy (E.g. nekro's):",
+            "\n> - For each of the 4 technology specialties, the player must place a token in a system that has a matching specialty, if able.",
+            "\n> - If there are not 4 distinct systems, the remaining tokens are not placed.",
+            "\nFinally, the players place a token in the Thunder's Edge system, if it is in play, or the Mecatol Rex system, if the expedition has not been completed."
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "coexist",
+        "title": "Coexist",
+        "description": [
+            "Some game effects allow a player's units to coexist with other ",
+            "units on a planet. When a unit or units coexist with another ",
+            "player's units, they do not trigger combat. The player whose ",
+            "units triggered coexistence does not gain control of the planet; ",
+            "if they already controlled it, the player they are now coexisting ",
+            "with gains control of it instead, exhausted. Coexisting structures ",
+            "are always blockaded. If the coexisting player places, produces, ",
+            "or moves additional units onto that planet, those units also ",
+            "coexist. If a player's coexisting units become the only units on a ",
+            "planet, that player gains control of the planet."
+        ],
+        "fields": [
+            {
+                "title": "Bombardment",
+                "text": [
+                    "Coexisting units can be bombarded. When a player makes a ",
+                    "bombardment roll against a planet, they choose which of their ",
+                    "units with bombardment are bombarding which other player's ",
+                    "units, rolling against each player separately."
+                ]
+            },
+            {
+                "title": "Combat",
+                "text": [
+                    "Coexisting units can have combat initiated against them by ",
+                    "committing units to the planet that contains them, including units ",
+                    "that they were already coexisting with. The activating player ",
+                    "may choose not to engage the coexisting units, however, and ",
+                    "leave the coexisting units in a state of coexistence. If a player ",
+                    "does wish to engage coexisting units, they may optionally ",
+                    "engage coexisting players' units after winning a combat against ",
+                    "the planet's owner, initiating separate combats against any ",
+                    "coexisting player as desired.",
+                    "\n\n",
+                    "Likewise, a coexisting player may choose to end their ",
+                    "coexistence by activating the coexisting unit's system and ",
+                    "committing the coexisting units against the planet they are ",
+                    "coexisting on. If they win the ground combat, they cease ",
+                    "coexisting and gain control of the planet as normal."
+                ]
+            },
+            {
+                "title": "Control & Objectives",
+                "text": [
+                    "When scoring objectives, a coexisting player counts as ",
+                    "controlling the planet they are coexisting on; they do not count ",
+                    "as controlling the planet for any other game ability or effect.",
+                    "\n - NOTE: This also means that if you are coexisting on your own ",
+                    "home planet, you still get to score objectives"
+                ]
+            }
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "otherFractureRules",
+        "title": "Other Fracture Rules/Notes",
+        "fields": [
+            {
+                "title": "Relic Icons",
+                "text": [
+                    "When you gain control of a planet with a relic icon for the first time, ",
+                    "you draw a relic. This does not happen if you take the planet from another player.",
+                    "\n- TIP: If you play Mercenary Contract to return the planet to ",
+                    "the planet deck, you can trigger the relic gain effect again."
+                ]
+            },
+            {
+                "title": "Objectives",
+                "text": [
+                    "Regardless of where The Fracture is placed, its systems are not adjacent ",
+                    "to other systems in the main galaxy except via ingress tokens. ",
+                    "The Fracture is considered to be __on the edge of the game board__. ",
+                    "If Mecatol Rex has an ingress, The Fracture's egress systems are adjacent ",
+                    "to Mecatol Rex for the purpose of Intimidate Council.",
+                    "\n- NOTE: Coexisting on Styx does NOT give you the 'A Song Like Marrow' point."
+                ]
+            }
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "neutralUnits",
+        "title": "Neutral Units",
+        "description": [
+            "Neutral units are more dangerous than typical units. ",
+            "They always engage a player in combat if they are in the same space area as the player."
+        ],
+        "fields": [
+            {
+                "title": "Assigning Hits",
+                "text": [
+                    "Hits are assigned to neutral units in the following order:",
+                    "\n- Sustain Damage is always used first, if able, in the same order as other hits",
+                    "\n> Space combat: <unit:fighter> > <unit:destroyer> > <unit:cruiser> > <unit:carrier> > <unit:dreadnought> > <unit:warsun> > <unit:flagship>",
+                    "\n> Ground combat: <unit:infantry> > <unit:mech>"
+                ]
+            },
+            {
+                "title": "Decisions",
+                "text": [
+                    "Neutral units typically do not make decisions. They will always use any unit ability they have, if able. ",
+                    "In the unlikely event that a decision must be made, the speaker will make the decision for the neutral units."
+                ]
+            },
+            {
+                "title": "Abilities and Scoring",
+                "text": [
+                    "There is no \"Neutral Player\", however, neutral units do count as \"another player's\" units ",
+                    "for the purpose of resolving players' abilities and game effects."
+                ]
+            }
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "expeditions",
+        "title": "Thunder's Edge Expedition",
+        "description": [
+            "Players may venture to Thunder's Edge to ",
+            "unlock powerful new abilities and potentially ",
+            "earn the right to claim the planet of Thunder's ",
+            "Edge for their faction. Thunder's Edge begins the ",
+            "game in play, off the board, with its expedition ",
+            "side - the side divided into six \"slices\" - faceup.",
+            "\n\n",
+            "**__At the end of a player's turn__**, they may commit to the expedition. ",
+            "To do so, they choose an unclaimed slice of the expedition and pay ",
+            "the indicated cost, placing one of their control tokens in that slice to ",
+            "indicate that it has been claimed.",
+            "\n\n",
+            "Once claimed, that slice cannot be claimed by another player, ",
+            "which means other players must choose a different cost to pay in ",
+            "order to contribute to the expedition. **__The first time a player ",
+            "claims one of the expedition slices, they gain their faction's ",
+            "breakthrough__**. A player can claim multiple expedition slices ",
+            "in a game, but must choose a different unclaimed slice each time ",
+            "they do so"
+        ],
+        "fields": [
+            {
+                "title": "The expedition costs are as follows",
+                "text": [
+                    "<Misc:Resources_5> Spend 5 Resources\n",
+                    "<Misc:Influence_5> Spend 5 Influence\n",
+                    "<Misc:tg> Spend 3 Trade Goods\n",
+                    "<Card:ActionCard> Discard 2 Action Cards\n",
+                    "<Card:SecretObjective> Discard 1 Unscored Secret Objective\n",
+                    "<Tech:NonUnitTechSkip> Exhaust 1 Technology Specialty Planet"
+                ]
+            },
+            {
+                "title": "When all slices are claimed",
+                "text": [
+                    "The Expedition is complete; the ",
+                    "player who claimed the final slice flips Thunder's Edge to its ",
+                    "planet side and places it in a system of their choice that does ",
+                    "not contain a planet, a supernova, or ",
+                    "a printed wormhole. Then, the player ",
+                    "with the most control tokens on the ",
+                    "expedition places that many infantry ",
+                    "on Thunder's Edge. In the case of ",
+                    "a tie, the player who claimed the ",
+                    "final slice chooses which tied player ",
+                    "places infantry on Thunder's Edge. ",
+                    "Thunder's Edge cannot be placed in ",
+                    "The Fracture."
+                ]
+            }
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "breakthroughAndSynergy",
+        "title": "<Tech:SynergyBioticLeft><Tech:SynergyCyberneticRight> Breakthroughs and Synergy",
+        "fields": [
+            {
+                "title": "Breakthrough",
+                "text": [
+                    "A breakthrough is a new type of faction-specific component, ",
+                    "most commonly gained by interacting with Thunder's Edge. A ",
+                    "breakthrough will give each faction a unique new ability and ",
+                    "grants synergy between two technology colors.",
+                    "\n- TIP: Use `/search rules search:expeditions` to learn more about Expeditions"
+                ]
+            },
+            {
+                "title": "Synergy",
+                "text": [
+                    "Synergy links two colors of technology. A technology of a color ",
+                    "that a player has synergy with can count as the other color ",
+                    "instead, for the purposes of researching technology and for ",
+                    "scoring technology-related objectives. Even so, a technology can ",
+                    "only count as one or the other at any given time, not both.",
+                    "\n- EX: <Tech:SynergyPropulsionLeft><Tech:SynergyWarfareRight> ",
+                    " is an example of a breakthrough that grants Blue-Red synergy."
+                ]
+            },
+            {
+                "title": "Rolling for The Fracture",
+                "text": [
+                    "Each time a breakthrough is gained, there is a possibility that ",
+                    "the fracture will come into play. When a player gains their ",
+                    "breakthrough, regardless of the source, if The Fracture is not ",
+                    "already in play, they roll one die. If their die roll is equal to 1 or ",
+                    "10, they put The Fracture into play."
+                ]
+            }
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "id": "entropicScar",
+        "title": "Entropic Scar Anomaly",
+        "description": [
+            "An __Entropic Scar__ is a new kind of anomaly. All unit abilities ",
+            "Sustain Damage, Production, Planetary Shield, Space Cannon, ",
+            "Bombardment, Deploy, and Anti-Fighter Barrage) ",
+            "cannot be used by or against units inside of an entropic scar. ",
+            "Text abilities are unaffected. ",
+            "Additionally, wormholes that would be placed inside of an entropic scar ",
+            "are discarded instead.",
+            "\n\nAt the start of the status phase, a player that has ships in an entropic scar",
+            " can spend a token from their strategy pool to gain one of their faction-specific technologies."
+        ],
+        "source": "thunders_edge"
+    }
+]

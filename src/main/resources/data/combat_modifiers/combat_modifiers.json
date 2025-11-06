@@ -1,34 +1,5 @@
 [
     {
-        "alias": "plus3_1combat_all",
-        "type": "DIE_MOD",
-        "value": "+3",
-        "scope": "",
-        "forCombatAbility": "combatround",
-        "persistenceType": "ONE_COMBAT",
-        "related": [
-            {
-                "type": "action_cards",
-                "alias": "close_quarters"
-            }
-        ]
-    },
-    {
-        "alias": "plus3_1combat_all_opponent",
-        "type": "DIE_MOD",
-        "value": "+3",
-        "scope": "",
-        "forCombatAbility": "combatround",
-        "applyToOpponent": true,
-        "persistenceType": "ONE_COMBAT",
-        "related": [
-            {
-                "type": "action_cards",
-                "alias": "close_quarters"
-            }
-        ]
-    },
-    {
         "alias": "minus4_bombard",
         "type": "DIE_MOD",
         "value": "-4",
@@ -100,6 +71,37 @@
                 "type": "tech",
                 "alias": "sc"
             },
+            {
+                "type": "action_cards",
+                "alias": "morale_boost_ds"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb1"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb2"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb3"
+            },
+            {
+                "type": "action_cards",
+                "alias": "mb4"
+            }
+        ]
+    },
+    {
+        "alias": "plus1_1round_wild",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "forCombatAbility": "combatround",
+        "persistenceType": "CONDITIONAL",
+        "condition": "wildMB",
+        "related": [
             {
                 "type": "action_cards",
                 "alias": "morale_boost_ds"
@@ -324,6 +326,22 @@
         ]
     },
     {
+        "alias": "plus2_roll_in_nebula_cosmic",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "nebula_cosmic_defender",
+        "scope": "_ship_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": ":shield: Defenders get +2 to ship rolls in a nebula during Cosmic Phenomenae."
+            }
+        ]
+    },
+    {
         "alias": "plus1_roll_in_arcane_citadel",
         "type": "mods",
         "value": "+1",
@@ -465,6 +483,97 @@
             }
         ],
         "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "plus1_roll_asail_afb",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "plus1_roll_asail_spacecannon_off",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus1_roll_asail_spacecannon_def",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
+        "alias": "plus1_roll_asail_bombard",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus1_roll_asail_combat",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_been_asailed",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "ability",
+                "alias": "marionettes"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_per_opponent_sftt",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "opponent_sftt",
+        "persistenceType": "CONDITIONAL",
+        "condition": "opponent_has_sftt",
+        "scope": "",
+        "related": [
+            {
+                "type": "breakthrough",
+                "alias": "winnubt"
+            }
+        ],
+        "forCombatAbility": "combatround"
     },
     {
         "alias": "plus1_roll_plasmascoring_afb",
@@ -723,6 +832,10 @@
             {
                 "type": "ability",
                 "alias": "unrelenting"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-unrelenting"
             }
         ],
         "forCombatAbility": "combatround"
@@ -785,7 +898,6 @@
         ],
         "forCombatAbility": "combatround"
     },
-    
     {
         "alias": "plus_x_code_always_mech",
         "type": "mods",

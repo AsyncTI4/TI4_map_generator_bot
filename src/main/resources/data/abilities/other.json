@@ -15,6 +15,34 @@
         "source": "ignis_aurora"
     },
     {
+        "id": "interstellar_string_walk",
+        "name": "Interstellar String Walk",
+        "faction": "arachian",
+        "permanentEffect": "When you activate a system, apply +1 to the move value of ships that move through a system that contains one of your Command Tokens. ",
+        "source": "other"
+    },
+    {
+        "id": "song_of_something",
+        "name": "Echo of Something",
+        "faction": "neutral",
+        "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "predatory_ambush",
+        "name": "Predatory Ambush",
+        "faction": "arachian",
+        "permanentEffect": "After a player moves ships into a system that contains one of your Command Tokens and your units: Choose up to 2 adjacent systems. Move 1 of your non-fighter ships from each of those systems into the activated system.",
+        "source": "other"
+    },
+    {
+        "id": "strong_webs",
+        "name": "Strong Webs",
+        "faction": "arachian",
+        "permanentEffect": "During the status phase, you may choose not to return up to 3 Command Tokens from the board to your reinforcements.",
+        "source": "other"
+    },
+    {
         "id": "voidmaker",
         "name": "Voidmaker",
         "faction": "raven",
@@ -47,8 +75,8 @@
         "id": "laws_order",
         "name": "Law's Order",
         "faction": "keleres",
-        "window": "At the start of your turn",
-        "windowEffect": "You may spend 1 influence to treat all laws as blank until the end of your turn.",
+        "window": "At the start of any player's turn",
+        "windowEffect": "You may spend 1 trade good or 1 commodity to treat all laws as blank until the end of that turn.",
         "source": "codex3"
     },
     {

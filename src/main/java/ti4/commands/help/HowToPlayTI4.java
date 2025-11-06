@@ -1,13 +1,7 @@
 package ti4.commands.help;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.ResourceHelper;
 import ti4.commands.Subcommand;
-import ti4.message.MessageHelper;
 
 public class HowToPlayTI4 extends Subcommand {
 
@@ -17,16 +11,6 @@ public class HowToPlayTI4 extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        howToPlayTI4(event);
-    }
-
-    public static void howToPlayTI4(GenericInteractionCreateEvent event) {
-        String path = ResourceHelper.getInstance().getHelpFile("HowToPlayTI4.txt");
-        try {
-            String message = new String(Files.readAllBytes(Paths.get(path)));
-            MessageHelper.sendMessageToEventChannel(event, message);
-        } catch (Exception e) {
-            MessageHelper.sendMessageToEventChannel(event, "TI4 HELP FILE IS BLANK");
-        }
+        HelpCommand.showHelpText(event, "HowToPlayTI4.txt");
     }
 }
