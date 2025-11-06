@@ -47,6 +47,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -64,6 +65,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.HeroUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.tech.PlayerTechService;
@@ -386,6 +388,46 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentation()
                         + " choose whether you want to research a unit upgrade (you need the pre-requistites) or gain a command token",
                 buttons);
+    }
+
+    @ButtonHandler("scoreOtherPlayersSecrets")
+    public static void scoreOtherPlayersSecrets(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            for (String so : p2.getSecretsScored().keySet()) {
+                SecretObjectiveModel soM = Mapper.getSecretObjective(so);
+                if (soM != null && game.getRevealedPublicObjectives().get("(Plotted) " + soM.getName()) == null) {
+                    buttons.add(Buttons.green("scoreOtherPsSO_" + so, soM.getName()));
+                }
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + "Select the secret you would like to score. The bot has not verified you can score these, so double check.",
+                buttons);
+    }
+
+    @ButtonHandler("scoreOtherPsSO")
+    public static void scoreOtherPsSO(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String so = buttonID.replace("scoreOtherPsSO_", "");
+        SecretObjectiveModel soM = Mapper.getSecretObjective(so);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " used their plots ability to score the secret "
+                        + soM.getName()
+                        + " for 0 VP (but they get to put a plot card into play)");
+        int poIndex = game.addCustomPO("(Plotted) " + soM.getName(), 0);
+        game.scorePublicObjective(player.getUserID(), poIndex);
+        HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
+        ActionCardHelper.sendPlotCardInfo(game, player);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + " use the buttons to put a plot card into play with the faction whose secret you just scored.");
     }
 
     @ButtonHandler("solBtBuild_")
