@@ -1275,6 +1275,7 @@ public class Constants {
     public static final String DRAW_RANDOM_ABILITY = "draw_random_ability";
     public static final String RADICAL_ADVANCEMENT = "radical_advancement";
     public static final String DO_EDICT_PHASE = "edict_phase";
+    public static final String FIX_COLORS = "fix_colors";
     public static final String DRAW_RANDOM_UNIT = "draw_random_unit";
     public static final String DRAW_RANDOM_GENOME = "draw_random_genome";
     public static final String DRAW_RANDOM_BLUE_TILE = "draw_random_blue_tile";

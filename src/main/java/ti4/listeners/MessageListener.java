@@ -62,12 +62,32 @@ public class MessageListener extends ListenerAdapter {
                 "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
+    private static void sendMessageToModLog(String msg) {
+        TextChannel moderationLogChannel =
+                JdaService.guildPrimary.getTextChannelsByName("interesting-messages-log", true).stream()
+                        .findFirst()
+                        .orElse(null);
+        if (moderationLogChannel != null) {
+            MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
+        }
+    }
+
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
+                if (message.getContentRaw().toLowerCase().contains("gaslight")) {
+                    String msg = "Someone used gaslight here: " + message.getJumpUrl() + "\nFull msg: "
+                            + message.getContentRaw();
+                    sendMessageToModLog(msg);
+                }
+                if (message.getContentRaw().toLowerCase().contains("please stop")) {
+                    String msg = "Someone used please stop here: " + message.getJumpUrl() + "\nFull msg: "
+                            + message.getContentRaw();
+                    sendMessageToModLog(msg);
+                }
 
                 String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
                 if (GameManager.isValid(gameName)) {

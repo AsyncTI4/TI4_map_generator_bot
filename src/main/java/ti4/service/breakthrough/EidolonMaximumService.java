@@ -62,9 +62,6 @@ public class EidolonMaximumService {
                 return;
             }
         }
-        String msg = player.getRepresentation(true, false)
-                + " You do not have 4 mechs in the same system, so you cannot use " + eidolonRep(false) + " right now.";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
     }
 
     public void sendFlipButtonsToCardsInfo(Player player, Tile tile, List<UnitHolder> unitHolders) {
