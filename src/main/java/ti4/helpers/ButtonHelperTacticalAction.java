@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -416,10 +417,19 @@ public class ButtonHelperTacticalAction {
         Map<String, Integer> distances =
                 CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         List<Button> buttons = new ArrayList<>();
-        if (desiredDistance > 0) {
-            buttons.add(Buttons.gray(
-                    "getTilesThisFarAway_" + (desiredDistance - 1),
-                    "Get Tiles " + (desiredDistance - 1) + " Spaces Away"));
+
+        System.out.println("------------------ Distance check ------------------");
+        System.out.println(distances);
+        List<Integer> allDistances =
+                (new HashSet<>(distances.values())).stream().sorted().toList();
+        System.out.println(allDistances);
+        Integer distIndx =
+                allDistances.stream().filter(i -> i <= desiredDistance).toList().size() - 1;
+        Integer prevDistIndx = distIndx - 1;
+        Integer nextDistIndx = distIndx + 1;
+        if (prevDistIndx >= 0) {
+            Integer prevDist = allDistances.get(prevDistIndx);
+            buttons.add(Buttons.gray("getTilesThisFarAway_" + prevDist, "Get Tiles " + prevDist + " Spaces Away"));
         }
         for (String pos :
                 CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
@@ -429,8 +439,16 @@ public class ButtonHelperTacticalAction {
                 buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation, tile.getTileEmoji(player)));
             }
         }
-        buttons.add(Buttons.gray(
-                "getTilesThisFarAway_" + (desiredDistance + 1), "Get Tiles " + (desiredDistance + 1) + " Spaces Away"));
+
+        if (nextDistIndx >= 0 && nextDistIndx < allDistances.size()) {
+            Integer nextDist = allDistances.get(nextDistIndx);
+            if (nextDist < 100) {
+                buttons.add(Buttons.gray("getTilesThisFarAway_" + nextDist, "Get Tiles " + nextDist + " Spaces Away"));
+            } 
+            if (nextDist >= 3 && allDistances.contains(100)) {
+                buttons.add(Buttons.red("getTilesThisFarAway_" + 100, "Get Tiles Far Far Away", "⚠️"));
+            }
+        }
 
         String message = "Doing a tactical action. Please choose the system you wish to activate.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
