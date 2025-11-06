@@ -38,11 +38,13 @@ public class RestDiscordClient {
             return objectMapper.readValue(response.body(), DiscordUserInfo.class);
         }
 
-        if (response.statusCode() == HttpStatus.UNAUTHORIZED.value() || response.statusCode() == HttpStatus.FORBIDDEN.value()) {
+        if (response.statusCode() == HttpStatus.UNAUTHORIZED.value()
+                || response.statusCode() == HttpStatus.FORBIDDEN.value()) {
             return null;
         }
 
-        throw new RuntimeException("Unexpected status from Discord: " + response.statusCode() + " - " + response.body());
+        throw new RuntimeException(
+                "Unexpected status from Discord: " + response.statusCode() + " - " + response.body());
     }
 
     DiscordTokenResponse exchangeCodeForToken(String code, String redirectUri)
@@ -84,7 +86,8 @@ public class RestDiscordClient {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != HttpStatus.OK.value()) {
-            throw new RuntimeException("Discord token request failed: " + response.statusCode() + " - " + response.body());
+            throw new RuntimeException(
+                    "Discord token request failed: " + response.statusCode() + " - " + response.body());
         }
 
         return objectMapper.readValue(response.body(), DiscordTokenResponse.class);

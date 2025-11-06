@@ -20,12 +20,12 @@ class DiscordAuthService {
             DiscordUserInfo userInfo = restDiscordClient.getUserInfo(tokenResponse.getAccessToken());
 
             return new AuthResponse(
-                userId,
-                userInfo.getId(),
-                userInfo.getFormattedName(),
-                tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(),
-                tokenResponse.getExpiresIn());
+                    userId,
+                    userInfo.getId(),
+                    userInfo.getFormattedName(),
+                    tokenResponse.getAccessToken(),
+                    tokenResponse.getRefreshToken(),
+                    tokenResponse.getExpiresIn());
         } catch (Exception e) {
             throw new RuntimeException("Failed to authenticate: " + e.getMessage());
         }
@@ -38,12 +38,12 @@ class DiscordAuthService {
             DiscordUserInfo userInfo = restDiscordClient.getUserInfo(tokenResponse.getAccessToken());
 
             return new AuthResponse(
-                userId,
-                userInfo.getId(),
-                userInfo.getFormattedName(),
-                tokenResponse.getAccessToken(),
-                tokenResponse.getRefreshToken(),
-                tokenResponse.getExpiresIn());
+                    userId,
+                    userInfo.getId(),
+                    userInfo.getFormattedName(),
+                    tokenResponse.getAccessToken(),
+                    tokenResponse.getRefreshToken(),
+                    tokenResponse.getExpiresIn());
         } catch (Exception e) {
             throw new RuntimeException("Failed to refresh: " + e.getMessage());
         }

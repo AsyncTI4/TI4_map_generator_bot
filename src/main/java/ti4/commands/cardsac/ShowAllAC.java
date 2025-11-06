@@ -15,11 +15,12 @@ class ShowAllAC extends GameStateSubcommand {
 
     ShowAllAC() {
         super(Constants.SHOW_ALL, "Show all Action Cards to one player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color being shown cards")
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color being shown cards")
                 .setRequired(true)
                 .setAutoComplete(true));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color showing cards").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color showing cards")
+                .setAutoComplete(true));
     }
 
     @Override
