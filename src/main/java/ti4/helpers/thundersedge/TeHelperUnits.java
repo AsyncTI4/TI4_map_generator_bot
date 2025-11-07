@@ -310,7 +310,7 @@ public class TeHelperUnits {
     public static void serveIconoclastDeployAbility(Game game, Player relicDrawer) {
         for (Player player : game.getRealPlayers()) {
             if (player.is(relicDrawer)) continue;
-            if (!player.hasUnit("naalu_mech_te")) continue;
+            if (!player.hasUnit("naalu_mech_te") || ButtonHelper.isLawInPlay(game, "articles_war")) continue;
 
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                 List<Button> buttons = new ArrayList<>(

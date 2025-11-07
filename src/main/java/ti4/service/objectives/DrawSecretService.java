@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -143,8 +144,9 @@ public class DrawSecretService {
             }
             if (game.isTwilightsFallMode()) {
                 ButtonHelperTwilightsFall.fixMahactColors(game, event);
+                game.setStrategyCardSet("twilights_fall_sc");
             }
-            if (game.isThundersEdge() || game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
+            if (game.isThundersEdge() || game.getStoredValue("useOldPok").isEmpty() || game.isTwilightsFallMode()) {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
                     String pos = mr.getPosition();

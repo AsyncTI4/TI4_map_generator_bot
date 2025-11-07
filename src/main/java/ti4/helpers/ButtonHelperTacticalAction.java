@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -87,7 +88,7 @@ public class ButtonHelperTacticalAction {
             }
             if (player.hasAbility("miniaturization")) {
                 String msg = player.getRepresentation()
-                        + " You can land your structures on planets in the active system using your ability Miniaturization:";
+                        + " You can land your structures on planets in any system you have floating structures using your ability Miniaturization:";
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
                 if (buttons.size() > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -163,7 +164,7 @@ public class ButtonHelperTacticalAction {
                 event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
 
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        if (player.hasUnit("tf-productionbiomes")) {
+        if (player.hasUnit("tf-productionbiomes") && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock).contains(game.getTileByPosition(pos))) {
             String msg = player.getRepresentation()
                     + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
             List<Button> buttons2 = new ArrayList<>();
@@ -198,9 +199,9 @@ public class ButtonHelperTacticalAction {
                             + " agent.",
                     empyButtons);
         }
-        if (unitsWereMoved
-                && player.hasUnit("tf-yssarilinfantry")
-                && tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+        boolean infMoved = game.getTacticalActionDisplacement().values().stream()
+                .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Infantry, player.getColor())));
+        if (unitsWereMoved && player.hasUnit("tf-yssarilinfantry") && infMoved) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.getAc() == 0) {
                     continue;
@@ -740,7 +741,7 @@ public class ButtonHelperTacticalAction {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        if (player.hasTech("ffac2")) {
+        if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactories")) {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {

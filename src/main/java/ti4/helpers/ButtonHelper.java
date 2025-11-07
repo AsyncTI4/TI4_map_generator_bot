@@ -19,7 +19,13 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -45,9 +51,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1305,13 +1308,15 @@ public class ButtonHelper {
                         .filter(p -> p.getUnitColorsOnHolder().contains(player.getColorID()))
                         .flatMap(p -> p.getUnitColorsOnHolder().stream())
                         .toList();
+                List<String> seenColors = new ArrayList<>();
 
                 for (String col : colorsCoexisting) {
                     Player p2 = game.getPlayerFromColorOrFaction(col);
                     if (player == p2) {
                         continue;
-                    } else if (player == titans) {
+                    } else if (player == titans && !seenColors.contains(col)) {
                         slumberBonus++;
+                        seenColors.add(col);
                         game.drawActionCard(player.getUserID());
                     } else if (p2 == titans) {
                         slumberBonus++;
@@ -7735,11 +7740,28 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
+    public static String getStratName(String ogName, Game game) {
+        if (!game.isTwilightsFallMode()) {
+            return ogName;
+        }
+        return switch (ogName) {
+            case "leadership" -> "lux";
+            case "diplomacy" -> "noctis";
+            case "politics" -> "tyrannus";
+            case "construction" -> "civitas";
+            case "trade" -> "amicus";
+            case "warfare" -> "calamitus";
+            case "technology" -> "magus";
+            case "imperial" -> "aeterna";
+            default -> "action";
+        };
+    }
+
     public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName) {
         if (message.contains("please choose the planets you wish to exhaust.")) {
             return;
         }
-        sendMessageToRightStratThread(player, game, message, stratName, null);
+        sendMessageToRightStratThread(player, game, message, getStratName(stratName, game), null);
     }
 
     public static String getStratName(int sc) {
