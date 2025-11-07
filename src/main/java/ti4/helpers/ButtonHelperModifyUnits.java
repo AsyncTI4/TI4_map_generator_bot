@@ -71,6 +71,11 @@ public class ButtonHelperModifyUnits {
                 && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
             return 0;
         }
+        if (game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()) != null
+                && game.getTileByPosition(game.getActiveSystem()).isScar()) {
+            return 0;
+        }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
         if (mentakFS != null && mentakFS != player) {
             if (unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
@@ -1112,14 +1117,35 @@ public class ButtonHelperModifyUnits {
                         || player.hasUnit("tf-ambassador")
                         || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
-                    String msg = player.getRepresentation() + " " + player2.getRepresentation()
+                    String msg = player.getRepresentation()
                             + " the game is unsure if a combat should occur on " + planetName
-                            + " or if you are coexisting. Please inform it with the buttons.\n\n";
+                            + " or if you wish to allow coexisting (or be forced into). Please inform it with the buttons.\n\n";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
-                    buttons.add(Buttons.green(
-                            "enterCoexistence_" + unitHolder.getName(), "I want to enter/continue Coexistence"));
+                    buttons.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "startCombatOn_" + unitHolder.getName(),
+                            "Engage in Combat"));
+                    if (player.hasUnlockedBreakthrough("titansbt")
+                            || player.hasAbility("researchteam")
+                            || player.hasUnit("tf-ambassador")) {
+                        buttons.add(Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
+                                "We want to enter Coexistence"));
+                    } else {
+                        buttons.add(
+                                Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Coexistence"));
+                    }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                    if (player2.getPlanets().contains(unitHolder.getName()) && player2.hasAbility("researchteam")) {
+                        buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                player2.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
+                                "We want to enter Coexistence"));
+                        buttons.add(Buttons.red(player2.getFinsFactionCheckerPrefix() + "deleteButtons", "Combat"));
+                        msg = player2.getRepresentation()
+                                + " if you wish to enter coexistence on " + planetName
+                                + " please tell the bot so with the buttons.\n\n";
+                        MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg, buttons);
+                    }
 
                 } else {
                     if (game.getStoredValue("coexistFlag").isEmpty()) {
@@ -1257,7 +1283,7 @@ public class ButtonHelperModifyUnits {
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet) continue;
+            if (unitHolder instanceof Planet && !game.isTwilightsFallMode()) continue;
 
             Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
             for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {

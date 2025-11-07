@@ -112,9 +112,11 @@ public class ButtonHelperTwilightsFall {
                     }
                 }
                 Collections.shuffle(slice);
-                if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()) {
+                if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
+                        || slice.get(1).getTile().isAnomaly()) {
                     Collections.rotate(slice, 1);
-                    if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()) {
+                    if (slice.get(1).getTile().getPlanetUnitHolders().isEmpty()
+                            || slice.get(1).getTile().isAnomaly()) {
                         Collections.rotate(slice, 1);
                     }
                 }
@@ -320,7 +322,6 @@ public class ButtonHelperTwilightsFall {
         game.removeStoredValue("lastSplicer");
         setNewSpliceCards(game, spliceType, size);
 
-        sendPlayerSpliceOptions(game, startPlayer);
         for (Player p : participants) {
             if (game.getStoredValue("savedParticipants").isEmpty()) {
                 game.setStoredValue("savedParticipants", p.getFaction());
@@ -329,7 +330,12 @@ public class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "A splice has started.");
+        List<String> cards = getSpliceCards(game);
+        List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, startPlayer);
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                game.getActionsChannel(), "A splice has started with the following options.", embeds);
+
+        sendPlayerSpliceOptions(game, startPlayer);
     }
 
     public static List<String> getSpliceCards(Game game) {
@@ -438,7 +444,21 @@ public class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if (player.hasUnit("blacktf_mech")) {
-            int numMechs = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false);
+            int numMechs = 0;
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+                boolean validPos = false;
+                for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                    if (FoWHelper.otherPlayersHaveUnitsInSystem(player, game.getTileByPosition(pos), game)) {
+                        validPos = true;
+                        break;
+                    }
+                }
+                if (validPos) {
+                    for (UnitHolder uH : tile.getUnitHolders().values()) {
+                        numMechs += uH.getUnitCount(UnitType.Mech, player);
+                    }
+                }
+            }
             AddUnitService.addUnits(null, player.getNomboxTile(), game, player.getColor(), numMechs + " infantry");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -470,6 +490,27 @@ public class ButtonHelperTwilightsFall {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("fixMahactColors")
+    public static void fixMahactColors(Game game, GenericInteractionCreateEvent event) {
+
+        // ColorChangeHelper.changePlayerColor(game, player, oldColor, newColor);
+        for (Player player : game.getRealPlayers()) {
+            String factionColor = player.getFaction().replace("tf", "");
+            if (Mapper.getColor(factionColor) != null && !player.getColor().equalsIgnoreCase(factionColor)) {
+                Player p2 = game.getPlayerFromColorOrFaction(factionColor);
+                if (p2 != null) {
+                    ColorChangeHelper.changePlayerColor(
+                            game,
+                            p2,
+                            p2.getColor(),
+                            game.getUnusedColors().getFirst().getAlias());
+                }
+                ColorChangeHelper.changePlayerColor(game, player, player.getColor(), factionColor);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("selectASpliceCard_")
     public static void selectASpliceCard(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String cardID = buttonID.split("_")[1];
@@ -486,11 +527,15 @@ public class ButtonHelperTwilightsFall {
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
         } else {
-            game.setStoredValue(
-                    "savedSpliceCards",
-                    game.getStoredValue("savedSpliceCards")
-                            .replace(cardID + "_", "")
-                            .replace(cardID, ""));
+            if (game.getStoredValue("savedSpliceCards").contains(cardID + "_")) {
+                game.setStoredValue(
+                        "savedSpliceCards",
+                        game.getStoredValue("savedSpliceCards").replace(cardID + "_", ""));
+            } else {
+                game.setStoredValue(
+                        "savedSpliceCards",
+                        game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+            }
             if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
@@ -540,7 +585,6 @@ public class ButtonHelperTwilightsFall {
         if (participants.size() > 0) {
             game.setStoredValue("lastSplicer", player.getFaction());
             sendPlayerSpliceOptions(game, participants.get(0));
-            participants.remove(0);
             for (Player p : participants) {
                 if (game.getStoredValue("savedParticipants").isEmpty()) {
                     game.setStoredValue("savedParticipants", p.getFaction());
@@ -850,6 +894,11 @@ public class ButtonHelperTwilightsFall {
         }
         if (type.equalsIgnoreCase("units")) {
             player.removeOwnedUnitByID(cardID);
+            UnitModel u = Mapper.getUnit(cardID);
+            if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
+                String replacementUnit = u.getBaseType();
+                player.addOwnedUnitByID(replacementUnit);
+            }
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
                     player.getRepresentation() + " has lost the unit: "

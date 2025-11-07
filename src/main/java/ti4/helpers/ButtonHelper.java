@@ -207,6 +207,17 @@ public class ButtonHelper {
     }
 
     public static void resolveInfantryRemoval(Player player, int totalAmount) {
+
+        if (player.hasUnit("tf-yinclone")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    (totalAmount <= 10
+                                    ? UnitEmojis.infantry.toString().repeat(totalAmount)
+                                    : UnitEmojis.infantry + "×" + totalAmount)
+                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of your next turn.");
+            player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
+            return;
+        }
         if (player.getUnitsOwned().contains("pharadn_infantry")
                 || player.getUnitsOwned().contains("pharadn_infantry2")) {
             MessageHelper.sendMessageToChannel(
@@ -237,7 +248,8 @@ public class ButtonHelper {
         resolveInfantryRemoval(player, totalAmount);
         if (totalAmount <= 0 || (!player.hasInf2Tech() && !player.hasUnit("mahact_infantry"))) return;
         if (player.getUnitsOwned().contains("pharadn_infantry")
-                || player.getUnitsOwned().contains("pharadn_infantry2")) return;
+                || player.getUnitsOwned().contains("pharadn_infantry2")
+                || player.hasUnit("tf-yinclone")) return;
 
         if (player.hasTech("cl2")) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
@@ -254,16 +266,6 @@ public class ButtonHelper {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
                 return;
             }
-        }
-        if (player.hasUnit("tf-yinclone")) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    (totalAmount <= 10
-                                    ? UnitEmojis.infantry.toString().repeat(totalAmount)
-                                    : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of your next turn.");
-            player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
-            return;
         }
         if (player.hasTech("dsqhetinf")) {
             MessageHelper.sendMessageToChannel(
@@ -456,14 +458,62 @@ public class ButtonHelper {
     public static MessageChannel getSCFollowChannel(Game game, Player player, int scNum) {
         String threadName = game.getName() + "-round-" + game.getRound() + "-";
         switch (scNum) {
-            case 1 -> threadName += "leadership";
-            case 2 -> threadName += "diplomacy";
-            case 3 -> threadName += "politics";
-            case 4 -> threadName += "construction";
-            case 5 -> threadName += "trade";
-            case 6 -> threadName += "warfare";
-            case 7 -> threadName += "technology";
-            case 8 -> threadName += "imperial";
+            case 1 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "lux";
+                } else {
+                    threadName += "leadership";
+                }
+            }
+            case 2 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "noctis";
+                } else {
+                    threadName += "diplomacy";
+                }
+            }
+            case 3 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "tyrannus";
+                } else {
+                    threadName += "politics";
+                }
+            }
+            case 4 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "civitas";
+                } else {
+                    threadName += "construction";
+                }
+            }
+            case 5 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "amicus";
+                } else {
+                    threadName += "trade";
+                }
+            }
+            case 6 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "calamitus";
+                } else {
+                    threadName += "warfare";
+                }
+            }
+            case 7 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "magus";
+                } else {
+                    threadName += "technology";
+                }
+            }
+            case 8 -> {
+                if (game.isTwilightsFallMode()) {
+                    threadName += "aeterna";
+                } else {
+                    threadName += "imperial";
+                }
+            }
             default -> {
                 return player.getCorrectChannel();
             }
@@ -1257,13 +1307,15 @@ public class ButtonHelper {
                         .filter(p -> p.getUnitColorsOnHolder().contains(player.getColorID()))
                         .flatMap(p -> p.getUnitColorsOnHolder().stream())
                         .toList();
+                List<String> seenColors = new ArrayList<>();
 
                 for (String col : colorsCoexisting) {
                     Player p2 = game.getPlayerFromColorOrFaction(col);
                     if (player == p2) {
                         continue;
-                    } else if (player == titans) {
+                    } else if (player == titans && !seenColors.contains(col)) {
                         slumberBonus++;
+                        seenColors.add(col);
                         game.drawActionCard(player.getUserID());
                     } else if (p2 == titans) {
                         slumberBonus++;
@@ -3453,8 +3505,8 @@ public class ButtonHelper {
             if (button.getCustomId() == null || button.getCustomId().contains("ultimateUndo")) {
                 continue;
             }
-            String builder = player.getFaction() + ";" + button.getCustomId() + ";" + button.getLabel() + ";"
-                    + button.getStyle();
+            String builder = player.getFaction() + ";" + button.getCustomId().replace(";", "fin66") + ";"
+                    + button.getLabel() + ";" + button.getStyle();
             if (button.getEmoji() != null
                     && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
@@ -3470,7 +3522,7 @@ public class ButtonHelper {
             if (game.getPlayerFromColorOrFaction(buttonString.split(";")[x]) != null) {
                 x = 1;
             }
-            String id = buttonString.split(";")[x];
+            String id = buttonString.split(";")[x].replace("fin66", ";");
             String label = buttonString.split(";")[x + 1];
             if (label.isEmpty()) {
                 label = "Edited";
@@ -4095,7 +4147,7 @@ public class ButtonHelper {
         // Expeditions
         String expeditionText = game.getExpeditions().getTopLevelExpeditionButtonText();
         boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
-        if (expeditionText != null && !thundersEdgeOnBoard && game.isThundersEdge()) {
+        if (expeditionText != null && !thundersEdgeOnBoard && game.isThundersEdge() && !game.isTwilightsFallMode()) {
             endButtons.add(Buttons.gray(player.finChecker() + "expeditionInfoAndButtons", expeditionText));
         }
 
@@ -7687,11 +7739,28 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
+    public static String getStratName(String ogName, Game game) {
+        if (!game.isTwilightsFallMode()) {
+            return ogName;
+        }
+        return switch (ogName) {
+            case "leadership" -> "lux";
+            case "diplomacy" -> "noctis";
+            case "politics" -> "tyrannus";
+            case "construction" -> "civitas";
+            case "trade" -> "amicus";
+            case "warfare" -> "calamitus";
+            case "technology" -> "magus";
+            case "imperial" -> "aeterna";
+            default -> "action";
+        };
+    }
+
     public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName) {
         if (message.contains("please choose the planets you wish to exhaust.")) {
             return;
         }
-        sendMessageToRightStratThread(player, game, message, stratName, null);
+        sendMessageToRightStratThread(player, game, message, getStratName(stratName, game), null);
     }
 
     public static String getStratName(int sc) {

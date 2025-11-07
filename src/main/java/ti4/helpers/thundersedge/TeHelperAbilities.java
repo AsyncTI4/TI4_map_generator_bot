@@ -167,45 +167,48 @@ public class TeHelperAbilities {
 
     public static List<Button> miniLandingButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        if (activeSystem != null) {
-            // TODO: galvanize
-            int dmgDocks =
-                    activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Spacedock, player.getColorID());
-            int docks = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, player) - dmgDocks;
-            int dmgPds = activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Pds, player.getColorID());
-            int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
+        // Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        for (Tile activeSystem : game.getTileMap().values()) {
+            if (activeSystem != null) {
+                // TODO: galvanize
+                int dmgDocks =
+                        activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Spacedock, player.getColorID());
+                int docks = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Spacedock, player) - dmgDocks;
+                int dmgPds = activeSystem.getSpaceUnitHolder().getDamagedUnitCount(UnitType.Pds, player.getColorID());
+                int pds = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Pds, player) - dmgPds;
 
-            for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-                if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
-                    continue;
-                }
-                for (int x = 1; x <= Math.min(2, pds); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
-                            + planet.getName();
-                    String label = "Land " + x + " PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
-                    buttons.add(Buttons.red(id, label, UnitEmojis.pds));
-                }
-                for (int x = 1; x <= Math.min(2, dmgPds); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
-                            + planet.getName();
-                    String label =
-                            "Land " + x + " damaged PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
-                    buttons.add(Buttons.red(id, label, UnitEmojis.pds));
-                }
-                for (int x = 1; x <= Math.min(1, docks); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
-                            + planet.getName();
-                    String label =
-                            "Land " + x + " Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game);
-                    buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
-                }
-                for (int x = 1; x <= Math.min(1, dmgDocks); x++) {
-                    String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
-                            + planet.getName();
-                    String label = "Land " + x + " damaged Space Dock on "
-                            + Helper.getPlanetRepresentation(planet.getName(), game);
-                    buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
+                for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+                    if (!player.getPlanetsAllianceMode().contains(planet.getName())) {
+                        continue;
+                    }
+                    for (int x = 1; x <= Math.min(2, pds); x++) {
+                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
+                                + planet.getName();
+                        String label =
+                                "Land " + x + " PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                        buttons.add(Buttons.red(id, label, UnitEmojis.pds));
+                    }
+                    for (int x = 1; x <= Math.min(2, dmgPds); x++) {
+                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
+                                + planet.getName();
+                        String label = "Land " + x + " damaged PDS on "
+                                + Helper.getPlanetRepresentation(planet.getName(), game);
+                        buttons.add(Buttons.red(id, label, UnitEmojis.pds));
+                    }
+                    for (int x = 1; x <= Math.min(1, docks); x++) {
+                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
+                                + planet.getName();
+                        String label = "Land " + x + " Space Dock on "
+                                + Helper.getPlanetRepresentation(planet.getName(), game);
+                        buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
+                    }
+                    for (int x = 1; x <= Math.min(1, dmgDocks); x++) {
+                        String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
+                                + planet.getName();
+                        String label = "Land " + x + " damaged Space Dock on "
+                                + Helper.getPlanetRepresentation(planet.getName(), game);
+                        buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
+                    }
                 }
             }
         }

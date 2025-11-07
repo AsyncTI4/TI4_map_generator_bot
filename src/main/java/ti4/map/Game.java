@@ -3609,7 +3609,7 @@ public class Game extends GameProperties {
         for (String ac : oldDeck) {
             newDeck.remove(ac);
         }
-        if (!getDiscardActionCards().isEmpty()) {
+        if (!getDiscardActionCards().isEmpty() && !isTwilightsFallMode()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
