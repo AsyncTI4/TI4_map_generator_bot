@@ -72,6 +72,7 @@ public class ButtonHelperModifyUnits {
             return 0;
         }
         if (game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar()) {
             return 0;
         }
