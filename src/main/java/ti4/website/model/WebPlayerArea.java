@@ -291,7 +291,17 @@ public class WebPlayerArea {
 
         // Planets
         webPlayerArea.setPlanets(player.getPlanets());
-        webPlayerArea.setExhaustedPlanets(player.getExhaustedPlanets());
+        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
+        // Ensure Custodia Vigilia is in exhausted planets if the player has it
+        // (it's always exhausted when gained via gainCustodiaVigilia())
+        if (player.getPlanets().contains("custodiavigilia") && !exhaustedPlanets.contains("custodiavigilia")) {
+            exhaustedPlanets.add("custodiavigilia");
+        }
+        // Also handle custodiavigiliaplus if it exists
+        if (player.getPlanets().contains("custodiavigiliaplus") && !exhaustedPlanets.contains("custodiavigiliaplus")) {
+            exhaustedPlanets.add("custodiavigiliaplus");
+        }
+        webPlayerArea.setExhaustedPlanets(exhaustedPlanets);
         webPlayerArea.setExhaustedPlanetAbilities(player.getExhaustedPlanetsAbilities());
 
         // Relics and fragments

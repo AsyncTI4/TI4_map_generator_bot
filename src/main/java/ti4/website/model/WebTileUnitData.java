@@ -54,6 +54,12 @@ public class WebTileUnitData {
             }
         }
 
+        // Add virtual "special" tile for off-tile planets (custodiavigilia, ghoti, etc.)
+        WebTileUnitData specialTileData = extractOffTilePlanetsData(game);
+        if (specialTileData != null && !specialTileData.getPlanets().isEmpty()) {
+            tileUnitData.put("special", specialTileData);
+        }
+
         return tileUnitData;
     }
 
@@ -271,6 +277,100 @@ public class WebTileUnitData {
         }
 
         return tileData;
+    }
+
+    /**
+     * Extract data for off-tile planets (custodiavigilia, ghoti, etc.) that don't exist on any tile
+     * but are stored in game.getPlanetsInfo()
+     */
+    private static WebTileUnitData extractOffTilePlanetsData(Game game) {
+        WebTileUnitData specialTileData = new WebTileUnitData();
+
+        // List of off-tile planets that don't exist on tiles
+        List<String> offTilePlanetIds = List.of(
+                "custodiavigilia",
+                "custodiavigiliaplus",
+                "ghoti",
+                "nevermore",
+                "ocean1",
+                "ocean2",
+                "ocean3",
+                "ocean4",
+                "ocean5",
+                "triad");
+
+        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+
+        for (String planetId : offTilePlanetIds) {
+            Planet planet = planetsInfo.get(planetId);
+            if (planet == null) {
+                continue;
+            }
+
+            // Create planet data entry
+            WebTilePlanet planetData = new WebTilePlanet();
+
+            // Determine controlling player by checking which players have the planet
+            String controllingFaction = null;
+            for (Player player : game.getRealPlayers()) {
+                if (player.getPlanets().contains(planetId)) {
+                    controllingFaction = player.getFaction();
+                    break;
+                }
+            }
+            planetData.setControlledBy(controllingFaction);
+
+            // Extract tokens/attachments from the planet
+            List<String> planetTokens = new ArrayList<>(planet.getTokenList());
+            planetTokens.removeIf(token -> token == null || token.trim().isEmpty());
+
+            if (!planetTokens.isEmpty()) {
+                Map<String, List<WebEntityData>> factionTokens = new HashMap<>();
+
+                for (String token : planetTokens) {
+                    // Check if this token is an attachment
+                    String entityType = "token"; // default to token
+                    if (ti4.image.Mapper.getAttachmentInfo(token) != null) {
+                        entityType = "attachment";
+                    }
+
+                    WebEntityData tokenData =
+                            new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
+                    factionTokens
+                            .computeIfAbsent("neutral", k -> new ArrayList<>())
+                            .add(tokenData);
+                }
+
+                // Add tokens to planet entities
+                for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
+                    planetData
+                            .getEntities()
+                            .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                            .addAll(factionEntry.getValue());
+                }
+            }
+
+            // Set commodities count for Discordant Stars comms on planets functionality
+            String commsStorageKey = "CommsOnPlanet" + planetId;
+            if (!game.getStoredValue(commsStorageKey).isEmpty()) {
+                try {
+                    int comms = Integer.parseInt(game.getStoredValue(commsStorageKey));
+                    if (comms > 0) {
+                        planetData.setCommodities(comms);
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore invalid stored values
+                }
+            }
+
+            // Set planetary shield status
+            planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+
+            // Add planet to special tile
+            specialTileData.getPlanets().put(planetId, planetData);
+        }
+
+        return specialTileData;
     }
 
     private static String getUnitIdFromType(UnitType unitType) {
