@@ -19,13 +19,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -51,6 +45,9 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -210,6 +207,17 @@ public class ButtonHelper {
     }
 
     public static void resolveInfantryRemoval(Player player, int totalAmount) {
+
+        if (player.hasUnit("tf-yinclone")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    (totalAmount <= 10
+                                    ? UnitEmojis.infantry.toString().repeat(totalAmount)
+                                    : UnitEmojis.infantry + "×" + totalAmount)
+                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of your next turn.");
+            player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
+            return;
+        }
         if (player.getUnitsOwned().contains("pharadn_infantry")
                 || player.getUnitsOwned().contains("pharadn_infantry2")) {
             MessageHelper.sendMessageToChannel(
@@ -240,7 +248,8 @@ public class ButtonHelper {
         resolveInfantryRemoval(player, totalAmount);
         if (totalAmount <= 0 || (!player.hasInf2Tech() && !player.hasUnit("mahact_infantry"))) return;
         if (player.getUnitsOwned().contains("pharadn_infantry")
-                || player.getUnitsOwned().contains("pharadn_infantry2")) return;
+                || player.getUnitsOwned().contains("pharadn_infantry2")
+                || player.hasUnit("tf-yinclone")) return;
 
         if (player.hasTech("cl2")) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
@@ -257,16 +266,6 @@ public class ButtonHelper {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
                 return;
             }
-        }
-        if (player.hasUnit("tf-yinclone")) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    (totalAmount <= 10
-                                    ? UnitEmojis.infantry.toString().repeat(totalAmount)
-                                    : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of your next turn.");
-            player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
-            return;
         }
         if (player.hasTech("dsqhetinf")) {
             MessageHelper.sendMessageToChannel(

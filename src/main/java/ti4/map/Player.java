@@ -480,6 +480,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("ws")
                 || hasUnit("tf_warsun")
                 || hasUnit("tf-universitywarsun")
+                || hasUnit("tf-pws")
                 || getTechs().contains("absol_ws")
                 || getTechs().contains("baxanws")
                 || getTechs().contains("absol_pws2")

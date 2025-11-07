@@ -6,11 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -175,11 +173,14 @@ public class DestroyUnitService {
             capturing.addAll(devours);
         }
 
-        if(game.isTwilightsFallMode() && (unit.unitKey().getUnitType() == UnitType.Infantry || unit.unitKey().getUnitType() == UnitType.Fighter)){
-            for(Player p2: game.getRealPlayersExcludingThis(player)){
-                if(p2.ownsUnit("tf-vortexer")){
-                    for(String pos : FoWHelper.getAdjacentTiles(game, unit.tile().getPosition(), p2, false, true)){
-                        if(game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0){
+        if (game.isTwilightsFallMode()
+                && (unit.unitKey().getUnitType() == UnitType.Infantry
+                        || unit.unitKey().getUnitType() == UnitType.Fighter)) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.ownsUnit("tf-vortexer")) {
+                    for (String pos :
+                            FoWHelper.getAdjacentTiles(game, unit.tile().getPosition(), p2, false, true)) {
+                        if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
                             capturing.add(p2);
                             break;
                         }

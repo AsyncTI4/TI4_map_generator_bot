@@ -71,6 +71,10 @@ public class ButtonHelperModifyUnits {
                 && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
             return 0;
         }
+        if (game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()).isScar()) {
+            return 0;
+        }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
         if (mentakFS != null && mentakFS != player) {
             if (unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
