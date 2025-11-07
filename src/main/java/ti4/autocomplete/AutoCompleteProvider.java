@@ -67,6 +67,7 @@ import ti4.service.draft.DraftOrchestrator;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.draft.Draftable;
 import ti4.service.draft.DraftableType;
+import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
 import ti4.service.draft.draftables.FactionDraftable;
 import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
@@ -155,7 +156,10 @@ public class AutoCompleteProvider {
                     Constants.BAN_HS,
                     Constants.BAN_STARTING_TECH,
                     Constants.BAN_COMMODITIES,
-                    GameStatisticsFilterer.WINNING_FACTION_FILTER -> {
+                    GameStatisticsFilterer.WINNING_FACTION_FILTER,
+                    Constants.HOMESYSTEM_FACTION_OPTION,
+                    Constants.STARTING_FLEET_FACTION_OPTION,
+                    Constants.PRIORITY_NUMBER_FACTION_OPTION -> {
                 var options = searchModels(event, Mapper.getFactionsValues(), null);
                 event.replyChoices(options).queue();
             }
@@ -1202,6 +1206,19 @@ public class AutoCompleteProvider {
                                         .contains(enteredValue))
                                 .limit(25)
                                 .map(option -> new Command.Choice(option.getUnformattedName(), option.getChoiceKey()))
+                                .collect(Collectors.toList()))
+                        .queue();
+            }
+            case Constants.PACKAGE_KEY_OPTION -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                if (!DraftManager.hasDraftManager(game)) return;
+                DraftManager draftManager = game.getDraftManager();
+                AndcatReferenceCardsDraftable draftable =
+                        (AndcatReferenceCardsDraftable) draftManager.getDraftable(AndcatReferenceCardsDraftable.TYPE);
+                if (draftable == null) return;
+                event.replyChoices(draftable.getReferenceCardPackages().keySet().stream()
+                                .map(key -> new Command.Choice(key.toString(), key))
                                 .collect(Collectors.toList()))
                         .queue();
             }

@@ -321,11 +321,28 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL), 3) progress % (desc)
+        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL),
+        // 3) For QUALIFIES: by absolute progress (desc) - prioritize fully complete objectives
+        // 4) For POTENTIAL: by progress % (desc)
         candidates.sort(Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue)
+                .reversed()
                 .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1)
-                .thenComparingDouble(c -> c.threshold > 0 ? (double) c.progress / c.threshold : 0.0)
-                .reversed());
+                .thenComparing((PublicObjectiveCandidate c1, PublicObjectiveCandidate c2) -> {
+                    // Within QUALIFIES group, prioritize by absolute progress (higher is better)
+                    if (c1.state == EntryState.QUALIFIES && c2.state == EntryState.QUALIFIES) {
+                        return Integer.compare(c2.progress, c1.progress); // Descending
+                    }
+                    // If one is QUALIFIES and one is POTENTIAL, QUALIFIES should already be first from previous
+                    // comparison
+                    // So this should only be called when both are same state
+                    if (c1.state == EntryState.POTENTIAL && c2.state == EntryState.POTENTIAL) {
+                        // Sort POTENTIAL by progress percentage (descending)
+                        double pct1 = c1.threshold > 0 ? (double) c1.progress / c1.threshold : 0.0;
+                        double pct2 = c2.threshold > 0 ? (double) c2.progress / c2.threshold : 0.0;
+                        return Double.compare(pct2, pct1); // Descending
+                    }
+                    return 0; // Shouldn't happen, but keep them in current order
+                }));
 
         // Add top N candidates to entries
         for (int i = 0; i < Math.min(maxPublicObjectives, candidates.size()); i++) {

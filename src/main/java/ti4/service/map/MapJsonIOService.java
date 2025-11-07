@@ -16,6 +16,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -26,6 +27,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.service.fow.LoreService;
@@ -145,7 +147,7 @@ public class MapJsonIOService {
             mapData.setMapInfo(tiles);
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapData);
         } catch (Exception e) {
-            BotLogger.error("Failed to export map to JSON", e);
+            BotLogger.error(new LogOrigin(game), "Failed to export map to JSON " + Constants.solaxPing(), e);
             return null;
         }
     }
@@ -177,7 +179,7 @@ public class MapJsonIOService {
 
             MessageHelper.sendMessageToChannel(feedbackChannel, "Map imported from JSON.");
         } catch (Exception e) {
-            BotLogger.error("Failed to import map from JSON", e);
+            BotLogger.error(new LogOrigin(game), "Failed to import map from JSON " + Constants.solaxPing(), e);
             MessageHelper.sendMessageToChannel(feedbackChannel, "Failed to import map from JSON: " + e.getMessage());
         }
 

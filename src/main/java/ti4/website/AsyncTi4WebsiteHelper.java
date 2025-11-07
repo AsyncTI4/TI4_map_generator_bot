@@ -20,6 +20,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
 import ti4.spring.context.SpringContext;
 import ti4.spring.websocket.WebSocketNotifier;
+import ti4.website.model.WebBorderAnomalies;
 import ti4.website.model.WebCardPool;
 import ti4.website.model.WebExpeditions;
 import ti4.website.model.WebLaw;
@@ -92,6 +93,7 @@ public class AsyncTi4WebsiteHelper {
             WebObjectives webObjectives = WebObjectives.fromGame(game);
             WebCardPool webCardPool = WebCardPool.fromGame(game);
             WebExpeditions webExpeditions = WebExpeditions.fromGame(game);
+            WebBorderAnomalies webBorderAnomalies = WebBorderAnomalies.fromGame(game);
 
             // Create score breakdowns for each player
             Map<String, WebScoreBreakdown> playerScoreBreakdowns = new HashMap<>();
@@ -114,6 +116,15 @@ public class AsyncTi4WebsiteHelper {
                 strategyCards.add(webSC);
             }
 
+            // Create map of initiative -> strategy card ID
+            Map<Integer, String> strategyCardIdMap = new HashMap<>();
+            var strategyCardSet = game.getStrategyCardSet();
+            if (strategyCardSet != null) {
+                for (var scModel : strategyCardSet.getStrategyCardModels()) {
+                    strategyCardIdMap.put(scModel.getInitiative(), scModel.getId());
+                }
+            }
+
             Map<String, Object> webData = new HashMap<>();
             webData.put("versionSchema", 5);
             webData.put("objectives", webObjectives);
@@ -121,6 +132,7 @@ public class AsyncTi4WebsiteHelper {
             webData.put("lawsInPlay", lawsInPlay);
             webData.put("cardPool", webCardPool);
             webData.put("strategyCards", strategyCards);
+            webData.put("strategyCardIdMap", strategyCardIdMap);
             webData.put("scoreBreakdowns", playerScoreBreakdowns);
             webData.put("tilePositions", webTilePositions.getTilePositions());
             webData.put("tileUnitData", tileUnitData);
@@ -133,6 +145,13 @@ public class AsyncTi4WebsiteHelper {
             webData.put("tableTalkJumpLink", game.getTabletalkJumpLink());
             webData.put("actionsJumpLink", game.getActionsJumpLink());
             webData.put("expeditions", webExpeditions != null ? webExpeditions.getExpeditions() : null);
+            webData.put(
+                    "borderAnomalies",
+                    webBorderAnomalies != null
+                                    && webBorderAnomalies.getBorderAnomalies() != null
+                                    && !webBorderAnomalies.getBorderAnomalies().isEmpty()
+                            ? webBorderAnomalies.getBorderAnomalies()
+                            : null);
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
