@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -323,7 +322,6 @@ public class ButtonHelperTwilightsFall {
         game.removeStoredValue("lastSplicer");
         setNewSpliceCards(game, spliceType, size);
 
-        
         for (Player p : participants) {
             if (game.getStoredValue("savedParticipants").isEmpty()) {
                 game.setStoredValue("savedParticipants", p.getFaction());
@@ -332,11 +330,10 @@ public class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-         List<String> cards = getSpliceCards(game);
+        List<String> cards = getSpliceCards(game);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, startPlayer);
-        MessageHelper.sendMessageToChannelWithEmbeds(game.getActionsChannel(), "A splice has started with the following options.",embeds);
-
-       
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                game.getActionsChannel(), "A splice has started with the following options.", embeds);
 
         sendPlayerSpliceOptions(game, startPlayer);
     }
@@ -448,16 +445,16 @@ public class ButtonHelperTwilightsFall {
         }
         if (player.hasUnit("blacktf_mech")) {
             int numMechs = 0;
-            for(Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)){
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
                 boolean validPos = false;
-                for(String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)){
-                    if(FoWHelper.otherPlayersHaveUnitsInSystem(player, game.getTileByPosition(pos), game)){
+                for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                    if (FoWHelper.otherPlayersHaveUnitsInSystem(player, game.getTileByPosition(pos), game)) {
                         validPos = true;
                         break;
                     }
                 }
-                if(validPos){
-                    for(UnitHolder uH : tile.getUnitHolders().values()){
+                if (validPos) {
+                    for (UnitHolder uH : tile.getUnitHolders().values()) {
                         numMechs += uH.getUnitCount(UnitType.Mech, player);
                     }
                 }

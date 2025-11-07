@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -168,8 +167,8 @@ public class TeHelperAbilities {
 
     public static List<Button> miniLandingButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        //Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
-        for(Tile activeSystem : game.getTileMap().values()){
+        // Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        for (Tile activeSystem : game.getTileMap().values()) {
             if (activeSystem != null) {
                 // TODO: galvanize
                 int dmgDocks =
@@ -185,21 +184,22 @@ public class TeHelperAbilities {
                     for (int x = 1; x <= Math.min(2, pds); x++) {
                         String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
                                 + planet.getName();
-                        String label = "Land " + x + " PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                        String label =
+                                "Land " + x + " PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                     }
                     for (int x = 1; x <= Math.min(2, dmgPds); x++) {
                         String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "pd_"
                                 + planet.getName();
-                        String label =
-                                "Land " + x + " damaged PDS on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                        String label = "Land " + x + " damaged PDS on "
+                                + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.pds));
                     }
                     for (int x = 1; x <= Math.min(1, docks); x++) {
                         String id = player.finChecker() + "miniLanding_" + activeSystem.getPosition() + "_" + x + "sd_"
                                 + planet.getName();
-                        String label =
-                                "Land " + x + " Space Dock on " + Helper.getPlanetRepresentation(planet.getName(), game);
+                        String label = "Land " + x + " Space Dock on "
+                                + Helper.getPlanetRepresentation(planet.getName(), game);
                         buttons.add(Buttons.red(id, label, UnitEmojis.spacedock));
                     }
                     for (int x = 1; x <= Math.min(1, dmgDocks); x++) {
