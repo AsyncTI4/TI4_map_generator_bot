@@ -489,12 +489,10 @@ public class StartTurnService {
                         finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
             if (player.hasUnit("tf-vortexer")
-                    && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game)
+                    && !ButtonHelperFactionSpecific.getVortexerReleaseButtons(player, game)
                             .isEmpty()) {
                 startButtons.add(Buttons.gray(
-                        finChecker + "startPharadnInfRevive",
-                        "Release Vortexer Infantry/Fighters",
-                        FactionEmojis.Cabal));
+                        finChecker + "startVortexerRevive", "Release Vortexer Infantry/Fighters", FactionEmojis.Cabal));
             }
             if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(

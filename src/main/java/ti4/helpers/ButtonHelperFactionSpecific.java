@@ -2080,6 +2080,16 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("starVortexerRevive")
+    public static void startVortexerRevive(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = getVortexerReleaseButtons(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please use the buttons to release infantry and fighters.",
+                buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     public static void checkForGeneticRecombination(Player voter, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == voter) {
