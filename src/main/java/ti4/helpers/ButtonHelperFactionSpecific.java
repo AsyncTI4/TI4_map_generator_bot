@@ -2080,7 +2080,7 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    @ButtonHandler("starVortexerRevive")
+    @ButtonHandler("startVortexerRevive")
     public static void startVortexerRevive(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = getVortexerReleaseButtons(player, game);
         MessageHelper.sendMessageToChannelWithButtons(
