@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
@@ -84,6 +85,11 @@ public class StartCombatService {
         if (playersWithUnitsOnPlanet.size() <= 1) {
             return false;
         }
+        if (game.getActivePlayer() != null
+                && !playersWithUnitsOnPlanet.contains(game.getActivePlayer())
+                && event instanceof ButtonInteractionEvent) {
+            return false;
+        }
         Player player = playersWithUnitsOnPlanet.contains(game.getActivePlayer())
                 ? game.getActivePlayer()
                 : playersWithUnitsOnPlanet.getFirst();
@@ -91,18 +97,13 @@ public class StartCombatService {
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
         if (enemyPlayer.isPresent()) {
-            if (enemyPlayer.get().hasUnlockedBreakthrough("titansbt") || player.hasUnlockedBreakthrough("titansbt")) {
-                String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
-                String msg = player.getRepresentation() + " the game is unsure if a combat should occur on "
-                        + planetName + " or if you are coexisting. Please inform it with the buttons.";
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
-                buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-
-            } else {
-                startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
-            }
+            String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
+            String msg = player.getRepresentation() + " the game is unsure if a combat should occur on " + planetName
+                    + " or if you are coexisting. Please inform it with the buttons.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
+            buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             return true;
         }
         return false;
@@ -1067,7 +1068,7 @@ public class StartCombatService {
                 threadChannel, "Buttons to roll ANTI-FIGHTER BARRAGE (if applicable).", afbButtons);
         if (!game.isFowMode()) {
             for (Player player : combatPlayers) {
-                if ((ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile)
+                if ((ButtonHelper.doesPlayerHaveMechHere("naalu_mech_omega", player, tile)
                                 && !ButtonHelper.isLawInPlay(game, "articles_war"))
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_2", player, tile)) {

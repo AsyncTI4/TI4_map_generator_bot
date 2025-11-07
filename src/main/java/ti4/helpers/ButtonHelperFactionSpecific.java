@@ -13,6 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -25,8 +29,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1468,6 +1470,9 @@ public class ButtonHelperFactionSpecific {
         String receiverFaction = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
         for (String planet : hacan.getPlanetsAllianceMode()) {
+            if(game.getUnitHolderFromPlanet(planet) == null || game.getUnitHolderFromPlanet(planet).isSpaceStation()){
+                continue;
+            }
             if (!planet.equalsIgnoreCase(origPlanet)) {
                 buttons.add(Buttons.gray(
                         "hacanMechTradeStepTwo_" + origPlanet + "_" + receiverFaction + "_" + planet,

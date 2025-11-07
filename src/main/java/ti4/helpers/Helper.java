@@ -2003,7 +2003,7 @@ public class Helper {
                 totalUnits += entry.getValue();
                 if ((player.hasUnit("arvaxi_mech") || player.hasUnit("tf-valefarprime"))
                         && removedUnit.getUnitType() == UnitType.Mech) {
-                    totalUnits -= entry.getValue();
+                    cost -= entry.getValue();
                 }
             }
         }

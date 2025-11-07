@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -1845,6 +1846,9 @@ public class ButtonHelperAbilities {
                             || (nekro.hasTech("vax") || nekro.getFactionTechs().contains("vax"))
                             || (nekro.hasTech("vay") || nekro.getFactionTechs().contains("vay"))
                             || !Mapper.getTech(tech).isFactionTech()) {
+                        if(game.isTwilightsFallMode() && (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter"))){
+                            continue;
+                        }
                         techToGain.add(tech);
                     }
                 }
