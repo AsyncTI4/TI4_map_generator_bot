@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
@@ -138,8 +139,13 @@ public class DrawSecretService {
                 }
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+                game.setStrategyCardSet("te");
             }
-            if (game.isThundersEdge() || game.getStoredValue("useNewRex").isEmpty() || game.isTwilightsFallMode()) {
+            if (game.isTwilightsFallMode()) {
+                ButtonHelperTwilightsFall.fixMahactColors(game, event);
+                game.setStrategyCardSet("twilights_fall_sc");
+            }
+            if (game.isThundersEdge() || game.getStoredValue("useOldPok").isEmpty() || game.isTwilightsFallMode()) {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
                     String pos = mr.getPosition();

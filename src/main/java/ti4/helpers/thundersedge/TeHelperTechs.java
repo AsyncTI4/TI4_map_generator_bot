@@ -139,7 +139,8 @@ public class TeHelperTechs {
         Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
         List<Tile> tilesAdjToObsInf = tilesAdjToPlayersInf(game, player);
         List<Player> playersWithInfAdj = game.getRealPlayers().stream()
-                .filter(p -> tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
+                .filter(p -> p != player
+                        && tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
                 .toList();
         String prefixID = player.getFinsFactionCheckerPrefix() + "neuralParasiteS2_";
         List<Button> buttons = playersWithInfAdj.stream()

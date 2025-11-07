@@ -51,6 +51,8 @@ public class CheckDistanceHelper {
                             && entry.getValue() != null
                             && distances.get(tilePos) > entry.getValue()) {
                         distances.put(tilePos, entry.getValue());
+                    } else if (entry.getValue() == null && distances.get(tilePos) == null) {
+                        distances.put(tilePos, 100);
                     }
                 }
             }

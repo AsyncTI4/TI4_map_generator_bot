@@ -1845,6 +1845,10 @@ public class ButtonHelperAbilities {
                             || (nekro.hasTech("vax") || nekro.getFactionTechs().contains("vax"))
                             || (nekro.hasTech("vay") || nekro.getFactionTechs().contains("vay"))
                             || !Mapper.getTech(tech).isFactionTech()) {
+                        if (game.isTwilightsFallMode()
+                                && (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter"))) {
+                            continue;
+                        }
                         techToGain.add(tech);
                     }
                 }

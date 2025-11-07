@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -87,7 +88,7 @@ public class ButtonHelperTacticalAction {
             }
             if (player.hasAbility("miniaturization")) {
                 String msg = player.getRepresentation()
-                        + " You can land your structures on planets in the active system using your ability Miniaturization:";
+                        + " You can land your structures on planets in any system you have floating structures using your ability Miniaturization:";
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
                 if (buttons.size() > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -163,7 +164,9 @@ public class ButtonHelperTacticalAction {
                 event.getChannel(), message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
 
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        if (player.hasUnit("tf-productionbiomes")) {
+        if (player.hasUnit("tf-productionbiomes")
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(game.getTileByPosition(pos))) {
             String msg = player.getRepresentation()
                     + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
             List<Button> buttons2 = new ArrayList<>();
@@ -198,9 +201,9 @@ public class ButtonHelperTacticalAction {
                             + " agent.",
                     empyButtons);
         }
-        if (unitsWereMoved
-                && player.hasUnit("tf-yssarilinfantry")
-                && tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+        boolean infMoved = game.getTacticalActionDisplacement().values().stream()
+                .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Infantry, player.getColor())));
+        if (unitsWereMoved && player.hasUnit("tf-yssarilinfantry") && infMoved) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.getAc() == 0) {
                     continue;
@@ -416,10 +419,19 @@ public class ButtonHelperTacticalAction {
         Map<String, Integer> distances =
                 CheckDistanceHelper.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
         List<Button> buttons = new ArrayList<>();
-        if (desiredDistance > 0) {
-            buttons.add(Buttons.gray(
-                    "getTilesThisFarAway_" + (desiredDistance - 1),
-                    "Get Tiles " + (desiredDistance - 1) + " Spaces Away"));
+
+        System.out.println("------------------ Distance check ------------------");
+        System.out.println(distances);
+        List<Integer> allDistances =
+                (new HashSet<>(distances.values())).stream().sorted().toList();
+        System.out.println(allDistances);
+        Integer distIndx =
+                allDistances.stream().filter(i -> i <= desiredDistance).toList().size() - 1;
+        Integer prevDistIndx = distIndx - 1;
+        Integer nextDistIndx = distIndx + 1;
+        if (prevDistIndx >= 0) {
+            Integer prevDist = allDistances.get(prevDistIndx);
+            buttons.add(Buttons.gray("getTilesThisFarAway_" + prevDist, "Get Tiles " + prevDist + " Spaces Away"));
         }
         for (String pos :
                 CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
@@ -429,8 +441,16 @@ public class ButtonHelperTacticalAction {
                 buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation, tile.getTileEmoji(player)));
             }
         }
-        buttons.add(Buttons.gray(
-                "getTilesThisFarAway_" + (desiredDistance + 1), "Get Tiles " + (desiredDistance + 1) + " Spaces Away"));
+
+        if (nextDistIndx >= 0 && nextDistIndx < allDistances.size()) {
+            Integer nextDist = allDistances.get(nextDistIndx);
+            if (nextDist < 100) {
+                buttons.add(Buttons.gray("getTilesThisFarAway_" + nextDist, "Get Tiles " + nextDist + " Spaces Away"));
+            }
+            if (desiredDistance >= 3 && allDistances.stream().anyMatch(i -> i.equals(100))) {
+                buttons.add(Buttons.red("getTilesThisFarAway_" + 100, "Get Tiles Far Far Away", "⚠️"));
+            }
+        }
 
         String message = "Doing a tactical action. Please choose the system you wish to activate.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -740,7 +760,7 @@ public class ButtonHelperTacticalAction {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        if (player.hasTech("ffac2")) {
+        if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactories")) {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {
