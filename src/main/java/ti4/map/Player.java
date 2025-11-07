@@ -480,6 +480,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("ws")
                 || hasUnit("tf_warsun")
                 || hasUnit("tf-universitywarsun")
+                || hasUnit("tf-pws")
                 || getTechs().contains("absol_ws")
                 || getTechs().contains("baxanws")
                 || getTechs().contains("absol_pws2")
@@ -653,7 +654,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
-        if (ability.equalsIgnoreCase("researchteam") && getAbilities().contains("tf-pacifist")) {
+        if (ability.equalsIgnoreCase("researchteam") && getTechs().contains("tf-pacifist")) {
             return true;
         }
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
@@ -2088,6 +2089,9 @@ public class Player extends PlayerProperties {
             if (getTechs().contains("absol_" + techID)) {
                 return true;
             }
+        }
+        if (techID.equalsIgnoreCase("ah") && getTechs().contains("tf-ahl")) {
+            return true;
         }
         if (getTechs().contains("tf-" + techID)) {
             return true;

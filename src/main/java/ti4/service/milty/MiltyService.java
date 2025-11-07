@@ -484,7 +484,7 @@ public class MiltyService {
             player.removeLeader("naaluagent-te");
             player.addLeader("naaluagent");
             player.removeOwnedUnitByID("naalu_mech_te");
-            player.addOwnedUnitByID("naalu_mech");
+            player.addOwnedUnitByID("naalu_mech_omega");
         }
         if (game.isThundersEdge() && player.hasLeader("xxchahero")) {
             player.removeLeader("xxchahero");

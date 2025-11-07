@@ -1468,6 +1468,10 @@ public class ButtonHelperFactionSpecific {
         String receiverFaction = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
         for (String planet : hacan.getPlanetsAllianceMode()) {
+            if (game.getUnitHolderFromPlanet(planet) == null
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                continue;
+            }
             if (!planet.equalsIgnoreCase(origPlanet)) {
                 buttons.add(Buttons.gray(
                         "hacanMechTradeStepTwo_" + origPlanet + "_" + receiverFaction + "_" + planet,
@@ -1946,6 +1950,104 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static List<Button> getVortexerReleaseButtons(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        boolean hasInf = false;
+        boolean hasFF = false;
+        for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
+                if (unitKey.getUnitType() == UnitType.Infantry
+                        && unitHolder.getUnits().get(unitKey) > 0) {
+                    hasInf = true;
+                }
+                if (unitKey.getUnitType() == UnitType.Fighter
+                        && unitHolder.getUnits().get(unitKey) > 0) {
+                    hasFF = true;
+                }
+            }
+        }
+        if (!hasInf && !hasFF) {
+            return buttons;
+        }
+        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Carrier)) {
+            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                if (uH instanceof Planet && !player.getPlanetsAllianceMode().contains(uH.getName())) {
+                    continue;
+                }
+                if (uH instanceof Planet) {
+                    if (hasInf) {
+                        buttons.add(Buttons.green(
+                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
+                                        + uH.getName(),
+                                "Release Inf on " + Helper.getPlanetRepresentation(uH.getName(), game),
+                                UnitEmojis.infantry));
+                    }
+
+                } else {
+                    if (hasFF) {
+                        buttons.add(Buttons.blue(
+                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_figher_" + uH.getName(),
+                                "Release FF in " + tile.getRepresentationForButtons(),
+                                UnitEmojis.fighter));
+                    }
+                    if (hasInf) {
+                        buttons.add(Buttons.green(
+                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
+                                        + uH.getName(),
+                                "Release Inf in space of " + tile.getRepresentationForButtons(),
+                                UnitEmojis.infantry));
+                    }
+                }
+            }
+        }
+        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Resolving"));
+        return buttons;
+    }
+
+    @ButtonHandler("vortexRevive_")
+    public static void vortexRevive_(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        String uHName = buttonID.split("_")[3];
+        Tile tile = game.getTileByPosition(pos);
+
+        int amount = 0;
+        for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
+                if (unitKey.getUnitType() == UnitType.Infantry
+                        && unitHolder.getUnits().get(unitKey) > 0
+                        && unit.equalsIgnoreCase("infantry")) {
+                    amount = unitHolder.getUnits().get(unitKey);
+                }
+                if (unitKey.getUnitType() == UnitType.Fighter
+                        && unitHolder.getUnits().get(unitKey) > 0
+                        && unit.equalsIgnoreCase("fighter")) {
+                    amount = unitHolder.getUnits().get(unitKey);
+                }
+            }
+        }
+        amount--;
+        RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), unit);
+        if (uHName.equalsIgnoreCase("space")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of tile " + pos
+                            + " using the Vortexer ability. (" + amount + " left to revive)");
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit);
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getRepresentationUnfogged() + " put 1 captured " + unit + " on the planet of "
+                            + Helper.getPlanetRepresentation(uHName, game) + " using the Vortexer ability. (" + amount
+                            + " left to revive)");
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
+        }
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
+        if (amount == 0) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
     @ButtonHandler("pharadnInf2Revive_")
     public static void pharadnInf2Revive(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
@@ -1974,6 +2076,16 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please use the buttons to release an infantry onto a planet.",
+                buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("startVortexerRevive")
+    public static void startVortexerRevive(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = getVortexerReleaseButtons(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please use the buttons to release infantry and fighters.",
                 buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
