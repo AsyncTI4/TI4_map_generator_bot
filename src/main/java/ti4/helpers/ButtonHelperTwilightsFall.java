@@ -322,7 +322,6 @@ public class ButtonHelperTwilightsFall {
         game.removeStoredValue("lastSplicer");
         setNewSpliceCards(game, spliceType, size);
 
-        sendPlayerSpliceOptions(game, startPlayer);
         for (Player p : participants) {
             if (game.getStoredValue("savedParticipants").isEmpty()) {
                 game.setStoredValue("savedParticipants", p.getFaction());
@@ -331,7 +330,12 @@ public class ButtonHelperTwilightsFall {
                         "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
             }
         }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "A splice has started.");
+        List<String> cards = getSpliceCards(game);
+        List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, startPlayer);
+        MessageHelper.sendMessageToChannelWithEmbeds(
+                game.getActionsChannel(), "A splice has started with the following options.", embeds);
+
+        sendPlayerSpliceOptions(game, startPlayer);
     }
 
     public static List<String> getSpliceCards(Game game) {
@@ -440,7 +444,21 @@ public class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if (player.hasUnit("blacktf_mech")) {
-            int numMechs = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false);
+            int numMechs = 0;
+            for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
+                boolean validPos = false;
+                for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
+                    if (FoWHelper.otherPlayersHaveUnitsInSystem(player, game.getTileByPosition(pos), game)) {
+                        validPos = true;
+                        break;
+                    }
+                }
+                if (validPos) {
+                    for (UnitHolder uH : tile.getUnitHolders().values()) {
+                        numMechs += uH.getUnitCount(UnitType.Mech, player);
+                    }
+                }
+            }
             AddUnitService.addUnits(null, player.getNomboxTile(), game, player.getColor(), numMechs + " infantry");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -509,11 +527,15 @@ public class ButtonHelperTwilightsFall {
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
         } else {
-            game.setStoredValue(
-                    "savedSpliceCards",
-                    game.getStoredValue("savedSpliceCards")
-                            .replace(cardID + "_", "")
-                            .replace(cardID, ""));
+            if (game.getStoredValue("savedSpliceCards").contains(cardID + "_")) {
+                game.setStoredValue(
+                        "savedSpliceCards",
+                        game.getStoredValue("savedSpliceCards").replace(cardID + "_", ""));
+            } else {
+                game.setStoredValue(
+                        "savedSpliceCards",
+                        game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+            }
             if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
@@ -563,7 +585,6 @@ public class ButtonHelperTwilightsFall {
         if (participants.size() > 0) {
             game.setStoredValue("lastSplicer", player.getFaction());
             sendPlayerSpliceOptions(game, participants.get(0));
-            participants.remove(0);
             for (Player p : participants) {
                 if (game.getStoredValue("savedParticipants").isEmpty()) {
                     game.setStoredValue("savedParticipants", p.getFaction());

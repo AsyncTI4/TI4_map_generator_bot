@@ -76,7 +76,9 @@ class CaptureUnitService {
             if (!counted.add(key.getColorID())) continue;
 
             Player p2 = game.getPlayerByUnitKey(key).orElse(null);
-            if (p2 != null && p2 != removed.getPlayer(game) && p2.hasAbility("devour")) {
+            if (p2 != null
+                    && p2 != removed.getPlayer(game)
+                    && (p2.hasAbility("devour") || p2.hasTech("tf-amalgamation"))) {
                 playersWithDevour.add(p2);
             }
         }
