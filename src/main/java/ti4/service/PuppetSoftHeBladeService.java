@@ -361,6 +361,20 @@ public class PuppetSoftHeBladeService {
             }
         }
 
+        // Update Expedition Tokens
+        if (game.getExpeditions().getTradeGoods().equals(oldFaction.getAlias()))
+            game.getExpeditions().setTradeGoods(newFaction.getAlias());
+        if (game.getExpeditions().getFiveInf().equals(oldFaction.getAlias()))
+            game.getExpeditions().setFiveInf(newFaction.getAlias());
+        if (game.getExpeditions().getFiveRes().equals(oldFaction.getAlias()))
+            game.getExpeditions().setFiveRes(newFaction.getAlias());
+        if (game.getExpeditions().getTechSkip().equals(oldFaction.getAlias()))
+            game.getExpeditions().setTechSkip(newFaction.getAlias());
+        if (game.getExpeditions().getActionCards().equals(oldFaction.getAlias()))
+            game.getExpeditions().setActionCards(newFaction.getAlias());
+        if (game.getExpeditions().getSecret().equals(oldFaction.getAlias()))
+            game.getExpeditions().setSecret(newFaction.getAlias());
+
         return "Successfully (?) updated game stored values.";
     }
 }
