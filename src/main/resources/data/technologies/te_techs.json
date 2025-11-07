@@ -19,7 +19,7 @@
         "requirements": "YY",
         "faction": "bastion",
         "baseUpgrade": "sd2",
-        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nThe resource value of this planet is increased by 2. [Note: not confirmed]\nUp to 3 fighters in this system do not count against your ships' capacity.",
+        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nThe resource value of this planet is increased by 2. \nUp to 3 fighters in this system do not count against your ships' capacity.",
         "source": "thunders_edge"
     },
     {
