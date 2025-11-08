@@ -51,7 +51,9 @@ public class SabotageService {
             return false;
         }
 
-        if (game.isTwilightsFallMode() && checkForAllShattersDiscarded(game)) {
+        if (checkForAllSabotagesDiscarded(game)
+                || checkAcd2ForAllSabotagesDiscarded(game)
+                || checkForAllShattersDiscarded(game)) {
             return false;
         }
 
@@ -60,14 +62,10 @@ public class SabotageService {
             return false;
         }
 
-        if (player.isPassed()
-                && game.getActivePlayer() != null
-                && (game.getActivePlayer().hasTech("tp")
-                        || game.getActivePlayer().hasTech("tf-crafty"))) {
-            return false;
-        }
-
-        return !checkForAllSabotagesDiscarded(game) && !checkAcd2ForAllSabotagesDiscarded(game);
+        return !player.isPassed()
+                || game.getActivePlayer() == null
+                || (!game.getActivePlayer().hasTech("tp")
+                        && !game.getActivePlayer().hasTech("tf-crafty"));
     }
 
     public static boolean couldUseInstinctTraining(Player player) {
