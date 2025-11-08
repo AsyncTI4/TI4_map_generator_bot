@@ -94,6 +94,11 @@ import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
 
+    private static final Set<String> SHATTER_CARD_ALIASES = Set.of("tf-shatter1", "tf-shatter2");
+    private static final Set<String> SABOTAGE_CARD_ALIASES = Set.of("sabo1", "sabo2", "sabo3", "sabo4");
+    private static final Set<String> AC_D2_SABOTAGE_CARD_ALIASES =
+            Set.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
+
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
         currentTime /= 1000;
@@ -119,7 +124,11 @@ public class Helper {
     }
 
     public static boolean isSaboAllowed(Game game, Player player) {
-        if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
+        if (game.isTwilightsFallMode()) {
+            if (checkForAllShattersDiscarded(game)) {
+                return false;
+            }
+        } else if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -142,7 +151,11 @@ public class Helper {
     }
 
     public static String noSaboReason(Game game, Player player) {
-        if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
+        if (game.isTwilightsFallMode()) {
+            if (checkForAllShattersDiscarded(game)) {
+                return "All _Shatter_ cards are in the discard.";
+            }
+        } else if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return "All _Sabotages_ are in the discard.";
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -165,19 +178,17 @@ public class Helper {
         return null;
     }
 
+    public static boolean checkForAllShattersDiscarded(Game game) {
+        return game.getDiscardActionCards().keySet().containsAll(SHATTER_CARD_ALIASES);
+    }
+
     private static boolean checkForAllSabotagesDiscarded(Game game) {
-        return game.getDiscardActionCards().containsKey("sabo1")
-                && game.getDiscardActionCards().containsKey("sabo2")
-                && game.getDiscardActionCards().containsKey("sabo3")
-                && game.getDiscardActionCards().containsKey("sabo4");
+        return game.getDiscardActionCards().keySet().containsAll(SABOTAGE_CARD_ALIASES);
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
         return game.isAcd2()
-                && game.getDiscardActionCards().containsKey("sabotage1_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage2_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage3_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage4_acd2");
+                && game.getDiscardActionCards().keySet().containsAll(AC_D2_SABOTAGE_CARD_ALIASES);
     }
 
     public static boolean doesAnyoneOwnPlanet(Game game, String planet) {

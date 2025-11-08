@@ -1,6 +1,8 @@
 package ti4.service.actioncard;
 
+import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -10,6 +12,20 @@ import ti4.service.unit.CheckUnitContainmentService;
 @UtilityClass
 public class SabotageService {
 
+    private static final Set<String> SABOTAGE_CARD_ALIASES =
+            Set.of(
+                    "sabo1",
+                    "sabo2",
+                    "sabo3",
+                    "sabo4",
+                    "sabotage_ds",
+                    "sabotage1_acd2",
+                    "sabotage2_acd2",
+                    "sabotage3_acd2",
+                    "sabotage4_acd2",
+                    "tf-shatter1",
+                    "tf-shatter2");
+
     public static boolean couldFeasiblySabotage(Player player, Game game) {
         if (player.isNpc()) {
             return false;
@@ -17,6 +33,11 @@ public class SabotageService {
 
         if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game)) {
             return true;
+        }
+
+        if (game.isTwilightsFallMode()
+                && (Helper.checkForAllShattersDiscarded(game) || player.getAc() == 0)) {
+            return false;
         }
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -83,14 +104,6 @@ public class SabotageService {
     }
 
     private static boolean playerHasSabotage(Player player) {
-        return player.getActionCards().containsKey("sabo1")
-                || player.getActionCards().containsKey("sabo2")
-                || player.getActionCards().containsKey("sabo3")
-                || player.getActionCards().containsKey("sabo4")
-                || player.getActionCards().containsKey("sabotage_ds")
-                || player.getActionCards().containsKey("sabotage1_acd2")
-                || player.getActionCards().containsKey("sabotage2_acd2")
-                || player.getActionCards().containsKey("sabotage3_acd2")
-                || player.getActionCards().containsKey("sabotage4_acd2");
+        return player.getActionCards().keySet().stream().anyMatch(SABOTAGE_CARD_ALIASES::contains);
     }
 }
