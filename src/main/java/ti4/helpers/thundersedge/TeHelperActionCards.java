@@ -107,7 +107,7 @@ public class TeHelperActionCards {
     private static void lieInWait(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(true)) {
-            if (p2 == player || p2.getAc() == 0) {
+            if (p2 == player || p2.getAcCount() == 0) {
                 continue;
             }
             if (game.isFowMode()) {
