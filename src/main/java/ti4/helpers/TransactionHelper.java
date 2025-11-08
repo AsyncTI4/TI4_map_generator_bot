@@ -628,7 +628,7 @@ public class TransactionHelper {
                             + " Please choose the number of action cards you wish to request."
                             + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                             + " these buttons will just make sure that the player is offered buttons to send them.";
-                    int limit = Math.min(7, p2.getAc());
+                    int limit = Math.min(7, p2.getAcCount());
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
                                 "offerToTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction() + "_generic" + x,
@@ -1616,7 +1616,7 @@ public class TransactionHelper {
                         || p2.hasAbility("arbiters")
                         || p1.hasTech("tf-guild_ships")
                         || p2.hasTech("tf-guild_ships"))
-                && p1.getAc() > 0) {
+                && p1.getAcCount() > 0) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(), "Action Cards"));
         }
@@ -1764,7 +1764,7 @@ public class TransactionHelper {
                         || (!game.isFowMode() && p2.hasAbility("arbiters"))
                         || p1.hasTech("tf-guild_ships")
                         || (!game.isFowMode() && p2.hasTech("tf-guild_ships")))
-                && p1.getAc() > 0) {
+                && p1.getAcCount() > 0) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {

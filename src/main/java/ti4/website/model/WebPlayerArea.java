@@ -344,7 +344,7 @@ public class WebPlayerArea {
 
         // card counts
         webPlayerArea.setSoCount(player.getSo());
-        webPlayerArea.setAcCount(player.getAc());
+        webPlayerArea.setAcCount(player.getAcCount());
         webPlayerArea.setPnCount(player.getPnCount());
 
         // victory points
