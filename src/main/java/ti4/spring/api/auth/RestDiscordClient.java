@@ -10,13 +10,10 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import ti4.website.EgressClientManager;
 
-/**
- * Low-level REST client for Discord API calls.
- * Handles HTTP communication and JSON deserialization.
- */
 @Component
 public class RestDiscordClient {
     private static final String DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token";
@@ -27,15 +24,6 @@ public class RestDiscordClient {
     private final ObjectMapper objectMapper = EgressClientManager.getObjectMapper();
     private final HttpClient httpClient = EgressClientManager.getHttpClient();
 
-    /**
-     * Fetch Discord user information using a bearer token.
-     * Returns null if authentication fails (401/403), throws IOException for other errors.
-     *
-     * @param bearerToken OAuth2 access token
-     * @return User info response, or null if unauthorized
-     * @throws IOException If network or deserialization fails
-     * @throws InterruptedException If HTTP request is interrupted
-     */
     public DiscordUserInfo getUserInfo(String bearerToken) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(DISCORD_USER_INFO_URL))
@@ -46,27 +34,20 @@ public class RestDiscordClient {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() == 200) {
+        if (response.statusCode() == HttpStatus.OK.value()) {
             return objectMapper.readValue(response.body(), DiscordUserInfo.class);
         }
 
-        if (response.statusCode() == 401 || response.statusCode() == 403) {
-            return null; // Authentication failed
+        if (response.statusCode() == HttpStatus.UNAUTHORIZED.value()
+                || response.statusCode() == HttpStatus.FORBIDDEN.value()) {
+            return null;
         }
 
-        throw new IOException("Unexpected status from Discord: " + response.statusCode() + " - " + response.body());
+        throw new RuntimeException(
+                "Unexpected status from Discord: " + response.statusCode() + " - " + response.body());
     }
 
-    /**
-     * Exchange authorization code for access token.
-     *
-     * @param code Authorization code from OAuth2 flow
-     * @param redirectUri Redirect URI used in authorization
-     * @return Token response with access token and refresh token
-     * @throws IOException If network or deserialization fails
-     * @throws InterruptedException If HTTP request is interrupted
-     */
-    public DiscordTokenResponse exchangeCodeForToken(String code, String redirectUri)
+    DiscordTokenResponse exchangeCodeForToken(String code, String redirectUri)
             throws IOException, InterruptedException {
         Map<String, String> formData = Map.of(
                 "client_id", DISCORD_CLIENT_ID,
@@ -78,15 +59,7 @@ public class RestDiscordClient {
         return postTokenRequest(formData);
     }
 
-    /**
-     * Refresh access token using refresh token.
-     *
-     * @param refreshToken Refresh token from previous token response
-     * @return New token response with refreshed access token
-     * @throws IOException If network or deserialization fails
-     * @throws InterruptedException If HTTP request is interrupted
-     */
-    public DiscordTokenResponse refreshAccessToken(String refreshToken) throws IOException, InterruptedException {
+    DiscordTokenResponse refreshAccessToken(String refreshToken) throws IOException, InterruptedException {
         Map<String, String> formData = Map.of(
                 "client_id", DISCORD_CLIENT_ID,
                 "client_secret", DISCORD_CLIENT_SECRET,
@@ -112,8 +85,9 @@ public class RestDiscordClient {
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200) {
-            throw new IOException("Discord token request failed: " + response.statusCode() + " - " + response.body());
+        if (response.statusCode() != HttpStatus.OK.value()) {
+            throw new RuntimeException(
+                    "Discord token request failed: " + response.statusCode() + " - " + response.body());
         }
 
         return objectMapper.readValue(response.body(), DiscordTokenResponse.class);
