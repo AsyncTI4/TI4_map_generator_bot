@@ -171,7 +171,7 @@
         "alias": "tf-reverse",
         "name": "Reverse",
         "phase": "Action",
-        "window": "When a splice begins",
+        "window": "When a splice begins [Note: in async, play this before the splice begins]",
         "text": "Reverse the order the spliced cards are passed.",
         "source": "twilights_fall"
     },

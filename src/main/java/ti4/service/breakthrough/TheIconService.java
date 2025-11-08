@@ -75,12 +75,13 @@ public class TheIconService {
 
         String msg = player.getRepresentationUnfogged() + " you can use your breakthrough, " + theIcon()
                 + ", to place your produced ships in a different eligible system.";
-        ButtonHelper.sendMessageToRightStratThread(player, game, msg, buttonID);
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
     }
 
     @ButtonHandler("useTheIcon")
     private void doExhaustIcon(ButtonInteractionEvent event, Player player) {
         BreakthroughCommandHelper.exhaustBreakthrough(event, player);
+        iconStepOne(event, player.getGame(), player);
     }
 
     public void iconStepOne(GenericInteractionCreateEvent event, Game game, Player player) {

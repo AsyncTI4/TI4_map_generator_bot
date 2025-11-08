@@ -2447,7 +2447,10 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         Tile tile1 = game.getTileByPosition(pos1);
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1) {
+            if (tile.getPosition().contains("t")
+                    || tile.getPosition().contains("b")
+                    || tile == tile1
+                    || tile.getPosition().contains("frac")) {
                 continue;
             }
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {

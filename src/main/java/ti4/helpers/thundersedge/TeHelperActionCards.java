@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
@@ -23,6 +24,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.ColorModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -309,6 +311,14 @@ public class TeHelperActionCards {
 
         String prefix = player.finChecker() + "teMercenaryContract_";
         String message = player.getRepresentation() + " choose a planet to place 2 neutral infantry on:";
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
         ButtonHelper.deleteMessage(event);
@@ -404,6 +414,14 @@ public class TeHelperActionCards {
     @ButtonHandler("resolvePirateContract_")
     private static void resolvePirateContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             resolvePiratesGeneric(event, game, player, tile, "dd");
@@ -418,6 +436,14 @@ public class TeHelperActionCards {
     @ButtonHandler("resolvePirateFleet_")
     private static void resolvePirateFleet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             resolvePiratesGeneric(event, game, player, tile, "cv, ca, dd, 2 ff");

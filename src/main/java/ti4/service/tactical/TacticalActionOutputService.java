@@ -272,6 +272,9 @@ public class TacticalActionOutputService {
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
+        if (game.isTwilightsFallMode()) {
+            tileHasWormhole = FoWHelper.doesTileHaveWHs(game, tile.getPosition());
+        }
         Tile activeSystem = getActiveSystem(game);
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();

@@ -44,8 +44,10 @@ class SecretObjectiveButtonHandler {
                         amountLeftToDiscard++;
                     }
                 }
-                msg += " (" + amountLeftToDiscard + " player" + (amountLeftToDiscard == 1 ? "" : "s")
-                        + " still to discard)";
+                if (amountLeftToDiscard > -1) {
+                    msg += " (" + amountLeftToDiscard + " player" + (amountLeftToDiscard == 1 ? "" : "s")
+                            + " still to discard)";
+                }
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
             DiscardSecretService.discardSO(player, soIndex, game);
