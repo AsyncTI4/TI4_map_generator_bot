@@ -1,5 +1,7 @@
 package ti4.message.logging;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,6 +19,7 @@ import ti4.cron.CronManager;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
+import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
@@ -157,6 +160,19 @@ public class BotLogger {
         logToChannel(origin, message, null, LogSeverity.Error);
     }
 
+    public static void errorToThread(@Nonnull String message, @Nonnull String threadName) {
+        errorToThread(null, message, null, threadName);
+    }
+
+    public static void errorToThread(@Nonnull String message, @Nullable Throwable err, @Nonnull String threadName) {
+        errorToThread(null, message, err, threadName);
+    }
+
+    public static void errorToThread(
+            @Nullable LogOrigin origin, @Nonnull String message, @Nullable Throwable err, @Nonnull String threadName) {
+        logToChannel(origin, message, err, LogSeverity.Error, threadName);
+    }
+
     /**
      * Sends a log message via the specified bot log channel. Should be used through info(), warning(), or error() methods.
      * <p>
@@ -172,6 +188,15 @@ public class BotLogger {
             @Nonnull String message,
             @Nullable Throwable err,
             @Nonnull LogSeverity severity) {
+        logToChannel(origin, message, err, severity, null);
+    }
+
+    private static void logToChannel(
+            @Nullable LogOrigin origin,
+            @Nonnull String message,
+            @Nullable Throwable err,
+            @Nonnull LogSeverity severity,
+            @Nullable String threadName) {
         // Count Error-severity logs once per entry
         if (severity == LogSeverity.Error) {
             SREStats.incrementErrorCount();
@@ -207,13 +232,22 @@ public class BotLogger {
         String compiledMessage = msg.toString();
         int msgLength = compiledMessage.length();
 
+        List<String> messageChunks = new ArrayList<>();
         // Handle message length overflow. Overflow length is derived from previous implementation
         for (int i = 0; i <= msgLength; i += MAX_DISCORD_MESSAGE_SIZE) {
-            String msgChunk = compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength));
+            messageChunks.add(compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength)));
+        }
 
-            if (err == null
-                    || i + MAX_DISCORD_MESSAGE_SIZE
-                            < msgLength) { // If length could overflow or there is no error to trace
+        if (threadName != null && channel != null) {
+            sendMessageToThread(channel, threadName, messageChunks, err);
+            return;
+        }
+
+        for (int i = 0; i < messageChunks.size(); i++) {
+            String msgChunk = messageChunks.get(i);
+            boolean isLastChunk = i == messageChunks.size() - 1;
+
+            if (err == null || !isLastChunk) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
             } else { // Handle error on last send
@@ -233,6 +267,20 @@ public class BotLogger {
                 }
             }
         }
+    }
+
+    private static void sendMessageToThread(
+            @Nonnull TextChannel channel,
+            @Nonnull String threadName,
+            @Nonnull List<String> messageChunks,
+            @Nullable Throwable err) {
+        ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
+        ThreadGetter.getThreadInChannel(channel, threadName, thread -> {
+            messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue());
+            if (err != null) {
+                MessageHelper.sendMessageToChannel(thread, ExceptionUtils.getStackTrace(err));
+            }
+        });
     }
 
     /**

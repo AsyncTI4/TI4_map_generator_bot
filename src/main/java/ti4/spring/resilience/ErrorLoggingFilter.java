@@ -18,6 +18,7 @@ import ti4.service.statistics.SREStats;
 public class ErrorLoggingFilter extends OncePerRequestFilter {
 
     private static final int START_OF_HTTP_ERROR_RANGE = 400;
+    private static final String HTTP_ERROR_THREAD_NAME = "http-errors";
 
     @Override
     protected void doFilterInternal(
@@ -32,7 +33,8 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, cachingResponse);
         } catch (Exception e) {
-            BotLogger.error("Exception during request to " + request.getRequestURI(), e);
+            BotLogger.errorToThread(
+                    "Exception during request to " + request.getRequestURI(), e, HTTP_ERROR_THREAD_NAME);
             SREStats.incrementWebserverRequestErrorCount();
             throw e;
         }
@@ -42,7 +44,7 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
             String error = String.format(
                     "Request to %s returned status %s with body: %s",
                     request.getRequestURI(), cachingResponse.getStatus(), body);
-            BotLogger.error(error);
+            BotLogger.errorToThread(error, HTTP_ERROR_THREAD_NAME);
             SREStats.incrementWebserverRequestErrorCount();
         }
 
