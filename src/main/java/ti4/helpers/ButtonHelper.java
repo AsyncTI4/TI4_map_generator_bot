@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -153,10 +156,7 @@ public class ButtonHelper {
         if (tile == null || tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player.getColor()) < 1) {
             return false;
         }
-        if (ValefarZService.hasFlagshipAbility(player.getGame(), player, flagshipID)) {
-            return true;
-        }
-        return false;
+        return ValefarZService.hasFlagshipAbility(player.getGame(), player, flagshipID);
     }
 
     public static boolean doesPlayerHaveMechHere(String mechID, Player player, Tile tile) {
@@ -903,7 +903,7 @@ public class ButtonHelper {
                 buttons2);
 
         if (player.hasAbility("propagation")) {
-            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            List<Button> buttons = getGainCCButtons(player);
             String message = player.getRepresentation()
                     + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation()
@@ -919,7 +919,7 @@ public class ButtonHelper {
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", use the button to research a technology.",
                     Buttons.GET_A_FREE_TECH);
-            if (player.getFaction().equalsIgnoreCase("nomad")) {
+            if ("nomad".equalsIgnoreCase(player.getFaction())) {
                 MessageHelper.sendMessageToChannelWithButton(
                         player.getCorrectChannel(),
                         player.getRepresentation() + ", use the button to get a second technology.",
@@ -1816,7 +1816,7 @@ public class ButtonHelper {
                 } else {
                     Button lookAtACs = Buttons.green(
                             fincheckerForNonActive + "yssarilcommander_ac_" + player.getFaction(),
-                            "Look at Action Cards (" + player.getAc() + ")");
+                            "Look at Action Cards (" + player.getAcCount() + ")");
                     Button lookAtPNs = Buttons.green(
                             fincheckerForNonActive + "yssarilcommander_pn_" + player.getFaction(),
                             "Look at Promissory Notes (" + player.getPnCount() + ")");
@@ -2099,7 +2099,7 @@ public class ButtonHelper {
             return false;
         }
         int limit = getACLimit(game, player);
-        return player.getAc() > limit;
+        return player.getAcCount() > limit;
     }
 
     public static int getACLimit(Game game, Player player) {
@@ -2315,7 +2315,7 @@ public class ButtonHelper {
             }
         }
         if (count > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")) {
-            count -= ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
+            count -= getNumberOfUnitsOnTheBoard(game, player, "sd");
         }
         return count;
     }
@@ -3432,7 +3432,7 @@ public class ButtonHelper {
 
                 remainingButtons.add(b);
                 newActionRow.add(b);
-                if (!b.getCustomId().equalsIgnoreCase("deleteButtons")
+                if (!"deleteButtons".equalsIgnoreCase(b.getCustomId())
                         && !b.getCustomId().contains("ultimateUndo")) {
                     hasRealButton = true;
                 }
@@ -3705,10 +3705,10 @@ public class ButtonHelper {
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
             fleetCap += 1000;
         }
-        if (ButtonHelper.doesPlayerHaveFSHere("blacktf_flagship", player, tile)) {
+        if (doesPlayerHaveFSHere("blacktf_flagship", player, tile)) {
             capacity += 100;
         }
-        if (ButtonHelper.doesPlayerHaveFSHere("tf-echoofascension", player, tile)) {
+        if (doesPlayerHaveFSHere("tf-echoofascension", player, tile)) {
             capacity += 2;
         }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
@@ -3802,7 +3802,7 @@ public class ButtonHelper {
                             numFighter2s = 0;
                         }
                     }
-                    if (unit.getId().equalsIgnoreCase("naaz_voltron")) {
+                    if ("naaz_voltron".equalsIgnoreCase(unit.getId())) {
                         numFighter2s++;
                     }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
@@ -5174,7 +5174,7 @@ public class ButtonHelper {
         String successMessage = player.getFactionEmoji() + " replaced 1 " + UnitEmojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with 1 pds using awaken.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
     }
 
     @ButtonHandler("absolsdn_")
@@ -7810,7 +7810,7 @@ public class ButtonHelper {
         Button codex3 = Buttons.green("codexCardPick_3", "Card #3");
         String message = "Please choose which action cards you wish to retrieve from the discard pile.";
         int acCountLimit = getACLimit(game, player);
-        int acCountPlayer = player.getAc();
+        int acCountPlayer = player.getAcCount();
         if (acCountPlayer + 3 > acCountLimit) {
             message += " After retrieving the 3 action cards, you will be over your action card hand limit of "
                     + acCountLimit + " cards; you will need to discard " + (acCountPlayer + 3 - acCountLimit)

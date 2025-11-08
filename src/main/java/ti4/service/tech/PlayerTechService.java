@@ -300,7 +300,7 @@ public class PlayerTechService {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player || p2.getAc() == 0) {
+                    if (p2 == player || p2.getAcCount() == 0) {
                         continue;
                     }
                     if (game.isFowMode()) {
@@ -758,7 +758,7 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
-        if (payType.equals("res")) {
+        if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {

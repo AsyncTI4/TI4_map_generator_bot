@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -26,7 +25,6 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -54,8 +52,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -70,7 +66,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -94,11 +89,6 @@ import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
 
-    private static final Set<String> SHATTER_CARD_ALIASES = Set.of("tf-shatter1", "tf-shatter2");
-    private static final Set<String> SABOTAGE_CARD_ALIASES = Set.of("sabo1", "sabo2", "sabo3", "sabo4");
-    private static final Set<String> AC_D2_SABOTAGE_CARD_ALIASES =
-            Set.of("sabotage1_acd2", "sabotage2_acd2", "sabotage3_acd2", "sabotage4_acd2");
-
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
         currentTime /= 1000;
@@ -121,83 +111,6 @@ public class Helper {
             }
         }
         return null;
-    }
-
-    public static boolean isSaboAllowed(Game game, Player player) {
-        if (game.isTwilightsFallMode()) {
-            if (checkForAllShattersDiscarded(game)) {
-                return false;
-            }
-        } else if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
-            return false;
-        }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
-            return false;
-        }
-        if ((player.hasTech("tp") || player.hasTech("tf-crafty"))
-                && game.getActivePlayerID() != null
-                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (!p2.isPassed()) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public static String noSaboReason(Game game, Player player) {
-        if (game.isTwilightsFallMode()) {
-            if (checkForAllShattersDiscarded(game)) {
-                return "All _Shatter_ cards are in the discard.";
-            }
-        } else if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
-            return "All _Sabotages_ are in the discard.";
-        }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
-            LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
-            return "Player has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation();
-        }
-        if (player.hasTech("tp")
-                && game.getActivePlayerID() != null
-                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) continue;
-                if (!p2.isPassed()) return null;
-            }
-            return "Player has " + FactionEmojis.Yssaril
-                    + " _Transparasteel Plating_, and all other players have passed.";
-        }
-        if (player.hasTech("baarvag")) {
-            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
-        }
-        return null;
-    }
-
-    public static boolean checkForAllShattersDiscarded(Game game) {
-        return game.getDiscardActionCards().keySet().containsAll(SHATTER_CARD_ALIASES);
-    }
-
-    private static boolean checkForAllSabotagesDiscarded(Game game) {
-        return game.getDiscardActionCards().keySet().containsAll(SABOTAGE_CARD_ALIASES);
-    }
-
-    private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
-        return game.isAcd2()
-                && game.getDiscardActionCards().keySet().containsAll(AC_D2_SABOTAGE_CARD_ALIASES);
-    }
-
-    public static boolean doesAnyoneOwnPlanet(Game game, String planet) {
-        for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(planet)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
@@ -527,35 +440,6 @@ public class Helper {
             }
         }
         return players;
-    }
-
-    public static void startOfTurnSaboWindowReminders(Game game, Player player) {
-        var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
-        for (GameMessageManager.GameMessage gameMessage : gameMessages) {
-            if (ReactionService.checkForSpecificPlayerReact(gameMessage.messageId(), player, game)) continue;
-
-            game.getMainGameChannel()
-                    .retrieveMessageById(gameMessage.messageId())
-                    .queue(mainMessage -> {
-                        Emoji reactionEmoji = getPlayerReactionEmoji(game, player, gameMessage.messageId());
-                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                        if (reaction == null) {
-                            Calendar rightNow = Calendar.getInstance();
-                            if (rightNow.get(Calendar.DAY_OF_YEAR)
-                                                    - mainMessage
-                                                            .getTimeCreated()
-                                                            .getDayOfYear()
-                                            > 2
-                                    || rightNow.get(Calendar.DAY_OF_YEAR)
-                                                    - mainMessage
-                                                            .getTimeCreated()
-                                                            .getDayOfYear()
-                                            < -100) {
-                                GameMessageManager.remove(game.getName(), gameMessage.messageId());
-                            }
-                        }
-                    });
-        }
     }
 
     public static Player getPlayerFromUnlockedLeader(Game game, String leader) {
@@ -2979,14 +2863,12 @@ public class Helper {
                     && "17"
                             .equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition())
                                     .getTileID());
-            if (((player.getFaction().contains("ghost")
-                                    || (tile != null && tile.getTileID().equalsIgnoreCase("51")))
+            if (((player.getFaction().contains("ghost") || (tile != null && "51".equalsIgnoreCase(tile.getTileID())))
                             && game.getTile("17") != null)
                     && ghostish) {
                 tile = game.getTile("17");
             }
-            if (((player.getFaction().contains("crimson")
-                            || (tile != null && tile.getTileID().equalsIgnoreCase("118")))
+            if (((player.getFaction().contains("crimson") || (tile != null && "118".equalsIgnoreCase(tile.getTileID())))
                     && game.getTile("94") != null)) {
                 tile = game.getTile("94");
             }

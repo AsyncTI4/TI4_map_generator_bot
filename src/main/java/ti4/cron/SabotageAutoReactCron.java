@@ -73,7 +73,7 @@ public class SabotageAutoReactCron {
     }
 
     private static boolean playerShouldRandomlyReact(Player player) {
-        if (player.isAFK() && player.getAc() != 0) {
+        if (player.isAFK()) {
             return false;
         }
         return shouldRandomlyReact(player);
