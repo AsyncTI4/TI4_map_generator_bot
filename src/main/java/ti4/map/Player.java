@@ -475,17 +475,18 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean hasWarsunTech() {
-        return getTechs().contains("pws2")
-                || getTechs().contains("dsrohdws")
-                || getTechs().contains("ws")
-                || hasUnit("tf_warsun")
-                || hasUnit("tf-universitywarsun")
-                || hasUnit("tf-pws")
-                || getTechs().contains("absol_ws")
-                || getTechs().contains("baxanws")
-                || getTechs().contains("absol_pws2")
-                || hasUnit("muaat_warsun")
-                || hasUnit("rohdhna_warsun");
+        return getUnitByBaseType("warsun") != null;
+        // return getTechs().contains("pws2")
+        //         || getTechs().contains("dsrohdws")
+        //         || getTechs().contains("ws")
+        //         || hasUnit("tf_warsun")
+        //         || hasUnit("tf-universitywarsun")
+        //         || hasUnit("tf-pws")
+        //         || getTechs().contains("absol_ws")
+        //         || getTechs().contains("baxanws")
+        //         || getTechs().contains("absol_pws2")
+        //         || hasUnit("muaat_warsun")
+        //         || hasUnit("rohdhna_warsun");
     }
 
     @JsonIgnore
@@ -2939,6 +2940,9 @@ public class Player extends PlayerProperties {
     public Tile getHomeSystemTile() {
         Game game = this.game;
         if (getFaction() == null) {
+            return null;
+        }
+        if (game.getStoredValue("silverFlamed").contains(getFaction())) {
             return null;
         }
         if (getHomeSystemPosition() != null) {

@@ -36,7 +36,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
-import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.DestroyUnitService;
 
 public class TeHelperTechs {
 
@@ -214,7 +214,7 @@ public class TeHelperTechs {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), privateMsg);
             }
             MessageHelper.sendMessageToChannel(victim.getCorrectChannel(), message);
-            RemoveUnitService.removeUnits(event, tile, game, victim.getColorID(), "inf " + uhName);
+            DestroyUnitService.destroyUnits(event, tile, game, victim.getColorID(), "inf " + uhName, false);
             ButtonHelper.deleteMessage(event);
         });
     }

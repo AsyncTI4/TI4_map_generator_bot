@@ -32,6 +32,7 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_agent", "Agent Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_commander", "Commander Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_hero", "Hero Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_breakthrough", "Breakthrough Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
@@ -108,6 +109,9 @@ class ListPlayerInfoButtonHandler {
                             messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                         }
                     }
+                    if (p2.getBreakthroughModel() != null) {
+                        messageEmbeds.add(p2.getBreakthroughModel().getRepresentationEmbed());
+                    }
                 }
                 case "abilities" -> {
                     for (String ability : p2.getAbilities()) {
@@ -123,6 +127,11 @@ class ListPlayerInfoButtonHandler {
                 case "ftech" -> {
                     for (String tech : p2.getFactionTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                }
+                case "breakthrough" -> {
+                    if (p2.getBreakthroughModel() != null) {
+                        messageEmbeds.add(p2.getBreakthroughModel().getRepresentationEmbed());
                     }
                 }
                 case "tech" -> {

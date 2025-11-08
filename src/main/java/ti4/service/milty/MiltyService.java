@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -317,6 +318,11 @@ public class MiltyService {
             player.setBreakthroughExhausted(false);
             player.setBreakthroughActive(false);
             player.setBreakthroughTGs(0);
+            if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
+                List<MessageEmbed> embeds = new ArrayList<>();
+                embeds.add(player.getBreakthroughModel().getRepresentationEmbed());
+                MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "Breakthrough info", embeds);
+            }
         }
 
         // HOME SYSTEM

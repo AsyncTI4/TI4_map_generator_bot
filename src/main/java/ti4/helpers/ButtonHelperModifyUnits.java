@@ -1627,6 +1627,7 @@ public class ButtonHelperModifyUnits {
             if (player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")
                     || player.hasTech("ffac2")
+                    || player.hasUnit("tf-floatingfactory")
                     || player.hasTech("absol_ffac2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
@@ -2200,7 +2201,7 @@ public class ButtonHelperModifyUnits {
                 player, "saar", "mentak", "l1z1x", "argent", "naaz", "arborec", "titans");
         CommanderUnlockCheckService.checkPlayer(
                 player, "tnelis", "cymiae", "kyro", "ghemina", "rohdhna", "cheiran", "celdauri");
-        if ("warsun".equalsIgnoreCase(unitLong)) {
+        if ("warsun".equalsIgnoreCase(unitLong) && !willSkipBuild) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         } else if ("sd".equalsIgnoreCase(unitID)) {
             tile = game.getTileFromPlanet(planetName);

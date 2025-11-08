@@ -2247,6 +2247,10 @@ public class UnfiledButtonHandlers {
                 if (warM) {
                     player.addSpentThing("warmachine");
                 }
+                if (!game.getStoredValue("manifestDiscount").isEmpty()) {
+                    player.addSpentThing("manifest");
+                    game.removeStoredValue("manifestDiscount");
+                }
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
                         && tile.getWormholes(game).size() > 0) {

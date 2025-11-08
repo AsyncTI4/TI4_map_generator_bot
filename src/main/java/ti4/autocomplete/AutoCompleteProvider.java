@@ -686,6 +686,15 @@ public class AutoCompleteProvider {
                 List<String> relicDeck =
                         Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
                 List<String> tableRelics = new ArrayList<>(relicDeck);
+                for (Player player : game.getRealPlayers()) {
+                    for (String relic : player.getRelics()) {
+                        if (Mapper.getRelic(relic) != null
+                                && Mapper.getRelic(relic).isFakeRelic()
+                                && !tableRelics.contains(relic)) {
+                            tableRelics.add(relic);
+                        }
+                    }
+                }
                 Collections.shuffle(tableRelics);
 
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tableRelics, enteredValue);
