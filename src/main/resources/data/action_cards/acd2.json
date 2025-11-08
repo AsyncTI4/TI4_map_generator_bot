@@ -652,7 +652,7 @@
         "phase": "Action",
         "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "",
+        "flavorText": "Each forge was an exact copy nearly to a molecular level. Inside, thousands of drones worked in unison with counterparts across the stars.",
         "source": "action_deck_2"
     },
     {
@@ -661,7 +661,7 @@
         "phase": "Action",
         "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "",
+        "flavorText": "Umbat had seen to the supply chain himself. No need went unmet; each world supplied the next with craftsmanship honed over generations.",
         "source": "action_deck_2"
     },
     {
@@ -670,7 +670,7 @@
         "phase": "Action",
         "window": "After you produce a ship",
         "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "",
+        "flavorText": "In short order, their once-meager fleet grew into an armada spanning sectors. From Umbat's hearthworld to distant suns, its shadow lengthened—stoked by their fury.",
         "source": "action_deck_2"
     },
     {
@@ -823,7 +823,7 @@
         "phase": "Any",
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
-        "flavorText": "",
+        "flavorText": "Kyver shivered as he slipped undetected past the Nekro fleet. Why? They had no way to know his plans—yet since his last report the fleet had dispersed, and there was no sign of the Alastor.",
         "source": "action_deck_2"
     },
     {
@@ -868,7 +868,7 @@
         "phase": "Action",
         "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
-        "flavorText": "\"Battle isn’t arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. This is a harsh lesson we must teach our lessers.\"",
+        "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. This is a harsh lesson we must teach our lessers.\"",
         "source": "action_deck_2"
     },
     {
@@ -1119,6 +1119,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "arbitration",
+        "name": "Arbitration",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Choose 1 non-home planet that contains ground forces and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
+        "flavorText": "When the Justicar left the room, Odlynn sank into his chair with a long, slow sigh. He had been granted once-prime real estate on a paradise world. Too bad the market for such land had tanked after the disaster on nearby Acheron.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "cache_te",
         "name": "Cache",
         "phase": "Action",
@@ -1196,51 +1205,42 @@
         "phase": "Action",
         "window": "After you lose a ground combat",
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets your opponent controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
-        "flavorText": "",
+        "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
         "source": "action_deck_2"
     },
     {
-        "alias": "rogues1",
-        "name": "Rogues",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "rogues2",
-        "name": "Rogues",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "rogues3",
-        "name": "Rogues",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "rogues4",
-        "name": "Rogues",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sacrifice",
+        "alias": "sacrifice1",
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, gain 2 trade goods or your breakthrough.",
+        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
+        "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sacrifice2",
+        "name": "Sacrifice",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
+        "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sacrifice3",
+        "name": "Sacrifice",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
+        "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "sacrifice4",
+        "name": "Sacrifice",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
@@ -1259,7 +1259,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
-        "flavorText": "",
+        "flavorText": "Quann’s great ocean was everything Carinna had hoped. She smiled as her vessel descended beneath the waves, far from the business above and beyond. The council had gladly ceded this territory, and she would make the best of it.",
         "source": "action_deck_2"
     },
     {
@@ -1268,7 +1268,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Choose 1 non-home planet controlled by another player that contains their ground forces. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
-        "flavorText": "",
+        "flavorText": "Willard grumbled, watching another offworld frigate shuttle toward the ocean-cities. He dared not act; the quiet truth was that they no longer held the advantage here.",
         "source": "action_deck_2"
     },
     {
