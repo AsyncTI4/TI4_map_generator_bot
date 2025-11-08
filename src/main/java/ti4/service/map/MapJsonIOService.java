@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
+import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
@@ -178,6 +179,10 @@ public class MapJsonIOService {
             }
 
             MessageHelper.sendMessageToChannel(feedbackChannel, "Map imported from JSON.");
+            MessageHelper.sendMessageToChannelWithButtons(
+                    feedbackChannel,
+                    "Add frontier tokens?",
+                    Arrays.asList(Buttons.green("addFrontierTokens", "Yes"), Buttons.DONE_DELETE_BUTTONS));
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(game), "Failed to import map from JSON " + Constants.solaxPing(), e);
             MessageHelper.sendMessageToChannel(feedbackChannel, "Failed to import map from JSON: " + e.getMessage());
