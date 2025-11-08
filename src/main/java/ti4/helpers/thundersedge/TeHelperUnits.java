@@ -55,6 +55,14 @@ public class TeHelperUnits {
     @ButtonHandler("revenantDeploy_")
     private static void revenantDeploy(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String regex = "revenantDeploy_" + RegexHelper.unitHolderRegex(game, "planet");
+        if (!game.getTileByPosition(game.getActiveSystem())
+                .getSpaceUnitHolder()
+                .getTokenList()
+                .contains(Constants.TOKEN_BREACH_ACTIVE)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "The system must have an active breach in it to deploy a mech.");
+            return;
+        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
@@ -65,7 +73,6 @@ public class TeHelperUnits {
 
             String msg = ThreadLocalRandom.current().nextInt(10) == 0 ? flavorMsg : boringMsg;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            game.setStoredValue("revenantDone", "true");
             ButtonHelper.deleteButtonsWithPartialID(event, "revenantDeploy_");
         });
     }

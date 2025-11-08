@@ -5955,6 +5955,7 @@ public class ButtonHelper {
                     && (spaceCombatish
                             && !(doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                     || player.hasUnit("purpletf_mech")
+                                    || player.hasUnit("naaz_voltron")
                                     || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)
                                     || doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile)))) {
                 continue;
@@ -5966,7 +5967,9 @@ public class ButtonHelper {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
-                if (unitModel.getUnitType() == UnitType.Infantry && spaceCombatish && player.hasUnit("purpletf_mech")) {
+                if (unitModel.getUnitType() == UnitType.Infantry
+                        && spaceCombatish
+                        && (player.hasUnit("purpletf_mech") || player.hasUnit("naaz_voltron"))) {
                     continue;
                 }
                 if ("assaultcannoncombat".equalsIgnoreCase(type)
@@ -6022,6 +6025,7 @@ public class ButtonHelper {
                         && player.getUnitsOwned().contains("nomad_mech"))
                 || ("mech".equalsIgnoreCase(unitBaseType)
                         && (player.ownsUnit("purpletf_mech")
+                                || player.hasUnit("naaz_voltron")
                                 || doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                 || doesPlayerHaveFSHere("sigma_nekro_flagship_1", player, tile)))
                 || (!player.isActivePlayer()

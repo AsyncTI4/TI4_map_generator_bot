@@ -234,7 +234,7 @@ public class EdictPhaseHandler {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "artificeStep2_" + (x) + "_"
                                         + (vpDifference - x),
-                                "Draw " + x + " Extra Relics and " + (vpDifference - x) + "Extra Paradigms"));
+                                "Draw " + x + " Extra Relics and " + (vpDifference - x) + " Extra Paradigms"));
                     }
                 }
             }

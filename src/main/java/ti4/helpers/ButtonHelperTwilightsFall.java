@@ -331,7 +331,7 @@ public class ButtonHelperTwilightsFall {
             }
         }
         List<String> cards = getSpliceCards(game);
-        List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, startPlayer);
+        List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, null);
         MessageHelper.sendMessageToChannelWithEmbeds(
                 game.getActionsChannel(), "A splice has started with the following options.", embeds);
 
@@ -390,6 +390,11 @@ public class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), player.getRepresentation() + " Use Buttons to Pay 4r", buttons);
         }
+        ButtonHelper.sendMessageToRightStratThread(
+                player,
+                game,
+                player.getRepresentationNoPing() + " will participate in the splice",
+                ButtonHelper.getStratName(splice));
 
         // Some message in SC thread to say they are participating?
 
@@ -762,10 +767,10 @@ public class ButtonHelperTwilightsFall {
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
         }
-        if (!player.hasTech("wavelength")) {
+        if (player != null && !player.hasTech("wavelength")) {
             embeds.add(Mapper.getTech("wavelength").getRepresentationEmbed());
         }
-        if (!player.hasTech("antimatter")) {
+        if (player != null && !player.hasTech("antimatter")) {
             embeds.add(Mapper.getTech("antimatter").getRepresentationEmbed());
         }
         return embeds;
@@ -986,6 +991,9 @@ public class ButtonHelperTwilightsFall {
             List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getTechs()) {
+                    allCards.remove(tech);
+                }
+                for (String tech : p.getPurgedTechs()) {
                     allCards.remove(tech);
                 }
             }

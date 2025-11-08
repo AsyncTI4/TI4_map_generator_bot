@@ -83,8 +83,12 @@
         "id": "tf7",
         "initiative": 7,
         "name": "Magus",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Initiate an ability splice. You may spend 3 resources and 3 influence to add 1 additional ability to the pool; if you do, after each player has chosen, it passes back to you and you take an additional ability."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 3 resources or 3 influence to participate in the ability splice."
+        ],
         "imageFileName": "tf7",
         "colourHexCode": "#15489f",
         "source": "twilights_fall"
@@ -93,8 +97,13 @@
         "id": "tf8",
         "initiative": 8,
         "name": "Aeterna",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements; otherwise, draw 1 paradigm",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective or 1 paradigm"
+        ],
         "imageFileName": "tf8",
         "colourHexCode": "#752b90",
         "source": "twilights_fall"
