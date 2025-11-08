@@ -1274,6 +1274,7 @@ public class Helper {
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
+                    && !thing.contains("manifest")
                     && !thing.contains("ghostbt")
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
@@ -1387,6 +1388,12 @@ public class Helper {
                     if (game.isWildWildGalaxyMode()) {
                         res += 4;
                     }
+                }
+                if (thing.contains("manifest")) {
+                    msg.append("> Used Manifest for 3r")
+                            .append(CardEmojis.ActionCard)
+                            .append("\n");
+                    res += 3;
                 }
                 if (thing.contains("ghostbt")) {
                     int wormholes =
@@ -1552,6 +1559,8 @@ public class Helper {
             if (activeSystem != null && tile == activeSystem && getProductionValue(player, game, tile, false) > 0) {
                 if (!player.hasUnit("arborec_mech")
                         && !player.hasUnit("arborec_infantry")
+                        && !player.hasUnit("tf-lataniwarrior")
+                        && !player.hasUnit("deepwrought_mech")
                         && !player.hasUnit("arborec_infantry2")) {
 
                     productionLimit = getProductionValue(player, game, tile, false);

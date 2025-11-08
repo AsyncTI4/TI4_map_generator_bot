@@ -224,6 +224,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 return 2;
             }
         }
+        if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
+            return 1;
+        }
+
         return spaceCannonDieCount;
     }
 
@@ -232,6 +236,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 || player.hasRelic("lightrailordnance")) {
             if ("spacedock".equalsIgnoreCase(baseType)) {
                 return 5;
+            }
+        }
+        if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
+            if (player.hasTech("pds2")) {
+                return 5;
+            } else {
+                return 6;
             }
         }
         return spaceCannonHitsOn;
@@ -296,6 +307,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player) {
+        return switch (rollType) {
+            case combatround -> getCombatHitsOn();
+            case AFB -> getAfbHitsOn(player);
+            case bombardment -> getBombardHitsOn(player);
+            case SpaceCannonOffence -> getSpaceCannonHitsOn(player);
+            case SpaceCannonDefence -> getSpaceCannonHitsOn(player);
+        };
+    }
+
+    public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player, UnitHolder uH) {
         return switch (rollType) {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player);
@@ -441,6 +462,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (player.hasRelic("lightrailordnance")) {
             if ("spacedock".equalsIgnoreCase(baseType)) {
                 return true;
+            }
+        }
+        if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
+            if (player.hasTech("pds2")) {
+                return true;
+            } else {
+                return false;
             }
         }
         return getDeepSpaceCannon();

@@ -156,7 +156,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveUnravel(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (player.getRelics().isEmpty()) {
+            if (p2.getRelics().isEmpty()) {
                 continue;
             }
             buttons.add(
@@ -681,8 +681,6 @@ public class ButtonHelperTwilightsFallActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    // tf-manifest
-    // "tf-unravel"
     // trine
     // statis/crisis
     // timestop
@@ -690,13 +688,11 @@ public class ButtonHelperTwilightsFallActionCards {
 
     // dragonfreed
     // linkship is ralnel FS ability
-    // cabal carrier
     // 3 mech abilities of TF factions
 
     // crimson and smothering suppressing sustains (and production)
     // Ral nel flagship
     // 3 ACs Automation
     // Ral Nel Hero
-    // Scoring of others secrets for firmament
 
 }

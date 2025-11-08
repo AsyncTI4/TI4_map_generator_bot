@@ -1127,7 +1127,7 @@ public class CombatRollService {
                 }
             } else {
 
-                if (player.hasUnit("purpletf_mech")) {
+                if (player.hasUnit("purpletf_mech") || player.hasUnit("naaz_voltron")) {
                     output = new HashMap<>(unitsInCombat.entrySet().stream()
                             .filter(entry -> entry.getKey() != null
                                     && (entry.getKey().getUnitType() == UnitType.Mech
@@ -1213,6 +1213,31 @@ public class CombatRollService {
             String colorID, Map<String, Integer> unitsByAsyncId, UnitHolder unitHolder) {
         Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         for (Map.Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+            Integer existingCount = 0;
+            if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
+                existingCount = unitsByAsyncId.get(unitEntry.getKey());
+            }
+            unitsByAsyncId.put(unitEntry.getKey(), existingCount + unitEntry.getValue());
+        }
+    }
+
+    private static void getUnitsOnHolderByAsyncIdForSpaceCannon(
+            String colorID, Map<String, Integer> unitsByAsyncId, UnitHolder unitHolder, Player player) {
+        Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
+        for (Map.Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
+
+            if (player.hasUnit("ralnel_destroyer2") && unitHolder.getName().equalsIgnoreCase("space")) {
+                if (unitEntry.getKey().equalsIgnoreCase("pd")
+                        || unitEntry.getKey().equalsIgnoreCase("sd")) {
+                    continue;
+                }
+                if (unitEntry.getKey().equalsIgnoreCase("dd")
+                        && (unitHolder.getUnitCount(UnitType.Pds, player)
+                                        + unitHolder.getUnitCount(UnitType.Spacedock, player)
+                                < 1)) {
+                    continue;
+                }
+            }
             Integer existingCount = 0;
             if (unitsByAsyncId.containsKey(unitEntry.getKey())) {
                 existingCount = unitsByAsyncId.get(unitEntry.getKey());
@@ -1310,7 +1335,7 @@ public class CombatRollService {
 
         Collection<UnitHolder> unitHolders = tile.getUnitHolders().values();
         for (UnitHolder unitHolder : unitHolders) {
-            getUnitsOnHolderByAsyncId(colorID, unitsByAsyncId, unitHolder);
+            getUnitsOnHolderByAsyncIdForSpaceCannon(colorID, unitsByAsyncId, unitHolder, player);
         }
 
         Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
@@ -1321,7 +1346,7 @@ public class CombatRollService {
             }
             Tile adjTile = game.getTileByPosition(adjacentTilePosition);
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                getUnitsOnHolderByAsyncId(colorID, adjacentUnitsByAsyncId, unitHolder);
+                getUnitsOnHolderByAsyncIdForSpaceCannon(colorID, adjacentUnitsByAsyncId, unitHolder, player);
             }
         }
 
