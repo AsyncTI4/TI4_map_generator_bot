@@ -166,7 +166,7 @@
         "name": "Defectors",
         "phase": "Action",
         "window": "After another player produces ships",
-        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any system that does not contain another player's ships.",
+        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any systems that do not contain another player's ships.",
         "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their minions had done well.",
         "source": "action_deck_2"
     },
