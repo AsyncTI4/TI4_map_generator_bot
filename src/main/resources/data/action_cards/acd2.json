@@ -839,7 +839,7 @@
         "alias": "vulnerability1",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
+        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
         "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
         "source": "action_deck_2"
@@ -848,7 +848,7 @@
         "alias": "vulnerability2",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
+        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
         "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn smiled. \"Perfect. Full burn—target their primaries.\"",
         "source": "action_deck_2"
@@ -857,7 +857,7 @@
         "alias": "vulnerability3",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
+        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
         "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
         "source": "action_deck_2"
@@ -866,7 +866,7 @@
         "alias": "vulnerability4",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit that matches a unit upgrade technology you own",
+        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
         "text": "Those hits must be assigned to units of that type, if able.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. This is a harsh lesson we must teach our lessers.\"",
         "source": "action_deck_2"
@@ -1159,8 +1159,8 @@
         "name": "Overthrow",
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability of that strategy card instead.",
-        "flavorText": "The hall fell silent as the standards rose behind Willard. The decree read precisely as it had before—save for the signature.",
+        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability instead.",
+        "flavorText": "The Council Speaker hadn't even hit the floor when Vos holstered the needle gun. He scooped the data bricks and moved. Any delay would consign him to the black cells of Winnu.",
         "source": "action_deck_2"
     },
     {
@@ -1168,8 +1168,8 @@
         "name": "Overthrow",
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability of that strategy card instead.",
-        "flavorText": "",
+        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability instead.",
+        "flavorText": "The merchant's blood-slicked finger slipped from Vos's grip as the scan chimed and Hercant's greatest vault unlocked. The unimaginable wealth before him tested his commitment to the cause.",
         "source": "action_deck_2"
     },
     {
@@ -1177,8 +1177,8 @@
         "name": "Overthrow",
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability of that strategy card instead.",
-        "flavorText": "",
+        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability instead.",
+        "flavorText": "Vos sighed as he approached Mordai II. Sharsiss had given him tough orders before, but this? Where to even begin?",
         "source": "action_deck_2"
     },
     {
@@ -1186,8 +1186,8 @@
         "name": "Overthrow",
         "phase": "Action",
         "window": "After you resolve a tactical action during which you gained control of a planet that was controlled by another player",
-        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability of that strategy card instead.",
-        "flavorText": "",
+        "text": "Perform the secondary ability of 1 of that player's strategy cards without spending a command token; if that planet is in that player's home system, perform the primary ability instead.",
+        "flavorText": "Connor's punch sent Vos sailing toward the balcony. \"How could you do this, you son of a—\" Connor's words died as Vos hurled himself into the open air, a carefully positioned transport rising to catch him. This had been a cruel affair, but it would keep Jord's operatives busy for a while.",
         "source": "action_deck_2"
     },
     {
@@ -1259,7 +1259,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
-        "flavorText": "Quann’s great ocean was everything Carinna had hoped. She smiled as her vessel descended beneath the waves, far from the business above and beyond. The council had gladly ceded this territory, and she would make the best of it.",
+        "flavorText": "Quann's great ocean was everything Carinna had hoped. She smiled as her vessel descended beneath the waves, far from the business above and beyond. The council had gladly ceded this territory, and she would make the best of it.",
         "source": "action_deck_2"
     },
     {
