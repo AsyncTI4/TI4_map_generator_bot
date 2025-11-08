@@ -1323,7 +1323,10 @@ public class Game extends GameProperties {
 
     @Override
     public boolean isHomebrewSCMode() {
-        return !"pok".equals(getScSetID()) && !"base_game".equals(getScSetID()) && !"te".equals(getScSetID());
+        return !"pok".equals(getScSetID())
+                && !"base_game".equals(getScSetID())
+                && !"te".equals(getScSetID())
+                && !"twilights_fall_sc".equals(getScSetID());
     }
 
     public void setSpecificThalnosUnit(String unit, int count) {

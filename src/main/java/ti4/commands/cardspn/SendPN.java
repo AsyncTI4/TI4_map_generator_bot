@@ -124,9 +124,9 @@ class SendPN extends GameStateSubcommand {
             String fail = "User for faction not found. Report to ADMIN.";
             String success = message + "\nThe other player has been notified.";
             MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event, message, fail, success);
-            MessageHelper.sendMessageToEventChannel(event, "Promissory note sent.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Promissory note sent.");
         } else {
-            MessageHelper.sendMessageToEventChannel(event, message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
 
         // FoW specific pinging

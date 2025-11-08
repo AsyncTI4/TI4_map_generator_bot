@@ -67,7 +67,7 @@ public class SilverFlameService {
         String watchPartyMsg = prePlayer.getRepresentation() + " is rolling for the silver flame in " + gameS.getName()
                 + "! They are at " + prePlayer.getTotalVictoryPoints() + "/" + gameS.getVp() + " VP!";
         if (prePlayer.hasRelicReady("heartofixth")) {
-            watchPartyMsg += " They have the heart of ixth, so only need an 8!";
+            watchPartyMsg += " They have the heart of ixth, so only need an 9!";
         }
         DisasterWatchHelper.postTileInFlameWatch(gameS, null, prePlayer.getHomeSystemTile(), 0, watchPartyMsg);
         String drumrollMessage = prePlayer.getRepresentation() + " is rolling for " + rep(false) + "!";
@@ -105,6 +105,10 @@ public class SilverFlameService {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         ButtonHelper.deleteMessage(event);
+        if (!FractureService.isFractureInPlay(game)) {
+            FractureService.spawnFracture(null, game);
+            FractureService.spawnIngressTokens(null, game, player, false);
+        }
     }
 
     @ButtonHandler("resolveSilverFlamePurge")
@@ -116,6 +120,8 @@ public class SilverFlameService {
             BotLogger.error(Constants.jazzPing() + " Missing Home System");
             return;
         }
+
+        game.setStoredValue("silverFlamed", player.getFaction());
 
         // count units
         Map<UnitKey, Integer> allUnitsCount = new HashMap<>();

@@ -560,6 +560,7 @@ public class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player, "replenishing and washing.");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
+        ButtonHelperStats.afterGainCommsChecks(game, player, player.getCommoditiesTotal());
     }
 
     @ButtonHandler("anarchy7Build_")
@@ -814,6 +815,17 @@ public class ButtonHelperSCs {
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
                 buttons);
+    }
+
+    @ButtonHandler("resolveManifest")
+    public static void resolveManifest(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = getAnarchy7Buttons(game, player);
+        game.setStoredValue("manifestDiscount", player.getFaction());
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("primaryOfLumi7")
