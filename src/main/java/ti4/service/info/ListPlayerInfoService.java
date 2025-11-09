@@ -840,7 +840,7 @@ public class ListPlayerInfoService {
             case "te" -> {
                 int count = 0;
                 for (Player p2 : game.getRealAndEliminatedPlayers()) {
-                    if (p2 == player || p2.getFaction().equalsIgnoreCase("neutral")) {
+                    if (p2 == player || "neutral".equalsIgnoreCase(p2.getFaction())) {
                         continue;
                     }
                     Tile tile = p2.getHomeSystemTile();
@@ -906,7 +906,7 @@ public class ListPlayerInfoService {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "spacedock"); // 3 SD
             }
             case "fsn" -> {
-                return player.getAc(); // 5 AC
+                return player.getAcCount(); // 5 AC
             }
             case "gamf" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false); // 5 dreads

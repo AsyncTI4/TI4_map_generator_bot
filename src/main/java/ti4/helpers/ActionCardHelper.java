@@ -34,6 +34,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -50,7 +51,7 @@ public class ActionCardHelper {
     public enum ACStatus {
         ralnelbt,
         garbozia,
-        purged;
+        purged
     }
 
     public static void sendActionCardInfo(Game game, Player player) {
@@ -209,7 +210,7 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("\n> Planet: ").append(representation).append("");
+            sb.append("\n> Planet: ").append(representation);
         }
         sb.append("\n");
         return sb.toString();
@@ -226,8 +227,7 @@ public class ActionCardHelper {
     }
 
     public static List<Button> getPlotCardButtons(Game game, Player player) {
-        boolean hasManageAbility = false;
-        if (player.hasAbility("plotsplots")) hasManageAbility = true;
+        boolean hasManageAbility = player.hasAbility("plotsplots");
         if (player.hasLeader("firmamenthero")) hasManageAbility = true;
         if (!hasManageAbility) return new ArrayList<>();
 
@@ -305,7 +305,7 @@ public class ActionCardHelper {
 
         // ACTION CARDS
         sb.append("__Action Cards__ (")
-                .append(player.getAc())
+                .append(player.getAcCount())
                 .append("/")
                 .append(ButtonHelper.getACLimit(game, player))
                 .append("):")
@@ -807,7 +807,7 @@ public class ActionCardHelper {
             String buttonLabel = "Resolve " + actionCardTitle;
             String automationID = actionCard.getAutomationID();
 
-            if (Helper.isSaboAllowed(game, player)) {
+            if (SabotageService.isSaboAllowed(game, player)) {
                 // Can be "sabotaged", basically every card
                 String sabo = "Sabotage";
                 if (game.isTwilightsFallMode()) {
@@ -821,7 +821,7 @@ public class ActionCardHelper {
                         mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
-                StringBuilder noSabosMessage = new StringBuilder("> " + Helper.noSaboReason(game, player));
+                StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
