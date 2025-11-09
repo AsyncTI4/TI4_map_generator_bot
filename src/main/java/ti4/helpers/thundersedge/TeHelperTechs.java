@@ -220,24 +220,29 @@ public class TeHelperTechs {
     }
 
     public static void initializePlanesplitterStep1(Game game, Player player) {
-        // ACTION: Exhaust this card to place or move an ingress token into a system that contains or is adjacent to
-        // your ships.
+        // When you perform a strategic action, you may move an ingress token into a system that contains or is adjacent
+        // to your units.\nThis technology cannot be researched.
         handlePlanesplitterStep1(game, player, null, "planesplitterStep1_page0");
     }
 
     @ButtonHandler("planesplitterStep1_")
-    private static void handlePlanesplitterStep1(
+    public static void handlePlanesplitterStep1(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        // ACTION: Exhaust this card to place or move an ingress token into a system that contains or is adjacent to
-        // your ships.
+        // When you perform a strategic action, you may move an ingress token into a system that contains or is adjacent
+        // to your units.\nThis technology cannot be researched.
         String buttonPrefix = player.getFinsFactionCheckerPrefix() + "planesplitterStep1_";
         List<Button> buttons = getPlanesplitterStep1Buttons(game, player);
 
-        String message = "Pick a system to place or move an Ingress token to:";
-        if (NewStuffHelper.checkAndHandlePaginationChange(
-                event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
+        String message = "Pick a system to move an Ingress token to:";
+        // if (NewStuffHelper.checkAndHandlePaginationChange(
+        //         event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
+        //     return;
+        // }
+        if (event == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
             return;
         }
+        System.out.println("boop");
 
         String regex = "planesplitterStep1_" + RegexHelper.posRegex(game);
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
@@ -247,7 +252,7 @@ public class TeHelperTechs {
             t.getSpaceUnitHolder().addToken(Constants.TOKEN_INGRESS);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), "Ingress token added to " + t.getRepresentation());
-            initializePlanesplitterStep2(game, player);
+            initializePlanesplitterStep2(game, player, event);
             ButtonHelper.deleteMessage(event);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Error with " + buttonID);
@@ -294,10 +299,10 @@ public class TeHelperTechs {
         }
     }
 
-    private static void initializePlanesplitterStep2(Game game, Player player) {
+    private static void initializePlanesplitterStep2(Game game, Player player, ButtonInteractionEvent event) {
         // ACTION: Exhaust this card to place or move an ingress token into a system that contains or is adjacent to
         // your ships.
-        handlePlanesplitterStep2(game, player, null, "planesplitterStep2_page0");
+        handlePlanesplitterStep2(game, player, event, "planesplitterStep2_page0");
     }
 
     private static List<Button> getPlanesplitterStep2Buttons(Game game, Player player) {

@@ -254,7 +254,6 @@ public class TeHelperActionCards {
     @ButtonHandler("strategize")
     private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("spendAStratCC", "Spend a Strategy CC"));
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
             buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs", CardEmojis.SC1));
@@ -283,7 +282,12 @@ public class TeHelperActionCards {
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving"));
 
-        String message = "Resolve strategize using the buttons. Be sure to spend a strategy CC if applicable:";
+        String message = "Resolve strategize using the buttons. ";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("spendAStratCC", "Spend a Strategy CC"));
+        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        message = "## Unless you are resolving leadership, please spend a strategy command token. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }

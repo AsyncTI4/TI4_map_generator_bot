@@ -214,7 +214,7 @@ public class ButtonHelper {
                     (totalAmount <= 10
                                     ? UnitEmojis.infantry.toString().repeat(totalAmount)
                                     : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of your next turn.");
+                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of the status phase.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
@@ -5608,9 +5608,14 @@ public class ButtonHelper {
     public static void resolveTransitDiodesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
-            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti") || planet.contains("ocean")) {
                 continue;
             }
+            if (game.getUnitHolderFromPlanet(planet) == null
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
+                continue;
+            }
+
             buttons.add(Buttons.green("transitDiodes_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving Transit Diodes"));

@@ -1,16 +1,28 @@
 {
     "id": "neutera",
     "tileId": "105",
-    "name": "Neutera",
-    "aliases": ["neuter", "neutera"],
+    "name": "New Terra",
+    "aliases": [
+        "neuter",
+        "neutera",
+        "newterra",
+        "neu"
+    ],
     "resources": 1,
     "influence": 1,
-    "planetTypes": ["INDUSTRIAL"],
-    "techSpecialties": ["BIOTIC"],
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "BIOTIC"
+    ],
     "planetLayout": {
         "unitHolderName": "neutera",
         "resourcesLocation": "TopLeft",
-        "centerPosition": { "x": 135.0, "y": 85.0 },
+        "centerPosition": {
+            "x": 135.0,
+            "y": 85.0
+        },
         "extraIcons": 1
     },
     "source": "thunders_edge"

@@ -143,7 +143,7 @@ public class DrawSecretService {
             }
             if (game.isTwilightsFallMode()) {
                 ButtonHelperTwilightsFall.fixMahactColors(game, event);
-                game.setStrategyCardSet("twilights_fall_sc");
+                game.setupTwilightsFallMode(event);
             }
             if (game.isThundersEdge() || game.getStoredValue("useOldPok").isEmpty() || game.isTwilightsFallMode()) {
                 Tile mr = game.getMecatolTile();
