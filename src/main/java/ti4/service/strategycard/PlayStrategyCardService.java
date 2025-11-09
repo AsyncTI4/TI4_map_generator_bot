@@ -25,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -259,6 +260,9 @@ public class PlayStrategyCardService {
         if (scToPlay == 9 && RiftSetModeService.isActive(game)) {
             RiftSetModeService.resolveSacrifice(event, game, player);
         }
+        if (player.hasTech("planesplitter-obs")) {
+            TeHelperTechs.initializePlanesplitterStep1(game, player);
+        }
 
         if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
@@ -483,6 +487,7 @@ public class PlayStrategyCardService {
                 } else {
                     if (scToPlay == 6
                             && !p2.hasUnit("ghoti_flagship")
+                            && !game.isTwilightsFallMode()
                             && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                             game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {

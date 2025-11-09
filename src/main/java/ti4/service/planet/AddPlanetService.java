@@ -200,7 +200,8 @@ public class AddPlanetService {
                     if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
                                 + " lost the planet of "
-                                + Mapper.getPlanet(planet).getName() + " (and could perhaps play _Reparations_).";
+                                + Mapper.getPlanet(planet).getName()
+                                + " (and could perhaps resolve some applicable ability).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                         if (player_.isRealPlayer()
                                 && player_.getPlanetsAllianceMode().isEmpty()

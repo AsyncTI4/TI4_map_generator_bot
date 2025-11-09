@@ -524,7 +524,16 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveIrradiate(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         List<String> units = new ArrayList<>(Arrays.asList(
-                "mech", "warsun", "dreadnought", "carrier", "fighter", "infantry", "cruiser", "spacedock", "pds"));
+                "mech",
+                "warsun",
+                "dreadnought",
+                "carrier",
+                "fighter",
+                "infantry",
+                "cruiser",
+                "spacedock",
+                "destroyer",
+                "pds"));
         for (String unit : units) {
             buttons.add(Buttons.gray("irradiateStep2_" + unit, StringUtils.capitalize(unit)));
         }

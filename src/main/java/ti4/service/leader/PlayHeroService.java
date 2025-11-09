@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ButtonHelperRelics;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
@@ -161,9 +162,7 @@ public class PlayHeroService {
                             event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
                     PlanetService.refreshPlanet(player, "elysium");
                 } else {
-                    MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(),
-                            "Use the following command to add the attachment: `/add_token token:titanshero`");
+                    ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
             case "onyxxahero" -> {
