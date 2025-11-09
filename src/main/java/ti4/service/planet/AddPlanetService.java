@@ -597,8 +597,9 @@ public class AddPlanetService {
             }
             for (Player p : game.getRealPlayers()) {
                 if (p.is(player)) continue;
-                game.unscorePublicObjective(message, id);
+                game.unscorePublicObjective(p.getUserID(), id);
             }
+            Helper.checkEndGame(game, player);
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
