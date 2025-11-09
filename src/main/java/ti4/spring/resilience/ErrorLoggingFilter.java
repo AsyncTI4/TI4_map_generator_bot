@@ -33,8 +33,11 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, cachingResponse);
         } catch (Exception e) {
+            String exceptionMessage = e.getMessage() != null ? e.getMessage() : "(no message)";
+            String exceptionSummary = e.getClass().getName() + ": " + exceptionMessage;
             BotLogger.errorToThread(
-                    "Exception during request to " + request.getRequestURI(), e, HTTP_ERROR_THREAD_NAME);
+                    "Exception during request to " + request.getRequestURI() + ": " + exceptionSummary,
+                    HTTP_ERROR_THREAD_NAME);
             SREStats.incrementWebserverRequestErrorCount();
             throw e;
         }
