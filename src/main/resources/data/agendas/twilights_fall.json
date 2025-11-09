@@ -73,7 +73,7 @@
     },
     {
         "alias": "tf-arbitrate",
-        "name": "Execute",
+        "name": "Arbitrate",
         "category": "agenda",
         "type": "Directive",
         "target": "Edict",

@@ -538,12 +538,14 @@ public class StatusHelper {
 
         // Optional abilities
         sendMitosisButtons(game);
+        sendYinCloneButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
         sendNeuralParasiteButtons(game);
         sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
         SowingReapingService.resolveTheReaping(game);
+
         // Obligatory abilities
         resolveSolFlagship(game);
     }
@@ -589,6 +591,25 @@ public class StatusHelper {
         String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
         MessageHelper.sendMessageToChannelWithButtons(
                 arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+    }
+
+    private static void sendYinCloneButtons(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
+                    List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
+                    String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
+                            + " infantry left to revive.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                } else {
+                    String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
+                    msg += " the bot couldn't find any planets you control in your home system to place them on";
+                    msg += ", so per the rules they now disappear into the ether.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    player.setStasisInfantry(0);
+                }
+            }
+        }
     }
 
     private static void handleMonumentToTheAges(Game game) {

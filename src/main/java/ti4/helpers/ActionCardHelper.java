@@ -675,6 +675,7 @@ public class ActionCardHelper {
         }
         if ("agenda".equalsIgnoreCase(actionCard.getPhase())
                 && game.getPhaseOfGame() != null
+                && !game.isTwilightsFallMode()
                 && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!"edyn".equalsIgnoreCase(player.getFaction())
                     && !player.getFaction().contains("franken")) {
@@ -692,6 +693,7 @@ public class ActionCardHelper {
         }
         if ("action".equalsIgnoreCase(actionCard.getPhase())
                 && game.getPhaseOfGame() != null
+                && !game.isTwilightsFallMode()
                 && game.getPhaseOfGame().contains("agenda")) {
             if (!actionCard.getName().toLowerCase().contains("war machine")) {
                 return player.getRepresentationUnfogged()

@@ -201,7 +201,9 @@ public class TacticalActionService {
 
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
-                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0;
+                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0
+                || (player.hasUnit("crimson_mech")
+                        && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
 
         if (unitsWereMoved) {
             ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, unitsWereMoved);
