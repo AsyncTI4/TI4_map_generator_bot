@@ -172,6 +172,22 @@ public class ComponentActionHelper {
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
+                        led = "crimsonagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Crimson Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
+                        led = "ralnelagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Ralnel Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
                         led = "bentoragent";
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(

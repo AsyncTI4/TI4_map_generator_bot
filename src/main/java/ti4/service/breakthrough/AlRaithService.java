@@ -1,16 +1,13 @@
 package ti4.service.breakthrough;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class AlRaithService {
@@ -26,22 +23,26 @@ public class AlRaithService {
 
     @ButtonHandler("beginCabalBreakthroughMove")
     public static void serveCabalMoveIngressButtons(ButtonInteractionEvent event, Game game, Player player) {
-        List<Tile> tilesWithIngress = new ArrayList<>();
-        for (Tile t : game.getTileMap().values()) {
-            if (t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
-                tilesWithIngress.add(t);
-            }
-        }
-        int totalIngress = tilesWithIngress.size();
+        // List<Tile> tilesWithIngress = new ArrayList<>();
+        // for (Tile t : game.getTileMap().values()) {
+        //     if (t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
+        //         tilesWithIngress.add(t);
+        //     }
+        // }
+        // int totalIngress = tilesWithIngress.size();
 
-        // Send notice
-        String notice = player.getRepresentation()
-                + " you can move up to 2 ingress tokens into systems that contain gravity rifts. For now, please use the command /remove_token and /add_token to accomplish this.";
-        if (totalIngress < 2) {
-            notice = player.getRepresentation() + " Only " + totalIngress
-                    + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain gravity rifts.";
-        }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), notice);
+        // // Send notice
+        // String notice = player.getRepresentation()
+        //         + " you can move up to 2 ingress tokens into systems that contain gravity rifts. For now, please use
+        // the command /remove_token and /add_token to accomplish this.";
+        // if (totalIngress < 2) {
+        //     notice = player.getRepresentation() + " Only " + totalIngress
+        //             + " ingress tokens spawned. You can move any of those ingress tokens into systems that contain
+        // gravity rifts.";
+        // }
+        // MessageHelper.sendMessageToChannel(player.getCorrectChannel(), notice);
+        TeHelperTechs.initializePlanesplitterStep1(game, player);
+        TeHelperTechs.initializePlanesplitterStep1(game, player);
         ButtonHelper.deleteMessage(event);
 
         // List<Button> buttons = new ArrayList<>();

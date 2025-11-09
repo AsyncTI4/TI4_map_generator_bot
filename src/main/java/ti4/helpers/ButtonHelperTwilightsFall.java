@@ -361,7 +361,7 @@ public class ButtonHelperTwilightsFall {
         List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
         String msg = player.getRepresentation() + " Select a card to splice into your faction:";
         String lastSplicer = game.getStoredValue("lastSplicer");
-        if (lastSplicer.equalsIgnoreCase(player.getRepresentation())) {
+        if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
             msg = player.getRepresentation() + " select a card to remove from the splice:";
         }
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);

@@ -1032,6 +1032,7 @@
         "abilityName": "Geoform: Awakening",
         "abilityWindow": "ACTION:",
         "abilityText": "Ready Elysium and attach this card to it. Its resource and influence values are each increased by 3, and it gains the SPACE CANNON 5(x3) ability as if it were a unit.",
+        "tfAbilityText": "Ready a planet you control and attach this card to it. Its resource and influence values are each increased by 3, and it gains the SPACE CANNON 5(x3) ability as if it were a unit.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },
