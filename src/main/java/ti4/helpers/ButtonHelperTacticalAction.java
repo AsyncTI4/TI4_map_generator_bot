@@ -203,6 +203,9 @@ public class ButtonHelperTacticalAction {
         }
         boolean infMoved = game.getTacticalActionDisplacement().values().stream()
                 .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Infantry, player.getColor())));
+        if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0) {
+            infMoved = true;
+        }
         if (unitsWereMoved && player.hasUnit("tf-yssarilinfantry") && infMoved) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.getAc() == 0) {
@@ -243,6 +246,9 @@ public class ButtonHelperTacticalAction {
         }
         boolean flagshipMoved = game.getTacticalActionDisplacement().values().stream()
                 .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Flagship, player.getColor())));
+        if (tile.getSpaceUnitHolder().getUnitCount(UnitType.Flagship, player) > 0) {
+            flagshipMoved = true;
+        }
         if (unitsWereMoved && flagshipMoved && player.hasUnit("dihmohn_flagship")) {
             Button produce = Buttons.blue("dihmohnfs_" + game.getActiveSystem(), "Produce 2 Units");
             String msg = player.getRepresentation()

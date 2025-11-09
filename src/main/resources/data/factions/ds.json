@@ -1538,7 +1538,7 @@
         "alias": "veldyr",
         "factionName": "Veldyr Sovereignty",
         "homeSystem": "d01",
-        "startingFleet": "dn,cv,dd,2 ff,4 inf r,sd r,pds r",
+        "startingFleet": "dn,cv,dd,3 ff,4 inf r,sd r,pds r",
         "commodities": 4,
         "factionTech": [
             "dsvelddn",
