@@ -20,12 +20,8 @@ public class DiscordAuthController {
             return ResponseEntity.badRequest().build();
         }
 
-        try {
-            AuthResponse response = authService.authenticate(request.getUserId(), request.getCode());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        AuthResponse response = authService.authenticate(request.getUserId(), request.getCode());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
@@ -34,11 +30,7 @@ public class DiscordAuthController {
             return ResponseEntity.badRequest().build();
         }
 
-        try {
-            AuthResponse response = authService.refresh(request.getUserId(), request.getRefreshToken());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).build();
-        }
+        AuthResponse response = authService.refresh(request.getUserId(), request.getRefreshToken());
+        return ResponseEntity.ok(response);
     }
 }

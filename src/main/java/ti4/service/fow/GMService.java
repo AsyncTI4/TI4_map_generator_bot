@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
@@ -336,5 +337,24 @@ public class GMService {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " GM has forced you to pass on \"after\"s.");
         AgendaHelper.declineToQueueAnAfter(game, event, player);
+    }
+
+    @ButtonHandler("fowCreateChannelFor_")
+    public static void createChannelFor(Game game, ButtonInteractionEvent event, Player gm, String buttonID) {
+        if (!gm.isGM()) return;
+        String userID = buttonID.replace("fowCreateChannelFor_", "");
+        Player player = game.getPlayer(userID);
+        if (player.getPrivateChannel() != null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), player.getUserName() + " already has a private channel.");
+            return;
+        }
+
+        CreateFoWGameService.createPrivateChannelForPlayer(player.getMember(), game);
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Created private channel for " + player.getUserName() + ": "
+                        + player.getPrivateChannel().getAsMention());
+        ButtonHelper.deleteTheOneButton(event, buttonID, false);
     }
 }

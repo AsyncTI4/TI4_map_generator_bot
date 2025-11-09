@@ -19,7 +19,7 @@ public class SchematicsAgendaResolver implements AgendaResolver {
                 if (player.getTechs().contains("ws")
                         || player.getTechs().contains("pws2")
                         || player.getTechs().contains("dsrohdws")) {
-                    ActionCardHelper.discardRandomAC(event, game, player, player.getAc());
+                    ActionCardHelper.discardRandomAC(event, game, player, player.getAcCount());
                 }
             }
             MessageHelper.sendMessageToChannel(

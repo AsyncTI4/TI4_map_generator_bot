@@ -208,7 +208,7 @@ public class ButtonHelperTacticalAction {
         }
         if (unitsWereMoved && player.hasUnit("tf-yssarilinfantry") && infMoved) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                if (p2.getAc() == 0) {
+                if (p2.getAcCount() == 0) {
                     continue;
                 }
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
@@ -242,7 +242,7 @@ public class ButtonHelperTacticalAction {
             String trueIdentity = player.getRepresentationUnfogged();
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
                     + ". Use buttons to gain 1 command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         boolean flagshipMoved = game.getTacticalActionDisplacement().values().stream()

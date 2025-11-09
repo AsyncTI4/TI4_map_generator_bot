@@ -435,7 +435,7 @@ class PlayerAreaGenerator {
 
         card = drawPAImage(x + 215, y, acImage);
         DrawingUtil.superDrawStringCenteredDefault(
-                g2, Integer.toString(player.getAc()), (int) card.getCenterX(), y + 75);
+                g2, Integer.toString(player.getAcCount()), (int) card.getCenterX(), y + 75);
         DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
 
         card = drawPAImage(x + 280, y, pnImage);
@@ -1586,7 +1586,7 @@ class PlayerAreaGenerator {
 
                 // Load voltron data
                 UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
-                boolean voltron = model == null ? false : model.getAlias().equals("naaz_voltron");
+                boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
                 BufferedImage voltronDecal =
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
@@ -1857,7 +1857,7 @@ class PlayerAreaGenerator {
                 }
                 // Load voltron data
                 UnitModel model = p == null ? null : p.getUnitFromUnitKey(unitKey);
-                boolean voltron = model == null ? false : model.getAlias().equals("naaz_voltron");
+                boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
                 BufferedImage voltronDecal =
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
@@ -2961,7 +2961,7 @@ class PlayerAreaGenerator {
             if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent()
                         || unit.getUpgradesToUnitId().isPresent();
-                boolean corsair = unit.getAlias().equals("mentak_cruiser3");
+                boolean corsair = "mentak_cruiser3".equals(unit.getAlias());
                 if (game.isFrankenGame()
                         || game.isTwilightsFallMode()
                         || corsair
@@ -2976,13 +2976,13 @@ class PlayerAreaGenerator {
                             32,
                             32);
                 }
-                if (unit.getAlias().equals("naaz_voltron")) {
+                if ("naaz_voltron".equals(unit.getAlias())) {
                     // paint the special voltron decal
                     BufferedImage voltronDecal =
                             ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
                     graphics.drawImage(voltronDecal, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
                 }
-                if (unit.getAsyncId().equals("fs")) {
+                if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
                         List<String> flagships = new ArrayList<>();

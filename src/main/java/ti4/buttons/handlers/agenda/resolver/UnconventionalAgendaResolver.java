@@ -21,7 +21,7 @@ public class UnconventionalAgendaResolver implements AgendaResolver {
         if (!"for".equalsIgnoreCase(winner)) {
             winOrLose = AgendaHelper.getLosingVoters(winner, game);
             for (Player playerWL : winOrLose) {
-                ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
+                ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAcCount());
             }
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Discarded the action cards of those who voted \"For\".");

@@ -1354,5 +1354,14 @@
         "text": "Remove 1 of your non-fighter ships from a system to place any number of fighters from your reinforcements in that system that have a combined cost equal to that ship's cost value. Then, place a matching neutral ship in a non-home system that contains no non-neutral ships.",
         "flavorText": "",
         "source": "deprecated"
+    },
+    {
+        "alias": "settlement",
+        "name": "Settlement",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 3 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
+        "source": "deprecated"
     }
 ]

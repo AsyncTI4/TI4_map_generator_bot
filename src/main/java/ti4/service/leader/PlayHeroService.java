@@ -487,7 +487,7 @@ public class PlayHeroService {
             case "voicehero" -> {
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                    edicts.removeIf(edict2 -> "tf-censure".equalsIgnoreCase(edict2));
                 }
                 List<Button> buttons = new ArrayList<>();
                 List<MessageEmbed> embeds = new ArrayList<>();
@@ -631,7 +631,7 @@ public class PlayHeroService {
             }
             case "yssarilhero" -> {
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player || p2.getAc() == 0) {
+                    if (p2 == player || p2.getAcCount() == 0) {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(getYssarilHeroActionCardButtons(player, p2));

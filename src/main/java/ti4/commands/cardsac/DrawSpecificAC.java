@@ -23,11 +23,11 @@ class DrawSpecificAC extends GameStateSubcommand {
         var game = getGame();
         var player = getPlayer();
         String acId = event.getOption(Constants.AC_ID).getAsString();
-        int currentAcCount = player.getAc();
+        int currentAcCount = player.getAcCount();
 
         game.drawSpecificActionCard(acId, player.getUserID());
 
-        if (currentAcCount == player.getAc()) {
+        if (currentAcCount == player.getAcCount()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     "Card not drawn. It could be in someone's hand, or you could be using the wrong ID."
