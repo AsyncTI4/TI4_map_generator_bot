@@ -167,7 +167,7 @@ public class PlayHeroService {
                             continue;
                         }
                         buttons.add(Buttons.gray(
-                                "dwsHeroPurge_" + tech.getAlias(), tech.getName(), tech.getRequirementsEmoji()));
+                                "dwsHeroPurge_" + tech.getAlias(), tech.getName(), tech.getSingleTechEmoji()));
                     }
                 }
                 MessageHelper.sendMessageToChannel(
