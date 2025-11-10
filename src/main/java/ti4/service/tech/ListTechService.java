@@ -407,8 +407,19 @@ public class ListTechService {
         return getAllTechOfAType(game, techType, player, deepwroughtbt, false);
     }
 
-    private static List<TechnologyModel> getAllTechOfAType(
+    public static List<TechnologyModel> getAllTechOfAType(
             Game game, String techType, Player player, boolean deepwroughtbt, boolean hasToBeResearchable) {
+
+        return getAllTechOfAType(game, techType, player, deepwroughtbt, hasToBeResearchable, false);
+    }
+
+    public static List<TechnologyModel> getAllTechOfAType(
+            Game game,
+            String techType,
+            Player player,
+            boolean deepwroughtbt,
+            boolean hasToBeResearchable,
+            boolean deepwroughthero) {
         List<TechnologyModel> validTechs = Mapper.getTechs().values().stream()
                 .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
                 .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
@@ -417,7 +428,7 @@ public class ListTechService {
                 .filter(tech -> tech.isType(techType)
                         || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
                 .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
-                .filter(tech -> !player.hasTech(tech.getAlias()))
+                .filter(tech -> !player.hasTech(tech.getAlias()) || deepwroughthero)
                 .filter(tech -> tech.getFaction().isEmpty()
                         || "".equalsIgnoreCase(tech.getFaction().get())
                         || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
