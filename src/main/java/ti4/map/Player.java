@@ -2150,7 +2150,8 @@ public class Player extends PlayerProperties {
 
         // firmament commander allows you to use planets in systems that contain your ships for scoring SECRET
         // OBJECTIVES
-        if (secret && game.playerHasLeaderUnlockedOrAlliance(this, "firmamentcommander")) {
+        if (secret && game.playerHasLeaderUnlockedOrAlliance(this, "firmamentcommander")
+                || hasTech("tf-theburningeye")) {
             Set<Planet> planetsUnderShips = game.getPlanetsInfo().values().stream()
                     .filter(planet -> {
                         Tile t = game.getTileFromPlanet(planet.getName());

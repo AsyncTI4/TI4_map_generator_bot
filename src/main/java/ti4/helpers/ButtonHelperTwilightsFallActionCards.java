@@ -142,7 +142,11 @@ public class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("resolveThieve")
     public static void resolveThieve(Game game, Player player, ButtonInteractionEvent event) {
-        ButtonHelperTwilightsFall.sendPlayerSpliceOptions(game, player);
+        // ButtonHelperTwilightsFall.sendPlayerSpliceOptions(game, player);
+        List<String> cards = ButtonHelperTwilightsFall.getSpliceCards(game);
+        for (String card : cards) {
+            ButtonHelperTwilightsFall.selectASpliceCard(game, player, "spoof_" + card, event);
+        }
         ButtonHelper.deleteMessage(event);
     }
 

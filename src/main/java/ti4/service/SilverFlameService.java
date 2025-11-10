@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -103,6 +104,7 @@ public class SilverFlameService {
             message = "Custom PO '" + flame + "' has been added.\n" + player.getRepresentation() + " scored '" + flame
                     + "'";
         }
+        Helper.checkEndGame(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         ButtonHelper.deleteMessage(event);
         if (!FractureService.isFractureInPlay(game)) {

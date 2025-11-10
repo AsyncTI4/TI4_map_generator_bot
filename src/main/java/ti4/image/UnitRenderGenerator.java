@@ -227,7 +227,8 @@ class UnitRenderGenerator {
                     tileGraphics.drawImage(badPositionImage, imageX - 5, imageY - 5, null);
                 }
 
-                if (unitKey.getUnitType() == UnitType.Spacedock && player.ownsUnitSubstring("cabal_spacedock")) {
+                if (unitKey.getUnitType() == UnitType.Spacedock
+                        && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
                     BufferedImage dimTear = ImageHelper.read(resourceHelper.getDecalFile("DimensionalTear.png"));
                     if (dimTear != null) {
                         int dtX = imageX + (unitImage.getWidth() - dimTear.getWidth()) / 2;
