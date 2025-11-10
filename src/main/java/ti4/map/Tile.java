@@ -627,7 +627,9 @@ public class Tile {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                     if (player != null) {
                         UnitModel model = player.getUnitFromUnitKey(unit);
-                        if (model != null && model.getId().contains("cabal_spacedock")) {
+                        if (model != null
+                                && (model.getId().contains("cabal_spacedock")
+                                        || player.hasTech("tf-dimensionaltear"))) {
                             return true;
                         }
                     }

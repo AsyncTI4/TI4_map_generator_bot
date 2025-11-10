@@ -1601,8 +1601,16 @@ public class Helper {
         String planet = uH.getName();
         int planetUnitVal = 0;
         if ("space".equals(uH.getName())) {
-            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (tile.isSupernova()
+                    && player.hasTech("mr")
+                    && (FoWHelper.playerHasUnitsInSystem(player, tile) || game.isTwilightsFallMode())) {
                 productionValueTotal += 5;
+            } else {
+                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
+                                .contains(tile)
+                        && player.hasTech("tf-mr")) {
+                    productionValueTotal += 5;
+                }
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && !tile.getWormholes(game).isEmpty()
