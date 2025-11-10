@@ -161,7 +161,7 @@ public class PlayHeroService {
                 List<Button> buttons = new ArrayList<>();
                 for (TechnologyType type : TechnologyType.mainFive) {
                     List<TechnologyModel> techs =
-                            ListTechService.getAllTechOfAType(game, type.toString(), player, false, false);
+                            ListTechService.getAllTechOfAType(game, type.toString(), player, false, false, true);
                     for (TechnologyModel tech : techs) {
                         if (tech.isUnitUpgrade() || tech.getFaction().isPresent()) {
                             continue;
