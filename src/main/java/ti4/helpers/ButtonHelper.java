@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1465,6 +1462,14 @@ public class ButtonHelper {
                     player.getCorrectChannel(),
                     "## " + player.getRepresentation()
                             + ", this is a __friendly__ reminder that you do not own _Antimass Deflectors_.");
+        }
+        if (!game.isFowMode()
+                && activeSystem.isScar()
+                && !player.getRelics().contains("circletofthevoid")
+                && !player.hasAbility("celestial_being")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work in an entropic scar.");
         }
         if (game.isL1Hero()) {
             return 0;
@@ -7038,6 +7043,16 @@ public class ButtonHelper {
                     if (model == null
                             || ("xxcha_mech".equalsIgnoreCase(model.getId()) && isLawInPlay(game, "articles_war"))) {
                         continue;
+                    }
+                    if (player.hasUnit("ralnel_destroyer2")
+                            && unitHolder.getName().equalsIgnoreCase("space")) {
+                        if (model.getUnitType() == UnitType.Pds || model.getUnitType() == UnitType.Spacedock) {
+                            continue;
+                        }
+                        if (model.getUnitType() == UnitType.Destroyer
+                                && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
+                            continue;
+                        }
                     }
                     if (model.getSpaceCannonDieCount(owningPlayer) > 0
                             && (model.getDeepSpaceCannon(owningPlayer)

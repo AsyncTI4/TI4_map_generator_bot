@@ -407,7 +407,7 @@ public class ListTechService {
         return getAllTechOfAType(game, techType, player, deepwroughtbt, false);
     }
 
-    private static List<TechnologyModel> getAllTechOfAType(
+    public static List<TechnologyModel> getAllTechOfAType(
             Game game, String techType, Player player, boolean deepwroughtbt, boolean hasToBeResearchable) {
         List<TechnologyModel> validTechs = Mapper.getTechs().values().stream()
                 .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))

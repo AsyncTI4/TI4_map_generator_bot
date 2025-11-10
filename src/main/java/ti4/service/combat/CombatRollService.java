@@ -1231,10 +1231,7 @@ public class CombatRollService {
                         || unitEntry.getKey().equalsIgnoreCase("sd")) {
                     continue;
                 }
-                if (unitEntry.getKey().equalsIgnoreCase("dd")
-                        && (unitHolder.getUnitCount(UnitType.Pds, player)
-                                        + unitHolder.getUnitCount(UnitType.Spacedock, player)
-                                < 1)) {
+                if (unitEntry.getKey().equalsIgnoreCase("dd") && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
                     continue;
                 }
             }
