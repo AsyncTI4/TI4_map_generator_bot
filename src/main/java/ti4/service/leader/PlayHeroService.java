@@ -166,12 +166,14 @@ public class PlayHeroService {
                         if (tech.isUnitUpgrade() || tech.getFaction().isPresent()) {
                             continue;
                         }
-                        buttons.add(Buttons.gray("dwsHeroPurge_" + tech.getAlias(), tech.getName()));
+                        buttons.add(Buttons.gray(
+                                "dwsHeroPurge_" + tech.getAlias(), tech.getName(), tech.getRequirementsEmoji()));
                     }
                 }
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged() + ", select a tech you would like to purge.");
+                        player.getRepresentationUnfogged() + ", select a tech you would like to purge.",
+                        buttons);
             }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
