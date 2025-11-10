@@ -2614,6 +2614,11 @@ public class ButtonHelperHeroes {
                     game.getMainGameChannel(),
                     game.getPing()
                             + " reminder that the others cannot follow this. Only the Overrule player gets to do anything.");
+            if (sc == 5) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "# Reminder that the primary of trade does not enable the secondary of trade. You cannot replenish others with overrule.");
+            }
         } else {
             if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
                 MessageHelper.sendMessageToChannel(

@@ -3081,7 +3081,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getRepresentation()
-                        + " choose the space station you wish to exhaust in order to wash your commodities",
+                        + " choose the space station you wish to exhaust in order to wash your commodities. Reminder that the space station must be readied/unexhausted in order to exhaust it.",
                 buttons);
     }
 
