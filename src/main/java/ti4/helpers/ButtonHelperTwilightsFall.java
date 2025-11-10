@@ -464,10 +464,12 @@ public class ButtonHelperTwilightsFall {
                     }
                 }
             }
-            AddUnitService.addUnits(null, player.getNomboxTile(), game, player.getColor(), numMechs + " infantry");
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " captured " + numMechs + " infantry with their mechs.");
+            if (numMechs > 0) {
+                AddUnitService.addUnits(null, player.getNomboxTile(), game, player.getColor(), numMechs + " infantry");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " captured " + numMechs + " infantry with their mechs.");
+            }
         }
     }
 

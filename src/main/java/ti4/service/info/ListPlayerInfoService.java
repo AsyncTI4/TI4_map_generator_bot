@@ -637,10 +637,7 @@ public class ListPlayerInfoService {
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
-                List<String> planets = new ArrayList<>(player.getPlanets());
-                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
-                for (String p : planets) {
-                    Planet planet = game.getPlanetsInfo().get(p);
+                for (Planet planet : player.getPlanetsForScoring(false)) {
                     if (planet.hasAttachment()) {
                         count++;
                     } else {
@@ -747,14 +744,9 @@ public class ListPlayerInfoService {
             }
             case "sai" -> {
                 int count = 0;
-                List<String> planets = new ArrayList<>(player.getPlanets());
-                planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
-                for (String p : planets) {
-                    Planet planet = game.getPlanetsInfo().get(p);
-                    if (planet == null) {
-                        BotLogger.warning(
-                                new LogOrigin(player), "Planet \"" + p + "\" not found for game " + game.getName());
-                    } else if (planet.isLegendary()) {
+
+                for (Planet planet : player.getPlanetsForScoring(true)) {
+                    if (planet.isLegendary()) {
                         count++;
                     }
                 }
