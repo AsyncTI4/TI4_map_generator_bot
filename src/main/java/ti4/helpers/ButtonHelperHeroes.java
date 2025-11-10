@@ -1260,6 +1260,27 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("dwsHeroPurge_")
+    public static void dwsHeroPurge(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String techID = buttonID.replace("dwsHeroPurge_", "");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " purged "
+                        + Mapper.getTech(techID).getName()
+                        + " with their hero. Those who owned the tech can now research one tech");
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.getTechs().contains(techID)) {
+                ButtonHelperActionCards.resolveResearch(game, p2, event);
+            }
+            p2.purgeTech(techID);
+            String msg = p2.getRepresentationUnfogged() + " purged "
+                    + Mapper.getTech(techID).getName();
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("nekroHeroStep2_")
     public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];

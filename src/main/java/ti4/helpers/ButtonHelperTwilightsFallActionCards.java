@@ -701,7 +701,7 @@ public class ButtonHelperTwilightsFallActionCards {
 
     // crimson and smothering suppressing sustains (and production)
     // Ral nel flagship
-    // 3 ACs Automation
-    // Ral Nel Hero
+    // Deepwrought hero
+    // 3 ACs Automation (puppets, extreme duress, and crisis)
 
 }

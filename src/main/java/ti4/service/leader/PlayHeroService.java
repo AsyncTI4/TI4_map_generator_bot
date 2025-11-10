@@ -41,6 +41,8 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.PlanetService;
 import ti4.service.emoji.CardEmojis;
@@ -49,6 +51,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -154,9 +157,27 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getRepresentationUnfogged() + ", select a plot from cards info to put into play.");
             }
+            case "deepwroughthero" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (TechnologyType type : TechnologyType.mainFive) {
+                    List<TechnologyModel> techs =
+                            ListTechService.getAllTechOfAType(game, type.toString(), player, false, false);
+                    for (TechnologyModel tech : techs) {
+                        if (tech.isUnitUpgrade() || tech.getFaction().isPresent()) {
+                            continue;
+                        }
+                        buttons.add(Buttons.gray("dwsHeroPurge_" + tech.getAlias(), tech.getName()));
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + ", select a tech you would like to purge.");
+            }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
-                if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
+                if (!game.isTwilightsFallMode()
+                        && game.getTileFromPlanet("elysium") != null
+                        && game.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
