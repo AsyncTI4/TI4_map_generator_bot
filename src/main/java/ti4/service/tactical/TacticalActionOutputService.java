@@ -317,6 +317,10 @@ public class TacticalActionOutputService {
             bonusMoveValue++;
         }
 
+        if (player.hasTech("tf-planesplitter") && tile.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
         if (player.hasUnlockedBreakthrough("crimsonbt") && (tileHasBreach || movingFromHome)) {
             bonusMoveValue++;
         }
