@@ -1363,5 +1363,14 @@
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 3 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
         "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
         "source": "deprecated"
+    },
+    {
+        "alias": "counterintelligence",
+        "name": "Counterintelligence",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
+        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
+        "source": "action_deck_2"
     }
 ]
