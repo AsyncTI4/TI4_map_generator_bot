@@ -4242,6 +4242,9 @@ public class Game extends GameProperties {
         if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
             return true;
         }
+        if ("crimsoncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-entropicharvest")) {
+            return true;
+        }
 
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance

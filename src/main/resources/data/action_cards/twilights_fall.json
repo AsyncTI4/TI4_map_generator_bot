@@ -188,7 +188,7 @@
         "name": "Meddle",
         "phase": "Action",
         "window": "When any die is rolled",
-        "text": "Add or sintract 1 from its result.",
+        "text": "Add or subtract 1 from its result.",
         "source": "twilights_fall"
     },
     {

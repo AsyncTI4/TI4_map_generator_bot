@@ -1509,7 +1509,8 @@ public class MapGenerator implements AutoCloseable {
                     }
                     x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
                 }
-            } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
+            } else if (displayType == DisplayType.anomalies
+                    && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
                 UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
                 int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
                 unitNum = (unitNum == 0
