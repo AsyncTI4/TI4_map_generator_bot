@@ -841,6 +841,21 @@
         "forCombatAbility": "combatround"
     },
     {
+        "alias": "plus2_fracture_all",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "tf-planesplitter"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus2_2_matching_non_ff",
         "type": "mods",
         "value": "+2",

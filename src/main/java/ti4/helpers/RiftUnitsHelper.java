@@ -444,6 +444,11 @@ public class RiftUnitsHelper {
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
                             + " is rifting some units. However, because of their _Circlet of the Void_ relic, they do not roll.");
+        } else if (player.hasTech("tf-crucible")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " is rifting some units. However, because of their Crucible tech, they do not roll.");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
                     channel,

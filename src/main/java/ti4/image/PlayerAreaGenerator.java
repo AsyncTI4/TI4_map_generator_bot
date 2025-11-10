@@ -1572,7 +1572,10 @@ class PlayerAreaGenerator {
             if ("cgf".equals(unitID)) unitKey = Mapper.getUnitKey("gf", playerColor);
 
             int count = unitMapCount.getOrDefault(unitKey, 0);
-            if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && "sd".equals(unitID)) {
+            if ((player.ownsUnit("cabal_spacedock")
+                            || player.ownsUnit("cabal_spacedock2")
+                            || player.hasTech("tf-dimensionaltear"))
+                    && "sd".equals(unitID)) {
                 count += unitMapCount.getOrDefault(Mapper.getUnitKey("csd", playerColor), 0);
             }
 
