@@ -41,7 +41,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
-        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the Arbiter’s documents.",
+        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the Arbiter's documents.",
         "source": "action_deck_2"
     },
     {
@@ -427,7 +427,7 @@
         "phase": "Any",
         "window": "When 1 of your units would be destroyed",
         "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
-        "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
+        "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he’d been standing on a heartbeat earlier erupted in plasma. The laughter died; their savior was born.",
         "source": "action_deck_2"
     },
     {
