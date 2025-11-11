@@ -379,6 +379,9 @@ public class ActionCardHelper {
     private static boolean hasPrePlayCards(Player player) {
         List<String> prePlayable = List.of(
                 "coup",
+                "crisis",
+                "stasis",
+                "extremeduress",
                 "disgrace",
                 "special_session",
                 "investments",

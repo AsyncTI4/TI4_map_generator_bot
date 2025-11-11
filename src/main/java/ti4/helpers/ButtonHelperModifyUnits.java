@@ -2237,7 +2237,7 @@ public class ButtonHelperModifyUnits {
         Player opponent = null;
         String msg;
         Tile tile = game.getTileByPosition(pos);
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNNeutral()) {
             if (p2 == player) {
                 continue;
             }
