@@ -58,13 +58,13 @@ public class TeHelperGeneral {
 
     @ButtonHandler("expeditionInfo")
     private static void expeditionInfo(ButtonInteractionEvent event, Game game, Player player) {
-        String info = game.getExpeditions().printExpeditionInfo();
+        String info = game.getExpeditions().printExpeditionInfo(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), info);
     }
 
     @ButtonHandler("expeditionInfoAndButtons")
     private static void expeditionInfoWithButtons(ButtonInteractionEvent event, Game game, Player player) {
-        String info = game.getExpeditions().printExpeditionInfo();
+        String info = game.getExpeditions().printExpeditionInfo(game, player);
         List<Button> butts = game.getExpeditions().getRemainingExpeditionButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), info, butts);
         ButtonHelper.deleteTheOneButton(event);
