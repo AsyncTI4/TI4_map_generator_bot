@@ -152,6 +152,7 @@ public class StatusCleanupService {
         game.removeStoredValue("hiredGunsInPlay");
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("Coup");
+        game.removeStoredValue("ExtremeDuress");
         game.removeStoredValue("PublicExecution");
         game.removeStoredValue("VisionariaResponded");
         game.setHasHadAStatusPhase(true);

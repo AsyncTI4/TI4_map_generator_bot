@@ -695,7 +695,6 @@ public class ButtonHelperTwilightsFallActionCards {
     }
 
     // trine
-    // statis/crisis
     // timestop
     // tf-manipulate
 
@@ -705,7 +704,6 @@ public class ButtonHelperTwilightsFallActionCards {
 
     // crimson and smothering suppressing sustains (and production)
     // Ral nel flagship
-    // Deepwrought hero
-    // 3 ACs Automation (puppets, extreme duress, and crisis)
+    // 1 AC Automation (puppets)
 
 }

@@ -213,7 +213,7 @@ public class ButtonHelperTacticalAction {
                 }
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.gray(
+                    buttons.add(Buttons.green(
                             player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
                             "Take AC from " + p2.getColor()));
                     MessageHelper.sendMessageToChannel(

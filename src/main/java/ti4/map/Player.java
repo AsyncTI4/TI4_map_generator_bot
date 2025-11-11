@@ -184,6 +184,16 @@ public class Player extends PlayerProperties {
                 .count();
     }
 
+    public boolean hasUnplayedSCs() {
+        boolean hadAnyUnplayedSCs = false;
+        for (Integer SC : getSCs()) {
+            if (!game.getPlayedSCs().contains(SC)) {
+                hadAnyUnplayedSCs = true;
+            }
+        }
+        return hadAnyUnplayedSCs;
+    }
+
     public List<String> getOceans() {
         List<String> oceans = new ArrayList<>();
         for (String planet : getPlanets()) {
@@ -436,6 +446,9 @@ public class Player extends PlayerProperties {
     }
 
     public String finChecker() {
+        if (isNpc() || isDummy()) {
+            return dummyPlayerSpoof();
+        }
         return getFinsFactionCheckerPrefix();
     }
 

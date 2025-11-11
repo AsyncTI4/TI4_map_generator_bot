@@ -851,6 +851,10 @@
             {
                 "type": "tech",
                 "alias": "tf-planesplitter"
+            },
+            {
+                "type": "leader",
+                "alias": "obsidiancommander"
             }
         ],
         "forCombatAbility": "combatround"

@@ -84,9 +84,7 @@ public class PlayStrategyCardService {
         }
 
         // HANDLE COUP
-        if (!winnuHero
-                && game.getStoredValue("Coup") != null
-                && game.getStoredValue("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && game.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("Coup").contains(p2.getFaction())
                         && p2.getActionCards().containsKey("coup")) {
