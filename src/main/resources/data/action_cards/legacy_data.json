@@ -1372,5 +1372,14 @@
         "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
         "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
         "source": "action_deck_2"
+    },
+    {
+        "alias": "armament_rider",
+        "name": "Armament Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+        "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
+        "source": "deprecated"
     }
 ]

@@ -369,7 +369,6 @@
 
             "ancient_trade_routes",
             "anomalous_conditions",
-            "armament_rider",
             "armistice",
             "arms_deal",
             "betrayal",
@@ -411,6 +410,7 @@
             "overtime",
             "pivot",
             "proclamation",
+            "production_rider",
             "project_rider",
             "public_outrage",
             "public_support",
@@ -704,7 +704,6 @@
 
             "ancient_trade_routes",
             "anomalous_conditions",
-            "armament_rider",
             "armistice",
             "arms_deal",
             "betrayal",
@@ -748,6 +747,7 @@
             "miracle",
             "outgun1",
             "outmaneuver1",
+            "production_rider",
             "overtime",
             "pivot",
             "proclamation",

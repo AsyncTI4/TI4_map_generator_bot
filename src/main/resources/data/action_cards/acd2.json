@@ -18,20 +18,11 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "armament_rider",
-        "name": "Armament Rider",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
-        "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "armistice",
         "name": "Armistice",
         "phase": "Action",
         "window": "When another player activates a system that contains your units",
-        "text": "Return that player's command token from that system to their strategy pool and end their turn.",
+        "text": "Return that player's command token from that system to their reinforcements and end their turn.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
@@ -545,6 +536,15 @@
         "window": "When a public objective is revealed",
         "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "production_rider",
+        "name": "Production Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+        "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
         "source": "action_deck_2"
     },
     {

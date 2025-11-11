@@ -7,7 +7,6 @@
         "cardIDs": [
             "ancient_trade_routes",
             "anomalous_conditions",
-            "armament_rider",
             "armistice",
             "arms_deal",
             "betrayal",
@@ -66,6 +65,7 @@
             "overtime",
             "pivot",
             "proclamation",
+            "production_rider",
             "project_rider",
             "prophecy",
             "public_outrage",
@@ -116,7 +116,6 @@
         "cardIDs": [
             "ancient_trade_routes",
             "anomalous_conditions",
-            "armament_rider",
             "armistice",
             "arms_deal",
             "betrayal",
@@ -175,6 +174,7 @@
             "overtime",
             "pivot",
             "proclamation",
+            "production_rider",
             "project_rider",
             "prophecy",
             "public_outrage",
@@ -246,7 +246,6 @@
         "cardIDs": [
             "ancient_trade_routes",
             "anomalous_conditions",
-            "armament_rider",
             "armistice",
             "arms_deal",
             "betrayal",
@@ -305,6 +304,7 @@
             "overtime",
             "pivot",
             "proclamation",
+            "production_rider",
             "project_rider",
             "prophecy",
             "public_outrage",
@@ -376,7 +376,6 @@
         "cardIDs": [
             "ancient_trade_routes",
             "anomalous_conditions",
-            "armament_rider",
             "armistice",
             "arms_deal",
             "betrayal",
@@ -435,6 +434,7 @@
             "overtime",
             "pivot",
             "proclamation",
+            "production_rider",
             "project_rider",
             "prophecy",
             "public_outrage",
