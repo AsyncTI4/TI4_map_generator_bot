@@ -1389,6 +1389,7 @@
         "window": "When another player gains 3 or more trade goods",
         "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
         "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
+        "source": "deprecated"
     },
     {
         "alias": "rogues1",
