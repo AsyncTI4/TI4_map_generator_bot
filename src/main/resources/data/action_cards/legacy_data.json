@@ -1360,7 +1360,7 @@
         "name": "Settlement",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 3 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
         "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
         "source": "deprecated"
     },
@@ -1389,6 +1389,50 @@
         "window": "When another player gains 3 or more trade goods",
         "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
         "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
+    },
+    {
+        "alias": "rogues1",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "",
+        "source": "deprecated"
+    },
+    {
+        "alias": "rogues2",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "",
+        "source": "deprecated"
+    },
+    {
+        "alias": "rogues3",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "",
+        "source": "deprecated"
+    },
+    {
+        "alias": "rogues4",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 2 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "",
+        "source": "deprecated"
+    },
+    {
+        "alias": "sacrifice",
+        "name": "Sacrifice",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
+        "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "deprecated"
     }
 ]

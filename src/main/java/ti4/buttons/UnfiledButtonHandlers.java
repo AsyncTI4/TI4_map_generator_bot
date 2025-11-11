@@ -1817,7 +1817,9 @@ public class UnfiledButtonHandlers {
                 message,
                 ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled));
 
-        if (game.getTileByPosition(pos).isGravityRift() && !player.hasRelic("circletofthevoid")) {
+        if (game.getTileByPosition(pos).isGravityRift()
+                && !player.hasRelic("circletofthevoid")
+                && !player.hasTech("tf-crucible")) {
             Button rift = Buttons.green(
                     player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos,
                     "Rift Units",
@@ -3081,7 +3083,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getRepresentation()
-                        + " choose the space station you wish to exhaust in order to wash your commodities",
+                        + " choose the space station you wish to exhaust in order to wash your commodities. Reminder that the space station must be readied/unexhausted in order to exhaust it.",
                 buttons);
     }
 
