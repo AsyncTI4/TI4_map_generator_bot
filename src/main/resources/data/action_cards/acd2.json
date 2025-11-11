@@ -41,7 +41,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
-        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
+        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the Arbiter’s documents.",
         "source": "action_deck_2"
     },
     {
@@ -93,7 +93,7 @@
         "alias": "collusion",
         "name": "Collusion",
         "phase": "Action",
-        "window": "After another player resolves the secondary ability of your strategy card",
+        "window": "When another player resolves the secondary ability of your strategy card",
         "text": "Return 1 of that player's command tokens from the game board to their strategy pool. Then, you may perform a transaction with that player; action cards and unscored secret objectives can be traded as part of this transaction.",
         "flavorText": "A gambit? Magi laughed. Hardly.",
         "source": "action_deck_2"
@@ -103,7 +103,7 @@
         "name": "Compounding Interests",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Place up to 2 command tokens from your reinforcements in different systems that contain your units. Then, gain 2 trade goods for each of your command tokens on the game board.",
+        "text": "Place up to 3 command tokens from your reinforcements in different systems that contain your units. Then, gain 2 trade goods for each of your command tokens on the game board.",
         "flavorText": "\"A station over Ordinian? What can we expect to gain from such a venture?\" Carth hissed. Harrugh snapped, \"Everything.\"",
         "source": "action_deck_2"
     },
@@ -197,7 +197,7 @@
         "name": "Defense Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 PDS from your reinforcements on a planet you control.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 PDS from your reinforcements on any planets you control.",
         "flavorText": "Procyon's cold silence enraged Sakora. \"We are the watchers on the walls, not you. We are the shield that guards all realms!\"",
         "source": "action_deck_2"
     },
@@ -275,15 +275,6 @@
         "window": "ACTION",
         "text": "Look at another player's action cards. Then, that player gives you 1 action card, promissory note, or secret objective from their hand.",
         "flavorText": "The leaked documents brought a smile to Willard's face. Schemes upon schemes, none of which would ever reach fruition. ",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "false_manifest",
-        "name": "False Manifest",
-        "phase": "Action",
-        "window": "When another player gains 3 or more trade goods",
-        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
-        "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
         "source": "action_deck_2"
     },
     {
@@ -409,7 +400,7 @@
         "phase": "Action",
         "window": "After you activate a system",
         "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
-        "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
+        "flavorText": "Connor radioed command. \"You're right. It was nearly impenetrable.\" Moments later, the shield pylons came crashing down, useless.",
         "source": "action_deck_2"
     },
     {
@@ -749,8 +740,8 @@
         "alias": "shrapnel_turrets",
         "name": "Shrapnel Turrets",
         "phase": "Action",
-        "window": "At the start of a space combat",
-        "text": "Choose any number of your ships that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8(x2) during this combat.",
+        "window": "During the \"Anti-Fighter Barrage\" step of space combat",
+        "text": "For each of your units that have a capacity value, resolve ANTI-FIGHTER BARRAGE 8 (x2) against your opponent's units.",
         "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. It'll shred 'em fine!\"",
         "source": "action_deck_2"
     },
@@ -800,6 +791,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "swindle",
+        "name": "Swindle",
+        "phase": "Action",
+        "window": "When another player gains 3 or more trade goods",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
+        "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "syndicate",
         "name": "Syndicate",
         "phase": "Action",
@@ -823,7 +823,7 @@
         "phase": "Any",
         "window": "When you would spend a command token from your strategy pool",
         "text": "Remove 1 of your command tokens from the game board instead.",
-        "flavorText": "Kyver shivered as he slipped undetected past the Nekro fleet. Why? They had no way to know his plans—yet since his last report the fleet had dispersed, and there was no sign of the Alastor.",
+        "flavorText": "Kyver shivered as he slipped undetected past the Nekro fleet. Why? They had no way of knowing his plans—yet, he saw no sign of the Alastor and its escort.",
         "source": "action_deck_2"
     },
     {
