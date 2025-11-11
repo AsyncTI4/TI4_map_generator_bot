@@ -967,7 +967,8 @@ public class UnfiledButtonHandlers {
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
         List<String> planets = new ArrayList<>();
         for (UnitHolder planetUH : tile.getPlanetUnitHolders()) {
-            if (!player.getPlanetsAllianceMode().contains(planetUH.getName())) {
+            if (!player.getPlanetsAllianceMode().contains(planetUH.getName())
+                    || FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planetUH)) {
                 if (!((Planet) planetUH).getPlanetTypes().contains("cultural")
                         || !ButtonHelper.isLawInPlay(game, "conventions")) {
                     planets.add(planetUH.getName());
@@ -1667,7 +1668,7 @@ public class UnfiledButtonHandlers {
     private static List<Button> getTyrannusAssignTyrantButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
-            if (!player.isSpeaker() && !player.isTyrant()) {
+            if ((!player.isSpeaker() || !politicsHolder.getSCs().contains(3)) && !player.isTyrant()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
                     Button button;
@@ -2214,10 +2215,7 @@ public class UnfiledButtonHandlers {
                     buttons.add(Buttons.red(
                             "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
                 }
-                if (player.hasUnexhaustedLeader("experimentalagent")) {
-                    buttons.add(Buttons.gray(
-                            "exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
-                }
+
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_mortheusagent_" + player.getFaction(),

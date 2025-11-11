@@ -338,6 +338,9 @@ public class ButtonHelperActionCards {
     @ButtonHandler("checkForAllACAssignments")
     public static void checkForAllAssignmentACs(Game game, Player player) {
         checkForAssigningCoup(game, player);
+        checkForAssigningExtremeDuress(game, player);
+        checkForAssigningStasis(game, player);
+        checkForAssigningCrisis(game, player);
         checkForAssigningPublicDisgrace(game, player);
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
@@ -1916,6 +1919,75 @@ public class ButtonHelperActionCards {
                     button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningExtremeDuress(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("extremeduress")) {
+            game.setStoredValue("ExtremeDuress", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player you wish to experience extreme duress."
+                    + " _Extreme Duress_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (!p2.hasUnplayedSCs()) {
+                    continue;
+                }
+                String label = "Expreme Duress " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_ExtremeDuress_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningCrisis(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("crisis")) {
+            game.setStoredValue("Crisis Target", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with crisis."
+                    + " _Crisis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                String label = "Crisis On " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_Crisis Target_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningStasis(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("tf-stasis")) {
+            game.setStoredValue("Stasis Target", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with statis."
+                    + " _stasis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                String label = "Statis On " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_Statis Target_" + p2.getColor(), label, scEmoji));
             }
             scButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);

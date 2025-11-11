@@ -223,6 +223,53 @@ public class StartTurnService {
                 }
             }
         }
+        if (game.getStoredValue("ExtremeDuress").equalsIgnoreCase(player.getColor()) && player.hasUnplayedSCs()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("extremeduress")) {
+                    game.removeStoredValue("ExtremeDuress");
+                    ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "concedeToED_" + p2.getFaction(),
+                            "Lose ACs, TGs, Show Secrets"));
+                    buttons2.add(Buttons.green("deleteButtons", "Give in and Play SC (or sabo Extreme Duress)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
+        if (game.getStoredValue("Crisis Target").equalsIgnoreCase(player.getColor())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("crisis")) {
+                    game.removeStoredValue("Crisis Target");
+                    ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End turn"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
+        if (game.getStoredValue("Stasis Target").equalsIgnoreCase(player.getColor())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("tf-stasis")) {
+                    game.removeStoredValue("Stasis Target");
+                    ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(ButtonHelper.getEndTurnButton(game, player));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
 
         if (goingToPass) {
             PassService.passPlayerForRound(event, game, player, true);

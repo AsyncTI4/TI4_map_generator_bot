@@ -992,6 +992,9 @@ public class StartPhaseService {
         game.setPhaseOfGame("action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);
+            ButtonHelperActionCards.checkForAssigningCrisis(game, p2);
+            ButtonHelperActionCards.checkForAssigningStasis(game, p2);
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
             if (game.getStoredValue("Play Naalu PN") != null
                     && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
@@ -1000,7 +1003,7 @@ public class StartPhaseService {
                     PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
             }
-            game.setStoredValue("autoProveEndurance_" + p2.getFaction(), "");
+            game.removeStoredValue("autoProveEndurance_" + p2.getFaction());
         }
 
         if (game.hasAnyPriorityTrackMode()) {

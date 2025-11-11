@@ -1,7 +1,7 @@
 [
     {
         "alias": "action_cards_te",
-        "name": "TE Action Cards",
+        "name": "TE + POK Action Cards",
         "type": "action_card",
         "description": "All action cards in a Thunder's Edge + PoK game. This is the default deck.",
         "cardIDs": [
