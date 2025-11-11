@@ -917,7 +917,7 @@
         "name": "Artifact Hunters",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 4 trade goods to purge that relic fragment and gain 1 relic.",
+        "text": "Explore 1 planet you control; if the resolved card is a relic fragment, you may spend 4 trade goods to purge that card and gain 1 relic.",
         "flavorText": "\"This is...\" Dart let out a long whistle. \"I can't identify a single part of it. Can you?\"",
         "source": "action_deck_2"
     },
@@ -1204,7 +1204,7 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After you lose a ground combat",
-        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets your opponent controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets that player controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
         "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
         "source": "action_deck_2"
     },
