@@ -16,6 +16,7 @@ import ti4.model.LeaderModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -115,7 +116,11 @@ public class SabotageService {
             return false;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
-            return false;
+            GMService.logPlayerActivity(
+                    game, player, "Sabotage not allowed due to Last Bastion commander.", null, true);
+            if (!game.isFowMode()) {
+                return false;
+            }
         }
         if ((player.hasTech("tp") || player.hasTech("tf-crafty"))
                 && game.getActivePlayerID() != null

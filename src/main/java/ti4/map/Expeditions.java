@@ -16,6 +16,7 @@ import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -133,9 +134,13 @@ public class Expeditions {
     }
 
     @JsonIgnore
-    private String playerInfo(String faction) {
+    private String playerInfo(Game game, Player viewingPlayer, String faction) {
         Player player = game.getPlayerFromColorOrFaction(faction);
-        return player != null ? player.getRepresentation(false, false) : "-";
+        return player != null
+                ? (game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, player, viewingPlayer)
+                        ? "Someone"
+                        : player.getRepresentation(false, false))
+                : "-";
     }
 
     @JsonIgnore
@@ -165,11 +170,11 @@ public class Expeditions {
     }
 
     @JsonIgnore
-    public String printExpeditionInfo() {
+    public String printExpeditionInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder("Thunder's Edge Expedition Status:");
         for (Entry<String, String> exp : expeditionFactions.entrySet()) {
             sb.append("\n> ").append(getExpeditionEmoji(exp.getKey()));
-            sb.append(" ").append(playerInfo(exp.getValue()));
+            sb.append(" ").append(playerInfo(game, player, exp.getValue()));
         }
         return sb.toString();
     }
@@ -293,7 +298,7 @@ public class Expeditions {
             BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
         event.getHook()
-                .editOriginal(exp.printExpeditionInfo())
+                .editOriginal(exp.printExpeditionInfo(game, player))
                 .setComponents()
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
