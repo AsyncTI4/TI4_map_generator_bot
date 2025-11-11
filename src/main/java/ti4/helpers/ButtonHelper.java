@@ -619,6 +619,10 @@ public class ButtonHelper {
                         || player.hasAbility("riftmeld"))) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.Cabal));
         }
+        if (player.hasUnexhaustedLeader("experimentalagent") && !whatIsItFor.contains("inf")) {
+            buttons.add(
+                    Buttons.gray("exhaustAgent_experimentalagent", "Use Experimental Genome", FactionEmojis.Jolnar));
+        }
         if (player.getNombox().hasUnits() && player.hasAbility("mark_of_pharadn")) {
             buttons.add(Buttons.gray("getReleaseButtons", "Release captured units", FactionEmojis.pharadn));
         }
@@ -5917,7 +5921,12 @@ public class ButtonHelper {
 
         // id parts
         List<String> idParts = new ArrayList<>();
-        idParts.add(player.finChecker() + action);
+        if (player.isDummy() || player.isNpc()) {
+            idParts.add(player.dummyPlayerSpoof() + action);
+            labelStart = "(For Dummy) " + labelStart;
+        } else {
+            idParts.add(player.finChecker() + action);
+        }
         idParts.add(tile.getPosition());
         idParts.add(Integer.toString(amt));
         idParts.add(key.asyncID());

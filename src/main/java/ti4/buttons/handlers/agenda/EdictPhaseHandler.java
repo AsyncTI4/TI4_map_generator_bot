@@ -278,7 +278,8 @@ public class EdictPhaseHandler {
                     if (p2 == player) {
                         continue;
                     }
-                    buttons.add(Buttons.green("electCensure_" + p2.getFaction(), p2.getFactionNameOrColor()));
+                    buttons.add(Buttons.green(
+                            "electCensure_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
                 }
                 msg += "\n\nChoose the player to censure.";
             }

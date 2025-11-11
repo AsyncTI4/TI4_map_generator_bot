@@ -117,6 +117,9 @@ public class SabotageService {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             return false;
         }
+        if (player.hasTech("tf-biosyntheticsynergy")) {
+            return false;
+        }
         if ((player.hasTech("tp") || player.hasTech("tf-crafty"))
                 && game.getActivePlayerID() != null
                 && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
