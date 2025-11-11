@@ -1105,7 +1105,7 @@
         "name": "Alliance Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "After an agenda is revealed:\nYou cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain the alliance ability of a random, unused faction.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, gain the alliance ability of a random, unused faction.",
         "flavorText": "S'ula limped toward the podium, meeting the jeers with a defiant smirk. She had been chased to the ends of the galaxy and now stood before the council with an offer to capitulate—to one of them.",
         "source": "action_deck_2"
     },
