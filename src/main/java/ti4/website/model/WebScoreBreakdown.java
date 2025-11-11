@@ -72,6 +72,7 @@ public class WebScoreBreakdown {
     private static final String CUSTOM_PO_SHARD = "Shard of the Throne";
     private static final String CUSTOM_PO_SHARD_PREFIX = "Shard of the Throne (";
     private static final String CUSTOM_PO_SUPPORT_FOR_THRONE = "support_for_the_throne";
+    private static final String CUSTOM_PO_STYX = "A Song Like Marrow";
 
     // Hardcoded metadata for losable agendas
     private static final Set<String> LOSABLE_AGENDAS = Set.of("political_censure", "mutiny");
@@ -88,6 +89,7 @@ public class WebScoreBreakdown {
             RELIC_LATVINIA,
             RELIC_LATVINIA_BALDRICK,
             RELIC_STYX,
+            CUSTOM_PO_STYX,
             CUSTOM_PO_SUPPORT_FOR_THRONE);
 
     public static WebScoreBreakdown fromPlayer(Player player, Game game) {
@@ -206,7 +208,8 @@ public class WebScoreBreakdown {
         }
 
         // Styx token - losable (homebrew)
-        if (hasStyx(player)) {
+        // Check if player has scored "A Song Like Marrow"
+        if (hasStyx(player, game)) {
             ScoreBreakdownEntry entry = createEntry(EntryType.STYX, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.STYX, EntryState.SCORED, null, null, player, game));
             relicEntries.add(entry);
@@ -515,7 +518,7 @@ public class WebScoreBreakdown {
                 case SHARD:
                     return "Shard of the Throne";
                 case STYX:
-                    return "Styx Token";
+                    return "A Song Like Marrow";
                 case AGENDA:
                     return agendaKey != null ? agendaKey : "Agenda Point";
                 default:
@@ -698,9 +701,15 @@ public class WebScoreBreakdown {
         return hasStrategyToken;
     }
 
-    private static boolean hasStyx(Player player) {
-        if (player == null) return false;
-        return player.hasRelic(RELIC_STYX);
+    private static boolean hasStyx(Player player, Game game) {
+        if (player == null || game == null) return false;
+        // Check if player has scored "A Song Like Marrow" (the custom PO for Styx)
+        Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
+        if (scoredPublics != null) {
+            List<String> scoringPlayers = scoredPublics.get(CUSTOM_PO_STYX);
+            return scoringPlayers != null && scoringPlayers.contains(player.getUserID());
+        }
+        return false;
     }
 
     private static boolean alreadyHasEntry(List<ScoreBreakdownEntry> entries, EntryType type) {
