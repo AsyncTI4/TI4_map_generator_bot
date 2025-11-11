@@ -7523,6 +7523,9 @@ public class ButtonHelper {
         if (countMatches(buttonID, "_") > 1) {
             part2 += "_" + buttonID.split("_")[2];
             msg += " on " + buttonID.split("_")[2];
+            if (messageID.contains("Extreme") || messageID.contains("Stasis") || messageID.contains("Crisis")) {
+                part2 = buttonID.split("_")[2];
+            }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + ".");
         game.setStoredValue(messageID, part2);
