@@ -204,18 +204,6 @@
         "source": "ds"
     },
     {
-        "alias": "kortalibt",
-        "name": "The Queens’ Wrath",
-        "displayName": "The Queens’ \nrath",
-        "faction": "kortali",
-        "synergy": [
-            "PROPULSION",
-            "WARFARE"
-        ],
-        "text": "If you have the Dreadnought II technology, flip this card and place it on top of Dreadnought II.",
-        "source": "ds"
-    },
-    {
         "alias": "kyrobt",
         "name": "Strain Dispersal",
         "displayName": "Strain\nDispersal",
@@ -349,7 +337,7 @@
     },
     {
         "alias": "rohdhnabt",
-        "name": "The Prodigy’s\nTriumph",
+        "name": "The Prodigy’s Triumph",
         "displayName": "The Prodigy’s\nTriumph",
         "faction": "rohdhna",
         "synergy": [
