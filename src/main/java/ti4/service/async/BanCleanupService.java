@@ -99,14 +99,17 @@ public class BanCleanupService {
 
     private void findAndDeleteSpamPosts(User user, MessageHistory hist) {
         for (Message m : hist.getRetrievedHistory()) {
-            boolean delete = false;
-            if (m.getAuthor().getId().equals(user.getId())) delete = true;
-            else if (m.getAuthor().getName().startsWith(user.getName())) delete = true;
-            else if (m.getAuthor().getEffectiveName().startsWith(user.getEffectiveName())) delete = true;
-            else if (m.getAuthor().getGlobalName().startsWith(user.getGlobalName())) delete = true;
-            if (delete) {
+            if (authorIsUser(m.getAuthor(), user)) {
                 m.delete().queue();
             }
         }
+    }
+
+    private boolean authorIsUser(User author, User user) {
+        List<String> names = List.of(user.getName(), user.getEffectiveName(), user.getGlobalName());
+        for (String n : names) {
+            if (author.getName().toLowerCase().startsWith(n.toLowerCase())) return true;
+        }
+        return author.getId().equals(user.getId());
     }
 }
