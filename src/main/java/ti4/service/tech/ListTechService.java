@@ -296,6 +296,10 @@ public class ListTechService {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             requirements = G.matcher(requirements).replaceFirst("");
+            if (ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true)
+                    .contains(tech.getAlias())) {
+                requirements = "";
+            }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")) {
             requirements = B.matcher(requirements).replaceFirst("");
