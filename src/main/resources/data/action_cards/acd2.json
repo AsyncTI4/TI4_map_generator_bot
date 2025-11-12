@@ -22,7 +22,7 @@
         "name": "Armistice",
         "phase": "Action",
         "window": "When another player activates a system that contains your units",
-        "text": "Return that player's command token from that system to their reinforcements and end their turn.",
+        "text": "Return that player's command token from that system to their strategy pool and end their turn.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
@@ -436,7 +436,7 @@
         "phase": "Any",
         "window": "When 1 of your units would be destroyed",
         "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
-        "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he’d been standing on a heartbeat earlier erupted in plasma. The laughter died; their savior was born.",
+        "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he’d been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
         "source": "action_deck_2"
     },
     {
@@ -749,8 +749,8 @@
         "alias": "shrapnel_turrets",
         "name": "Shrapnel Turrets",
         "phase": "Action",
-        "window": "During the \"Anti-Fighter Barrage\" step of space combat",
-        "text": "For each of your units that have a capacity value, resolve ANTI-FIGHTER BARRAGE 8 (x2) against your opponent's units.",
+        "window": "At the start of a space combat",
+        "text": "Choose any number of your ships that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8 (x2) during this combat.",
         "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. It'll shred 'em fine!\"",
         "source": "action_deck_2"
     },
@@ -814,7 +814,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Spend 6 resources to research 1 technology; for each neighbor that owns that technology, reduce this cost by 1 and ignore 1 prerequisite.",
-        "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics—patented and traded to the rim of the galaxy.",
+        "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics: patented and traded to the rim of the galaxy.",
         "source": "action_deck_2"
     },
     {
@@ -1205,7 +1205,7 @@
         "phase": "Action",
         "window": "ACTION",
         "text": "Place 4 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg, at least.\"",
+        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
         "source": "deprecated"
     },
     {
