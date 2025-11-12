@@ -1,10 +1,12 @@
 package ti4.service.actioncard;
 
 import java.util.Calendar;
+import java.util.EnumSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -38,6 +40,9 @@ public class SabotageService {
             "sabotage4_acd2",
             "tf-shatter1",
             "tf-shatter2");
+
+    private static final Set<ACStatus> NON_HAND_SABOTAGE_LOCATIONS =
+            EnumSet.of(ACStatus.garbozia, ACStatus.ralnelbt, ACStatus.purged);
 
     public static boolean couldFeasiblySabotage(Player player, Game game) {
         if (player.isNpc()) {
@@ -174,11 +179,20 @@ public class SabotageService {
     }
 
     private static boolean checkForAllSabotagesDiscarded(Game game) {
-        return game.getDiscardActionCards().keySet().containsAll(SABOTAGE_CARD_ALIASES);
+        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isSabotageAccountedFor(game, alias));
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
-        return game.isAcd2() && game.getDiscardActionCards().keySet().containsAll(ACD2_SABOTAGE_CARD_ALIASES);
+        return game.isAcd2()
+                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isSabotageAccountedFor(game, alias));
+    }
+
+    private static boolean isSabotageAccountedFor(Game game, String sabotageAlias) {
+        if (!game.getDiscardActionCards().containsKey(sabotageAlias)) {
+            return false;
+        }
+        ACStatus status = game.getDiscardACStatus().get(sabotageAlias);
+        return status == null || NON_HAND_SABOTAGE_LOCATIONS.contains(status);
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
