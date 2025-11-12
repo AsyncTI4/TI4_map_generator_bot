@@ -19,8 +19,13 @@
         "id": "tf2",
         "initiative": 2,
         "name": "Noctis",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Initiate a genome splice",
+            "Ready up to 2 planets."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to participate in the genome splice."
+        ],
         "imageFileName": "tf2",
         "colourHexCode": "#f69421",
         "source": "twilights_fall"
@@ -29,8 +34,14 @@
         "id": "tf3",
         "initiative": 3,
         "name": "Tyrannus",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Choose a player other than the speaker. That player gains the speaker token",
+            "Choose a player other than the speaker or tyrant. That player gains the benediction token.",
+            "Draw 2 action cards."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 action cards."
+        ],
         "imageFileName": "tf3",
         "colourHexCode": "#fff200",
         "botSCAutomationID": "pok3politics",
@@ -73,8 +84,13 @@
         "id": "tf6",
         "initiative": 6,
         "name": "Calamitas",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Initiate a unit upgrade splice.",
+            "Resolve the PRODUCTION abilities of your units in 1 system."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to either participate in the unit upgrade splice or use the PRODUCTION abilities of the units in your home system."
+        ],
         "imageFileName": "tf6",
         "colourHexCode": "#008ed4",
         "source": "twilights_fall"
