@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -21,17 +22,22 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class BanCleanupService {
 
-    public void banSpamAccount(User user, AuditLogEntry log) {
-        ManagedPlayer mp = GameManager.getManagedPlayer(user.getId());
-        if (mp != null) {
-            return;
+    public void banSpamAccount(AuditLogEntry log, User target, User admin) {
+        if (shouldBanFromAllGuilds(log, target, admin)) {
+            int errors = removeUserFromAllGuilds(target, log.getReason());
+            auditPostBanAction(target, log, errors);
         }
-        if (log.getUser().getId().equals(JdaService.getBotId())) {
-            return;
-        }
+    }
 
-        int errors = removeUserFromAllGuilds(user, log.getReason());
-        auditPostBanAction(user, log, errors);
+    private boolean shouldBanFromAllGuilds(AuditLogEntry log, User target, User admin) {
+        if (admin == null || target == null || !log.getType().equals(ActionType.BAN)) {
+            return false;
+        }
+        ManagedPlayer mp = GameManager.getManagedPlayer(target.getId());
+        if (mp != null || admin.getId().equals(JdaService.getBotId())) {
+            return false;
+        }
+        return true;
     }
 
     private int removeUserFromAllGuilds(User user, String reason) {
