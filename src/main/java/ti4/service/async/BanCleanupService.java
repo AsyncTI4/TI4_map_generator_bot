@@ -26,6 +26,9 @@ public class BanCleanupService {
         if (mp != null) {
             return;
         }
+        if (log.getUser().getId().equals(JdaService.getBotId())) {
+            return;
+        }
 
         int errors = removeUserFromAllGuilds(user);
         auditPostBanAction(user, log, errors);
