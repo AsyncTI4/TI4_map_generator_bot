@@ -30,17 +30,17 @@ public class BanCleanupService {
             return;
         }
 
-        int errors = removeUserFromAllGuilds(user);
+        int errors = removeUserFromAllGuilds(user, log.getReason());
         auditPostBanAction(user, log, errors);
     }
 
-    private int removeUserFromAllGuilds(User user) {
+    private int removeUserFromAllGuilds(User user, String reason) {
         int errors = 0;
         UserSnowflake snowflake = UserSnowflake.fromId(user.getId());
         Collection<UserSnowflake> banList = Collections.singleton(snowflake);
         for (Guild guild : JdaService.guilds) {
             try {
-                guild.ban(banList, 24, TimeUnit.HOURS).queue();
+                guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue();
                 errors += cleanupBotQuestionChannel(guild, user);
             } catch (Exception e) {
                 String msg = "Error encountered trying to ban user `" + user.getName() + "`";
