@@ -63,6 +63,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "cache",
+        "name": "Cache",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Exhaust 1 non-home planet you control to gain trade goods equal to its combined resource and influence values.",
+        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "chain_reaction",
         "name": "Chain Reaction",
         "phase": "Action",
@@ -782,15 +791,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "strategic_aid",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "swindle",
         "name": "Swindle",
         "phase": "Action",
@@ -1128,15 +1128,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "cache_te",
-        "name": "Cache",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Exhaust 1 non-home, non-legendary planet you control to gain trade goods equal to its combined resource and influence values.",
-        "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "flawless_strategy",
         "name": "Flawless Strategy",
         "phase": "Action",
@@ -1207,6 +1198,15 @@
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets that player controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
         "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
         "source": "action_deck_2"
+    },
+    {
+        "alias": "rogues",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 4 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg, at least.\"",
+        "source": "deprecated"
     },
     {
         "alias": "sacrifice1",

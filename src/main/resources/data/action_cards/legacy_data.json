@@ -1124,11 +1124,11 @@
         "source": "deprecated"
     },
     {
-        "alias": "cache",
+        "alias": "cache_te",
         "name": "Cache",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
+        "text": "Exhaust 1 non-home, non-legendary planet you control to gain trade goods equal to its combined resource and influence values.",
         "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
         "source": "deprecated"
     },
@@ -1434,6 +1434,15 @@
         "window": "At the start of your turn",
         "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "strategic_aid",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
         "source": "deprecated"
     }
 ]
