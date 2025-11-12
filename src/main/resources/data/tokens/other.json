@@ -17,49 +17,64 @@
         "id": "consulate",
         "imagePath": "token_consulate.png",
         "spaceOrPlanet": "planet",
-        "aliasList": ["consulate", "token_consulate"],
+        "aliasList": [
+            "consulate",
+            "token_consulate"
+        ],
         "source": "oath_of_kings"
     },
     {
         "id": "creussepsilon",
         "imagePath": "token_creussepsilon.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["EPSILON"],
+        "wormholes": [
+            "EPSILON"
+        ],
         "source": "other"
     },
     {
         "id": "custom_eronous_whepsilon",
         "imagePath": "token_custom_eronous_whepsilon.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["CUSTOM_ERONOUS_WHEPSILON"],
+        "wormholes": [
+            "CUSTOM_ERONOUS_WHEPSILON"
+        ],
         "source": "eronous"
     },
     {
         "id": "custom_eronous_wheta",
         "imagePath": "token_custom_eronous_wheta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["CUSTOM_ERONOUS_WHETA"],
+        "wormholes": [
+            "CUSTOM_ERONOUS_WHETA"
+        ],
         "source": "eronous"
     },
     {
         "id": "custom_eronous_whiota",
         "imagePath": "token_custom_eronous_whiota.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["CUSTOM_ERONOUS_WHIOTA"],
+        "wormholes": [
+            "CUSTOM_ERONOUS_WHIOTA"
+        ],
         "source": "eronous"
     },
     {
         "id": "custom_eronous_whtheta",
         "imagePath": "token_custom_eronous_whtheta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["CUSTOM_ERONOUS_WHTHETA"],
+        "wormholes": [
+            "CUSTOM_ERONOUS_WHTHETA"
+        ],
         "source": "eronous"
     },
     {
         "id": "custom_eronous_whzeta",
         "imagePath": "token_custom_eronous_whzeta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["CUSTOM_ERONOUS_WHZETA"],
+        "wormholes": [
+            "CUSTOM_ERONOUS_WHZETA"
+        ],
         "source": "eronous"
     },
     {
@@ -95,7 +110,19 @@
     {
         "id": "speaker",
         "imagePath": "token_speaker.png",
-        "aliasList": ["speaker", "token_speaker"],
+        "aliasList": [
+            "speaker",
+            "token_speaker"
+        ],
+        "source": "other"
+    },
+    {
+        "id": "tyrant",
+        "imagePath": "token_tyrant.png",
+        "aliasList": [
+            "tyrant",
+            "token_tyrant"
+        ],
         "source": "other"
     },
     {
@@ -107,91 +134,117 @@
         "id": "whalpha",
         "imagePath": "token_whalpha.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["ALPHA"],
+        "wormholes": [
+            "ALPHA"
+        ],
         "source": "other"
     },
     {
         "id": "whbeta",
         "imagePath": "token_whbeta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["BETA"],
+        "wormholes": [
+            "BETA"
+        ],
         "source": "other"
     },
     {
         "id": "whchampion",
         "imagePath": "token_whchampion.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["WHCHAMPION"],
+        "wormholes": [
+            "WHCHAMPION"
+        ],
         "source": "eronous"
     },
     {
         "id": "whdelta",
         "imagePath": "token_whdelta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["DELTA"],
+        "wormholes": [
+            "DELTA"
+        ],
         "source": "other"
     },
     {
         "id": "whepsilon",
         "imagePath": "token_custom_eronous_whepsilon.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["EPSILON"],
+        "wormholes": [
+            "EPSILON"
+        ],
         "source": "other"
     },
     {
         "id": "wheta",
         "imagePath": "token_custom_eronous_wheta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["ETA"],
+        "wormholes": [
+            "ETA"
+        ],
         "source": "other"
     },
     {
         "id": "whkappa",
         "imagePath": "token_custom_eronous_whkappa.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["KAPPA"],
+        "wormholes": [
+            "KAPPA"
+        ],
         "source": "other"
     },
     {
         "id": "whgamma",
         "imagePath": "token_whgamma.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["GAMMA"],
+        "wormholes": [
+            "GAMMA"
+        ],
         "source": "other"
     },
     {
         "id": "whnarrows",
         "imagePath": "token_whnarrows.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["WHNARROWS"],
+        "wormholes": [
+            "WHNARROWS"
+        ],
         "source": "eronous"
     },
     {
         "id": "whprobability",
         "imagePath": "token_whprobability.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["WHPROBABILITY"],
+        "wormholes": [
+            "WHPROBABILITY"
+        ],
         "source": "eronous"
     },
     {
         "id": "whvoyage",
         "imagePath": "token_whvoyage.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["WHVOYAGE"],
+        "wormholes": [
+            "WHVOYAGE"
+        ],
         "source": "eronous"
     },
     {
         "id": "whzeta",
         "imagePath": "token_custom_eronous_whzeta.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["ZETA"],
+        "wormholes": [
+            "ZETA"
+        ],
         "source": "other"
     },
     {
         "id": "vortex",
         "imagePath": "token_vortex.png",
         "spaceOrPlanet": "space",
-        "wormholes": ["VORTEX"],
+        "wormholes": [
+            "VORTEX"
+        ],
         "source": "eronous"
     },
     {
@@ -205,7 +258,10 @@
         "imagePath": "token_illusion.png",
         "spaceOrPlanet": "space",
         "tokenPlanetName": "illusion",
-        "aliasList": ["illusion", "token_illusion"],
+        "aliasList": [
+            "illusion",
+            "token_illusion"
+        ],
         "source": "other"
     },
     {
@@ -213,7 +269,10 @@
         "imagePath": "token_phantasm.png",
         "spaceOrPlanet": "space",
         "tokenPlanetName": "phantasm",
-        "aliasList": ["phantasm", "token_phantasm"],
+        "aliasList": [
+            "phantasm",
+            "token_phantasm"
+        ],
         "source": "other"
     }
 ]

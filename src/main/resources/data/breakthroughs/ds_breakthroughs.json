@@ -1,0 +1,410 @@
+[
+    {
+        "alias": "axisbt",
+        "name": "Arms Brokerage",
+        "displayName": "Arms\nBrokerage",
+        "faction": "axis",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "At the end of your turn, you may exhaust this card to move any number of your ships between two systems that contain your space docks and no other player’s ships",
+        "source": "ds"
+    },
+    {
+        "alias": "bentorbt",
+        "name": "Historian Conclave",
+        "displayName": "Historian\nConclave",
+        "faction": "bentor",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "ACTION: Exhaust this card to allow each other player to explore a planet they control; gain a number of commodities equal to the number of players who do.",
+        "source": "ds"
+    },
+    {
+        "alias": "celdauribt",
+        "name": "Trade Protectorate",
+        "displayName": "Trade\nProtectorate",
+        "faction": "celdauri",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When you gain this card, flip this card and place it on your faction sheet. Then, place the Celagrom token in a system that contains your ships, if able. The Celagrom token is a second flagship with the attributes, abilities, and ability text on the Celagrom flagship card.",
+        "source": "ds"
+    },
+    {
+        "alias": "cheiranbt",
+        "name": "Matriphagy",
+        "displayName": "Matriphagy",
+        "faction": "cheiran",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "At the end of your turn, you may exhaust this card to choose 1 of your non-fighter ships on the game board; replace that ship with 1 or more units from your reinforcements that have a total combined cost less than that ship's cost value.",
+        "source": "ds"
+    },
+    {
+        "alias": "cymiaebt",
+        "name": "Cybernetic Armoring",
+        "displayName": "Cybernetic\nArmoring",
+        "faction": "cymiae",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "At any time, you may discard 1 action card to cancel up to 2 hits produced against your ground forces.",
+        "source": "ds"
+    },
+    {
+        "alias": "dihmohnbt",
+        "name": "Exodus Engineering",
+        "displayName": "Exodus\nEngineering",
+        "faction": "dihmohn",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "Once per space combat, after 1 of your opponent's non-fighter ships is destroyed, you may exhaust this card to place 1 frontier token in the active system, or produce 1 non-fighter ship in that system to ready this card. You can produce ships in systems that contain both your ships and another player's ships.",
+        "source": "ds"
+    },
+    {
+        "alias": "edynbt",
+        "name": "Celestial Ambassadors",
+        "displayName": "Celestial\nAmbassadors",
+        "faction": "edyn",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "ACTION: Exhaust this card and show another player 1 of your unscored secret objectives; that player must show you 1 of their unscored secret objectives, at random, or allow you to place 1 ground force from your reinforcements into coexistence on a planet they control.",
+        "source": "ds"
+    },
+    {
+        "alias": "freesystemsbt",
+        "name": "Galactic Movement",
+        "displayName": "Galactic\nMovement",
+        "faction": "freesystems",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "After you spend a strategy token, you may place 1 infantry from your reinforcements into coexistence on any cultural, hazardous, or industrial planet that contains the active player's ground forces. Your infantry tokens on planets you control can be accompanied by your control tokens instead of plastic pieces.",
+        "source": "ds"
+    },
+    {
+        "alias": "gheminabt",
+        "name": "Raiding Parties",
+        "displayName": "Raiding\nParties",
+        "faction": "ghemina",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "During each round of combat, you may choose 1 of your participating units; roll that unit’s combat roll twice and resolve the result of your choice. When you announce a retreat, you may exhaust this card to immediately resolve that retreat.",
+        "source": "ds"
+    },
+    {
+        "alias": "ghotibt",
+        "name": "Cult of the All-Mother",
+        "displayName": "Cult of\nthe All-Mother",
+        "faction": "ghoti",
+        "synergy": [
+            "BIOTIC",
+            "PROPULSION"
+        ],
+        "text": "When you pass, you may exhaust this card to move 1 ingress token into an empty system. Your units may retreat to any empty system that does not contain another player's ships.",
+        "source": "ds"
+    },
+    {
+        "alias": "gledgebt",
+        "name": "Dhonraz Installations",
+        "displayName": "Dhonraz\nInstallations",
+        "faction": "gledge",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "Planets you control that contain core tokens are also treated as stations except for the purposes of control; units can be committed to, produced on, and placed on these planets. Stations you control have SPACE CANNON 5.",
+        "source": "ds"
+    },
+    {
+        "alias": "augersbt",
+        "name": "Cryptic Insights",
+        "displayName": "Cryptic\nInsights",
+        "faction": "augers",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "text": "When you would explore a planet, you may instead draw 1 action card.",
+        "source": "ds"
+    },
+    {
+        "alias": "kjalengardbt",
+        "name": "Bannerhalls",
+        "displayName": "Bannerhalls",
+        "faction": "kjalengard",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "For each Glory token on the game board, you control 1 Bannerhall card. Once per action, when a player wins a combat in a system that contains a Glory token, ready each Bannerhall card.",
+        "source": "ds"
+    },
+    {
+        "alias": "kolleccbt",
+        "name": "The Collector's Museum",
+        "displayName": "The Collector's\nMuseum",
+        "faction": "kollecc",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "When you explore a planet, you may exhaust this card to resolve a card from that exploration deck's discard pile instead; if you would discard that card, instead shuffle it into the corresponding exploration deck. ",
+        "source": "ds"
+    },
+    {
+        "alias": "kolumebt",
+        "name": "Synchronicity VI",
+        "displayName": "Synchronicity VI",
+        "faction": "kolume",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Exhaust this card to either gain 1 command token, or spend 3 influence to research a technology of the same color as 1 of your exhausted technologies.",
+        "source": "ds"
+    },
+    {
+        "alias": "kolumebt",
+        "name": "Synchronicity VI",
+        "displayName": "Synchronicity VI",
+        "faction": "kolume",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "ACTION: Exhaust this card to either gain 1 command token, or spend 3 influence to research a technology of the same color as 1 of your exhausted technologies.",
+        "source": "ds"
+    },
+    {
+        "alias": "kortalibt",
+        "name": "The Queens’ Wrath",
+        "displayName": "The Queens’ \nrath",
+        "faction": "kortali",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "If you have the Dreadnought II technology, flip this card and place it on top of Dreadnought II.",
+        "source": "ds"
+    },
+    {
+        "alias": "kyrobt",
+        "name": "Strain Dispersal",
+        "displayName": "Strain\nDispersal",
+        "faction": "kyro",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "When researching a technology, you may discard an action card to ignore 1 of that technology's prerequisites. Other players must spend 1 influence as an additional cost to research or gain a technology you own.",
+        "source": "ds"
+    },
+    {
+        "alias": "lanefirbt",
+        "name": "Erasure Corps",
+        "displayName": "Erasure Corps",
+        "faction": "lanefir",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "After another player purges 1 or more non-action card components, gain 1 command token or ready this card. During the action phase, you may exhaust this card to explore 1 planet you control.",
+        "source": "ds"
+    },
+    {
+        "alias": "lizhobt",
+        "name": "Professional Intrigue",
+        "displayName": "Professional\nIntrigue",
+        "faction": "lizho",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "After you perform a tactical action in a non-home system, you may move 1 of your infantry on the game board into coexistence on a planet in that system. When a player ends your units' coexistence on a planet, they must discard 1 action card, if able.",
+        "source": "ds"
+    },
+    {
+        "alias": "khraskbt",
+        "name": "Mended Grove",
+        "displayName": "Mended Grove",
+        "faction": "khrask",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you resolve METEOR SLINGS, you may choose for your units to coexist instead; if you do, you may reroll each of your unit's BOMBARDMENT rolls. While you are coexisting on 1 or more planets, you control the Grove card.",
+        "source": "ds"
+    },
+    {
+        "alias": "mirvedabt",
+        "name": "Stabilization Arrays",
+        "displayName": "Stabilization\nArrays",
+        "faction": "mirveda",
+        "synergy": [
+            "PROPULSION",
+            "CYBERNETIC"
+        ],
+        "text": "At the start and end of your turn, move up to 1 of your PDS units onto a planet you control in that unit's system, or that system's space area. Your PDS units on planets have PLANETARY SHIELD and do not have text abilities; you may use their SPACE CANNON against ships in adjacent systems.",
+        "source": "ds"
+    },
+    {
+        "alias": "mortheusbt",
+        "name": "Mirage Craft",
+        "displayName": "Mirage \nCraft",
+        "faction": "mortheus",
+        "synergy": [
+            "WARFARE",
+            "CYBERNETIC"
+        ],
+        "text": "At the start and end of a space combat in which you are the defender, you may swap 1 of your ships in the active system with 1 of your ships in another system that contains 1 of your command tokens; the swapped ships cannot transport units.",
+        "source": "ds"
+    },
+    {
+        "alias": "mykomentoribt",
+        "name": "Dreamwalkers",
+        "displayName": "Dreamwalkers",
+        "faction": "mykomentori",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "Capture other player's infantry that are destroyed during combat on planets you control. After each round of ground combat on a planet you control, roll a die. On a result of 7 or greater, place up to 1 of your captured infantry onto that planet, as if it were your own.",
+        "source": "ds"
+    },
+    {
+        "alias": "nivynbt",
+        "name": "Anomaly Stabilization",
+        "displayName": "Anomaly\nStabilization",
+        "faction": "nivyn",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "The system that contains the Wound token is also an entropic scar. You may ignore the effects of entropic scars. You may treat entropic scars as ingress tokens.",
+        "source": "ds"
+    },
+    {
+        "alias": "nokarbt",
+        "name": "Mercenary Captains",
+        "displayName": "Mercenary\nCaptains",
+        "faction": "nokar",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "ACTION: Exhaust this card to place 1 neutral cruiser and 2 neutral destroyers into a non-fracture system that contains no non-neutral ships. After another player wins a space combat in a system that contains your ships, gain 2 commodities.",
+        "source": "ds"
+    },
+    {
+        "alias": "olradinbt",
+        "name": "Insurrectionist Networking",
+        "displayName": "Insurrectionist\nNetworking",
+        "faction": "olradin",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "Once per action, after you resolve a policy ability, you may spend 1 trade good to move 1 of your infantry on the game board into coexistence on a planet in an adjacent system. ACTION: Purge this card to resolve invasion on all planets that contain your coexisting infantry.",
+        "source": "ds"
+    },
+    {
+        "alias": "zealotsbt",
+        "name": "Rhodun's Reliquary",
+        "displayName": "Rhodun's\nReliquary",
+        "faction": "zealots",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "After you gain control of a legendary or fracture planet, you may research 1 technology or remove 1 of your command tokens in that system and return it to your reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "rohdhnabt",
+        "name": "The Prodigy’s Triumph",
+        "displayName": "The Prodigy’s\nTriumph",
+        "faction": "rohdhna",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "If you have the Terrafactory II technology, flip this card and place it on top of Terrafactory II. ",
+        "source": "ds"
+    },
+    {
+        "alias": "tnelisbt",
+        "name": "Hidden Hardpoints",
+        "displayName": "Hidden\nHardpoints",
+        "faction": "tnelis",
+        "synergy": [
+            "WARFARE",
+            "PROPULSION"
+        ],
+        "text": "During ground combat, you may exhaust this card; all your units on that planet enter coexistence and that combat ends in a draw. When a player ends coexistence with your units, draw 1 secret objective.",
+        "source": "ds"
+    },
+    {
+        "alias": "vadenbt",
+        "name": "Strongarm Banking",
+        "displayName": "Strongarm\nBanking",
+        "faction": "vaden",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "Other players cannot take any of your trade goods, commodities, or relic fragments unless you allow it. When another player returns 1 of your promissory notes, place 1 of their control tokens on your faction sheet.",
+        "source": "ds"
+    },
+    {
+        "alias": "vaylerianbt",
+        "name": "Gravitic Disruption",
+        "displayName": "Gravitic\nDisruption",
+        "faction": "vaylerian",
+        "synergy": [
+            "WARFARE",
+            "PROPULSION"
+        ],
+        "text": "After you move 1 or more ships into the active system, you may discard an action card to move 1 of those ships into an adjacent system that does not contain another player’s ships.",
+        "source": "ds"
+    },
+    {
+        "alias": "veldyrbt",
+        "name": "Aurora Research Base",
+        "displayName": "Aurora\nResearch Base",
+        "faction": "veldyr",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "Your home system is also a nebula. Hits produced by the combat and ability rolls of your units in nebulae cannot be canceled. When you pass, explore the frontier deck in your home system.",
+        "source": "ds"
+    },
+    {
+        "alias": "zelianbt",
+        "name": "Awakened Planetoids",
+        "displayName": "Awakened\nPlanetoids",
+        "faction": "zelian",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "Your planets in the active system participate in space combat if that system contains 1 or more of your ships, and ground combat on themselves if they contain 1 or more of your ground forces. Your planets cannot be assigned hits and have a combat value equal to 10 minus their resource value, minimum 1.",
+        "source": "ds"
+    }
+]
