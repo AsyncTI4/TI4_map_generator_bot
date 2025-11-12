@@ -456,7 +456,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String tech : p2.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!tech.equalsIgnoreCase("wavelength") || !tech.equalsIgnoreCase("antimatter")) {
+            if (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter")) {
                 continue;
             }
             buttons.add(Buttons.gray("lawsHeroStep3_" + p2.getFaction() + "_" + tech, techM.getName()));
@@ -705,5 +705,6 @@ public class ButtonHelperTwilightsFallActionCards {
     // crimson and smothering suppressing sustains (and production)
     // Ral nel flagship
     // 1 AC Automation (puppets)
+    // Yssaril bt
 
 }

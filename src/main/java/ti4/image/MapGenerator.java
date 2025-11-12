@@ -1791,6 +1791,15 @@ public class MapGenerator implements AutoCloseable {
                     graphics.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
                 }
             }
+            if (player.isTyrant()) {
+                String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+                BufferedImage img = ImageHelper.read(speakerFile);
+                if (img != null) {
+                    point = PositionMapper.getPlayerStats("newspeaker");
+                    point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));
+                    graphics.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
+                }
+            }
         }
 
         { // PAINT PASSED/ACTIVE/AFK
