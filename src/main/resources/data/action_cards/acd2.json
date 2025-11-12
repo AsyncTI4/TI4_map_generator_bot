@@ -875,7 +875,7 @@
         "alias": "weirdway1",
         "name": "Weirdway",
         "phase": "Action",
-        "window": "After you activate a system",
+        "window": "After you activate a non-home system",
         "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
         "source": "action_deck_2"
@@ -884,7 +884,7 @@
         "alias": "weirdway2",
         "name": "Weirdway",
         "phase": "Action",
-        "window": "After you activate a system",
+        "window": "After you activate a non-home system",
         "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
         "source": "action_deck_2"
@@ -893,7 +893,7 @@
         "alias": "weirdway3",
         "name": "Weirdway",
         "phase": "Action",
-        "window": "After you activate a system",
+        "window": "After you activate a non-home system",
         "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "The ship's power flickered off, but the strain remained. The pilot had flung them into the void, trusting his intuition, and Mendosa was not eager to discover what awaited them on the other end.",
         "source": "action_deck_2"
@@ -902,7 +902,7 @@
         "alias": "weirdway4",
         "name": "Weirdway",
         "phase": "Action",
-        "window": "After you activate a system",
+        "window": "After you activate a non-home system",
         "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
         "source": "action_deck_2"
