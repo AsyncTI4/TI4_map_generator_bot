@@ -26,18 +26,21 @@ public class BanCleanupService {
         if (mp != null) {
             return;
         }
+        if (log.getUser().getId().equals(JdaService.getBotId())) {
+            return;
+        }
 
-        int errors = removeUserFromAllGuilds(user);
+        int errors = removeUserFromAllGuilds(user, log.getReason());
         auditPostBanAction(user, log, errors);
     }
 
-    private int removeUserFromAllGuilds(User user) {
+    private int removeUserFromAllGuilds(User user, String reason) {
         int errors = 0;
         UserSnowflake snowflake = UserSnowflake.fromId(user.getId());
         Collection<UserSnowflake> banList = Collections.singleton(snowflake);
         for (Guild guild : JdaService.guilds) {
             try {
-                guild.ban(banList, 24, TimeUnit.HOURS).queue();
+                guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue();
                 errors += cleanupBotQuestionChannel(guild, user);
             } catch (Exception e) {
                 String msg = "Error encountered trying to ban user `" + user.getName() + "`";
@@ -96,14 +99,17 @@ public class BanCleanupService {
 
     private void findAndDeleteSpamPosts(User user, MessageHistory hist) {
         for (Message m : hist.getRetrievedHistory()) {
-            boolean delete = false;
-            if (m.getAuthor().getId().equals(user.getId())) delete = true;
-            else if (m.getAuthor().getName().startsWith(user.getName())) delete = true;
-            else if (m.getAuthor().getEffectiveName().startsWith(user.getEffectiveName())) delete = true;
-            else if (m.getAuthor().getGlobalName().startsWith(user.getGlobalName())) delete = true;
-            if (delete) {
+            if (authorIsUser(m.getAuthor(), user)) {
                 m.delete().queue();
             }
         }
+    }
+
+    private boolean authorIsUser(User author, User user) {
+        List<String> names = List.of(user.getName(), user.getEffectiveName(), user.getGlobalName());
+        for (String n : names) {
+            if (author.getName().toLowerCase().startsWith(n.toLowerCase())) return true;
+        }
+        return author.getId().equals(user.getId());
     }
 }
