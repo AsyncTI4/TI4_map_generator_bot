@@ -1204,7 +1204,7 @@
         "name": "Rogues",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Place 4 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "text": "Place 3 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
         "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
         "source": "deprecated"
     },
