@@ -41,7 +41,7 @@ public class SabotageService {
             "tf-shatter1",
             "tf-shatter2");
 
-    private static final Set<ACStatus> NON_HAND_SABOTAGE_LOCATIONS =
+    private static final Set<ACStatus> AC_STATUS_TO_IGNORE =
             EnumSet.of(ACStatus.garbozia, ACStatus.ralnelbt, ACStatus.purged);
 
     public static boolean couldFeasiblySabotage(Player player, Game game) {
@@ -179,20 +179,16 @@ public class SabotageService {
     }
 
     private static boolean checkForAllSabotagesDiscarded(Game game) {
-        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isSabotageAccountedFor(game, alias));
+        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotInDeckOrHand(game, alias));
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
         return game.isAcd2()
-                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isSabotageAccountedFor(game, alias));
+                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotInDeckOrHand(game, alias));
     }
 
-    private static boolean isSabotageAccountedFor(Game game, String sabotageAlias) {
-        if (!game.getDiscardActionCards().containsKey(sabotageAlias)) {
-            return false;
-        }
-        ACStatus status = game.getDiscardACStatus().get(sabotageAlias);
-        return status == null || NON_HAND_SABOTAGE_LOCATIONS.contains(status);
+    private static boolean isActionCardNotInDeckOrHand(Game game, String sabotageAlias) {
+        return game.getDiscardACStatus().containsKey(sabotageAlias);
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
