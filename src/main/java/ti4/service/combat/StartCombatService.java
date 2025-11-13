@@ -1218,6 +1218,16 @@ public class StartCombatService {
             return buttons;
         }
         buttons.add(Buttons.red("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
+        if (p1.isDummy() || p1.isNpc()) {
+            buttons.add(Buttons.red(
+                    p1.dummyPlayerSpoof() + "getDamageButtons_" + pos + "_" + groundOrSpace + "combat",
+                    "Assign Hits For Dummy"));
+        }
+        if (p2.isDummy() || p2.isNpc()) {
+            buttons.add(Buttons.red(
+                    p2.dummyPlayerSpoof() + "getDamageButtons_" + pos + "_" + groundOrSpace + "combat",
+                    "Assign Hits For Dummy"));
+        }
         buttons.add(Buttons.gray("checkCombatACs", "Check Combat Action Cards", CardEmojis.ActionCard));
         buttons.add(Buttons.green("getRepairButtons_" + pos, "Repair Damage"));
         buttons.add(Buttons.blue(

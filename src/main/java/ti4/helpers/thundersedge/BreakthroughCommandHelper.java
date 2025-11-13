@@ -132,6 +132,8 @@ public class BreakthroughCommandHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (bt.getAlias().equalsIgnoreCase("naazbt")) {
                     player.addOwnedUnitByID("naaz_voltron");
+                    player.removeOwnedUnitByID("naaz_mech");
+                    player.removeOwnedUnitByID("naaz_mech_space");
                 }
             }
         });
@@ -145,6 +147,8 @@ public class BreakthroughCommandHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (bt.getAlias().equalsIgnoreCase("naazbt")) {
                     player.removeOwnedUnitByID("naaz_voltron");
+                    player.addOwnedUnitByID("naaz_mech");
+                    player.addOwnedUnitByID("naaz_mech_space");
                 }
             }
         });

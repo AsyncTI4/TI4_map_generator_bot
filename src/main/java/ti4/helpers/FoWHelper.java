@@ -966,6 +966,23 @@ public class FoWHelper {
         return false;
     }
 
+    public static boolean otherPlayersHaveUnitsOnPlanet(Player player, UnitHolder unitHolder) {
+
+        for (Player p2 : player.getGame().getRealPlayersExcludingThis(player)) {
+            String colorID = Mapper.getColorID(p2.getColor());
+            if (colorID == null) return false;
+
+            Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+
+            for (UnitKey unitKey : units.keySet()) {
+                if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean playerHasInfantryOnPlanet(Player player, Tile tile, String planet) {
         String colorID = Mapper.getColorID(player.getColor());
         if (tile == null || colorID == null) return false;

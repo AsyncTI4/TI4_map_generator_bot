@@ -467,7 +467,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control."
+        "ability": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control."
     },
     {
         "id": "tf-productionbiomes",
@@ -608,7 +608,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "DEPLOY: At the start of your turn, you may destroy one of your abilities to place this unit from your reinforcement into a system that contains your ships."
+        "ability": "DEPLOY: At the start of your turn, you may discard one of your abilities to place this unit from your reinforcement into a system that contains your ships."
     },
     {
         "id": "redtf_mech",

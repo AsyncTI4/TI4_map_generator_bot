@@ -64,7 +64,7 @@
         "requirements": "RR",
         "faction": "crimson",
         "baseUpgrade": "dd2",
-        "text": "Cost 1, Combat 8, Move 2, ANTI-FIGHTER BARRAGE 6 (x3). At the end of any players' combat in this unit's system or up to 2 systems away, you may place 1 active or inactive breach in that system.",
+        "text": "Cost 1, Combat 7, Move 2, ANTI-FIGHTER BARRAGE 6 (x3). At the end of any players' combat in this unit's system or up to 2 systems away, you may place 1 active or inactive breach in that system.",
         "source": "thunders_edge"
     },
     {

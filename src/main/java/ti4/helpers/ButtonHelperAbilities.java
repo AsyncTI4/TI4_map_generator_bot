@@ -829,7 +829,7 @@ public class ButtonHelperAbilities {
             }
 
             var userSettings = UserSettingsManager.get(player.getUserID());
-            if (!userSettings.isPrefersPillageMsg()) {
+            if (!userSettings.isPrefersPillageMsg() || game.isTwilightsFallMode()) {
                 pillagerMessage = player.getRepresentationUnfogged()
                         + " you succesfully **Pillage**'d, so your ~~doubloons~~ trade goods have gone from "
                         + player.getTg() + " to "

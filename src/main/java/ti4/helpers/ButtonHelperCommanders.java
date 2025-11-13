@@ -208,16 +208,18 @@ public class ButtonHelperCommanders {
 
     public static List<String> getVeldyrCommanderTechs(Player player, Game game, boolean yin) {
         List<String> techsSummed = new ArrayList<>();
+        List<Player> players = ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player);
         if (yin) {
             if (!game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
                 return techsSummed;
             }
+            players = game.getRealPlayersExcludingThis(player);
         } else {
             if (!game.playerHasLeaderUnlockedOrAlliance(player, "veldyrcommander")) {
                 return techsSummed;
             }
         }
-        for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
+        for (Player p2 : players) {
             for (String tech : p2.getTechs()) {
                 if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
                     TechnologyModel model = Mapper.getTech(tech);
