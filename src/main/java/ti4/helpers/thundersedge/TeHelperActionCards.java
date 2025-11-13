@@ -414,6 +414,8 @@ public class TeHelperActionCards {
         String message = player.getRepresentation() + " choose a system to place the pirates! 🦜☠";
         if (allowRes) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Use buttons to pay the kind pirates", buttons);
         } else {

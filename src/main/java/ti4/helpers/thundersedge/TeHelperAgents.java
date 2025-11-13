@@ -248,12 +248,34 @@ public class TeHelperAgents {
         String regex = "useNaaluAgent_" + RegexHelper.posRegex(game) + "_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
+            Player p3 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
 
             player.getLeaderByID("naaluagent-te").ifPresent(zeu -> {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
-                RemoveCommandCounterService.fromTile(event, p2, tile);
+                RemoveCommandCounterService.fromTile(event, p3, tile);
             });
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
+                    List<Button> buttons2 = new ArrayList<>();
+                    String msg;
+                    if (game.isTwilightsFallMode()) {
+                        buttons2.add(Buttons.green(
+                                p2.getFinsFactionCheckerPrefix() + "useTCS_naaluagent-te_" + player.getFaction(),
+                                "Spend A Command Token to Ready Naalu Agent"));
+                        buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                        msg = p2.getRepresentationUnfogged()
+                                + " you have the opportunity to spend a command token via _ Temporal Command Suite_ to ready Naalu Agent and potentially resolve a transaction.";
+                    } else {
+                        buttons2.add(Buttons.green(
+                                p2.getFinsFactionCheckerPrefix() + "exhaustTCS_naaluagent-te_" + player.getFaction(),
+                                "Exhaust Temporal Command Suite to Ready Naalu Agent"));
+                        buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                        msg = p2.getRepresentationUnfogged()
+                                + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready Naalu Agent and potentially resolve a transaction.";
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
+                }
+            }
         });
         ButtonHelper.deleteMessage(event);
     }

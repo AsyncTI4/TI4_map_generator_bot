@@ -825,7 +825,7 @@ public class ActionCardHelper {
             } else {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                 StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
-                boolean it = false, watcher = false;
+                boolean it = false, watcher = false, triune = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
@@ -834,6 +834,10 @@ public class ActionCardHelper {
                     }
                     if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
                         noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
+                        watcher = true;
+                    }
+                    if (!triune && (game.isFowMode() || Helper.getPlayerFromUnit(game, "tf-triune") != null)) {
+                        noSabosMessage.append("\n> A player may have access to a Triune fighter cancel, so watch out.");
                         watcher = true;
                     }
                 }
