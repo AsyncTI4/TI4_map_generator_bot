@@ -1025,7 +1025,7 @@
         "name": "Simulacrum",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 agent. Ready or exhaust that agent.",
+        "text": "Ready or exhaust any agent.",
         "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
         "source": "action_deck_2"
     },
