@@ -144,8 +144,8 @@ public class PuppetSoftHeBladeService {
         newHome.inheritFogData(home);
 
         String returnString = "Sucessfully replaced home system tile.";
-        if (oldFaction.getHomeSystem().equals("te15a")
-                && newFaction.getHomeSystem().equals("te15b")) { // obsidian
+        if (oldFaction.getHomeSystem().equals("96a")
+                && newFaction.getHomeSystem().equals("96b")) { // obsidian
             // Resolve control
             for (Player p : game.getPlayers().values()) {
                 if (p.hasPlanet("cronos")) {
@@ -238,21 +238,22 @@ public class PuppetSoftHeBladeService {
     private static String replaceTechAndFactionTech(
             Game game, Player player, FactionModel oldFaction, FactionModel newFaction) {
         // change over faction techs
-        // NOTE :: if the player has researched faction techs, they will NOT carry over to the new faction
-        // Except for firmament/obsidian
-        List<String> ownedFactionTech = new ArrayList<>();
-        oldFaction.getFactionTech().forEach(tech -> {
-            if (player.hasTech(tech)) ownedFactionTech.add(Mapper.getTech(tech).getName());
-            player.removeFactionTech(tech);
-            player.removeTech(tech);
-        });
+        List<String> failed = new ArrayList<>();
         newFaction.getFactionTech().forEach(tech -> {
-            player.addFactionTech(tech);
-
-            String replacableTech = Mapper.getTech(tech).getName().replace("Obsidian", "Firmament");
-            if (ownedFactionTech.contains(replacableTech)) {
-                player.addTech(tech);
+            if (!tech.endsWith("-obs")) {
+                failed.add(tech);
+                return;
             }
+            String replacableTech = Mapper.getTech(tech).getName().replace("Obsidian", "Firmament");
+            for (Player p2 : game.getPlayers().values()) {
+                // replace tech for all players because nekro i guess
+                if (p2.hasTech(replacableTech)) {
+                    p2.removeTech(replacableTech);
+                    p2.addTech(tech);
+                }
+            }
+            player.removeFactionTech(replacableTech);
+            player.addFactionTech(tech);
         });
 
         // Remove and re-add all techs again (to fix units owned list)
@@ -267,12 +268,19 @@ public class PuppetSoftHeBladeService {
             }
         }
 
-        if (ownedFactionTech.isEmpty()) return "Sucessfully changed faction techs.";
+        List<String> oldTech = oldFaction.getFactionTech().stream()
+                .filter(tech -> !tech.endsWith("-firm"))
+                .toList();
+        if (oldTech.isEmpty()) {
+            return "Sucessfully changed faction techs.";
+        }
 
         String warning = "**__Warning encountered while changing faction techs:__**\n> - You owned [";
-        warning += String.join(", ", ownedFactionTech);
-        warning +=
-                "] and those techs cannot be automatically replaced. Work with your table to find a suitable solution.";
+        warning += String.join(", ", oldTech);
+        warning += "] and your new faction has the techs [";
+        warning += String.join(", ", failed);
+        warning += "]. Those techs cannot be automatically replaced,";
+        warning += " work with your table to find a suitable solution.";
         return warning;
     }
 
@@ -352,6 +360,20 @@ public class PuppetSoftHeBladeService {
                 game.getMessagesThatICheckedForAllReacts().put(newKey, newValue);
             }
         }
+
+        // Update Expedition Tokens
+        if (game.getExpeditions().getTradeGoods().equals(oldFaction.getAlias()))
+            game.getExpeditions().setTradeGoods(newFaction.getAlias());
+        if (game.getExpeditions().getFiveInf().equals(oldFaction.getAlias()))
+            game.getExpeditions().setFiveInf(newFaction.getAlias());
+        if (game.getExpeditions().getFiveRes().equals(oldFaction.getAlias()))
+            game.getExpeditions().setFiveRes(newFaction.getAlias());
+        if (game.getExpeditions().getTechSkip().equals(oldFaction.getAlias()))
+            game.getExpeditions().setTechSkip(newFaction.getAlias());
+        if (game.getExpeditions().getActionCards().equals(oldFaction.getAlias()))
+            game.getExpeditions().setActionCards(newFaction.getAlias());
+        if (game.getExpeditions().getSecret().equals(oldFaction.getAlias()))
+            game.getExpeditions().setSecret(newFaction.getAlias());
 
         return "Successfully (?) updated game stored values.";
     }
