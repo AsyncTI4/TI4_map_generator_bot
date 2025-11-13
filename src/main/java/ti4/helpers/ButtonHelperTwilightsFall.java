@@ -42,6 +42,7 @@ import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 import ti4.service.milty.MiltyDraftSlice;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.MiltyService;
+import ti4.service.turn.EndTurnService;
 import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTwilightsFall {
@@ -603,6 +604,13 @@ public class ButtonHelperTwilightsFall {
         } else {
             game.removeStoredValue("lastSplicer");
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " The splice is complete.");
+            if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
+                Player p2 = game.getActivePlayer();
+                if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
+                    EndTurnService.endTurnAndUpdateMap(event, game, p2);
+                }
+                game.setStoredValue("endTurnWhenSpliceEnds", "");
+            }
             game.removeStoredValue("willParticipateInSplice");
         }
         ButtonHelper.deleteMessage(event);
