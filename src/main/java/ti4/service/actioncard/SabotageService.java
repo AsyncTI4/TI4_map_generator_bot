@@ -49,6 +49,12 @@ public class SabotageService {
             return false;
         }
 
+        if (player.hasUnit("tf-triune")
+                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
+                        .isEmpty()) {
+            return true;
+        }
+
         if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game)) {
             return true;
         }
@@ -157,6 +163,9 @@ public class SabotageService {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
             return "Player has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation();
+        }
+        if (player.hasTech("tf-biosyntheticsynergy")) {
+            return "Player has Bio Synthetic Synergy.";
         }
         if (player.hasTech("tp")
                 && game.getActivePlayerID() != null

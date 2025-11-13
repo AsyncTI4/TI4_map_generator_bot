@@ -1309,7 +1309,11 @@ public class CombatRollService {
     public static Map<UnitModel, Integer> getProximaBombardUnit(Tile tile, Player player) {
         UnitModel proximaFakeUnit = new UnitModel();
         proximaFakeUnit.setBombardDieCount(3);
-        proximaFakeUnit.setBombardHitsOn(8);
+        if (player.getGame().isTwilightsFallMode()) {
+            proximaFakeUnit.setBombardHitsOn(8);
+        } else {
+            proximaFakeUnit.setBombardHitsOn(8);
+        }
         proximaFakeUnit.setName(Mapper.getTech("proxima").getName());
         proximaFakeUnit.setAsyncId("ProximaBombard");
         proximaFakeUnit.setId("ProximaBombard");

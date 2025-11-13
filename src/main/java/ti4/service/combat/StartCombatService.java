@@ -1383,7 +1383,9 @@ public class StartCombatService {
                         FactionEmojis.Empyrean));
             }
 
-            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("yinagent")) {
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && (isSpaceCombat || !game.isTwilightsFallMode())
+                    && agentHolder.hasUnexhaustedLeader("yinagent")) {
                 buttons.add(Buttons.gray(
                         finChecker + "yinagent_" + pos,
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
