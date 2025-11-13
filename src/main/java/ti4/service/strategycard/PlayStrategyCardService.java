@@ -297,6 +297,13 @@ public class PlayStrategyCardService {
             }
         }
 
+        if (scModel.usesAutomationForSCID("te6")) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "## " + game.getPing()
+                            + " Dane has said that if you are using the secondary to produce at home, you do not need to spend the 4 resources.");
+        }
+
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (obsidian != null && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())) {
             if (!scModel.usesAutomationForSCID("pok1leadership")) {
@@ -355,13 +362,20 @@ public class PlayStrategyCardService {
         conclusionButtons.add(ButtonHelper.getEndTurnButton(game, player));
         conclusionButtons.add(
                 Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action"));
-        conclusionButtons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
-                "End Turn When All Have Reacted"));
-        if (player.hasTech("fl")) {
+
+        if (game.isTwilightsFallMode() && (scToPlay == 2 || scToPlay == 6 || scToPlay == 7)) {
+            conclusionButtons.add(Buttons.blue(
+                    player.getFinsFactionCheckerPrefix() + "endTurnWhenSpliceEnds_" + scToPlay,
+                    "End Turn When Splice Ends"));
+        } else {
             conclusionButtons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "fleetLogWhenAllReactedTo_" + scToPlay,
-                    "Use Fleet Logistics When All Have Reacted"));
+                    player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
+                    "End Turn When All Have Reacted"));
+            if (player.hasTech("fl")) {
+                conclusionButtons.add(Buttons.red(
+                        player.getFinsFactionCheckerPrefix() + "fleetLogWhenAllReactedTo_" + scToPlay,
+                        "Use Fleet Logistics When All Have Reacted"));
+            }
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);

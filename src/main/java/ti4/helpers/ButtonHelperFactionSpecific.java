@@ -3772,23 +3772,28 @@ public class ButtonHelperFactionSpecific {
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
-        buttons.add(DoneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), "Use Buttons to Pay 3 influence", buttons);
+
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
+        Button loseTactic = Buttons.red(finsFactionCheckerPrefix + "decrease_tactic_cc", "Lose 1 Tactic Token");
+        Button loseFleet = Buttons.red(finsFactionCheckerPrefix + "decrease_fleet_cc", "Lose 1 Fleet Token");
+        Button loseStrat = Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy Token");
+        Button DoneGainingCC = Buttons.red(finsFactionCheckerPrefix + "deleteButtons", "Done Losing Tokens");
+        List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
+        String message2 = p2.getRepresentationUnfogged() + "! Your current command tokens are "
+                + p2.getCCRepresentation() + ". Use buttons to lose a token.";
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
         Leader playerLeader = p2.getLeader(agent).orElse(null);
         if (playerLeader == null) {
             if (agent.contains("titanprototype")) {
                 p2.removeExhaustedRelic("titanprototype");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " spent 3 influence via _ Temporal Command Suite_ to ready " + agent
-                                + ", owned by " + p2.getColor() + ".");
+                        player.getFactionEmoji() + " spent 1 Command Token via _ Temporal Command Suite_ to ready "
+                                + agent + ", owned by " + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
-                            p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
+                            p2.getRepresentationUnfogged() + " 1 Command Token was spent by " + player.getColor()
                                     + " to ready your " + agent + ".");
                 }
                 event.getMessage().delete().queue();
@@ -3797,12 +3802,12 @@ public class ButtonHelperFactionSpecific {
                 p2.removeExhaustedRelic("absol_jr");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getFactionEmoji() + " spent 3 influence via _ Temporal Command Suite_ to ready " + agent
-                                + ", owned by " + p2.getColor() + ".");
+                        player.getFactionEmoji() + " spent 1 Command Token via _ Temporal Command Suite_ to ready "
+                                + agent + ", owned by " + p2.getColor() + ".");
                 if (p2 != player) {
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
-                            p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
+                            p2.getRepresentationUnfogged() + " 1 Command Token was spent by " + player.getColor()
                                     + " to ready your " + agent + ".");
                 }
                 event.getMessage().delete().queue();

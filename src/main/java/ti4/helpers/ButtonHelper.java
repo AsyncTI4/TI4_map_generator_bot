@@ -7395,6 +7395,18 @@ public class ButtonHelper {
         EndTurnService.endTurnAndUpdateMap(event, game, p2);
     }
 
+    @ButtonHandler("endTurnWhenSpliceEnds_")
+    public static void endTurnWhenSpliceEnds(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String sc = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                game.getPing()
+                        + ", the active player has elected to move the game along after this splice finishes. Please respond as soon as possible so that the game may progress.");
+        game.setTemporaryPingDisable(true);
+        game.setStoredValue("endTurnWhenSpliceEnds", player.getFaction());
+        deleteTheOneButton(event);
+    }
+
     @ButtonHandler("fleetLogWhenAllReactedTo_")
     public static void fleetLogWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String sc = buttonID.split("_")[1];
