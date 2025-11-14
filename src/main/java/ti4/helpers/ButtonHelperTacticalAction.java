@@ -767,7 +767,7 @@ public class ButtonHelperTacticalAction {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactories")) {
+        if (player.hasTech("ffac2") || player.hasUnit("tf-floatingfactory")) {
             movableFromPlanets.add(UnitType.Spacedock);
         }
         if (player.hasAbility("miniaturization")) {

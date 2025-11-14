@@ -4120,7 +4120,7 @@ public class ButtonHelper {
             String text = " (+" + abilities + (abilities > 1 ? " abilities)" : " ability)");
             return Buttons.red(player.finChecker() + "endOfTurnAbilities", "End Turn" + text);
         }
-        return Buttons.red(player.finChecker() + "turnEnd", "End Turn");
+        return Buttons.red(player.finChecker() + "endOfTurnAbilities", "End Turn");
     }
 
     public static List<Button> getEndOfTurnAbilities(Player player, Game game) {

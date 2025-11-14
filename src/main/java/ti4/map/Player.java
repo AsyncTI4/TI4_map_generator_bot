@@ -2264,6 +2264,9 @@ public class Player extends PlayerProperties {
         if (getTechs().contains(techID)) {
             return;
         }
+        if (Mapper.getTech(techID) == null) {
+            return;
+        }
         getTechs().add(techID);
         doAdditionalThingsWhenAddingTech(techID);
     }
