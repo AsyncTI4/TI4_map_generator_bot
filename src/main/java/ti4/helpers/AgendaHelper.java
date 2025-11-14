@@ -1342,7 +1342,9 @@ public class AgendaHelper {
                 }
                 if ((game.getLaws() == null
                                 || (!game.getLaws().containsKey("rep_govt")
-                                        && !game.getLaws().containsKey("absol_government")))
+                                                && !game.getLaws().containsKey("absol_government")
+                                        || !game.getStoredValue("executiveOrder")
+                                                .isEmpty()))
                         && (player.ownsPromissoryNote("blood_pact")
                                 || player.getPromissoryNotesInPlayArea().contains("blood_pact"))) {
                     for (Player p2 : getWinningVoters(winner, game)) {
@@ -2588,7 +2590,9 @@ public class AgendaHelper {
             voteCount = 0;
         }
 
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
+        if (game.getLaws() != null
+                && (game.getLaws().containsKey("rep_govt"))
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             voteCount = 1;
         }
 
@@ -3411,7 +3415,8 @@ public class AgendaHelper {
             }
             sb.append("  ").append(additionalVotesText);
         } else sb.append("**");
-        if (game.getLaws().containsKey("rep_govt")) {
+        if (game.getLaws().containsKey("rep_govt")
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             sb = new StringBuilder();
             sb.append(" vote count (_Representative Government_): **1**");
         }
@@ -3702,7 +3707,9 @@ public class AgendaHelper {
 
     @ButtonHandler("outcome_")
     public static void outcome(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
+        if (game.getLaws() != null
+                && (game.getLaws().containsKey("rep_govt")
+                        && game.getStoredValue("executiveOrder").isEmpty())) {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
             String outcome = buttonID.substring(buttonID.indexOf('_') + 1);

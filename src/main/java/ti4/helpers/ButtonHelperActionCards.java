@@ -1749,7 +1749,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+            if (uH != null && uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 if (!game.getTileFromPlanet(planet).isHomeSystem(game)) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
@@ -1962,7 +1962,7 @@ public class ButtonHelperActionCards {
                     + " _Crisis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
-            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            for (Player p2 : game.getRealPlayers()) {
                 String label = "Crisis On " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
                 scButtons.add(Buttons.gray("resolvePreassignment_Crisis Target_" + p2.getColor(), label, scEmoji));

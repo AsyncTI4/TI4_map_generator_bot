@@ -34,6 +34,7 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.UnlockLeaderService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -79,8 +80,14 @@ public class ComponentActionHelper {
             compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }
         if (game.isMercenariesForHireMode()) {
-            compButtons.add(
-                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg on Mercenries For Hire"));
+            if (game.getStoredValue("mercCommander").isEmpty()) {
+                game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+            }
+            String commanderName =
+                    StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
+            compButtons.add(Buttons.red(
+                    finChecker + prefix + "mercenariesForHireAction_",
+                    "Spend 3tg on Mercenries For Hire to acquire " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
@@ -816,7 +823,31 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(),
                         p1.getRepresentationUnfogged() + " has spent 3 TG to hire mercenaries.");
-                BreakthroughHelper.resolveYinBreakthroughAbility(game, p1);
+                String leaderID = game.getStoredValue("mercCommander");
+                if (leaderID != null) {
+                    p1.addLeader(leaderID);
+                    game.addFakeCommander(leaderID);
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            p1.getRepresentation() + " acquired a new commander, "
+                                    + Mapper.getLeader(leaderID).getName() + "!");
+                    UnlockLeaderService.unlockLeader(leaderID, game, p1);
+                    game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+                    if (!game.getStoredValue("mercCommander").isEmpty()) {
+                        LeaderModel led = Mapper.getLeader(game.getStoredValue("mercCommander"));
+                        if (led != null) {
+                            MessageHelper.sendMessageToChannelWithEmbed(
+                                    game.getActionsChannel(),
+                                    game.getPing() + " this is the next commander on top of the mercenary pile.",
+                                    led.getRepresentationEmbed());
+                        }
+                    }
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            p1.getRepresentation()
+                                    + " cannot gain a new commander, as all commanders are already in play.");
+                }
             }
             case "exhaustBT" -> {
                 BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
