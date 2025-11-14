@@ -1,8 +1,9 @@
 package ti4.buttons.handlers.phases;
 
+import org.apache.commons.lang3.function.Consumers;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -13,7 +14,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 
 @UtilityClass
-class TurnEndButtonHandler {
+public class TurnEndButtonHandler {
 
     @ButtonHandler("turnEnd")
     public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {

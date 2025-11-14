@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -63,6 +64,9 @@ public class ComponentActionHelper {
                     && ButtonHelper.getButtonsForConventions(p1, game).size() > 0;
             if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
+                    continue;
+                }
+                if("tf-fabrication".equalsIgnoreCase(tech)){
                     continue;
                 }
                 Button tButton = Buttons.red(finChecker + "exhaustTech_" + tech, "Exhaust " + techName, techEmoji);

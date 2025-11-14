@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -25,7 +26,7 @@ public class CheckDistanceHelper {
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
         if (ButtonHelper.nomadHeroAndDomOrbCheck(player, game)) return true;
-        return !CommandCounterHelper.hasCC(player, tile);
+        return !CommandCounterHelper.hasCC(player, tile) || tile.getPosition().equalsIgnoreCase(game.getActiveSystem());
     }
 
     public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game game, Player player) {
