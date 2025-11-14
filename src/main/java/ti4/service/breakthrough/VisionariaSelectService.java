@@ -1,6 +1,7 @@
 package ti4.service.breakthrough;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -36,13 +37,13 @@ public class VisionariaSelectService {
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         String message = game.getPing() + " - " + player.getRepresentationNoPing() + " exhausted their breakthrough, "
                 + visionariaRep() + ":";
-        message += "\n> Use the buttons to get a technology, or decline.";
+        message += "\n> Use the buttons to research, or decline.";
         message +=
-                "\n-# > Reminder: This tech costs 3 trade goods, and you must give the Deepwrought player a Promissory Note of your choice.";
+                "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a Promissory Note of your choice.";
 
         game.removeStoredValue("VisionariaResponded");
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("acquireATechWithDwsBt", "Get a tech for 3 TGs", MiscEmojis.tg));
+        buttons.add(Buttons.green("acquireATechWithDwsBt", "Research for 3 TGs", MiscEmojis.tg));
         buttons.add(Buttons.red("declineVisionaria", "Decline"));
         buttons.add(Buttons.gray(
                 player.finChecker() + "fleetLogAfterVisionaria",
@@ -82,7 +83,35 @@ public class VisionariaSelectService {
         boolean dws = true;
         boolean firstTime = !buttonID.endsWith("_second");
         game.setComponentAction(true);
-        ListTechService.acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
+        if (player.hasAbility("propagation")) {
+
+            Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic Token");
+            Button getFleet = Buttons.green("increase_fleet_cc", "Gain 1 Fleet Token");
+            Button getStrat = Buttons.green("increase_strategy_cc", "Gain 1 Strategy Token");
+            Button doneGainingCC = Buttons.red("deleteButtons_spitItOut", "Done Gaining Command Tokens");
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            String message = player.getRepresentationUnfogged() + ", your current command tokens are "
+                    + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+            Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
+            List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+            if (player.getTg() > 2) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), player.getRepresentation() + " automatically spent 3tg");
+                player.setTg(player.getTg() - 3);
+            }
+            Player deepwrought = Helper.getPlayerFromUnlockedBreakthrough(game, "deepwroughtbt");
+            if (deepwrought != null) {
+
+                // Send PN to DWS
+                List<Button> sendPNbuttons = ButtonHelper.getForcedPNSendButtons(game, deepwrought, player);
+                String dwsPromMsg = player.getRepresentation() + " choose a promissory note to send to "
+                        + deepwrought.getRepresentation(false, false) + " as part of" + visionariaName() + ":";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), dwsPromMsg, sendPNbuttons);
+            }
+        } else {
+            ListTechService.acquireATech(event, game, player, sc, dws, TechnologyType.mainFour, firstTime);
+        }
         if (firstTime) {
             respondToVisionaria(event, game, player);
             String msg = player.getRepresentationNoPing() + " is using Visionaria Select.";

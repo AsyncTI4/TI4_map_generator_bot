@@ -1425,7 +1425,7 @@ public class ButtonHelperHeroes {
             message.append("### Resolving for tile ")
                     .append(tile.getRepresentationForButtons())
                     .append("\n");
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) {
                     continue;
                 }
@@ -1461,7 +1461,8 @@ public class ButtonHelperHeroes {
                         if (key.getUnitType() == UnitType.Infantry
                                 || key.getUnitType() == UnitType.Mech
                                 || key.getUnitType() == UnitType.Fighter
-                                || key.getUnitType() == UnitType.Spacedock) {
+                                || key.getUnitType() == UnitType.Spacedock
+                                || key.getUnitType() == UnitType.Pds) {
                             continue;
                         }
 
@@ -1829,7 +1830,7 @@ public class ButtonHelperHeroes {
     public static void executeCabalHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
         String pos = buttonID.replace("cabalHeroTile_", "");
         Tile tile = game.getTileByPosition(pos);
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNNeutral()) {
             if (p2 == player) {
                 continue;
             }
