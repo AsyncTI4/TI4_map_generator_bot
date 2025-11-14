@@ -39,7 +39,7 @@ public class FractureService {
             String msg = player.getRepresentation(false, false)
                     + " has Cabal breakthrough so the Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             spawnFracture(event, game);
             spawnIngressTokens(event, game, player, true);
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
@@ -48,7 +48,7 @@ public class FractureService {
             if (result == 1 || result == 10) { // success
                 String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
                         + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, true);
             } else { // fail
