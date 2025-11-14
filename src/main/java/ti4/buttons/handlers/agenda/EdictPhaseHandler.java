@@ -110,8 +110,11 @@ public class EdictPhaseHandler {
     @ButtonHandler("conveneStep1_")
     public static void conveneStep1_(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
         String cardID = buttonID.split("_")[1];
-        if (player == game.getSpeaker()) {
-            Player tyrant = game.getTyrant();
+        if (player == game.getSpeaker()
+                && !game.getStoredValue("conveneStarter").isEmpty()) {
+            Player tyrant = game.getPlayerFromColorOrFaction(game.getStoredValue("conveneStarter"));
+            game.removeStoredValue("conveneStarter");
+            game.setStoredValue("convenePlayers", game.getStoredValue("convenePlayers") + tyrant.getFaction());
             tyrant.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -247,6 +250,7 @@ public class EdictPhaseHandler {
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolvePlagueStep13", "Resolve Execute"));
             }
             case "tf-convene" -> {
+                game.setStoredValue("conveneStarter", player.getFaction());
                 List<String> techs = ButtonHelperTwilightsFall.getDeckForSplicing(
                         game, "ability", game.getRealPlayers().size());
 
@@ -257,7 +261,7 @@ public class EdictPhaseHandler {
                     embeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                 }
                 msg += "\n\n" + game.getSpeaker().getRepresentation()
-                        + " needs to assign the first ability to the tyrant, then the tyrant does the rest";
+                        + " needs to assign the first ability to the player resolving the edict, then that player does the rest";
             }
             case "tf-foretell" -> {
                 int loc = 1;

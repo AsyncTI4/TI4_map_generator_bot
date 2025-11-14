@@ -1812,6 +1812,9 @@ public class ButtonHelperAgents {
                 continue;
             }
             UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (uh == null) {
+                continue;
+            }
             for (String token : uh.getTokenList()) {
                 if (!token.contains("attachment")) {
                     continue;
@@ -2796,6 +2799,7 @@ public class ButtonHelperAgents {
                         + "Doctor Sucaban, the Jol-Nar"
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + unitHName);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }

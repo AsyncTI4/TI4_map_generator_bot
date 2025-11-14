@@ -237,13 +237,9 @@ public class ButtonHelperSCs {
         Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         List<Button> buttons2 = Collections.singletonList(exhaust);
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Exhaust using this", buttons2);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Exhaust using this", buttons2);
-        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), player.getRepresentation() + " Exhaust planets using this", buttons2);
     }
 
     @ButtonHandler("preDeclineSC_")
