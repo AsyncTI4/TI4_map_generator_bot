@@ -1,5 +1,6 @@
 package ti4.commands.tech;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -53,14 +54,23 @@ abstract class TechAddRemove extends GameStateSubcommand {
                                 value.getValue().getName().toLowerCase().contains(techID))
                         .map(Map.Entry::getKey)
                         .toList();
+                List<String> mutableList = new ArrayList<>();
+                mutableList.addAll(possibleTechs);
                 if (possibleTechs.isEmpty()) {
+                    for (String tech : player.getTechs()) {
+                        if (tech.equalsIgnoreCase(techID)) {
+                            mutableList.add(techID);
+                        }
+                    }
+                }
+                if (mutableList.isEmpty()) {
                     MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
                     return;
-                } else if (possibleTechs.size() > 1) {
+                } else if (mutableList.size() > 1) {
                     MessageHelper.sendMessageToEventChannel(event, "More that one matching technology found.");
                     return;
                 }
-                doAction(player, possibleTechs.getFirst(), event);
+                doAction(player, mutableList.getFirst(), event);
             }
         }
     }

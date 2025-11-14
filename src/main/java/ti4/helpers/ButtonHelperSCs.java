@@ -47,27 +47,15 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("constructionPrimary_produce")
     public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
-        StrategyCardModel scModel =
-                game.getStrategyCardModelByName("construction").orElse(null);
-        if (scModel == null) {
-            scModel = game.getStrategyCardModelByInitiative(4).orElse(null);
-        }
-        if (player.getSCs().contains(scModel.getInitiative())) {
-            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
 
-            String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
-            List<Button> buttons = new ArrayList<>();
-            tiles.forEach(t ->
-                    buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
+        String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
+        List<Button> buttons = new ArrayList<>();
+        tiles.forEach(
+                t -> buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
 
-            String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        } else {
-            event.getHook()
-                    .sendMessage("You do not hold construction, so you can not use a primary ability")
-                    .setEphemeral(true)
-                    .queue();
-        }
+        String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     @ButtonHandler("constructionBuild_")
