@@ -77,10 +77,16 @@ public class PlayerTechService {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                player.getRepresentation(false, false) + " removed technology: "
-                        + Mapper.getTech(techID).getRepresentation(false) + ".");
+
+        if (Mapper.getTech(techID) != null) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    player.getRepresentation(false, false) + " removed technology: "
+                            + Mapper.getTech(techID).getRepresentation(false) + ".");
+        } else {
+            MessageHelper.sendMessageToEventChannel(
+                    event, player.getRepresentation(false, false) + " removed technology: " + techID + ".");
+        }
     }
 
     public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
