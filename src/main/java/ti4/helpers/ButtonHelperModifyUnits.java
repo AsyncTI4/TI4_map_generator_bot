@@ -299,11 +299,20 @@ public class ButtonHelperModifyUnits {
                 int min = calculateMinHits(player, hits, totalUnits);
 
                 if (unitModel.getSustainDamage() && min > 0) {
-                    msg.append("> Sustained ")
-                            .append(min)
-                            .append(" ")
-                            .append(unitModel.getUnitEmoji())
-                            .append("\n");
+                    if (RandomHelper.isOneInX(40)) {
+                        msg.append("> ")
+                                .append(min)
+                                .append(" ")
+                                .append(unitModel.getUnitEmoji())
+                                .append(" got a boo boo 🤕")
+                                .append("\n");
+                    } else {
+                        msg.append("> Sustained ")
+                                .append(min)
+                                .append(" ")
+                                .append(unitModel.getUnitEmoji())
+                                .append("\n");
+                    }
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
 
