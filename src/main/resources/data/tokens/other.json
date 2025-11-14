@@ -274,5 +274,55 @@
             "token_phantasm"
         ],
         "source": "other"
+    },
+    {
+        "id": "supernova",
+        "imagePath": "token_supernova_async.png",
+        "spaceOrPlanet": "space",
+        "isAnomaly": true,
+        "isNova": true,
+        "aliasList": [
+            "supernova",
+            "token_supernova_async",
+            "nova"
+        ],
+        "source": "pok"
+    },
+    {
+        "id": "nebula",
+        "imagePath": "token_nebula_async.png",
+        "spaceOrPlanet": "space",
+        "isAnomaly": true,
+        "isNebula": true,
+        "aliasList": [
+            "nebula",
+            "token_nebula_async"
+        ],
+        "source": "pok"
+    },
+    {
+        "id": "entropicscar",
+        "imagePath": "token_entropicscar_async.png",
+        "spaceOrPlanet": "space",
+        "isAnomaly": true,
+        "isScar": true,
+        "aliasList": [
+            "entropicscar",
+            "token_entropicscar_async",
+            "scar"
+        ],
+        "source": "pok"
+    },
+    {
+        "id": "asteroids",
+        "imagePath": "token_asteroids_async.png",
+        "spaceOrPlanet": "space",
+        "isAnomaly": true,
+        "isAsteroids": true,
+        "aliasList": [
+            "asteroids",
+            "token_asteroids_async"
+        ],
+        "source": "pok"
     }
 ]
