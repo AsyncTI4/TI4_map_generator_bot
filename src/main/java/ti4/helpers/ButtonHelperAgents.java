@@ -1518,10 +1518,10 @@ public class ButtonHelperAgents {
                 if (game.isTwilightsFallMode()) {
                     buttons2.add(Buttons.green(
                             p2.getFinsFactionCheckerPrefix() + "useTCS_" + agent + "_" + player.getFaction(),
-                            "Spend 3 influence to Ready " + agent));
+                            "Spend A Command Token to Ready " + agent));
                     buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                     msg = p2.getRepresentationUnfogged()
-                            + " you have the opportunity to spend 3 influence via _ Temporal Command Suite_ to ready "
+                            + " you have the opportunity to spend a command token via _ Temporal Command Suite_ to ready "
                             + agent
                             + " and potentially resolve a transaction.";
                 } else {
