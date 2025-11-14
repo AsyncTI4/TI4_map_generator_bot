@@ -3,6 +3,7 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -297,7 +298,7 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (scModel.usesAutomationForSCID("te6")) {
+        if (scModel.usesAutomationForSCID("tf6")) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "## " + game.getPing()

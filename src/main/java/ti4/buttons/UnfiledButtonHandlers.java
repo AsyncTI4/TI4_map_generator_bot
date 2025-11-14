@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
+import ti4.buttons.handlers.phases.TurnEndButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.special.SetupNeutralPlayer;
@@ -3483,8 +3484,12 @@ public class UnfiledButtonHandlers {
     public static void endOfTurnAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an end of turn ability";
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
-        buttons.add(0, Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
+        if(buttons.size() > 0){
+            buttons.add(0, Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
+            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
+        }else{
+            TurnEndButtonHandler.turnEnd(event, game, player);
+        }
     }
 
     @ButtonHandler("startStrategyPhase")
