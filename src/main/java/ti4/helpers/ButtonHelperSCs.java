@@ -51,12 +51,11 @@ public class ButtonHelperSCs {
 
         String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
         List<Button> buttons = new ArrayList<>();
-        tiles.forEach(t ->
-                buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
+        tiles.forEach(
+                t -> buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
 
         String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-
     }
 
     @ButtonHandler("constructionBuild_")
