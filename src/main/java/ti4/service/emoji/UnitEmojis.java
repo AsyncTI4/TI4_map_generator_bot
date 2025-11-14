@@ -22,7 +22,13 @@ public enum UnitEmojis implements TI4Emoji {
     // Homebrew
     TyrantsLament,
     PlenaryOrbital,
-    Monument;
+    Monument,
+
+    // Unit State
+    Blank,
+    Damaged,
+    Galvanized,
+    DamagedGalvanized;
 
     @Override
     public String toString() {

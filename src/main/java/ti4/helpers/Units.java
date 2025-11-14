@@ -246,6 +246,24 @@ public class Units {
                 case dmg_glv -> "Dmg+Glv";
             };
         }
+
+        public TI4Emoji stateEmoji() {
+            return switch (this) {
+                case none -> null;
+                case dmg -> UnitEmojis.Damaged;
+                case glv -> UnitEmojis.Galvanized;
+                case dmg_glv -> UnitEmojis.DamagedGalvanized;
+            };
+        }
+
+        public TI4Emoji stateEmojiWithBlank() {
+            return switch (this) {
+                case none -> UnitEmojis.Blank;
+                case dmg -> UnitEmojis.Damaged;
+                case glv -> UnitEmojis.Galvanized;
+                case dmg_glv -> UnitEmojis.DamagedGalvanized;
+            };
+        }
     }
 
     public static UnitState findUnitState(String state) {
