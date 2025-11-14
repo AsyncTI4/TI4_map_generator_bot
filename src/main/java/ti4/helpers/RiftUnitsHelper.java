@@ -109,7 +109,8 @@ public class RiftUnitsHelper {
                         || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
                         || (cabal != null
                                 && (key.getUnitType() == UnitType.Fighter
-                                        || key.getUnitType() == UnitType.Spacedock))) {
+                                        || key.getUnitType() == UnitType.Spacedock
+                                        || key.getUnitType() == UnitType.Pds))) {
                     continue;
                 }
 

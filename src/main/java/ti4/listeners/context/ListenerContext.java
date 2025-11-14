@@ -118,10 +118,16 @@ public abstract class ListenerContext {
         }
         componentID = componentID.replace("FFCC_", "");
         String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
-        if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
+
+        if (player != null
+                && !componentID.startsWith(factionWhoPressedButton + "_")
+                && (!componentID.contains("firmament_") || !factionWhoPressedButton.contains("obsidian"))) {
             String message = "To " + player.fogSafeEmoji() + ": these buttons are for someone else";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             return false;
+        }
+        if (componentID.contains("firmament_") && factionWhoPressedButton.contains("obsidian")) {
+            factionWhoPressedButton = "firmament";
         }
         componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
         factionChecked = true;

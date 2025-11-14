@@ -50,6 +50,7 @@ public class BreakthroughHelper {
                     || Mapper.getLeader(commanderName) == null
                     || "unknown"
                             .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())
+                    || game.getStoredValue("mercCommander").contains(commanderName)
                     || Mapper.getLeader(commanderName)
                             .getAbilityText()
                             .toLowerCase()
