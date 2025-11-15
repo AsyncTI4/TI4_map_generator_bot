@@ -553,7 +553,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After any player's genome becomes exhausted: You may spend 3 influence to ready that genome; if you ready another player's genome you may perform a transaction with that player. ",
+        "text": "After any player's genome becomes exhausted: You may spend 1 command token from any pool to ready that genome; if you ready another player's genome you may perform a transaction with that player. [Note: Cost changed from 3 influence to 1 CC, to combat infinite loops and with Dane's assent.)",
         "source": "twilights_fall",
         "faction": "nomad"
     },

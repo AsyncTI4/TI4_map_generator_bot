@@ -851,7 +851,18 @@
             {
                 "type": "tech",
                 "alias": "tf-planesplitter"
-            },
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_fracture_all",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
             {
                 "type": "leader",
                 "alias": "obsidiancommander"
