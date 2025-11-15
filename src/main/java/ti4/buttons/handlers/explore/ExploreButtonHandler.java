@@ -29,12 +29,12 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
-import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 

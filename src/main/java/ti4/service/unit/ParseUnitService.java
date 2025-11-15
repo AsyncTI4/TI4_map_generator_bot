@@ -17,7 +17,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.service.PlanetService;
+import ti4.service.planet.PlanetService;
 
 @UtilityClass
 public class ParseUnitService {

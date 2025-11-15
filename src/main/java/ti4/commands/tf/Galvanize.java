@@ -2,7 +2,7 @@ package ti4.commands.tf;
 
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.service.GalvanizeService;
+import ti4.service.unit.GalvanizeService;
 
 public class Galvanize extends GameStateSubcommand {
 
