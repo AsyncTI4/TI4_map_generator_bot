@@ -164,9 +164,7 @@ public class TeHelperTechs {
                         ? "Space " + tile.getPosition()
                         : Helper.getPlanetRepresentation(uh.getName(), game);
                 label += " (" + count + ")";
-                if (state == UnitState.none) {
-                    id = prefix;
-                } else {
+                if (state != UnitState.none) {
                     label += " [" + state.humanDescr() + "]";
                 }
                 buttons.add(Buttons.red(id, label, state.stateEmoji()));
