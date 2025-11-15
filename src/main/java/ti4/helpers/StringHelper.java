@@ -151,7 +151,7 @@ public final class StringHelper {
             }
         }
         // Add the last line if there's any content
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString());
         }
 
@@ -227,19 +227,19 @@ public final class StringHelper {
                 }
                 if (currentMessage.length() + chunk.length() + sep.length() > maxLength) {
                     // This chunk would make the message too big, so start a new message
-                    if (currentMessage.length() > 0) {
+                    if (!currentMessage.isEmpty()) {
                         messages.add(currentMessage.toString());
                     }
                     currentMessage = new StringBuilder(chunk);
                 } else {
                     // This chunk fits in the current message
-                    if (currentMessage.length() > 0) {
+                    if (!currentMessage.isEmpty()) {
                         currentMessage.append(sep);
                     }
                     currentMessage.append(chunk);
                 }
             }
-            if (currentMessage.length() > 0) {
+            if (!currentMessage.isEmpty()) {
                 messages.add(currentMessage.toString());
             }
             if (!messages.isEmpty()) {

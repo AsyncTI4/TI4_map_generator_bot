@@ -2,7 +2,6 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -89,7 +88,8 @@ public class EidolonMaximumService {
 
             // validate that there are still 4 mechs here
             int mechs = tile.getUnitHolders().values().stream()
-                    .collect(Collectors.summingInt(h -> h.getUnitCount(UnitType.Mech, player)));
+                    .mapToInt(h -> h.getUnitCount(UnitType.Mech, player))
+                    .sum();
             if (mechs < 4) {
                 MessageHelper.sendEphemeralMessageToEventChannel(
                         event, "There are no longer 4 mechs at this location.");

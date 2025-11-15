@@ -86,7 +86,7 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         sb.append(source.emoji());
         sb.append("\n");
 
-        if (getText().length() > 0) {
+        if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }

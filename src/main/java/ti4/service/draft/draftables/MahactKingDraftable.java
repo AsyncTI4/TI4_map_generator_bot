@@ -212,7 +212,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
         List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, TYPE);
         if (!playerPicks.isEmpty()) {
-            String factionAlias = playerPicks.get(0).getChoiceKey();
+            String factionAlias = playerPicks.getFirst().getChoiceKey();
             playerSetupState.setFaction(factionAlias);
         }
 
@@ -267,7 +267,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();

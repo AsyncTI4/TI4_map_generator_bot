@@ -899,11 +899,9 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("civitas").orElse(null);
         }
         int scNum = scModel.getInitiative();
-        boolean automationExists = scModel != null
-                && (scModel.usesAutomationForSCID("pok4construction")
-                        || scModel.usesAutomationForSCID("te4construction"));
+        boolean automationExists =
+                scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction");
         if (!used
-                && scModel != null
                 && !player.getFollowedSCs().contains(scNum)
                 && automationExists
                 && game.getPlayedSCs().contains(scNum)) {

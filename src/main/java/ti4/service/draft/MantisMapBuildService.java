@@ -243,14 +243,14 @@ public class MantisMapBuildService {
         var groupedPositions = getGroupedPositions(mapBuildContext.game(), mapBuildContext.mapTemplateModel());
         List<String> positionsToPlace = getNextPositionGroup(mapBuildContext.game(), groupedPositions);
         Integer templatePlayerNum =
-                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), positionsToPlace.get(0));
+                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), positionsToPlace.getFirst());
         if (templatePlayerNum == null) {
-            return "Error: Could not determine player number for tile position " + positionsToPlace.get(0) + ".";
+            return "Error: Could not determine player number for tile position " + positionsToPlace.getFirst() + ".";
         }
         Player nextPlayerToPlace =
                 mapBuildContext.getPlayerForPosition().apply(templatePlayerNum).orElse(null);
         if (nextPlayerToPlace == null) {
-            return "Error: Could not find player for tile position " + positionsToPlace.get(0) + ".";
+            return "Error: Could not find player for tile position " + positionsToPlace.getFirst() + ".";
         }
         if (!nextPlayerToPlace.getUserID().equals(playerWithTileId)) {
             return DraftButtonService.USER_MISTAKE_PREFIX
@@ -313,12 +313,12 @@ public class MantisMapBuildService {
         // Use the first position in the group to determine which player is placing
         // next.
         Integer templatePlayerNum =
-                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), nextGroup.get(0));
+                getPlayerNumberForTilePosition(mapBuildContext.mapTemplateModel(), nextGroup.getFirst());
         if (templatePlayerNum == null) {
             MessageHelper.sendMessageToChannel(
                     responseChannel,
-                    "Error: Could not determine player number for next tile placement position at " + nextGroup.get(0)
-                            + ".");
+                    "Error: Could not determine player number for next tile placement position at "
+                            + nextGroup.getFirst() + ".");
             return;
         }
         Player player =
@@ -326,7 +326,7 @@ public class MantisMapBuildService {
         if (player == null) {
             MessageHelper.sendMessageToChannel(
                     responseChannel,
-                    "Error: Could not find player for next tile placement position at " + nextGroup.get(0) + ".");
+                    "Error: Could not find player for next tile placement position at " + nextGroup.getFirst() + ".");
             return;
         }
 
@@ -362,13 +362,13 @@ public class MantisMapBuildService {
 
         // If only one position, do it now and call this recursively
         if (nextGroup.size() == 1 && !canMulligan) {
-            boolean success = placeTile(mapBuildContext, nextGroup.get(0), nextTile.ItemId);
+            boolean success = placeTile(mapBuildContext, nextGroup.getFirst(), nextTile.ItemId);
             if (!success) return;
 
             MessageHelper.sendMessageToChannel(
                     mapBuildContext.game().getMainGameChannel(),
                     player.getRepresentation() + " placed "
-                            + nextTile.getShortDescription() + " at Position " + nextGroup.get(0)
+                            + nextTile.getShortDescription() + " at Position " + nextGroup.getFirst()
                             + " (automatically; no alternatives).");
 
             // Regenerate possible tiles
@@ -434,7 +434,7 @@ public class MantisMapBuildService {
 
     private void sendMapImage(
             GenericInteractionCreateEvent event, MessageChannel fallbackChannel, FileUpload mapImage) {
-        if (event != null && event instanceof ButtonInteractionEvent buttonEvent) {
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
             // Attempt replace
             buttonEvent
                     .getChannel()
@@ -478,7 +478,6 @@ public class MantisMapBuildService {
                     for (Attachment attachment : msg.getAttachments()) {
                         if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
                             msg.delete().queue();
-                            continue;
                         }
                     }
                 }
@@ -532,7 +531,7 @@ public class MantisMapBuildService {
 
         // Draw and set a new tile as the "current drawn tile"
         Collections.shuffle(availableTileIDs);
-        String selectedTileId = availableTileIDs.get(0);
+        String selectedTileId = availableTileIDs.getFirst();
         mapBuildContext.persistDrawnTile().accept(selectedTileId);
         Category category =
                 playerRemainingTiles.blueTileIds().contains(selectedTileId) ? Category.BLUETILE : Category.REDTILE;
@@ -632,7 +631,7 @@ public class MantisMapBuildService {
 
         // Remove the home position, which by convention seems to be the first one in
         // the list
-        emulatedPositions.remove(0);
+        emulatedPositions.removeFirst();
 
         Map<Integer, Map<Integer, List<String>>> groupToPlayerNumToTiles = new HashMap<>();
         for (MapTemplateTile tile : mapTemplateModel.getTemplateTiles()) {

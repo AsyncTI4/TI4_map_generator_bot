@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
@@ -197,12 +198,12 @@ public class TeHelperUnits {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> forerunnerMap =
                     TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
-            for (String source : forerunnerMap.keySet()) {
+            for (Map.Entry<String, List<String>> entry : forerunnerMap.entrySet()) {
                 List<String> units =
-                        forerunnerMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                        entry.getValue().stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
                                 .map(e -> e.getValue().size() + " " + e.getKey())
                                 .toList();
-                List<String> unitsTo = forerunnerMap.get(source).stream()
+                List<String> unitsTo = entry.getValue().stream()
                         .map(unit -> unit.substring(0, unit.indexOf(' ')) + " " + matcher.group("combatPlanet"))
                         .collect(Collectors.groupingBy(s -> s))
                         .entrySet()
@@ -213,7 +214,7 @@ public class TeHelperUnits {
                 String unitStrTo = String.join(", ", unitsTo);
 
                 RemoveUnitService.removeUnits(
-                        event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
+                        event, game.getTileByPosition(entry.getKey()), game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("forerunnerMovementMap");

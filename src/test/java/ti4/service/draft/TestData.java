@@ -139,9 +139,7 @@ public class TestData {
                 throw new RuntimeException(
                         "Test data file for finished 6p draft is missing at path: " + path.toAbsolutePath());
             }
-            String firstLine =
-                    Files.readAllLines(path, Charset.defaultCharset()).get(0);
-            return firstLine;
+            return Files.readAllLines(path, Charset.defaultCharset()).getFirst();
         } catch (Exception e) {
             throw new RuntimeException("Failed to read finished 6p draft string from file", e);
         }

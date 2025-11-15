@@ -243,7 +243,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String ability : p2.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
-            if (!tech.getFaction().isPresent()) {
+            if (tech.getFaction().isEmpty()) {
                 continue;
             }
             buttons.add(Buttons.gray(
@@ -286,7 +286,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String ability : p2.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
-            if (!tech.getFaction().isPresent()) {
+            if (tech.getFaction().isEmpty()) {
                 continue;
             }
             buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
@@ -327,7 +327,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String ability : player.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
-            if (!tech.getFaction().isPresent()) {
+            if (tech.getFaction().isEmpty()) {
                 continue;
             }
             buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
@@ -344,7 +344,7 @@ public class ButtonHelperTwilightsFallActionCards {
         String ability1 = buttonID.split("_")[2];
         for (String ability : p2.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
-            if (!tech.getFaction().isPresent()) {
+            if (tech.getFaction().isEmpty()) {
                 continue;
             }
             buttons.add(Buttons.gray(
@@ -381,7 +381,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Map<String, Integer> factions = new HashMap<>();
         for (String ability : player.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
-            if (!tech.getFaction().isPresent()) {
+            if (tech.getFaction().isEmpty()) {
                 continue;
             }
             String faction = tech.getFaction().get();
@@ -402,7 +402,7 @@ public class ButtonHelperTwilightsFallActionCards {
         }
         for (String unit : player.getUnitsOwned()) {
             UnitModel unitM = Mapper.getUnit(unit);
-            if (!unitM.getFaction().isPresent()) {
+            if (unitM.getFaction().isEmpty()) {
                 continue;
             }
             String faction = unitM.getFaction().get();
@@ -416,8 +416,8 @@ public class ButtonHelperTwilightsFallActionCards {
             }
         }
         int max = 0;
-        for (String faction : factions.keySet()) {
-            max = Math.max(factions.get(faction), max);
+        for (Integer i : factions.values()) {
+            max = Math.max(i, max);
         }
 
         String gainMsg = player.gainTG(max * 2, true);
@@ -584,12 +584,12 @@ public class ButtonHelperTwilightsFallActionCards {
         List<String> allCards = new ArrayList<>();
         String unitT = buttonID.split("_")[1];
         Map<String, UnitModel> allUnits = Mapper.getUnits();
-        for (String unitID : allUnits.keySet()) {
-            UnitModel mod = allUnits.get(unitID);
+        for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
+            UnitModel mod = entry.getValue();
             if (mod.getFaction().isPresent() && mod.getSource() == ComponentSource.twilights_fall) {
                 FactionModel faction = Mapper.getFaction(mod.getFaction().get());
                 if (faction != null && faction.getSource() != ComponentSource.twilights_fall) {
-                    allCards.add(unitID);
+                    allCards.add(entry.getKey());
                 }
             }
         }

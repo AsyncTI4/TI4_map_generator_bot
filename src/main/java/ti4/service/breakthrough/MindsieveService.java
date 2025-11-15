@@ -47,10 +47,10 @@ public class MindsieveService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseMindsieve(naalu, primary, scModel)) return;
 
-        String msg = naalu.getRepresentation() + " since you have " + mindsieve()
-                + " you are able to send a promissory note to " + primary.getRepresentationNoPing();
-        msg +=
-                " instead of spending a command token. If you would like to do so, choose which promissory note to send by clicking one of the buttons:";
+        StringBuilder msg = new StringBuilder(naalu.getRepresentation() + " since you have " + mindsieve()
+                + " you are able to send a promissory note to " + primary.getRepresentationNoPing());
+        msg.append(
+                " instead of spending a command token. If you would like to do so, choose which promissory note to send by clicking one of the buttons:");
 
         List<Button> buttons = new ArrayList<>();
         for (String pn : naalu.getPromissoryNotes().keySet()) {
@@ -58,7 +58,8 @@ public class MindsieveService {
             if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
             if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) {
                 String fmt = "\n-# > - Since they %s, you cannot send the _Alliance_ promissory note.";
-                msg += String.format(fmt, game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact");
+                msg.append(String.format(
+                        fmt, game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact"));
                 continue;
             }
             Player owner = game.getPNOwner(pn);
@@ -66,7 +67,7 @@ public class MindsieveService {
         }
         buttons.add(
                 Buttons.DONE_DELETE_BUTTONS.withLabel("Decline Mindsieve").withEmoji(FactionEmojis.Naalu.asEmoji()));
-        MessageHelper.sendMessageToChannelWithButtons(naalu.getCardsInfoThread(), msg, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(naalu.getCardsInfoThread(), msg.toString(), buttons);
     }
 
     @ButtonHandler("mindsieveFollow_")

@@ -2256,7 +2256,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
-                        && tile.getWormholes(game).size() > 0) {
+                        && !tile.getWormholes(game).isEmpty()) {
                     player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
                 }
                 // ButtonHelper.updateMap(game, event,
@@ -2569,9 +2569,7 @@ public class UnfiledButtonHandlers {
             case "no_sabotage" ->
                 ReactionService.handleAllPlayersReactingNoSabotage(
                         event.getInteraction().getMessage(), game);
-            case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                respondAllHaveScored(game);
-            }
+            case Constants.PO_SCORING, Constants.PO_NO_SCORING -> respondAllHaveScored(game);
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     if (game.isTwilightsFallMode()) {
@@ -3478,7 +3476,7 @@ public class UnfiledButtonHandlers {
     private static void passingAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an ability when you pass:";
         List<Button> buttons = ButtonHelper.getPassingAbilities(player, game);
-        buttons.add(0, Buttons.red(player.finChecker() + "passForRound", "Pass"));
+        buttons.addFirst(Buttons.red(player.finChecker() + "passForRound", "Pass"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
     }
 
@@ -3486,8 +3484,8 @@ public class UnfiledButtonHandlers {
     public static void endOfTurnAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an end of turn ability";
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
-        if (buttons.size() > 0) {
-            buttons.add(0, Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
+        if (!buttons.isEmpty()) {
+            buttons.addFirst(Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
         } else {
             TurnEndButtonHandler.turnEnd(event, game, player);

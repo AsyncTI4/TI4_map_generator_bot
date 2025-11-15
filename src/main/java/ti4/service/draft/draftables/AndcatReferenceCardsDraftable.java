@@ -253,9 +253,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("info_")) {
             String[] tokens = commandKey.substring("info_".length()).split("_");
-            informPackages = Arrays.asList(tokens).stream()
-                    .map(this::getPackageByChoiceKey)
-                    .toList();
+            informPackages =
+                    Arrays.stream(tokens).map(this::getPackageByChoiceKey).toList();
             new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("assign_")) {
             new AndcatReferenceCardsMessageHelper(this)
@@ -385,7 +384,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();
@@ -395,13 +394,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         AndcatReferenceCardsDraftableSettings settings = draftSystemSettings.getAndcatReferenceCardsDraftableSettings();
         SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
-        String error = initialize(
+        return initialize(
                 settings.getNumPackages().getVal(),
                 sourceSettings.getFactionSources(),
                 settings.getPriFactions().getKeys().stream().toList(),
                 settings.getBanFactions().getKeys().stream().toList());
-
-        return error;
     }
 
     @Override
@@ -413,7 +410,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (playerChoices == null || playerChoices.isEmpty()) {
                 continue;
             }
-            DraftChoice pick = playerChoices.get(0);
+            DraftChoice pick = playerChoices.getFirst();
             ReferenceCardPackage refPackage = getPackageByChoiceKey(pick.getChoiceKey());
             Player player = draftManager.getGame().getPlayer(playerId);
 
@@ -431,7 +428,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                 return "Player " + player.getRepresentation() + " has not picked a reference card package.";
             }
 
-            DraftChoice pick = playerChoices.get(0);
+            DraftChoice pick = playerChoices.getFirst();
             ReferenceCardPackage refPackage = getPackageByChoiceKey(pick.getChoiceKey());
             if (refPackage.homeSystemFaction() == null) {
                 return "Player " + player.getRepresentation() + " has not assigned a home system faction.";
@@ -458,7 +455,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         if (playerChoices == null || playerChoices.isEmpty()) {
             return null;
         }
-        DraftChoice pick = playerChoices.get(0);
+        DraftChoice pick = playerChoices.getFirst();
         ReferenceCardPackage refPackage = getPackageByChoiceKey(pick.getChoiceKey());
 
         // Determine speaker position and set home system location
@@ -537,7 +534,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (pState.getPickCount(TYPE) == 0) {
                 return Collections.emptyList();
             }
-            String choiceKey = pState.getPicks(TYPE).get(0).getChoiceKey();
+            String choiceKey = pState.getPicks(TYPE).getFirst().getChoiceKey();
             ReferenceCardPackage refPackage = getPackageByChoiceKey(choiceKey);
             if (refPackage.speakerOrderFaction() == null) {
                 return Collections.emptyList();
@@ -551,11 +548,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
         // Sort player states by speaker order priority number
         playerStates.sort((p1, p2) -> {
-            DraftChoice p1Choice = p1.getValue().getPicks(TYPE).get(0);
+            DraftChoice p1Choice = p1.getValue().getPicks(TYPE).getFirst();
             ReferenceCardPackage p1Package = getPackageByChoiceKey(p1Choice.getChoiceKey());
             FactionModel p1SpeakerFaction = Mapper.getFaction(p1Package.speakerOrderFaction());
 
-            DraftChoice p2Choice = p2.getValue().getPicks(TYPE).get(0);
+            DraftChoice p2Choice = p2.getValue().getPicks(TYPE).getFirst();
             ReferenceCardPackage p2Package = getPackageByChoiceKey(p2Choice.getChoiceKey());
             FactionModel p2SpeakerFaction = Mapper.getFaction(p2Package.speakerOrderFaction());
 
@@ -566,6 +563,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
     }
 
     private boolean shouldAlsoSetSeat(DraftManager draftManager) {
-        return !draftManager.getDraftables().stream().anyMatch(d -> d instanceof SeatDraftable);
+        return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
     }
 }

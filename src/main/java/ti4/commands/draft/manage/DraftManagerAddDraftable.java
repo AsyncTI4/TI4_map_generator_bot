@@ -1,6 +1,7 @@
 package ti4.commands.draft.manage;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -26,7 +27,7 @@ class DraftManagerAddDraftable extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        String draftableType = event.getOption(Constants.ADD_DRAFTABLE_OPTION, o -> o.getAsString());
+        String draftableType = event.getOption(Constants.ADD_DRAFTABLE_OPTION, OptionMapping::getAsString);
         Draftable draftable = DraftComponentFactory.createDraftable(draftableType);
         if (draftable == null) {
             draftable = DraftComponentFactory.createDraftable(draftableType + "Draftable");
@@ -37,7 +38,7 @@ class DraftManagerAddDraftable extends GameStateSubcommand {
             return;
         }
         draftManager.addDraftable(draftable);
-        String saveData = event.getOption(Constants.SAVE_DATA_OPTION, null, o -> o.getAsString());
+        String saveData = event.getOption(Constants.SAVE_DATA_OPTION, null, OptionMapping::getAsString);
         if (saveData != null) {
             draftable.load(saveData);
             draftable.validateState(draftManager);

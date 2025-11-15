@@ -291,7 +291,7 @@ public class CombatRollService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        if (message != null && message.endsWith(";\n")) {
+        if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -688,7 +688,10 @@ public class CombatRollService {
                 resultBuilder.append("Applied +2 to the rolls of 1 unit via supercharge\n");
                 letnevBTBoost = 2;
             } else {
-                resultBuilder.append("Applied +" + letnevBTBoost + " to the rolls of 1 unit via letnev breakthrough\n");
+                resultBuilder
+                        .append("Applied +")
+                        .append(letnevBTBoost)
+                        .append(" to the rolls of 1 unit via letnev breakthrough\n");
             }
         }
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
@@ -1306,14 +1309,10 @@ public class CombatRollService {
         }
     }
 
-    public static Map<UnitModel, Integer> getProximaBombardUnit(Tile tile, Player player) {
+    public static Map<UnitModel, Integer> getProximaBombardUnit(Player player) {
         UnitModel proximaFakeUnit = new UnitModel();
         proximaFakeUnit.setBombardDieCount(3);
-        if (player.getGame().isTwilightsFallMode()) {
-            proximaFakeUnit.setBombardHitsOn(8);
-        } else {
-            proximaFakeUnit.setBombardHitsOn(8);
-        }
+        proximaFakeUnit.setBombardHitsOn(8);
         proximaFakeUnit.setName(Mapper.getTech("proxima").getName());
         proximaFakeUnit.setAsyncId("ProximaBombard");
         proximaFakeUnit.setId("ProximaBombard");

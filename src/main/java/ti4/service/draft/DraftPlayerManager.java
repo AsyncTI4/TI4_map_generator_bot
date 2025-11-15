@@ -93,8 +93,7 @@ public class DraftPlayerManager {
         if (!pState.getPicks().containsKey(type)) {
             return List.of();
         }
-        List<DraftChoice> choices = pState.getPicks().get(type);
-        return choices;
+        return pState.getPicks().get(type);
     }
 
     public List<String> getPlayersWithChoiceKey(DraftableType type, String choiceKey) {
@@ -113,8 +112,7 @@ public class DraftPlayerManager {
 
     public List<DraftChoice> getAllPicksOfType(DraftableType type) {
         List<DraftChoice> allChoices = new ArrayList<>();
-        for (String userId : playerStates.keySet()) {
-            PlayerDraftState pState = playerStates.get(userId);
+        for (PlayerDraftState pState : playerStates.values()) {
             if (pState.getPicks().containsKey(type)) {
                 allChoices.addAll(pState.getPicks().get(type));
             }

@@ -132,7 +132,7 @@ public class SeatDraftable extends SinglePickDraftable {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a seat");
         }
 
-        String seat = pState.getPicks().get(TYPE).get(0).getChoiceKey();
+        String seat = pState.getPicks().get(TYPE).getFirst().getChoiceKey();
         Integer seatNum = getSeatNumberFromChoiceKey(seat);
         if (seatNum == null) {
             throw new IllegalStateException("Player " + playerUserId + " has an invalid seat choice key: " + seat);
@@ -147,7 +147,7 @@ public class SeatDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();

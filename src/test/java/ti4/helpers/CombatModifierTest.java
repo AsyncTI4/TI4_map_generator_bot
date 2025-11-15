@@ -31,7 +31,7 @@ public class CombatModifierTest extends BaseTi4Test {
     private static Player letnev;
 
     @BeforeAll
-    private static void setupTestGame() {
+    static void setupTestGame() {
         if (testGame != null) return;
         testGame = new Game();
         testGame.newGameSetup();
@@ -116,7 +116,7 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     private static void assertListsEqual(String name, Set<String> actual, Set<String> expected) {
-        if (SetUtils.disjunction(actual, expected).size() > 0) {
+        if (!SetUtils.disjunction(actual, expected).isEmpty()) {
             System.out.println(actual);
             System.out.println(expected);
         }

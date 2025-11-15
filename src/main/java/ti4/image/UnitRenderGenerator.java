@@ -147,7 +147,7 @@ class UnitRenderGenerator {
                         "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
                 continue;
             }
-            Integer unitCount = unitHolder.getUnitCount(unitKey);
+            int unitCount = unitHolder.getUnitCount(unitKey);
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);
 

@@ -95,13 +95,12 @@ public class NewStuffHelper {
 
     public static void sendOrEditButtons(
             GenericInteractionCreateEvent event, MessageChannel channel, String message, List<Button> buttons) {
-        if (event != null
-                && event instanceof ButtonInteractionEvent bEvent
+        if (event instanceof ButtonInteractionEvent bEvent
                 && bEvent.getMessage().getContentRaw().equals(message)) {
             // replace the buttons in the previous message
             List<List<ActionRow>> actionRows = MessageHelper.getPartitionedButtonLists(buttons);
-            if (actionRows.size() >= 1) {
-                bEvent.getHook().editOriginalComponents(actionRows.get(0)).queue();
+            if (!actionRows.isEmpty()) {
+                bEvent.getHook().editOriginalComponents(actionRows.getFirst()).queue();
             }
         } else {
             // make a new message
@@ -145,9 +144,9 @@ public class NewStuffHelper {
         // Right now, only a 'null' status allows the card to be picked up. Add more to this list if it changes in the
         // future
         List<ACStatus> allowedStatus = new ArrayList<>(Collections.singleton(null));
-        game.getDiscardActionCards().entrySet().stream()
-                .filter(e -> allowedStatus.contains(status.getOrDefault(e.getKey(), null)))
-                .map(e -> Map.entry(e.getKey(), Mapper.getActionCard(e.getKey()).getName()))
+        game.getDiscardActionCards().keySet().stream()
+                .filter(integer -> allowedStatus.contains(status.getOrDefault(integer, null)))
+                .map(integer -> Map.entry(integer, Mapper.getActionCard(integer).getName()))
                 .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.ActionCard))
                 .forEach(allButtons::add);
         return allButtons;

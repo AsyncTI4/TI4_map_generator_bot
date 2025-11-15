@@ -20,11 +20,17 @@ public class TEOptionService {
     @ButtonHandler("startTFGame")
     public static void startTFGame(Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        String msg = "There are currently two draft options for Twilight's Fall.\n\nThere is a bag draft option, "
-                + "where you draft everything (tiles, mahact king faction, speaker position, starting fleet, starting HS initial abilities, etc), "
-                + "and then there is a milty draft option where you draft slice, mahact king faction, and a pack of 3 faction cards (from which you "
-                + "get speaker position, starting home system, and starting fleet.) After you finish the milty draft option, you'll do a bag draft (called in the rules an Inaugurul Splice) where "
-                + "you draft abilities/units/genomes.\n\nThe second option is closer to Rules As Written, the first is closer to a classic franken draft.";
+        String msg =
+                """
+            There are currently two draft options for Twilight's Fall.
+
+            There is a bag draft option, \
+            where you draft everything (tiles, mahact king faction, speaker position, starting fleet, starting HS initial abilities, etc), \
+            and then there is a milty draft option where you draft slice, mahact king faction, and a pack of 3 faction cards (from which you \
+            get speaker position, starting home system, and starting fleet.) After you finish the milty draft option, you'll do a bag draft (called in the rules an Inaugurul Splice) where \
+            you draft abilities/units/genomes.
+
+            The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
         buttons.add(Buttons.gray("startDraftSystem_andcatPreset", "Start Milty Draft + Later Inaugural Splice"));

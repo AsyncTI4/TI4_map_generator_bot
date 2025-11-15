@@ -168,10 +168,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your turn to draft.";
         }
         // Ensure no one else has picked this choice
-        if (draftManager
-                        .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
-                        .size()
-                > 0) {
+        if (!draftManager
+                .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
+                .isEmpty()) {
             return DraftButtonService.USER_MISTAKE_PREFIX + "That choice has already been taken.";
         }
 
@@ -218,9 +217,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // If 1+ deterministic picks are found amongst the draftables, AND there are no more deterministic picks
         // than there are picks at this time, AND there are no non-deterministic picks available, apply the only
         // possible picks automatically.
-        if (!undeterministicPicks && totalPossiblePicks.size() > 0 && totalPossiblePicks.size() <= simultaneousPicks) {
+        if (!undeterministicPicks && !totalPossiblePicks.isEmpty() && totalPossiblePicks.size() == simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
-            DraftChoice forcedPick = totalPossiblePicks.get(0);
+            DraftChoice forcedPick = totalPossiblePicks.getFirst();
             Draftable forcedDraftable = draftManager.getDraftable(forcedPick.getType());
             String status = draftManager.routeCommand(
                     event,
@@ -299,7 +298,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
-            if (orchestratorState == null || !(orchestratorState instanceof State state)) {
+            if (!(orchestratorState instanceof State state)) {
                 return "Player " + playerUserId
                         + " has invalid draft state (missing or weird type). Try `/draft manage set_orchestrator public_snake` (this will reset the draft order).";
             }
@@ -367,7 +366,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();

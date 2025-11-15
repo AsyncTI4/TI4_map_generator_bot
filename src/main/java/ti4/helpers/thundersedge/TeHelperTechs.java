@@ -3,6 +3,7 @@ package ti4.helpers.thundersedge;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -52,8 +53,8 @@ public class TeHelperTechs {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            String msg =
-                    player.getFactionEmoji() + " resolved **__Magen Defense Grid__** on " + tile.getPosition() + ":";
+            StringBuilder msg = new StringBuilder(
+                    player.getFactionEmoji() + " resolved **__Magen Defense Grid__** on " + tile.getPosition() + ":");
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
@@ -64,15 +65,17 @@ public class TeHelperTechs {
                     String infStr = emoji.repeat(count);
                     if (count > 6) infStr += "(" + count + " total)";
                     if (uh instanceof Space) {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to Space.";
+                        msg.append("\n-# > ").append(emoji.repeat(count)).append(" added to Space.");
                     } else {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to "
-                                + Helper.getPlanetRepresentation(uh.getName(), game);
+                        msg.append("\n-# > ")
+                                .append(emoji.repeat(count))
+                                .append(" added to ")
+                                .append(Helper.getPlanetRepresentation(uh.getName(), game));
                     }
                 }
             }
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, total));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg.toString(), total));
         });
     }
 
@@ -128,7 +131,7 @@ public class TeHelperTechs {
         List<Tile> tilesAdjToInf = tilesWithInf.stream()
                 .flatMap(t -> FoWHelper.getAdjacentTiles(game, t.getPosition(), player, false).stream())
                 .map(game::getTileByPosition)
-                .filter(t -> t != null)
+                .filter(Objects::nonNull)
                 .toList();
         return new ArrayList<>(tilesAdjToInf);
     }
@@ -288,13 +291,14 @@ public class TeHelperTechs {
             }
         } else {
             Set<String> adjTilePositions = new HashSet<>();
-            ButtonHelper.getTilesWithShipsInTheSystem(player, game).forEach(tile -> {
-                adjTilePositions.addAll(FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false));
-            });
+            ButtonHelper.getTilesWithShipsInTheSystem(player, game)
+                    .forEach(tile -> adjTilePositions.addAll(
+                            FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)));
 
-            adjTilePositions.stream().map(game::getTileByPosition).forEach(tile -> {
-                buttons.add(Buttons.blue(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-            });
+            adjTilePositions.stream()
+                    .map(game::getTileByPosition)
+                    .forEach(tile -> buttons.add(
+                            Buttons.blue(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player))));
         }
 
         return buttons;

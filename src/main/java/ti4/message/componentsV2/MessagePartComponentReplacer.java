@@ -168,9 +168,8 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
         if (mediaGallery == null || contains == null) {
             return false;
         }
-        Predicate<MediaGalleryItem> matchFunc = (item) -> {
-            return item.getUrl() != null && item.getUrl().contains(contains);
-        };
+        Predicate<MediaGalleryItem> matchFunc =
+                (item) -> item.getUrl() != null && item.getUrl().contains(contains);
         return mediaGallery.getItems().stream().anyMatch(matchFunc);
     }
 

@@ -143,7 +143,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a speaker order");
         }
 
-        String speakerOrder = pState.getPicks().get(TYPE).get(0).getChoiceKey();
+        String speakerOrder = pState.getPicks().get(TYPE).getFirst().getChoiceKey();
         Integer speakerNum = getSpeakerOrderFromChoiceKey(speakerOrder);
         if (speakerNum == null) {
             throw new IllegalStateException(
@@ -170,7 +170,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();
@@ -182,6 +182,6 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     }
 
     private boolean shouldAlsoSetSeat(DraftManager draftManager) {
-        return !draftManager.getDraftables().stream().anyMatch(d -> d instanceof SeatDraftable);
+        return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
     }
 }

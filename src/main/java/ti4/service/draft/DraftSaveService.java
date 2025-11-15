@@ -103,8 +103,7 @@ public class DraftSaveService {
         }
 
         // Reduce footprint of save data by concatenating lines into a single line
-        String joinedLines = StringHelper.safeJoin(lines, ENCODED_DATA_SEPARATOR);
 
-        return joinedLines;
+        return StringHelper.safeJoin(lines, ENCODED_DATA_SEPARATOR);
     }
 }

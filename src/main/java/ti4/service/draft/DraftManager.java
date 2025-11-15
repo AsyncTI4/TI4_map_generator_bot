@@ -153,16 +153,14 @@ public class DraftManager extends DraftPlayerManager {
                     }
                 }
 
-                String status = d.handleCustomCommand(event, this, player.getUserID(), innerCommand);
-                return status;
+                return d.handleCustomCommand(event, this, player.getUserID(), innerCommand);
             }
         }
 
         if (orchestrator != null && command.startsWith(orchestrator.getButtonPrefix())) {
             String innerButtonID =
                     command.substring(orchestrator.getButtonPrefix().length());
-            String status = orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
-            return status;
+            return orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
         }
 
         throw new IllegalArgumentException("Button ID " + command + " not recognized by draft manager");
@@ -207,8 +205,7 @@ public class DraftManager extends DraftPlayerManager {
         if (orchestrator == null) {
             return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
         }
-        String reason = orchestrator.whatsStoppingDraftStart(this);
-        return reason;
+        return orchestrator.whatsStoppingDraftStart(this);
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {

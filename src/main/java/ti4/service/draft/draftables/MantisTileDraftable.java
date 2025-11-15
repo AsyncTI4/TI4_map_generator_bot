@@ -278,15 +278,13 @@ public class MantisTileDraftable extends Draftable {
             return; // Not sure this needs to be logged anywhere
         }
 
-        cardsInfoChannel.getHistory().retrievePast(10).queue(messages -> {
-            messages.stream()
-                    .filter(msg -> !msg.isUsingComponentsV2())
-                    .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
-                    .findFirst()
-                    .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> cardsInfoChannel
-                            .sendMessage(summary.toString())
-                            .queue());
-        });
+        cardsInfoChannel.getHistory().retrievePast(10).queue(messages -> messages.stream()
+                .filter(msg -> !msg.isUsingComponentsV2())
+                .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
+                .findFirst()
+                .ifPresentOrElse(
+                        msg -> msg.editMessage(summary.toString()).queue(),
+                        () -> cardsInfoChannel.sendMessage(summary.toString()).queue()));
     }
 
     @Override
@@ -479,7 +477,7 @@ public class MantisTileDraftable extends Draftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();

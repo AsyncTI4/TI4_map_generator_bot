@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -147,13 +148,13 @@ public class TeHelperCommanders {
             boolean movedFlagship = false;
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> ojzMap = TeHelperAbilities.readMoveMap(game.getStoredValue("OjzRetreatMap"));
-            for (String source : ojzMap.keySet()) {
-                if (ojzMap.get(source).contains("fs space")) movedFlagship = true;
+            for (Map.Entry<String, List<String>> entry : ojzMap.entrySet()) {
+                if (entry.getValue().contains("fs space")) movedFlagship = true;
                 List<String> units =
-                        ojzMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                        entry.getValue().stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
                                 .map(e -> e.getValue().size() + " " + e.getKey())
                                 .toList();
-                List<String> unitsTo = ojzMap.get(source).stream()
+                List<String> unitsTo = entry.getValue().stream()
                         .map(unit -> unit.substring(0, unit.indexOf(' ')))
                         .collect(Collectors.groupingBy(s -> s))
                         .entrySet()
@@ -163,7 +164,7 @@ public class TeHelperCommanders {
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
                 RemoveUnitService.removeUnits(
-                        event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
+                        event, game.getTileByPosition(entry.getKey()), game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             if (!player.hasUnit("ralnel_flagship")) movedFlagship = false;

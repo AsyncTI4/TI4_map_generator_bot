@@ -93,7 +93,7 @@ public class Tile {
     public static Predicate<Tile> tileMayHaveThundersEdge() {
         return tile -> {
             if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
-            if (tile.getPlanetUnitHolders().size() > 0) return false;
+            if (!tile.getPlanetUnitHolders().isEmpty()) return false;
             if (tile.isSupernova()) return false;
             if (tile.getPosition().contains("frac")) return false;
             return !tile.getTileModel().hasWormhole();

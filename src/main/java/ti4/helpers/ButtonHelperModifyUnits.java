@@ -1806,7 +1806,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0 && tile != null) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition(),
@@ -2179,7 +2179,7 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && tile.getWormholes(game).size() > 0) {
+                    && !tile.getWormholes(game).isEmpty()) {
                 player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {

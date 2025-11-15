@@ -242,9 +242,8 @@ public class RiftUnitsHelper {
     }
 
     public static String getWormholeUnit(String unit, boolean over5roll, Player player, Game game) {
-        List<String> wormholeUnits = new ArrayList<String>();
 
-        wormholeUnits.addAll(List.of("ff", "dd", "ca", "dn", "cv", "fs", "ws"));
+        List<String> wormholeUnits = new ArrayList<>(List.of("ff", "dd", "ca", "dn", "cv", "fs", "ws"));
         if (!over5roll) {
             Collections.reverse(wormholeUnits);
         }

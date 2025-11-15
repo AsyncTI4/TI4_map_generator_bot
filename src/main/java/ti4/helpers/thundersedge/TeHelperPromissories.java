@@ -41,7 +41,7 @@ public class TeHelperPromissories {
         for (String tech : dws.getTechs()) {
             TechnologyModel techModel = Mapper.getTech(tech);
             if (techModel.getFaction().isPresent()
-                    && techModel.getFaction().orElse("").length() > 0) continue; // no faction techs
+                    && !techModel.getFaction().orElse("").isEmpty()) continue; // no faction techs
             if (techModel.isUnitUpgrade()) continue;
             if (player.hasTech(tech)) continue;
             techsToAdd.add(techModel);

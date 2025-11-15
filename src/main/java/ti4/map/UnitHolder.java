@@ -416,7 +416,9 @@ public abstract class UnitHolder {
 
     @JsonIgnore
     public int getTotalGalvanizedCount() {
-        return unitsByState.values().stream().collect(Collectors.summingInt(UnitHolder::getGalvanizedUnitStateCount));
+        return unitsByState.values().stream()
+                .mapToInt(UnitHolder::getGalvanizedUnitStateCount)
+                .sum();
     }
 
     public int getGalvanizedUnitCount(UnitKey unitKey) {
@@ -432,7 +434,8 @@ public abstract class UnitHolder {
     public int getGalvanizedUnitCount(String colorID) {
         return unitsByState.entrySet().stream()
                 .filter(e -> e.getKey().getColorID().equals(colorID))
-                .collect(Collectors.summingInt(e -> getGalvanizedUnitStateCount(e.getValue())));
+                .mapToInt(e -> getGalvanizedUnitStateCount(e.getValue()))
+                .sum();
     }
 
     @JsonIgnore

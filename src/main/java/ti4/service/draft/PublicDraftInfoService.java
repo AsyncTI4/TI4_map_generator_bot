@@ -120,10 +120,9 @@ public class PublicDraftInfoService {
         List<Button> buttons = new ArrayList<>();
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
-            if (draftManager
-                            .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
-                            .size()
-                    > 0) {
+            if (!draftManager
+                    .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
+                    .isEmpty()) {
                 continue;
             }
 
@@ -176,8 +175,13 @@ public class PublicDraftInfoService {
                     // Skip adding anything if no default emoji
                 }
 
-                if (longChoiceNames.size() > 0) {
-                    bulletSummary.append("- " + draftable.getDisplayName() + ": " + System.lineSeparator() + "  - ");
+                if (!longChoiceNames.isEmpty()) {
+                    bulletSummary
+                            .append("- ")
+                            .append(draftable.getDisplayName())
+                            .append(": ")
+                            .append(System.lineSeparator())
+                            .append("  - ");
                     bulletSummary.append(String.join(System.lineSeparator() + "  - ", longChoiceNames));
                 }
             }

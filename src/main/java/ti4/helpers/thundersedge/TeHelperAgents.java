@@ -28,6 +28,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -118,7 +119,7 @@ public class TeHelperAgents {
     }
 
     private static void postCrimsonAgentStep1(Game game, Player player) {
-        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> um.getIsShip());
+        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
         String message = player.getRepresentation() + " Choose the first tile to swap a unit from:";
         List<Button> buttons =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "handleCrimsonAgent", pred, false);
@@ -128,7 +129,7 @@ public class TeHelperAgents {
     @ButtonHandler("handleCrimsonAgent_")
     private static void handleCrimsonAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String prefix = buttonID + "_";
-        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> um.getIsShip());
+        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
 
         String part1 = "handleCrimsonAgent";
         String part2 = part1 + "_" + RegexHelper.posRegex(game, "tileA");

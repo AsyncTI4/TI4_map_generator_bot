@@ -112,7 +112,7 @@ public class Expeditions {
                 .orElse(0L);
         return new ArrayList<>(factionCounts.entrySet().stream()
                 .filter(e -> e.getValue() == most)
-                .map(e -> e.getKey())
+                .map(Entry::getKey)
                 .toList());
     }
 

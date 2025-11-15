@@ -266,14 +266,14 @@ public class FactionDraftable extends SinglePickDraftable {
             keleresFlavor = null;
             List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
             if (!keleresPlayers.isEmpty()) {
-                sendKeleresButtons(draftManager, keleresPlayers.get(0), false);
+                sendKeleresButtons(draftManager, keleresPlayers.getFirst(), false);
             }
         } else if (keleresFlavor == null
                 && draftFactions.contains("keleresm")
                 && keleresFlavors.contains(choice.getChoiceKey())) {
             List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
             if (!keleresPlayers.isEmpty()) {
-                sendKeleresButtons(draftManager, keleresPlayers.get(0), false);
+                sendKeleresButtons(draftManager, keleresPlayers.getFirst(), false);
             }
         }
     }
@@ -294,7 +294,7 @@ public class FactionDraftable extends SinglePickDraftable {
         // Check for and trigger Keleres setup
         List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
         if (!keleresPlayers.isEmpty() && keleresFlavor == null) {
-            sendKeleresButtons(draftManager, keleresPlayers.get(0), true);
+            sendKeleresButtons(draftManager, keleresPlayers.getFirst(), true);
         }
     }
 
@@ -302,7 +302,7 @@ public class FactionDraftable extends SinglePickDraftable {
     public String whatsStoppingSetup(DraftManager draftManager) {
         List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
         if (!keleresPlayers.isEmpty() && keleresFlavor == null) {
-            Player player = draftManager.getGame().getPlayer(keleresPlayers.get(0));
+            Player player = draftManager.getGame().getPlayer(keleresPlayers.getFirst());
             return "Waiting for " + player.getPing() + " to choose a Keleres flavor.";
         }
         return null;
@@ -314,7 +314,7 @@ public class FactionDraftable extends SinglePickDraftable {
 
         List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, TYPE);
         if (!playerPicks.isEmpty()) {
-            String factionAlias = playerPicks.get(0).getChoiceKey();
+            String factionAlias = playerPicks.getFirst().getChoiceKey();
             if (factionAlias.contains("keleres")) {
                 if (keleresFlavor == null) {
                     throw new IllegalStateException(
@@ -389,7 +389,7 @@ public class FactionDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
         Game game = draftSystemSettings.getGame();

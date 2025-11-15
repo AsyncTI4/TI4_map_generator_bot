@@ -34,9 +34,10 @@ public class BreakthroughCommandHelper {
     }
 
     public static void sendBreakthroughInfo(Game game, Player player) {
-        withBreakthrough(player, bt -> {
-            MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "", List.of(bt.getRepresentationEmbed()));
-        });
+        withBreakthrough(
+                player,
+                bt -> MessageHelper.sendMessageEmbedsToCardsInfoThread(
+                        player, "", List.of(bt.getRepresentationEmbed())));
     }
 
     public static void sendBreakthroughInfo(GenericInteractionCreateEvent event, Game game, Player player) {

@@ -212,7 +212,7 @@ public class TeHelperAbilities {
                 }
             }
         }
-        if (buttons.size() > 0) buttons.add(Buttons.DONE_DELETE_BUTTONS);
+        if (!buttons.isEmpty()) buttons.add(Buttons.DONE_DELETE_BUTTONS);
         return buttons;
     }
 
@@ -287,12 +287,11 @@ public class TeHelperAbilities {
         if (matcher.matches()) {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> survivalMap = readMoveMap(game.getStoredValue("survivalInstinctMap"));
-            for (String source : survivalMap.keySet()) {
-                List<String> units =
-                        survivalMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
-                                .map(e -> e.getValue().size() + " " + e.getKey())
-                                .toList();
-                List<String> unitsTo = survivalMap.get(source).stream()
+            for (List<String> strings : survivalMap.values()) {
+                List<String> units = strings.stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                        .map(e -> e.getValue().size() + " " + e.getKey())
+                        .toList();
+                List<String> unitsTo = strings.stream()
                         .map(unit -> unit.substring(0, unit.indexOf(' ')))
                         .collect(Collectors.groupingBy(s -> s))
                         .entrySet()

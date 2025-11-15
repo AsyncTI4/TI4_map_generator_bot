@@ -267,7 +267,7 @@ public class ButtonHelperTwilightsFall {
         String tileID = Mapper.getFaction(factionHS).getHomeSystem();
         tileID = AliasHandler.resolveTile(tileID);
 
-        if (!pos.isEmpty() && tileID != null) {
+        if (!pos.isEmpty()) {
 
             if (game.getTileByPosition(pos) != null) {
                 for (UnitHolder planet :
@@ -306,8 +306,8 @@ public class ButtonHelperTwilightsFall {
             Collections.rotate(participants, 1);
         }
         if (!game.getStoredValue("engineerACSplice").isEmpty()) {
-            participants.add(0, startPlayer);
-            participants.add(0, startPlayer);
+            participants.addFirst(startPlayer);
+            participants.addFirst(startPlayer);
             game.removeStoredValue("engineerACSplice");
         }
         if (!game.getStoredValue("paid6ForSplice").isEmpty()) {
@@ -415,9 +415,7 @@ public class ButtonHelperTwilightsFall {
         List<Player> participants = new ArrayList<>();
         List<Player> fullOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         if (buttonID.contains("all")) {
-            for (Player p : fullOrder) {
-                participants.add(p);
-            }
+            participants.addAll(fullOrder);
             ButtonHelper.deleteMessage(event);
         } else {
             for (Player p : game.getRealPlayers()) {
@@ -590,9 +588,9 @@ public class ButtonHelperTwilightsFall {
         List<Player> participants = getParticipantsList(game);
         participants.remove(player);
         game.removeStoredValue("savedParticipants");
-        if (participants.size() > 0) {
+        if (!participants.isEmpty()) {
             game.setStoredValue("lastSplicer", player.getFaction());
-            sendPlayerSpliceOptions(game, participants.get(0));
+            sendPlayerSpliceOptions(game, participants.getFirst());
             for (Player p : participants) {
                 if (game.getStoredValue("savedParticipants").isEmpty()) {
                     game.setStoredValue("savedParticipants", p.getFaction());
@@ -644,12 +642,11 @@ public class ButtonHelperTwilightsFall {
         if (scPara) {
             boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player);
             StrategyCardModel scModel = game.getStrategyCardModelByInitiative(8).get();
-            if (scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())) {
+            if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
             }
 
-            if (scModel != null
-                    && !used
+            if (!used
                     && (scModel.usesAutomationForSCID("pok8imperial") || scModel.usesAutomationForSCID("tf8"))
                     && !player.getFollowedSCs().contains(scModel.getInitiative())
                     && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -671,7 +668,7 @@ public class ButtonHelperTwilightsFall {
         for (String card : alreadyDrawn) {
             allCards.remove(card);
         }
-        String leader = allCards.remove(0);
+        String leader = allCards.removeFirst();
         if (game.getStoredValue("savedParadigms").isEmpty()) {
             game.setStoredValue("savedParadigms", leader);
         } else {
@@ -821,8 +818,7 @@ public class ButtonHelperTwilightsFall {
                 allCards.remove(tech);
             }
         }
-        List<String> someCardList = new ArrayList<>();
-        someCardList.addAll(allCards);
+        List<String> someCardList = new ArrayList<>(allCards);
         for (String card : someCardList) {
             if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
                 allCards.remove(card);
@@ -953,7 +949,7 @@ public class ButtonHelperTwilightsFall {
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
-        String cardID = getDeckForSplicing(game, type, 1).get(0);
+        String cardID = getDeckForSplicing(game, type, 1).getFirst();
         if (buttonID.split("_").length > 2) {
             cardID = buttonID.split("_")[2];
             ButtonHelper.deleteMessage(event);
@@ -1007,15 +1003,14 @@ public class ButtonHelperTwilightsFall {
                     allCards.remove(tech);
                 }
             }
-            List<String> someCardList = new ArrayList<>();
-            someCardList.addAll(allCards);
+            List<String> someCardList = new ArrayList<>(allCards);
             for (String card : someCardList) {
                 if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
                     allCards.remove(card);
                 }
             }
-            for (int i = 0; i < size && allCards.size() > 0; i++) {
-                cards.add(allCards.remove(0));
+            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
+                cards.add(allCards.removeFirst());
             }
         }
         if ("genome".equalsIgnoreCase(type)) {
@@ -1025,8 +1020,8 @@ public class ButtonHelperTwilightsFall {
                     allCards.remove(tech);
                 }
             }
-            for (int i = 0; i < size && allCards.size() > 0; i++) {
-                cards.add(allCards.remove(0));
+            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
+                cards.add(allCards.removeFirst());
             }
         }
         if ("paradigm".equalsIgnoreCase(type)) {
@@ -1036,19 +1031,19 @@ public class ButtonHelperTwilightsFall {
             for (String card : alreadyDrawn) {
                 allCards.remove(card);
             }
-            for (int i = 0; i < size && allCards.size() > 0; i++) {
-                cards.add(allCards.remove(0));
+            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
+                cards.add(allCards.removeFirst());
             }
         }
         if ("units".equalsIgnoreCase(type)) {
             List<String> allCards = new ArrayList<>();
             Map<String, UnitModel> allUnits = Mapper.getUnits();
-            for (String unitID : allUnits.keySet()) {
-                UnitModel mod = allUnits.get(unitID);
+            for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
+                UnitModel mod = entry.getValue();
                 if (mod.getFaction().isPresent() && mod.getSource() == ComponentSource.twilights_fall) {
                     FactionModel faction = Mapper.getFaction(mod.getFaction().get());
                     if (faction != null && faction.getSource() != ComponentSource.twilights_fall) {
-                        allCards.add(unitID);
+                        allCards.add(entry.getKey());
                     }
                 }
             }
@@ -1058,8 +1053,8 @@ public class ButtonHelperTwilightsFall {
                 }
             }
             Collections.shuffle(allCards);
-            for (int i = 0; i < size && allCards.size() > 0; i++) {
-                cards.add(allCards.remove(0));
+            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
+                cards.add(allCards.removeFirst());
             }
         }
 

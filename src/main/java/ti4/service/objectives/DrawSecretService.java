@@ -161,8 +161,7 @@ public class DrawSecretService {
                 }
             }
             if (game.isCulturalExchangeProgramMode()) {
-                List<String> factions = new ArrayList<>();
-                factions.addAll(game.getRealFactions());
+                List<String> factions = new ArrayList<>(game.getRealFactions());
                 Collections.shuffle(factions);
                 for (Player player : game.getRealPlayers()) {
                     player.setLeaders(new ArrayList<>());

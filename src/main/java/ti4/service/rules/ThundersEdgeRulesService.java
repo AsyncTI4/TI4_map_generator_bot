@@ -20,7 +20,7 @@ import ti4.model.RuleModel;
 public class ThundersEdgeRulesService {
 
     private static List<MessageEmbed> getRuleEmbeds(String... rules) {
-        return Arrays.asList(rules).stream()
+        return Arrays.stream(rules)
                 .map(Mapper::getRule)
                 .filter(Objects::nonNull)
                 .map(RuleModel::getRepresentationEmbed)
@@ -29,8 +29,8 @@ public class ThundersEdgeRulesService {
     }
 
     public static List<MessageEmbed> startOfDraftRules(Game game) {
-        List<MessageEmbed> relevantRules = new ArrayList<>();
-        relevantRules.addAll(getRuleEmbeds("expeditions", "breakthroughAndSynergy", "coexist"));
+        List<MessageEmbed> relevantRules =
+                new ArrayList<>(getRuleEmbeds("expeditions", "breakthroughAndSynergy", "coexist"));
 
         Set<String> extraRules = new HashSet<>();
         for (var slice : game.getMiltyDraftManager().getSlices()) {

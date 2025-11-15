@@ -21,16 +21,15 @@ public class BanListener extends ListenerAdapter {
     }
 
     private User getTargetUser(AuditLogEntry log) {
-        if (log.getTargetType() == TargetType.MEMBER && log.getTargetId() != null) {
+        if (log.getTargetType() == TargetType.MEMBER) {
+            log.getTargetId();
             return JdaService.jda.getUserById(log.getTargetId());
         }
         return null;
     }
 
     private User getInitiatingUser(AuditLogEntry log) {
-        if (log.getUserId() != null) {
-            return JdaService.jda.getUserById(log.getUserId());
-        }
-        return null;
+        log.getUserId();
+        return JdaService.jda.getUserById(log.getUserId());
     }
 }

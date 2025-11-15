@@ -48,8 +48,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        String sb = getFactionEmoji() + " " + getSynergyEmojis() + "**" + name + "**" + source.emoji();
-        return sb;
+        return getFactionEmoji() + " " + getSynergyEmojis() + "**" + name + "**" + source.emoji();
     }
 
     public String getRepresentation(boolean includeCardText) {

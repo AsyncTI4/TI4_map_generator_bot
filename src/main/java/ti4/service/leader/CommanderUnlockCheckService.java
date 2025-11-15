@@ -2,7 +2,6 @@ package ti4.service.leader;
 
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -74,26 +73,22 @@ public class CommanderUnlockCheckService {
             case "bastion" -> {
                 int totGalvanized = game.getTileMap().values().stream()
                         .flatMap(t -> t.getUnitHolders().values().stream())
-                        .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+                        .mapToInt(UnitHolder::getTotalGalvanizedCount)
+                        .sum();
                 if (totGalvanized >= 3) {
                     shouldBeUnlocked = true;
                 }
             }
-            case "deepwrought" -> {
+            case "deepwrought" ->
                 shouldBeUnlocked = player.getPlanets().stream().anyMatch(s -> s.startsWith("ocean"));
-            }
-            case "ralnel" -> {
-                shouldBeUnlocked = true;
-            }
-            case "crimson" -> {
-                shouldBeUnlocked = true;
-                // This commander unlock is checked in @ResonanceGeneratorService and
+            case "ralnel" -> shouldBeUnlocked = true;
+            case "crimson" -> // This commander unlock is checked in @ResonanceGeneratorService and
                 // TODO: (TE) @{wherever crimson destroyers are handled}
-            }
+                shouldBeUnlocked = true;
             case "firmament" -> {
                 for (Entry<String, List<String>> entry :
                         player.getPlotCardsFactions().entrySet()) {
-                    if (entry.getValue() != null && entry.getValue().size() > 0) {
+                    if (entry.getValue() != null && !entry.getValue().isEmpty()) {
                         shouldBeUnlocked = true;
                         break;
                     }

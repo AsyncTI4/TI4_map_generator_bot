@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -319,7 +320,7 @@ public class FoWHelper {
             return adjacentPositions;
         }
 
-        Set<Feature> adjToFeatures = new HashSet<>();
+        Set<Feature> adjToFeatures = EnumSet.noneOf(Feature.class);
         for (String alias : tile.getTileModel().getAliases()) {
             if (alias.startsWith("egress")) adjToFeatures.add(Feature.ingress);
         }
@@ -681,7 +682,7 @@ public class FoWHelper {
         if (player != null
                 && "ghost".equals(player.getFaction())
                 && game.getPlayerFromColorOrFaction("crimson") != null) {
-            wormholeIDs.removeIf(wh -> "epsilon".equalsIgnoreCase(wh));
+            wormholeIDs.removeIf("epsilon"::equalsIgnoreCase);
         }
 
         if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {

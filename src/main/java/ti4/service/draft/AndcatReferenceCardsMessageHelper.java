@@ -52,7 +52,8 @@ public class AndcatReferenceCardsMessageHelper {
         for (ReferenceCardPackage refPackage : packages) {
             StringBuilder message = new StringBuilder();
 
-            message.append("### Faction Package " + refPackage.key())
+            message.append("### Faction Package ")
+                    .append(refPackage.key())
                     .append(System.lineSeparator())
                     .append(System.lineSeparator());
 
@@ -83,7 +84,7 @@ public class AndcatReferenceCardsMessageHelper {
         }
         List<FactionModel> factionsInPackage = AndcatReferenceCardsDraftable.getFactionsInPackage(refPackage);
         MessageV2Builder messageBuilder = new MessageV2Builder(cardsInfoThread, 3);
-        boolean isChoiceFinalized = refPackage.choicesFinal() != null && refPackage.choicesFinal();
+        boolean isChoiceFinalized = false;
 
         messageBuilder.appendLine(player.getRepresentation() + " Select how each faction will be used.");
 
@@ -102,7 +103,7 @@ public class AndcatReferenceCardsMessageHelper {
                     faction.getAlias(),
                     isSelectedAnywhere,
                     factionForPart,
-                    isChoiceFinalized,
+                    false,
                     faction.getShortName(),
                     faction.getFactionEmoji())));
         }
@@ -123,7 +124,7 @@ public class AndcatReferenceCardsMessageHelper {
                     faction.getAlias(),
                     isSelectedAnywhere,
                     factionForPart,
-                    isChoiceFinalized,
+                    false,
                     faction.getShortName(),
                     faction.getFactionEmoji())));
         }
@@ -145,7 +146,7 @@ public class AndcatReferenceCardsMessageHelper {
                     faction.getAlias(),
                     isSelectedAnywhere,
                     factionForPart,
-                    isChoiceFinalized,
+                    false,
                     faction.getShortName(),
                     faction.getFactionEmoji())));
         }
@@ -155,8 +156,7 @@ public class AndcatReferenceCardsMessageHelper {
         Button finalizeButton = Buttons.gray(draftable.makeButtonId("assign_complete"), "Finish assigning factions");
         boolean canFinalize = refPackage.homeSystemFaction() != null
                 && refPackage.startingUnitsFaction() != null
-                && refPackage.speakerOrderFaction() != null
-                && !isChoiceFinalized;
+                && refPackage.speakerOrderFaction() != null;
         if (!canFinalize) {
             finalizeButton = finalizeButton.asDisabled();
         }
@@ -182,7 +182,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             ReferenceCardPackage refPackage =
-                    draftable.getPackageByChoiceKey(playerPicks.get(0).getChoiceKey());
+                    draftable.getPackageByChoiceKey(playerPicks.getFirst().getChoiceKey());
             if (refPackage == null) {
                 messageBuilder.append(playerRepresentation).append(" has an invalid package pick.");
                 continue;

@@ -187,7 +187,7 @@ public class MapJsonIOService {
             MessageHelper.sendMessageToChannel(feedbackChannel, "Failed to import map from JSON: " + e.getMessage());
         }
 
-        if (errorSb.length() > 0) {
+        if (!errorSb.isEmpty()) {
             MessageHelper.sendMessageToChannel(feedbackChannel, "Some tiles failed to import:\n" + errorSb);
         }
     }

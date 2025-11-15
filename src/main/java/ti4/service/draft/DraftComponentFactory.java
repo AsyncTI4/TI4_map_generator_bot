@@ -12,24 +12,21 @@ import org.reflections.Reflections;
 @UtilityClass
 public class DraftComponentFactory {
     private final Map<String, Class<? extends Draftable>> KNOWN_DRAFTABLE_TYPES =
-            findAllDerivedClasses(Draftable.class).stream().collect(Collectors.toMap(d -> d.getSimpleName(), d -> d));
+            findAllDerivedClasses(Draftable.class).stream().collect(Collectors.toMap(Class::getSimpleName, d -> d));
 
     private final Map<String, Class<? extends DraftOrchestrator>> KNOWN_ORCHESTRATOR_TYPES =
             findAllDerivedClasses(DraftOrchestrator.class).stream()
-                    .collect(Collectors.toMap(o -> o.getSimpleName(), o -> o));
+                    .collect(Collectors.toMap(Class::getSimpleName, o -> o));
 
     public List<String> getKnownDraftableClasses() {
         return KNOWN_DRAFTABLE_TYPES.keySet().stream().sorted().collect(Collectors.toList());
     }
 
     public Draftable createDraftable(String type) {
-        for (String knownType : KNOWN_DRAFTABLE_TYPES.keySet()) {
-            if (knownType.equalsIgnoreCase(type)) {
+        for (Map.Entry<String, Class<? extends Draftable>> entry : KNOWN_DRAFTABLE_TYPES.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(type)) {
                 try {
-                    return KNOWN_DRAFTABLE_TYPES
-                            .get(knownType)
-                            .getDeclaredConstructor()
-                            .newInstance();
+                    return entry.getValue().getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     throw new RuntimeException("Failed to instantiate draftable of type: " + type, e);
                 }
@@ -44,13 +41,10 @@ public class DraftComponentFactory {
     }
 
     public DraftOrchestrator createOrchestrator(String type) {
-        for (String knownType : KNOWN_ORCHESTRATOR_TYPES.keySet()) {
-            if (knownType.equalsIgnoreCase(type)) {
+        for (Map.Entry<String, Class<? extends DraftOrchestrator>> entry : KNOWN_ORCHESTRATOR_TYPES.entrySet()) {
+            if (entry.getKey().equalsIgnoreCase(type)) {
                 try {
-                    return KNOWN_ORCHESTRATOR_TYPES
-                            .get(knownType)
-                            .getDeclaredConstructor()
-                            .newInstance();
+                    return entry.getValue().getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     throw new RuntimeException("Failed to instantiate orchestrator of type: " + type, e);
                 }
