@@ -3323,7 +3323,7 @@ public class AgendaHelper {
                         String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
                                 .toString();
                         Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
-                        if (outcomerP != null && outcomerP.getFactionEmoji() != null) {
+                        if (outcomerP != null) {
                             emoji = outcomerP.getFactionEmoji();
                         }
 

@@ -35,14 +35,14 @@ public class ThundersParadoxService {
             List<Button> buttons = new ArrayList<>();
             String buttonPrefix = player.finChecker() + "useThundersParadox_step2_";
             for (Leader leader : player.getLeaders()) {
-                if (leader.isExhausted() || !leader.getType().equals("agent")) continue;
+                if (leader.isExhausted() || !"agent".equals(leader.getType())) continue;
 
                 String id = buttonPrefix + leader.getId();
                 String label = leader.getLeaderModel()
                         .map(lm -> "Exhaust " + lm.getName())
                         .orElse("Exhaust " + leader.getId());
                 TI4Emoji emoji =
-                        leader.getLeaderModel().map(lm -> lm.getLeaderEmoji()).orElse(null);
+                        leader.getLeaderModel().map(LeaderModel::getLeaderEmoji).orElse(null);
                 buttons.add(Buttons.blue(id, label, emoji));
             }
             if (player.hasRelicReady("titanprototype"))
@@ -78,9 +78,9 @@ public class ThundersParadoxService {
             String message = player.getRepresentation(false, false) + " exhausted their agent ";
             if (player.hasUnexhaustedLeader(leaderID)) {
                 Optional<Leader> leader = player.getLeaderByID(leaderID);
-                Optional<LeaderModel> model = leader.flatMap(l -> l.getLeaderModel());
+                Optional<LeaderModel> model = leader.flatMap(Leader::getLeaderModel);
                 leader.ifPresent(l -> l.setExhausted(true));
-                message += model.map(lm -> lm.getNameRepresentation()).orElse("");
+                message += model.map(LeaderModel::getNameRepresentation).orElse("");
             } else if (player.hasRelicReady(leaderID)) {
                 player.addExhaustedRelic(leaderID);
                 message += ExploreEmojis.Relic + " " + Mapper.getRelic(leaderID).getName();
@@ -93,8 +93,9 @@ public class ThundersParadoxService {
             for (Player p : game.getRealPlayers()) {
                 boolean found = false;
                 for (Leader l : p.getLeaders()) {
-                    if (l.getType().equals("agent")) {
+                    if ("agent".equals(l.getType())) {
                         found = true;
+                        break;
                     }
                 }
                 if (found
@@ -119,14 +120,14 @@ public class ThundersParadoxService {
                 List<Button> buttons = new ArrayList<>();
                 String buttonPrefix = player.finChecker() + "useThundersParadox_step4_" + p2.getFaction() + "_";
                 for (Leader leader : p2.getLeaders()) {
-                    if (!leader.isExhausted() || !leader.getType().equals("agent")) continue;
+                    if (!leader.isExhausted() || !"agent".equals(leader.getType())) continue;
 
                     String id = buttonPrefix + leader.getId();
                     String label = leader.getLeaderModel()
                             .map(lm -> "Ready " + lm.getName())
                             .orElse("Ready " + leader.getId());
                     TI4Emoji emoji = leader.getLeaderModel()
-                            .map(lm -> lm.getLeaderEmoji())
+                            .map(LeaderModel::getLeaderEmoji)
                             .orElse(null);
                     buttons.add(Buttons.blue(id, label, emoji));
                 }
@@ -154,9 +155,9 @@ public class ThundersParadoxService {
                 if (p2.hasLeader(leaderID)
                         && p2.getLeader(leaderID).map(Leader::isExhausted).orElse(true)) {
                     Optional<Leader> leader = p2.getLeaderByID(leaderID);
-                    Optional<LeaderModel> model = leader.flatMap(l -> l.getLeaderModel());
+                    Optional<LeaderModel> model = leader.flatMap(Leader::getLeaderModel);
                     leader.ifPresent(l -> RefreshLeaderService.refreshLeader(p2, l, game));
-                    message += model.map(lm -> lm.getNameRepresentation()).orElse("");
+                    message += model.map(LeaderModel::getNameRepresentation).orElse("");
 
                 } else if (p2.hasRelic(leaderID) && p2.getExhaustedRelics().contains(leaderID)) {
                     p2.removeExhaustedRelic(leaderID);

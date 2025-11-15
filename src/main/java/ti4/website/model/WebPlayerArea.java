@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -449,7 +448,8 @@ public class WebPlayerArea {
             int maxGalvanizeTokens = 7;
             int totGalvanized = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
-                    .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+                    .mapToInt(UnitHolder::getTotalGalvanizedCount)
+                    .sum();
             webPlayerArea.setGalvanizeTokensReinf(Math.max(0, maxGalvanizeTokens - totGalvanized));
         } else {
             webPlayerArea.setGalvanizeTokensReinf(0);

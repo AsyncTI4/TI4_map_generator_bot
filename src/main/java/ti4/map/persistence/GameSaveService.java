@@ -148,9 +148,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writeCards(game.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        Map<String, String> discardStatus = new LinkedHashMap<String, String>(
-                game.getDiscardACStatus().entrySet().stream().collect(Collectors.toMap(Entry::getKey, e -> e.getValue()
-                        .toString())));
+        Map<String, String> discardStatus = new LinkedHashMap<>(game.getDiscardACStatus().entrySet().stream()
+                .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().toString())));
         writeCardsStrings(discardStatus, writer, Constants.AC_STATUS);
 
         writer.write(Constants.EXPLORE + " " + String.join(",", game.getAllExplores()));

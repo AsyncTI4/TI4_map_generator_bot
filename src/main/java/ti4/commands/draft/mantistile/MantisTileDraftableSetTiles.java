@@ -1,7 +1,7 @@
 package ti4.commands.draft.mantistile;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
@@ -42,10 +42,10 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
         draftable.getBlueTiles().clear();
         draftable.getRedTiles().clear();
 
-        List<String> tileIDs = List.of(commaSeparatedTiles.split(",")).stream()
+        List<String> tileIDs = Stream.of(commaSeparatedTiles.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+                .toList();
         for (String tileID : tileIDs) {
             TileModel tile = TileHelper.getTileById(tileID);
             if (tile == null) {
@@ -57,7 +57,7 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
                         event.getChannel(), "Tile ID " + tileID + " is not a blue or red tile.");
                 return;
             }
-            if (tile.getTileBack().equals(TileBack.BLUE)) {
+            if (tile.getTileBack() == TileBack.BLUE) {
                 draftable.getBlueTiles().add((BlueTileDraftItem) DraftItem.generate(Category.BLUETILE, tileID));
             } else {
                 draftable.getRedTiles().add((RedTileDraftItem) DraftItem.generate(Category.REDTILE, tileID));

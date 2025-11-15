@@ -149,10 +149,7 @@ public class DrawSecretService {
                 Tile mr = game.getMecatolTile();
                 if (mr != null) {
                     String pos = mr.getPosition();
-                    boolean ingress = false;
-                    if (mr.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS)) {
-                        ingress = true;
-                    }
+                    boolean ingress = mr.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_INGRESS);
                     game.removeTile(pos);
                     Tile tile = new Tile("112", pos);
                     Planet rex = tile.getUnitHolderFromPlanet("mrte");
@@ -164,8 +161,7 @@ public class DrawSecretService {
                 }
             }
             if (game.isCulturalExchangeProgramMode()) {
-                List<String> factions = new ArrayList<>();
-                factions.addAll(game.getRealFactions());
+                List<String> factions = new ArrayList<>(game.getRealFactions());
                 Collections.shuffle(factions);
                 for (Player player : game.getRealPlayers()) {
                     player.setLeaders(new ArrayList<>());

@@ -1846,7 +1846,7 @@ public class ButtonHelperAbilities {
                             || (nekro.hasTech("vay") || nekro.getFactionTechs().contains("vay"))
                             || !Mapper.getTech(tech).isFactionTech()) {
                         if (game.isTwilightsFallMode()
-                                && (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter"))) {
+                                && ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech))) {
                             continue;
                         }
                         techToGain.add(tech);

@@ -140,7 +140,7 @@ public class Buttons {
         buttonsWeb.add(REFRESH_CARDS_INFO);
         buttonsWeb.add(SHOW_DECKS);
         if (game.isTwilightsFallMode()) {
-            buttonsWeb.add(Buttons.green("showSpliceDecks", "Show Twilight Fall Decks"));
+            buttonsWeb.add(green("showSpliceDecks", "Show Twilight Fall Decks"));
         }
         buttonsWeb.add(REFRESH_MAP);
         return buttonsWeb;

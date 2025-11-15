@@ -24,14 +24,14 @@ import ti4.testUtils.BaseTi4Test;
 
 public class CombatModifierTest extends BaseTi4Test {
 
-    private static Game testGame = null;
-    private static Player neutral = null;
-    private static Player winnu = null;
-    private static Player bastion = null;
-    private static Player letnev = null;
+    private static Game testGame;
+    private static Player neutral;
+    private static Player winnu;
+    private static Player bastion;
+    private static Player letnev;
 
     @BeforeAll
-    private static void setupTestGame() {
+    static void setupTestGame() {
         if (testGame != null) return;
         testGame = new Game();
         testGame.newGameSetup();
@@ -116,7 +116,7 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     private static void assertListsEqual(String name, Set<String> actual, Set<String> expected) {
-        if (SetUtils.disjunction(actual, expected).size() > 0) {
+        if (!SetUtils.disjunction(actual, expected).isEmpty()) {
             System.out.println(actual);
             System.out.println(expected);
         }

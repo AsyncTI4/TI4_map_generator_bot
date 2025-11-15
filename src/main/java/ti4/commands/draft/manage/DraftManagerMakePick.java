@@ -55,7 +55,6 @@ class DraftManagerMakePick extends GameStateSubcommand {
                     CommandSource.SLASH_COMMAND);
             if (DraftButtonService.isError(outcome)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Could not make pick: " + outcome);
-                return;
             }
             // TODO: Handle magic strings from routeCommand, such as "delete button"
         } catch (IllegalArgumentException e) {

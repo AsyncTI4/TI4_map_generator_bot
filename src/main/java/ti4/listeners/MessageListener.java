@@ -41,7 +41,7 @@ public class MessageListener extends ListenerAdapter {
     private static final String BOTHELPER_MENTION_REMINDER_TEXT =
             """
         Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!
-            """;
+        """;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -61,13 +61,9 @@ public class MessageListener extends ListenerAdapter {
     }
 
     private static void sendMessageToModLog(String msg) {
-        TextChannel moderationLogChannel =
-                JdaService.guildPrimary.getTextChannelsByName("interesting-messages-log", true).stream()
-                        .findFirst()
-                        .orElse(null);
-        if (moderationLogChannel != null) {
-            MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
-        }
+        JdaService.guildPrimary.getTextChannelsByName("interesting-messages-log", true).stream()
+                .findFirst()
+                .ifPresent(moderationLogChannel -> MessageHelper.sendMessageToChannel(moderationLogChannel, msg));
     }
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {

@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,7 +27,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -660,7 +661,7 @@ public class ButtonHelperFactionSpecific {
 
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getSpaceUnitHolder();
-        List<UnitType> units = new ArrayList<UnitType>(List.of(
+        List<UnitType> units = new ArrayList<>(List.of(
                 UnitType.Cavalry,
                 UnitType.Warsun,
                 UnitType.Dreadnought,
@@ -672,8 +673,7 @@ public class ButtonHelperFactionSpecific {
                 if (space.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
                     buttons.add(Buttons.gray(
                             "empyreanFlagshipAbilityStep2_" + pos + "_" + p2.getFaction() + "_" + unit.getValue(),
-                            StringUtils.capitalize(p2.getColor()) + " "
-                                    + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
+                            capitalize(p2.getColor()) + " " + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
                             p2.getFactionEmoji()));
                 }
             }
@@ -824,11 +824,9 @@ public class ButtonHelperFactionSpecific {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByName("construction").orElse(null);
         int scNum = scModel.getInitiative();
-        boolean construction = scModel != null
-                && (scModel.usesAutomationForSCID("pok4construction")
-                        || scModel.usesAutomationForSCID("te4construction"));
+        boolean construction =
+                scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction");
         if (!used
-                && scModel != null
                 && construction
                 && !player.getFollowedSCs().contains(scNum)
                 && game.getPlayedSCs().contains(scNum)) {
@@ -1439,7 +1437,7 @@ public class ButtonHelperFactionSpecific {
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         for (String planet : saar.getPlanetsAllianceMode()) {
-            if (planet.equalsIgnoreCase("triad")
+            if ("triad".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;
@@ -2016,19 +2014,19 @@ public class ButtonHelperFactionSpecific {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 if (unitKey.getUnitType() == UnitType.Infantry
                         && unitHolder.getUnits().get(unitKey) > 0
-                        && unit.equalsIgnoreCase("infantry")) {
+                        && "infantry".equalsIgnoreCase(unit)) {
                     amount = unitHolder.getUnits().get(unitKey);
                 }
                 if (unitKey.getUnitType() == UnitType.Fighter
                         && unitHolder.getUnits().get(unitKey) > 0
-                        && unit.equalsIgnoreCase("fighter")) {
+                        && "fighter".equalsIgnoreCase(unit)) {
                     amount = unitHolder.getUnits().get(unitKey);
                 }
             }
         }
         amount--;
         RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), unit);
-        if (uHName.equalsIgnoreCase("space")) {
+        if ("space".equalsIgnoreCase(uHName)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of tile " + pos
@@ -2722,8 +2720,8 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("startRedTFDeploy")
     public static void startRedTFDeploy(Game game, Player p1, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(p1, game, "fs", "placeOneNDone_skipbuild"));
+        List<Button> buttons =
+                new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(p1, game, "fs", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 p1.getFactionEmoji() + " has chosen to discard an ability or genome to deploy their flagship.");
@@ -2738,7 +2736,7 @@ public class ButtonHelperFactionSpecific {
         }
         List<Button> buttons3 = new ArrayList<>();
         for (String tech : p1.getTechs()) {
-            if (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter")) {
+            if ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech)) {
                 continue;
             }
             buttons3.add(
@@ -3871,10 +3869,7 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         }
-        if (count > 2) {
-            return true;
-        }
-        return false;
+        return count > 2;
     }
 
     public static List<Button> getLanefirATSButtons(Player p1, Player p2) {
