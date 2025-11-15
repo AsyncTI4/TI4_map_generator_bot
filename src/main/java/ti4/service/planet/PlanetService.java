@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.planet;
 
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;

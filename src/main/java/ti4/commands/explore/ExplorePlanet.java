@@ -14,8 +14,8 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
-import ti4.service.PlanetService;
 import ti4.service.explore.ExploreService;
+import ti4.service.planet.PlanetService;
 
 class ExplorePlanet extends GameStateSubcommand {
 
