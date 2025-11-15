@@ -839,8 +839,8 @@
         "alias": "vulnerability1",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
-        "text": "Those hits must be assigned to units of that type, if able.",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
         "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
         "source": "action_deck_2"
     },
@@ -848,8 +848,8 @@
         "alias": "vulnerability2",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
-        "text": "Those hits must be assigned to units of that type, if able.",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
         "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn smiled. \"Finish them.\"",
         "source": "action_deck_2"
     },
@@ -857,8 +857,8 @@
         "alias": "vulnerability3",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
-        "text": "Those hits must be assigned to units of that type, if able.",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
         "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
         "source": "action_deck_2"
     },
@@ -866,8 +866,8 @@
         "alias": "vulnerability4",
         "name": "Vulnerability",
         "phase": "Action",
-        "window": "After you produce hits against a non-upgraded unit of the same type as a unit upgrade technology you own",
-        "text": "Those hits must be assigned to units of that type, if able.",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
         "source": "action_deck_2"
     },
