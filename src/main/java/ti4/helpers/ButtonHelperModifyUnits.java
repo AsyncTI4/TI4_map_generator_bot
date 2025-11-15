@@ -1107,7 +1107,9 @@ public class ButtonHelperModifyUnits {
             for (Player p2 : players) {
                 if (p2 != player && !player.getAllianceMembers().contains(p2.getFaction())) {
                     player2 = p2;
-                    break;
+                    if (p2.getPlanetsAllianceMode().contains(unitHolder.getName())) {
+                        break;
+                    }
                 }
             }
             if (player != player2 && players.contains(player)) {
