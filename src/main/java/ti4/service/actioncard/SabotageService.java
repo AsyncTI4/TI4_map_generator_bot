@@ -1,12 +1,10 @@
 package ti4.service.actioncard;
 
 import java.util.Calendar;
-import java.util.EnumSet;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -40,9 +38,6 @@ public class SabotageService {
             "sabotage4_acd2",
             "tf-shatter1",
             "tf-shatter2");
-
-    private static final Set<ACStatus> AC_STATUS_TO_IGNORE =
-            EnumSet.of(ACStatus.garbozia, ACStatus.ralnelbt, ACStatus.purged);
 
     public static boolean couldFeasiblySabotage(Player player, Game game) {
         if (player.isNpc()) {
@@ -184,7 +179,7 @@ public class SabotageService {
     }
 
     private static boolean checkForAllShattersDiscarded(Game game) {
-        return game.getDiscardActionCards().keySet().containsAll(SHATTER_CARD_ALIASES);
+        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotInDeckOrHand(game, alias));
     }
 
     private static boolean checkForAllSabotagesDiscarded(Game game) {
