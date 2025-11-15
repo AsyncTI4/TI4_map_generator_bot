@@ -22,6 +22,9 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     private Boolean isAnomaly;
     private Boolean isRift;
     private Boolean isNebula;
+    private Boolean isAsteroids;
+    private Boolean isNova;
+    private Boolean isScar;
     private Boolean isFullPlanetToken;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
@@ -76,8 +79,20 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
         return isNebula != null && isNebula;
     }
 
+    public boolean isNova() {
+        return isNova != null && isNova;
+    }
+
+    public boolean isAsteroids() {
+        return isAsteroids != null && isAsteroids;
+    }
+
+    public boolean isScar() {
+        return isScar != null && isScar;
+    }
+
     public boolean isAnomaly() {
-        return (isAnomaly != null && isAnomaly) || isRift() || isNebula();
+        return (isAnomaly != null && isAnomaly) || isRift() || isNebula() || isNova() || isAsteroids() || isScar();
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -93,8 +108,11 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
         // if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
         // if (isSupernova()) sb.append(MiscEmojis.Supernova);
+        if (isNova()) sb.append(MiscEmojis.Supernova);
         if (isNebula()) sb.append(MiscEmojis.Nebula);
         if (isRift()) sb.append(MiscEmojis.GravityRift);
+        if (isAsteroids()) sb.append(MiscEmojis.Asteroids);
+        if (isScar()) sb.append("\nEntropic Scar");
         if (isFullPlanetToken) sb.append("\nPlanet: ").append(tokenPlanetName);
         eb.setDescription(sb.toString());
 
