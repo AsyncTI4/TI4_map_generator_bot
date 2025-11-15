@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.button.ReactionService;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.tech.ListTechService;
 import ti4.service.turn.EndTurnService;
@@ -34,8 +35,8 @@ public class VisionariaSelectService {
     }
 
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        String message = game.getPing() + " - " + player.getRepresentationNoPing() + " exhausted their breakthrough, "
-                + visionariaRep() + ":";
+        String message = game.getPing() + " - " + visionariaName() + " breakthrough was exhausted"
+                + (!game.isFowMode() ? " by " + player.getRepresentationNoPing() : "") + ".";
         message += "\n> Use the buttons to get a technology, or decline.";
         message +=
                 "\n-# > Reminder: This tech costs 3 trade goods, and you must give the Deepwrought player a Promissory Note of your choice.";
@@ -43,16 +44,26 @@ public class VisionariaSelectService {
         game.removeStoredValue("VisionariaResponded");
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("acquireATechWithDwsBt", "Get a tech for 3 TGs", MiscEmojis.tg));
+        buttons.add(Buttons.green("giveVisionariaPN", "Give PN", CardEmojis.PN));
         buttons.add(Buttons.red("declineVisionaria", "Decline"));
         buttons.add(Buttons.gray(
                 player.finChecker() + "fleetLogAfterVisionaria",
                 "Wait until all have reacted",
-                player.getFactionEmoji()));
+                (!game.isFowMode() ? player.getFactionEmoji() : null)));
         buttons.add(Buttons.gray(
                 player.finChecker() + "endTurnAfterVisionaria",
                 "End turn after all have reacted",
-                player.getFactionEmoji()));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                (!game.isFowMode() ? player.getFactionEmoji() : null)));
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+    }
+
+    @ButtonHandler("giveVisionariaPN")
+    private void giveVisionariaPN(ButtonInteractionEvent event, Game game, Player player) {
+        Player deepwrought = Helper.getPlayerFromUnlockedBreakthrough(game, "deepwroughtbt");
+        String message = player.getRepresentationUnfogged()
+                + ", please choose which promissory note you wish to send for " + visionariaName();
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), message, ButtonHelper.getForcedPNSendButtons(game, deepwrought, player));
     }
 
     @ButtonHandler("fleetLogAfterVisionaria")
