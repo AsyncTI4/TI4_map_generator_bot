@@ -182,7 +182,7 @@ public class PlayerFactionSettings extends SettingsMenu {
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if (model.getAlias().equalsIgnoreCase("obsidian")) {
+                if ("obsidian".equalsIgnoreCase(model.getAlias())) {
                     continue;
                 }
                 if (model.getSource() == ComponentSource.thunders_edge) newKeys.add(model.getAlias());

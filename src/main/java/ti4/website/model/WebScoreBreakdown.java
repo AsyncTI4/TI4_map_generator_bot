@@ -1,6 +1,14 @@
 package ti4.website.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -496,34 +504,25 @@ public class WebScoreBreakdown {
             EntryType type, EntryState state, String objectiveKey, String agendaKey, Player player, Game game) {
         // For SCORED entries - just show the name
         if (state == EntryState.SCORED) {
-            switch (type) {
-                case PO_1:
-                case PO_2:
+            return switch (type) {
+                case PO_1, PO_2 -> {
                     PublicObjectiveModel po = Mapper.getPublicObjective(objectiveKey);
-                    return po != null ? po.getName() : objectiveKey;
-                case SECRET:
-                    return Mapper.getSecretObjective(objectiveKey) != null
+                    yield po != null ? po.getName() : objectiveKey;
+                }
+                case SECRET ->
+                    Mapper.getSecretObjective(objectiveKey) != null
                             ? Mapper.getSecretObjective(objectiveKey).getName()
                             : objectiveKey;
-                case CUSTODIAN:
-                    return "Custodians Point";
-                case IMPERIAL:
-                    return "Imperial Point";
-                case CROWN:
-                    return "Crown of Emphidia";
-                case LATVINIA:
-                    return "Book of Latvinia";
-                case SFTT:
-                    return "Support for the Throne";
-                case SHARD:
-                    return "Shard of the Throne";
-                case STYX:
-                    return "A Song Like Marrow";
-                case AGENDA:
-                    return agendaKey != null ? agendaKey : "Agenda Point";
-                default:
-                    return "";
-            }
+                case CUSTODIAN -> "Custodians Point";
+                case IMPERIAL -> "Imperial Point";
+                case CROWN -> "Crown of Emphidia";
+                case LATVINIA -> "Book of Latvinia";
+                case SFTT -> "Support for the Throne";
+                case SHARD -> "Shard of the Throne";
+                case STYX -> "A Song Like Marrow";
+                case AGENDA -> agendaKey != null ? agendaKey : "Agenda Point";
+                default -> "";
+            };
         }
 
         // For POTENTIAL PO entries - show when they can be scored
@@ -537,25 +536,23 @@ public class WebScoreBreakdown {
 
         // For other POTENTIAL/QUALIFIES entries - just show the name
         if (state == EntryState.POTENTIAL || state == EntryState.QUALIFIES) {
-            switch (type) {
-                case SECRET:
+            return switch (type) {
+                case SECRET ->
                     // Secrets should never leak the name unless SCORED
                     // POTENTIAL and QUALIFIES both hide the secret
-                    return "Drawn Secret";
-                case CUSTODIAN:
+                    "Drawn Secret";
+                case CUSTODIAN -> {
                     List<String> custodianOpportunities = getScoringOpportunities(player, game);
-                    return "Custodians (" + String.join(" or ", custodianOpportunities) + ")";
-                case CROWN:
-                    return "Crown of Emphidia";
-                case LATVINIA:
-                    return "Book of Latvinia";
-                case PO_1:
-                case PO_2:
+                    yield "Custodians (" + String.join(" or ", custodianOpportunities) + ")";
+                }
+                case CROWN -> "Crown of Emphidia";
+                case LATVINIA -> "Book of Latvinia";
+                case PO_1, PO_2 -> {
                     PublicObjectiveModel po = Mapper.getPublicObjective(objectiveKey);
-                    return po != null ? po.getName() : objectiveKey;
-                default:
-                    return "";
-            }
+                    yield po != null ? po.getName() : objectiveKey;
+                }
+                default -> "";
+            };
         }
 
         // UNSCORED state - description set elsewhere
@@ -630,7 +627,7 @@ public class WebScoreBreakdown {
         if (player == null) return false;
 
         Optional<Leader> heroOpt = player.getLeader("winnuhero");
-        if (!heroOpt.isPresent()) return false;
+        if (heroOpt.isEmpty()) return false;
 
         Leader hero = heroOpt.get();
         return hero.isActive() && !hero.isExhausted();
@@ -696,9 +693,8 @@ public class WebScoreBreakdown {
         }
 
         // Player must have a strategy token to follow Imperial
-        boolean hasStrategyToken = player.getStrategicCC() > 0;
 
-        return hasStrategyToken;
+        return player.getStrategicCC() > 0;
     }
 
     private static boolean hasStyx(Player player, Game game) {

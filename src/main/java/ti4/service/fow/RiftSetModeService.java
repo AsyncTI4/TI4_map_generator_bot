@@ -84,11 +84,14 @@ public class RiftSetModeService {
         game.addTag("RiftSet");
         game.setFowOption(FOWOption.RIFTSET_MODE, true);
 
-        StringBuilder sb = new StringBuilder("RiftSet Mode activated.\n");
-        sb.append("* Agenda deck set as `agendas_riftset`.\n");
-        sb.append("* Explore deck set as `explores_riftset`.\n");
-        sb.append("* Strategy cards set as `riftset`.\n");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        String sb =
+                """
+            RiftSet Mode activated.
+            * Agenda deck set as `agendas_riftset`.
+            * Explore deck set as `explores_riftset`.
+            * Strategy cards set as `riftset`.
+            """;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         return true;
     }
 

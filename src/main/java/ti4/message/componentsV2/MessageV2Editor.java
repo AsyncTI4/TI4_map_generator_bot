@@ -47,32 +47,32 @@ public class MessageV2Editor {
 
         public ReplaceMessagePart(String oldCustomId, Button part) {
             this.part = part;
-            this.type = MessagePartType.BUTTON;
-            this.replaceKey = oldCustomId;
+            type = MessagePartType.BUTTON;
+            replaceKey = oldCustomId;
         }
 
         public ReplaceMessagePart(String oldCustomId, StringSelectMenu part) {
             this.part = part;
-            this.type = MessagePartType.STRING_SELECT;
-            this.replaceKey = oldCustomId;
+            type = MessagePartType.STRING_SELECT;
+            replaceKey = oldCustomId;
         }
 
         public ReplaceMessagePart(String oldCustomId, EntitySelectMenu part) {
             this.part = part;
-            this.type = MessagePartType.ENTITY_SELECT;
-            this.replaceKey = oldCustomId;
+            type = MessagePartType.ENTITY_SELECT;
+            replaceKey = oldCustomId;
         }
 
         public ReplaceMessagePart(String oldLineStartsWith, TextDisplay part) {
             this.part = part;
-            this.type = MessagePartType.TEXT_DISPLAY;
-            this.replaceKey = oldLineStartsWith;
+            type = MessagePartType.TEXT_DISPLAY;
+            replaceKey = oldLineStartsWith;
         }
 
         public ReplaceMessagePart(String oldItemUrlPart, MediaGallery part) {
             this.part = part;
-            this.type = MessagePartType.MEDIA_GALLERY;
-            this.replaceKey = oldItemUrlPart;
+            type = MessagePartType.MEDIA_GALLERY;
+            replaceKey = oldItemUrlPart;
         }
 
         public Component asComponent() {

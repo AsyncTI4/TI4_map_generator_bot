@@ -26,10 +26,10 @@ public class CommunityStatisticsService {
 
             List<ManagedPlayer> players = new ArrayList<>(games.stream()
                     .flatMap(g -> g.getPlayers().stream())
-                    .collect(Collectors.toMap(p -> p.getId(), p -> p, (p, q) -> p))
+                    .collect(Collectors.toMap(ManagedPlayer::getId, p -> p, (p, q) -> p))
                     .values());
             long activePlayers = players.stream()
-                    .filter(p -> p.getGames().stream().anyMatch(g -> g.isActive()))
+                    .filter(p -> p.getGames().stream().anyMatch(ManagedGame::isActive))
                     .count();
             long allPlayers = players.size();
 

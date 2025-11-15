@@ -38,7 +38,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     private final IntegerSetting maxNucleusQualityDifference;
     private final IntegerSetting minimumRedTiles;
 
-    private boolean showAdvanced = false;
+    private boolean showAdvanced;
 
     private static final String MENU_ID = "nucleusSlice";
 

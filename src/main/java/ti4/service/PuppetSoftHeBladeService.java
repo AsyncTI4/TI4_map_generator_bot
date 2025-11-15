@@ -51,11 +51,11 @@ public class PuppetSoftHeBladeService {
             plotInfo.append("\n").append(plot.getRepresentation());
 
             List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
-            if (puppetedFactions != null && puppetedFactions.size() > 0) {
-                String factions = "";
+            if (puppetedFactions != null && !puppetedFactions.isEmpty()) {
+                StringBuilder factions = new StringBuilder();
                 for (String faction : puppetedFactions) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null) factions += p2.getFactionEmoji() + " ";
+                    if (p2 != null) factions.append(p2.getFactionEmoji()).append(" ");
                 }
                 plotInfo.append("\n> - Puppeted Factions for ")
                         .append(plot.getName())
@@ -69,7 +69,7 @@ public class PuppetSoftHeBladeService {
         // Serve relevant plot automation on reveal
         for (String plotID : player.getPlotCards().keySet()) {
             List<String> puppetedFactions = player.getPuppetedFactionsForPlot(plotID);
-            if (puppetedFactions != null && puppetedFactions.size() > 0) {
+            if (puppetedFactions != null && !puppetedFactions.isEmpty()) {
                 List<Player> puppets = new ArrayList<>();
                 for (String faction : puppetedFactions) puppets.add(game.getPlayerFromColorOrFaction(faction));
 
@@ -173,7 +173,7 @@ public class PuppetSoftHeBladeService {
         }
 
         // remove the planets that have been removed from the game.
-        oldFaction.getHomePlanets().forEach(planet -> player.removePlanet(planet));
+        oldFaction.getHomePlanets().forEach(player::removePlanet);
         game.removeTile(home.getPosition());
         game.setTile(newHome);
         player.setHomeSystemPosition(newHome.getPosition());
@@ -253,8 +253,7 @@ public class PuppetSoftHeBladeService {
         });
 
         // Remove and re-add all techs again (to fix units owned list)
-        List<String> techs = new ArrayList<>();
-        techs.addAll(player.getTechs());
+        List<String> techs = new ArrayList<>(player.getTechs());
         for (String tech : techs) {
             boolean exh = player.getExhaustedTechs().contains(tech);
             player.removeTech(tech);
@@ -281,8 +280,7 @@ public class PuppetSoftHeBladeService {
     }
 
     private static String replaceLaws(Game game, FactionModel oldFaction, FactionModel newFaction) {
-        List<String> laws = new ArrayList<>();
-        laws.addAll(game.getLawsInfo().keySet());
+        List<String> laws = new ArrayList<>(game.getLawsInfo().keySet());
         for (String law : laws) {
             if (game.getLawsInfo().get(law).equalsIgnoreCase(oldFaction.getAlias())) {
                 game.reviseLaw(game.getLaws().get(law), newFaction.getAlias());

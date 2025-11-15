@@ -108,7 +108,7 @@ public class MapGenerator implements AutoCloseable {
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
-    private int fractureYbump = 0;
+    private int fractureYbump;
     private boolean isFoWPrivate;
     private Player fowPlayer;
 

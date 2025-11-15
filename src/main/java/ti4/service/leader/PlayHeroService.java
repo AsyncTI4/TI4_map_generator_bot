@@ -130,9 +130,7 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
-            case "xxchahero-te" -> {
-                ButtonHelperHeroes.xxchaHeroTEStart(game, player);
-            }
+            case "xxchahero-te" -> ButtonHelperHeroes.xxchaHeroTEStart(game, player);
             case "ralnelhero" -> {
                 // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
                 // purge this card
@@ -496,9 +494,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
             }
-            case "lawshero" -> {
-                ButtonHelperTwilightsFallActionCards.resolveLawsHero(game, player);
-            }
+            case "lawshero" -> ButtonHelperTwilightsFallActionCards.resolveLawsHero(game, player);
             case "devourhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -510,7 +506,7 @@ public class PlayHeroService {
             case "voicehero" -> {
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> "tf-censure".equalsIgnoreCase(edict2));
+                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
                 }
                 List<Button> buttons = new ArrayList<>();
                 List<MessageEmbed> embeds = new ArrayList<>();
@@ -537,9 +533,7 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
                         buttons);
             }
-            case "poisonhero" -> {
-                ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
-            }
+            case "poisonhero" -> ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
             case "eternityhero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("searchSpliceDeck_ability", "Search For Ability"));
