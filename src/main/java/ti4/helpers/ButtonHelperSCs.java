@@ -47,27 +47,15 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("constructionPrimary_produce")
     public static void resolveConstructionPrimaryTE(ButtonInteractionEvent event, Game game, Player player) {
-        StrategyCardModel scModel =
-                game.getStrategyCardModelByName("construction").orElse(null);
-        if (scModel == null) {
-            scModel = game.getStrategyCardModelByInitiative(4).orElse(null);
-        }
-        if (player.getSCs().contains(scModel.getInitiative())) {
-            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
 
-            String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
-            List<Button> buttons = new ArrayList<>();
-            tiles.forEach(t ->
-                    buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
+        String prefix = player.getFinsFactionCheckerPrefix() + "constructionBuild_";
+        List<Button> buttons = new ArrayList<>();
+        tiles.forEach(
+                t -> buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
 
-            String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        } else {
-            event.getHook()
-                    .sendMessage("You do not hold construction, so you can not use a primary ability")
-                    .setEphemeral(true)
-                    .queue();
-        }
+        String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     @ButtonHandler("constructionBuild_")
@@ -249,13 +237,9 @@ public class ButtonHelperSCs {
         Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         List<Button> buttons2 = Collections.singletonList(exhaust);
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Exhaust using this", buttons2);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Exhaust using this", buttons2);
-        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), player.getRepresentation() + " Exhaust planets using this", buttons2);
     }
 
     @ButtonHandler("preDeclineSC_")

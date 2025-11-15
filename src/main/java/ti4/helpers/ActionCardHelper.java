@@ -832,13 +832,13 @@ public class ActionCardHelper {
                         noSabosMessage.append("\n> A player may have access to **Instinct Training**, so watch out.");
                         it = true;
                     }
-                    if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
+                    if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
                         noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
                         watcher = true;
                     }
-                    if (!triune && (game.isFowMode() || Helper.getPlayerFromUnit(game, "tf-triune") != null)) {
+                    if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
                         noSabosMessage.append("\n> A player may have access to a Triune fighter cancel, so watch out.");
-                        watcher = true;
+                        triune = true;
                     }
                 }
                 MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());

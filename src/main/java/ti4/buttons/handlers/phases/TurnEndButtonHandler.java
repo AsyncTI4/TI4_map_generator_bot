@@ -13,7 +13,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 
 @UtilityClass
-class TurnEndButtonHandler {
+public class TurnEndButtonHandler {
 
     @ButtonHandler("turnEnd")
     public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {

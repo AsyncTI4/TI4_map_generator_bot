@@ -297,7 +297,7 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (scModel.usesAutomationForSCID("te6")) {
+        if (scModel.usesAutomationForSCID("tf6")) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "## " + game.getPing()

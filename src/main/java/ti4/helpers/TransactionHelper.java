@@ -581,7 +581,9 @@ public class TransactionHelper {
             case "Planets" -> {
                 message += " Please choose the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanetsAllianceMode()) {
-                    if (planet.contains("custodia") || planet.contains("ghoti")) {
+                    if (planet.contains("custodia")
+                            || planet.contains("ghoti")
+                            || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
                         continue;
                     }
                     if (ButtonHelper.getUnitHolderFromPlanetName(planet, game)

@@ -21,6 +21,7 @@ import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -138,7 +139,7 @@ public class TeHelperTechs {
         // your infantry."
         Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
         List<Tile> tilesAdjToObsInf = tilesAdjToPlayersInf(game, player);
-        List<Player> playersWithInfAdj = game.getRealPlayers().stream()
+        List<Player> playersWithInfAdj = game.getRealPlayersNNeutral().stream()
                 .filter(p -> p != player
                         && tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
                 .toList();
@@ -152,24 +153,38 @@ public class TeHelperTechs {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    private static List<Button> getButtonsForEachUnitState(
+            Game game, Tile tile, UnitHolder uh, UnitKey unit, String prefix) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitState state : UnitState.defaultRemoveOrder()) {
+            int count = uh.getUnitCountForState(unit, state);
+            if (count > 0) {
+                String id = prefix + "_" + state.name();
+                String label = uh.getName().equals("space")
+                        ? "Space " + tile.getPosition()
+                        : Helper.getPlanetRepresentation(uh.getName(), game);
+                label += " (" + count + ")";
+                if (state != UnitState.none) {
+                    label += " [" + state.humanDescr() + "]";
+                }
+                buttons.add(Buttons.red(id, label, state.stateEmoji()));
+            }
+        }
+        return buttons;
+    }
+
     @ButtonHandler("neuralParasiteS2_")
     private static void neuralParasiteStep2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player victim = game.getPlayerFromColorOrFaction(faction);
         if (victim == null) return;
+        UnitKey inf = Units.getUnitKey(UnitType.Infantry, victim.getColor());
 
         List<Button> buttons = new ArrayList<>();
         for (Tile t : tilesAdjToPlayersInf(game, player)) {
             for (UnitHolder uh : t.getUnitHolders().values()) {
-                int count = uh.getUnitCount(UnitType.Infantry, victim);
-                if (count > 0) {
-                    String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
-                    String label = uh.getName().equals("space")
-                            ? "Space " + t.getPosition()
-                            : Helper.getPlanetRepresentation(uh.getName(), game);
-                    label += " (" + count + ")";
-                    buttons.add(Buttons.red(id, label));
-                }
+                String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
+                buttons.addAll(getButtonsForEachUnitState(game, t, uh, inf, id));
             }
         }
 
@@ -183,7 +198,7 @@ public class TeHelperTechs {
     @ButtonHandler("resolveNeuralParasite_")
     private static void neuralParasiteFinish(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String part3 = "resolveNeuralParasite_" + RegexHelper.posRegex() + "_" + RegexHelper.unitHolderRegex(game, "uh")
-                + "_" + RegexHelper.factionRegex(game);
+                + "_" + RegexHelper.factionRegex(game) + "_" + RegexHelper.unitStateRegex();
         RegexService.runMatcher(part3, buttonID, matcher -> {
             String position = matcher.group("pos");
             String uhName = matcher.group("uh");

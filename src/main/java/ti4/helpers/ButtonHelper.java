@@ -4120,7 +4120,7 @@ public class ButtonHelper {
             String text = " (+" + abilities + (abilities > 1 ? " abilities)" : " ability)");
             return Buttons.red(player.finChecker() + "endOfTurnAbilities", "End Turn" + text);
         }
-        return Buttons.red(player.finChecker() + "turnEnd", "End Turn");
+        return Buttons.red(player.finChecker() + "endOfTurnAbilities", "End Turn");
     }
 
     public static List<Button> getEndOfTurnAbilities(Player player, Game game) {
@@ -5285,9 +5285,7 @@ public class ButtonHelper {
         for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (isNotBlank(planetReal.getOriginalPlanetType())
-                    && player.getPlanetsAllianceMode().contains(planet)
-                    && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
