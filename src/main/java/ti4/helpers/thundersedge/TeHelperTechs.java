@@ -159,14 +159,15 @@ public class TeHelperTechs {
         for (UnitState state : UnitState.defaultRemoveOrder()) {
             int count = uh.getUnitCountForState(unit, state);
             if (count > 0) {
-                String id = prefix + "_" + state.toString();
+                String id = prefix + "_" + state.name();
                 String label = uh.getName().equals("space")
                         ? "Space " + tile.getPosition()
                         : Helper.getPlanetRepresentation(uh.getName(), game);
+                label += " (" + count + ")";
                 if (state == UnitState.none) {
                     id = prefix;
                 } else {
-                    label += "[" + state.humanDescr() + "]";
+                    label += " [" + state.humanDescr() + "]";
                 }
                 buttons.add(Buttons.red(id, label, state.stateEmoji()));
             }
@@ -184,7 +185,8 @@ public class TeHelperTechs {
         List<Button> buttons = new ArrayList<>();
         for (Tile t : tilesAdjToPlayersInf(game, player)) {
             for (UnitHolder uh : t.getUnitHolders().values()) {
-                buttons.addAll(getButtonsForEachUnitState(game, t, uh, inf, faction));
+                String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
+                buttons.addAll(getButtonsForEachUnitState(game, t, uh, inf, id));
             }
         }
 
@@ -198,7 +200,7 @@ public class TeHelperTechs {
     @ButtonHandler("resolveNeuralParasite_")
     private static void neuralParasiteFinish(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String part3 = "resolveNeuralParasite_" + RegexHelper.posRegex() + "_" + RegexHelper.unitHolderRegex(game, "uh")
-                + "_" + RegexHelper.factionRegex(game);
+                + "_" + RegexHelper.factionRegex(game) + "_" + RegexHelper.unitStateRegex();
         RegexService.runMatcher(part3, buttonID, matcher -> {
             String position = matcher.group("pos");
             String uhName = matcher.group("uh");
