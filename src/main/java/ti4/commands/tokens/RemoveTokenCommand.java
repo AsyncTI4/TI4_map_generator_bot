@@ -17,8 +17,8 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.service.PlanetService;
 import ti4.service.map.TokenPlanetService;
+import ti4.service.planet.PlanetService;
 
 public class RemoveTokenCommand extends AddRemoveTokenCommand {
 

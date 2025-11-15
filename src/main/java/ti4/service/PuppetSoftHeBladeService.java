@@ -28,8 +28,7 @@ import ti4.service.leader.HeroUnlockCheckService;
 
 public class PuppetSoftHeBladeService {
     @ButtonHandler("componentActionRes_ability_puppetsoftheblade") // puppet soft he blade
-    private static void convertFactionToObsidian(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static void convertFactionToObsidian(ButtonInteractionEvent event, Game game, Player player) {
         if (!player.hasAbility("puppetsoftheblade")) return;
 
         // ABILITY: Puppets of the Blade [puppetsoftheblade]
@@ -74,8 +73,8 @@ public class PuppetSoftHeBladeService {
                 List<Player> puppets = new ArrayList<>();
                 for (String faction : puppetedFactions) puppets.add(game.getPlayerFromColorOrFaction(faction));
 
-                if (plotID.equals("seethe")) revealPlotSeethe(game, player, puppets);
-                if (plotID.equals("extract")) revealPlotExtract(game, player, puppets);
+                if ("seethe".equals(plotID)) revealPlotSeethe(player, puppets);
+                if ("extract".equals(plotID)) revealPlotExtract(player, puppets);
             }
         }
 
@@ -84,7 +83,7 @@ public class PuppetSoftHeBladeService {
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
     }
 
-    private static void revealPlotSeethe(Game game, Player obsidian, List<Player> puppets) {
+    private static void revealPlotSeethe(Player obsidian, List<Player> puppets) {
         List<Button> seetheButtons = new ArrayList<>();
         String prefix = obsidian.finChecker() + "revealSeethe_";
         for (Player p : puppets) {
@@ -96,7 +95,7 @@ public class PuppetSoftHeBladeService {
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, seetheButtons);
     }
 
-    private static void revealPlotExtract(Game game, Player obsidian, List<Player> puppets) {
+    private static void revealPlotExtract(Player obsidian, List<Player> puppets) {
         List<Button> extractButtons = new ArrayList<>();
         String prefix = obsidian.finChecker() + "revealExtract_";
         for (Player p : puppets) {
@@ -114,8 +113,8 @@ public class PuppetSoftHeBladeService {
 
         List<String> outputStrings = new ArrayList<>();
         outputStrings.add(replaceHomeSystem(game, player, oldFactionModel, newFactionModel));
-        outputStrings.add(replaceFactionSheet(game, player, oldFactionModel, newFactionModel));
-        outputStrings.add(replaceBreakthrough(game, player, oldFactionModel, newFactionModel));
+        outputStrings.add(replaceFactionSheet(game, player, newFactionModel));
+        outputStrings.add(replaceBreakthrough(player, newFactionModel));
         outputStrings.add(replacePN(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceTechAndFactionTech(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceLaws(game, oldFactionModel, newFactionModel));
@@ -144,8 +143,7 @@ public class PuppetSoftHeBladeService {
         newHome.inheritFogData(home);
 
         String returnString = "Sucessfully replaced home system tile.";
-        if (oldFaction.getHomeSystem().equals("96a")
-                && newFaction.getHomeSystem().equals("96b")) { // obsidian
+        if ("96a".equals(oldFaction.getHomeSystem()) && "96b".equals(newFaction.getHomeSystem())) { // obsidian
             // Resolve control
             for (Player p : game.getPlayers().values()) {
                 if (p.hasPlanet("cronos")) {
@@ -161,10 +159,10 @@ public class PuppetSoftHeBladeService {
             // Then add units and stuff
             for (UnitHolder unitHolder : home.getUnitHolders().values()) {
                 String uh = unitHolder.getName();
-                if (uh.equals("cronos") || uh.equals("tallin")) {
+                if ("cronos".equals(uh) || "tallin".equals(uh)) {
                     Planet p = newHome.getUnitHolderFromPlanet(uh + "hollow");
                     if (p != null) p.inheritEverythingFrom(unitHolder);
-                } else if (uh.equals("space")) {
+                } else if ("space".equals(uh)) {
                     newHome.getSpaceUnitHolder().inheritEverythingFrom(unitHolder);
                 }
             }
@@ -183,8 +181,7 @@ public class PuppetSoftHeBladeService {
         return returnString;
     }
 
-    private static String replaceFactionSheet(
-            Game game, Player player, FactionModel oldFaction, FactionModel newFaction) {
+    private static String replaceFactionSheet(Game game, Player player, FactionModel newFaction) {
         player.setFaction(game, newFaction.getAlias());
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
 
@@ -200,8 +197,7 @@ public class PuppetSoftHeBladeService {
         return "Successfully changed faction sheet.";
     }
 
-    private static String replaceBreakthrough(
-            Game game, Player player, FactionModel oldFaction, FactionModel newFaction) {
+    private static String replaceBreakthrough(Player player, FactionModel newFaction) {
         player.setBreakthroughID(newFaction.getAlias() + "bt");
         // automate flipping sowing to reaping
         return "Successfully changed breakthrough.";

@@ -22,8 +22,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import ti4.service.TriadService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.relic.TriadService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.unit.AddUnitService;
 
