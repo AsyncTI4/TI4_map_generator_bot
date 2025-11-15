@@ -2013,17 +2013,10 @@ public class ButtonHelperFactionSpecific {
 
         int amount = 0;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
-            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
-                if (unitKey.getUnitType() == UnitType.Infantry
-                        && unitHolder.getUnits().get(unitKey) > 0
-                        && unit.equalsIgnoreCase("infantry")) {
-                    amount = unitHolder.getUnits().get(unitKey);
-                }
-                if (unitKey.getUnitType() == UnitType.Fighter
-                        && unitHolder.getUnits().get(unitKey) > 0
-                        && unit.equalsIgnoreCase("fighter")) {
-                    amount = unitHolder.getUnits().get(unitKey);
-                }
+            if (unit.equalsIgnoreCase("infantry")) {
+                amount = Math.max(amount, unitHolder.getUnitCount(UnitType.Infantry, player));
+            } else {
+                amount = Math.max(unitHolder.getUnitCount(UnitType.Fighter, player), amount);
             }
         }
         amount--;
@@ -2042,7 +2035,7 @@ public class ButtonHelperFactionSpecific {
                             + " left to revive)");
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
         }
-        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
+        // AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
         if (amount == 0) {
             ButtonHelper.deleteTheOneButton(event);
         }

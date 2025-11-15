@@ -282,7 +282,7 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            buttons.add(Buttons.gray("draw2ac", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             buttons.add(Buttons.green("construction_spacedock", "Place A SD", UnitEmojis.spacedock));

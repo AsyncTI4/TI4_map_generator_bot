@@ -346,7 +346,7 @@ public class PlayStrategyCardService {
                         continue;
                     }
                     empNMahButtons.addFirst(
-                            Buttons.red("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
+                            Buttons.green("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player3.getCardsInfoThread(),
                             player3.getRepresentationUnfogged() + " You may follow **" + stratCardName + "** with "
