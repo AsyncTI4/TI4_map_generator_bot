@@ -59,7 +59,7 @@ public class TeHelperAgents {
 
         List<Button> buttons = new ArrayList<>();
         List<String> newACs = acsAfter.keySet().stream()
-                .filter(key -> !acsBefore.keySet().contains(key))
+                .filter(key -> !acsBefore.containsKey(key))
                 .toList();
         for (String ac : newACs) {
             ActionCardModel model = Mapper.getActionCard(ac);

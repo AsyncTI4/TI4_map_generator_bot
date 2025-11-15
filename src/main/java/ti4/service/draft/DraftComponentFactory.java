@@ -24,7 +24,7 @@ public class DraftComponentFactory {
 
     public Draftable createDraftable(String type) {
         for (String knownType : KNOWN_DRAFTABLE_TYPES.keySet()) {
-            if (knownType.toLowerCase().equals(type.toLowerCase())) {
+            if (knownType.equalsIgnoreCase(type)) {
                 try {
                     return KNOWN_DRAFTABLE_TYPES
                             .get(knownType)
@@ -45,7 +45,7 @@ public class DraftComponentFactory {
 
     public DraftOrchestrator createOrchestrator(String type) {
         for (String knownType : KNOWN_ORCHESTRATOR_TYPES.keySet()) {
-            if (knownType.toLowerCase().equals(type.toLowerCase())) {
+            if (knownType.equalsIgnoreCase(type)) {
                 try {
                     return KNOWN_ORCHESTRATOR_TYPES
                             .get(knownType)

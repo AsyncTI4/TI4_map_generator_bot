@@ -57,7 +57,7 @@ class MantisTileDraftableSetTiles extends GameStateSubcommand {
                         event.getChannel(), "Tile ID " + tileID + " is not a blue or red tile.");
                 return;
             }
-            if (tile.getTileBack().equals(TileBack.BLUE)) {
+            if (tile.getTileBack() == TileBack.BLUE) {
                 draftable.getBlueTiles().add((BlueTileDraftItem) DraftItem.generate(Category.BLUETILE, tileID));
             } else {
                 draftable.getRedTiles().add((RedTileDraftItem) DraftItem.generate(Category.REDTILE, tileID));

@@ -63,8 +63,7 @@ public class MapTemplateModel implements ModelInterface {
 
     public boolean isNucleusTemplate() {
         if (nucleusSliceCount == null) return false;
-        if (tilesPerNucleusSlice == null) return false;
-        return true;
+      return tilesPerNucleusSlice != null;
     }
 
     public String autoCompleteString() {
@@ -166,8 +165,7 @@ public class MapTemplateModel implements ModelInterface {
         for (int i = 1; i <= playerCount; i++) {
             if (!playerNumbers.contains(i)) return false;
         }
-        if (playerNumbers.size() != playerCount) return false;
-        return true;
+      return playerNumbers.size() == playerCount;
     }
 
     private boolean nucleusValidation() {

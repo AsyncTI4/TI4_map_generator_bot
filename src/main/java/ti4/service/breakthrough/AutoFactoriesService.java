@@ -26,7 +26,7 @@ public class AutoFactoriesService {
             UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
             UnitModel producedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
 
-            if (producedUnit.getIsShip() && !producedUnit.getAsyncId().equals("ff")) {
+            if (producedUnit.getIsShip() && !"ff".equals(producedUnit.getAsyncId())) {
                 count += producedUnits.get(unit);
             }
         }

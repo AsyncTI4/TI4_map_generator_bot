@@ -24,7 +24,7 @@ import ti4.service.regex.RegexService;
 
 @UtilityClass
 public class MindsieveService {
-    private String id = "naalubt";
+    private final String id = "naalubt";
 
     public String mindsieve() {
         return Mapper.getBreakthrough(id).getNameRepresentation();
@@ -36,7 +36,7 @@ public class MindsieveService {
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
             if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
-            if (model.getName().equals("Alliance") && primary.hasAbility("hubris")) continue;
+            if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) continue;
             return true;
         }
         return false;
@@ -56,7 +56,7 @@ public class MindsieveService {
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
             if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
-            if (model.getName().equals("Alliance") && primary.hasAbility("hubris")) {
+            if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) {
                 String fmt = "\n-# > - Since they %s, you cannot send the _Alliance_ promissory note.";
                 msg += String.format(fmt, game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact");
                 continue;

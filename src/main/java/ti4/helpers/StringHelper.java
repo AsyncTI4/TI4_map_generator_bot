@@ -119,9 +119,9 @@ public final class StringHelper {
             }
             line = line.replace(
                     String.valueOf(ESCAPE_CHARACTER),
-                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ESCAPE_CHARACTER));
+                    String.valueOf(ESCAPE_CHARACTER) + ESCAPE_CHARACTER);
             line = line.replace(
-                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + String.valueOf(separator));
+                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + separator);
             sb.append(line);
         }
         return sb.toString();
@@ -169,7 +169,7 @@ public final class StringHelper {
         return replaceWithEmojis(initial, false);
     }
 
-    private static Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
+    private static final Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
 
     private static String replaceWithEmojis(String initial, boolean replaceWithBlank) {
         StringBuilder output = new StringBuilder();
@@ -181,7 +181,7 @@ public final class StringHelper {
                 output.append(initial.substring(index));
                 break;
             }
-            output.append(initial.substring(index, pos));
+            output.append(initial, index, pos);
 
             int end = initial.indexOf('>', pos);
             if (end == -1) {

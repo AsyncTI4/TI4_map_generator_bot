@@ -301,7 +301,7 @@ public class EdictPhaseHandler {
                         + " after resolving the edict, use this button to resolve an additional edict from your flagship.";
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                    edicts.removeIf(edict2 -> "tf-censure".equalsIgnoreCase(edict2));
                 }
                 Button proceedToStrategyPhase = Buttons.green(
                         yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(0) + "_orangetf",

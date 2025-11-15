@@ -48,16 +48,15 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getFactionEmoji()).append(" ").append(getSynergyEmojis());
-        sb.append("**").append(getName()).append("**");
-        sb.append(getSource().emoji());
-        return sb.toString();
+      String sb = getFactionEmoji() + " " + getSynergyEmojis() +
+          "**" + name + "**" +
+          source.emoji();
+        return sb;
     }
 
     public String getRepresentation(boolean includeCardText) {
         StringBuilder sb = new StringBuilder(getNameRepresentation());
-        if (includeCardText) sb.append("\n> ").append(getText());
+        if (includeCardText) sb.append("\n> ").append(text);
         return sb.toString();
     }
 
@@ -70,18 +69,17 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
         // TITLE
         eb.setTitle(
-                getFactionEmoji() + " **__" + getName() + "__** " + getSource().emoji());
+                getFactionEmoji() + " **__" + name + "__** " + source.emoji());
 
         // DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        description.append("SYNERGY: ").append(getSynergyEmojis()).append("\n");
-        description.append(getText());
-        eb.setDescription(description.toString());
+      String description = "SYNERGY: " + getSynergyEmojis() + "\n" +
+          text;
+        eb.setDescription(description);
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+            footer.append("ID: ").append(alias).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -100,15 +98,15 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
                 || getFaction().orElse("").contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        StringBuilder sb = new StringBuilder(getName());
+        StringBuilder sb = new StringBuilder(name);
         if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
-        sb.append(" [").append(getSource()).append("]");
+        sb.append(" [").append(source).append("]");
         return sb.toString();
     }
 

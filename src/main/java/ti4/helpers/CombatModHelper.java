@@ -774,7 +774,7 @@ public class CombatModHelper {
     public static int getOpponentSfttCount(Player player) {
         return (int) player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
-                .filter(pn -> pn.getName().equals("Support for the Throne"))
+                .filter(pn -> "Support for the Throne".equals(pn.getName()))
                 .count();
     }
 

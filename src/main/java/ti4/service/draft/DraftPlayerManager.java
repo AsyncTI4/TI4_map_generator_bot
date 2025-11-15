@@ -52,7 +52,7 @@ public class DraftPlayerManager {
     }
 
     public void resetForNewDraft() {
-        this.playerStates.clear();
+        playerStates.clear();
     }
 
     // Player management

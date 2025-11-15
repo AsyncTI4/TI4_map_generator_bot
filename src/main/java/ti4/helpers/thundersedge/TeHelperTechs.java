@@ -72,7 +72,7 @@ public class TeHelperTechs {
                 }
             }
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, Integer.toString(total)));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, total));
         });
     }
 
@@ -160,7 +160,7 @@ public class TeHelperTechs {
             int count = uh.getUnitCountForState(unit, state);
             if (count > 0) {
                 String id = prefix + "_" + state.name();
-                String label = uh.getName().equals("space")
+                String label = "space".equals(uh.getName())
                         ? "Space " + tile.getPosition()
                         : Helper.getPlanetRepresentation(uh.getName(), game);
                 label += " (" + count + ")";
@@ -216,7 +216,7 @@ public class TeHelperTechs {
                 return;
             }
             String location = "in the space area of " + tile.getRepresentationForButtons(game, player);
-            if (!uhName.equals("space") && uh instanceof Planet) {
+            if (!"space".equals(uhName) && uh instanceof Planet) {
                 location = "on the planet " + Helper.getPlanetRepresentation(uhName, game);
             }
 

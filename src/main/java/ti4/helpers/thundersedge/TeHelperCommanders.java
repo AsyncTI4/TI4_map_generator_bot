@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -189,12 +190,12 @@ public class TeHelperCommanders {
         // Get buttons to move units from this system
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uh : source.getUnitHolders().values()) {
-            String uhName = uh.getName().equals("space") ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
+            String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnitsByState().keySet()) {
                 // franken compat
                 if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (List.of(UnitType.PlenaryOrbital).contains(uk.getUnitType())) continue;
+                if (Objects.equals(UnitType.PlenaryOrbital, uk.getUnitType())) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -216,9 +217,9 @@ public class TeHelperCommanders {
             for (String unit : uniqueUnits) {
                 String[] data = unit.split(" ");
                 UnitType type = Units.findUnitType(data[0]);
-                String uhName = data[1].equals("space") ? "Space" : Helper.getPlanetRepresentation(data[1], game);
+                String uhName = "space".equals(data[1]) ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type.toString()
+                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type
                             + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));

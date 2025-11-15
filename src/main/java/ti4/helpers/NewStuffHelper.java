@@ -86,8 +86,8 @@ public class NewStuffHelper {
         Matcher pageMatcher = Pattern.compile(pageRegex).matcher(buttonID);
         if (pageMatcher.find()) {
             int page = Integer.parseInt(pageMatcher.group("page"));
-            List<Button> buttons = NewStuffHelper.buttonPagination(allButtons, buttonPrefix, 24, page, true);
-            NewStuffHelper.sendOrEditButtons(event, event.getMessageChannel(), message, buttons);
+            List<Button> buttons = buttonPagination(allButtons, buttonPrefix, 24, page, true);
+            sendOrEditButtons(event, event.getMessageChannel(), message, buttons);
             return true;
         }
         return false;
@@ -134,7 +134,6 @@ public class NewStuffHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.deleteMessage(event);
-            return;
         }
     }
 

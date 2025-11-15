@@ -33,11 +33,8 @@ public class MuaatHeroService {
         // Add the muaat supernova to the map and copy over the space unitholder
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
-        boolean frontier = false;
-        if (space.getTokenList().contains(frontierFilename)) {
-            frontier = true;
-        }
-        Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
+        boolean frontier = space.getTokenList().contains(frontierFilename);
+      Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
 
         game.removeTile(tile.getPosition());
         game.setTile(novaTile);

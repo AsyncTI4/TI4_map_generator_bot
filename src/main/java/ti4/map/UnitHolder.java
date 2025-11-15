@@ -57,11 +57,11 @@ public abstract class UnitHolder {
     public abstract String getRepresentation(Game game);
 
     public void inheritEverythingFrom(UnitHolder other) {
-        unitsByState.putAll(other.getUnitsByState());
+        unitsByState.putAll(other.unitsByState);
 
-        ccList.addAll(other.getCcList());
-        controlList.addAll(other.getControlList());
-        tokenList.addAll(other.getTokenList());
+        ccList.addAll(other.ccList);
+        controlList.addAll(other.controlList);
+        tokenList.addAll(other.tokenList);
     }
 
     public void addUnit(UnitKey unit, Integer count) {

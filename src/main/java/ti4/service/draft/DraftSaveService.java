@@ -24,12 +24,13 @@ public class DraftSaveService {
 
         // Save player user IDs, and create a shorthand for each ID
         Map<String, String> userIdToShortId = new HashMap<>();
-        if (!draftManager.getPlayerStates().keySet().isEmpty()) {
+        if (!draftManager.getPlayerStates().isEmpty()) {
             int index = 0;
             List<String> playerSaveList = new ArrayList<>();
             for (String userId : draftManager.getPlayerStates().keySet()) {
-                String shortId = "u" + index++;
-                userIdToShortId.put(userId, shortId);
+                String shortId = "u" + index;
+              index++;
+              userIdToShortId.put(userId, shortId);
                 playerSaveList.add(userId + "," + shortId);
             }
             lines.add(PLAYER_DATA + KEY_SEPARATOR + String.join(DATA_SEPARATOR, playerSaveList));

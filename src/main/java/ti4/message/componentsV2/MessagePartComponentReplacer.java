@@ -23,7 +23,7 @@ import ti4.message.logging.BotLogger;
 public class MessagePartComponentReplacer implements TrackingComponentReplacer {
     private final Map<String, ReplaceMessagePart> replaceByCustomId;
     private final List<ReplaceMessagePart> replaceByPattern;
-    private boolean madeChanges = false;
+    private boolean madeChanges;
 
     public MessagePartComponentReplacer(
             List<ReplaceMessagePart> replaceByCustomId, List<ReplaceMessagePart> replaceByPattern) {
@@ -146,10 +146,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             return null;
         }
         ReplaceMessagePart replacement = replaceByCustomId.getOrDefault(curId, null);
-        if (replacement == null) {
-            return null;
-        }
-        return replacement;
+      return replacement;
     }
 
     private static String getCustomId(Component component) {
@@ -181,9 +178,6 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
         if (current == null || replacement == null) {
             return true;
         }
-        if (!current.getClass().equals(replacement.getClass())) {
-            return false;
-        }
-        return true;
+      return current.getClass().equals(replacement.getClass());
     }
 }

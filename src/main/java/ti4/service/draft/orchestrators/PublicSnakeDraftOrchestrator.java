@@ -101,7 +101,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         for (String playerUserId : playerOrder) {
             PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
             State orchestratorState = (State) playerState.getOrchestratorState();
-            orchestratorState.setOrderIndex(orderIndex++);
+            orchestratorState.setOrderIndex(orderIndex);
+          orderIndex++;
         }
     }
 
@@ -254,12 +255,12 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String save() {
-        return currentPlayerIndex + DraftOrchestrator.SAVE_SEPARATOR + isReversing;
+        return currentPlayerIndex + SAVE_SEPARATOR + isReversing;
     }
 
     @Override
     public void load(String data) {
-        String[] tokens = data.split(DraftOrchestrator.SAVE_SEPARATOR, 2);
+        String[] tokens = data.split(SAVE_SEPARATOR, 2);
         if (tokens.length != 2) {
             throw new IllegalArgumentException("Invalid data for PublicSnakeDraftOrchestrator: " + data);
         }
@@ -269,12 +270,11 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String savePlayerState(OrchestratorState state) {
-        if (!(state instanceof State)) {
+        if (!(state instanceof State psdState)) {
             throw new IllegalArgumentException("Invalid state type for PublicSnakeDraftOrchestrator: "
                     + state.getClass().getSimpleName());
         }
-        State psdState = (State) state;
-        return psdState.getOrderIndex() + "";
+      return psdState.getOrderIndex() + "";
     }
 
     @Override
@@ -299,12 +299,11 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
-            if (orchestratorState == null || !(orchestratorState instanceof State)) {
+            if (orchestratorState == null || !(orchestratorState instanceof State state)) {
                 return "Player " + playerUserId
                         + " has invalid draft state (missing or weird type). Try `/draft manage set_orchestrator public_snake` (this will reset the draft order).";
             }
-            State state = (State) orchestratorState;
-            if (state.getOrderIndex() < 0
+          if (state.getOrderIndex() < 0
                     || state.getOrderIndex() >= draftManager.getPlayerStates().size()) {
                 return "Player " + playerUserId + " has out of bounds order index: " + state.getOrderIndex()
                         + ". Fix it with `/draft public_snake set_order`.";
@@ -337,7 +336,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public String handleCustomButtonPress(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
-        if (buttonId.equals("reprintdraft")) {
+        if ("reprintdraft".equals(buttonId)) {
             List<String> playerOrder = getDraftOrder(draftManager);
             PublicDraftInfoService.send(
                     draftManager,
@@ -368,11 +367,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
-        Game game = draftSystemSettings.getGame();
+      Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

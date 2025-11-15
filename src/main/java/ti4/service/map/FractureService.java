@@ -135,7 +135,7 @@ public class FractureService {
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), automatic.toString());
 
-        final int countPer = numberOfIngressPerTechType;
+        int countPer = numberOfIngressPerTechType;
         for (TechnologyType type : techTypesToAddIngress) {
             List<Tile> tilesWithSkip = getTilesWithSkipAndNoIngressAndNotAdding(game, type, automaticAdds);
             if (tilesWithSkip.size() <= numberOfIngressPerTechType) continue;

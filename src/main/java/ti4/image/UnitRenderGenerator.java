@@ -326,7 +326,7 @@ class UnitRenderGenerator {
 
     private void optionallyDrawEidolonMaximumDecal(UnitKey unitKey, int imageX, int imageY) {
         UnitModel model = game.getUnitFromUnitKey(unitKey);
-        if (model == null || !model.getAlias().equals("naaz_voltron")) return;
+        if (model == null || !"naaz_voltron".equals(model.getAlias())) return;
         BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile("Voltron.png"));
         tileGraphics.drawImage(voltron, imageX, imageY, null);
     }

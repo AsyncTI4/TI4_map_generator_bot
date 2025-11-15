@@ -24,11 +24,11 @@ import ti4.testUtils.BaseTi4Test;
 
 public class CombatModifierTest extends BaseTi4Test {
 
-    private static Game testGame = null;
-    private static Player neutral = null;
-    private static Player winnu = null;
-    private static Player bastion = null;
-    private static Player letnev = null;
+    private static Game testGame;
+    private static Player neutral;
+    private static Player winnu;
+    private static Player bastion;
+    private static Player letnev;
 
     @BeforeAll
     private static void setupTestGame() {

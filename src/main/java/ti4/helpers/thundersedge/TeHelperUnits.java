@@ -79,7 +79,7 @@ public class TeHelperUnits {
 
     public static boolean affectedByQuietus(Game game, Player player, UnitHolder uh) {
         // Get the actual space unit holder if able
-        if (!uh.getName().equals("space")) {
+        if (!"space".equals(uh.getName())) {
             Tile t = game.getTileFromPlanet(uh.getName());
             if (t == null) return false;
             uh = t.getSpaceUnitHolder();
@@ -122,8 +122,8 @@ public class TeHelperUnits {
                 TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
 
         // Part 1 (no error)
-        final String regex1 = "startForerunner_" + RegexHelper.posRegex();
-        final Pattern part1 = Pattern.compile(regex1);
+        String regex1 = "startForerunner_" + RegexHelper.posRegex();
+        Pattern part1 = Pattern.compile(regex1);
         boolean succ = RegexService.runMatcher(
                 part1,
                 buttonID,
@@ -139,8 +139,8 @@ public class TeHelperUnits {
         if (succ) return;
 
         // Part 2
-        final String regex2 = regex1 + "_" + RegexHelper.posRegex("source");
-        final Pattern part2 = Pattern.compile(regex2);
+        String regex2 = regex1 + "_" + RegexHelper.posRegex("source");
+        Pattern part2 = Pattern.compile(regex2);
         RegexService.runMatcher(part2, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             Tile source = game.getTileByPosition(matcher.group("source"));
@@ -277,7 +277,7 @@ public class TeHelperUnits {
                 String uhName = Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
                     String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
-                            + source.getPosition() + "_" + type.toString() + "_" + data[1];
+                            + source.getPosition() + "_" + type + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }

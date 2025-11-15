@@ -182,13 +182,13 @@ public class PublicDraftInfoService {
                 }
             }
 
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("**__");
+            if (userId.equals(nextPlayer)) sb.append("*");
+            if (userId.equals(currentPlayer)) sb.append("**__");
             sb.append(player.getUserName());
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("   <- on deck");
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("__**");
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
+            if (userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
+            if (userId.equals(nextPlayer)) sb.append("   <- on deck");
+            if (userId.equals(currentPlayer)) sb.append("__**");
+            if (userId.equals(nextPlayer)) sb.append("*");
 
             pickNum++;
         }

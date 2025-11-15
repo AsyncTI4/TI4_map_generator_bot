@@ -250,7 +250,7 @@ public class RiftUnitsHelper {
         }
         boolean found = false;
         for (String u : wormholeUnits) {
-            if (u.equalsIgnoreCase("ws") && !player.hasWarsunTech()) {
+            if ("ws".equalsIgnoreCase(u) && !player.hasWarsunTech()) {
                 continue;
             }
             if (found

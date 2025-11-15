@@ -32,7 +32,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     private int numPicks;
 
     public void initialize(int numPlayers) {
-        this.numPicks = numPlayers;
+        numPicks = numPlayers;
     }
 
     public static Integer getSpeakerOrderFromChoiceKey(String choiceKey) {
@@ -57,7 +57,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
             String displayName = StringHelper.ordinal(i) + " Pick";
             String unformattedName = StringHelper.ordinal(i) + " Pick";
             choices.add(new DraftChoice(
-                    getType(),
+                TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, null, buttonEmoji),
                     displayName,
@@ -87,7 +87,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-                getType(),
+            TYPE,
                 null,
                 null,
                 "No speaker position",
@@ -139,12 +139,12 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     public Consumer<Player> setupPlayer(
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(getType())
-                || pState.getPicks().get(getType()).isEmpty()) {
+        if (!pState.getPicks().containsKey(TYPE)
+                || pState.getPicks().get(TYPE).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a speaker order");
         }
 
-        String speakerOrder = pState.getPicks().get(getType()).get(0).getChoiceKey();
+        String speakerOrder = pState.getPicks().get(TYPE).get(0).getChoiceKey();
         Integer speakerNum = getSpeakerOrderFromChoiceKey(speakerOrder);
         if (speakerNum == null) {
             throw new IllegalStateException(
@@ -171,11 +171,10 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
-        Game game = draftSystemSettings.getGame();
+      Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

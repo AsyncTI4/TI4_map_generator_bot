@@ -29,7 +29,7 @@ public class DataSkimmerService {
         String buttonPrefix = ralnel.getFinsFactionCheckerPrefix() + "dataSkimmer_";
         List<Button> pickButtons = new ArrayList<>();
         game.getDiscardACStatus().entrySet().forEach(discard -> {
-            if (!discard.getValue().equals(ACStatus.ralnelbt)) return;
+            if (discard.getValue() != ACStatus.ralnelbt) return;
             int acNum = game.getDiscardActionCards().get(discard.getKey());
             ActionCardModel acModel = Mapper.getActionCard(discard.getKey());
             Button pick =
@@ -60,7 +60,7 @@ public class DataSkimmerService {
         List<Entry<String, ACStatus>> pile =
                 new ArrayList<>(game.getDiscardACStatus().entrySet());
         for (Entry<String, ACStatus> discard : pile) {
-            if (discard.getValue().equals(ACStatus.ralnelbt)) {
+            if (discard.getValue() == ACStatus.ralnelbt) {
                 discarded.add(discard.getKey());
                 game.getDiscardACStatus().remove(discard.getKey());
             }

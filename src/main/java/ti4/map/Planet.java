@@ -108,7 +108,7 @@ public class Planet extends UnitHolder {
     }
 
     public void updateTriadStats(Player player) {
-        if (getName().equals("triad")) {
+        if ("triad".equals(getName())) {
             resourcesModifier = 0;
             if (player.getHrf() > 0) resourcesModifier++;
             if (player.getIrf() > 0) resourcesModifier++;

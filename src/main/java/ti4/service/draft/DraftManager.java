@@ -38,7 +38,7 @@ public class DraftManager extends DraftPlayerManager {
     private final Game game;
 
     @Getter
-    private DraftOrchestrator orchestrator = null;
+    private DraftOrchestrator orchestrator;
     // The order of draftables is assumed to be the correct order for summarizing, applying, etc.
     @Getter
     private final List<Draftable> draftables = new ArrayList<>();
@@ -62,8 +62,8 @@ public class DraftManager extends DraftPlayerManager {
             throw new IllegalArgumentException("Player " + playerUserId + " is not in the game");
         }
         super.addPlayer(playerUserId);
-        if (this.orchestrator != null) {
-            this.orchestrator.initializePlayerStates(this);
+        if (orchestrator != null) {
+            orchestrator.initializePlayerStates(this);
         }
     }
 
@@ -88,8 +88,8 @@ public class DraftManager extends DraftPlayerManager {
     }
 
     public void resetForNewDraft() {
-        this.orchestrator = null;
-        this.draftables.clear();
+        orchestrator = null;
+        draftables.clear();
         super.resetForNewDraft();
     }
 
@@ -208,10 +208,7 @@ public class DraftManager extends DraftPlayerManager {
             return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
         }
         String reason = orchestrator.whatsStoppingDraftStart(this);
-        if (reason != null) {
-            return reason;
-        }
-        return null;
+      return reason;
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {
@@ -322,7 +319,7 @@ public class DraftManager extends DraftPlayerManager {
 
             // Default color if not set
             boolean playerHasColor =
-                    player.getColor() != null && !player.getColor().equals("null");
+                    player.getColor() != null && !"null".equals(player.getColor());
             if (!playerHasColor && playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);

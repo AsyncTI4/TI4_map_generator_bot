@@ -100,8 +100,8 @@ public class BreakthroughCommandHelper {
 
             if (!FractureService.isFractureInPlay(game) && !game.isNoFractureMode())
                 serveRollFractureButtons(game, player);
-            if (bt.getAlias().equals("muaatbt")) StellarGenesisService.serveAvernusButtons(game, player);
-            if (bt.getAlias().equals("keleresbt")) player.gainCustodiaVigilia();
+            if ("muaatbt".equals(bt.getAlias())) StellarGenesisService.serveAvernusButtons(game, player);
+            if ("keleresbt".equals(bt.getAlias())) player.gainCustodiaVigilia();
         });
     }
 
@@ -130,7 +130,7 @@ public class BreakthroughCommandHelper {
                 player.setBreakthroughActive(true);
                 String message = player.getRepresentation() + " activated their breakthrough: " + bt.getName();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (bt.getAlias().equalsIgnoreCase("naazbt")) {
+                if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                     player.addOwnedUnitByID("naaz_voltron");
                     player.removeOwnedUnitByID("naaz_mech");
                     player.removeOwnedUnitByID("naaz_mech_space");
@@ -145,7 +145,7 @@ public class BreakthroughCommandHelper {
                 player.setBreakthroughActive(false);
                 String message = player.getRepresentation() + " de-activated their breakthrough: " + bt.getName();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (bt.getAlias().equalsIgnoreCase("naazbt")) {
+                if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
                     player.removeOwnedUnitByID("naaz_voltron");
                     player.addOwnedUnitByID("naaz_mech");
                     player.addOwnedUnitByID("naaz_mech_space");
@@ -179,13 +179,13 @@ public class BreakthroughCommandHelper {
     }
 
     private static int readPlusMinus(int initial, String option) {
-        final Pattern pattern = Pattern.compile("(?<pm>([\\+\\-]?))(?<amt>(\\d+))");
+        Pattern pattern = Pattern.compile("(?<pm>([\\+\\-]?))(?<amt>(\\d+))");
         Matcher matcher = pattern.matcher(option);
         if (matcher.matches()) {
             String pm = matcher.group("pm");
             int amt = Integer.parseInt(matcher.group("amt"));
             if (pm != null && !pm.isBlank()) {
-                if (pm.equals("-")) return initial - amt;
+                if ("-".equals(pm)) return initial - amt;
                 return initial + amt;
             }
             return amt;

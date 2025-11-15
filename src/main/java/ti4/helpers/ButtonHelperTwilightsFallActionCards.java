@@ -58,7 +58,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     for (UnitHolder uH : tile2.getUnitHolders().values()) {
                         String label;
                         for (Player p2 : game.getRealAndEliminatedAndDummyPlayers()) {
-                            if (uH.getName().equals("space")) {
+                            if ("space".equals(uH.getName())) {
                                 label = "(" + StringUtils.capitalize(p2.getColor()) + ") Space Area of "
                                         + tile2.getRepresentationForButtons();
                             } else {
@@ -106,7 +106,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     String label;
 
                     for (Player p2 : game.getRealAndEliminatedAndDummyPlayers()) {
-                        if (uH.getName().equals("space")) {
+                        if ("space".equals(uH.getName())) {
                             label = "(" + StringUtils.capitalize(p2.getColor()) + ") Space Area of "
                                     + tile2.getRepresentationForButtons();
                         } else {
@@ -385,7 +385,7 @@ public class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             String faction = tech.getFaction().get();
-            if (factions.keySet().contains(faction)) {
+            if (factions.containsKey(faction)) {
                 factions.put(faction, factions.get(faction) + 1);
             } else {
                 factions.put(faction, 1);
@@ -394,7 +394,7 @@ public class ButtonHelperTwilightsFallActionCards {
         for (String leaderID : player.getLeaderIDs()) {
             LeaderModel lead = Mapper.getLeader(leaderID);
             String faction = lead.getFaction();
-            if (factions.keySet().contains(faction)) {
+            if (factions.containsKey(faction)) {
                 factions.put(faction, factions.get(faction) + 1);
             } else {
                 factions.put(faction, 1);
@@ -409,7 +409,7 @@ public class ButtonHelperTwilightsFallActionCards {
             if (faction.equalsIgnoreCase(player.getFaction())) {
                 continue;
             }
-            if (factions.keySet().contains(faction)) {
+            if (factions.containsKey(faction)) {
                 factions.put(faction, factions.get(faction) + 1);
             } else {
                 factions.put(faction, 1);
@@ -456,7 +456,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String tech : p2.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter")) {
+            if ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech)) {
                 continue;
             }
             buttons.add(Buttons.gray("lawsHeroStep3_" + p2.getFaction() + "_" + tech, techM.getName()));
@@ -605,7 +605,7 @@ public class ButtonHelperTwilightsFallActionCards {
             if (Mapper.getUnit(card).getBaseType().equalsIgnoreCase(unitT)) {
                 UnitModel unitModel = Mapper.getUnit(card);
                 String asyncId = unitModel.getAsyncId();
-                if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
+                if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
                     List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
                             .filter(unit -> unit.getFaction().isEmpty()
                                     || unit.getUpgradesFromUnitId().isEmpty())

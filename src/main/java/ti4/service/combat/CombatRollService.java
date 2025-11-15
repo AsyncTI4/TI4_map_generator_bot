@@ -671,7 +671,7 @@ public class CombatRollService {
                         opponent,
                         game,
                         playerUnitsList,
-                        rollType,
+                    CombatRollType.combatround,
                         activeSystem,
                         unitHolder);
                 int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
@@ -772,11 +772,11 @@ public class CombatRollService {
             for (String singleUnit : singleUnitUse) {
 
                 int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-                if (singleUnit.equals("singleUnit")) {
+                if ("singleUnit".equals(singleUnit)) {
                     numRolls = numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     modifierToHit += letnevBTBoost;
                 }
-                if (singleUnit.equals("RestOfUnits")) {
+                if ("RestOfUnits".equals(singleUnit)) {
                     numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     modifierToHit -= letnevBTBoost;
                 }
@@ -1289,12 +1289,12 @@ public class CombatRollService {
         Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         for (Map.Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
 
-            if (player.hasUnit("ralnel_destroyer2") && unitHolder.getName().equalsIgnoreCase("space")) {
-                if (unitEntry.getKey().equalsIgnoreCase("pd")
-                        || unitEntry.getKey().equalsIgnoreCase("sd")) {
+            if (player.hasUnit("ralnel_destroyer2") && "space".equalsIgnoreCase(unitHolder.getName())) {
+                if ("pd".equalsIgnoreCase(unitEntry.getKey())
+                        || "sd".equalsIgnoreCase(unitEntry.getKey())) {
                     continue;
                 }
-                if (unitEntry.getKey().equalsIgnoreCase("dd") && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
+                if ("dd".equalsIgnoreCase(unitEntry.getKey()) && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
                     continue;
                 }
             }

@@ -56,7 +56,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
             output.add(f);
         }
 
-        this.draftFactions = output;
+        draftFactions = output;
     }
 
     public void addFaction(String factionAlias) {
@@ -118,7 +118,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
             DraftChoice choice = new DraftChoice(
-                    getType(),
+                TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, buttonText, buttonEmoji),
                     formattedName,
@@ -147,11 +147,11 @@ public class MahactKingDraftable extends SinglePickDraftable {
     public String handleCustomCommand(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
         List<String> informFactions;
-        if (buttonId.equals("remaininginfo")) {
+        if ("remaininginfo".equals(buttonId)) {
             informFactions = new ArrayList<>(draftFactions);
             for (String pId : draftManager.getPlayerStates().keySet()) {
                 List<DraftChoice> playerChoices =
-                        draftManager.getPlayerStates().get(pId).getPicks().get(getType());
+                        draftManager.getPlayerStates().get(pId).getPicks().get(TYPE);
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
                         informFactions.remove(choice.getChoiceKey());
@@ -163,11 +163,11 @@ public class MahactKingDraftable extends SinglePickDraftable {
             } else {
                 sendFactionInfo(draftManager, playerUserId, informFactions);
             }
-        } else if (buttonId.equals("pickedinfo")) {
+        } else if ("pickedinfo".equals(buttonId)) {
             informFactions = new ArrayList<>();
             for (String pId : draftManager.getPlayerStates().keySet()) {
                 List<DraftChoice> playerChoices =
-                        draftManager.getPlayerStates().get(pId).getPicks().get(getType());
+                        draftManager.getPlayerStates().get(pId).getPicks().get(TYPE);
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
                         if (!informFactions.contains(choice.getChoiceKey())) {
@@ -181,7 +181,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
             } else {
                 sendFactionInfo(draftManager, playerUserId, informFactions);
             }
-        } else if (buttonId.equals("allinfo")) {
+        } else if ("allinfo".equals(buttonId)) {
             informFactions = new ArrayList<>(draftFactions);
             sendFactionInfo(draftManager, playerUserId, informFactions);
         } else if (buttonId.startsWith("info_")) {
@@ -198,7 +198,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-                getType(),
+            TYPE,
                 null,
                 null,
                 "No king picked",
@@ -231,9 +231,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
         } else {
             String[] tokens = data.split(SAVE_SEPARATOR);
             draftFactions = new ArrayList<>();
-            for (int i = 0; i < tokens.length; i++) {
-                draftFactions.add(tokens[i]);
-            }
+          Collections.addAll(draftFactions, tokens);
         }
     }
 
@@ -269,11 +267,10 @@ public class MahactKingDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
-        Game game = draftSystemSettings.getGame();
+      Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

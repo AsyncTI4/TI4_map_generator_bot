@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,7 +101,7 @@ public class TeHelperAbilities {
             for (String unit : system.getValue()) {
                 String[] data = unit.split(" ");
                 UnitType type = Units.findUnitType(data[0]);
-                String uhName = data[1].equals("space") ? "" : " from " + Helper.getPlanetRepresentation(data[1], game);
+                String uhName = "space".equals(data[1]) ? "" : " from " + Helper.getPlanetRepresentation(data[1], game);
                 sb.append("\n> - ").append(type.humanReadableName()).append(uhName);
             }
         }
@@ -110,7 +111,7 @@ public class TeHelperAbilities {
     public static HashMap<String, List<String>> readMoveMap(String val) {
         HashMap<String, List<String>> moveMap = new HashMap<>();
         if (val == null || val.isBlank()) return moveMap;
-        List<String> systemInfos = Arrays.asList(val.split("\\|"));
+        String[] systemInfos = val.split("\\|");
         for (String system : systemInfos) {
             String[] data = system.split(";");
             String pos = data[0];
@@ -339,14 +340,14 @@ public class TeHelperAbilities {
         // Get buttons to move units from this system
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uh : source.getUnitHolders().values()) {
-            String uhName = uh.getName().equals("space") ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
+            String uhName = "space".equals(uh.getName()) ? "Space" : Helper.getPlanetRepresentation(uh.getName(), game);
             for (UnitKey uk : uh.getUnits().keySet()) {
                 if (!player.unitBelongsToPlayer(uk)) continue;
 
                 // franken compat
                 if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (List.of(UnitType.PlenaryOrbital).contains(uk.getUnitType())) continue;
+                if (Objects.equals(UnitType.PlenaryOrbital, uk.getUnitType())) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -367,10 +368,10 @@ public class TeHelperAbilities {
             for (String unit : uniqueUnits) {
                 String[] data = unit.split(" ");
                 UnitType type = Units.findUnitType(data[0]);
-                String uhName = data[1].equals("space") ? "Space" : Helper.getPlanetRepresentation(data[1], game);
+                String uhName = "space".equals(data[1]) ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
                     String id = player.finChecker() + "undoSurvival_" + destination.getPosition() + "_"
-                            + source.getPosition() + "_" + type.toString() + "_" + data[1];
+                            + source.getPosition() + "_" + type + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }

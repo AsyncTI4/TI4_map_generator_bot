@@ -15,13 +15,13 @@ public class BanListener extends ListenerAdapter {
     @Override
     public void onGuildAuditLogEntryCreate(@Nonnull GuildAuditLogEntryCreateEvent event) {
         AuditLogEntry log = event.getEntry();
-        if (log.getType().equals(ActionType.BAN)) {
+        if (log.getType() == ActionType.BAN) {
             BanCleanupService.banSpamAccount(log, getTargetUser(log), getInitiatingUser(log));
         }
     }
 
     private User getTargetUser(AuditLogEntry log) {
-        if (log.getTargetType().equals(TargetType.MEMBER) && log.getTargetId() != null) {
+        if (log.getTargetType() == TargetType.MEMBER && log.getTargetId() != null) {
             return JdaService.jda.getUserById(log.getTargetId());
         }
         return null;

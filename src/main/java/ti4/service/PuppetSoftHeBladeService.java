@@ -74,8 +74,8 @@ public class PuppetSoftHeBladeService {
                 List<Player> puppets = new ArrayList<>();
                 for (String faction : puppetedFactions) puppets.add(game.getPlayerFromColorOrFaction(faction));
 
-                if (plotID.equals("seethe")) revealPlotSeethe(game, player, puppets);
-                if (plotID.equals("extract")) revealPlotExtract(game, player, puppets);
+                if ("seethe".equals(plotID)) revealPlotSeethe(game, player, puppets);
+                if ("extract".equals(plotID)) revealPlotExtract(game, player, puppets);
             }
         }
 
@@ -144,8 +144,8 @@ public class PuppetSoftHeBladeService {
         newHome.inheritFogData(home);
 
         String returnString = "Sucessfully replaced home system tile.";
-        if (oldFaction.getHomeSystem().equals("96a")
-                && newFaction.getHomeSystem().equals("96b")) { // obsidian
+        if ("96a".equals(oldFaction.getHomeSystem())
+                && "96b".equals(newFaction.getHomeSystem())) { // obsidian
             // Resolve control
             for (Player p : game.getPlayers().values()) {
                 if (p.hasPlanet("cronos")) {
@@ -161,10 +161,10 @@ public class PuppetSoftHeBladeService {
             // Then add units and stuff
             for (UnitHolder unitHolder : home.getUnitHolders().values()) {
                 String uh = unitHolder.getName();
-                if (uh.equals("cronos") || uh.equals("tallin")) {
+                if ("cronos".equals(uh) || "tallin".equals(uh)) {
                     Planet p = newHome.getUnitHolderFromPlanet(uh + "hollow");
                     if (p != null) p.inheritEverythingFrom(unitHolder);
-                } else if (uh.equals("space")) {
+                } else if ("space".equals(uh)) {
                     newHome.getSpaceUnitHolder().inheritEverythingFrom(unitHolder);
                 }
             }

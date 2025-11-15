@@ -36,9 +36,8 @@ import ti4.service.fow.LoreService;
 @UtilityClass
 public class MapJsonIOService {
     private final ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
-    ;
 
-    @ModalHandler("importMapFromJSON")
+  @ModalHandler("importMapFromJSON")
     public void importMapFromJSON(ModalInteractionEvent event, Game game) {
         String url = event.getValue("url").getAsString();
         String jsonString = URLReaderHelper.readFromURL(url, event.getChannel());
@@ -189,7 +188,7 @@ public class MapJsonIOService {
         }
 
         if (errorSb.length() > 0) {
-            MessageHelper.sendMessageToChannel(feedbackChannel, "Some tiles failed to import:\n" + errorSb.toString());
+            MessageHelper.sendMessageToChannel(feedbackChannel, "Some tiles failed to import:\n" + errorSb);
         }
     }
 

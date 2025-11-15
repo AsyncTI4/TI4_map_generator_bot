@@ -672,7 +672,7 @@ public class ButtonHelperFactionSpecific {
                 if (space.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
                     buttons.add(Buttons.gray(
                             "empyreanFlagshipAbilityStep2_" + pos + "_" + p2.getFaction() + "_" + unit.getValue(),
-                            StringUtils.capitalize(p2.getColor()) + " "
+                            capitalize(p2.getColor()) + " "
                                     + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
                             p2.getFactionEmoji()));
                 }
@@ -1439,7 +1439,7 @@ public class ButtonHelperFactionSpecific {
         Player saar = game.getPNOwner("ragh");
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         for (String planet : saar.getPlanetsAllianceMode()) {
-            if (planet.equalsIgnoreCase("triad")
+            if ("triad".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;
@@ -2016,19 +2016,19 @@ public class ButtonHelperFactionSpecific {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 if (unitKey.getUnitType() == UnitType.Infantry
                         && unitHolder.getUnits().get(unitKey) > 0
-                        && unit.equalsIgnoreCase("infantry")) {
+                        && "infantry".equalsIgnoreCase(unit)) {
                     amount = unitHolder.getUnits().get(unitKey);
                 }
                 if (unitKey.getUnitType() == UnitType.Fighter
                         && unitHolder.getUnits().get(unitKey) > 0
-                        && unit.equalsIgnoreCase("fighter")) {
+                        && "fighter".equalsIgnoreCase(unit)) {
                     amount = unitHolder.getUnits().get(unitKey);
                 }
             }
         }
         amount--;
         RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), unit);
-        if (uHName.equalsIgnoreCase("space")) {
+        if ("space".equalsIgnoreCase(uHName)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of tile " + pos
@@ -2738,7 +2738,7 @@ public class ButtonHelperFactionSpecific {
         }
         List<Button> buttons3 = new ArrayList<>();
         for (String tech : p1.getTechs()) {
-            if (tech.equalsIgnoreCase("wavelength") || tech.equalsIgnoreCase("antimatter")) {
+            if ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech)) {
                 continue;
             }
             buttons3.add(
@@ -3871,10 +3871,7 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         }
-        if (count > 2) {
-            return true;
-        }
-        return false;
+      return count > 2;
     }
 
     public static List<Button> getLanefirATSButtons(Player p1, Player p2) {

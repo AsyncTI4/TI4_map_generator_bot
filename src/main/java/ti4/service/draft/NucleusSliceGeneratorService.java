@@ -133,7 +133,7 @@ public class NucleusSliceGeneratorService {
 
         String mostCommonFailure = failureReasons.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
-                .map(Map.Entry<String, Integer>::getKey)
+                .map(Map.Entry::getKey)
                 .orElse("No registered failures");
         return new NucleusOutcome(null, mostCommonFailure);
     }
@@ -344,11 +344,11 @@ public class NucleusSliceGeneratorService {
         boolean anomaliesTouching = false;
         for (int i = 0; i < placedTiles.size(); ++i) {
             PlacedTile tileA = placedTiles.get(i);
-            if (tileA.draftTile.getTile().isAnomaly() == false) continue;
+            if (!tileA.draftTile.getTile().isAnomaly()) continue;
 
             for (int j = i + 1; j < placedTiles.size(); ++j) {
                 PlacedTile tileB = placedTiles.get(j);
-                if (tileB.draftTile.getTile().isAnomaly() == false) continue;
+                if (!tileB.draftTile.getTile().isAnomaly()) continue;
 
                 if (distanceTool.getNattyDistance(tileA.mapTile.getPos(), tileB.mapTile.getPos()) == 1) {
                     anomaliesTouching = true;
@@ -539,16 +539,16 @@ public class NucleusSliceGeneratorService {
     private record PlanetTraits(int cultural, int industrial, int hazardous) {
         public PlanetTraits add(PlanetTraits other) {
             return new PlanetTraits(
-                    this.cultural + other.cultural,
-                    this.industrial + other.industrial,
-                    this.hazardous + other.hazardous);
+                    cultural + other.cultural,
+                    industrial + other.industrial,
+                    hazardous + other.hazardous);
         }
 
         public PlanetTraits subtract(PlanetTraits other) {
             return new PlanetTraits(
-                    this.cultural - other.cultural,
-                    this.industrial - other.industrial,
-                    this.hazardous - other.hazardous);
+                    cultural - other.cultural,
+                    industrial - other.industrial,
+                    hazardous - other.hazardous);
         }
 
         public int get(PlanetType type) {
@@ -894,8 +894,9 @@ public class NucleusSliceGeneratorService {
             int i = 0;
             Collections.shuffle(slices);
             for (MiltyDraftSlice slice : slices) {
-                slice.setName(String.valueOf((char) ('A' + i++)));
-                Collections.shuffle(slice.getTiles());
+                slice.setName(String.valueOf((char) ('A' + i)));
+              i++;
+              Collections.shuffle(slice.getTiles());
             }
 
             return slices;

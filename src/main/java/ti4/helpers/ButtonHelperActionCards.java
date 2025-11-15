@@ -1616,7 +1616,7 @@ public class ButtonHelperActionCards {
                     && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                 continue;
             }
-            if (planet.equalsIgnoreCase("triad")
+            if ("triad".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;

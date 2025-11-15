@@ -191,7 +191,7 @@ public class ButtonHelperTwilightsFall {
 
             // Ensure map template is set
             String mapTemplate = game.getMapTemplateID();
-            if (mapTemplate == null || mapTemplate.equals("null")) {
+            if (mapTemplate == null || "null".equals(mapTemplate)) {
                 MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(
                         manager.getPlayers().size());
                 if (defaultTemplate == null) {
@@ -524,7 +524,7 @@ public class ButtonHelperTwilightsFall {
         String cardID = buttonID.split("_")[1];
         String lastSplicer = game.getStoredValue("lastSplicer");
         String type = game.getStoredValue("spliceType");
-        if (cardID.equalsIgnoreCase("antimatter") || cardID.equalsIgnoreCase("wavelength")) {
+        if ("antimatter".equalsIgnoreCase(cardID) || "wavelength".equalsIgnoreCase(cardID)) {
             player.addTech(cardID);
 
             MessageHelper.sendMessageToChannelWithEmbed(
@@ -549,7 +549,7 @@ public class ButtonHelperTwilightsFall {
                         game.getActionsChannel(),
                         player.getRepresentation() + " has removed a spliced card from the draft");
             } else {
-                if (type.equalsIgnoreCase("ability")) {
+                if ("ability".equalsIgnoreCase(type)) {
                     player.addTech(cardID);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             game.getActionsChannel(),
@@ -557,7 +557,7 @@ public class ButtonHelperTwilightsFall {
                                     + Mapper.getTech(cardID).getName(),
                             Mapper.getTech(cardID).getRepresentationEmbed());
                 }
-                if (type.equalsIgnoreCase("genome")) {
+                if ("genome".equalsIgnoreCase(type)) {
                     player.addLeader(cardID);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             game.getActionsChannel(),
@@ -565,10 +565,10 @@ public class ButtonHelperTwilightsFall {
                                     + Mapper.getLeader(cardID).getTFNameIfAble(),
                             Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                 }
-                if (type.equalsIgnoreCase("units")) {
+                if ("units".equalsIgnoreCase(type)) {
                     UnitModel unitModel = Mapper.getUnit(cardID);
                     String asyncId = unitModel.getAsyncId();
-                    if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
+                    if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
                         List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
                                 .filter(unit -> unit.getFaction().isEmpty()
                                         || unit.getUpgradesFromUnitId().isEmpty())
@@ -677,7 +677,7 @@ public class ButtonHelperTwilightsFall {
         } else {
             game.setStoredValue("savedParadigms", game.getStoredValue("savedParadigms") + "_" + leader);
         }
-        if (!scPara && game.getPhaseOfGame().equalsIgnoreCase("agenda")) {
+        if (!scPara && "agenda".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (game.getStoredValue("artificeParadigms").isEmpty()) {
                 game.setStoredValue("artificeParadigms", leader);
             } else {
@@ -695,7 +695,7 @@ public class ButtonHelperTwilightsFall {
 
     public static List<Button> getSpliceButtons(Game game, String type, List<String> cards, Player player) {
         List<Button> buttons = new ArrayList<>();
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 String name = Mapper.getTech(card).getName();
                 buttons.add(Buttons.green(
@@ -704,7 +704,7 @@ public class ButtonHelperTwilightsFall {
                         Mapper.getTech(card).getSingleTechEmoji()));
             }
         }
-        if (type.equalsIgnoreCase("genome")) {
+        if ("genome".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 String name = Mapper.getLeader(card).getTFNameIfAble();
                 String faction = Mapper.getLeader(card).getFaction();
@@ -718,7 +718,7 @@ public class ButtonHelperTwilightsFall {
                         factionModel.getFactionEmoji()));
             }
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 String name = Mapper.getUnit(card).getName();
                 buttons.add(Buttons.green(
@@ -742,17 +742,17 @@ public class ButtonHelperTwilightsFall {
     public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
         List<MessageEmbed> embeds = new ArrayList<>();
         List<String> cards = getDeckForSplicing(game, type, 100);
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getTech(card).getRepresentationEmbed());
             }
         }
-        if (type.equalsIgnoreCase("genome") || type.equalsIgnoreCase("paradigm")) {
+        if ("genome".equalsIgnoreCase(type) || "paradigm".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getLeader(card).getRepresentationEmbed(false, true, false, false, true));
             }
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
@@ -762,17 +762,17 @@ public class ButtonHelperTwilightsFall {
 
     public static List<MessageEmbed> getSpliceEmbeds(Game game, String type, List<String> cards, Player player) {
         List<MessageEmbed> embeds = new ArrayList<>();
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getTech(card).getRepresentationEmbed());
             }
         }
-        if (type.equalsIgnoreCase("genome")) {
+        if ("genome".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getLeader(card).getRepresentationEmbed(false, true, false, false, true));
             }
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
@@ -791,7 +791,7 @@ public class ButtonHelperTwilightsFall {
         List<Button> buttons = new ArrayList<>();
         ButtonHelper.deleteMessage(event);
         for (String tech : player.getTechs()) {
-            if (tech.equalsIgnoreCase("antimatter") || tech.equalsIgnoreCase("wavelength")) {
+            if ("antimatter".equalsIgnoreCase(tech) || "wavelength".equalsIgnoreCase(tech)) {
                 continue;
             }
             buttons.add(Buttons.red(
@@ -851,9 +851,9 @@ public class ButtonHelperTwilightsFall {
         }
         List<Button> buttons = new ArrayList<>();
 
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             for (String tech : player.getTechs()) {
-                if (tech.equalsIgnoreCase("antimatter") || tech.equalsIgnoreCase("wavelength")) {
+                if ("antimatter".equalsIgnoreCase(tech) || "wavelength".equalsIgnoreCase(tech)) {
                     continue;
                 }
                 buttons.add(Buttons.red(
@@ -861,7 +861,7 @@ public class ButtonHelperTwilightsFall {
                         "Discard " + Mapper.getTech(tech).getName()));
             }
         }
-        if (type.equalsIgnoreCase("genome")) {
+        if ("genome".equalsIgnoreCase(type)) {
             for (String leader : player.getLeaderIDs()) {
                 if (!leader.contains("agent")) {
                     continue;
@@ -871,7 +871,7 @@ public class ButtonHelperTwilightsFall {
                         "Discard " + Mapper.getLeader(leader).getTFNameIfAble()));
             }
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             for (String unit : player.getUnitsOwned()) {
                 if (unit.contains("tf_")) {
                     continue;
@@ -891,7 +891,7 @@ public class ButtonHelperTwilightsFall {
         String type = buttonID.split("_")[1];
 
         String cardID = buttonID.split("_")[2];
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             player.removeTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -899,7 +899,7 @@ public class ButtonHelperTwilightsFall {
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
         }
-        if (type.equalsIgnoreCase("genome")) {
+        if ("genome".equalsIgnoreCase(type)) {
             player.removeLeader(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -907,7 +907,7 @@ public class ButtonHelperTwilightsFall {
                             + Mapper.getLeader(cardID).getTFNameIfAble(),
                     Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             player.removeOwnedUnitByID(cardID);
             UnitModel u = Mapper.getUnit(cardID);
             if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
@@ -935,9 +935,9 @@ public class ButtonHelperTwilightsFall {
             buttons.add(Buttons.green(
                     "drawSingularNewSpliceCard_" + type + "_" + card,
                     "Draw "
-                            + (type.equalsIgnoreCase("ability")
+                            + ("ability".equalsIgnoreCase(type)
                                     ? Mapper.getTech(card).getName()
-                                    : type.equalsIgnoreCase("genome")
+                                    : "genome".equalsIgnoreCase(type)
                                             ? Mapper.getLeader(card).getName()
                                             : Mapper.getUnit(card).getName())));
         }
@@ -958,7 +958,7 @@ public class ButtonHelperTwilightsFall {
             cardID = buttonID.split("_")[2];
             ButtonHelper.deleteMessage(event);
         }
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             player.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -966,7 +966,7 @@ public class ButtonHelperTwilightsFall {
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
         }
-        if (type.equalsIgnoreCase("genome")) {
+        if ("genome".equalsIgnoreCase(type)) {
             player.addLeader(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -974,10 +974,10 @@ public class ButtonHelperTwilightsFall {
                             + Mapper.getLeader(cardID).getName(),
                     Mapper.getLeader(cardID).getRepresentationEmbed());
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             UnitModel unitModel = Mapper.getUnit(cardID);
             String asyncId = unitModel.getAsyncId();
-            if (!asyncId.equalsIgnoreCase("fs") && !asyncId.equalsIgnoreCase("mf")) {
+            if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
                 List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
                         .filter(unit -> unit.getFaction().isEmpty()
                                 || unit.getUpgradesFromUnitId().isEmpty())
@@ -997,7 +997,7 @@ public class ButtonHelperTwilightsFall {
 
     public static List<String> getDeckForSplicing(Game game, String type, int size) {
         List<String> cards = new ArrayList<>();
-        if (type.equalsIgnoreCase("ability")) {
+        if ("ability".equalsIgnoreCase(type)) {
             List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getTechs()) {
@@ -1018,7 +1018,7 @@ public class ButtonHelperTwilightsFall {
                 cards.add(allCards.remove(0));
             }
         }
-        if (type.equalsIgnoreCase("genome")) {
+        if ("genome".equalsIgnoreCase(type)) {
             List<String> allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getLeaderIDs()) {
@@ -1029,7 +1029,7 @@ public class ButtonHelperTwilightsFall {
                 cards.add(allCards.remove(0));
             }
         }
-        if (type.equalsIgnoreCase("paradigm")) {
+        if ("paradigm".equalsIgnoreCase(type)) {
             List<String> allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
             List<String> alreadyDrawn =
                     List.of(game.getStoredValue("savedParadigms").split("_"));
@@ -1040,7 +1040,7 @@ public class ButtonHelperTwilightsFall {
                 cards.add(allCards.remove(0));
             }
         }
-        if (type.equalsIgnoreCase("units")) {
+        if ("units".equalsIgnoreCase(type)) {
             List<String> allCards = new ArrayList<>();
             Map<String, UnitModel> allUnits = Mapper.getUnits();
             for (String unitID : allUnits.keySet()) {

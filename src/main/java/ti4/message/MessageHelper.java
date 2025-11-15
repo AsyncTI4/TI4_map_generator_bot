@@ -1059,7 +1059,7 @@ public class MessageHelper {
                                 TimeUnit.MILLISECONDS,
                                 t -> {
                                     sendMessageToChannelWithEmbeds(t, null, embeds);
-                                    MessageHelper.sendMessageToChannel(
+                                    sendMessageToChannel(
                                             channel,
                                             "Redirected your results to the following thread: " + t.getJumpUrl());
                                 },

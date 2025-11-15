@@ -72,7 +72,7 @@ public class EidolonMaximumService {
         for (UnitHolder uh : unitHolders) {
             String id = "activateEidolonMaximum_" + tile.getPosition() + "_" + uh.getName();
             String label = "Create in space";
-            if (!uh.getName().equals("space")) label = "Create on " + Helper.getPlanetName(uh.getName());
+            if (!"space".equals(uh.getName())) label = "Create on " + Helper.getPlanetName(uh.getName());
             buttons.add(Buttons.green(id, label));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);

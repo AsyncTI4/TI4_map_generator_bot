@@ -54,7 +54,7 @@ public class SeatDraftable extends SinglePickDraftable {
             String unformattedName = "Seat " + i;
             String displayName = "Seat " + i;
             choices.add(new DraftChoice(
-                    getType(),
+                TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, null, buttonEmoji),
                     displayName,
@@ -74,7 +74,7 @@ public class SeatDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-                getType(), null, null, "No seat picked", "No seat picked", MiscEmojis.resources.toString());
+            TYPE, null, null, "No seat picked", "No seat picked", MiscEmojis.resources.toString());
     }
 
     @Override
@@ -129,12 +129,12 @@ public class SeatDraftable extends SinglePickDraftable {
     public Consumer<Player> setupPlayer(
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(getType())
-                || pState.getPicks().get(getType()).isEmpty()) {
+        if (!pState.getPicks().containsKey(TYPE)
+                || pState.getPicks().get(TYPE).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a seat");
         }
 
-        String seat = pState.getPicks().get(getType()).get(0).getChoiceKey();
+        String seat = pState.getPicks().get(TYPE).get(0).getChoiceKey();
         Integer seatNum = getSeatNumberFromChoiceKey(seat);
         if (seatNum == null) {
             throw new IllegalStateException("Player " + playerUserId + " has an invalid seat choice key: " + seat);
@@ -149,11 +149,10 @@ public class SeatDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
-        Game game = draftSystemSettings.getGame();
+      Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

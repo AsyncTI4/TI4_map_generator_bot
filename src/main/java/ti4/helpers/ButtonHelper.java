@@ -7052,7 +7052,7 @@ public class ButtonHelper {
                         continue;
                     }
                     if (player.hasUnit("ralnel_destroyer2")
-                            && unitHolder.getName().equalsIgnoreCase("space")) {
+                            && "space".equalsIgnoreCase(unitHolder.getName())) {
                         if (model.getUnitType() == UnitType.Pds || model.getUnitType() == UnitType.Spacedock) {
                             continue;
                         }

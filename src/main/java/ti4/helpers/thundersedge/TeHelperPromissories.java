@@ -117,7 +117,7 @@ public class TeHelperPromissories {
 
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 String uhName = "space";
-                if (!uh.getName().equals("space")) {
+                if (!"space".equals(uh.getName())) {
                     uhName = Helper.getPlanetRepresentation(uh.getName(), game);
                 }
 

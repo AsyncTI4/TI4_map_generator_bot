@@ -26,7 +26,7 @@ import ti4.service.draft.draftables.AndcatReferenceCardsDraftable.ReferenceCardP
 public class AndcatReferenceCardsMessageHelper {
     private static final String USER_SUMMARY_PREFIX = "### Selecting which faction for what purpose\n";
 
-    private AndcatReferenceCardsDraftable draftable;
+    private final AndcatReferenceCardsDraftable draftable;
 
     public AndcatReferenceCardsMessageHelper(AndcatReferenceCardsDraftable draftable) {
         this.draftable = draftable;
@@ -153,7 +153,7 @@ public class AndcatReferenceCardsMessageHelper {
 
         messageBuilder.appendLine("When you're satisfied with your choices, lock them in:");
         Button finalizeButton =
-                Buttons.gray(this.draftable.makeButtonId("assign_complete"), "Finish assigning factions");
+                Buttons.gray(draftable.makeButtonId("assign_complete"), "Finish assigning factions");
         boolean canFinalize = refPackage.homeSystemFaction() != null
                 && refPackage.startingUnitsFaction() != null
                 && refPackage.speakerOrderFaction() != null
@@ -173,7 +173,7 @@ public class AndcatReferenceCardsMessageHelper {
         for (String playerUserId : draftManager.getPlayerUserIds()) {
             Player player = draftManager.getGame().getPlayer(playerUserId);
             String playerRepresentation = player.getRepresentation(true, false, true, true);
-            List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, this.draftable.getType());
+            List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, draftable.getType());
             messageBuilder.append(System.lineSeparator());
             if (playerPicks.isEmpty()) {
                 messageBuilder
@@ -183,7 +183,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             ReferenceCardPackage refPackage =
-                    this.draftable.getPackageByChoiceKey(playerPicks.get(0).getChoiceKey());
+                    draftable.getPackageByChoiceKey(playerPicks.get(0).getChoiceKey());
             if (refPackage == null) {
                 messageBuilder.append(playerRepresentation).append(" has an invalid package pick.");
                 continue;
@@ -303,7 +303,7 @@ public class AndcatReferenceCardsMessageHelper {
 
         // Finalize choices button
         String buttonLabel = isChoiceFinalized ? "Choices locked!" : "Finish assigning factions";
-        Button finalizeButton = Buttons.gray(this.draftable.makeButtonId("assign_complete"), buttonLabel);
+        Button finalizeButton = Buttons.gray(draftable.makeButtonId("assign_complete"), buttonLabel);
         boolean canFinalize = refPackage.homeSystemFaction() != null
                 && refPackage.startingUnitsFaction() != null
                 && refPackage.speakerOrderFaction() != null
@@ -341,7 +341,7 @@ public class AndcatReferenceCardsMessageHelper {
             boolean isChoiceFinalized,
             String factionName,
             String factionEmoji) {
-        String buttonId = this.draftable.makeButtonId("assign_" + setupPart + "_" + factionAlias);
+        String buttonId = draftable.makeButtonId("assign_" + setupPart + "_" + factionAlias);
         Button button = Buttons.green(buttonId, "Pick " + factionName, factionEmoji);
         if (factionAlias.equals(factionForPart)) {
             button = Buttons.red(buttonId, "Unpick " + factionName, factionEmoji);
@@ -366,14 +366,14 @@ public class AndcatReferenceCardsMessageHelper {
         }
         String setupPart = tokens[0];
 
-        String playerChoiceKey = draftManager.getPlayerPicks(playerUserId, this.draftable.getType()).stream()
+        String playerChoiceKey = draftManager.getPlayerPicks(playerUserId, draftable.getType()).stream()
                 .map(DraftChoice::getChoiceKey)
                 .findFirst()
                 .orElse(null);
         if (playerChoiceKey == null) {
             return "You have not picked a reference card package.";
         }
-        ReferenceCardPackage refPackage = this.draftable.getPackageByChoiceKey(playerChoiceKey);
+        ReferenceCardPackage refPackage = draftable.getPackageByChoiceKey(playerChoiceKey);
         if (refPackage == null) {
             return "Cannot find reference card package for your pick.";
         }
@@ -382,7 +382,7 @@ public class AndcatReferenceCardsMessageHelper {
                     + "You have already finalized your reference card assignments.";
         }
 
-        if (setupPart.equals("complete")) {
+        if ("complete".equals(setupPart)) {
             // Make sure everything is picked
             if (refPackage.homeSystemFaction() == null
                     || refPackage.startingUnitsFaction() == null
@@ -400,14 +400,14 @@ public class AndcatReferenceCardsMessageHelper {
                     refPackage.speakerOrderFaction(),
                     true);
             Integer packageKey = Integer.parseInt(playerChoiceKey.substring("package".length()));
-            this.draftable.getReferenceCardPackages().put(packageKey, refPackage);
+            draftable.getReferenceCardPackages().put(packageKey, refPackage);
 
             // Disable buttons
             Player player = draftManager.getGame().getPlayer(playerUserId);
             updatePackageButtons(event, draftManager, player, refPackage);
             updatePackagePickSummary(draftManager);
 
-            if (this.draftable.whatsStoppingSetup(draftManager) == null) {
+            if (draftable.whatsStoppingSetup(draftManager) == null) {
                 // TODO: Print speaker order and priority numbers
                 // TODO: Block for Keleres to pick their HS tile
                 // TODO: Make sure setup messages go to the main game channel, not the event channel (e.g. frontier
@@ -515,7 +515,7 @@ public class AndcatReferenceCardsMessageHelper {
         }
 
         Integer packageKey = Integer.parseInt(playerChoiceKey.substring("package".length()));
-        this.draftable.getReferenceCardPackages().put(packageKey, refPackage);
+        draftable.getReferenceCardPackages().put(packageKey, refPackage);
 
         // Update buttons
         Player player = draftManager.getGame().getPlayer(playerUserId);

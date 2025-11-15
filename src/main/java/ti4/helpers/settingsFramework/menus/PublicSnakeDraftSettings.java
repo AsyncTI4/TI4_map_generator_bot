@@ -143,11 +143,10 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
     }
 
     private String initialSetOrderButtons(GenericInteractionCreateEvent event) {
-        if (!(parent instanceof DraftSystemSettings)) {
+        if (!(parent instanceof DraftSystemSettings dss)) {
             return "Unknown Event (or unknown parent menu)";
         }
-        DraftSystemSettings dss = (DraftSystemSettings) parent;
-        Set<String> playerUserIds = dss.getPlayerUserIds();
+      Set<String> playerUserIds = dss.getPlayerUserIds();
         Game game = dss.getGame();
 
         List<Button> buttons = new ArrayList<>();
@@ -187,11 +186,10 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
             buttonEvent.getMessage().delete().queue();
         }
 
-        if (!(parent instanceof DraftSystemSettings)) {
+        if (!(parent instanceof DraftSystemSettings dss)) {
             return "Unknown Event (or unknown parent menu)";
         }
-        DraftSystemSettings dss = (DraftSystemSettings) parent;
-        Set<String> playerUserIds = dss.getPlayerUserIds();
+      Set<String> playerUserIds = dss.getPlayerUserIds();
         Game game = dss.getGame();
 
         String playerUserId = action.substring("orderFor_".length());

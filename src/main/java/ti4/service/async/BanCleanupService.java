@@ -30,14 +30,11 @@ public class BanCleanupService {
     }
 
     private boolean shouldBanFromAllGuilds(AuditLogEntry log, User target, User admin) {
-        if (admin == null || target == null || !log.getType().equals(ActionType.BAN)) {
+        if (admin == null || target == null || log.getType() != ActionType.BAN) {
             return false;
         }
         ManagedPlayer mp = GameManager.getManagedPlayer(target.getId());
-        if (mp != null || admin.getId().equals(JdaService.getBotId())) {
-            return false;
-        }
-        return true;
+      return mp == null && !admin.getId().equals(JdaService.getBotId());
     }
 
     private int removeUserFromAllGuilds(User user, String reason) {

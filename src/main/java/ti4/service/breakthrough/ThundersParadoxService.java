@@ -35,7 +35,7 @@ public class ThundersParadoxService {
             List<Button> buttons = new ArrayList<>();
             String buttonPrefix = player.finChecker() + "useThundersParadox_step2_";
             for (Leader leader : player.getLeaders()) {
-                if (leader.isExhausted() || !leader.getType().equals("agent")) continue;
+                if (leader.isExhausted() || !"agent".equals(leader.getType())) continue;
 
                 String id = buttonPrefix + leader.getId();
                 String label = leader.getLeaderModel()
@@ -93,9 +93,10 @@ public class ThundersParadoxService {
             for (Player p : game.getRealPlayers()) {
                 boolean found = false;
                 for (Leader l : p.getLeaders()) {
-                    if (l.getType().equals("agent")) {
-                        found = true;
-                    }
+                  if ("agent".equals(l.getType())) {
+                    found = true;
+                    break;
+                  }
                 }
                 if (found
                         || p.getExhaustedRelics().contains("titanprototype")
@@ -119,7 +120,7 @@ public class ThundersParadoxService {
                 List<Button> buttons = new ArrayList<>();
                 String buttonPrefix = player.finChecker() + "useThundersParadox_step4_" + p2.getFaction() + "_";
                 for (Leader leader : p2.getLeaders()) {
-                    if (!leader.isExhausted() || !leader.getType().equals("agent")) continue;
+                    if (!leader.isExhausted() || !"agent".equals(leader.getType())) continue;
 
                     String id = buttonPrefix + leader.getId();
                     String label = leader.getLeaderModel()

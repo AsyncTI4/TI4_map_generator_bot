@@ -1842,7 +1842,7 @@ public class ButtonHelperModifyUnits {
             for (Integer sc : player.getSCs()) {
                 StrategyCardModel scModel =
                         game.getStrategyCardModelByInitiative(sc).orElse(null);
-                if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
                     hasConstruction = true;
                 }
                 if (scModel != null
@@ -1853,7 +1853,7 @@ public class ButtonHelperModifyUnits {
                     break;
                 }
             }
-            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te") || game.isTwilightsFallMode()) {
+            if ("te".equalsIgnoreCase(game.getStrategyCardSet().getAlias()) || game.isTwilightsFallMode()) {
                 hasConstruction = true;
             }
 

@@ -339,6 +339,6 @@ public class SliceDraftableSettings extends SettingsMenu {
     }
 
     private boolean isNucleusMode() {
-        return MapGenerationMode.Nucleus.equals(mapGenerationMode.getValue());
+        return MapGenerationMode.Nucleus == mapGenerationMode.getValue();
     }
 }

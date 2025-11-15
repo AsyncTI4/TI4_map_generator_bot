@@ -479,7 +479,7 @@ public class NucleusImageGeneratorService {
      * @return space for the (number of rings + 1) + 2 * EXTRA_Y
      */
     private int getMapHeight(Game game) {
-        return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
+        return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2;
     }
 
     /**

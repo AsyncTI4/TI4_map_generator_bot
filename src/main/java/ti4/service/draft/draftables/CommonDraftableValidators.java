@@ -24,9 +24,6 @@ public class CommonDraftableValidators {
     public boolean hasRemainingChoices(
             DraftManager draftManager, String playerUserId, DraftableType type, int maxChoices) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (pState.getPicks().containsKey(type) && pState.getPicks().get(type).size() >= maxChoices) {
-            return false;
-        }
-        return true;
+      return !pState.getPicks().containsKey(type) || pState.getPicks().get(type).size() < maxChoices;
     }
 }
