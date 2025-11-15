@@ -1,4 +1,4 @@
-package ti4.commands.tf;
+package ti4.commands.special;
 
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
