@@ -34,7 +34,7 @@ public class DeorbitBarrageService {
     }
 
     private List<Planet> getAllPlanetsInRange(Game game, Player player) {
-        Predicate<Tile> asteroidWithUnit = Tile.tileHasPlayerShips(player).and(tile -> tile.isAsteroidField());
+        Predicate<Tile> asteroidWithUnit = Tile.tileHasPlayerShips(player).and(Tile::isAsteroidField);
         List<Tile> asteroids =
                 game.getTileMap().values().stream().filter(asteroidWithUnit).toList();
 

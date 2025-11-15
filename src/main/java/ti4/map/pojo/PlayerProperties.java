@@ -76,10 +76,10 @@ public class PlayerProperties {
     private int atsCount;
 
     private String breakthroughID = "";
-    private boolean breakthroughUnlocked = false;
-    private boolean breakthroughExhausted = false;
-    private boolean breakthroughActive = false;
-    private int breakthroughTGs = 0;
+    private boolean breakthroughUnlocked;
+    private boolean breakthroughExhausted;
+    private boolean breakthroughActive;
+    private int breakthroughTGs;
 
     // Stat tracking
     private int sarweenCounter;

@@ -40,7 +40,6 @@ import ti4.model.FactionModel;
 import ti4.model.Source;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
-import ti4.service.PlanetService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.info.AbilityInfoService;
 import ti4.service.info.CardsInfoService;
@@ -50,6 +49,7 @@ import ti4.service.info.TechInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.planet.PlanetService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
@@ -352,7 +352,7 @@ public class MiltyService {
                 pos = "bl";
             }
             if (game.getTileByPosition(pos) != null) {
-                if (pos.equalsIgnoreCase("tr")) {
+                if ("tr".equalsIgnoreCase(pos)) {
                     pos = "br";
                 } else {
                     pos = "tr";
@@ -375,7 +375,7 @@ public class MiltyService {
                 pos = "bl";
             }
             if (game.getTileByPosition(pos) != null) {
-                if (pos.equalsIgnoreCase("tr")) {
+                if ("tr".equalsIgnoreCase(pos)) {
                     pos = "br";
                 } else {
                     pos = "tr";
@@ -430,7 +430,7 @@ public class MiltyService {
 
             for (String tech : factionModel.getFactionTech()) {
                 if (tech.trim().isEmpty()) continue;
-                if (tech.equalsIgnoreCase("iihq") && game.isThundersEdge()) {
+                if ("iihq".equalsIgnoreCase(tech) && game.isThundersEdge()) {
                     tech = "executiveorder";
                 }
                 TechnologyModel factionTech = techReplacements.getOrDefault(tech, Mapper.getTech(tech));
@@ -623,7 +623,7 @@ public class MiltyService {
                             + " technology due to the _Age of Fighters_ galactic event.");
         }
         if (game.isAdventOfTheWarsunMode()) {
-            if (player.getFaction().equalsIgnoreCase("muaat")) {
+            if ("muaat".equalsIgnoreCase(player.getFaction())) {
                 player.removeOwnedPromissoryNoteByID("fires");
                 UnlockLeaderService.unlockLeader("muaatcommander", game, player);
                 AddUnitService.addUnits(event, tile, game, color, "ws");
@@ -707,7 +707,7 @@ public class MiltyService {
             player.removePromissoryNote(player.getColor() + "_sftt");
         }
 
-        if (game.isThundersEdge() && player.getFaction().equalsIgnoreCase("crimson")) {
+        if (game.isThundersEdge() && "crimson".equalsIgnoreCase(player.getFaction())) {
             BreakthroughCommandHelper.unlockBreakthrough(game, player);
         }
 
@@ -765,7 +765,7 @@ public class MiltyService {
                 pos = "bl";
             }
             if (game.getTileByPosition(pos) != null) {
-                if (pos.equalsIgnoreCase("tr")) {
+                if ("tr".equalsIgnoreCase(pos)) {
                     pos = "br";
                 } else {
                     pos = "tr";

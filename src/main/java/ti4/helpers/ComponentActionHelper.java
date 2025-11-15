@@ -25,8 +25,6 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
-import ti4.service.BookOfLatviniaService;
-import ti4.service.SilverFlameService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -35,6 +33,8 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.relic.BookOfLatviniaService;
+import ti4.service.relic.SilverFlameService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -61,7 +61,7 @@ public class ComponentActionHelper {
 
             boolean x89Conventions = ("x89".equalsIgnoreCase(tech) || "x89c4".equalsIgnoreCase(tech))
                     && game.isConventionsOfWarAbandonedMode()
-                    && ButtonHelper.getButtonsForConventions(p1, game).size() > 0;
+                    && !ButtonHelper.getButtonsForConventions(p1, game).isEmpty();
             if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
@@ -104,22 +104,14 @@ public class ComponentActionHelper {
                 boolean validAction =
                         switch (bt.getAlias()) {
                             case "arborecbt" ->
-                                game.getTileMap().values().stream()
-                                                .filter(Tile.tileHasPlayersInfAndCC(p1))
-                                                .count()
-                                        > 0;
+                                game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
                             case "crimsonbt" ->
-                                game.getTileMap().values().stream()
-                                                .filter(Tile.tileHasBreach())
-                                                .count()
-                                        > 0;
-                            case "mahactbt" -> p1.getTechs().size() > 0;
+                                game.getTileMap().values().stream().anyMatch(Tile.tileHasBreach());
+                            case "mahactbt" -> !p1.getTechs().isEmpty();
                             case "saarbt" ->
                                 game.getTileMap().values().stream()
-                                                .filter(Tile::isAsteroidField)
-                                                .filter(Tile.tileHasPlayerShips(p1))
-                                                .count()
-                                        > 0;
+                                        .filter(Tile::isAsteroidField)
+                                        .anyMatch(Tile.tileHasPlayerShips(p1));
                             case "deepwroughtbt" -> true;
                             default -> true;
                         };
@@ -396,7 +388,7 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("puppetsoftheblade")
-                && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && ary.size() > 0)) {
+                && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && !ary.isEmpty())) {
             Button abilityButton = Buttons.green(
                     finChecker + prefix + "ability_puppetsoftheblade", "Become The Obsidian", FactionEmojis.Obsidian);
             compButtons.add(abilityButton);
@@ -774,12 +766,10 @@ public class ComponentActionHelper {
                 String secretScoreMsg = "Click a button below to play an action card.";
                 List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
                 acButtons.add(Buttons.DONE_DELETE_BUTTONS);
-                if (!acButtons.isEmpty()) {
-                    List<MessageCreateData> messageList =
-                            MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-                    for (MessageCreateData message : messageList) {
-                        event.getHook().setEphemeral(true).sendMessage(message).queue();
-                    }
+                List<MessageCreateData> messageList =
+                        MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
+                for (MessageCreateData message : messageList) {
+                    event.getHook().setEphemeral(true).sendMessage(message).queue();
                 }
             }
             case "doStarCharts" -> {

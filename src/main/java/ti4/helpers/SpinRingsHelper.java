@@ -192,10 +192,10 @@ public class SpinRingsHelper {
                     if ((x - 2) < 1) {
                         tile.setPosition(2 + "" + ((x - 2) + (2 * 6)));
                     } else {
-                        if ((x - y) < 10) {
-                            tile.setPosition(y + "0" + (x - y));
+                        if ((x - 2) < 10) {
+                            tile.setPosition(2 + "0" + (x - 2));
                         } else {
-                            tile.setPosition(y + "" + (x - y));
+                            tile.setPosition(2 + "" + (x - 2));
                         }
                     }
                 } else {

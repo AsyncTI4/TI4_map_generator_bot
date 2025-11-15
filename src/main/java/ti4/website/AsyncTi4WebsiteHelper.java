@@ -18,6 +18,7 @@ import ti4.map.Player;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
+import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
 import ti4.spring.websocket.WebSocketNotifier;
 import ti4.website.model.WebBorderAnomalies;
@@ -147,8 +148,7 @@ public class AsyncTi4WebsiteHelper {
             webData.put("expeditions", webExpeditions != null ? webExpeditions.getExpeditions() : null);
             webData.put(
                     "borderAnomalies",
-                    webBorderAnomalies != null
-                                    && webBorderAnomalies.getBorderAnomalies() != null
+                    webBorderAnomalies.getBorderAnomalies() != null
                                     && !webBorderAnomalies.getBorderAnomalies().isEmpty()
                             ? webBorderAnomalies.getBorderAnomalies()
                             : null);
@@ -170,6 +170,25 @@ public class AsyncTi4WebsiteHelper {
                         "application/json",
                         "no-cache, no-store, must-revalidate",
                         null);
+
+                // Upload latest image name if available
+                try {
+                    GameImageService gameImageService = SpringContext.getBean(GameImageService.class);
+                    String latestImageName = gameImageService.getLatestMapImageName(game.getName());
+                    if (latestImageName != null && !latestImageName.isEmpty()) {
+                        Map<String, String> imageData = new HashMap<>();
+                        imageData.put("image", latestImageName);
+                        String imageJson = EgressClientManager.getObjectMapper().writeValueAsString(imageData);
+                        putObjectInBucket(
+                                String.format("webdata/%s/latestImage.json", gameId),
+                                AsyncRequestBody.fromString(imageJson),
+                                "application/json",
+                                "no-cache, no-store, must-revalidate",
+                                null);
+                    }
+                } catch (Exception e) {
+                    BotLogger.error(new LogOrigin(game), "Could not upload latest image name to web server", e);
+                }
 
                 notifyGameRefreshWebsocket(gameId);
             }

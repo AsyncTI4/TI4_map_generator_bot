@@ -1,6 +1,9 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +28,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
@@ -78,7 +80,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
-import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.AutoFactoriesService;
@@ -106,6 +107,7 @@ import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.option.TEOptionService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
+import ti4.service.planet.PlanetService;
 import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tactical.TacticalActionService;
@@ -866,7 +868,7 @@ public class UnfiledButtonHandlers {
 
                         if (assignedUnit.contains(name)) {
                             String planet = assignedUnit.split("_")[2];
-                            String label = "Unassign " + StringUtils.capitalize(mod.getBaseType()) + " from "
+                            String label = "Unassign " + capitalize(mod.getBaseType()) + " from "
                                     + Helper.getPlanetRepresentationNoResInf(planet, game);
                             if (!usedLabels.contains(label)) {
                                 buttons.add(
@@ -877,7 +879,7 @@ public class UnfiledButtonHandlers {
                     }
                 } else {
                     for (String planet : getBombardablePlanets(player, game, tile)) {
-                        String label = "Assign " + StringUtils.capitalize(mod.getBaseType()) + " to "
+                        String label = "Assign " + capitalize(mod.getBaseType()) + " to "
                                 + Helper.getPlanetRepresentationNoResInf(planet, game);
                         if (!usedLabels.contains(label)) {
                             buttons.add(Buttons.green(
@@ -1327,7 +1329,7 @@ public class UnfiledButtonHandlers {
     public static void refresh(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planetName = buttonID.split("_")[1];
         Player p2 = player;
-        if (StringUtils.countMatches(buttonID, "_") > 1) {
+        if (countMatches(buttonID, "_") > 1) {
             String faction = buttonID.split("_")[2];
             p2 = game.getPlayerFromColorOrFaction(faction);
         }
@@ -1597,7 +1599,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("assignSpeaker_")
     public static void assignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = StringUtils.substringAfter(buttonID, "assignSpeaker_");
+        String faction = substringAfter(buttonID, "assignSpeaker_");
         game.setStoredValue("hasntSetSpeaker", "");
         if (!game.isFowMode()) {
             for (Player player_ : game.getPlayers().values()) {
@@ -2254,7 +2256,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
-                        && tile.getWormholes(game).size() > 0) {
+                        && !tile.getWormholes(game).isEmpty()) {
                     player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
                 }
                 // ButtonHelper.updateMap(game, event,
@@ -2567,9 +2569,7 @@ public class UnfiledButtonHandlers {
             case "no_sabotage" ->
                 ReactionService.handleAllPlayersReactingNoSabotage(
                         event.getInteraction().getMessage(), game);
-            case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                respondAllHaveScored(game);
-            }
+            case Constants.PO_SCORING, Constants.PO_NO_SCORING -> respondAllHaveScored(game);
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     if (game.isTwilightsFallMode()) {
@@ -3476,7 +3476,7 @@ public class UnfiledButtonHandlers {
     private static void passingAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an ability when you pass:";
         List<Button> buttons = ButtonHelper.getPassingAbilities(player, game);
-        buttons.add(0, Buttons.red(player.finChecker() + "passForRound", "Pass"));
+        buttons.addFirst(Buttons.red(player.finChecker() + "passForRound", "Pass"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
     }
 
@@ -3484,8 +3484,8 @@ public class UnfiledButtonHandlers {
     public static void endOfTurnAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an end of turn ability";
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
-        if (buttons.size() > 0) {
-            buttons.add(0, Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
+        if (!buttons.isEmpty()) {
+            buttons.addFirst(Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
         } else {
             TurnEndButtonHandler.turnEnd(event, game, player);
