@@ -586,9 +586,8 @@ public class TransactionHelper {
                             || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
                         continue;
                     }
-                    if (ButtonHelper.getUnitHolderFromPlanetName(planet, game)
-                                    .getUnitCount(UnitType.Mech, p1.getColor())
-                            > 0) {
+                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    if (unitHolder != null && unitHolder.getUnitCount(UnitType.Mech, p1.getColor()) > 0) {
                         stuffToTransButtons.add(Buttons.gray(
                                 "offerToTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction() + "_" + planet,
                                 Helper.getPlanetRepresentation(planet, game)));
