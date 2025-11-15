@@ -260,6 +260,16 @@ public class AgendaHelper {
                 names.add(actionCard.getName());
             }
         }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("When an agenda is revealed")) {
+                    names.add(actionCard.getName());
+                }
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
@@ -383,6 +393,17 @@ public class AgendaHelper {
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
+            }
+        }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("After an agenda is revealed")
+                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
+                    names.add(actionCard.getName());
+                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -917,7 +938,14 @@ public class AgendaHelper {
 
     private static boolean playerDoesNotHaveShenanigans(Player player) {
         Set<String> shenanigans = Set.of("deadly_plot", "bribery", "confounding", "confusing");
-        return player.getActionCards().keySet().stream().noneMatch(shenanigans::contains);
+        if (player.getActionCards().keySet().stream().anyMatch(shenanigans::contains)) {
+            return false;
+        }
+        if (player.hasPlanet("garbozia")) {
+            return ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet().stream()
+                    .noneMatch(shenanigans::contains);
+        }
+        return true;
     }
 
     public static void offerEveryonePreAbstain(Game game) {

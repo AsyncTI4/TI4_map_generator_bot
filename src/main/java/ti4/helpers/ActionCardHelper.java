@@ -122,7 +122,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static Map<String, Integer> getGarboziaActionCards(Game game) {
+    public static Map<String, Integer> getGarboziaActionCards(Game game) {
         Map<String, Integer> cards = new HashMap<>();
         for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
             if (discard.getValue() != ACStatus.garbozia) continue;
