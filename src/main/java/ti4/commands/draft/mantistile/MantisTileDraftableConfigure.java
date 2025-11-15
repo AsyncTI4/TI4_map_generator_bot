@@ -1,7 +1,6 @@
 package ti4.commands.draft.mantistile;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
@@ -43,10 +42,10 @@ class MantisTileDraftableConfigure extends GameStateSubcommand {
             if (commaSeparatedTiles != null && !commaSeparatedTiles.trim().isEmpty()) {
                 draftable
                         .getMulliganTileIDs()
-                        .addAll(List.of(commaSeparatedTiles.split(",")).stream()
+                        .addAll(Stream.of(commaSeparatedTiles.split(","))
                                 .map(String::trim)
                                 .filter(s -> !s.isEmpty())
-                                .collect(Collectors.toList()));
+                                .toList());
             }
         }
         if (event.getOption("discarded_tiles") != null) {
@@ -55,10 +54,10 @@ class MantisTileDraftableConfigure extends GameStateSubcommand {
             if (commaSeparatedTiles != null && !commaSeparatedTiles.trim().isEmpty()) {
                 draftable
                         .getDiscardedTileIDs()
-                        .addAll(List.of(commaSeparatedTiles.split(",")).stream()
+                        .addAll(Stream.of(commaSeparatedTiles.split(","))
                                 .map(String::trim)
                                 .filter(s -> !s.isEmpty())
-                                .collect(Collectors.toList()));
+                                .toList());
             }
         }
     }

@@ -7,7 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.service.StellarConverterService;
+import ti4.service.relic.StellarConverterService;
 
 class StellarConverter extends GameStateSubcommand {
 

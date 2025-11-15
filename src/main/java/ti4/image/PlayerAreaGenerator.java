@@ -669,10 +669,7 @@ class PlayerAreaGenerator {
 
             List<Entry<String, Integer>> plots =
                     new ArrayList<>(player.getPlotCards().entrySet());
-            Collections.sort(
-                    plots,
-                    Comparator.comparing(
-                            Entry::getValue)); // sort by number to keep a consistent and anonymous ordering
+            plots.sort(Entry.comparingByValue()); // sort by number to keep a consistent and anonymous ordering
             for (Entry<String, Integer> entry : plots) {
                 String alias = entry.getKey();
                 Integer id = entry.getValue();
@@ -795,7 +792,8 @@ class PlayerAreaGenerator {
             IntStream.range(0, maxGalvanizeTokens).forEach(i -> points.add(new Point(i * 20, 20 * ((i + 1) % 2))));
             int totGalvanized = game.getTileMap().values().stream()
                     .flatMap(t -> t.getUnitHolders().values().stream())
-                    .collect(Collectors.summingInt(UnitHolder::getTotalGalvanizedCount));
+                    .mapToInt(UnitHolder::getTotalGalvanizedCount)
+                    .sum();
             if (totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
                         + " there are too many galvanized units on the board. Please review and resolve manually.";

@@ -70,7 +70,7 @@ public class MantisTileDraftable extends Draftable {
 
     @Getter
     @Setter
-    private String drawnTileId = null;
+    private String drawnTileId;
 
     @Getter
     private final List<String> mulliganTileIDs = new ArrayList<>();
@@ -160,7 +160,7 @@ public class MantisTileDraftable extends Draftable {
 
     private DraftChoice produceChoice(DraftItem tile) {
         String tileID = tile.ItemId;
-        String choiceKey = MantisTileDraftable.makeChoiceKey(tileID);
+        String choiceKey = makeChoiceKey(tileID);
         String representation = Mapper.getTileRepresentations().get(tileID);
         if (representation == null) {
             representation = tileID;
@@ -278,15 +278,13 @@ public class MantisTileDraftable extends Draftable {
             return; // Not sure this needs to be logged anywhere
         }
 
-        cardsInfoChannel.getHistory().retrievePast(10).queue(messages -> {
-            messages.stream()
-                    .filter(msg -> !msg.isUsingComponentsV2())
-                    .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
-                    .findFirst()
-                    .ifPresentOrElse(msg -> msg.editMessage(summary.toString()).queue(), () -> cardsInfoChannel
-                            .sendMessage(summary.toString())
-                            .queue());
-        });
+        cardsInfoChannel.getHistory().retrievePast(10).queue(messages -> messages.stream()
+                .filter(msg -> !msg.isUsingComponentsV2())
+                .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
+                .findFirst()
+                .ifPresentOrElse(
+                        msg -> msg.editMessage(summary.toString()).queue(),
+                        () -> cardsInfoChannel.sendMessage(summary.toString()).queue()));
     }
 
     @Override
@@ -323,7 +321,7 @@ public class MantisTileDraftable extends Draftable {
             allTileIDs.add("w" + mulligans);
         }
 
-        return String.join(Draftable.SAVE_SEPARATOR, allTileIDs);
+        return String.join(SAVE_SEPARATOR, allTileIDs);
     }
 
     @Override
@@ -335,7 +333,7 @@ public class MantisTileDraftable extends Draftable {
         if (data == null || data.isEmpty()) {
             return;
         }
-        String[] labeledTileIDs = data.split(Draftable.SAVE_SEPARATOR);
+        String[] labeledTileIDs = data.split(SAVE_SEPARATOR);
         for (String labeledTileId : labeledTileIDs) {
             Character label = labeledTileId.charAt(0);
             String datum = labeledTileId.length() > 1 ? labeledTileId.substring(1) : "";
@@ -479,10 +477,9 @@ public class MantisTileDraftable extends Draftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
@@ -508,9 +505,9 @@ public class MantisTileDraftable extends Draftable {
 
         game.setMapTemplateID(mapTemplate.getAlias());
 
-        this.extraBlues = mantisSettings.getExtraBlues().getVal();
-        this.extraReds = mantisSettings.getExtraReds().getVal();
-        this.mulligans = mantisSettings.getMulligans().getVal();
+        extraBlues = mantisSettings.getExtraBlues().getVal();
+        extraReds = mantisSettings.getExtraReds().getVal();
+        mulligans = mantisSettings.getMulligans().getVal();
 
         List<ComponentSource> sources = sourceSettings.getTileSources();
         DraftTileManager tileManager = game.getDraftTileManager();

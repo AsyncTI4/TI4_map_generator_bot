@@ -21,13 +21,13 @@ public class AutoFactoriesService {
     private static int getNumberOfProducedNonFighterShips(Player player, Game game) {
         int count = 0;
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
-        for (String unit : producedUnits.keySet()) {
-            String unit2 = unit.split("_")[0];
+        for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+            String unit2 = entry.getKey().split("_")[0];
             UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
             UnitModel producedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
 
-            if (producedUnit.getIsShip() && !producedUnit.getAsyncId().equals("ff")) {
-                count += producedUnits.get(unit);
+            if (producedUnit.getIsShip() && !"ff".equals(producedUnit.getAsyncId())) {
+                count += entry.getValue();
             }
         }
         return count;

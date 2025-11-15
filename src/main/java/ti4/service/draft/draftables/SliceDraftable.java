@@ -70,7 +70,7 @@ public class SliceDraftable extends SinglePickDraftable {
             String unformattedName = "Slice " + slice.getName();
             String displayName = "Slice " + slice.getName();
             choices.add(new DraftChoice(
-                    getType(),
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, null, buttonEmoji),
                     displayName,
@@ -90,7 +90,7 @@ public class SliceDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-                getType(),
+                TYPE,
                 null,
                 null,
                 "No slice picked",
@@ -137,25 +137,22 @@ public class SliceDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }
         SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
 
-        if (MapGenerationMode.Nucleus.equals(
-                sliceSettings.getMapGenerationMode().getValue())) {
+        if (sliceSettings.getMapGenerationMode().getValue() == MapGenerationMode.Nucleus) {
             return doNucleusGeneration(
                     event,
                     game,
                     sliceSettings,
                     draftSystemSettings.getPlayerUserIds().size());
-        } else if (MapGenerationMode.Milty.equals(
-                sliceSettings.getMapGenerationMode().getValue())) {
+        } else if (sliceSettings.getMapGenerationMode().getValue() == MapGenerationMode.Milty) {
             return doMiltyGeneration(event, game, draftSystemSettings);
         } else {
             return "Error: Unknown map generation mode: "

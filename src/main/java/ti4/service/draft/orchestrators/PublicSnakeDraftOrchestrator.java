@@ -101,7 +101,8 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         for (String playerUserId : playerOrder) {
             PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
             State orchestratorState = (State) playerState.getOrchestratorState();
-            orchestratorState.setOrderIndex(orderIndex++);
+            orchestratorState.setOrderIndex(orderIndex);
+            orderIndex++;
         }
     }
 
@@ -167,10 +168,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             return DraftButtonService.USER_MISTAKE_PREFIX + "It's not your turn to draft.";
         }
         // Ensure no one else has picked this choice
-        if (draftManager
-                        .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
-                        .size()
-                > 0) {
+        if (!draftManager
+                .getPlayersWithChoiceKey(choice.getType(), choice.getChoiceKey())
+                .isEmpty()) {
             return DraftButtonService.USER_MISTAKE_PREFIX + "That choice has already been taken.";
         }
 
@@ -217,9 +217,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         // If 1+ deterministic picks are found amongst the draftables, AND there are no more deterministic picks
         // than there are picks at this time, AND there are no non-deterministic picks available, apply the only
         // possible picks automatically.
-        if (!undeterministicPicks && totalPossiblePicks.size() > 0 && totalPossiblePicks.size() <= simultaneousPicks) {
+        if (!undeterministicPicks && !totalPossiblePicks.isEmpty() && totalPossiblePicks.size() == simultaneousPicks) {
             Player nextPlayer = draftManager.getGame().getPlayer(getCurrentPlayer(playerOrder));
-            DraftChoice forcedPick = totalPossiblePicks.get(0);
+            DraftChoice forcedPick = totalPossiblePicks.getFirst();
             Draftable forcedDraftable = draftManager.getDraftable(forcedPick.getType());
             String status = draftManager.routeCommand(
                     event,
@@ -254,12 +254,12 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String save() {
-        return currentPlayerIndex + DraftOrchestrator.SAVE_SEPARATOR + isReversing;
+        return currentPlayerIndex + SAVE_SEPARATOR + isReversing;
     }
 
     @Override
     public void load(String data) {
-        String[] tokens = data.split(DraftOrchestrator.SAVE_SEPARATOR, 2);
+        String[] tokens = data.split(SAVE_SEPARATOR, 2);
         if (tokens.length != 2) {
             throw new IllegalArgumentException("Invalid data for PublicSnakeDraftOrchestrator: " + data);
         }
@@ -269,11 +269,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String savePlayerState(OrchestratorState state) {
-        if (!(state instanceof State)) {
+        if (!(state instanceof State psdState)) {
             throw new IllegalArgumentException("Invalid state type for PublicSnakeDraftOrchestrator: "
                     + state.getClass().getSimpleName());
         }
-        State psdState = (State) state;
         return psdState.getOrderIndex() + "";
     }
 
@@ -299,11 +298,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             String playerUserId = entry.getKey();
             PlayerDraftState playerState = entry.getValue();
             OrchestratorState orchestratorState = playerState.getOrchestratorState();
-            if (orchestratorState == null || !(orchestratorState instanceof State)) {
+            if (!(orchestratorState instanceof State state)) {
                 return "Player " + playerUserId
                         + " has invalid draft state (missing or weird type). Try `/draft manage set_orchestrator public_snake` (this will reset the draft order).";
             }
-            State state = (State) orchestratorState;
             if (state.getOrderIndex() < 0
                     || state.getOrderIndex() >= draftManager.getPlayerStates().size()) {
                 return "Player " + playerUserId + " has out of bounds order index: " + state.getOrderIndex()
@@ -337,7 +335,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
     public String handleCustomButtonPress(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
 
-        if (buttonId.equals("reprintdraft")) {
+        if ("reprintdraft".equals(buttonId)) {
             List<String> playerOrder = getDraftOrder(draftManager);
             PublicDraftInfoService.send(
                     draftManager,
@@ -368,10 +366,9 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";

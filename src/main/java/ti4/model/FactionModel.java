@@ -134,7 +134,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getBreakthrough() {
-        String breakthrough = getAlias() + "bt";
+        String breakthrough = alias + "bt";
         if (breakthrough.contains("keleres")) {
             breakthrough = "keleresbt";
         }

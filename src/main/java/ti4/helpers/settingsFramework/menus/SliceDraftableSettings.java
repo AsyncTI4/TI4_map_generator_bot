@@ -269,7 +269,7 @@ public class SliceDraftableSettings extends SettingsMenu {
 
     private Predicate<MapTemplateModel> getNucleusTemplatePredicate() {
         if (isNucleusMode()) {
-            return (t -> t.isNucleusTemplate());
+            return (MapTemplateModel::isNucleusTemplate);
         }
         return (t -> !t.isNucleusTemplate());
     }
@@ -339,6 +339,6 @@ public class SliceDraftableSettings extends SettingsMenu {
     }
 
     private boolean isNucleusMode() {
-        return MapGenerationMode.Nucleus.equals(mapGenerationMode.getValue());
+        return mapGenerationMode.getValue() == MapGenerationMode.Nucleus;
     }
 }

@@ -3,6 +3,7 @@ package ti4.commands.map;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -34,15 +35,13 @@ class ExportToJson extends GameStateSubcommand {
             return;
         }
 
-        boolean includeTokens = event.getOption("include_tokens") != null
-                ? event.getOption("include_tokens").getAsBoolean()
-                : true;
+        boolean includeTokens = event.getOption("include_tokens") == null
+                || event.getOption("include_tokens").getAsBoolean();
         boolean includeAttachments = false; /*event.getOption("include_attachments") != null
                 ? event.getOption("include_attachments").getAsBoolean()
                 : true;*/
-        boolean includeLore = event.getOption("include_lore") != null
-                ? event.getOption("include_lore").getAsBoolean()
-                : true;
+        boolean includeLore = event.getOption("include_lore") == null
+                || event.getOption("include_lore").getAsBoolean();
         String json = MapJsonIOService.exportMapAsJson(event, game, includeTokens, includeAttachments, includeLore);
         if (json == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Failed to export map to JSON.");
@@ -50,7 +49,7 @@ class ExportToJson extends GameStateSubcommand {
         }
 
         File exportFile = new File(game.getName() + "_map.json");
-        try (FileWriter writer = new FileWriter(exportFile)) {
+        try (FileWriter writer = new FileWriter(exportFile, StandardCharsets.UTF_8)) {
             writer.write(json);
         } catch (IOException e) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Failed to export map to JSON: " + e.getMessage());

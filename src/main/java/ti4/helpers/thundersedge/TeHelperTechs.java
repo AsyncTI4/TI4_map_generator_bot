@@ -3,6 +3,7 @@ package ti4.helpers.thundersedge;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -21,6 +22,7 @@ import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -51,8 +53,8 @@ public class TeHelperTechs {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            String msg =
-                    player.getFactionEmoji() + " resolved **__Magen Defense Grid__** on " + tile.getPosition() + ":";
+            StringBuilder msg = new StringBuilder(
+                    player.getFactionEmoji() + " resolved **__Magen Defense Grid__** on " + tile.getPosition() + ":");
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
@@ -63,15 +65,17 @@ public class TeHelperTechs {
                     String infStr = emoji.repeat(count);
                     if (count > 6) infStr += "(" + count + " total)";
                     if (uh instanceof Space) {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to Space.";
+                        msg.append("\n-# > ").append(emoji.repeat(count)).append(" added to Space.");
                     } else {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to "
-                                + Helper.getPlanetRepresentation(uh.getName(), game);
+                        msg.append("\n-# > ")
+                                .append(emoji.repeat(count))
+                                .append(" added to ")
+                                .append(Helper.getPlanetRepresentation(uh.getName(), game));
                     }
                 }
             }
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, Integer.toString(total)));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg.toString(), total));
         });
     }
 
@@ -127,7 +131,7 @@ public class TeHelperTechs {
         List<Tile> tilesAdjToInf = tilesWithInf.stream()
                 .flatMap(t -> FoWHelper.getAdjacentTiles(game, t.getPosition(), player, false).stream())
                 .map(game::getTileByPosition)
-                .filter(t -> t != null)
+                .filter(Objects::nonNull)
                 .toList();
         return new ArrayList<>(tilesAdjToInf);
     }
@@ -138,7 +142,7 @@ public class TeHelperTechs {
         // your infantry."
         Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
         List<Tile> tilesAdjToObsInf = tilesAdjToPlayersInf(game, player);
-        List<Player> playersWithInfAdj = game.getRealPlayers().stream()
+        List<Player> playersWithInfAdj = game.getRealPlayersNNeutral().stream()
                 .filter(p -> p != player
                         && tilesAdjToObsInf.stream().anyMatch(t -> t.containsPlayersUnitsWithKeyCondition(p, isInf)))
                 .toList();
@@ -152,24 +156,38 @@ public class TeHelperTechs {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    private static List<Button> getButtonsForEachUnitState(
+            Game game, Tile tile, UnitHolder uh, UnitKey unit, String prefix) {
+        List<Button> buttons = new ArrayList<>();
+        for (UnitState state : UnitState.defaultRemoveOrder()) {
+            int count = uh.getUnitCountForState(unit, state);
+            if (count > 0) {
+                String id = prefix + "_" + state.name();
+                String label = "space".equals(uh.getName())
+                        ? "Space " + tile.getPosition()
+                        : Helper.getPlanetRepresentation(uh.getName(), game);
+                label += " (" + count + ")";
+                if (state != UnitState.none) {
+                    label += " [" + state.humanDescr() + "]";
+                }
+                buttons.add(Buttons.red(id, label, state.stateEmoji()));
+            }
+        }
+        return buttons;
+    }
+
     @ButtonHandler("neuralParasiteS2_")
     private static void neuralParasiteStep2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player victim = game.getPlayerFromColorOrFaction(faction);
         if (victim == null) return;
+        UnitKey inf = Units.getUnitKey(UnitType.Infantry, victim.getColor());
 
         List<Button> buttons = new ArrayList<>();
         for (Tile t : tilesAdjToPlayersInf(game, player)) {
             for (UnitHolder uh : t.getUnitHolders().values()) {
-                int count = uh.getUnitCount(UnitType.Infantry, victim);
-                if (count > 0) {
-                    String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
-                    String label = uh.getName().equals("space")
-                            ? "Space " + t.getPosition()
-                            : Helper.getPlanetRepresentation(uh.getName(), game);
-                    label += " (" + count + ")";
-                    buttons.add(Buttons.red(id, label));
-                }
+                String id = "resolveNeuralParasite_" + t.getPosition() + "_" + uh.getName() + "_" + faction;
+                buttons.addAll(getButtonsForEachUnitState(game, t, uh, inf, id));
             }
         }
 
@@ -183,7 +201,7 @@ public class TeHelperTechs {
     @ButtonHandler("resolveNeuralParasite_")
     private static void neuralParasiteFinish(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String part3 = "resolveNeuralParasite_" + RegexHelper.posRegex() + "_" + RegexHelper.unitHolderRegex(game, "uh")
-                + "_" + RegexHelper.factionRegex(game);
+                + "_" + RegexHelper.factionRegex(game) + "_" + RegexHelper.unitStateRegex();
         RegexService.runMatcher(part3, buttonID, matcher -> {
             String position = matcher.group("pos");
             String uhName = matcher.group("uh");
@@ -201,7 +219,7 @@ public class TeHelperTechs {
                 return;
             }
             String location = "in the space area of " + tile.getRepresentationForButtons(game, player);
-            if (!uhName.equals("space") && uh instanceof Planet) {
+            if (!"space".equals(uhName) && uh instanceof Planet) {
                 location = "on the planet " + Helper.getPlanetRepresentation(uhName, game);
             }
 
@@ -273,13 +291,14 @@ public class TeHelperTechs {
             }
         } else {
             Set<String> adjTilePositions = new HashSet<>();
-            ButtonHelper.getTilesWithShipsInTheSystem(player, game).forEach(tile -> {
-                adjTilePositions.addAll(FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false));
-            });
+            ButtonHelper.getTilesWithShipsInTheSystem(player, game)
+                    .forEach(tile -> adjTilePositions.addAll(
+                            FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)));
 
-            adjTilePositions.stream().map(game::getTileByPosition).forEach(tile -> {
-                buttons.add(Buttons.blue(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
-            });
+            adjTilePositions.stream()
+                    .map(game::getTileByPosition)
+                    .forEach(tile -> buttons.add(
+                            Buttons.blue(prefix + tile.getPosition(), tile.getRepresentationForButtons(game, player))));
         }
 
         return buttons;

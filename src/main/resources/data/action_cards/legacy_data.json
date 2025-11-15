@@ -1124,11 +1124,11 @@
         "source": "deprecated"
     },
     {
-        "alias": "cache",
+        "alias": "cache_te",
         "name": "Cache",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Exhaust 1 non-home planet you control other than Mecatol Rex. Then, gain trade goods equal to that planet's combined resource and influence values.",
+        "text": "Exhaust 1 non-home, non-legendary planet you control to gain trade goods equal to its combined resource and influence values.",
         "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
         "source": "deprecated"
     },
@@ -1365,6 +1365,33 @@
         "source": "deprecated"
     },
     {
+        "alias": "counterintelligence",
+        "name": "Counterintelligence",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
+        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "armament_rider",
+        "name": "Armament Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+        "flavorText": "\"We groveled before the Lazax for liberation,\" Magmus declared, his voice rising from a gravelly rumble to a roar. \"Now we demand it!\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "false_manifest",
+        "name": "False Manifest",
+        "phase": "Action",
+        "window": "When another player gains 3 or more trade goods",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
+        "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
+        "source": "deprecated"
+    },
+    {
         "alias": "rogues1",
         "name": "Rogues",
         "phase": "Action",
@@ -1407,6 +1434,15 @@
         "window": "At the start of your turn",
         "text": "Destroy 1 of your units to move 1 ingress token into that unit's system. Then, you may choose 1 player; that player gains their breakthrough.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "strategic_aid",
+        "name": "Strategic Aid",
+        "phase": "Action",
+        "window": "When you perform a strategic action",
+        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
+        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
         "source": "deprecated"
     }
 ]

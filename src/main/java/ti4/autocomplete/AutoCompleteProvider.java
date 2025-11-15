@@ -638,8 +638,7 @@ public class AutoCompleteProvider {
             }
             case Constants.DRAFT_MODE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<FrankenDraftMode> modes = new ArrayList<>();
-                modes.addAll(Arrays.asList(FrankenDraftMode.values()));
+                List<FrankenDraftMode> modes = new ArrayList<>(Arrays.asList(FrankenDraftMode.values()));
                 List<Command.Choice> options = modes.stream()
                         .filter(mode -> mode.search(enteredValue))
                         .limit(25)
@@ -1148,7 +1147,6 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 DraftTileManager draftTileManager = game.getDraftTileManager();
-                if (draftTileManager == null) return;
                 if (draftTileManager.getAll().isEmpty()) {
                     DraftTileManager.resetForGame(game);
                 }
@@ -1175,7 +1173,7 @@ public class AutoCompleteProvider {
             }
             case Constants.PICK_COUNT_OPTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                if (enteredValue != null && !enteredValue.isBlank()) return;
+                if (!enteredValue.isBlank()) return;
 
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();

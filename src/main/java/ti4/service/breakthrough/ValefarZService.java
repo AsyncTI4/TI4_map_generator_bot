@@ -62,7 +62,7 @@ public class ValefarZService {
     public List<Player> getAllPlayersWithFlagships(Game game, String... flagships) {
         List<Player> players = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
-            if (ValefarZService.hasAnyFlagshipAbility(game, player, flagships)) {
+            if (hasAnyFlagshipAbility(game, player, flagships)) {
                 players.add(player);
             }
         }

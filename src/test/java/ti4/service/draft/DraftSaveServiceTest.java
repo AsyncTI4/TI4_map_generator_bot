@@ -119,33 +119,23 @@ public class DraftSaveServiceTest extends BaseTi4Test {
     }
 
     private Draftable getDraftableWithTestData(String className) {
-        switch (className) {
-            case "FactionDraftable":
-                return TestData.createFactionDraftable();
-            case "SeatDraftable":
-                return TestData.createSeatDraftable();
-            case "SliceDraftable":
-                return TestData.createSliceDraftable();
-            case "SpeakerOrderDraftable":
-                return TestData.createSpeakerOrderDraftable();
-            case "MantisTileDraftable":
-                return TestData.createMantisTileDraftable();
-            case "MahactKingDraftable":
-                return TestData.createMahactKingDraftable();
-            case "AndcatReferenceCardsDraftable":
-                return TestData.createAndcatReferenceCardsDraftable();
-            default:
-                return null;
-        }
+        return switch (className) {
+            case "FactionDraftable" -> TestData.createFactionDraftable();
+            case "SeatDraftable" -> TestData.createSeatDraftable();
+            case "SliceDraftable" -> TestData.createSliceDraftable();
+            case "SpeakerOrderDraftable" -> TestData.createSpeakerOrderDraftable();
+            case "MantisTileDraftable" -> TestData.createMantisTileDraftable();
+            case "MahactKingDraftable" -> TestData.createMahactKingDraftable();
+            case "AndcatReferenceCardsDraftable" -> TestData.createAndcatReferenceCardsDraftable();
+            default -> null;
+        };
     }
 
     private DraftOrchestrator getOrchestratorWithTestData(String className) {
-        switch (className) {
-            case "PublicSnakeDraftOrchestrator":
-                return TestData.createPublicSnakeDraftOrchestrator();
-            default:
-                return null;
-        }
+        return switch (className) {
+            case "PublicSnakeDraftOrchestrator" -> TestData.createPublicSnakeDraftOrchestrator();
+            default -> null;
+        };
     }
 
     private Game createTestGame(int playerCount) {

@@ -1,6 +1,7 @@
 package ti4.commands.draft.manage;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -22,7 +23,7 @@ class DraftManagerSetupPlayers extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        boolean force = event.getOption(Constants.FORCE_OPTION, false, o -> o.getAsBoolean());
+        boolean force = event.getOption(Constants.FORCE_OPTION, false, OptionMapping::getAsBoolean);
         if (force) {
             draftManager.setupPlayers(event);
         } else {

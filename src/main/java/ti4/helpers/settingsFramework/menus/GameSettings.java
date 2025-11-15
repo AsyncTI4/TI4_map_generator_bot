@@ -237,7 +237,7 @@ public class GameSettings extends SettingsMenu {
 
     public Predicate<MapTemplateModel> getNucleusTemplatePredicate() {
         if (parent instanceof MiltySettings m && m.getDraftMode().getValue() == DraftingMode.nucleus) {
-            return (t -> t.isNucleusTemplate());
+            return (MapTemplateModel::isNucleusTemplate);
         }
         return (t -> !t.isNucleusTemplate());
     }

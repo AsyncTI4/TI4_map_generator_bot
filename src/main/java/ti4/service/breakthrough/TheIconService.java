@@ -94,13 +94,15 @@ public class TheIconService {
         }
 
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
-        String producedSummary = "";
-        for (String unitAndPos : producedUnits.keySet()) {
-            String[] data = unitAndPos.split("_");
+        StringBuilder producedSummary = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+            String[] data = entry.getKey().split("_");
             UnitType type = Units.findUnitType(data[0]);
             UnitModel model = player.getUnitByType(type);
             if (model.getIsShip()) {
-                producedSummary += "\n> " + model.getUnitEmoji().toString().repeat(producedUnits.get(unitAndPos));
+                producedSummary
+                        .append("\n> ")
+                        .append(model.getUnitEmoji().toString().repeat(entry.getValue()));
             }
         }
 
@@ -125,9 +127,9 @@ public class TheIconService {
             Tile dest = game.getTileByPosition(matcher.group("pos"));
             Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
 
-            String movedSummary = "";
-            for (String unitAndPos : producedUnits.keySet()) {
-                String[] data = unitAndPos.split("_");
+            StringBuilder movedSummary = new StringBuilder();
+            for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                String[] data = entry.getKey().split("_");
                 UnitType type = Units.findUnitType(data[0]);
                 String pos = data[1];
                 String uhName = data[2];
@@ -135,11 +137,13 @@ public class TheIconService {
                 UnitModel model = player.getUnitByType(type);
                 if (model.getIsShip()) {
                     Tile src = game.getTileByPosition(pos);
-                    int amt = producedUnits.get(unitAndPos);
+                    int amt = entry.getValue();
                     UnitKey key = Units.getUnitKey(type, player.getColor());
                     var states = src.getUnitHolders().get(uhName).removeUnit(key, amt, UnitState.none);
                     dest.getSpaceUnitHolder().addUnitsWithStates(key, states);
-                    movedSummary += "\n> " + model.getUnitEmoji().toString().repeat(producedUnits.get(unitAndPos));
+                    movedSummary
+                            .append("\n> ")
+                            .append(model.getUnitEmoji().toString().repeat(entry.getValue()));
                 }
             }
 

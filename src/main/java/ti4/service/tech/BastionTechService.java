@@ -111,7 +111,7 @@ public class BastionTechService {
                 }
             }
 
-            var units = CombatRollService.getProximaBombardUnit(tile, p1);
+            var units = CombatRollService.getProximaBombardUnit(p1);
 
             var rollMods = CombatModHelper.getModifiers(
                     p1,

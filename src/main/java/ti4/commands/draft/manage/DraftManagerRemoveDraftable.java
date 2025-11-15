@@ -1,6 +1,7 @@
 package ti4.commands.draft.manage;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -20,7 +21,7 @@ class DraftManagerRemoveDraftable extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        String draftableTypeStr = event.getOption(Constants.DRAFTABLE_TYPE_OPTION, o -> o.getAsString());
+        String draftableTypeStr = event.getOption(Constants.DRAFTABLE_TYPE_OPTION, OptionMapping::getAsString);
         DraftableType draftableType = DraftableType.of(draftableTypeStr);
 
         boolean removed = draftManager.getDraftables().removeIf(d -> d.getType().equals(draftableType));

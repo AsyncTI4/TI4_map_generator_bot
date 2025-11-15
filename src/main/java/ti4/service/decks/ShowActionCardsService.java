@@ -36,13 +36,13 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == null)
                 .toList();
         List<Entry<String, Integer>> purged = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> ACStatus.purged.equals(game.getDiscardACStatus().get(x.getKey())))
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
                 .toList();
         List<Entry<String, Integer>> dataSkimmer = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> ACStatus.ralnelbt.equals(game.getDiscardACStatus().get(x.getKey())))
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.ralnelbt)
                 .toList();
         List<Entry<String, Integer>> garbozia = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> ACStatus.garbozia.equals(game.getDiscardACStatus().get(x.getKey())))
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.garbozia)
                 .toList();
 
         if (!purged.isEmpty()) {

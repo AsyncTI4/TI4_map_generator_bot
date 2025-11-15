@@ -10,7 +10,7 @@ public interface TokenModelInterface extends ModelInterface {
 
     enum UnitHolderType {
         SPACE,
-        PLANET;
+        PLANET
     }
 
     default boolean allowedInSpace() {

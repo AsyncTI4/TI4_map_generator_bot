@@ -15,7 +15,7 @@ public class GameImageService {
     private final MapImageDataRepository mapImageDataRepository;
 
     @Nullable
-    String getLatestMapImageName(String gameName) {
+    public String getLatestMapImageName(String gameName) {
         if (!GameManager.isValid(gameName)) return null;
         return mapImageDataRepository
                 .findById(gameName)

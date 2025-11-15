@@ -1,5 +1,6 @@
 package ti4.commands.draft.manage;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -18,10 +19,8 @@ class DraftManagerCanSetupPlayers extends GameStateSubcommand {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
         String reason = draftManager.whatsStoppingSetup();
-        if (reason == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "The draft should have set up players already.");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), reason);
-        }
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                Objects.requireNonNullElse(reason, "The draft should have set up players already."));
     }
 }

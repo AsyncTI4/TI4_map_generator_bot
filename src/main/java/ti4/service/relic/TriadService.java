@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.relic;
 
 import ti4.map.Game;
 import ti4.map.Planet;

@@ -49,6 +49,11 @@ class ExploreFrontier extends GameStateSubcommand {
         }
 
         Tile tile = TileHelper.getTile(event, tileName, game);
+        if (tile == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Invalid tile: `" + tileName + "`");
+            return;
+        }
+
         if (cardID != null || force) {
             ExploreService.expFront(event, tile, game, getPlayer(), force, cardID);
         } else {

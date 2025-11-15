@@ -154,7 +154,7 @@ public class MapTemplateHelper {
                 tileID = color + "blank";
             }
         } else if (tile.getNucleusNumbers() != null && !tile.getNucleusNumbers().isEmpty()) {
-            Integer nucleusSlice = tile.getNucleusNumbers().get(0);
+            Integer nucleusSlice = tile.getNucleusNumbers().getFirst();
             // TODO: Get a better placeholder tile.
             // For now, use the same color for all nucleus tiles.
             tileID = NUCLEUS_COLOR + nucleusSlice;

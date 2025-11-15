@@ -54,8 +54,7 @@ abstract class TechAddRemove extends GameStateSubcommand {
                                 value.getValue().getName().toLowerCase().contains(techID))
                         .map(Map.Entry::getKey)
                         .toList();
-                List<String> mutableList = new ArrayList<>();
-                mutableList.addAll(possibleTechs);
+                List<String> mutableList = new ArrayList<>(possibleTechs);
                 if (possibleTechs.isEmpty()) {
                     for (String tech : player.getTechs()) {
                         if (tech.equalsIgnoreCase(techID)) {

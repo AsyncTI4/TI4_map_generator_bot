@@ -54,7 +54,7 @@ public class DraftSystemSettings extends SettingsMenu {
     private final PublicSnakeDraftSettings publicSnakeDraftSettings;
     // Bonus Attributes
     @Setter
-    private String preset = null;
+    private String preset;
 
     @JsonIgnore
     private final Game game;
@@ -223,26 +223,24 @@ public class DraftSystemSettings extends SettingsMenu {
     }
 
     public void setupNucleusPreset() {
-        getDraftablesList()
-                .setKeys(List.of(
-                        FactionDraftable.class.getSimpleName(),
-                        SliceDraftable.class.getSimpleName(),
-                        SeatDraftable.class.getSimpleName(),
-                        SpeakerOrderDraftable.class.getSimpleName()));
-        getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
-        getSliceSettings().getMapGenerationMode().setChosenKey("Nucleus");
+        draftablesList.setKeys(List.of(
+                FactionDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                SeatDraftable.class.getSimpleName(),
+                SpeakerOrderDraftable.class.getSimpleName()));
+        draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
+        sliceSettings.getMapGenerationMode().setChosenKey("Nucleus");
         setPreset("Nucleus Draft");
     }
 
     public void setupAndcatTwilightsFallPreset() {
-        getDraftablesList()
-                .setKeys(List.of(
-                        AndcatReferenceCardsDraftable.class.getSimpleName(),
-                        SliceDraftable.class.getSimpleName(),
-                        MahactKingDraftable.class.getSimpleName()));
-        getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
-        getSliceSettings().getMapGenerationMode().setChosenKey("Milty");
-        getSourceSettings().getTeDemo().setVal(true);
+        draftablesList.setKeys(List.of(
+                AndcatReferenceCardsDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                MahactKingDraftable.class.getSimpleName()));
+        draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
+        sliceSettings.getMapGenerationMode().setChosenKey("Milty");
+        sourceSettings.getTeDemo().setVal(true);
         setPreset("Twilights Fall (Andcat Draft)");
     }
 }

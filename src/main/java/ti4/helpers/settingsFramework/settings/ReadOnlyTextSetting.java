@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 @Getter
 @Setter
-@JsonIncludeProperties({"id"})
+@JsonIncludeProperties("id")
 public class ReadOnlyTextSetting extends SettingInterface {
     private String display;
 

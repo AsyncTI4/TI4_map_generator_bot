@@ -314,7 +314,9 @@ public class RelicHelper {
             int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n" + x + ". ")
+                text.append("\n")
+                        .append(x)
+                        .append(". ")
                         .append(ExploreEmojis.Relic)
                         .append(" _")
                         .append(relicName)

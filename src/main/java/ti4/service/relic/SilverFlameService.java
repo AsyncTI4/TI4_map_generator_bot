@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.relic;
 
 import java.util.ArrayList;
 import java.util.HashMap;

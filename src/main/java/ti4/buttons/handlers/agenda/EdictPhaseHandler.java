@@ -227,7 +227,7 @@ public class EdictPhaseHandler {
                     game.removeStoredValue("artificeParadigms");
                 } else {
                     ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
-                    String relic = game.getAllRelics().get(0);
+                    String relic = game.getAllRelics().getFirst();
                     RelicModel mod = Mapper.getRelic(relic);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             player.getCorrectChannel(),
@@ -301,10 +301,11 @@ public class EdictPhaseHandler {
                         + " after resolving the edict, use this button to resolve an additional edict from your flagship.";
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
                 }
                 Button proceedToStrategyPhase = Buttons.green(
-                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(0) + "_orangetf",
+                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.getFirst()
+                                + "_orangetf",
                         "Resolve 1 Edict");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
             } else {

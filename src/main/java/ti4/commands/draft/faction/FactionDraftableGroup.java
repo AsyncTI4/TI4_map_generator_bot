@@ -29,9 +29,6 @@ public class FactionDraftableGroup extends SubcommandGroup {
 
     public static FactionDraftable getDraftable(Game game) {
         DraftManager draftManager = game.getDraftManager();
-        if (draftManager == null) {
-            return null;
-        }
         return (FactionDraftable) draftManager.getDraftable(FactionDraftable.TYPE);
     }
 }
