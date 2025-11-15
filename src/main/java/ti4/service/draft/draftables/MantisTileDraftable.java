@@ -482,7 +482,7 @@ public class MantisTileDraftable extends Draftable {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

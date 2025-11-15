@@ -34,7 +34,7 @@ public class PlayerTokenModel implements TokenModelInterface, ColorableModelInte
 
     @Override
     public boolean isColorable() {
-        return color.equals("<color>");
+        return "<color>".equals(color);
     }
 
     @Override

@@ -539,16 +539,12 @@ public class NucleusSliceGeneratorService {
     private record PlanetTraits(int cultural, int industrial, int hazardous) {
         public PlanetTraits add(PlanetTraits other) {
             return new PlanetTraits(
-                    cultural + other.cultural,
-                    industrial + other.industrial,
-                    hazardous + other.hazardous);
+                    cultural + other.cultural, industrial + other.industrial, hazardous + other.hazardous);
         }
 
         public PlanetTraits subtract(PlanetTraits other) {
             return new PlanetTraits(
-                    cultural - other.cultural,
-                    industrial - other.industrial,
-                    hazardous - other.hazardous);
+                    cultural - other.cultural, industrial - other.industrial, hazardous - other.hazardous);
         }
 
         public int get(PlanetType type) {
@@ -895,8 +891,8 @@ public class NucleusSliceGeneratorService {
             Collections.shuffle(slices);
             for (MiltyDraftSlice slice : slices) {
                 slice.setName(String.valueOf((char) ('A' + i)));
-              i++;
-              Collections.shuffle(slice.getTiles());
+                i++;
+                Collections.shuffle(slice.getTiles());
             }
 
             return slices;

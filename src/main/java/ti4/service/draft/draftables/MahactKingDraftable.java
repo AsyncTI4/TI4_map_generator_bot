@@ -118,7 +118,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
             DraftChoice choice = new DraftChoice(
-                TYPE,
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, buttonText, buttonEmoji),
                     formattedName,
@@ -198,7 +198,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-            TYPE,
+                TYPE,
                 null,
                 null,
                 "No king picked",
@@ -231,7 +231,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
         } else {
             String[] tokens = data.split(SAVE_SEPARATOR);
             draftFactions = new ArrayList<>();
-          Collections.addAll(draftFactions, tokens);
+            Collections.addAll(draftFactions, tokens);
         }
     }
 
@@ -270,7 +270,7 @@ public class MahactKingDraftable extends SinglePickDraftable {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

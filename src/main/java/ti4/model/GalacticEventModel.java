@@ -101,11 +101,7 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-      String sb = CardEmojis.Event +
-          "__**" +
-          name +
-          "**__" +
-          source.emoji();
+        String sb = CardEmojis.Event + "__**" + name + "**__" + source.emoji();
         eb.setTitle(sb);
 
         eb.setDescription(getText());

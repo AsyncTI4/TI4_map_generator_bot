@@ -96,7 +96,7 @@ public class RuleModel implements ModelInterface, EmbeddableModel {
         if (getTitle().toLowerCase().contains(lower)) return true;
         if (plainDescription().toLowerCase().contains(lower)) return true;
         if (getFields().stream().anyMatch(t -> t.getTitle().toLowerCase().contains(lower))) return true;
-      return getFields().stream()
-          .anyMatch(t -> t.plainDescription().toLowerCase().contains(lower));
+        return getFields().stream()
+                .anyMatch(t -> t.plainDescription().toLowerCase().contains(lower));
     }
 }

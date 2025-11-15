@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -347,7 +346,7 @@ public class TeHelperAbilities {
                 // franken compat
                 if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (Objects.equals(UnitType.PlenaryOrbital, uk.getUnitType())) continue;
+                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();

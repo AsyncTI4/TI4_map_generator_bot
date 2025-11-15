@@ -1,6 +1,9 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +28,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
@@ -866,7 +868,7 @@ public class UnfiledButtonHandlers {
 
                         if (assignedUnit.contains(name)) {
                             String planet = assignedUnit.split("_")[2];
-                            String label = "Unassign " + StringUtils.capitalize(mod.getBaseType()) + " from "
+                            String label = "Unassign " + capitalize(mod.getBaseType()) + " from "
                                     + Helper.getPlanetRepresentationNoResInf(planet, game);
                             if (!usedLabels.contains(label)) {
                                 buttons.add(
@@ -877,7 +879,7 @@ public class UnfiledButtonHandlers {
                     }
                 } else {
                     for (String planet : getBombardablePlanets(player, game, tile)) {
-                        String label = "Assign " + StringUtils.capitalize(mod.getBaseType()) + " to "
+                        String label = "Assign " + capitalize(mod.getBaseType()) + " to "
                                 + Helper.getPlanetRepresentationNoResInf(planet, game);
                         if (!usedLabels.contains(label)) {
                             buttons.add(Buttons.green(
@@ -1327,7 +1329,7 @@ public class UnfiledButtonHandlers {
     public static void refresh(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planetName = buttonID.split("_")[1];
         Player p2 = player;
-        if (StringUtils.countMatches(buttonID, "_") > 1) {
+        if (countMatches(buttonID, "_") > 1) {
             String faction = buttonID.split("_")[2];
             p2 = game.getPlayerFromColorOrFaction(faction);
         }
@@ -1597,7 +1599,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("assignSpeaker_")
     public static void assignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = StringUtils.substringAfter(buttonID, "assignSpeaker_");
+        String faction = substringAfter(buttonID, "assignSpeaker_");
         game.setStoredValue("hasntSetSpeaker", "");
         if (!game.isFowMode()) {
             for (Player player_ : game.getPlayers().values()) {

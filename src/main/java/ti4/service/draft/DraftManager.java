@@ -208,7 +208,7 @@ public class DraftManager extends DraftPlayerManager {
             return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
         }
         String reason = orchestrator.whatsStoppingDraftStart(this);
-      return reason;
+        return reason;
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {
@@ -318,8 +318,7 @@ public class DraftManager extends DraftPlayerManager {
             Player player = game.getPlayer(userId);
 
             // Default color if not set
-            boolean playerHasColor =
-                    player.getColor() != null && !"null".equals(player.getColor());
+            boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
             if (!playerHasColor && playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);

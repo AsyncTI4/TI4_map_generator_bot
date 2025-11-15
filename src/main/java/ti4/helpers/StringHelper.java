@@ -117,11 +117,8 @@ public final class StringHelper {
             } else {
                 sb.append(separator);
             }
-            line = line.replace(
-                    String.valueOf(ESCAPE_CHARACTER),
-                    String.valueOf(ESCAPE_CHARACTER) + ESCAPE_CHARACTER);
-            line = line.replace(
-                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + separator);
+            line = line.replace(String.valueOf(ESCAPE_CHARACTER), String.valueOf(ESCAPE_CHARACTER) + ESCAPE_CHARACTER);
+            line = line.replace(String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + separator);
             sb.append(line);
         }
         return sb.toString();

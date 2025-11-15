@@ -34,7 +34,7 @@ public class MuaatHeroService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         boolean frontier = space.getTokenList().contains(frontierFilename);
-      Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
+        Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
 
         game.removeTile(tile.getPosition());
         game.setTile(novaTile);

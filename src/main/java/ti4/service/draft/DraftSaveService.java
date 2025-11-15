@@ -29,8 +29,8 @@ public class DraftSaveService {
             List<String> playerSaveList = new ArrayList<>();
             for (String userId : draftManager.getPlayerStates().keySet()) {
                 String shortId = "u" + index;
-              index++;
-              userIdToShortId.put(userId, shortId);
+                index++;
+                userIdToShortId.put(userId, shortId);
                 playerSaveList.add(userId + "," + shortId);
             }
             lines.add(PLAYER_DATA + KEY_SEPARATOR + String.join(DATA_SEPARATOR, playerSaveList));

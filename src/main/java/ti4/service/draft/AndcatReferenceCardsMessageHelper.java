@@ -152,8 +152,7 @@ public class AndcatReferenceCardsMessageHelper {
         messageBuilder.append(Container.of(containerComponents));
 
         messageBuilder.appendLine("When you're satisfied with your choices, lock them in:");
-        Button finalizeButton =
-                Buttons.gray(draftable.makeButtonId("assign_complete"), "Finish assigning factions");
+        Button finalizeButton = Buttons.gray(draftable.makeButtonId("assign_complete"), "Finish assigning factions");
         boolean canFinalize = refPackage.homeSystemFaction() != null
                 && refPackage.startingUnitsFaction() != null
                 && refPackage.speakerOrderFaction() != null

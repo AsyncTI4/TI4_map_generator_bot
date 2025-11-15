@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -195,7 +194,7 @@ public class TeHelperCommanders {
                 // franken compat
                 if (List.of(UnitType.Pds, UnitType.Spacedock).contains(uk.getUnitType())
                         && !player.hasAbility("miniaturization")) continue;
-                if (Objects.equals(UnitType.PlenaryOrbital, uk.getUnitType())) continue;
+                if (uk.getUnitType() == UnitType.PlenaryOrbital) continue;
 
                 // moved all of this unit already from this unit holder
                 String unitStr = uk.asyncID() + " " + uh.getName();
@@ -219,8 +218,8 @@ public class TeHelperCommanders {
                 UnitType type = Units.findUnitType(data[0]);
                 String uhName = "space".equals(data[1]) ? "Space" : Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
-                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type
-                            + "_" + data[1];
+                    String id = player.finChecker() + "undoOjzRetreatS1_" + source.getPosition() + "_" + type + "_"
+                            + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }

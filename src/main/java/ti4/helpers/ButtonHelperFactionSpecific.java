@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -672,8 +671,7 @@ public class ButtonHelperFactionSpecific {
                 if (space.getDamagedUnitCount(unit, p2.getColorID()) > 0) {
                     buttons.add(Buttons.gray(
                             "empyreanFlagshipAbilityStep2_" + pos + "_" + p2.getFaction() + "_" + unit.getValue(),
-                            capitalize(p2.getColor()) + " "
-                                    + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
+                            capitalize(p2.getColor()) + " " + Mapper.getUnitBaseTypeFromAsyncID(unit.getValue()),
                             p2.getFactionEmoji()));
                 }
             }
@@ -3871,7 +3869,7 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         }
-      return count > 2;
+        return count > 2;
     }
 
     public static List<Button> getLanefirATSButtons(Player p1, Player p2) {

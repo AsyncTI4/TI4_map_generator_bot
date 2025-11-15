@@ -342,8 +342,7 @@ public class PromissoryNoteHelper {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
                     + ". Use buttons to gain 2 command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             ActionCardHelper.sendPlotCardInfo(game, owner);
             MessageHelper.sendMessageToChannel(

@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -671,10 +672,10 @@ public class CombatRollService {
                         opponent,
                         game,
                         playerUnitsList,
-                    CombatRollType.combatround,
+                        CombatRollType.combatround,
                         activeSystem,
                         unitHolder);
-                int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
+                int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
                 if (numRollsPerUnit + Math.min(1, extraRollsForUnit) > max) {
                     max = numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     game.setStoredValue("highestValueSingleUnit", unitModel.getAsyncId());
@@ -1290,8 +1291,7 @@ public class CombatRollService {
         for (Map.Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
 
             if (player.hasUnit("ralnel_destroyer2") && "space".equalsIgnoreCase(unitHolder.getName())) {
-                if ("pd".equalsIgnoreCase(unitEntry.getKey())
-                        || "sd".equalsIgnoreCase(unitEntry.getKey())) {
+                if ("pd".equalsIgnoreCase(unitEntry.getKey()) || "sd".equalsIgnoreCase(unitEntry.getKey())) {
                     continue;
                 }
                 if ("dd".equalsIgnoreCase(unitEntry.getKey()) && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {

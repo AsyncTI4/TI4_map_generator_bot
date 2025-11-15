@@ -102,7 +102,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             PlayerDraftState playerState = draftManager.getPlayerStates().get(playerUserId);
             State orchestratorState = (State) playerState.getOrchestratorState();
             orchestratorState.setOrderIndex(orderIndex);
-          orderIndex++;
+            orderIndex++;
         }
     }
 
@@ -274,7 +274,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             throw new IllegalArgumentException("Invalid state type for PublicSnakeDraftOrchestrator: "
                     + state.getClass().getSimpleName());
         }
-      return psdState.getOrderIndex() + "";
+        return psdState.getOrderIndex() + "";
     }
 
     @Override
@@ -303,7 +303,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
                 return "Player " + playerUserId
                         + " has invalid draft state (missing or weird type). Try `/draft manage set_orchestrator public_snake` (this will reset the draft order).";
             }
-          if (state.getOrderIndex() < 0
+            if (state.getOrderIndex() < 0
                     || state.getOrderIndex() >= draftManager.getPlayerStates().size()) {
                 return "Player " + playerUserId + " has out of bounds order index: " + state.getOrderIndex()
                         + ". Fix it with `/draft public_snake set_order`.";
@@ -370,7 +370,7 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

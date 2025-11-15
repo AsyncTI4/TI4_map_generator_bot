@@ -57,7 +57,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
             String displayName = StringHelper.ordinal(i) + " Pick";
             String unformattedName = StringHelper.ordinal(i) + " Pick";
             choices.add(new DraftChoice(
-                TYPE,
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, null, buttonEmoji),
                     displayName,
@@ -87,7 +87,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-            TYPE,
+                TYPE,
                 null,
                 null,
                 "No speaker position",
@@ -139,8 +139,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
     public Consumer<Player> setupPlayer(
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(TYPE)
-                || pState.getPicks().get(TYPE).isEmpty()) {
+        if (!pState.getPicks().containsKey(TYPE) || pState.getPicks().get(TYPE).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a speaker order");
         }
 
@@ -174,7 +173,7 @@ public class SpeakerOrderDraftable extends SinglePickDraftable {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

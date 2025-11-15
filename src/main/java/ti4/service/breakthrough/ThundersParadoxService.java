@@ -93,10 +93,10 @@ public class ThundersParadoxService {
             for (Player p : game.getRealPlayers()) {
                 boolean found = false;
                 for (Leader l : p.getLeaders()) {
-                  if ("agent".equals(l.getType())) {
-                    found = true;
-                    break;
-                  }
+                    if ("agent".equals(l.getType())) {
+                        found = true;
+                        break;
+                    }
                 }
                 if (found
                         || p.getExhaustedRelics().contains("titanprototype")

@@ -62,9 +62,9 @@ public class TEOptionService {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 "Set game to use "
-                        + (choice.equalsIgnoreCase("newPok")
+                        + ("newPok".equalsIgnoreCase(choice)
                                 ? "New PoK"
-                                : choice.equalsIgnoreCase("oldPok") ? "Old PoK" : "Thunder's Edge + New PoK")
+                                : "oldPok".equalsIgnoreCase(choice) ? "Old PoK" : "Thunder's Edge + New PoK")
                         + " components.");
     }
 

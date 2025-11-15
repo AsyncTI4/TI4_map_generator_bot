@@ -18,8 +18,7 @@ public class FrankenUnitService {
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
             if (player.getGame().isTwilightsFallMode()
-                    && ("fs".equalsIgnoreCase(unitModel.getAsyncId())
-                            || "mf".equalsIgnoreCase(unitModel.getAsyncId()))
+                    && ("fs".equalsIgnoreCase(unitModel.getAsyncId()) || "mf".equalsIgnoreCase(unitModel.getAsyncId()))
                     && !unitID.contains("_")) {
                 allowDuplicates = true;
             }

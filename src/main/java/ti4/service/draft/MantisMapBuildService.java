@@ -425,9 +425,11 @@ public class MantisMapBuildService {
         buttons.add(Buttons.gray(mapBuildContext.makeButtonId().apply(ACTION_PREFIX + "repost"), "Repost build info"));
 
         // Build next message text
-      MessageHelper.sendMessageToChannel(responseChannel,
-          player.getRepresentation() + " can pick a position to place " + nextTile.getLongDescription() + "." +
-              mulliganString, buttons);
+        MessageHelper.sendMessageToChannel(
+                responseChannel,
+                player.getRepresentation() + " can pick a position to place " + nextTile.getLongDescription() + "."
+                        + mulliganString,
+                buttons);
     }
 
     private void sendMapImage(

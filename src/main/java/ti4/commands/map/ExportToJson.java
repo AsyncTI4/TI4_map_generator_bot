@@ -35,12 +35,13 @@ class ExportToJson extends GameStateSubcommand {
             return;
         }
 
-        boolean includeTokens =
-            event.getOption("include_tokens") == null || event.getOption("include_tokens").getAsBoolean();
+        boolean includeTokens = event.getOption("include_tokens") == null
+                || event.getOption("include_tokens").getAsBoolean();
         boolean includeAttachments = false; /*event.getOption("include_attachments") != null
                 ? event.getOption("include_attachments").getAsBoolean()
                 : true;*/
-        boolean includeLore = event.getOption("include_lore") == null || event.getOption("include_lore").getAsBoolean();
+        boolean includeLore = event.getOption("include_lore") == null
+                || event.getOption("include_lore").getAsBoolean();
         String json = MapJsonIOService.exportMapAsJson(event, game, includeTokens, includeAttachments, includeLore);
         if (json == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Failed to export map to JSON.");

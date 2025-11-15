@@ -191,7 +191,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && getAfbDieCount() == 0) return 3;
+        if (player.hasRelic("metalivoidarmaments") && afbDieCount == 0) return 3;
         if (capacityValue > 0
                 && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
                 && getExpectedAfbHits() < 0.6) {
@@ -465,7 +465,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
         }
         if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
-          return player.hasTech("pds2");
+            return player.hasTech("pds2");
         }
         return getDeepSpaceCannon();
     }

@@ -37,7 +37,7 @@ import ti4.service.fow.LoreService;
 public class MapJsonIOService {
     private final ObjectMapper mapper = new ObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-  @ModalHandler("importMapFromJSON")
+    @ModalHandler("importMapFromJSON")
     public void importMapFromJSON(ModalInteractionEvent event, Game game) {
         String url = event.getValue("url").getAsString();
         String jsonString = URLReaderHelper.readFromURL(url, event.getChannel());

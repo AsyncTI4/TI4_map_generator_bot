@@ -93,10 +93,10 @@ public class CommanderUnlockCheckService {
             case "firmament" -> {
                 for (Entry<String, List<String>> entry :
                         player.getPlotCardsFactions().entrySet()) {
-                  if (entry.getValue() != null && entry.getValue().size() > 0) {
-                    shouldBeUnlocked = true;
-                    break;
-                  }
+                    if (entry.getValue() != null && entry.getValue().size() > 0) {
+                        shouldBeUnlocked = true;
+                        break;
+                    }
                 }
             }
             case "obsidian" -> {

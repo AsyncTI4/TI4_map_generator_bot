@@ -48,9 +48,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-      String sb = getFactionEmoji() + " " + getSynergyEmojis() +
-          "**" + name + "**" +
-          source.emoji();
+        String sb = getFactionEmoji() + " " + getSynergyEmojis() + "**" + name + "**" + source.emoji();
         return sb;
     }
 
@@ -68,12 +66,10 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        eb.setTitle(
-                getFactionEmoji() + " **__" + name + "__** " + source.emoji());
+        eb.setTitle(getFactionEmoji() + " **__" + name + "__** " + source.emoji());
 
         // DESCRIPTION
-      String description = "SYNERGY: " + getSynergyEmojis() + "\n" +
-          text;
+        String description = "SYNERGY: " + getSynergyEmojis() + "\n" + text;
         eb.setDescription(description);
 
         // FOOTER

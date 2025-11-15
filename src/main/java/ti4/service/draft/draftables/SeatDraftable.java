@@ -54,7 +54,7 @@ public class SeatDraftable extends SinglePickDraftable {
             String unformattedName = "Seat " + i;
             String displayName = "Seat " + i;
             choices.add(new DraftChoice(
-                TYPE,
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, null, buttonEmoji),
                     displayName,
@@ -73,8 +73,7 @@ public class SeatDraftable extends SinglePickDraftable {
 
     @Override
     public DraftChoice getNothingPickedChoice() {
-        return new DraftChoice(
-            TYPE, null, null, "No seat picked", "No seat picked", MiscEmojis.resources.toString());
+        return new DraftChoice(TYPE, null, null, "No seat picked", "No seat picked", MiscEmojis.resources.toString());
     }
 
     @Override
@@ -129,8 +128,7 @@ public class SeatDraftable extends SinglePickDraftable {
     public Consumer<Player> setupPlayer(
             DraftManager draftManager, String playerUserId, PlayerSetupState playerSetupState) {
         PlayerDraftState pState = draftManager.getPlayerStates().get(playerUserId);
-        if (!pState.getPicks().containsKey(TYPE)
-                || pState.getPicks().get(TYPE).isEmpty()) {
+        if (!pState.getPicks().containsKey(TYPE) || pState.getPicks().get(TYPE).isEmpty()) {
             throw new IllegalStateException("Player " + playerUserId + " has not picked a seat");
         }
 
@@ -152,7 +150,7 @@ public class SeatDraftable extends SinglePickDraftable {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

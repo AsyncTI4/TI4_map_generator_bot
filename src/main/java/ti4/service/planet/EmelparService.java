@@ -98,7 +98,7 @@ public class EmelparService {
     private static void getEmelparButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String msg = player.getRepresentationUnfogged() + " select a component to ready:";
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = EmelparService.getReadyComponentButtons(game, player2);
+        List<Button> buttons = getReadyComponentButtons(game, player2);
 
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);

@@ -146,7 +146,7 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
         if (!(parent instanceof DraftSystemSettings dss)) {
             return "Unknown Event (or unknown parent menu)";
         }
-      Set<String> playerUserIds = dss.getPlayerUserIds();
+        Set<String> playerUserIds = dss.getPlayerUserIds();
         Game game = dss.getGame();
 
         List<Button> buttons = new ArrayList<>();
@@ -189,7 +189,7 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
         if (!(parent instanceof DraftSystemSettings dss)) {
             return "Unknown Event (or unknown parent menu)";
         }
-      Set<String> playerUserIds = dss.getPlayerUserIds();
+        Set<String> playerUserIds = dss.getPlayerUserIds();
         Game game = dss.getGame();
 
         String playerUserId = action.substring("orderFor_".length());

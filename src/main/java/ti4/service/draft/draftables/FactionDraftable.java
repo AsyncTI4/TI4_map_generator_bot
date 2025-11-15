@@ -157,7 +157,7 @@ public class FactionDraftable extends SinglePickDraftable {
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
             DraftChoice choice = new DraftChoice(
-                TYPE,
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, buttonText, buttonEmoji),
                     formattedName,
@@ -281,7 +281,7 @@ public class FactionDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-            TYPE,
+                TYPE,
                 null,
                 null,
                 "No faction picked",
@@ -345,7 +345,7 @@ public class FactionDraftable extends SinglePickDraftable {
             draftFactions = new ArrayList<>();
             keleresFlavor =
                     "keleresflavor_null".equals(tokens[0]) ? null : tokens[0].substring("keleresflavor_".length());
-          draftFactions.addAll(Arrays.asList(tokens).subList(1, tokens.length));
+            draftFactions.addAll(Arrays.asList(tokens).subList(1, tokens.length));
         }
     }
 
@@ -392,7 +392,7 @@ public class FactionDraftable extends SinglePickDraftable {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }

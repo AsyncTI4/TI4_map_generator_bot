@@ -223,23 +223,21 @@ public class DraftSystemSettings extends SettingsMenu {
     }
 
     public void setupNucleusPreset() {
-        draftablesList
-                .setKeys(List.of(
-                        FactionDraftable.class.getSimpleName(),
-                        SliceDraftable.class.getSimpleName(),
-                        SeatDraftable.class.getSimpleName(),
-                        SpeakerOrderDraftable.class.getSimpleName()));
+        draftablesList.setKeys(List.of(
+                FactionDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                SeatDraftable.class.getSimpleName(),
+                SpeakerOrderDraftable.class.getSimpleName()));
         draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         sliceSettings.getMapGenerationMode().setChosenKey("Nucleus");
         setPreset("Nucleus Draft");
     }
 
     public void setupAndcatTwilightsFallPreset() {
-        draftablesList
-                .setKeys(List.of(
-                        AndcatReferenceCardsDraftable.class.getSimpleName(),
-                        SliceDraftable.class.getSimpleName(),
-                        MahactKingDraftable.class.getSimpleName()));
+        draftablesList.setKeys(List.of(
+                AndcatReferenceCardsDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                MahactKingDraftable.class.getSimpleName()));
         draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         sliceSettings.getMapGenerationMode().setChosenKey("Milty");
         sourceSettings.getTeDemo().setVal(true);

@@ -144,8 +144,7 @@ public class PuppetSoftHeBladeService {
         newHome.inheritFogData(home);
 
         String returnString = "Sucessfully replaced home system tile.";
-        if ("96a".equals(oldFaction.getHomeSystem())
-                && "96b".equals(newFaction.getHomeSystem())) { // obsidian
+        if ("96a".equals(oldFaction.getHomeSystem()) && "96b".equals(newFaction.getHomeSystem())) { // obsidian
             // Resolve control
             for (Player p : game.getPlayers().values()) {
                 if (p.hasPlanet("cronos")) {

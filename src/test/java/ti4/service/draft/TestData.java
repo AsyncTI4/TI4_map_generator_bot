@@ -66,8 +66,8 @@ public class TestData {
             slice.setTiles(new ArrayList<>());
             MiltyDraftTile tile = new MiltyDraftTile();
             tile.setTile(new Tile("" + tileId, "none"));
-          tileId++;
-          // Could set a lot more tile stats if needed by tests
+            tileId++;
+            // Could set a lot more tile stats if needed by tests
             slice.getTiles().add(tile);
             slices.add(slice);
         }
@@ -118,8 +118,8 @@ public class TestData {
             for (String userId : manager.getPlayerStates().keySet()) {
                 PublicSnakeDraftOrchestrator.State state = new PublicSnakeDraftOrchestrator.State();
                 state.setOrderIndex(orderIndex);
-              orderIndex++;
-              PlayerDraftState pState = manager.getPlayerStates().get(userId);
+                orderIndex++;
+                PlayerDraftState pState = manager.getPlayerStates().get(userId);
                 pState.setOrchestratorState(state);
             }
             // Random position in draft

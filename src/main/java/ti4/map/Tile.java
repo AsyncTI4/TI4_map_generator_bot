@@ -96,7 +96,7 @@ public class Tile {
             if (tile.getPlanetUnitHolders().size() > 0) return false;
             if (tile.isSupernova()) return false;
             if (tile.getPosition().contains("frac")) return false;
-          return !tile.getTileModel().hasWormhole();
+            return !tile.getTileModel().hasWormhole();
         };
     }
 
@@ -645,7 +645,7 @@ public class Tile {
         if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
             return true;
         }
-      return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
+        return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
     }
 
     @JsonIgnore

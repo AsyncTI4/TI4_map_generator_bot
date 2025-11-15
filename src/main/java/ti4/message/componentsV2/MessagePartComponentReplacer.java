@@ -146,7 +146,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             return null;
         }
         ReplaceMessagePart replacement = replaceByCustomId.getOrDefault(curId, null);
-      return replacement;
+        return replacement;
     }
 
     private static String getCustomId(Component component) {
@@ -178,6 +178,6 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
         if (current == null || replacement == null) {
             return true;
         }
-      return current.getClass().equals(replacement.getClass());
+        return current.getClass().equals(replacement.getClass());
     }
 }

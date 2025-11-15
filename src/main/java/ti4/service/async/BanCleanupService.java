@@ -34,7 +34,7 @@ public class BanCleanupService {
             return false;
         }
         ManagedPlayer mp = GameManager.getManagedPlayer(target.getId());
-      return mp == null && !admin.getId().equals(JdaService.getBotId());
+        return mp == null && !admin.getId().equals(JdaService.getBotId());
     }
 
     private int removeUserFromAllGuilds(User user, String reason) {

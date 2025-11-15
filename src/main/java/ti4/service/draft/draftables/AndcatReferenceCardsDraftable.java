@@ -182,7 +182,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                     .map(FactionModel::getFactionEmoji)
                     .reduce("", String::concat);
             DraftChoice choice = new DraftChoice(
-                TYPE,
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, formattedName, null),
                     formattedName,
@@ -388,7 +388,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         if (menu == null || !(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-      Game game = draftSystemSettings.getGame();
+        Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
         }
@@ -537,8 +537,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             if (pState.getPickCount(TYPE) == 0) {
                 return Collections.emptyList();
             }
-            String choiceKey =
-                    pState.getPicks(TYPE).get(0).getChoiceKey();
+            String choiceKey = pState.getPicks(TYPE).get(0).getChoiceKey();
             ReferenceCardPackage refPackage = getPackageByChoiceKey(choiceKey);
             if (refPackage.speakerOrderFaction() == null) {
                 return Collections.emptyList();

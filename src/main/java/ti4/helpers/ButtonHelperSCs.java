@@ -928,8 +928,7 @@ public class ButtonHelperSCs {
             if ("agesmonument".equalsIgnoreCase(unit)) {
                 String message = player.getRepresentationUnfogged()
                         + ", please choose the planet you wish to put your monument on for **Construction**.";
-                if (!player.getSCs().contains(4)
-                        && !"te4construction".equals(scModel.getBotSCAutomationID())) {
+                if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = new ArrayList<>();
@@ -947,8 +946,7 @@ public class ButtonHelperSCs {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
                 String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                         + unitKey.unitName() + " on for **Construction**.";
-                if (!player.getSCs().contains(4)
-                        && !"te4construction".equals(scModel.getBotSCAutomationID())) {
+                if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");

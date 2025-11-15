@@ -109,7 +109,7 @@ public class PlanetPositionModel {
                 case TYPE06_2 -> "3-planet, planet-2 (Rigel 2/Abaddon)";
                 case TYPE06_3 -> "3-planet, planet-3 (Rigel 1/Ashtroth)";
 
-              case TYPE07 -> "1 planet bottom left (Groose Mihsal, Albredaan)";
+                case TYPE07 -> "1 planet bottom left (Groose Mihsal, Albredaan)";
                 case TYPE08 -> "Empties";
                 case TYPE09 -> "Mallice and Creuss";
                 case TYPE10 -> "Everra and Cormund";
@@ -120,9 +120,9 @@ public class PlanetPositionModel {
                 case TYPE15 -> "Kwon (C10)";
 
                 case TYPE17 -> "Single planet, centered";
-              default -> "unknown";
+                default -> "unknown";
 
-              // Non-HS system layouts
+                    // Non-HS system layouts
             };
         }
 
