@@ -1,6 +1,7 @@
 package ti4.commands.draft.manage;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -26,7 +27,7 @@ class DraftManagerAddOrchestrator extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         DraftManager draftManager = game.getDraftManager();
-        String orchestratorType = event.getOption(Constants.SET_ORCHESTRATOR_OPTION, o -> o.getAsString());
+        String orchestratorType = event.getOption(Constants.SET_ORCHESTRATOR_OPTION, OptionMapping::getAsString);
         DraftOrchestrator orchestrator = DraftComponentFactory.createOrchestrator(orchestratorType);
         if (orchestrator == null) {
             orchestrator = DraftComponentFactory.createOrchestrator(orchestratorType + "Orchestrator");
@@ -36,7 +37,7 @@ class DraftManagerAddOrchestrator extends GameStateSubcommand {
             return;
         }
         draftManager.setOrchestrator(orchestrator);
-        String saveData = event.getOption(Constants.SAVE_DATA_OPTION, null, o -> o.getAsString());
+        String saveData = event.getOption(Constants.SAVE_DATA_OPTION, null, OptionMapping::getAsString);
         if (saveData != null) {
             orchestrator.load(saveData);
             orchestrator.validateState(draftManager);

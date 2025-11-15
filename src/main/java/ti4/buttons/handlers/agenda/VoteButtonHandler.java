@@ -283,7 +283,7 @@ public class VoteButtonHandler {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && p.isSpaceStation()) continue;
             Button button;
             TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);

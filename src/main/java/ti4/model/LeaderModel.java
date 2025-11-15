@@ -153,12 +153,12 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         // TITLE
         String title_name_component = "";
         String title_subtitle_component = "";
-        if (type.equals("agent") && useTwilightsFallText) {
+        if ("agent".equals(type) && useTwilightsFallText) {
             title_name_component = getTFName().orElse(name);
-            title_subtitle_component = getTFTitle().orElse(this.tfTitle);
+            title_subtitle_component = getTFTitle().orElse(tfTitle);
         } else {
             title_name_component = name;
-            title_subtitle_component = this.title;
+            title_subtitle_component = title;
         }
         String title = factionEmoji + " __**" + title_name_component + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type)
                 + " " + title_subtitle_component + source.emoji();
@@ -184,7 +184,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         String abilityWindow =
                 useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
         String fieldTitle = abilityName + "\n**" + abilityWindow + "**";
-        String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(this.abilityText) : this.abilityText;
+        String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(abilityText) : abilityText;
         eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 

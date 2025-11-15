@@ -63,7 +63,7 @@ public class AddPlanetService {
         Tile tile = game.getTileFromPlanet(planet);
         Planet unitHolder = game.getPlanetsInfo().get(planet);
 
-        if (!planet.equalsIgnoreCase("custodiavigilia") && !planet.equalsIgnoreCase("ghoti")) {
+        if (!"custodiavigilia".equalsIgnoreCase(planet) && !"ghoti".equalsIgnoreCase(planet)) {
             if (unitHolder == null || tile == null) {
                 return;
             }
@@ -71,7 +71,7 @@ public class AddPlanetService {
         if (game.getRevealedPublicObjectives().size() < 2 || (unitHolder != null && unitHolder.isSpaceStation())) {
             setup = true;
         }
-        if (planet.equalsIgnoreCase("avernus")) {
+        if ("avernus".equalsIgnoreCase(planet)) {
             setup = false;
         }
         if (unitHolder == null) {
