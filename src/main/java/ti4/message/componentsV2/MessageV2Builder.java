@@ -42,7 +42,7 @@ public class MessageV2Builder {
     public MessageV2Builder(MessageChannel channel) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
-        this.maxSplits = null;
+        maxSplits = null;
     }
 
     /**
@@ -71,22 +71,22 @@ public class MessageV2Builder {
 
         public MessagePart(String part) {
             this.part = part;
-            this.type = MessagePartType.TEXT;
+            type = MessagePartType.TEXT;
         }
 
         public MessagePart(Button part) {
             this.part = List.of(part);
-            this.type = MessagePartType.BUTTONS;
+            type = MessagePartType.BUTTONS;
         }
 
         public MessagePart(List<Button> part) {
             this.part = part;
-            this.type = MessagePartType.BUTTONS;
+            type = MessagePartType.BUTTONS;
         }
 
         public MessagePart(MessageTopLevelComponent part) {
             this.part = part;
-            this.type = MessagePartType.TOP_LEVEL_COMPONENT;
+            type = MessagePartType.TOP_LEVEL_COMPONENT;
         }
 
         public MessagePartType getType() {
@@ -168,7 +168,7 @@ public class MessageV2Builder {
         }
         if (maxSplits != null && combinedComponents.size() > maxSplits) {
             List<String> componentTrees = combinedComponents.stream()
-                    .map(msg -> MessageV2Builder.ComponentTypeTree(msg.getComponentTree()))
+                    .map(msg -> ComponentTypeTree(msg.getComponentTree()))
                     .collect(Collectors.toList());
             BotLogger.warning(Constants.jabberwockyPing()
                     + " Someone attempted to send a v2 message that is split beyond the maximum. Message not sent.\n"
@@ -245,12 +245,12 @@ public class MessageV2Builder {
         int currentCharacterCount = 0;
         while (!topLevelComponents.isEmpty()) {
             MessageTopLevelComponent component = topLevelComponents.removeFirst();
-            int componentCount = MessageV2Builder.CountComponents(component);
-            int characterCount = MessageV2Builder.CountCharacters(component);
+            int componentCount = CountComponents(component);
+            int characterCount = CountCharacters(component);
             if (componentCount > Message.MAX_COMPONENT_COUNT_IN_COMPONENT_TREE
                     || characterCount > Message.MAX_CONTENT_LENGTH_COMPONENT_V2) {
                 BotLogger.warning("Cannot send a message with a top-level component that exceeds the component limit.\n"
-                        + MessageV2Builder.ComponentTypeTree(component));
+                        + ComponentTypeTree(component));
                 continue;
             }
             boolean exceedsCharacterLimit =

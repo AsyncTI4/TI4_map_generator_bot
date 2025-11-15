@@ -641,7 +641,8 @@ public class StatusHelper {
                 }
             }
         }
-        for (Player player : scars.keySet()) {
+        for (Map.Entry<Player, Integer> entry : scars.entrySet()) {
+            Player player = entry.getKey();
             List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
             if (game.isTwilightsFallMode()) {
                 factionTechs.add("antimatter");
@@ -667,7 +668,7 @@ public class StatusHelper {
             if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
                 scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
                         + " available to exhaust (This will be spent first)";
-            for (int i = 0; i < techs && i < scars.get(player); i++) {
+            for (int i = 0; i < techs && i < entry.getValue(); i++) {
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
             }

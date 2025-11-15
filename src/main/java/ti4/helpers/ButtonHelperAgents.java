@@ -35,7 +35,6 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
-import ti4.service.PlanetService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
@@ -45,6 +44,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -1812,6 +1812,9 @@ public class ButtonHelperAgents {
                 continue;
             }
             UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (uh == null) {
+                continue;
+            }
             for (String token : uh.getTokenList()) {
                 if (!token.contains("attachment")) {
                     continue;
@@ -2796,6 +2799,7 @@ public class ButtonHelperAgents {
                         + "Doctor Sucaban, the Jol-Nar"
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + unitHName);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }

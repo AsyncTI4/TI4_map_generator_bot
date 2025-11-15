@@ -25,8 +25,6 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
-import ti4.service.BookOfLatviniaService;
-import ti4.service.SilverFlameService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -34,6 +32,9 @@ import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
+import ti4.service.leader.UnlockLeaderService;
+import ti4.service.relic.BookOfLatviniaService;
+import ti4.service.relic.SilverFlameService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -60,7 +61,7 @@ public class ComponentActionHelper {
 
             boolean x89Conventions = ("x89".equalsIgnoreCase(tech) || "x89c4".equalsIgnoreCase(tech))
                     && game.isConventionsOfWarAbandonedMode()
-                    && ButtonHelper.getButtonsForConventions(p1, game).size() > 0;
+                    && !ButtonHelper.getButtonsForConventions(p1, game).isEmpty();
             if (techText.contains("ACTION") || detAgeOfExp || x89Conventions) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
@@ -79,8 +80,14 @@ public class ComponentActionHelper {
             compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
         }
         if (game.isMercenariesForHireMode()) {
-            compButtons.add(
-                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg on Mercenries For Hire"));
+            if (game.getStoredValue("mercCommander").isEmpty()) {
+                game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+            }
+            String commanderName =
+                    StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
+            compButtons.add(Buttons.red(
+                    finChecker + prefix + "mercenariesForHireAction_",
+                    "Spend 3tg on Mercenries For Hire to acquire " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
@@ -97,22 +104,14 @@ public class ComponentActionHelper {
                 boolean validAction =
                         switch (bt.getAlias()) {
                             case "arborecbt" ->
-                                game.getTileMap().values().stream()
-                                                .filter(Tile.tileHasPlayersInfAndCC(p1))
-                                                .count()
-                                        > 0;
+                                game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
                             case "crimsonbt" ->
-                                game.getTileMap().values().stream()
-                                                .filter(Tile.tileHasBreach())
-                                                .count()
-                                        > 0;
-                            case "mahactbt" -> p1.getTechs().size() > 0;
+                                game.getTileMap().values().stream().anyMatch(Tile.tileHasBreach());
+                            case "mahactbt" -> !p1.getTechs().isEmpty();
                             case "saarbt" ->
                                 game.getTileMap().values().stream()
-                                                .filter(Tile::isAsteroidField)
-                                                .filter(Tile.tileHasPlayerShips(p1))
-                                                .count()
-                                        > 0;
+                                        .filter(Tile::isAsteroidField)
+                                        .anyMatch(Tile.tileHasPlayerShips(p1));
                             case "deepwroughtbt" -> true;
                             default -> true;
                         };
@@ -389,7 +388,7 @@ public class ComponentActionHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("puppetsoftheblade")
-                && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && ary.size() > 0)) {
+                && p1.getPlotCardsFactions().values().stream().anyMatch(ary -> ary != null && !ary.isEmpty())) {
             Button abilityButton = Buttons.green(
                     finChecker + prefix + "ability_puppetsoftheblade", "Become The Obsidian", FactionEmojis.Obsidian);
             compButtons.add(abilityButton);
@@ -767,12 +766,10 @@ public class ComponentActionHelper {
                 String secretScoreMsg = "Click a button below to play an action card.";
                 List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
                 acButtons.add(Buttons.DONE_DELETE_BUTTONS);
-                if (!acButtons.isEmpty()) {
-                    List<MessageCreateData> messageList =
-                            MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-                    for (MessageCreateData message : messageList) {
-                        event.getHook().setEphemeral(true).sendMessage(message).queue();
-                    }
+                List<MessageCreateData> messageList =
+                        MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
+                for (MessageCreateData message : messageList) {
+                    event.getHook().setEphemeral(true).sendMessage(message).queue();
                 }
             }
             case "doStarCharts" -> {
@@ -816,7 +813,31 @@ public class ComponentActionHelper {
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(),
                         p1.getRepresentationUnfogged() + " has spent 3 TG to hire mercenaries.");
-                BreakthroughHelper.resolveYinBreakthroughAbility(game, p1);
+                String leaderID = game.getStoredValue("mercCommander");
+                if (leaderID != null) {
+                    p1.addLeader(leaderID);
+                    game.addFakeCommander(leaderID);
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            p1.getRepresentation() + " acquired a new commander, "
+                                    + Mapper.getLeader(leaderID).getName() + "!");
+                    UnlockLeaderService.unlockLeader(leaderID, game, p1);
+                    game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+                    if (!game.getStoredValue("mercCommander").isEmpty()) {
+                        LeaderModel led = Mapper.getLeader(game.getStoredValue("mercCommander"));
+                        if (led != null) {
+                            MessageHelper.sendMessageToChannelWithEmbed(
+                                    game.getActionsChannel(),
+                                    game.getPing() + " this is the next commander on top of the mercenary pile.",
+                                    led.getRepresentationEmbed());
+                        }
+                    }
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            p1.getCorrectChannel(),
+                            p1.getRepresentation()
+                                    + " cannot gain a new commander, as all commanders are already in play.");
+                }
             }
             case "exhaustBT" -> {
                 BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);

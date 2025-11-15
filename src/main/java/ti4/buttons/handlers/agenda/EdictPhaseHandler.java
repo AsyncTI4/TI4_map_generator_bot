@@ -110,8 +110,11 @@ public class EdictPhaseHandler {
     @ButtonHandler("conveneStep1_")
     public static void conveneStep1_(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
         String cardID = buttonID.split("_")[1];
-        if (player == game.getSpeaker()) {
-            Player tyrant = game.getTyrant();
+        if (player == game.getSpeaker()
+                && !game.getStoredValue("conveneStarter").isEmpty()) {
+            Player tyrant = game.getPlayerFromColorOrFaction(game.getStoredValue("conveneStarter"));
+            game.removeStoredValue("conveneStarter");
+            game.setStoredValue("convenePlayers", game.getStoredValue("convenePlayers") + tyrant.getFaction());
             tyrant.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -224,7 +227,7 @@ public class EdictPhaseHandler {
                     game.removeStoredValue("artificeParadigms");
                 } else {
                     ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
-                    String relic = game.getAllRelics().get(0);
+                    String relic = game.getAllRelics().getFirst();
                     RelicModel mod = Mapper.getRelic(relic);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             player.getCorrectChannel(),
@@ -247,6 +250,7 @@ public class EdictPhaseHandler {
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolvePlagueStep13", "Resolve Execute"));
             }
             case "tf-convene" -> {
+                game.setStoredValue("conveneStarter", player.getFaction());
                 List<String> techs = ButtonHelperTwilightsFall.getDeckForSplicing(
                         game, "ability", game.getRealPlayers().size());
 
@@ -257,7 +261,7 @@ public class EdictPhaseHandler {
                     embeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                 }
                 msg += "\n\n" + game.getSpeaker().getRepresentation()
-                        + " needs to assign the first ability to the tyrant, then the tyrant does the rest";
+                        + " needs to assign the first ability to the player resolving the edict, then that player does the rest";
             }
             case "tf-foretell" -> {
                 int loc = 1;
@@ -297,10 +301,11 @@ public class EdictPhaseHandler {
                         + " after resolving the edict, use this button to resolve an additional edict from your flagship.";
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
                 }
                 Button proceedToStrategyPhase = Buttons.green(
-                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(0) + "_orangetf",
+                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.getFirst()
+                                + "_orangetf",
                         "Resolve 1 Edict");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
             } else {

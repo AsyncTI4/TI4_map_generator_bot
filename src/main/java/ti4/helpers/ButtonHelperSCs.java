@@ -237,13 +237,9 @@ public class ButtonHelperSCs {
         Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         List<Button> buttons2 = Collections.singletonList(exhaust);
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Exhaust using this", buttons2);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Exhaust using this", buttons2);
-        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(), player.getRepresentation() + " Exhaust planets using this", buttons2);
     }
 
     @ButtonHandler("preDeclineSC_")
@@ -903,11 +899,9 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("civitas").orElse(null);
         }
         int scNum = scModel.getInitiative();
-        boolean automationExists = scModel != null
-                && (scModel.usesAutomationForSCID("pok4construction")
-                        || scModel.usesAutomationForSCID("te4construction"));
+        boolean automationExists =
+                scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction");
         if (!used
-                && scModel != null
                 && !player.getFollowedSCs().contains(scNum)
                 && automationExists
                 && game.getPlayedSCs().contains(scNum)) {
@@ -923,7 +917,7 @@ public class ButtonHelperSCs {
         String unit = buttonID.replace("construction_", "");
         if ("facility".equalsIgnoreCase(unit)) {
             String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
-            if (!player.getSCs().contains(4) && !scModel.getBotSCAutomationID().equals("te4construction")) {
+            if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
                 message += "\n## __It will place a command token in the system as well.__ ";
             }
             List<Button> buttons = getPossibleFacilities(game, player);
@@ -932,8 +926,7 @@ public class ButtonHelperSCs {
             if ("agesmonument".equalsIgnoreCase(unit)) {
                 String message = player.getRepresentationUnfogged()
                         + ", please choose the planet you wish to put your monument on for **Construction**.";
-                if (!player.getSCs().contains(4)
-                        && !scModel.getBotSCAutomationID().equals("te4construction")) {
+                if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = new ArrayList<>();
@@ -951,8 +944,7 @@ public class ButtonHelperSCs {
                 UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
                 String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                         + unitKey.unitName() + " on for **Construction**.";
-                if (!player.getSCs().contains(4)
-                        && !scModel.getBotSCAutomationID().equals("te4construction")) {
+                if (!player.getSCs().contains(4) && !"te4construction".equals(scModel.getBotSCAutomationID())) {
                     message += "\n-# It will place a command token in the system as well.";
                 }
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");

@@ -27,7 +27,7 @@ public class SetExpedition extends GameStateSubcommand {
         String expedition = event.getOption(Constants.EXPEDITION).getAsString();
         String value = null;
         String faction = event.getOption(Constants.FACTION).getAsString();
-        if (faction != null && !faction.equalsIgnoreCase("null")) {
+        if (faction != null && !"null".equalsIgnoreCase(faction)) {
             value = faction;
         }
         Expeditions.setExpedition(game, expedition, value);

@@ -254,9 +254,9 @@ public class CreateFoWGameService {
                 .complete();
         Player player_ = game.getPlayer(member.getId());
         player_.setPrivateChannelID(memberChannel.getId());
-        StringBuilder sb = new StringBuilder(member.getAsMention() + " - private channel\n");
-        sb.append(getInfoTextFromFile("FoWPrivateChannelIntro.txt"));
-        MessageHelper.sendMessageToChannel(memberChannel, sb.toString());
+        MessageHelper.sendMessageToChannel(
+                memberChannel,
+                member.getAsMention() + " - private channel\n" + getInfoTextFromFile("FoWPrivateChannelIntro.txt"));
     }
 
     private static String getInfoTextFromFile(String file) {

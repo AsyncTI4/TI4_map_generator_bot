@@ -30,13 +30,13 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.UnitModel;
-import ti4.service.StellarConverterService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.relic.StellarConverterService;
 import ti4.spring.jda.JdaService;
 
 /*
@@ -84,11 +84,14 @@ public class RiftSetModeService {
         game.addTag("RiftSet");
         game.setFowOption(FOWOption.RIFTSET_MODE, true);
 
-        StringBuilder sb = new StringBuilder("RiftSet Mode activated.\n");
-        sb.append("* Agenda deck set as `agendas_riftset`.\n");
-        sb.append("* Explore deck set as `explores_riftset`.\n");
-        sb.append("* Strategy cards set as `riftset`.\n");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        String sb =
+                """
+            RiftSet Mode activated.
+            * Agenda deck set as `agendas_riftset`.
+            * Explore deck set as `explores_riftset`.
+            * Strategy cards set as `riftset`.
+            """;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         return true;
     }
 

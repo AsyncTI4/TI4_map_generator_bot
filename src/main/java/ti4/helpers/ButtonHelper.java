@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -92,7 +95,6 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
-import ti4.service.PlanetService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
@@ -118,6 +120,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.planet.PlanetService;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
@@ -349,7 +352,7 @@ public class ButtonHelper {
     public static List<Button> getForcedPNSendButtons(Game game, Player receiver, Player sender) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         String idNPC = "";
-        List<String> nullOwnerPNs = new ArrayList();
+        List<String> nullOwnerPNs = new ArrayList<>();
         for (String pnShortHand : sender.getPromissoryNotes().keySet()) {
             if (sender.getPromissoryNotesInPlayArea().contains(pnShortHand)
                     || (receiver.hasAbility("hubris") && pnShortHand.endsWith("_an"))) {
@@ -1313,7 +1316,6 @@ public class ButtonHelper {
                 for (String col : colorsCoexisting) {
                     Player p2 = game.getPlayerFromColorOrFaction(col);
                     if (player == p2) {
-                        continue;
                     } else if (player == titans && !seenColors.contains(col)) {
                         slumberBonus++;
                         seenColors.add(col);
@@ -3325,7 +3327,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage().delete().queue();
         }
     }
@@ -5285,9 +5287,7 @@ public class ButtonHelper {
         for (UnitHolder planetUnit : tile.getPlanetUnitHolders()) {
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
-            if (isNotBlank(planetReal.getOriginalPlanetType())
-                    && player.getPlanetsAllianceMode().contains(planet)
-                    && FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
+            if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
                 List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
             }
@@ -7053,8 +7053,7 @@ public class ButtonHelper {
                             || ("xxcha_mech".equalsIgnoreCase(model.getId()) && isLawInPlay(game, "articles_war"))) {
                         continue;
                     }
-                    if (player.hasUnit("ralnel_destroyer2")
-                            && unitHolder.getName().equalsIgnoreCase("space")) {
+                    if (player.hasUnit("ralnel_destroyer2") && "space".equalsIgnoreCase(unitHolder.getName())) {
                         if (model.getUnitType() == UnitType.Pds || model.getUnitType() == UnitType.Spacedock) {
                             continue;
                         }
@@ -7506,12 +7505,13 @@ public class ButtonHelper {
         Button btn = event.getButton()
                 .withId(buttonID + "_confirm")
                 .withLabel("Confirm " + event.getButton().getLabel());
-        String message = player.getRepresentation()
-                + " you have some abilities that you could resolve before you pass, are you sure you want to preset a pass?";
+        StringBuilder message = new StringBuilder(
+                player.getRepresentation()
+                        + " you have some abilities that you could resolve before you pass, are you sure you want to preset a pass?");
         for (Button b : getPassingAbilities(player, game)) {
-            message += "\n> " + b.getLabel();
+            message.append("\n> ").append(b.getLabel());
         }
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), message, btn);
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), message.toString(), btn);
     }
 
     @ButtonHandler("resolvePreassignment_")

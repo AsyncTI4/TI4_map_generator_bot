@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -309,7 +310,7 @@ public class FoWHelper {
             ingress,
             egress,
             breach,
-            scar;
+            scar
         }
 
         Set<String> adjacentPositions = new HashSet<>();
@@ -319,7 +320,7 @@ public class FoWHelper {
             return adjacentPositions;
         }
 
-        Set<Feature> adjToFeatures = new HashSet<>();
+        Set<Feature> adjToFeatures = EnumSet.noneOf(Feature.class);
         for (String alias : tile.getTileModel().getAliases()) {
             if (alias.startsWith("egress")) adjToFeatures.add(Feature.ingress);
         }
@@ -679,9 +680,9 @@ public class FoWHelper {
         }
 
         if (player != null
-                && player.getFaction().equals("ghost")
+                && "ghost".equals(player.getFaction())
                 && game.getPlayerFromColorOrFaction("crimson") != null) {
-            wormholeIDs.removeIf(wh -> "epsilon".equals(wh.toLowerCase()));
+            wormholeIDs.removeIf("epsilon"::equalsIgnoreCase);
         }
 
         if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
@@ -1010,7 +1011,7 @@ public class FoWHelper {
         }
         // get players adjacent
         for (Player player_ : game.getRealPlayers()) {
-            if (FoWHelper.getTilePositionsToShow(game, player_).contains(position)) {
+            if (getTilePositionsToShow(game, player_).contains(position)) {
                 String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons()
                         + " has been pinged:\n>>> " + message;
                 List<Button> refreshButton = viewSystemButton

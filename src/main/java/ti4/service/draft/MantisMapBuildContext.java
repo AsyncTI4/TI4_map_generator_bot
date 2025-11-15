@@ -1,6 +1,7 @@
 package ti4.service.draft;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import ti4.draft.DraftItem.Category;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.draftables.MantisTileDraftable;
@@ -107,7 +109,7 @@ public record MantisMapBuildContext(
                 mantisTileDraftable::makeButtonId,
                 mantisTileDraftable.getDrawnTileId(),
                 null,
-                (String tileId) -> mantisTileDraftable.setDrawnTileId(tileId),
+                mantisTileDraftable::setDrawnTileId,
                 (String tileId) -> mantisTileDraftable.getMulliganTileIDs().add(tileId),
                 (String tileId) -> mantisTileDraftable.getDiscardedTileIDs().add(tileId),
                 (Integer playerNum) -> getPlayerBySpeakerOrder(draftManager, playerNum),
@@ -143,7 +145,7 @@ public record MantisMapBuildContext(
             }
             // This is 1-based
             Integer playerPosition = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(
-                    picks.get(0).getChoiceKey());
+                    picks.getFirst().getChoiceKey());
 
             if (playerPosition != null && playerPosition == playerNum) {
                 if (game.getPlayer(playerId) == null) {
@@ -159,10 +161,9 @@ public record MantisMapBuildContext(
             DraftManager draftManager, MantisTileDraftable mantisDraftable) {
         List<PlayerTiles> result = new ArrayList<>();
         Set<String> placedTiles = draftManager.getGame().getTileMap().values().stream()
-                .map(t -> t.getTileID())
+                .map(Tile::getTileID)
                 .collect(Collectors.toSet());
-        Set<String> discardedTiles =
-                mantisDraftable.getDiscardedTileIDs().stream().collect(Collectors.toSet());
+        Set<String> discardedTiles = new HashSet<>(mantisDraftable.getDiscardedTileIDs());
         for (Entry<String, PlayerDraftState> entry :
                 draftManager.getPlayerStates().entrySet()) {
             String playerId = entry.getKey();
@@ -186,7 +187,7 @@ public record MantisMapBuildContext(
         public static PlayerTiles create(
                 String playerUserId, MantisTileDraftable mantisDraftable, List<DraftChoice> playerPicks) {
 
-            Integer mulligansUsed = 0;
+            int mulligansUsed = 0;
             List<String> blueTileIds = new ArrayList<>();
             List<String> redTileIds = new ArrayList<>();
             for (DraftChoice choice : playerPicks) {

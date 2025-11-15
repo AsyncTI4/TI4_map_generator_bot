@@ -15,6 +15,7 @@ import ti4.draft.DraftItem.Category;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.model.MapTemplateModel;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildContext.PlayerTiles;
@@ -68,9 +69,7 @@ public class FrankenMapBuildContextHelper {
                         }
                         boolean hasSpeakerOrder = player.getDraftHand().Contents.stream()
                                 .filter(item -> item.ItemCategory == Category.DRAFTORDER)
-                                .filter(item -> item.ItemId.equals("" + playerNum))
-                                .findFirst()
-                                .isPresent();
+                                .anyMatch(item -> item.ItemId.equals("" + playerNum));
                         if (hasSpeakerOrder) {
                             return Optional.of(player);
                         }
@@ -90,7 +89,7 @@ public class FrankenMapBuildContextHelper {
     private static List<PlayerTiles> getPlayerTileStateFranken(Game game) {
         List<PlayerTiles> result = new ArrayList<>();
         Set<String> placedTiles =
-                game.getTileMap().values().stream().map(t -> t.getTileID()).collect(Collectors.toSet());
+                game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
         String discardedTilesStr = game.getStoredValue(DISCARDS_KEY);
         Set<String> discardedTiles = new HashSet<>();
         if (discardedTilesStr != null && !discardedTilesStr.isEmpty()) {
@@ -113,10 +112,7 @@ public class FrankenMapBuildContextHelper {
             // mulliganned more than once)
             int mulligansUsed = 0;
             for (String mulligannedTileId : mulligannedTiles) {
-                boolean isInBag = tileItems.stream()
-                        .filter(item -> item.ItemId.equals(mulligannedTileId))
-                        .findFirst()
-                        .isPresent();
+                boolean isInBag = tileItems.stream().anyMatch(item -> item.ItemId.equals(mulligannedTileId));
                 if (isInBag) {
                     mulligansUsed++;
                 }

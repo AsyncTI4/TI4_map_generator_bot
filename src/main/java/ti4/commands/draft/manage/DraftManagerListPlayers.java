@@ -23,7 +23,7 @@ class DraftManagerListPlayers extends GameStateSubcommand {
             if (game.getPlayer(playerUserId) != null) {
                 sb.append(game.getPlayer(playerUserId).getPing());
             } else {
-                sb.append(playerUserId + " (not in game)");
+                sb.append(playerUserId).append(" (not in game)");
             }
 
             sb.append(System.lineSeparator());

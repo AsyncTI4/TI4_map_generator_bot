@@ -260,6 +260,16 @@ public class AgendaHelper {
                 names.add(actionCard.getName());
             }
         }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("When an agenda is revealed")) {
+                    names.add(actionCard.getName());
+                }
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
@@ -383,6 +393,17 @@ public class AgendaHelper {
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
+            }
+        }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("After an agenda is revealed")
+                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
+                    names.add(actionCard.getName());
+                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -917,7 +938,14 @@ public class AgendaHelper {
 
     private static boolean playerDoesNotHaveShenanigans(Player player) {
         Set<String> shenanigans = Set.of("deadly_plot", "bribery", "confounding", "confusing");
-        return player.getActionCards().keySet().stream().noneMatch(shenanigans::contains);
+        if (player.getActionCards().keySet().stream().anyMatch(shenanigans::contains)) {
+            return false;
+        }
+        if (player.hasPlanet("garbozia")) {
+            return ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet().stream()
+                    .noneMatch(shenanigans::contains);
+        }
+        return true;
     }
 
     public static void offerEveryonePreAbstain(Game game) {
@@ -1342,7 +1370,9 @@ public class AgendaHelper {
                 }
                 if ((game.getLaws() == null
                                 || (!game.getLaws().containsKey("rep_govt")
-                                        && !game.getLaws().containsKey("absol_government")))
+                                                && !game.getLaws().containsKey("absol_government")
+                                        || !game.getStoredValue("executiveOrder")
+                                                .isEmpty()))
                         && (player.ownsPromissoryNote("blood_pact")
                                 || player.getPromissoryNotesInPlayArea().contains("blood_pact"))) {
                     for (Player p2 : getWinningVoters(winner, game)) {
@@ -2588,7 +2618,9 @@ public class AgendaHelper {
             voteCount = 0;
         }
 
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
+        if (game.getLaws() != null
+                && (game.getLaws().containsKey("rep_govt"))
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             voteCount = 1;
         }
 
@@ -3293,7 +3325,7 @@ public class AgendaHelper {
                         String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
                                 .toString();
                         Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
-                        if (outcomerP != null && outcomerP.getFactionEmoji() != null) {
+                        if (outcomerP != null) {
                             emoji = outcomerP.getFactionEmoji();
                         }
 
@@ -3411,7 +3443,8 @@ public class AgendaHelper {
             }
             sb.append("  ").append(additionalVotesText);
         } else sb.append("**");
-        if (game.getLaws().containsKey("rep_govt")) {
+        if (game.getLaws().containsKey("rep_govt")
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             sb = new StringBuilder();
             sb.append(" vote count (_Representative Government_): **1**");
         }
@@ -3702,7 +3735,9 @@ public class AgendaHelper {
 
     @ButtonHandler("outcome_")
     public static void outcome(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
+        if (game.getLaws() != null
+                && (game.getLaws().containsKey("rep_govt")
+                        && game.getStoredValue("executiveOrder").isEmpty())) {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
             String outcome = buttonID.substring(buttonID.indexOf('_') + 1);

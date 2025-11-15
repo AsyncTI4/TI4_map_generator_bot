@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class LoreService {
     @ButtonHandler("gmLoreExport")
     private static void exportLore(ButtonInteractionEvent event, Game game) {
         File exportFile = new File(game.getName() + LORE_EXPORT_FILENAME);
-        try (FileWriter writer = new FileWriter(exportFile)) {
+        try (FileWriter writer = new FileWriter(exportFile, StandardCharsets.UTF_8)) {
             writer.write(game.getStoredValue(SYSTEM_LORE_KEY));
         } catch (IOException e) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Failed to export lore: " + e.getMessage());

@@ -218,7 +218,7 @@ public class CustomHyperlaneService {
                 return;
             }
 
-            CustomHyperlaneService.insertData(game, position, hyperlaneData);
+            insertData(game, position, hyperlaneData);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Hyperlane data `" + hyperlaneData + "` added to " + position + ".");
         }

@@ -33,7 +33,6 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
-import ti4.service.PlanetService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -43,6 +42,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -299,11 +299,20 @@ public class ButtonHelperModifyUnits {
                 int min = calculateMinHits(player, hits, totalUnits);
 
                 if (unitModel.getSustainDamage() && min > 0) {
-                    msg.append("> Sustained ")
-                            .append(min)
-                            .append(" ")
-                            .append(unitModel.getUnitEmoji())
-                            .append("\n");
+                    if (RandomHelper.isOneInX(40)) {
+                        msg.append("> ")
+                                .append(min)
+                                .append(" ")
+                                .append(unitModel.getUnitEmoji())
+                                .append(" got a boo boo 🤕")
+                                .append("\n");
+                    } else {
+                        msg.append("> Sustained ")
+                                .append(min)
+                                .append(" ")
+                                .append(unitModel.getUnitEmoji())
+                                .append("\n");
+                    }
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
 
@@ -1797,7 +1806,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0 && tile != null) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition(),
@@ -1833,7 +1842,7 @@ public class ButtonHelperModifyUnits {
             for (Integer sc : player.getSCs()) {
                 StrategyCardModel scModel =
                         game.getStrategyCardModelByInitiative(sc).orElse(null);
-                if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
                     hasConstruction = true;
                 }
                 if (scModel != null
@@ -1844,7 +1853,7 @@ public class ButtonHelperModifyUnits {
                     break;
                 }
             }
-            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te") || game.isTwilightsFallMode()) {
+            if ("te".equalsIgnoreCase(game.getStrategyCardSet().getAlias()) || game.isTwilightsFallMode()) {
                 hasConstruction = true;
             }
 
@@ -2170,7 +2179,7 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && tile.getWormholes(game).size() > 0) {
+                    && !tile.getWormholes(game).isEmpty()) {
                 player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {

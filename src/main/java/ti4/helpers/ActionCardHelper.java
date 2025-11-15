@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
@@ -121,7 +122,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    private static Map<String, Integer> getGarboziaActionCards(Game game) {
+    public static Map<String, Integer> getGarboziaActionCards(Game game) {
         Map<String, Integer> cards = new HashMap<>();
         for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
             if (discard.getValue() != ACStatus.garbozia) continue;
@@ -260,7 +261,7 @@ public class ActionCardHelper {
     public static List<Button> getFactionButtonsForPlot(Game game, Player player, String plotID, String prefix) {
         List<Button> buttons = new ArrayList<>();
         List<String> factions = player.getPuppetedFactionsForPlot(plotID);
-        game.getRealPlayers().stream().forEach(p -> {
+        game.getRealPlayers().forEach(p -> {
             boolean valid = factions == null || !factions.contains(p.getFaction());
             if (prefix.startsWith("remove")) valid = factions != null && factions.contains(p.getFaction());
             if (valid) {
@@ -292,7 +293,7 @@ public class ActionCardHelper {
         if (factions != null) {
             List<String> factionEmojis = factions.stream()
                     .map(game::getPlayerFromColorOrFaction)
-                    .filter(x -> x != null)
+                    .filter(Objects::nonNull)
                     .map(Player::getFactionEmoji)
                     .toList();
             sb.append("> ").append(String.join(", ", factionEmojis)).append("\n");
@@ -389,8 +390,7 @@ public class ActionCardHelper {
                 "deflection",
                 "summit",
                 "bounty_contracts");
-        List<String> actionCards = new ArrayList<>();
-        actionCards.addAll(player.getActionCards().keySet());
+        List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
         if (player.hasPlanet("garbozia")) {
             actionCards.addAll(getGarboziaActionCards(player.getGame()).keySet());
         }

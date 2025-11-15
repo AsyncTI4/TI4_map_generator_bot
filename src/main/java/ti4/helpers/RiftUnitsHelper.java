@@ -109,7 +109,8 @@ public class RiftUnitsHelper {
                         || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
                         || (cabal != null
                                 && (key.getUnitType() == UnitType.Fighter
-                                        || key.getUnitType() == UnitType.Spacedock))) {
+                                        || key.getUnitType() == UnitType.Spacedock
+                                        || key.getUnitType() == UnitType.Pds))) {
                     continue;
                 }
 
@@ -241,15 +242,14 @@ public class RiftUnitsHelper {
     }
 
     public static String getWormholeUnit(String unit, boolean over5roll, Player player, Game game) {
-        List<String> wormholeUnits = new ArrayList<String>();
 
-        wormholeUnits.addAll(List.of("ff", "dd", "ca", "dn", "cv", "fs", "ws"));
+        List<String> wormholeUnits = new ArrayList<>(List.of("ff", "dd", "ca", "dn", "cv", "fs", "ws"));
         if (!over5roll) {
             Collections.reverse(wormholeUnits);
         }
         boolean found = false;
         for (String u : wormholeUnits) {
-            if (u.equalsIgnoreCase("ws") && !player.hasWarsunTech()) {
+            if ("ws".equalsIgnoreCase(u) && !player.hasWarsunTech()) {
                 continue;
             }
             if (found
