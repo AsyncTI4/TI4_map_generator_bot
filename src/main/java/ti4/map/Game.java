@@ -1051,10 +1051,6 @@ public class Game extends GameProperties {
         checkingForAllReacts.put(messageID, factionsWhoReacted);
     }
 
-    public void removeMessageIDFromCurrentReacts(String messageID) {
-        checkingForAllReacts.remove(messageID);
-    }
-
     public Map<String, String> getMessagesThatICheckedForAllReacts() {
         return checkingForAllReacts;
     }
@@ -1074,6 +1070,7 @@ public class Game extends GameProperties {
     }
 
     public void setStoredValue(String key, String value) {
+        if (value == null) return;
         value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);
     }
