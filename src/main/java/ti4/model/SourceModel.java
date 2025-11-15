@@ -95,8 +95,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {
-        boolean official = "official".equals(canal);
-        return official;
+        return "official".equals(canal);
     }
 
     /**

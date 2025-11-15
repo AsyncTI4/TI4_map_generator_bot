@@ -55,7 +55,7 @@ public class TwilightsFallInfoHelper {
                     .append(String.join(System.lineSeparator(), planetRepresentations))
                     .append(System.lineSeparator());
             List<String> legendaryAbilities = planets.stream()
-                    .filter(p -> p.isLegendary())
+                    .filter(PlanetModel::isLegendary)
                     .map(p -> "**" + p.getShortName() + "**: " + p.getLegendaryAbilityText())
                     .toList();
             for (String ability : legendaryAbilities) {

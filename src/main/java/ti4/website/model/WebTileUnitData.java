@@ -56,7 +56,7 @@ public class WebTileUnitData {
 
         // Add virtual "special" tile for off-tile planets (custodiavigilia, ghoti, etc.)
         WebTileUnitData specialTileData = extractOffTilePlanetsData(game);
-        if (specialTileData != null && !specialTileData.getPlanets().isEmpty()) {
+        if (specialTileData != null && !specialTileData.planets.isEmpty()) {
             tileUnitData.put("special", specialTileData);
         }
 
@@ -367,7 +367,7 @@ public class WebTileUnitData {
             planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
 
             // Add planet to special tile
-            specialTileData.getPlanets().put(planetId, planetData);
+            specialTileData.planets.put(planetId, planetData);
         }
 
         return specialTileData;

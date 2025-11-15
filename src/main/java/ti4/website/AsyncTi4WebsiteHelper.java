@@ -148,8 +148,7 @@ public class AsyncTi4WebsiteHelper {
             webData.put("expeditions", webExpeditions != null ? webExpeditions.getExpeditions() : null);
             webData.put(
                     "borderAnomalies",
-                    webBorderAnomalies != null
-                                    && webBorderAnomalies.getBorderAnomalies() != null
+                    webBorderAnomalies.getBorderAnomalies() != null
                                     && !webBorderAnomalies.getBorderAnomalies().isEmpty()
                             ? webBorderAnomalies.getBorderAnomalies()
                             : null);

@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -290,7 +291,7 @@ public class CombatRollService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        if (message != null && message.endsWith(";\n")) {
+        if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -671,10 +672,10 @@ public class CombatRollService {
                         opponent,
                         game,
                         playerUnitsList,
-                        rollType,
+                        CombatRollType.combatround,
                         activeSystem,
                         unitHolder);
-                int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player);
+                int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
                 if (numRollsPerUnit + Math.min(1, extraRollsForUnit) > max) {
                     max = numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     game.setStoredValue("highestValueSingleUnit", unitModel.getAsyncId());
@@ -687,7 +688,10 @@ public class CombatRollService {
                 resultBuilder.append("Applied +2 to the rolls of 1 unit via supercharge\n");
                 letnevBTBoost = 2;
             } else {
-                resultBuilder.append("Applied +" + letnevBTBoost + " to the rolls of 1 unit via letnev breakthrough\n");
+                resultBuilder
+                        .append("Applied +")
+                        .append(letnevBTBoost)
+                        .append(" to the rolls of 1 unit via letnev breakthrough\n");
             }
         }
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
@@ -772,11 +776,11 @@ public class CombatRollService {
             for (String singleUnit : singleUnitUse) {
 
                 int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-                if (singleUnit.equals("singleUnit")) {
+                if ("singleUnit".equals(singleUnit)) {
                     numRolls = numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     modifierToHit += letnevBTBoost;
                 }
-                if (singleUnit.equals("RestOfUnits")) {
+                if ("RestOfUnits".equals(singleUnit)) {
                     numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     modifierToHit -= letnevBTBoost;
                 }
@@ -1289,12 +1293,11 @@ public class CombatRollService {
         Map<String, Integer> unitsOnHolderByAsyncId = unitHolder.getUnitAsyncIdsOnHolder(colorID);
         for (Map.Entry<String, Integer> unitEntry : unitsOnHolderByAsyncId.entrySet()) {
 
-            if (player.hasUnit("ralnel_destroyer2") && unitHolder.getName().equalsIgnoreCase("space")) {
-                if (unitEntry.getKey().equalsIgnoreCase("pd")
-                        || unitEntry.getKey().equalsIgnoreCase("sd")) {
+            if (player.hasUnit("ralnel_destroyer2") && "space".equalsIgnoreCase(unitHolder.getName())) {
+                if ("pd".equalsIgnoreCase(unitEntry.getKey()) || "sd".equalsIgnoreCase(unitEntry.getKey())) {
                     continue;
                 }
-                if (unitEntry.getKey().equalsIgnoreCase("dd") && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
+                if ("dd".equalsIgnoreCase(unitEntry.getKey()) && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
                     continue;
                 }
             }
@@ -1306,14 +1309,10 @@ public class CombatRollService {
         }
     }
 
-    public static Map<UnitModel, Integer> getProximaBombardUnit(Tile tile, Player player) {
+    public static Map<UnitModel, Integer> getProximaBombardUnit(Player player) {
         UnitModel proximaFakeUnit = new UnitModel();
         proximaFakeUnit.setBombardDieCount(3);
-        if (player.getGame().isTwilightsFallMode()) {
-            proximaFakeUnit.setBombardHitsOn(8);
-        } else {
-            proximaFakeUnit.setBombardHitsOn(8);
-        }
+        proximaFakeUnit.setBombardHitsOn(8);
         proximaFakeUnit.setName(Mapper.getTech("proxima").getName());
         proximaFakeUnit.setAsyncId("ProximaBombard");
         proximaFakeUnit.setId("ProximaBombard");

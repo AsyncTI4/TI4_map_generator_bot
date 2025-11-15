@@ -3,6 +3,7 @@ package ti4.service.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,7 +29,7 @@ import ti4.service.unit.AddUnitService;
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-        return List.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7").stream()
+        return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                 .allMatch(pos -> game.getTileByPosition(pos) != null);
     }
 
@@ -135,7 +136,7 @@ public class FractureService {
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), automatic.toString());
 
-        final int countPer = numberOfIngressPerTechType;
+        int countPer = numberOfIngressPerTechType;
         for (TechnologyType type : techTypesToAddIngress) {
             List<Tile> tilesWithSkip = getTilesWithSkipAndNoIngressAndNotAdding(game, type, automaticAdds);
             if (tilesWithSkip.size() <= numberOfIngressPerTechType) continue;

@@ -90,7 +90,7 @@ public class ButtonHelperTacticalAction {
                 String msg = player.getRepresentation()
                         + " You can land your structures on planets in any system you have floating structures using your ability Miniaturization:";
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
-                if (buttons.size() > 0) {
+                if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
             }
@@ -432,10 +432,10 @@ public class ButtonHelperTacticalAction {
         List<Integer> allDistances =
                 (new HashSet<>(distances.values())).stream().sorted().toList();
         System.out.println(allDistances);
-        Integer distIndx =
+        int distIndx =
                 allDistances.stream().filter(i -> i <= desiredDistance).toList().size() - 1;
-        Integer prevDistIndx = distIndx - 1;
-        Integer nextDistIndx = distIndx + 1;
+        int prevDistIndx = distIndx - 1;
+        int nextDistIndx = distIndx + 1;
         if (prevDistIndx >= 0) {
             Integer prevDist = allDistances.get(prevDistIndx);
             buttons.add(Buttons.gray("getTilesThisFarAway_" + prevDist, "Get Tiles " + prevDist + " Spaces Away"));
@@ -661,7 +661,7 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
             if (player.hasPlayablePromissoryInHand("nanolink")
-                    && activeSystem.getPlanetUnitHolders().size() > 0
+                    && !activeSystem.getPlanetUnitHolders().isEmpty()
                     && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
                         + " You can use Nano Link Permit to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
@@ -675,7 +675,7 @@ public class ButtonHelperTacticalAction {
                 }
             }
             if (player.hasTech("tf-couriertransport")
-                    && activeSystem.getPlanetUnitHolders().size() > 0
+                    && !activeSystem.getPlanetUnitHolders().isEmpty()
                     && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
                         + " You can use courier transport to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";

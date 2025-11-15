@@ -61,7 +61,7 @@ public class VoidTetherService {
     }
 
     public void postInitialButtons(Game game, Player player, Tile activeSystem) {
-        List<Button> buttons = VoidTetherService.getInitialVoidTetherButtons(game, player, activeSystem.getPosition());
+        List<Button> buttons = getInitialVoidTetherButtons(game, player, activeSystem.getPosition());
         String message = player.getRepresentationNoPing()
                 + " you can use these buttons to place or move a Void Tether token using your breakthrough:";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -114,7 +114,7 @@ public class VoidTetherService {
 
             String override = game.getAdjacentTileOverride(pos, dir);
             if (override != null) position_ = override;
-            if (position_.equals("x")) continue;
+            if ("x".equals(position_)) continue;
             if (game.getTileByPosition(position_) == null) continue;
             String tileBlocked = game.getTileByPosition(position_).getRepresentationForButtons(game, player);
             // there is a tile that exists in that direction
@@ -168,8 +168,8 @@ public class VoidTetherService {
 
     @ButtonHandler("placeVoidTether_")
     private void placeVoidTether(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        final String regex = "placeVoidTether_" + RegexHelper.posRegex("pos") + "_" + RegexHelper.intRegex("dir");
-        final Pattern pattern = Pattern.compile(regex);
+        String regex = "placeVoidTether_" + RegexHelper.posRegex("pos") + "_" + RegexHelper.intRegex("dir");
+        Pattern pattern = Pattern.compile(regex);
         RegexService.runMatcher(pattern, buttonID, matcher -> {
             String position = matcher.group("pos");
             int direction = Integer.parseInt(matcher.group("dir"));

@@ -65,7 +65,8 @@ public class TestData {
             slice.setName("" + (char) ('A' + i));
             slice.setTiles(new ArrayList<>());
             MiltyDraftTile tile = new MiltyDraftTile();
-            tile.setTile(new Tile("" + tileId++, "none"));
+            tile.setTile(new Tile("" + tileId, "none"));
+            tileId++;
             // Could set a lot more tile stats if needed by tests
             slice.getTiles().add(tile);
             slices.add(slice);
@@ -116,7 +117,8 @@ public class TestData {
             int orderIndex = 0;
             for (String userId : manager.getPlayerStates().keySet()) {
                 PublicSnakeDraftOrchestrator.State state = new PublicSnakeDraftOrchestrator.State();
-                state.setOrderIndex(orderIndex++);
+                state.setOrderIndex(orderIndex);
+                orderIndex++;
                 PlayerDraftState pState = manager.getPlayerStates().get(userId);
                 pState.setOrchestratorState(state);
             }
@@ -137,9 +139,7 @@ public class TestData {
                 throw new RuntimeException(
                         "Test data file for finished 6p draft is missing at path: " + path.toAbsolutePath());
             }
-            String firstLine =
-                    Files.readAllLines(path, Charset.defaultCharset()).get(0);
-            return firstLine;
+            return Files.readAllLines(path, Charset.defaultCharset()).getFirst();
         } catch (Exception e) {
             throw new RuntimeException("Failed to read finished 6p draft string from file", e);
         }

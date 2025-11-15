@@ -21,7 +21,7 @@ public class IndustrexButtonHandler {
 
     @ButtonHandler("industrexPickType_")
     public static void pickUnitType(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        final Pattern regex = Pattern.compile("industrexPickType_" + RegexHelper.unitTypeRegex());
+        Pattern regex = Pattern.compile("industrexPickType_" + RegexHelper.unitTypeRegex());
         RegexService.runMatcher(regex, buttonID, matcher -> {
             UnitType type = Units.findUnitType(matcher.group("unittype"));
 

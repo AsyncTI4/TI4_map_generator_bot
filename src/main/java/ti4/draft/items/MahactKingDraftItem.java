@@ -34,7 +34,10 @@ public class MahactKingDraftItem extends DraftItem {
         FactionModel faction = Mapper.getFaction(ItemId);
         if (faction != null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(faction.getFactionName() + "\n> Commodities: " + faction.getCommodities() + "\n> Flagship: ");
+            sb.append(faction.getFactionName())
+                    .append("\n> Commodities: ")
+                    .append(faction.getCommodities())
+                    .append("\n> Flagship: ");
             UnitModel unit = Mapper.getUnit(ItemId + "_flagship");
             sb.append(" Combat: ");
             sb.append(unit.getCombatHitsOn());

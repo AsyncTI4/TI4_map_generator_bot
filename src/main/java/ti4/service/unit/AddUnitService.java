@@ -103,7 +103,7 @@ public class AddUnitService {
             UnitModel mod = player.getUnitsByAsyncID(asyncId).getFirst();
             // Ships go to space
             if (mod.getIsShip()
-                    || (UnitType.Spacedock == unitType
+                    || (unitType == UnitType.Spacedock
                             && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
                 assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), totalAmt, Constants.SPACE));
                 continue;

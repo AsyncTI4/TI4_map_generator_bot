@@ -120,10 +120,9 @@ public class PublicDraftInfoService {
         List<Button> buttons = new ArrayList<>();
         for (DraftChoice choice : allDraftChoices) {
             // Skip this choice if someone already has it.
-            if (draftManager
-                            .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
-                            .size()
-                    > 0) {
+            if (!draftManager
+                    .getPlayersWithChoiceKey(draftable.getType(), choice.getChoiceKey())
+                    .isEmpty()) {
                 continue;
             }
 
@@ -176,19 +175,24 @@ public class PublicDraftInfoService {
                     // Skip adding anything if no default emoji
                 }
 
-                if (longChoiceNames.size() > 0) {
-                    bulletSummary.append("- " + draftable.getDisplayName() + ": " + System.lineSeparator() + "  - ");
+                if (!longChoiceNames.isEmpty()) {
+                    bulletSummary
+                            .append("- ")
+                            .append(draftable.getDisplayName())
+                            .append(": ")
+                            .append(System.lineSeparator())
+                            .append("  - ");
                     bulletSummary.append(String.join(System.lineSeparator() + "  - ", longChoiceNames));
                 }
             }
 
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("**__");
+            if (userId.equals(nextPlayer)) sb.append("*");
+            if (userId.equals(currentPlayer)) sb.append("**__");
             sb.append(player.getUserName());
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("   <- on deck");
-            if (currentPlayer != null && userId.equals(currentPlayer)) sb.append("__**");
-            if (nextPlayer != null && userId.equals(nextPlayer)) sb.append("*");
+            if (userId.equals(currentPlayer)) sb.append("   <- CURRENTLY DRAFTING");
+            if (userId.equals(nextPlayer)) sb.append("   <- on deck");
+            if (userId.equals(currentPlayer)) sb.append("__**");
+            if (userId.equals(nextPlayer)) sb.append("*");
 
             pickNum++;
         }

@@ -48,7 +48,7 @@ public class RuleModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     public String getTitle() {
@@ -96,8 +96,7 @@ public class RuleModel implements ModelInterface, EmbeddableModel {
         if (getTitle().toLowerCase().contains(lower)) return true;
         if (plainDescription().toLowerCase().contains(lower)) return true;
         if (getFields().stream().anyMatch(t -> t.getTitle().toLowerCase().contains(lower))) return true;
-        if (getFields().stream()
-                .anyMatch(t -> t.plainDescription().toLowerCase().contains(lower))) return true;
-        return false;
+        return getFields().stream()
+                .anyMatch(t -> t.plainDescription().toLowerCase().contains(lower));
     }
 }

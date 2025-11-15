@@ -392,10 +392,9 @@ public class Helper {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
-        List<Player> arrayPlayers = new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
+        return new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
                 .filter(Objects::nonNull)
                 .toList());
-        return arrayPlayers;
     }
 
     public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
@@ -1266,7 +1265,9 @@ public class Helper {
                     if (game.isFowMode()) {
                         faction = "someone";
                     }
-                    msg.append("> Used " + faction + "'s Commander Discount ")
+                    msg.append("> Used ")
+                            .append(faction)
+                            .append("'s Commander Discount ")
                             .append(MiscEmojis.Resources_1)
                             .append("\n");
                     res += 1;

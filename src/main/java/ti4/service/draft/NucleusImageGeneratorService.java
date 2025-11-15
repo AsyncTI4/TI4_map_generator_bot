@@ -152,7 +152,7 @@ public class NucleusImageGeneratorService {
                 if (seatChoices == null || seatChoices.isEmpty()) {
                     return null;
                 }
-                DraftChoice seatChoice = seatChoices.get(0);
+                DraftChoice seatChoice = seatChoices.getFirst();
                 Integer seatNum = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
                 return seatNum;
             };
@@ -162,7 +162,7 @@ public class NucleusImageGeneratorService {
                 if (speakerChoices == null || speakerChoices.isEmpty()) {
                     return null;
                 }
-                DraftChoice speakerChoice = speakerChoices.get(0);
+                DraftChoice speakerChoice = speakerChoices.getFirst();
                 Integer seatNum = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.getChoiceKey());
                 return seatNum;
             };
@@ -204,7 +204,7 @@ public class NucleusImageGeneratorService {
                 && draftManager.getDraftable(SpeakerOrderDraftable.TYPE) != null) {
             List<DraftChoice> speakerChoices = draftManager.getPlayerPicks(playerUserId, SpeakerOrderDraftable.TYPE);
             if (speakerChoices != null && !speakerChoices.isEmpty()) {
-                DraftChoice speakerChoice = speakerChoices.get(0);
+                DraftChoice speakerChoice = speakerChoices.getFirst();
                 Integer speakerOrder = SpeakerOrderDraftable.getSpeakerOrderFromChoiceKey(speakerChoice.getChoiceKey());
                 TI4Emoji speakerEmoji = MiltyDraftEmojis.getSpeakerPickEmoji(speakerOrder);
                 if (speakerEmoji != null) {
@@ -217,7 +217,7 @@ public class NucleusImageGeneratorService {
         if (draftManager.getDraftable(FactionDraftable.TYPE) != null) {
             List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, FactionDraftable.TYPE);
             if (playerPicks != null && playerPicks.size() == 1) {
-                DraftChoice factionChoice = playerPicks.get(0);
+                DraftChoice factionChoice = playerPicks.getFirst();
                 FactionModel faction = FactionDraftable.getFactionByChoice(factionChoice);
                 if (faction.getAlias().contains("keleres")) {
                     TI4Emoji keleresEmoji = FactionEmojis.getFactionIcon(faction.getAlias());
@@ -479,7 +479,7 @@ public class NucleusImageGeneratorService {
      * @return space for the (number of rings + 1) + 2 * EXTRA_Y
      */
     private int getMapHeight(Game game) {
-        return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2 + EXTRA_Y * 2;
+        return (getRingCount(game) + 1) * SPACE_FOR_TILE_HEIGHT * 2;
     }
 
     /**

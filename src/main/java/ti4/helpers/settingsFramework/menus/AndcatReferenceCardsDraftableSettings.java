@@ -92,8 +92,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
     @Override
     public List<Button> specialButtons() {
         // String idPrefix = menuAction + "_" + navId() + "_";
-        List<Button> ls = new ArrayList<>(super.specialButtons());
-        return ls;
+        return new ArrayList<>(super.specialButtons());
     }
 
     @Override

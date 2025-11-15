@@ -263,8 +263,7 @@ public class Game extends GameProperties {
     public void fixScrewedRelics() {
 
         for (Player p2 : getRealPlayers()) {
-            List<String> relics = new ArrayList<>();
-            relics.addAll(p2.getRelics());
+            List<String> relics = new ArrayList<>(p2.getRelics());
             for (String relic : relics) {
                 if (Mapper.getRelic(relic) == null) {
                     p2.removeRelic(relic);
@@ -3795,13 +3794,12 @@ public class Game extends GameProperties {
 
     @JsonSetter
     public void setDiscardActionCards(Map<String, Integer> discardActionCards) {
-        discardActionCards.entrySet().stream()
-                .forEach(e -> getDiscardActionCards().put(e.getKey(), e.getValue()));
+        discardActionCards.entrySet().forEach(e -> getDiscardActionCards().put(e.getKey(), e.getValue()));
     }
 
     @JsonSetter
     public void setDiscardActionCardStatus(Map<String, ACStatus> discardACStatus) {
-        discardACStatus.entrySet().stream().forEach(e -> getDiscardACStatus().put(e.getKey(), e.getValue()));
+        discardACStatus.entrySet().forEach(e -> getDiscardACStatus().put(e.getKey(), e.getValue()));
     }
 
     public void setDiscardActionCards(List<String> discardActionCardList) {
@@ -4064,7 +4062,7 @@ public class Game extends GameProperties {
     }
 
     public void removeAllTiles() {
-        for (Tile tile : new ArrayList<Tile>(tileMap.values())) {
+        for (Tile tile : new ArrayList<>(tileMap.values())) {
             removeTile(tile.getPosition());
         }
     }

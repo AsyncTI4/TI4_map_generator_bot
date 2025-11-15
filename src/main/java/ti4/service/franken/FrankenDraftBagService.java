@@ -308,11 +308,11 @@ public class FrankenDraftBagService {
             BagDraft draft, DraftBag bag, DraftItem.Category cat, Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("### ").append(cat.toString()).append(" (");
-        if (game.isTwilightsFallMode() && cat.toString().equalsIgnoreCase("tech")) {
+        if (game.isTwilightsFallMode() && "tech".equalsIgnoreCase(cat.toString())) {
             sb = new StringBuilder();
             sb.append("### ").append("ABILITY ").append(" (");
         }
-        if (game.isTwilightsFallMode() && cat.toString().equalsIgnoreCase("agent")) {
+        if (game.isTwilightsFallMode() && "agent".equalsIgnoreCase(cat.toString())) {
             sb = new StringBuilder();
             sb.append("### ").append("GENOME ").append(" (");
         }

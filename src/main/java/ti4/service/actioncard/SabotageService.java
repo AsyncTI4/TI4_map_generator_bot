@@ -1,10 +1,12 @@
 package ti4.service.actioncard;
 
 import java.util.Calendar;
+import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
@@ -58,9 +60,9 @@ public class SabotageService {
             return false;
         }
 
-        if (checkForAllSabotagesDiscarded(game)
-                || checkAcd2ForAllSabotagesDiscarded(game)
-                || checkForAllShattersDiscarded(game)) {
+        if (checkForAllSabotagesDiscarded(game, player)
+                || checkAcd2ForAllSabotagesDiscarded(game, player)
+                || checkForAllShattersDiscarded(game, player)) {
             return false;
         }
 
@@ -115,10 +117,10 @@ public class SabotageService {
 
     public static boolean isSaboAllowed(Game game, Player player) {
         if (game.isTwilightsFallMode()) {
-            if (checkForAllShattersDiscarded(game)) {
+            if (checkForAllShattersDiscarded(game, player)) {
                 return false;
             }
-        } else if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
+        } else if (checkForAllSabotagesDiscarded(game, player) || checkAcd2ForAllSabotagesDiscarded(game, player)) {
             return false;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -149,10 +151,10 @@ public class SabotageService {
 
     public static String noSaboReason(Game game, Player player) {
         if (game.isTwilightsFallMode()) {
-            if (checkForAllShattersDiscarded(game)) {
+            if (checkForAllShattersDiscarded(game, player)) {
                 return "All _Shatter_ cards are in the discard.";
             }
-        } else if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
+        } else if (checkForAllSabotagesDiscarded(game, player) || checkAcd2ForAllSabotagesDiscarded(game, player)) {
             return "All _Sabotages_ are in the discard.";
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -178,21 +180,25 @@ public class SabotageService {
         return null;
     }
 
-    private static boolean checkForAllShattersDiscarded(Game game) {
-        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotInDeckOrHand(game, alias));
+    private static boolean checkForAllShattersDiscarded(Game game, Player player) {
+        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean checkForAllSabotagesDiscarded(Game game) {
-        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotInDeckOrHand(game, alias));
+    private static boolean checkForAllSabotagesDiscarded(Game game, Player player) {
+        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
+    private static boolean checkAcd2ForAllSabotagesDiscarded(Game game, Player player) {
         return game.isAcd2()
-                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotInDeckOrHand(game, alias));
+                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean isActionCardNotInDeckOrHand(Game game, String sabotageAlias) {
-        return game.getDiscardACStatus().containsKey(sabotageAlias);
+    private static boolean isActionCardNotPlayable(Game game, Player player, String sabotageAlias) {
+        return game.getDiscardACStatus().entrySet().stream()
+                .filter(entry ->
+                        entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
+                .map(Map.Entry::getKey)
+                .anyMatch(sabotageAlias::equals);
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {

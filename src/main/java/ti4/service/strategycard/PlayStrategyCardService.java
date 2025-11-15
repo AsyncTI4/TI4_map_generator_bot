@@ -641,7 +641,7 @@ public class PlayStrategyCardService {
                                 new StringBuilder("__Not__ neighbors with the **Trade** holder:");
                         boolean anyNeighbours = false;
                         boolean allNeighbours = true;
-                        StringBuilder spaceStation = new StringBuilder("");
+                        StringBuilder spaceStation = new StringBuilder();
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
                                 if (player.getNeighbouringPlayers(true).contains(p2)) {
@@ -669,7 +669,7 @@ public class PlayStrategyCardService {
                             MessageHelper.sendMessageToChannel(
                                     m5,
                                     "The **Trade** player has a space station and can transact with players who also have a space station ("
-                                            + spaceStation.toString() + ")");
+                                            + spaceStation + ")");
                         }
                     }
                 }

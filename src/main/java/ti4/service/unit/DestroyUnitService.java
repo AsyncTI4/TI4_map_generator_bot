@@ -195,12 +195,12 @@ public class DestroyUnitService {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
-                if (player != null && player.hasUnit("mykomentori_mech")) {
+                if (player.hasUnit("mykomentori_mech")) {
                     for (int x = 0; x < totalAmount; x++) {
                         ButtonHelper.rollMykoMechRevival(game, player);
                     }
                 }
-                if (player != null && player.hasUnit("cheiran_mech")) {
+                if (player.hasUnit("cheiran_mech")) {
                     AddUnitService.addUnits(
                             event,
                             unit.tile(),

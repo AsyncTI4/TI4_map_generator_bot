@@ -62,7 +62,7 @@ public class Ban extends GameStateSubcommand {
             OptionMapping opt = event.getOption(optionName);
             if (opt == null) continue;
             String value = opt.getAsString();
-            if (value == null || value.isEmpty()) continue;
+            if (value.isEmpty()) continue;
             String line = banService.applyOption(game, optionName, value);
             if (line != null && !line.isEmpty()) sb.append(line);
         }
@@ -70,7 +70,7 @@ public class Ban extends GameStateSubcommand {
         OptionMapping banListOpt = event.getOption(Constants.BAN_LIST);
         if (banListOpt != null) {
             String banListValue = banListOpt.getAsString();
-            if (banListValue != null && !banListValue.isEmpty()) {
+            if (!banListValue.isEmpty()) {
                 FrankenBanList list = FrankenBanList.fromString(banListValue);
                 if (list == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid ban list selection.");

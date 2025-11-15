@@ -65,7 +65,7 @@ public class TeHelperActionCards {
             case "strategize" -> buttons.add(Buttons.green(ffcc + "strategize", resolve));
         }
 
-        if (buttons != null && buttons.size() > 0) {
+        if (buttons != null && !buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
             return true;
         }
@@ -114,7 +114,7 @@ public class TeHelperActionCards {
             p2.gainTG(player.getTg(), true);
             player.setTg(0);
         }
-        if (player.getSecretsUnscored().size() > 0) {
+        if (!player.getSecretsUnscored().isEmpty()) {
             SecretObjectiveHelper.showAll(player, p2, game);
         }
         String message = player.getRepresentation()

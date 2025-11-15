@@ -1806,7 +1806,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0 && tile != null) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition(),
@@ -1842,7 +1842,7 @@ public class ButtonHelperModifyUnits {
             for (Integer sc : player.getSCs()) {
                 StrategyCardModel scModel =
                         game.getStrategyCardModelByInitiative(sc).orElse(null);
-                if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
                     hasConstruction = true;
                 }
                 if (scModel != null
@@ -1853,7 +1853,7 @@ public class ButtonHelperModifyUnits {
                     break;
                 }
             }
-            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te") || game.isTwilightsFallMode()) {
+            if ("te".equalsIgnoreCase(game.getStrategyCardSet().getAlias()) || game.isTwilightsFallMode()) {
                 hasConstruction = true;
             }
 
@@ -2179,7 +2179,7 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && tile.getWormholes(game).size() > 0) {
+                    && !tile.getWormholes(game).isEmpty()) {
                 player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {

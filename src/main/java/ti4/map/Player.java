@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -356,7 +357,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Set<TechnologyType> getSynergies() {
-        Set<TechnologyType> synergies = new HashSet<>();
+        Set<TechnologyType> synergies = EnumSet.noneOf(TechnologyType.class);
         if (isBreakthroughUnlocked()) {
             synergies.addAll(getBreakthroughModel().getSynergy());
         }
@@ -1577,7 +1578,7 @@ public class Player extends PlayerProperties {
         }
         if (hasAbility("puppetsoftheblade")) {
             List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values());
-            allPlots.stream().forEach(plot -> setPlotCard(plot.getAlias()));
+            allPlots.forEach(plot -> setPlotCard(plot.getAlias()));
         }
     }
 
@@ -2148,12 +2149,12 @@ public class Player extends PlayerProperties {
         Game game = this.game;
 
         // All planets the player owns count for scoring, except oceans. Oceans are fake
-        Set<Planet> playerPlanets = new HashSet<>(getPlanets().stream()
+        Set<Planet> playerPlanets = getPlanets().stream()
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Objects::nonNull)
                 .filter(p -> !p.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
                 .filter(p -> !p.isSpaceStation())
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet());
 
         // Current coexisting framework is really very dumb
         Set<Planet> coexistingPlanets = game.getPlanetsInfo().values().stream()
@@ -2342,7 +2343,7 @@ public class Player extends PlayerProperties {
             addOwnedUnitByID("mentak_cruiser3");
         }
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
-        if (!techModel.getFaction().isPresent()
+        if (techModel.getFaction().isEmpty()
                 && obsidian != null
                 && !obsidian.is(this)
                 && obsidian.getPuppetedFactionsForPlot("extract").contains(getFaction())
