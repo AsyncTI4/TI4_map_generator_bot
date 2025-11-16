@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -852,6 +852,7 @@ public class Game extends GameProperties {
         gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Veiled Heart", isVeiledHeartMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
@@ -3086,7 +3087,8 @@ public class Game extends GameProperties {
     }
 
     public void checkSOLimit(Player player) {
-        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
+        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()
+                && player.getSecretsUnscored().size() > 0) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                     + player.getMaxSOCount()
                     + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
