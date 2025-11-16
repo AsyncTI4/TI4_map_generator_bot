@@ -651,11 +651,20 @@ public class ButtonHelperTwilightsFall {
                         Mapper.getUnit(card).getName()));
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
-            if (Mapper.getLeader(card) != null) {
-                buttons.add(Buttons.blue(
-                        "revealSpecificVeiledCard_genome_" + card,
-                        Mapper.getLeader(card).getLeaderPositionAndFaction()));
-                embeds.add(Mapper.getLeader(card).getRepresentationEmbed());
+            LeaderModel leaderModel = Mapper.getLeader(card);
+            if (leaderModel != null) {
+                if ("agent".equalsIgnoreCase(leaderModel.getType())) {
+                    buttons.add(Buttons.blue(
+                            "revealSpecificVeiledCard_genome_" + card,
+                            leaderModel.getLeaderPositionAndFaction()));
+                    embeds.add(leaderModel.getRepresentationEmbed());
+                }
+                if ("hero".equalsIgnoreCase(leaderModel.getType())) {
+                    buttons.add(Buttons.red(
+                            "revealSpecificVeiledCard_paradigm_" + card,
+                            leaderModel.getLeaderPositionAndFaction()));
+                    embeds.add(leaderModel.getRepresentationEmbed());
+                }
             }
         }
         if (buttons.size() > 0) {
@@ -680,7 +689,7 @@ public class ButtonHelperTwilightsFall {
             player.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the ability: "
+                    player.getRepresentation() + " has unveiled the ability: "
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
         }
@@ -688,9 +697,18 @@ public class ButtonHelperTwilightsFall {
             player.addLeader(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the following card: "
+                    player.getRepresentation() + " has unveiled the genome: "
                             + Mapper.getLeader(cardID).getName(),
                     Mapper.getLeader(cardID).getRepresentationEmbed());
+        }
+        if ("paradigm".equalsIgnoreCase(type)) {
+            player.addLeader(cardID);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has unveiled the paradigm: "
+                            + Mapper.getLeader(cardID).getName(),
+                    Mapper.getLeader(cardID).getRepresentationEmbed());
+            player.getLeaderByID(cardID).get().setLocked(false);
         }
         if ("units".equalsIgnoreCase(type)) {
             UnitModel unitModel = Mapper.getUnit(cardID);
@@ -707,7 +725,7 @@ public class ButtonHelperTwilightsFall {
             player.addOwnedUnitByID(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the unit: "
+                    player.getRepresentation() + " has unveiled the unit: "
                             + Mapper.getUnit(cardID).getName(),
                     Mapper.getUnit(cardID).getRepresentationEmbed());
         }
