@@ -123,6 +123,7 @@ public class GameProperties {
     private @ExportableField boolean zealousOrthodoxyMode;
     private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
+    private @ExportableField boolean veiledHeartMode;
     private @ExportableField boolean limitedWhispersMode;
     private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;

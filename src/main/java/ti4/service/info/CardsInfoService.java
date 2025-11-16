@@ -169,6 +169,9 @@ public class CardsInfoService {
                     "Pay To Ignore Laws",
                     FactionEmojis.Keleres));
         }
+        if (game.isVeiledHeartMode()) {
+            buttons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
+        }
         if (player.hasAbility("military_industrial_complex")) {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }

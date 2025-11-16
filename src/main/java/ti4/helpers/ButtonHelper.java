@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1376,7 +1373,7 @@ public class ButtonHelper {
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
         ButtonHelperActionCards.checkForPlayingSummit(game, player);
-        if (game.isCustodiansScored()) {
+        if (game.isCustodiansScored() && !game.isTwilightsFallMode()) {
             List<String> whens = AgendaHelper.getPossibleWhenNames(player);
             List<String> afters = AgendaHelper.getPossibleAfterNames(player);
             if ((player.isAutoPassOnWhensAfters() && whens.isEmpty() && afters.isEmpty()) || player.isNpc()) {

@@ -1,5 +1,6 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,7 +19,10 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private Boolean isAsteroids;
     private Boolean isRift;
     private Boolean isNebula;
+
+    @JsonIgnore
     private Boolean isNova;
+
     private Boolean isScar;
     private List<String> aliasList;
     private List<Wormhole> wormholes;

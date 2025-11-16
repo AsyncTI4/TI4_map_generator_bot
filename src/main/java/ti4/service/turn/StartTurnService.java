@@ -605,6 +605,15 @@ public class StartTurnService {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
+        if (player.hasUnexhaustedLeader("hyperagent")) {
+            startButtons.add(Buttons.gray(
+                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+        }
+
+        if (game.isVeiledHeartMode()
+                && !game.getStoredValue("veiledCards" + player.getFaction()).isEmpty()) {
+            startButtons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
+        }
 
         GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                 .ifPresent(messageId ->
