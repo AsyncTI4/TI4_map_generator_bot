@@ -101,7 +101,18 @@ class FrankenButtonHandler {
             case ABILITY -> FrankenAbilityService.addAbilities(event, player, List.of(itemID));
             case TECH -> {
                 if (player.getGame().isTwilightsFallMode()) {
-                    player.addTech(itemID);
+                    if (player.getGame().isVeiledHeartMode()) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCardsInfoThread(),
+                                "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                        player.getGame()
+                                .setStoredValue(
+                                        "veiledCards" + player.getFaction(),
+                                        player.getGame().getStoredValue("veiledCards" + player.getFaction()) + itemID
+                                                + "_");
+                    } else {
+                        player.addTech(itemID);
+                    }
                 } else {
                     FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
                 }
@@ -115,8 +126,34 @@ class FrankenButtonHandler {
                 PlayerStatsService.setTotalCommodities(
                         event, player, (player.getCommoditiesTotal(true) + faction.getCommodities()));
             }
-            case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP, UNIT -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+            case AGENT, COMMANDER, HERO -> {
+                if (player.getGame().isVeiledHeartMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                    player.getGame()
+                            .setStoredValue(
+                                    "veiledCards" + player.getFaction(),
+                                    player.getGame().getStoredValue("veiledCards" + player.getFaction()) + itemID
+                                            + "_");
+                } else {
+                    FrankenLeaderService.addLeaders(event, player, List.of(itemID));
+                }
+            }
+            case MECH, FLAGSHIP, UNIT -> {
+                if (player.getGame().isVeiledHeartMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                    player.getGame()
+                            .setStoredValue(
+                                    "veiledCards" + player.getFaction(),
+                                    player.getGame().getStoredValue("veiledCards" + player.getFaction()) + itemID
+                                            + "_");
+                } else {
+                    FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+                }
+            }
             case COMMODITIES ->
                 PlayerStatsService.setTotalCommodities(
                         event,
