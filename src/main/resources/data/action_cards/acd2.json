@@ -381,7 +381,7 @@
         "name": "Incompetence",
         "phase": "Action",
         "window": "Before your opponent's units make combat rolls",
-        "text": "For up to 3 of those unit's unmodified results of 1 or 2, produce 1 hit that your opponent must assign to 1 of their ships.",
+        "text": "For up to 3 of those units' unmodified results of 1 or 2, produce 1 hit that your opponent must assign to 1 of their ships.",
         "flavorText": "\"Commander, the left flank is dissolving. Crossfire—\" A hull breach slammed Agnlan to the deck before they could reply, their pitiful whine broadcast across the rapidly deteriorating battle. \"Agnlan, what happened? Agnlan!? Agnlan—!\"",
         "source": "action_deck_2"
     },
@@ -777,7 +777,7 @@
         "name": "Shock Troops",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Apply +1 to the result of each of your unit's combat rolls during this combat.",
+        "text": "Apply +1 to the result of each of your units' combat rolls during this combat.",
         "flavorText": "\"Our training has borne the finest warriors in the galaxy,\" Jace promised. \"We are the rising of a new dawn. A day of death and reckoning. Now for wrath, now for ruin, and a red nightfall!\"",
         "source": "action_deck_2"
     },
