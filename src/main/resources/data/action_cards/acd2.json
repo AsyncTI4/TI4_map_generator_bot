@@ -380,8 +380,8 @@
         "alias": "incompetence",
         "name": "Incompetence",
         "phase": "Action",
-        "window": "Before the \"Roll Dice\" step of combat",
-        "text": "For up to 3 of your opponent's combat roll results of 1 or 2, produce 1 additional hit.",
+        "window": "Before your opponent's units make combat rolls",
+        "text": "For up to 3 of those unit's unmodified results of 1 or 2, produce 1 hit that your opponent must assign to 1 of their ships.",
         "flavorText": "\"Commander, the left flank is dissolving. Crossfire—\" A hull breach slammed Agnlan to the deck before they could reply, their pitiful whine broadcast across the rapidly deteriorating battle. \"Agnlan, what happened? Agnlan!? Agnlan—!\"",
         "source": "action_deck_2"
     },
