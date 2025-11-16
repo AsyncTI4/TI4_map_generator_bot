@@ -2,12 +2,12 @@ package ti4.commands.map;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
@@ -30,12 +30,13 @@ public class AddBorderAnomaly extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        Set<String> tiles = resolveTiles(event, game);
+        Set<String> tiles =
+                Helper.getSetFromCSV(event.getOption(Constants.PRIMARY_TILE).getAsString());
         Set<Integer> directions = resolveDirections(event);
 
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE).getAsString();
-        BorderAnomalyModel model = new BorderAnomalyModel();
-        BorderAnomalyModel.BorderAnomalyType anomalyType = model.getBorderAnomalyTypeFromString(anomalyTypeString);
+        BorderAnomalyModel.BorderAnomalyType anomalyType =
+                new BorderAnomalyModel().getBorderAnomalyTypeFromString(anomalyTypeString);
 
         StringBuilder sb = new StringBuilder();
         int amountAdded = 0;
@@ -57,26 +58,11 @@ public class AddBorderAnomaly extends GameStateSubcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
-    public static Set<String> resolveTiles(SlashCommandInteractionEvent event, Game game) {
-        Set<String> tiles = new HashSet<>();
-        String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        StringTokenizer tilesTokenizer = new StringTokenizer(tilesString, ",");
-        while (tilesTokenizer.hasMoreTokens()) {
-            String tile = tilesTokenizer.nextToken().trim();
-            if (!game.getTileMap().containsKey(tile)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Map does not contain tile " + tile);
-            }
-            tiles.add(tile);
-        }
-        return tiles;
-    }
-
     public static Set<Integer> resolveDirections(SlashCommandInteractionEvent event) {
-        String directionString = event.getOption(Constants.PRIMARY_TILE_DIRECTION, "", OptionMapping::getAsString);
-        StringTokenizer directionTokenizer = new StringTokenizer(directionString, ",");
+        Set<String> directionsString =
+                Helper.getSetFromCSV(event.getOption(Constants.PRIMARY_TILE_DIRECTION, "", OptionMapping::getAsString));
         Set<Integer> directions = new HashSet<>();
-        while (directionTokenizer.hasMoreTokens()) {
-            String dir = directionTokenizer.nextToken().trim().toLowerCase();
+        for (String dir : directionsString) {
             switch (dir) {
                 case "north", "n" -> directions.add(0);
                 case "northeast", "ne" -> directions.add(1);
