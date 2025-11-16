@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -852,6 +852,7 @@ public class Game extends GameProperties {
         gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Veiled Heart", isVeiledHeartMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());

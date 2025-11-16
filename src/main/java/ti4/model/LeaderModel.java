@@ -84,6 +84,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
+    public String getLeaderPositionAndFaction() {
+        return StringUtils.capitalize(faction) + " " + StringUtils.capitalize(type);
+    }
+
     public Optional<String> getTFTitle() {
         return Optional.ofNullable(tfTitle);
     }

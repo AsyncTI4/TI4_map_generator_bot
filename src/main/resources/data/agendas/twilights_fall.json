@@ -86,7 +86,7 @@
         "category": "agenda",
         "type": "Directive",
         "target": "Edict",
-        "text1": "Roll 1 die: 10: Draw up to 2 spliced cards from any decks .6-9: Each player draws 1 spliced card from any deck. 1-5: Destroy each unit in the Mecatol Rex system, then each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their units in each of those systems.",
+        "text1": "Roll 1 die: \n10: Draw up to 2 spliced cards from any decks\n6-9: Each player draws 1 spliced card from any deck. \n1-5: Destroy each unit in the Mecatol Rex system, then each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their units in each of those systems.",
         "source": "twilights_fall"
     }
 ]

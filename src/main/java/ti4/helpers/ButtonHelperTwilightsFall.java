@@ -333,8 +333,10 @@ public class ButtonHelperTwilightsFall {
         }
         List<String> cards = getSpliceCards(game);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, null);
-        MessageHelper.sendMessageToChannelWithEmbeds(
-                game.getActionsChannel(), "A splice has started with the following options.", embeds);
+        if (!game.isVeiledHeartMode()) {
+            MessageHelper.sendMessageToChannelWithEmbeds(
+                    startPlayer.getCorrectChannel(), "A splice has started with the following options.", embeds);
+        }
 
         sendPlayerSpliceOptions(game, startPlayer);
     }
@@ -365,7 +367,11 @@ public class ButtonHelperTwilightsFall {
         if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
             msg = player.getRepresentation() + " select a card to remove from the splice:";
         }
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
+        if (game.isVeiledHeartMode()) {
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), msg, embeds, buttons);
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
+        }
     }
 
     @ButtonHandler("participateInSplice_")
@@ -477,7 +483,7 @@ public class ButtonHelperTwilightsFall {
         String cardID = buttonID.split("_")[1];
         player.removeTech(cardID);
         MessageHelper.sendMessageToChannelWithEmbed(
-                game.getActionsChannel(),
+                player.getCorrectChannel(),
                 player.getRepresentation() + " has discarded the ability: "
                         + Mapper.getTech(cardID).getName(),
                 Mapper.getTech(cardID).getRepresentationEmbed());
@@ -489,7 +495,7 @@ public class ButtonHelperTwilightsFall {
         String cardID = buttonID.split("_")[1];
         player.removeLeader(cardID);
         MessageHelper.sendMessageToChannelWithEmbed(
-                game.getActionsChannel(),
+                player.getCorrectChannel(),
                 player.getRepresentation() + " has discarded the genome: "
                         + Mapper.getLeader(cardID).getName(),
                 Mapper.getLeader(cardID).getRepresentationEmbed());
@@ -526,7 +532,7 @@ public class ButtonHelperTwilightsFall {
             player.addTech(cardID);
 
             MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
+                    player.getCorrectChannel(),
                     player.getRepresentation()
                             + " has chosen to get a commonly available tech instead of splicing: the tech is "
                             + Mapper.getTech(cardID).getName(),
@@ -544,43 +550,53 @@ public class ButtonHelperTwilightsFall {
             }
             if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(),
+                        player.getCorrectChannel(),
                         player.getRepresentation() + " has removed a spliced card from the draft");
             } else {
-                if ("ability".equalsIgnoreCase(type)) {
-                    player.addTech(cardID);
-                    MessageHelper.sendMessageToChannelWithEmbed(
-                            game.getActionsChannel(),
-                            player.getRepresentation() + " has spliced in the ability: "
-                                    + Mapper.getTech(cardID).getName(),
-                            Mapper.getTech(cardID).getRepresentationEmbed());
-                }
-                if ("genome".equalsIgnoreCase(type)) {
-                    player.addLeader(cardID);
-                    MessageHelper.sendMessageToChannelWithEmbed(
-                            game.getActionsChannel(),
-                            player.getRepresentation() + " has spliced in the genome: "
-                                    + Mapper.getLeader(cardID).getTFNameIfAble(),
-                            Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
-                }
-                if ("units".equalsIgnoreCase(type)) {
-                    UnitModel unitModel = Mapper.getUnit(cardID);
-                    String asyncId = unitModel.getAsyncId();
-                    if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
-                        List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
-                                .filter(unit -> unit.getFaction().isEmpty()
-                                        || unit.getUpgradesFromUnitId().isEmpty())
-                                .toList();
-                        for (UnitModel u : unitsToRemove) {
-                            player.removeOwnedUnitByID(u.getId());
-                        }
+                if (!game.isVeiledHeartMode()) {
+                    if ("ability".equalsIgnoreCase(type)) {
+                        player.addTech(cardID);
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " has spliced in the ability: "
+                                        + Mapper.getTech(cardID).getName(),
+                                Mapper.getTech(cardID).getRepresentationEmbed());
                     }
-                    player.addOwnedUnitByID(cardID);
-                    MessageHelper.sendMessageToChannelWithEmbed(
-                            game.getActionsChannel(),
-                            player.getRepresentation() + " has spliced in the unit: "
-                                    + Mapper.getUnit(cardID).getName(),
-                            Mapper.getUnit(cardID).getRepresentationEmbed());
+                    if ("genome".equalsIgnoreCase(type)) {
+                        player.addLeader(cardID);
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " has spliced in the genome: "
+                                        + Mapper.getLeader(cardID).getTFNameIfAble(),
+                                Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
+                    }
+                    if ("units".equalsIgnoreCase(type)) {
+                        UnitModel unitModel = Mapper.getUnit(cardID);
+                        String asyncId = unitModel.getAsyncId();
+                        if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
+                            List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                                    .filter(unit -> unit.getFaction().isEmpty()
+                                            || unit.getUpgradesFromUnitId().isEmpty())
+                                    .toList();
+                            for (UnitModel u : unitsToRemove) {
+                                player.removeOwnedUnitByID(u.getId());
+                            }
+                        }
+                        player.addOwnedUnitByID(cardID);
+                        MessageHelper.sendMessageToChannelWithEmbed(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " has spliced in the unit: "
+                                        + Mapper.getUnit(cardID).getName(),
+                                Mapper.getUnit(cardID).getRepresentationEmbed());
+                    }
+                } else {
+                    game.setStoredValue(
+                            "veiledCards" + player.getFaction(),
+                            game.getStoredValue("veiledCards" + player.getFaction()) + cardID + "_");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing()
+                                    + " has taken a secret card. They may put it into play with a button in their cards info.");
                 }
                 triggerYellowUnits(game, player);
             }
@@ -601,7 +617,7 @@ public class ButtonHelperTwilightsFall {
             }
         } else {
             game.removeStoredValue("lastSplicer");
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " The splice is complete.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), game.getPing() + " The splice is complete.");
             if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                 Player p2 = game.getActivePlayer();
                 if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
@@ -612,6 +628,94 @@ public class ButtonHelperTwilightsFall {
             game.removeStoredValue("willParticipateInSplice");
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("revealVeiledCards")
+    public static void revealVeiledCards(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>();
+        List<MessageEmbed> embeds = new ArrayList<>();
+        for (String card :
+                game.getStoredValue("veiledCards" + player.getFaction()).split("_")) {
+            if (card == null || card.isEmpty()) {
+                continue;
+            }
+            if (Mapper.getTech(card) != null) {
+                buttons.add(Buttons.green(
+                        "revealSpecificVeiledCard_ability_" + card,
+                        Mapper.getTech(card).getName()));
+                embeds.add(Mapper.getTech(card).getRepresentationEmbed());
+            }
+            if (Mapper.getUnit(card) != null) {
+                buttons.add(Buttons.gray(
+                        "revealSpecificVeiledCard_units_" + card,
+                        Mapper.getUnit(card).getName()));
+                embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
+            }
+            if (Mapper.getLeader(card) != null) {
+                buttons.add(Buttons.blue(
+                        "revealSpecificVeiledCard_genome_" + card,
+                        Mapper.getLeader(card).getLeaderPositionAndFaction()));
+                embeds.add(Mapper.getLeader(card).getRepresentationEmbed());
+            }
+        }
+        if (buttons.size() > 0) {
+            buttons.add(Buttons.red("deleteButtons", "Done"));
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + " select a card to reveal.",
+                    embeds,
+                    buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(), player.getRepresentation() + " you have no veiled cards");
+        }
+    }
+
+    @ButtonHandler("revealSpecificVeiledCard_")
+    public static void revealSpecificVeiledCard(
+            Game game, String buttonID, Player player, GenericInteractionCreateEvent event) {
+        String type = buttonID.split("_")[1];
+        String cardID = buttonID.split("_")[2];
+        if ("ability".equalsIgnoreCase(type)) {
+            player.addTech(cardID);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has acquired the ability: "
+                            + Mapper.getTech(cardID).getName(),
+                    Mapper.getTech(cardID).getRepresentationEmbed());
+        }
+        if ("genome".equalsIgnoreCase(type)) {
+            player.addLeader(cardID);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has acquired the following card: "
+                            + Mapper.getLeader(cardID).getName(),
+                    Mapper.getLeader(cardID).getRepresentationEmbed());
+        }
+        if ("units".equalsIgnoreCase(type)) {
+            UnitModel unitModel = Mapper.getUnit(cardID);
+            String asyncId = unitModel.getAsyncId();
+            if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
+                List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                        .filter(unit -> unit.getFaction().isEmpty()
+                                || unit.getUpgradesFromUnitId().isEmpty())
+                        .toList();
+                for (UnitModel u : unitsToRemove) {
+                    player.removeOwnedUnitByID(u.getId());
+                }
+            }
+            player.addOwnedUnitByID(cardID);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has acquired the unit: "
+                            + Mapper.getUnit(cardID).getName(),
+                    Mapper.getUnit(cardID).getRepresentationEmbed());
+        }
+
+        game.setStoredValue(
+                "veiledCards" + player.getFaction(),
+                game.getStoredValue("veiledCards" + player.getFaction()).replace(cardID + "_", ""));
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("drawParadigm")
@@ -681,13 +785,28 @@ public class ButtonHelperTwilightsFall {
                 game.setStoredValue("artificeParadigms", game.getStoredValue("artificeParadigms") + "_" + leader);
             }
         }
-        MessageHelper.sendMessageToChannelWithEmbed(
-                game.getActionsChannel(),
-                player.getRepresentation() + " has drawn a new paradigm: "
-                        + Mapper.getLeader(leader).getName(),
-                Mapper.getLeader(leader).getRepresentationEmbed(false, true, false, false, true));
-        player.addLeader(leader);
-        player.getLeaderByID(leader).get().setLocked(false);
+        if (game.isVeiledHeartMode()) {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + " has drawn a new paradigm: "
+                            + Mapper.getLeader(leader).getName(),
+                    Mapper.getLeader(leader).getRepresentationEmbed(false, true, false, false, true));
+            game.setStoredValue(
+                    "veiledCards" + player.getFaction(),
+                    game.getStoredValue("veiledCards" + player.getFaction()) + leader + "_");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " has taken a secret card. They may put it into play with a button in their cards info.");
+        } else {
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has drawn a new paradigm: "
+                            + Mapper.getLeader(leader).getName(),
+                    Mapper.getLeader(leader).getRepresentationEmbed(false, true, false, false, true));
+            player.addLeader(leader);
+            player.getLeaderByID(leader).get().setLocked(false);
+        }
     }
 
     public static List<Button> getSpliceButtons(Game game, String type, List<String> cards, Player player) {
@@ -805,7 +924,7 @@ public class ButtonHelperTwilightsFall {
         String cardID = buttonID.split("_")[1];
         player.removeTech(cardID);
         MessageHelper.sendMessageToChannelWithEmbed(
-                game.getActionsChannel(),
+                player.getCorrectChannel(),
                 player.getRepresentation() + " has lost the ability: "
                         + Mapper.getTech(cardID).getName(),
                 Mapper.getTech(cardID).getRepresentationEmbed());
@@ -890,7 +1009,7 @@ public class ButtonHelperTwilightsFall {
         if ("ability".equalsIgnoreCase(type)) {
             player.removeTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
+                    player.getCorrectChannel(),
                     player.getRepresentation() + " has lost the ability: "
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
@@ -898,7 +1017,7 @@ public class ButtonHelperTwilightsFall {
         if ("genome".equalsIgnoreCase(type)) {
             player.removeLeader(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
+                    player.getCorrectChannel(),
                     player.getRepresentation() + " has lost the genome: "
                             + Mapper.getLeader(cardID).getTFNameIfAble(),
                     Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
@@ -911,7 +1030,7 @@ public class ButtonHelperTwilightsFall {
                 player.addOwnedUnitByID(replacementUnit);
             }
             MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
+                    player.getCorrectChannel(),
                     player.getRepresentation() + " has lost the unit: "
                             + Mapper.getUnit(cardID).getName(),
                     Mapper.getUnit(cardID).getRepresentationEmbed());
@@ -954,40 +1073,50 @@ public class ButtonHelperTwilightsFall {
             cardID = buttonID.split("_")[2];
             ButtonHelper.deleteMessage(event);
         }
-        if ("ability".equalsIgnoreCase(type)) {
-            player.addTech(cardID);
-            MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
-                    player.getRepresentation() + " has acquired the ability: "
-                            + Mapper.getTech(cardID).getName(),
-                    Mapper.getTech(cardID).getRepresentationEmbed());
-        }
-        if ("genome".equalsIgnoreCase(type)) {
-            player.addLeader(cardID);
-            MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
-                    player.getRepresentation() + " has acquired the genome: "
-                            + Mapper.getLeader(cardID).getName(),
-                    Mapper.getLeader(cardID).getRepresentationEmbed());
-        }
-        if ("units".equalsIgnoreCase(type)) {
-            UnitModel unitModel = Mapper.getUnit(cardID);
-            String asyncId = unitModel.getAsyncId();
-            if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
-                List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
-                        .filter(unit -> unit.getFaction().isEmpty()
-                                || unit.getUpgradesFromUnitId().isEmpty())
-                        .toList();
-                for (UnitModel u : unitsToRemove) {
-                    player.removeOwnedUnitByID(u.getId());
-                }
+        if (!game.isVeiledHeartMode()) {
+            if ("ability".equalsIgnoreCase(type)) {
+                player.addTech(cardID);
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " has acquired the ability: "
+                                + Mapper.getTech(cardID).getName(),
+                        Mapper.getTech(cardID).getRepresentationEmbed());
             }
-            player.addOwnedUnitByID(cardID);
-            MessageHelper.sendMessageToChannelWithEmbed(
-                    game.getActionsChannel(),
-                    player.getRepresentation() + " has acquired the unit: "
-                            + Mapper.getUnit(cardID).getName(),
-                    Mapper.getUnit(cardID).getRepresentationEmbed());
+            if ("genome".equalsIgnoreCase(type)) {
+                player.addLeader(cardID);
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " has acquired the genome: "
+                                + Mapper.getLeader(cardID).getName(),
+                        Mapper.getLeader(cardID).getRepresentationEmbed());
+            }
+            if ("units".equalsIgnoreCase(type)) {
+                UnitModel unitModel = Mapper.getUnit(cardID);
+                String asyncId = unitModel.getAsyncId();
+                if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
+                    List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                            .filter(unit -> unit.getFaction().isEmpty()
+                                    || unit.getUpgradesFromUnitId().isEmpty())
+                            .toList();
+                    for (UnitModel u : unitsToRemove) {
+                        player.removeOwnedUnitByID(u.getId());
+                    }
+                }
+                player.addOwnedUnitByID(cardID);
+                MessageHelper.sendMessageToChannelWithEmbed(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " has acquired the unit: "
+                                + Mapper.getUnit(cardID).getName(),
+                        Mapper.getUnit(cardID).getRepresentationEmbed());
+            }
+        } else {
+            game.setStoredValue(
+                    "veiledCards" + player.getFaction(),
+                    game.getStoredValue("veiledCards" + player.getFaction()) + cardID + "_");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing()
+                            + " has taken a secret card. They may put it into play with a button in their cards info.");
         }
     }
 
@@ -1008,6 +1137,13 @@ public class ButtonHelperTwilightsFall {
                 if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
                     allCards.remove(card);
                 }
+                if (game.isVeiledHeartMode()) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                            allCards.remove(card);
+                        }
+                    }
+                }
             }
             for (int i = 0; i < size && !allCards.isEmpty(); i++) {
                 cards.add(allCards.removeFirst());
@@ -1018,6 +1154,16 @@ public class ButtonHelperTwilightsFall {
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getLeaderIDs()) {
                     allCards.remove(tech);
+                }
+            }
+            List<String> someCardList = new ArrayList<>(allCards);
+            for (String card : someCardList) {
+                if (game.isVeiledHeartMode()) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                            allCards.remove(card);
+                        }
+                    }
                 }
             }
             for (int i = 0; i < size && !allCards.isEmpty(); i++) {
@@ -1050,6 +1196,16 @@ public class ButtonHelperTwilightsFall {
             for (Player p : game.getRealPlayers()) {
                 for (String unit : p.getUnitsOwned()) {
                     allCards.remove(unit);
+                }
+            }
+            List<String> someCardList = new ArrayList<>(allCards);
+            for (String card : someCardList) {
+                if (game.isVeiledHeartMode()) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                            allCards.remove(card);
+                        }
+                    }
                 }
             }
             Collections.shuffle(allCards);
