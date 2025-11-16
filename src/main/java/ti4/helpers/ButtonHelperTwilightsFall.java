@@ -1146,9 +1146,6 @@ public class ButtonHelperTwilightsFall {
                     }
                 }
             }
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
-            }
         }
         if ("genome".equalsIgnoreCase(type)) {
             allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
@@ -1167,9 +1164,6 @@ public class ButtonHelperTwilightsFall {
                     }
                 }
             }
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
-            }
         }
         if ("paradigm".equalsIgnoreCase(type)) {
             allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
@@ -1177,9 +1171,6 @@ public class ButtonHelperTwilightsFall {
                     List.of(game.getStoredValue("savedParadigms").split("_"));
             for (String card : alreadyDrawn) {
                 allCards.remove(card);
-            }
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
             }
         }
         if ("units".equalsIgnoreCase(type)) {
@@ -1210,9 +1201,9 @@ public class ButtonHelperTwilightsFall {
                 }
             }
             Collections.shuffle(allCards);
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
-            }
+        }
+        for (int i = 0; i < size && !allCards.isEmpty(); i++) {
+            cards.add(allCards.removeFirst());
         }
 
         return cards;
