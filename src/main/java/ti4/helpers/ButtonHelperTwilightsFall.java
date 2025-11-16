@@ -1122,8 +1122,9 @@ public class ButtonHelperTwilightsFall {
 
     public static List<String> getDeckForSplicing(Game game, String type, int size) {
         List<String> cards = new ArrayList<>();
+        List<String> allCards;
         if ("ability".equalsIgnoreCase(type)) {
-            List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+            allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getTechs()) {
                     allCards.remove(tech);
@@ -1150,7 +1151,7 @@ public class ButtonHelperTwilightsFall {
             }
         }
         if ("genome".equalsIgnoreCase(type)) {
-            List<String> allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
+            allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getLeaderIDs()) {
                     allCards.remove(tech);
@@ -1171,7 +1172,7 @@ public class ButtonHelperTwilightsFall {
             }
         }
         if ("paradigm".equalsIgnoreCase(type)) {
-            List<String> allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
+            allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
             List<String> alreadyDrawn =
                     List.of(game.getStoredValue("savedParadigms").split("_"));
             for (String card : alreadyDrawn) {
@@ -1182,7 +1183,7 @@ public class ButtonHelperTwilightsFall {
             }
         }
         if ("units".equalsIgnoreCase(type)) {
-            List<String> allCards = new ArrayList<>();
+            allCards = new ArrayList<>();
             Map<String, UnitModel> allUnits = Mapper.getUnits();
             for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
                 UnitModel mod = entry.getValue();
