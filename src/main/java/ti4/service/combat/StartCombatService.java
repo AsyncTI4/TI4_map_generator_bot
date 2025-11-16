@@ -109,19 +109,6 @@ public class StartCombatService {
         return false;
     }
 
-    // TODO: can we get rid of this and just have the command do a combat check?
-    public static void findOrCreateCombatThread(
-            Game game,
-            MessageChannel channel,
-            Player player1,
-            Player player2,
-            Tile tile,
-            GenericInteractionCreateEvent event,
-            String spaceOrGround,
-            String unitHolderName) {
-        findOrCreateCombatThread(game, channel, player1, player2, null, tile, event, spaceOrGround, unitHolderName);
-    }
-
     private static void startSpaceCombat(
             Game game, Player player, Player player2, Tile tile, GenericInteractionCreateEvent event) {
         startSpaceCombat(game, player, player2, tile, event, null);
@@ -137,7 +124,7 @@ public class StartCombatService {
         String threadName = combatThreadName(game, player, player2, tile, specialCombatTitle);
         if (!game.isFowMode()) {
             findOrCreateCombatThread(
-                    game, game.getActionsChannel(), player, player2, threadName, tile, event, "space", "space");
+                    game, game.getActionsChannel(), player, player2, threadName, tile, event, "space", "space", true);
             game.setStoredValue(
                     "currentActionSummary" + player.getFaction(),
                     game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a space combat in "
@@ -145,10 +132,19 @@ public class StartCombatService {
             return;
         }
         findOrCreateCombatThread(
-                game, player.getPrivateChannel(), player, player2, threadName, tile, event, "space", "space");
+                game, player.getPrivateChannel(), player, player2, threadName, tile, event, "space", "space", true);
         if (player2.getPrivateChannel() != null) {
             findOrCreateCombatThread(
-                    game, player2.getPrivateChannel(), player2, player, threadName, tile, event, "space", "space");
+                    game,
+                    player2.getPrivateChannel(),
+                    player2,
+                    player,
+                    threadName,
+                    tile,
+                    event,
+                    "space",
+                    "space",
+                    false);
         }
         for (Player player3 : game.getRealPlayers()) {
             if (player3 == player2 || player3 == player) {
@@ -184,7 +180,8 @@ public class StartCombatService {
                     tile,
                     event,
                     "ground",
-                    unitHolder.getName());
+                    unitHolder.getName(),
+                    true);
             if ((unitHolder.getUnitCount(Units.UnitType.Pds, player2.getColor()) < 1
                             || (!player2.hasUnit("titans_pds") && !player2.hasUnit("titans_pds2")))
                     && unitHolder.getUnitCount(Units.UnitType.Mech, player2.getColor()) < 1
@@ -211,7 +208,8 @@ public class StartCombatService {
                     tile,
                     event,
                     "ground",
-                    unitHolder.getName());
+                    unitHolder.getName(),
+                    true);
             if (player2.getPrivateChannel() != null) {
                 findOrCreateCombatThread(
                         game,
@@ -222,7 +220,8 @@ public class StartCombatService {
                         tile,
                         event,
                         "ground",
-                        unitHolder.getName());
+                        unitHolder.getName(),
+                        false);
             }
             for (Player player3 : game.getRealPlayers()) {
                 if (player3 == player2 || player3 == player) {
@@ -245,7 +244,8 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String spaceOrGround,
-            String unitHolderName) {
+            String unitHolderName,
+            boolean firstCombatThread) {
         ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null) threadName = combatThreadName(game, player1, player2, tile, null);
         if (!game.isFowMode()) {
@@ -265,7 +265,16 @@ public class StartCombatService {
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 initializeCombatThread(
-                        threadChannel_, game, player1, player2, tile, event, spaceOrGround, null, unitHolderName);
+                        threadChannel_,
+                        game,
+                        player1,
+                        player2,
+                        tile,
+                        event,
+                        spaceOrGround,
+                        null,
+                        unitHolderName,
+                        firstCombatThread);
                 CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
                 CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
                 return;
@@ -291,7 +300,16 @@ public class StartCombatService {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             }
             threadChannel.queue(tc -> initializeCombatThread(
-                    tc, game, player1, player2, tile, event, spaceOrGround, systemWithContext, unitHolderName));
+                    tc,
+                    game,
+                    player1,
+                    player2,
+                    tile,
+                    event,
+                    spaceOrGround,
+                    systemWithContext,
+                    unitHolderName,
+                    firstCombatThread));
         });
         CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
         CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
@@ -306,7 +324,8 @@ public class StartCombatService {
             GenericInteractionCreateEvent event,
             String spaceOrGround,
             FileUpload file,
-            String unitHolderName) {
+            String unitHolderName,
+            boolean firstCombatThread) {
         StringBuilder message = new StringBuilder();
         message.append(player1.getRepresentationUnfogged());
         if (!game.isFowMode()) message.append(player2.getRepresentation());
@@ -529,57 +548,59 @@ public class StartCombatService {
                     threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
         }
 
-        for (Player p : game.getRealPlayers()) {
-            // offer buttons for all crimson commander holders
-            offerRedGhostCommanderButtons(p, game, event);
-            if (p.hasUnit("crimson_destroyer")) {
-                List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Destroyer);
-                boolean inRange = false;
-                for (Tile tile2 : destroyers) {
-                    if (FoWHelper.getAdjacentTiles(game, tile.getPosition(), p, false, true)
-                            .contains(tile2.getPosition())) {
-                        inRange = true;
-                    }
-                }
-                if (inRange) {
-                    String msg = p.getRepresentation()
-                            + " at the end of the combat, if your destroyer is still within or adjacent to the tile containing the combat, you can use this button to place an inactive breach";
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
-                            "Place Inactive Breach"));
-                    buttons.add(Buttons.red(p.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline to place"));
-                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg, buttons);
-                }
-            }
-            if (p.hasUnit("crimson_destroyer2")) {
-                List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Destroyer);
-                boolean inRange = false;
-                for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p, false, true)) {
+        if (firstCombatThread) {
+            for (Player p : game.getRealPlayers()) {
+                // offer buttons for all crimson commander holders
+                offerRedGhostCommanderButtons(p, game, tile, event);
+                if (p.hasUnit("crimson_destroyer")) {
+                    List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Destroyer);
+                    boolean inRange = false;
                     for (Tile tile2 : destroyers) {
-                        if (FoWHelper.getAdjacentTiles(game, adjPos, p, false, true)
+                        if (FoWHelper.getAdjacentTiles(game, tile.getPosition(), p, false, true)
                                 .contains(tile2.getPosition())) {
                             inRange = true;
-                            break;
                         }
                     }
                     if (inRange) {
-                        break;
+                        String msg = p.getRepresentation()
+                                + " at the end of the combat, if your destroyer is still within or adjacent to the tile containing the combat, you can use this button to place an inactive breach";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
+                                "Place Inactive Breach"));
+                        buttons.add(Buttons.red(p.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline to place"));
+                        MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg, buttons);
                     }
                 }
+                if (p.hasUnit("crimson_destroyer2")) {
+                    List<Tile> destroyers = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Destroyer);
+                    boolean inRange = false;
+                    for (String adjPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p, false, true)) {
+                        for (Tile tile2 : destroyers) {
+                            if (FoWHelper.getAdjacentTiles(game, adjPos, p, false, true)
+                                    .contains(tile2.getPosition())) {
+                                inRange = true;
+                                break;
+                            }
+                        }
+                        if (inRange) {
+                            break;
+                        }
+                    }
 
-                if (inRange) {
-                    String msg = p.getRepresentation()
-                            + " at the end of the combat, if your destroyer is still in the active system or within 2 tiles away, you can use these buttons to place an active or inactive breach";
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green(
-                            p.getFinsFactionCheckerPrefix() + "placeBreach_" + tile.getPosition() + "_destroyer",
-                            "Place Active Breach"));
-                    buttons.add(Buttons.blue(
-                            p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
-                            "Place Inactive Breach"));
-                    buttons.add(Buttons.red(p.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline to place"));
-                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg, buttons);
+                    if (inRange) {
+                        String msg = p.getRepresentation()
+                                + " at the end of the combat, if your destroyer is still in the active system or within 2 tiles away, you can use these buttons to place an active or inactive breach";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                p.getFinsFactionCheckerPrefix() + "placeBreach_" + tile.getPosition() + "_destroyer",
+                                "Place Active Breach"));
+                        buttons.add(Buttons.blue(
+                                p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
+                                "Place Inactive Breach"));
+                        buttons.add(Buttons.red(p.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline to place"));
+                        MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg, buttons);
+                    }
                 }
             }
         }
@@ -614,7 +635,11 @@ public class StartCombatService {
                 false);
     }
 
-    private static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+    private static void offerRedGhostCommanderButtons(
+            Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+        if (game.isFowMode() && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition())) {
+            return;
+        }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
@@ -623,7 +648,8 @@ public class StartCombatService {
                     + " with Ahk Siever, the Crimson commander."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), message, buttons);
         }
     }
 
