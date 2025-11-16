@@ -1143,7 +1143,7 @@ public class TileGenerator {
                         }
                     }
 
-                    if (!traitFile.isEmpty()) {
+                    if (traitFile != null && !traitFile.isEmpty()) {
                         BufferedImage bufferedImage = ImageHelper.read(traitFile);
                         bufferedImage = ImageHelper.scale(bufferedImage, (float)
                                 Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
