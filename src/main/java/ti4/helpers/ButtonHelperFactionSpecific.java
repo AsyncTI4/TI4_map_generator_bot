@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1984,7 +1982,7 @@ public class ButtonHelperFactionSpecific {
                 } else {
                     if (hasFF) {
                         buttons.add(Buttons.blue(
-                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_figher_" + uH.getName(),
+                                player.finChecker() + "vortexRevive_" + tile.getPosition() + "_fighter_" + uH.getName(),
                                 "Release FF in " + tile.getRepresentationForButtons(),
                                 UnitEmojis.fighter));
                     }
