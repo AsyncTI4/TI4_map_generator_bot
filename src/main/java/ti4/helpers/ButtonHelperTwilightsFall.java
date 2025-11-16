@@ -1122,7 +1122,7 @@ public class ButtonHelperTwilightsFall {
 
     public static List<String> getDeckForSplicing(Game game, String type, int size) {
         List<String> cards = new ArrayList<>();
-        List<String> allCards;
+        List<String> allCards = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
             allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
@@ -1138,13 +1138,6 @@ public class ButtonHelperTwilightsFall {
                 if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
                     allCards.remove(card);
                 }
-                if (game.isVeiledHeartMode()) {
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                            allCards.remove(card);
-                        }
-                    }
-                }
             }
         }
         if ("genome".equalsIgnoreCase(type)) {
@@ -1152,16 +1145,6 @@ public class ButtonHelperTwilightsFall {
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getLeaderIDs()) {
                     allCards.remove(tech);
-                }
-            }
-            List<String> someCardList = new ArrayList<>(allCards);
-            for (String card : someCardList) {
-                if (game.isVeiledHeartMode()) {
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                            allCards.remove(card);
-                        }
-                    }
                 }
             }
         }
@@ -1174,7 +1157,6 @@ public class ButtonHelperTwilightsFall {
             }
         }
         if ("units".equalsIgnoreCase(type)) {
-            allCards = new ArrayList<>();
             Map<String, UnitModel> allUnits = Mapper.getUnits();
             for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
                 UnitModel mod = entry.getValue();
@@ -1190,17 +1172,17 @@ public class ButtonHelperTwilightsFall {
                     allCards.remove(unit);
                 }
             }
+            Collections.shuffle(allCards);
+        }
+        if (game.isVeiledHeartMode()) {
             List<String> someCardList = new ArrayList<>(allCards);
             for (String card : someCardList) {
-                if (game.isVeiledHeartMode()) {
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                            allCards.remove(card);
-                        }
+                for (Player p2 : game.getRealPlayers()) {
+                    if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                        allCards.remove(card);
                     }
                 }
             }
-            Collections.shuffle(allCards);
         }
         for (int i = 0; i < size && !allCards.isEmpty(); i++) {
             cards.add(allCards.removeFirst());
