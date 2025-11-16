@@ -1152,14 +1152,6 @@ public class ButtonHelperTwilightsFall {
                 }
             }
         }
-        if ("paradigm".equalsIgnoreCase(type)) {
-            allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
-            List<String> alreadyDrawn =
-                    List.of(game.getStoredValue("savedParadigms").split("_"));
-            for (String card : alreadyDrawn) {
-                allCards.remove(card);
-            }
-        }
         if ("units".equalsIgnoreCase(type)) {
             Map<String, UnitModel> allUnits = Mapper.getUnits();
             for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
@@ -1178,7 +1170,26 @@ public class ButtonHelperTwilightsFall {
             }
             Collections.shuffle(allCards);
         }
-        if (game.isVeiledHeartMode() && !includeVeiledCards) {
+        if ("paradigm".equalsIgnoreCase(type)) {
+            allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
+            List<String> alreadyDrawn =
+                    List.of(game.getStoredValue("savedParadigms").split("_"));
+            for (String card : alreadyDrawn) {
+                // savedParadigms includes veiled paradigms, which should only be removed if includeVeiledCards is false
+                boolean shouldRemove = true;
+                if (game.isVeiledHeartMode() & includeVeiledCards) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                            shouldRemove = false;
+                            break;
+                        }
+                    }
+                }
+                if (shouldRemove) {
+                    allCards.remove(card);
+                }
+            }
+        } else if (game.isVeiledHeartMode() && !includeVeiledCards) {
             List<String> someCardList = new ArrayList<>(allCards);
             for (String card : someCardList) {
                 for (Player p2 : game.getRealPlayers()) {
