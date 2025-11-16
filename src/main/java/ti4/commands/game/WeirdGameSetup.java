@@ -27,10 +27,6 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.MILTYMOD_MODE,
-                "True to switch to MiltyMod mode (only compatabile with No Expansion Mode)"));
-        addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
@@ -62,10 +58,9 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
                         .setAutoComplete(true));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.THUNDERS_EDGE_MODE,
-                "True to enable the work in progress Thunders Edge Mode"));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, Constants.THUNDERS_EDGE_MODE, "True to enable Thunders Edge Mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.VEILED_HEART_MODE, "True to enable Veiled Heart Mode"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -130,6 +125,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean noSwapMode = event.getOption(Constants.NO_SWAP_MODE, null, OptionMapping::getAsBoolean);
         if (noSwapMode != null) game.setNoSwapMode(noSwapMode);
+
+        Boolean veiledHeartMode = event.getOption(Constants.VEILED_HEART_MODE, null, OptionMapping::getAsBoolean);
+        if (veiledHeartMode != null) game.setVeiledHeartMode(veiledHeartMode);
 
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);

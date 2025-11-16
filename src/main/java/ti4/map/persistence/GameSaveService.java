@@ -561,6 +561,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.NO_SWAP_MODE + " " + game.isNoSwapMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.VEILED_HEART_MODE + " " + game.isVeiledHeartMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.LIMITED_WHISPERS_MODE + " " + game.isLimitedWhispersMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());

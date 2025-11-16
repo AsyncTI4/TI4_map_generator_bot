@@ -43,7 +43,7 @@ class FrankenButtonHandler {
         event.editButton(draftItem.getRemoveButton()).queue();
 
         // Handle Errata
-        if (draftItem.Errata != null) {
+        if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
                 for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
@@ -72,7 +72,7 @@ class FrankenButtonHandler {
         event.editButton(draftItem.getAddButton()).queue();
 
         // Handle Errata
-        if (draftItem.Errata != null) {
+        if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
                 for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
