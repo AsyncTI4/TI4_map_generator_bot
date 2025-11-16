@@ -1444,5 +1444,59 @@
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
         "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
         "source": "deprecated"
+    },
+    {
+        "alias": "classified_weapons_acd2",
+        "name": "Classified Weapons",
+        "phase": "Action",
+        "window": "When 1 of your units makes a combat or unit ability roll",
+        "text": "That unit rolls 2 additional dice.",
+        "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "vulnerability1",
+        "name": "Vulnerability",
+        "phase": "Action",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
+        "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "vulnerability2",
+        "name": "Vulnerability",
+        "phase": "Action",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
+        "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn smiled. \"Finish them.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "vulnerability3",
+        "name": "Vulnerability",
+        "phase": "Action",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
+        "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "vulnerability4",
+        "name": "Vulnerability",
+        "phase": "Action",
+        "window": "When you produce 1 or more hits against a non-upgraded unit",
+        "text": "Assign 1 of those hits to 1 of those units.",
+        "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
+        "source": "deprecated"
+    },
+    {
+        "alias": "ambassadors",
+        "name": "Ambassadors",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Place 1 infantry from your reinforcements into coexistence on a non-home planet controlled by another player and exhaust each planet in its system.",
+        "flavorText": "The pageantry and endless bandying of crooked words with these uncertain allies was yet another of their schemes.",
+        "source": "deprecated"
     }
 ]
