@@ -24,8 +24,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to base game mode."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(
@@ -41,13 +40,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.EXTRA_SECRET_MODE,
-                "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
-        addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
-        addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.TWILIGHTS_FALL_MODE, "True to enable Twilights Fall Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));

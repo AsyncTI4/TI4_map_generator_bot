@@ -816,9 +816,7 @@ class PlayerAreaGenerator {
             DrawingUtil.superDrawStringCenteredDefault(
                     graphics,
                     "Veiled Cards: "
-                            + (game.getStoredValue("veiledCards" + player.getFaction())
-                                            .split("_")
-                                            .length
+                            + ((game.getStoredValue("veiledCards" + player.getFaction()) + "spoof").split("_").length
                                     - 1),
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 50);
