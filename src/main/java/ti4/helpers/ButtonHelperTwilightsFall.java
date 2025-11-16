@@ -1121,6 +1121,10 @@ public class ButtonHelperTwilightsFall {
     }
 
     public static List<String> getDeckForSplicing(Game game, String type, int size) {
+        return getDeckForSplicing(game, type, size, false);
+    }
+
+    public static List<String> getDeckForSplicing(Game game, String type, int size, boolean includeVeiledCards) {
         List<String> cards = new ArrayList<>();
         List<String> allCards = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
@@ -1174,7 +1178,7 @@ public class ButtonHelperTwilightsFall {
             }
             Collections.shuffle(allCards);
         }
-        if (game.isVeiledHeartMode()) {
+        if (game.isVeiledHeartMode() && !includeVeiledCards) {
             List<String> someCardList = new ArrayList<>(allCards);
             for (String card : someCardList) {
                 for (Player p2 : game.getRealPlayers()) {
