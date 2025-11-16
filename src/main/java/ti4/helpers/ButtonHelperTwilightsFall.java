@@ -857,7 +857,7 @@ public class ButtonHelperTwilightsFall {
 
     public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
         List<MessageEmbed> embeds = new ArrayList<>();
-        List<String> cards = getDeckForSplicing(game, type, 100);
+        List<String> cards = getDeckForSplicing(game, type, 100, true);
         if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getTech(card).getRepresentationEmbed());
