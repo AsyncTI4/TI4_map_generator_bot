@@ -16,10 +16,10 @@ public class BanListener extends ListenerAdapter {
     @Override
     public void onGuildAuditLogEntryCreate(@Nonnull GuildAuditLogEntryCreateEvent event) {
         try {
-        AuditLogEntry log = event.getEntry();
-        if (log.getType() == ActionType.BAN) {
-            BanCleanupService.banSpamAccount(log, getTargetUser(log), getInitiatingUser(log));
-        }
+            AuditLogEntry log = event.getEntry();
+            if (log.getType() == ActionType.BAN) {
+                BanCleanupService.banSpamAccount(log, getTargetUser(log), getInitiatingUser(log));
+            }
         } catch (Exception e) {
             BotLogger.error("Error attepting to propagate ban", e);
         }
@@ -27,15 +27,17 @@ public class BanListener extends ListenerAdapter {
 
     private User getTargetUser(AuditLogEntry log) {
         if (log.getTargetType() == TargetType.MEMBER) {
-            if (log.getTargetId() != null)
+            if (log.getTargetId() != null) {
                 return JdaService.jda.getUserById(log.getTargetId());
+            }
         }
         return null;
     }
 
     private User getInitiatingUser(AuditLogEntry log) {
-        if (log.getUserId() != null)
+        if (log.getUserId() != null) {
             return JdaService.jda.getUserById(log.getUserId());
+        }
         return null;
     }
 }
