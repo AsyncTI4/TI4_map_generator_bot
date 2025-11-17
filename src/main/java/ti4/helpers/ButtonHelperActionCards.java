@@ -932,7 +932,7 @@ public class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
+            if (p2 == player && !game.isTwilightsFallMode()) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -1695,14 +1695,14 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(game, pos, player, false)) {
             Tile tile = game.getTileByPosition(tilePos);
-            if (!tile.isHomeSystem(game)) {
+            if (!tile.isHomeSystem(game) || game.isTwilightsFallMode()) {
                 buttons.add(Buttons.gray(
                         "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
             }
         }
         Tile tile = game.getTileByPosition(pos);
-        if (!tile.isHomeSystem(game)) {
+        if (!tile.isHomeSystem(game) || game.isTwilightsFallMode()) {
             buttons.add(Buttons.gray(
                     "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
