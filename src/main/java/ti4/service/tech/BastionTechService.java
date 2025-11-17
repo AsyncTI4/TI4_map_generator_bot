@@ -202,6 +202,16 @@ public class BastionTechService {
             if (message != null && message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }
+            if (player.hasTech("tf-proxima") && h > 0) {
+                message += "\nProxima cancelled 1 hit automatically";
+                h--;
+            } else {
+                if (planet.getGalvanizedUnitCount(player.getColorID()) > 0 && h > 0) {
+                    int oldH = h;
+                    h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
+                    message += "\nProxima cancelled " + (oldH - h) + " hit(s) automatically";
+                }
+            }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             if (h > 0) {
                 String msg = p1.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
