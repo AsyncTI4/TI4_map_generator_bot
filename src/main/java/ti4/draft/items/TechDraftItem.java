@@ -33,6 +33,9 @@ public class TechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
+        if ("none".equalsIgnoreCase(getTech().getRequirementsEmoji())) {
+            return getTech().getText();
+        }
         return getTech().getText() + " " + getTech().getRequirementsEmoji();
     }
 
@@ -68,7 +71,8 @@ public class TechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         if (game.isTwilightsFallMode()) {
             for (TechnologyModel tech : Mapper.getTechs().values()) {
-                if (tech.getSource() == ComponentSource.twilights_fall) {
+                if (tech.getSource() == ComponentSource.twilights_fall
+                        && tech.getFaction().isPresent()) {
                     allItems.add(generate(Category.TECH, tech.getID()));
                 }
             }

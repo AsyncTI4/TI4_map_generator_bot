@@ -189,7 +189,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
         String mostCommonFailure = failureReasons.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
-                .map(Map.Entry<String, Integer>::getKey)
+                .map(Map.Entry::getKey)
                 .orElse("none");
 
         assertNull(mostCommonFailure);

@@ -153,12 +153,26 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null
-                && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
+        return imageFileName != null && getImageFilePath() != null;
     }
 
     public String getImageFilePath() {
         return ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png");
+    }
+
+    @Deprecated
+    public String getImageUrl() {
+        return imageURL;
+    }
+
+    public String getImageFileUrl() {
+        String urlBase =
+                "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/strat_cards/";
+        if (hasImageFile()) {
+            return urlBase + imageFileName + ".png";
+        } else {
+            return urlBase + "sadFace.png";
+        }
     }
 
     @Nullable

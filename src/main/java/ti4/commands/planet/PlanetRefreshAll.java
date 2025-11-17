@@ -7,7 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.PlanetService;
+import ti4.service.planet.PlanetService;
 
 public class PlanetRefreshAll extends GameStateSubcommand {
 

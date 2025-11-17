@@ -13,6 +13,7 @@ public class MapCommand implements ParentCommand {
                     new AddTile(),
                     new AddTileList(),
                     new RemoveTile(),
+                    new SpawnFracture(),
                     new AddBorderAnomaly(),
                     new RemoveBorderAnomaly(),
                     new InteractiveBuilder(),

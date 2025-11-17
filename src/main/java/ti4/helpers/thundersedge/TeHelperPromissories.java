@@ -41,7 +41,7 @@ public class TeHelperPromissories {
         for (String tech : dws.getTechs()) {
             TechnologyModel techModel = Mapper.getTech(tech);
             if (techModel.getFaction().isPresent()
-                    && techModel.getFaction().orElse("").length() > 0) continue; // no faction techs
+                    && !techModel.getFaction().orElse("").isEmpty()) continue; // no faction techs
             if (techModel.isUnitUpgrade()) continue;
             if (player.hasTech(tech)) continue;
             techsToAdd.add(techModel);
@@ -60,7 +60,7 @@ public class TeHelperPromissories {
             List<Button> buttons = getCourierTransportButtons(game, player, destination);
             buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-            String msg = player.getRepresentation() + " Choose which structures to move with courier transport:";
+            String msg = player.getRepresentation() + " Choose which structures to move:";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -84,21 +84,22 @@ public class TeHelperPromissories {
             String from = unit.getValue() + " " + planetFrom;
             String to = unit.getValue() + " " + planetTo;
 
-            PromissoryNoteHelper.resolvePNPlay("couriertransport", player, game, event);
             RemoveUnitService.removeUnits(event, source, game, player.getColor(), from);
             AddUnitService.addUnits(event, destination, game, player.getColor(), to);
 
             String srcStr = Helper.getUnitHolderRepresentation(source, matcher.group("sourcePlanet"), game, player);
             String destStr = Helper.getUnitHolderRepresentation(destination, matcher.group("destPlanet"), game, player);
 
-            PromissoryNoteModel courier = Mapper.getPromissoryNote("couriertransport");
+            PromissoryNoteModel courier = Mapper.getPromissoryNote("nanolink");
+            String name = courier.getNameRepresentation();
+            if (game.isTwilightsFallMode()) {
+                name = "Courier Transport";
+            } else {
+                PromissoryNoteHelper.resolvePNPlay("nanolink", player, game, event);
+            }
             String msg = String.format(
                     "%s moved %s from %s to %s using %s.",
-                    player.getRepresentation(),
-                    unit.humanReadableName(),
-                    srcStr,
-                    destStr,
-                    courier.getNameRepresentation());
+                    player.getRepresentation(), unit.humanReadableName(), srcStr, destStr, name);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteTheOneButton(event);
         });
@@ -116,7 +117,7 @@ public class TeHelperPromissories {
 
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 String uhName = "space";
-                if (!uh.getName().equals("space")) {
+                if (!"space".equals(uh.getName())) {
                     uhName = Helper.getPlanetRepresentation(uh.getName(), game);
                 }
 

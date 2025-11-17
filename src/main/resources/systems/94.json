@@ -1,1 +1,21 @@
-{"id":"94","name":"Sorrow (Crimson)","aliases":["te04","epsilonwh","sorrow","sorrowgate","crimsongate","rebelliongate","epsilongate"],"imagePath":"94_SorrowWH.png","shipPositionsType":"TYPE08","wormholes":["EPSILON"],"tileBack":"green","source":"thunders_edge"}
+{
+    "id": "94",
+    "name": "Sorrow (Crimson)",
+    "aliases": [
+        "te04",
+        "epsilonwh",
+        "sorrow",
+        "sorrowgate",
+        "crimsongate",
+        "rebelliongate",
+        "epsilongate"
+    ],
+    "planets": [],
+    "imagePath": "94_SorrowWH.png",
+    "shipPositionsType": "TYPE08",
+    "wormholes": [
+        "EPSILON"
+    ],
+    "tileBack": "green",
+    "source": "thunders_edge"
+}

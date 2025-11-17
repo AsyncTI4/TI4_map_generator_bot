@@ -77,10 +77,16 @@ public class PlayerTechService {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(
-                event,
-                player.getRepresentation(false, false) + " removed technology: "
-                        + Mapper.getTech(techID).getRepresentation(false) + ".");
+
+        if (Mapper.getTech(techID) != null) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    player.getRepresentation(false, false) + " removed technology: "
+                            + Mapper.getTech(techID).getRepresentation(false) + ".");
+        } else {
+            MessageHelper.sendMessageToEventChannel(
+                    event, player.getRepresentation(false, false) + " removed technology: " + techID + ".");
+        }
     }
 
     public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
@@ -300,7 +306,7 @@ public class PlayerTechService {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player || p2.getAc() == 0) {
+                    if (p2 == player || p2.getAcCount() == 0) {
                         continue;
                     }
                     if (game.isFowMode()) {
@@ -340,7 +346,7 @@ public class PlayerTechService {
                 ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
             case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
-            case "nekroc4r", "nanomachines" -> {
+            case "nekroc4r", "nanomachines", "tf-nanomachines" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
                 String message = player.getRepresentation() + ", please choose one of the options for this technology:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -758,7 +764,7 @@ public class PlayerTechService {
             Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
-        if (payType.equals("res")) {
+        if ("res".equals(payType)) {
             buttons.addAll(dwsCommanders);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {

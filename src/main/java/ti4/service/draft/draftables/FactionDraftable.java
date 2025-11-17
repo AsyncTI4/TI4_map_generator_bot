@@ -1,6 +1,7 @@
 package ti4.service.draft.draftables;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +18,6 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.FactionDraftableSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
-import ti4.helpers.thundersedge.TeHelperDemo;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -53,14 +53,11 @@ public class FactionDraftable extends SinglePickDraftable {
             boolean isThundersEdgeDemo) {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
-        if (isThundersEdgeDemo) {
-            effBannedFactions.addAll(TeHelperDemo.getExcludedFactions());
-            numFactions = Math.min(25 - TeHelperDemo.getExcludedFactions().size(), numFactions);
-        }
 
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> !effBannedFactions.contains(f.getAlias()))
                 .filter(f -> sources.contains(f.getSource()))
+                .filter(f -> !f.getAlias().contains("obsidian"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
@@ -80,8 +77,8 @@ public class FactionDraftable extends SinglePickDraftable {
             output.add(f);
         }
 
-        this.draftFactions = output;
-        this.keleresFlavor = null;
+        draftFactions = output;
+        keleresFlavor = null;
     }
 
     public void addFaction(String factionAlias) {
@@ -121,7 +118,7 @@ public class FactionDraftable extends SinglePickDraftable {
         if (!keleresFlavors.contains(flavor)) {
             throw new IllegalArgumentException("Unknown keleres flavor: " + flavor);
         }
-        this.keleresFlavor = flavor;
+        keleresFlavor = flavor;
     }
 
     public static FactionModel getFactionByChoice(DraftChoice choice) {
@@ -160,7 +157,7 @@ public class FactionDraftable extends SinglePickDraftable {
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
             DraftChoice choice = new DraftChoice(
-                    getType(),
+                    TYPE,
                     choiceKey,
                     makeChoiceButton(choiceKey, buttonText, buttonEmoji),
                     formattedName,
@@ -189,11 +186,11 @@ public class FactionDraftable extends SinglePickDraftable {
     public String handleCustomCommand(
             GenericInteractionCreateEvent event, DraftManager draftManager, String playerUserId, String buttonId) {
         List<String> informFactions;
-        if (buttonId.equals("remaininginfo")) {
+        if ("remaininginfo".equals(buttonId)) {
             informFactions = new ArrayList<>(draftFactions);
             for (String pId : draftManager.getPlayerStates().keySet()) {
                 List<DraftChoice> playerChoices =
-                        draftManager.getPlayerStates().get(pId).getPicks().get(getType());
+                        draftManager.getPlayerStates().get(pId).getPicks().get(TYPE);
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
                         informFactions.remove(choice.getChoiceKey());
@@ -205,11 +202,11 @@ public class FactionDraftable extends SinglePickDraftable {
             } else {
                 sendFactionInfo(draftManager, playerUserId, informFactions);
             }
-        } else if (buttonId.equals("pickedinfo")) {
+        } else if ("pickedinfo".equals(buttonId)) {
             informFactions = new ArrayList<>();
             for (String pId : draftManager.getPlayerStates().keySet()) {
                 List<DraftChoice> playerChoices =
-                        draftManager.getPlayerStates().get(pId).getPicks().get(getType());
+                        draftManager.getPlayerStates().get(pId).getPicks().get(TYPE);
                 if (playerChoices != null) {
                     for (DraftChoice choice : playerChoices) {
                         if (!informFactions.contains(choice.getChoiceKey())) {
@@ -223,7 +220,7 @@ public class FactionDraftable extends SinglePickDraftable {
             } else {
                 sendFactionInfo(draftManager, playerUserId, informFactions);
             }
-        } else if (buttonId.equals("allinfo")) {
+        } else if ("allinfo".equals(buttonId)) {
             informFactions = new ArrayList<>(draftFactions);
             sendFactionInfo(draftManager, playerUserId, informFactions);
         } else if (buttonId.startsWith("info_")) {
@@ -242,7 +239,7 @@ public class FactionDraftable extends SinglePickDraftable {
                 // Regenerate buttons and message based on current draft state
                 sendKeleresButtons(draftManager, playerUserId, false);
 
-                String flavoredKeleres = "keleres" + flavor.substring(0, 1);
+                String flavoredKeleres = "keleres" + flavor.charAt(0);
                 FactionModel flavorFaction = Mapper.getFaction(flavoredKeleres);
                 MessageHelper.sendMessageToChannel(
                         draftManager.getGame().getPlayer(playerUserId).getCardsInfoThread(),
@@ -269,14 +266,14 @@ public class FactionDraftable extends SinglePickDraftable {
             keleresFlavor = null;
             List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
             if (!keleresPlayers.isEmpty()) {
-                sendKeleresButtons(draftManager, keleresPlayers.get(0), false);
+                sendKeleresButtons(draftManager, keleresPlayers.getFirst(), false);
             }
         } else if (keleresFlavor == null
                 && draftFactions.contains("keleresm")
                 && keleresFlavors.contains(choice.getChoiceKey())) {
             List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
             if (!keleresPlayers.isEmpty()) {
-                sendKeleresButtons(draftManager, keleresPlayers.get(0), false);
+                sendKeleresButtons(draftManager, keleresPlayers.getFirst(), false);
             }
         }
     }
@@ -284,7 +281,7 @@ public class FactionDraftable extends SinglePickDraftable {
     @Override
     public DraftChoice getNothingPickedChoice() {
         return new DraftChoice(
-                getType(),
+                TYPE,
                 null,
                 null,
                 "No faction picked",
@@ -297,7 +294,7 @@ public class FactionDraftable extends SinglePickDraftable {
         // Check for and trigger Keleres setup
         List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
         if (!keleresPlayers.isEmpty() && keleresFlavor == null) {
-            sendKeleresButtons(draftManager, keleresPlayers.get(0), true);
+            sendKeleresButtons(draftManager, keleresPlayers.getFirst(), true);
         }
     }
 
@@ -305,7 +302,7 @@ public class FactionDraftable extends SinglePickDraftable {
     public String whatsStoppingSetup(DraftManager draftManager) {
         List<String> keleresPlayers = draftManager.getPlayersWithChoiceKey(TYPE, "keleresm");
         if (!keleresPlayers.isEmpty() && keleresFlavor == null) {
-            Player player = draftManager.getGame().getPlayer(keleresPlayers.get(0));
+            Player player = draftManager.getGame().getPlayer(keleresPlayers.getFirst());
             return "Waiting for " + player.getPing() + " to choose a Keleres flavor.";
         }
         return null;
@@ -317,13 +314,13 @@ public class FactionDraftable extends SinglePickDraftable {
 
         List<DraftChoice> playerPicks = draftManager.getPlayerPicks(playerUserId, TYPE);
         if (!playerPicks.isEmpty()) {
-            String factionAlias = playerPicks.get(0).getChoiceKey();
+            String factionAlias = playerPicks.getFirst().getChoiceKey();
             if (factionAlias.contains("keleres")) {
                 if (keleresFlavor == null) {
                     throw new IllegalStateException(
                             "Player " + playerUserId + " picked keleres but keleresFlavor is not set");
                 }
-                factionAlias = "keleres" + keleresFlavor.substring(0, 1);
+                factionAlias = "keleres" + keleresFlavor.charAt(0);
             }
 
             playerSetupState.setFaction(factionAlias);
@@ -347,10 +344,8 @@ public class FactionDraftable extends SinglePickDraftable {
             String[] tokens = data.split(SAVE_SEPARATOR);
             draftFactions = new ArrayList<>();
             keleresFlavor =
-                    tokens[0].equals("keleresflavor_null") ? null : tokens[0].substring("keleresflavor_".length());
-            for (int i = 1; i < tokens.length; i++) {
-                draftFactions.add(tokens[i]);
-            }
+                    "keleresflavor_null".equals(tokens[0]) ? null : tokens[0].substring("keleresflavor_".length());
+            draftFactions.addAll(Arrays.asList(tokens).subList(1, tokens.length));
         }
     }
 
@@ -394,10 +389,9 @@ public class FactionDraftable extends SinglePickDraftable {
 
     @Override
     public String applySetupMenuChoices(GenericInteractionCreateEvent event, SettingsMenu menu) {
-        if (menu == null || !(menu instanceof DraftSystemSettings)) {
+        if (!(menu instanceof DraftSystemSettings draftSystemSettings)) {
             return "Error: Could not find parent draft system settings.";
         }
-        DraftSystemSettings draftSystemSettings = (DraftSystemSettings) menu;
         Game game = draftSystemSettings.getGame();
         if (game == null) {
             return "Error: Could not find game instance.";
@@ -420,7 +414,7 @@ public class FactionDraftable extends SinglePickDraftable {
         List<String> summarizeFlavors = new ArrayList<>();
         boolean hasDraftableFlavor = false;
         for (String flavor : keleresFlavors) {
-            if (draftManager.hasBeenPicked(getType(), flavor)) continue;
+            if (draftManager.hasBeenPicked(TYPE, flavor)) continue;
             FactionModel flavorFaction = Mapper.getFaction(flavor);
             String factionName = flavorFaction.getFactionName();
             if (!draftEnded && draftFactions.contains(flavor)) {
@@ -466,7 +460,7 @@ public class FactionDraftable extends SinglePickDraftable {
 
     private String getKeleresSummaryString(FactionModel flavorFaction) {
         FactionModel keleres =
-                Mapper.getFaction("keleres" + flavorFaction.getAlias().substring(0, 1));
+                Mapper.getFaction("keleres" + flavorFaction.getAlias().charAt(0));
 
         List<String> summaryParts = new ArrayList<>();
 

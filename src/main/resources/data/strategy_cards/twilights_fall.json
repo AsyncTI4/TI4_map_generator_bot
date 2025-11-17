@@ -19,8 +19,13 @@
         "id": "tf2",
         "initiative": 2,
         "name": "Noctis",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Initiate a genome splice",
+            "Ready up to 2 planets."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to participate in the genome splice."
+        ],
         "imageFileName": "tf2",
         "colourHexCode": "#f69421",
         "source": "twilights_fall"
@@ -29,8 +34,14 @@
         "id": "tf3",
         "initiative": 3,
         "name": "Tyrannus",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Choose a player other than the speaker. That player gains the speaker token",
+            "Choose a player other than the speaker or tyrant. That player gains the benediction token.",
+            "Draw 2 action cards."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 action cards."
+        ],
         "imageFileName": "tf3",
         "colourHexCode": "#fff200",
         "botSCAutomationID": "pok3politics",
@@ -73,8 +84,13 @@
         "id": "tf6",
         "initiative": 6,
         "name": "Calamitas",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Initiate a unit upgrade splice.",
+            "Resolve the PRODUCTION abilities of your units in 1 system."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to either participate in the unit upgrade splice or use the PRODUCTION abilities of the units in your home system."
+        ],
         "imageFileName": "tf6",
         "colourHexCode": "#008ed4",
         "source": "twilights_fall"
@@ -83,8 +99,12 @@
         "id": "tf7",
         "initiative": 7,
         "name": "Magus",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Initiate an ability splice. You may spend 3 resources and 3 influence to add 1 additional ability to the pool; if you do, after each player has chosen, it passes back to you and you take an additional ability."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 3 resources or 3 influence to participate in the ability splice."
+        ],
         "imageFileName": "tf7",
         "colourHexCode": "#15489f",
         "source": "twilights_fall"
@@ -93,8 +113,13 @@
         "id": "tf8",
         "initiative": 8,
         "name": "Aeterna",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements; otherwise, draw 1 paradigm",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective"
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective or 1 paradigm"
+        ],
         "imageFileName": "tf8",
         "colourHexCode": "#752b90",
         "source": "twilights_fall"

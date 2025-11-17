@@ -85,7 +85,7 @@
         "name": "Rescue",
         "phase": "Action",
         "window": "After a player moves ships into a system that contains your ships",
-        "text": "You may move 1 ship into the active system from any system that does not contain one of your command tokens.",
+        "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens.",
         "flavorText": "\"Hold on...\" Tuck pleaded. \"We are coming. Hold on, please...\"",
         "source": "thunders_edge"
     },
@@ -148,7 +148,7 @@
         "name": "Pirate Contract",
         "phase": "Action",
         "window": "Action",
-        "text": "Place 1 neutral stroter in a non-home system that contains no non-neutral ships.",
+        "text": "Place 1 neutral destroyer in a non-home system that contains no non-neutral ships.",
         "flavorText": "Satisfied, Suffi cashed in her contracts, wondering how long it would take any of them to notice she was gone. After it was much too late, with any luck.",
         "source": "thunders_edge"
     },

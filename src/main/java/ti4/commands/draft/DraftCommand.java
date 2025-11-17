@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.commands.ParentCommand;
 import ti4.commands.SubcommandGroup;
+import ti4.commands.draft.andcat.AndcatDraftableGroup;
 import ti4.commands.draft.faction.FactionDraftableGroup;
 import ti4.commands.draft.manage.DraftManagerGroup;
 import ti4.commands.draft.mantistile.MantisTileDraftableGroup;
@@ -23,7 +24,8 @@ public class DraftCommand implements ParentCommand {
                     new SliceDraftableGroup(),
                     new SpeakerOrderDraftableGroup(),
                     new PublicSnakeDraftGroup(),
-                    new MantisTileDraftableGroup())
+                    new MantisTileDraftableGroup(),
+                    new AndcatDraftableGroup())
             .collect(Collectors.toMap(SubcommandGroup::getName, subcommandGroup -> subcommandGroup));
 
     @Override

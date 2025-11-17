@@ -40,7 +40,10 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.relic.SendRelicService;
+import ti4.service.transaction.SendPromissoryService;
 import ti4.settings.users.UserSettingsManager;
 
 public class TransactionHelper {
@@ -64,6 +67,7 @@ public class TransactionHelper {
         String privateSummary =
                 "The following transaction has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
         MessageHelper.sendMessageToChannel(channel, publicSummary);
+        boolean secretRefresh = false;
         for (Player sender : players) {
             Player receiver = p2;
             if (sender == p2) {
@@ -76,8 +80,9 @@ public class TransactionHelper {
                     String furtherDetail = item.replace(
                             item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                     int amountToTransact = 1;
-                    if ((("ACs".equalsIgnoreCase(thingToTransact) || "PNs".equalsIgnoreCase(thingToTransact))
-                            && furtherDetail.contains("generic"))) {
+                    boolean isGeneralized =
+                            List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                    if (isGeneralized) {
                         amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                         furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                     }
@@ -111,6 +116,20 @@ public class TransactionHelper {
                                 default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                             }
                         }
+                        case "SOs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    for (int x = 0; x < amountToTransact; x++) {
+                                        String buttonID = "transact_SOs_" + receiver.getFaction();
+                                        resolveSpecificTransButtonsOld(game, sender, buttonID, event);
+                                    }
+                                }
+                                default -> {
+                                    secretRefresh = true;
+                                    resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                                }
+                            }
+                        }
                         case "Planets" ->
                             ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(
                                     sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
@@ -140,6 +159,10 @@ public class TransactionHelper {
                     }
                 }
             }
+        }
+        if (secretRefresh) {
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p1, event);
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
         }
 
         // Send Summary to Player's CardsInfo threads
@@ -181,9 +204,9 @@ public class TransactionHelper {
                 String furtherDetail = item.replace(
                         item.split("_")[0] + "_" + item.split("_")[1] + "_" + item.split("_")[2] + "_", "");
                 int amountToTransact = 1;
-                if ("frags".equalsIgnoreCase(thingToTransact)
-                        || (("PNs".equalsIgnoreCase(thingToTransact) || "ACs".equalsIgnoreCase(thingToTransact))
-                                && furtherDetail.contains("generic"))) {
+                boolean isGeneralized =
+                        List.of("PNs", "ACs", "SOs").contains(thingToTransact) && furtherDetail.contains("generic");
+                if ("frags".equalsIgnoreCase(thingToTransact) || isGeneralized) {
                     amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
                     furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
                 }
@@ -290,6 +313,25 @@ public class TransactionHelper {
                             }
                         }
                     }
+                    case "SOs" -> {
+                        switch (furtherDetail) {
+                            case "generic" ->
+                                trans.append(amountToTransact)
+                                        .append(" ")
+                                        .append(CardEmojis.SecretObjective)
+                                        .append(" to be specified by player");
+                            default -> {
+                                String soID = furtherDetail;
+                                if (!player.getSecretsUnscored().containsKey(soID)) continue;
+                                trans.append(CardEmojis.SecretObjective);
+                                if (!hidePrivateCardText)
+                                    trans.append(" _")
+                                            .append(Mapper.getSecretObjective(soID)
+                                                    .getName())
+                                            .append("_");
+                            }
+                        }
+                    }
                     case "Frags" ->
                         trans.append(ExploreEmojis.getFragEmoji(furtherDetail)
                                 .toString()
@@ -298,6 +340,8 @@ public class TransactionHelper {
                         trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" ->
                         trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
+                    case "Relics" ->
+                        trans.append(Mapper.getRelic(furtherDetail).getName()).append(ExploreEmojis.Relic);
                     case "action" ->
                         trans.append("An in-game ").append(furtherDetail).append(" action");
                     case "details" -> {
@@ -491,13 +535,24 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler(value = "transaction", save = false)
     public static void transaction(Player player, Game game) {
+        transaction(null, player, game, "");
+    }
+
+    @ButtonHandler(value = "transact_BMD", save = true) // deprecated
+    @ButtonHandler(value = "transaction_BMD", save = true)
+    @ButtonHandler(value = "transaction", save = false)
+    private static void transaction(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (buttonID.endsWith("_BMD")) {
+            game.setStoredValue("blackmarketdealing", player.getFaction());
+            ButtonHelper.deleteMessage(event);
+        }
+
         List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
-        if (game.isHiddenAgendaMode() && !game.getPhaseOfGame().toLowerCase().contains("action")) {
+        if (game.isHiddenAgendaMode() && game.getPhaseOfGame().toLowerCase().contains("agenda")) {
             message = player.getRepresentation()
-                    + ", this game is in Hidden Agenda mode, which does not allow transactions outside of the Action Phase. ";
+                    + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
             return;
         }
@@ -581,12 +636,13 @@ public class TransactionHelper {
             case "Planets" -> {
                 message += " Please choose the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanetsAllianceMode()) {
-                    if (planet.contains("custodia") || planet.contains("ghoti")) {
+                    if (planet.contains("custodia")
+                            || planet.contains("ghoti")
+                            || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
                         continue;
                     }
-                    if (ButtonHelper.getUnitHolderFromPlanetName(planet, game)
-                                    .getUnitCount(UnitType.Mech, p1.getColor())
-                            > 0) {
+                    UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+                    if (unitHolder != null && unitHolder.getUnitCount(UnitType.Mech, p1.getColor()) > 0) {
                         stuffToTransButtons.add(Buttons.gray(
                                 "offerToTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction() + "_" + planet,
                                 Helper.getPlanetRepresentation(planet, game)));
@@ -628,7 +684,7 @@ public class TransactionHelper {
                             + " Please choose the number of action cards you wish to request."
                             + " Since action cards are private info, you will have to discuss with other other player to explain which action cards you wish to transact;"
                             + " these buttons will just make sure that the player is offered buttons to send them.";
-                    int limit = Math.min(7, p2.getAc());
+                    int limit = Math.min(7, p1.getAcCount());
                     for (int x = 1; x < limit + 1; x++) {
                         Button transact = Buttons.green(
                                 "offerToTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction() + "_generic" + x,
@@ -730,6 +786,31 @@ public class TransactionHelper {
                     message += "\n### A reminder that you cannot swap _Supports For The Thrones_ in this game.";
                 }
             }
+            case "SOs" -> {
+                if (requesting) {
+                    message += player.getRepresentation(false, false);
+                    message += " Click the number of unscored secret objectives you wish to request.";
+                    message +=
+                            " Since unscored secret objectives are private info, you will have to discuss with other other player to explain which unscored secret objectives you wish to transact;";
+                    message += " these buttons will just make sure that the player is offered buttons to send them.";
+
+                    int limit = p2.getSecretsUnscored().size();
+                    String prefix = "offerToTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction() + "_generic";
+                    for (int x = 1; x < limit + 1; x++) {
+                        stuffToTransButtons.add(
+                                Buttons.green(prefix + x, x + " Secret Objectives", CardEmojis.SecretObjective));
+                    }
+                } else {
+                    message += player.getRepresentation(false, false);
+                    message += " Click the __green__ button that indicates the unscored secret objective you wish to "
+                            + requestOrOffer + ".";
+                    String prefix = "offerToTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction() + "_";
+                    for (String soID : p1.getSecretsUnscored().keySet()) {
+                        String name = Mapper.getSecretObjective(soID).getName();
+                        stuffToTransButtons.add(Buttons.green(prefix + soID, name, CardEmojis.SecretObjective));
+                    }
+                }
+            }
             case "Frags" -> {
                 message += " Please choose the number of relic fragments you wish to " + requestOrOffer + ".";
                 String prefix = "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction();
@@ -748,6 +829,17 @@ public class TransactionHelper {
                 for (int x = 1; x <= p1.getUrf(); x++) {
                     stuffToTransButtons.add(
                             Buttons.gray(prefix + "_URF" + x, "Unknown Fragments (x" + x + ")", ExploreEmojis.UFrag));
+                }
+            }
+            case "Relics" -> {
+                message += " Click the relics you wish to " + requestOrOffer + ".";
+                String prefix = "offerToTransact_Relics_" + p1.getFaction() + "_" + p2.getFaction();
+
+                boolean blackmarket =
+                        List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
+                for (String relic : (blackmarket ? p1.getActualRelics() : p1.getTradableRelics())) {
+                    String name = Mapper.getRelic(relic).getName();
+                    stuffToTransButtons.add(Buttons.gray(prefix + "_" + relic, name, ExploreEmojis.Relic));
                 }
             }
             case "Details" -> {
@@ -1016,8 +1108,17 @@ public class TransactionHelper {
             }
         }
 
+        String bmdSuffix = "";
+        for (Player bmdPlayer : List.of(player, p2)) {
+            if (game.getStoredValue("blackmarketdealing").equals(bmdPlayer.getFaction())) {
+                bmdSuffix = "_BMD_" + bmdPlayer.getFaction();
+                game.removeStoredValue("blackmarketdealing");
+                break;
+            }
+        }
+
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red("rescindOffer_" + p2.getFaction(), "Rescind Offer"));
+        buttons.add(Buttons.red("rescindOffer_" + p2.getFaction() + bmdSuffix, "Rescind Offer"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
                 player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing()
@@ -1035,8 +1136,8 @@ public class TransactionHelper {
 
         buttons = new ArrayList<>();
         buttons.add(Buttons.green("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
-        buttons.add(Buttons.red("rejectOffer_" + player.getFaction(), "Reject"));
-        buttons.add(Buttons.red("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
+        buttons.add(Buttons.red("rejectOffer_" + player.getFaction() + bmdSuffix, "Reject"));
+        buttons.add(Buttons.red("resetOffer_" + player.getFaction() + bmdSuffix, "Reject and CounterOffer"));
         MessageHelper.sendMessageToChannelWithButtons(
                 p2.getCardsInfoThread(),
                 p2.getRepresentation() + " you have received a transaction offer from "
@@ -1154,17 +1255,16 @@ public class TransactionHelper {
                         continue;
                     }
                     Button transact;
+                    Integer intID = p1.getPromissoryNotes().get(pnShortHand);
                     if (game.isFowMode()) {
                         transact = Buttons.green(
-                                finChecker + "send_PNs_" + p2.getFaction() + "_"
-                                        + p1.getPromissoryNotes().get(pnShortHand),
+                                finChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
                                 owner.getColor() + " " + promissoryNote.getName());
                     } else {
                         transact = Buttons.green(
-                                        finChecker + "send_PNs_" + p2.getFaction() + "_"
-                                                + p1.getPromissoryNotes().get(pnShortHand),
-                                        promissoryNote.getName())
-                                .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                                finChecker + "send_PNs_" + p2.getFaction() + "_" + intID,
+                                promissoryNote.getName(),
+                                owner.getFactionEmoji());
                     }
                     stuffToTransButtons.add(transact);
                 }
@@ -1178,6 +1278,18 @@ public class TransactionHelper {
                             p1.getCardsInfoThread(),
                             "### A reminder that you cannot swap _Supports For The Thrones_ in this game");
                 }
+            }
+            case "SOs" -> {
+                String message = p1.getRepresentation();
+                message += " Click the __green__ button that indicates the unscored secret objective you wish to send.";
+
+                String prefix = finChecker + "send_SOs_" + p2.getFaction() + "_";
+                for (String soID : p1.getSecretsUnscored().keySet()) {
+                    String name = Mapper.getSecretObjective(soID).getName();
+                    Integer intID = p1.getSecretsUnscored().get(soID);
+                    stuffToTransButtons.add(Buttons.green(prefix + intID, name, CardEmojis.SecretObjective));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
             case "Technology" -> {
                 String message = "Please choose the technology you wish to send.";
@@ -1228,6 +1340,15 @@ public class TransactionHelper {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
+            }
+            case "Relics" -> {
+                String message = " Click the relics you wish to send.";
+                String prefix = "send_Relics_" + p2.getFaction() + "_";
+                for (String relic : p1.getActualRelics()) {
+                    String name = Mapper.getRelic(relic).getName();
+                    stuffToTransButtons.add(Buttons.gray(prefix + relic, name, ExploreEmojis.Relic));
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
             }
         }
     }
@@ -1368,7 +1489,10 @@ public class TransactionHelper {
                 ButtonHelper.checkACLimit(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p2);
                 ActionCardHelper.sendActionCardInfo(game, p1);
-                if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters")) {
+
+                boolean blackMarket =
+                        List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
+                if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters") && !blackMarket) {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
                         MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
@@ -1403,49 +1527,38 @@ public class TransactionHelper {
                             "Could not find that promissory note, so no promissory note was sent.");
                     return;
                 }
-                if (game.isNoSwapMode()) {
-                    if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
-                        MessageHelper.sendMessageToChannel(
-                                p1.getCardsInfoThread(),
-                                p1.getRepresentation()
-                                        + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
-                        return;
-                    }
-                }
-                p1.removePromissoryNote(id);
-                p2.setPromissoryNote(id);
-                if (id.contains("dspnveld") && !p2.getAllianceMembers().contains(p1.getFaction())) {
-                    PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
-                }
-                if (id.contains("blackops") && !p2.getAllianceMembers().contains(p1.getFaction())) {
-                    PromissoryNoteHelper.resolvePNPlay(id, p2, game, event);
-                }
-                boolean sendSftT = false;
-                boolean sendAlliance = false;
-                String promissoryNoteOwner = Mapper.getPromissoryNote(id).getOwner();
-                if ((id.endsWith("_sftt") || id.endsWith("_an"))
-                        && !promissoryNoteOwner.equals(p2.getFaction())
-                        && !promissoryNoteOwner.equals(p2.getColor())
-                        && !p2.isPlayerMemberOfAlliance(game.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
-                    p2.addPromissoryNoteToPlayArea(id);
-                    if (id.endsWith("_sftt")) {
-                        sendSftT = true;
-                    } else {
-                        sendAlliance = true;
-                    }
-                }
-                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
+
+                SendPromissoryService.sendPromissoryToPlayer(event, game, p1, p2, id);
                 CardsInfoService.sendVariousAdditionalButtons(game, p1);
-                PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
-                if (sendSftT || sendAlliance) {
-                    String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
-                    message2 =
-                            p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2 + ".";
-                } else {
-                    message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2 + ".";
+            }
+            case "SOs" -> {
+                int soNum = Integer.parseInt(amountToTrans);
+                String soID = null;
+                for (Map.Entry<String, Integer> so : p1.getSecretsUnscored().entrySet()) {
+                    if (so.getValue().equals(soNum)) {
+                        soID = so.getKey();
+                    }
                 }
-                Helper.checkEndGame(game, p2);
+
+                if (!p1.getSecretsUnscored().containsValue(soNum) || soID == null) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(),
+                            "Could not find that unscored secret objective, and so no secret objective was sent.");
+                    return;
+                }
+
+                p1.removeSecret(soNum);
+                p2.setSecret(soID);
+
+                if (oldWay) {
+                    SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p1, event);
+                    SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
+                }
+
+                String msg = p1.getRepresentation() + " sent a secret objective to " + p2.getRepresentation();
+                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
+                if (game.isFowMode()) MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
             }
             case "Frags" -> {
                 String fragType = amountToTrans.substring(0, 3).toUpperCase();
@@ -1468,6 +1581,7 @@ public class TransactionHelper {
                         p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans)
                                 + "_ from a transaction.");
             }
+            case "Relics" -> SendRelicService.handleSendRelic(event, game, p1, p2, amountToTrans);
         }
         Button button = Buttons.gray(finChecker + "transactWith_" + p2.getColor(), "Send something else to player?");
         Button done = Buttons.gray("finishTransaction_" + p2.getColor(), "Done With This Transaction");
@@ -1579,6 +1693,8 @@ public class TransactionHelper {
     }
 
     private static List<Button> getStuffToTransButtonsNew(Game game, Player player, Player p1, Player p2) {
+        boolean blackMarket =
+                List.of(p1.getFaction(), p2.getFaction()).contains(game.getStoredValue("blackmarketdealing"));
         List<Button> stuffToTransButtons = new ArrayList<>();
         if (p1.getTg() > 0) {
             stuffToTransButtons.add(
@@ -1615,8 +1731,9 @@ public class TransactionHelper {
         if ((p1.hasAbility("arbiters")
                         || p2.hasAbility("arbiters")
                         || p1.hasTech("tf-guild_ships")
-                        || p2.hasTech("tf-guild_ships"))
-                && p1.getAc() > 0) {
+                        || p2.hasTech("tf-guild_ships")
+                        || blackMarket)
+                && p1.getAcCount() > 0) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_ACs_" + p1.getFaction() + "_" + p2.getFaction(), "Action Cards"));
         }
@@ -1624,9 +1741,18 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
+        if (blackMarket && p1.getSecretsUnscored().size() > 0) {
+            stuffToTransButtons.add(
+                    Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
+        }
         if (!p1.getFragments().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
+        }
+        if ((blackMarket && !p1.getActualRelics().isEmpty())
+                || !p1.getTradableRelics().isEmpty()) {
+            stuffToTransButtons.add(
+                    Buttons.gray("newTransact_Relics_" + p1.getFaction() + "_" + p2.getFaction(), "Relics"));
         }
         if (p1 == player) {
             stuffToTransButtons.add(Buttons.blue(
@@ -1761,10 +1887,10 @@ public class TransactionHelper {
             stuffToTransButtons.add(Buttons.gray(finChecker + "transact_starCharts_" + p2.getFaction(), "Star Charts"));
         }
         if ((p1.hasAbility("arbiters")
-                        || p2.hasAbility("arbiters")
+                        || (!game.isFowMode() && p2.hasAbility("arbiters"))
                         || p1.hasTech("tf-guild_ships")
-                        || p2.hasTech("tf-guild_ships"))
-                && p1.getAc() > 0) {
+                        || (!game.isFowMode() && p2.hasTech("tf-guild_ships")))
+                && p1.getAcCount() > 0) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }
         if (p1.getPnCount() > 0) {
@@ -1800,8 +1926,23 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
+    private static void restoreBlackMarketStatus(Game game, String buttonID) {
+        if (buttonID.contains("_BMD_")) {
+            String prevBlackMarketFaction = buttonID.substring(buttonID.indexOf("_BMD_") + 5);
+            Player bmdPlayer = game.getPlayerFromColorOrFaction(prevBlackMarketFaction);
+            if (bmdPlayer != null) {
+                String msg = "The previous offer you made using Black Market Dealing was rejected, rescinded, ";
+                msg += "or is being counter offered. Therefore, the next transaction offer you make will be ";
+                msg += "allowed to use Black Market Dealing again.";
+                MessageHelper.sendMessageToChannel(bmdPlayer.getCardsInfoThread(), msg);
+                game.setStoredValue("blackmarketdealing", prevBlackMarketFaction);
+            }
+        }
+    }
+
     @ButtonHandler("rescindOffer_")
     public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        restoreBlackMarketStatus(game, buttonID);
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 != null) {
             MessageHelper.sendMessageToChannel(
@@ -1817,8 +1958,9 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler(value = "rejectOffer_", save = false)
+    @ButtonHandler("rejectOffer_")
     public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        restoreBlackMarketStatus(game, buttonID);
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p1 != null) {
             MessageHelper.sendMessageToChannel(
@@ -1878,6 +2020,7 @@ public class TransactionHelper {
     @ButtonHandler("transactWith_")
     @ButtonHandler("resetOffer_")
     public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        restoreBlackMarketStatus(game, buttonID);
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 != null) {

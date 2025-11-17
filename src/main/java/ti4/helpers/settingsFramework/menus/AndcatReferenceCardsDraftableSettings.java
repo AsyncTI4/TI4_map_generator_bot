@@ -34,12 +34,21 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         super(MENU_ID, "Reference Card Package Settings", "Control reference card package options.", parent);
 
         int players = parent.getPlayerUserIds().size();
-        numPackages = new IntegerSetting("#Packages", "Number of Packages", players, 2, 24, 1);
+        numPackages = new IntegerSetting("#Packages", "Number of Packages", players, 2, 9, 1);
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
+        Set<String> keleres = new HashSet<>();
+        // TODO: Fix Keleres start
+        keleres.add("keleresm");
         banFactions = new ListSetting<>(
-                "BanFactionCards", "Banned faction cards", "Ban faction", "Unban faction", allFactions, empty, empty);
+                "BanFactionCards",
+                "Banned faction cards",
+                "Ban faction",
+                "Unban faction",
+                allFactions,
+                keleres,
+                keleres);
         priFactions = new ListSetting<>(
                 "PriFactionCards",
                 "Prioritized faction cards",
@@ -83,8 +92,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
     @Override
     public List<Button> specialButtons() {
         // String idPrefix = menuAction + "_" + navId() + "_";
-        List<Button> ls = new ArrayList<>(super.specialButtons());
-        return ls;
+        return new ArrayList<>(super.specialButtons());
     }
 
     @Override

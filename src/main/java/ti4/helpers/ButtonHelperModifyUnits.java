@@ -33,7 +33,6 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
-import ti4.service.PlanetService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -43,6 +42,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -69,6 +69,11 @@ public class ButtonHelperModifyUnits {
         if (mentakFS != null
                 && mentakFS != player
                 && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
+            return 0;
+        }
+        if (game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()) != null
+                && game.getTileByPosition(game.getActiveSystem()).isScar()) {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
@@ -294,11 +299,20 @@ public class ButtonHelperModifyUnits {
                 int min = calculateMinHits(player, hits, totalUnits);
 
                 if (unitModel.getSustainDamage() && min > 0) {
-                    msg.append("> Sustained ")
-                            .append(min)
-                            .append(" ")
-                            .append(unitModel.getUnitEmoji())
-                            .append("\n");
+                    if (RandomHelper.isOneInX(40)) {
+                        msg.append("> ")
+                                .append(min)
+                                .append(" ")
+                                .append(unitModel.getUnitEmoji())
+                                .append(" got a boo boo 🤕")
+                                .append("\n");
+                    } else {
+                        msg.append("> Sustained ")
+                                .append(min)
+                                .append(" ")
+                                .append(unitModel.getUnitEmoji())
+                                .append("\n");
+                    }
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
                     tile.addUnitDamage(planet, unitEntry.getKey(), min);
 
@@ -624,7 +638,7 @@ public class ButtonHelperModifyUnits {
                 if (p2 == player) {
                     continue;
                 }
-                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
+                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty() || p2.ownsUnit("tf-justicerrail")) {
                     assignHitOrder = new ArrayList<>(List.of(
                             "destroyer",
                             "cruiser",
@@ -1102,7 +1116,9 @@ public class ButtonHelperModifyUnits {
             for (Player p2 : players) {
                 if (p2 != player && !player.getAllianceMembers().contains(p2.getFaction())) {
                     player2 = p2;
-                    break;
+                    if (p2.getPlanetsAllianceMode().contains(unitHolder.getName())) {
+                        break;
+                    }
                 }
             }
             if (player != player2 && players.contains(player)) {
@@ -1112,14 +1128,35 @@ public class ButtonHelperModifyUnits {
                         || player.hasUnit("tf-ambassador")
                         || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
-                    String msg = player.getRepresentation() + " " + player2.getRepresentation()
+                    String msg = player.getRepresentation()
                             + " the game is unsure if a combat should occur on " + planetName
-                            + " or if you are coexisting. Please inform it with the buttons.\n\n";
+                            + " or if you wish to allow coexisting (or be forced into). Please inform it with the buttons.\n\n";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
-                    buttons.add(Buttons.green(
-                            "enterCoexistence_" + unitHolder.getName(), "I want to enter/continue Coexistence"));
+                    buttons.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "startCombatOn_" + unitHolder.getName(),
+                            "Engage in Combat"));
+                    if (player.hasUnlockedBreakthrough("titansbt")
+                            || player.hasAbility("researchteam")
+                            || player.hasUnit("tf-ambassador")) {
+                        buttons.add(Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
+                                "We want to enter Coexistence"));
+                    } else {
+                        buttons.add(
+                                Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Coexistence"));
+                    }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+                    if (player2.getPlanets().contains(unitHolder.getName()) && player2.hasAbility("researchteam")) {
+                        buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(
+                                player2.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
+                                "We want to enter Coexistence"));
+                        buttons.add(Buttons.red(player2.getFinsFactionCheckerPrefix() + "deleteButtons", "Combat"));
+                        msg = player2.getRepresentation()
+                                + " if you wish to enter coexistence on " + planetName
+                                + " please tell the bot so with the buttons.\n\n";
+                        MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg, buttons);
+                    }
 
                 } else {
                     if (game.getStoredValue("coexistFlag").isEmpty()) {
@@ -1148,6 +1185,12 @@ public class ButtonHelperModifyUnits {
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
                 List<Button> b2s = new ArrayList<>();
                 b2s.add(Buttons.green("returnFFToSpace_" + tile.getPosition(), "Return Fighters to Space"));
+                if (player.hasUnit("tf-morphwing")) {
+                    b2s.add(Buttons.green(
+                            "convertFFToInf_" + unitHolder.getName(),
+                            "Convert 1 Fighter to Infantry on "
+                                    + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
+                }
                 b2s.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
@@ -1194,6 +1237,23 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("convertFFToInf_")
+    public static void convertFFToInf(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+
+        UnitHolder uh = game.getUnitHolderFromPlanet(buttonID.split("_")[1]);
+        String msg = player.getRepresentation() + " converted 1 Fighter into 1 Infantry on "
+                + Helper.getPlanetRepresentation(uh.getName(), game) + ".";
+        RemoveUnitService.removeUnits(
+                event, game.getTileFromPlanet(uh.getName()), game, player.getColor(), "1 fighter " + uh.getName());
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(uh.getName()), game, player.getColor(), "1 infantry " + uh.getName());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+
+        if (uh.getUnitCount(UnitType.Fighter, player) < 1) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
     @ButtonHandler("startDevotion_")
     public static void startDevotion(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
@@ -1223,7 +1283,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
-    private static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
+    public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         String exo = "";
@@ -1234,7 +1294,7 @@ public class ButtonHelperModifyUnits {
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet) continue;
+            if (unitHolder instanceof Planet && !game.isTwilightsFallMode()) continue;
 
             Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
             for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
@@ -1245,7 +1305,7 @@ public class ButtonHelperModifyUnits {
                     continue;
                 }
                 UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
-                if (!unitModel.getIsShip()) {
+                if (!unitModel.getIsShip() && !game.isTwilightsFallMode()) {
                     continue;
                 }
 
@@ -1578,6 +1638,7 @@ public class ButtonHelperModifyUnits {
             if (player.hasUnit("absol_saar_spacedock")
                     || player.hasUnit("saar_spacedock")
                     || player.hasTech("ffac2")
+                    || player.hasUnit("tf-floatingfactory")
                     || player.hasTech("absol_ffac2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
                 successMessage = "Placed 1 space dock in the space area of the "
@@ -1698,24 +1759,18 @@ public class ButtonHelperModifyUnits {
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
                                 shroadedFleets);
                     }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
+                    if (player.hasLeaderUnlocked("redcreusshero") || player.hasLeaderUnlocked("crimsonhero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
                                 Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
+                                "You may place this produced ship on the Crimson Hero.",
                                 shroadedFleets);
-                    }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
-                        List<Button> shroadedFleets = new ArrayList<>();
-                        shroadedFleets.add(
-                                Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
+                                "You may place this produced ship on the Crimson Hero.",
                                 shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1739,7 +1794,7 @@ public class ButtonHelperModifyUnits {
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
                                 cloakedFleets);
                     }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
+                    if (player.hasLeaderUnlocked("redcreusshero") || player.hasLeaderUnlocked("crimsonhero")) {
                         List<Button> cloakedFleets = new ArrayList<>();
                         cloakedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile.getPosition() + "_" + unitID,
@@ -1747,13 +1802,13 @@ public class ButtonHelperModifyUnits {
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the \"A Tall Stranger\", Red Creuss Hero.",
+                                "You may place this produced ship on the Crimson Hero.",
                                 cloakedFleets);
                     }
                 }
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0 && tile != null) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition(),
@@ -1789,7 +1844,7 @@ public class ButtonHelperModifyUnits {
             for (Integer sc : player.getSCs()) {
                 StrategyCardModel scModel =
                         game.getStrategyCardModelByInitiative(sc).orElse(null);
-                if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("te4construction")) {
+                if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
                     hasConstruction = true;
                 }
                 if (scModel != null
@@ -1800,7 +1855,7 @@ public class ButtonHelperModifyUnits {
                     break;
                 }
             }
-            if (game.getStrategyCardSet().getAlias().equalsIgnoreCase("te") || game.isTwilightsFallMode()) {
+            if ("te".equalsIgnoreCase(game.getStrategyCardSet().getAlias()) || game.isTwilightsFallMode()) {
                 hasConstruction = true;
             }
 
@@ -1974,7 +2029,7 @@ public class ButtonHelperModifyUnits {
         String playerRep = player.getRepresentation();
 
         Tile tile = game.getTileFromPositionOrAlias(planetName);
-        if (ButtonHelper.isNumeric(planetName) && unitLong.contains("2gf")) {
+        if (ButtonHelper.isNumeric(planetName) && (unitLong.contains("2gf") || unitLong.contains("mech"))) {
             planetName += "space";
         }
         if ("sd".equalsIgnoreCase(unitID)) {
@@ -2051,16 +2106,14 @@ public class ButtonHelperModifyUnits {
                                 "You may use your **Cloaked Fleets** ability to capture this produced ship.",
                                 shroadedFleets);
                     }
-                    if (player.hasLeaderUnlocked("redcreusshero")) {
+                    if (player.hasLeaderUnlocked("redcreusshero") || player.hasLeaderUnlocked("crimsonhero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(Buttons.green(
                                 "cloakedFleets_" + tile2.getPosition() + "_" + unitID,
                                 "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
-                                event.getChannel(),
-                                "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
-                                shroadedFleets);
+                                event.getChannel(), "You may place this produced ship on the Crimson.", shroadedFleets);
                     }
                     if (tile2 != null
                             && !willSkipBuild
@@ -2128,7 +2181,7 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && tile.getWormholes(game).size() > 0) {
+                    && !tile.getWormholes(game).isEmpty()) {
                 player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {
@@ -2159,7 +2212,7 @@ public class ButtonHelperModifyUnits {
                 player, "saar", "mentak", "l1z1x", "argent", "naaz", "arborec", "titans");
         CommanderUnlockCheckService.checkPlayer(
                 player, "tnelis", "cymiae", "kyro", "ghemina", "rohdhna", "cheiran", "celdauri");
-        if ("warsun".equalsIgnoreCase(unitLong)) {
+        if ("warsun".equalsIgnoreCase(unitLong) && !willSkipBuild) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         } else if ("sd".equalsIgnoreCase(unitID)) {
             tile = game.getTileFromPlanet(planetName);
@@ -2195,7 +2248,7 @@ public class ButtonHelperModifyUnits {
         Player opponent = null;
         String msg;
         Tile tile = game.getTileByPosition(pos);
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNNeutral()) {
             if (p2 == player) {
                 continue;
             }

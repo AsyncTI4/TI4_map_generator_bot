@@ -28,9 +28,10 @@ public class DataSkimmerService {
     private static void handleDataSkimmer(ButtonInteractionEvent event, Game game, Player ralnel, String buttonID) {
         String buttonPrefix = ralnel.getFinsFactionCheckerPrefix() + "dataSkimmer_";
         List<Button> pickButtons = new ArrayList<>();
-        game.getDiscardACStatus().entrySet().forEach(discard -> {
-            int acNum = game.getDiscardActionCards().get(discard.getKey());
-            ActionCardModel acModel = Mapper.getActionCard(discard.getKey());
+        game.getDiscardACStatus().forEach((key, value) -> {
+            if (value != ACStatus.ralnelbt) return;
+            int acNum = game.getDiscardActionCards().get(key);
+            ActionCardModel acModel = Mapper.getActionCard(key);
             Button pick =
                     Buttons.green(buttonPrefix + "draw" + acNum, "Draw " + acModel.getName(), CardEmojis.ActionCard);
             pickButtons.add(pick);
@@ -59,7 +60,7 @@ public class DataSkimmerService {
         List<Entry<String, ACStatus>> pile =
                 new ArrayList<>(game.getDiscardACStatus().entrySet());
         for (Entry<String, ACStatus> discard : pile) {
-            if (discard.getValue().equals(ACStatus.ralnelbt)) {
+            if (discard.getValue() == ACStatus.ralnelbt) {
                 discarded.add(discard.getKey());
                 game.getDiscardACStatus().remove(discard.getKey());
             }

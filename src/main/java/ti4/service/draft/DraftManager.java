@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -38,7 +39,7 @@ public class DraftManager extends DraftPlayerManager {
     private final Game game;
 
     @Getter
-    private DraftOrchestrator orchestrator = null;
+    private DraftOrchestrator orchestrator;
     // The order of draftables is assumed to be the correct order for summarizing, applying, etc.
     @Getter
     private final List<Draftable> draftables = new ArrayList<>();
@@ -62,8 +63,8 @@ public class DraftManager extends DraftPlayerManager {
             throw new IllegalArgumentException("Player " + playerUserId + " is not in the game");
         }
         super.addPlayer(playerUserId);
-        if (this.orchestrator != null) {
-            this.orchestrator.initializePlayerStates(this);
+        if (orchestrator != null) {
+            orchestrator.initializePlayerStates(this);
         }
     }
 
@@ -88,8 +89,8 @@ public class DraftManager extends DraftPlayerManager {
     }
 
     public void resetForNewDraft() {
-        this.orchestrator = null;
-        this.draftables.clear();
+        orchestrator = null;
+        draftables.clear();
         super.resetForNewDraft();
     }
 
@@ -153,16 +154,14 @@ public class DraftManager extends DraftPlayerManager {
                     }
                 }
 
-                String status = d.handleCustomCommand(event, this, player.getUserID(), innerCommand);
-                return status;
+                return d.handleCustomCommand(event, this, player.getUserID(), innerCommand);
             }
         }
 
         if (orchestrator != null && command.startsWith(orchestrator.getButtonPrefix())) {
             String innerButtonID =
                     command.substring(orchestrator.getButtonPrefix().length());
-            String status = orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
-            return status;
+            return orchestrator.handleCustomButtonPress(event, this, player.getUserID(), innerButtonID);
         }
 
         throw new IllegalArgumentException("Button ID " + command + " not recognized by draft manager");
@@ -207,11 +206,7 @@ public class DraftManager extends DraftPlayerManager {
         if (orchestrator == null) {
             return "No orchestrator has been set for the draft. Try `/draft manage set_orchestrator`.";
         }
-        String reason = orchestrator.whatsStoppingDraftStart(this);
-        if (reason != null) {
-            return reason;
-        }
-        return null;
+        return orchestrator.whatsStoppingDraftStart(this);
     }
 
     public void tryEndDraft(GenericInteractionCreateEvent event) {
@@ -257,7 +252,7 @@ public class DraftManager extends DraftPlayerManager {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     game.getPing()
-                            + "The draft has ended. Some additional setup needs to happen before the game can start.");
+                            + "The draft has ended. Some additional setup needs to happen before the game can start. Check your cards info threads for details.");
         } else {
             trySetupPlayers(event);
         }
@@ -321,8 +316,7 @@ public class DraftManager extends DraftPlayerManager {
             Player player = game.getPlayer(userId);
 
             // Default color if not set
-            boolean playerHasColor =
-                    player.getColor() != null && !player.getColor().equals("null");
+            boolean playerHasColor = player.getColor() != null && !"null".equals(player.getColor());
             if (!playerHasColor && playerSetupState.getColor() == null) {
                 String color = player.getNextAvailableColour();
                 playerSetupState.setColor(color);
@@ -345,6 +339,8 @@ public class DraftManager extends DraftPlayerManager {
         ButtonHelper.updateMap(game, event);
 
         if (game.isTwilightsFallMode()) {
+            // The inaugural splice uses the seating order, so it's set here already
+            Helper.setOrder(game);
             game.setBagDraft(new InauguralSpliceFrankenDraft(game));
             FrankenDraftBagService.startDraft(game);
         }

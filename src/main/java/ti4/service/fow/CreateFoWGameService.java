@@ -42,6 +42,9 @@ public class CreateFoWGameService {
     private static final int MAX_CHANNELS_MINUS_5 = 495;
     private static final int MAX_ROLE_COUNT = 250;
 
+    private static final long PERMISSIONS =
+            Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+
     @ButtonHandler("createFoWGameChannels")
     public static void createFoWGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(
@@ -185,19 +188,18 @@ public class CreateFoWGameService {
         String newActionsChannelName = gameName + "-anonymous-announcements-private";
         long gameRoleID = role.getIdLong();
         long gameRoleGMID = roleGM.getIdLong();
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         // CREATE GM CHANNEL
         TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
                 .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleGMID, permission, 0)
+                .addRolePermissionOverride(gameRoleGMID, PERMISSIONS, 0)
                 .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
                 .syncPermissionOverrides()
-                .addRolePermissionOverride(gameRoleID, permission, 0)
+                .addRolePermissionOverride(gameRoleID, PERMISSIONS, 0)
                 .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
         StringBuilder sb = new StringBuilder(role.getAsMention() + " - announcements channel\n");
@@ -216,22 +218,8 @@ public class CreateFoWGameService {
                 true);
 
         // Individual player channels
-        String privateChannelIntro = getInfoTextFromFile("FoWPrivateChannelIntro.txt");
         for (Member member : members) {
-            String name = member.getNickname();
-            if (name == null) {
-                name = member.getEffectiveName();
-            }
-            TextChannel memberChannel = guild.createTextChannel(gameName + "-" + name + "-private", category)
-                    .syncPermissionOverrides()
-                    .addMemberPermissionOverride(member.getIdLong(), permission, 0)
-                    .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
-            // game
-            Player player_ = newGame.getPlayer(member.getId());
-            player_.setPrivateChannelID(memberChannel.getId());
-            sb = new StringBuilder(member.getAsMention() + " - private channel\n");
-            sb.append(privateChannelIntro);
-            MessageHelper.sendMessageToChannel(memberChannel, sb.toString());
+            createPrivateChannelForPlayer(member, newGame);
         }
 
         String message = "Channels have been set up:\n" + "> "
@@ -250,6 +238,25 @@ public class CreateFoWGameService {
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             manager.queue();
         }
+    }
+
+    public static void createPrivateChannelForPlayer(Member member, Game game) {
+        String name = member.getNickname();
+        if (name == null) {
+            name = member.getEffectiveName();
+        }
+        TextChannel memberChannel = game.getGuild()
+                .createTextChannel(
+                        game.getName() + "-" + name + "-private",
+                        game.getMainGameChannel().getParentCategory())
+                .syncPermissionOverrides()
+                .addMemberPermissionOverride(member.getIdLong(), PERMISSIONS, 0)
+                .complete();
+        Player player_ = game.getPlayer(member.getId());
+        player_.setPrivateChannelID(memberChannel.getId());
+        MessageHelper.sendMessageToChannel(
+                memberChannel,
+                member.getAsMention() + " - private channel\n" + getInfoTextFromFile("FoWPrivateChannelIntro.txt"));
     }
 
     private static String getInfoTextFromFile(String file) {

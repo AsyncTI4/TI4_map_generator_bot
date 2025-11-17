@@ -1,6 +1,7 @@
 package ti4.map;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -108,7 +109,7 @@ public class Planet extends UnitHolder {
     }
 
     public void updateTriadStats(Player player) {
-        if (getName().equals("triad")) {
+        if ("triad".equals(getName())) {
             resourcesModifier = 0;
             if (player.getHrf() > 0) resourcesModifier++;
             if (player.getIrf() > 0) resourcesModifier++;
@@ -146,6 +147,14 @@ public class Planet extends UnitHolder {
                 .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
                 .filter(Objects::nonNull)
                 .anyMatch(UnitModel::getIsGroundForce);
+    }
+
+    public boolean hasStructures(Player player) {
+        return getUnits().keySet().stream()
+                .filter(player::unitBelongsToPlayer)
+                .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
+                .filter(Objects::nonNull)
+                .anyMatch(UnitModel::getIsStructure);
     }
 
     public boolean hasGroundForces(Game game) {
@@ -234,6 +243,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public int getHigherofInfluenceOrResource() {
+        return Math.max(getInfluence(), getResources());
+    }
+
+    @JsonIgnore
     public int getMaxResInf() {
         return Math.max(getResources(), getInfluence());
     }
@@ -317,9 +331,8 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public List<String> getTechSpecialities() {
-        List<String> specialties = new ArrayList<>();
 
-        specialties.addAll(techSpeciality);
+        List<String> specialties = new ArrayList<>(techSpeciality);
         specialties.removeAll(Collections.singleton(null));
         specialties.removeAll(Collections.singleton(""));
         if (isNotBlank(originalTechSpeciality) && specialties.isEmpty()) {

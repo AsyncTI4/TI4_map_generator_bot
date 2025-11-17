@@ -283,7 +283,7 @@ public class VoteButtonHandler {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && p.isSpaceStation()) continue;
             Button button;
             TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);
@@ -302,8 +302,11 @@ public class VoteButtonHandler {
 
     public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
-
-        for (Player player : game.getRealPlayers()) {
+        List<Player> players = game.getRealPlayers();
+        if (prefix.contains("yinHero")) {
+            players = game.getRealPlayersNNeutral();
+        }
+        for (Player player : players) {
             String faction = player.getFaction();
             Button button;
             if (!game.isFowMode() && !faction.contains("franken")) {

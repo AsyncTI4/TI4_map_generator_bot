@@ -18,6 +18,7 @@ import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -26,6 +27,8 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.milty.MiltyService;
 
@@ -95,6 +98,21 @@ public class FrankenDraftBagService {
                         + "\nClick the buttons below to add or remove items from your faction.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
+            if (game.isTwilightsFallMode()) {
+                List<Button> buttons = new ArrayList<>();
+
+                List<MessageEmbed> embeds = new ArrayList<>();
+                embeds.add(Mapper.getTech("wavelength").getRepresentationEmbed());
+                embeds.add(Mapper.getTech("antimatter").getRepresentationEmbed());
+
+                String msg = player.getRepresentation()
+                        + " You should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted. Instead of keeping 1 of those, you can instead use these buttons to take one of the two following technologies instead.";
+                MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), msg, embeds);
+                buttons.add(Buttons.green("getTech_wavelength__noPay__comp", "Select Wavelength"));
+                buttons.add(Buttons.green("getTech_antimatter__noPay__comp", "Select Antimatter"));
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
+            }
             MessageEmbed embed = player.getRepresentationEmbed();
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(), null, List.of(embed), List.of(Buttons.FACTION_EMBED));
@@ -103,6 +121,12 @@ public class FrankenDraftBagService {
         if (includeGameSetup) {
             game.setShowMapSetup(true);
         }
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
+                "Press this button after every player has chosen their components.",
+                List.of(Buttons.green(
+                        "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
     }
 
     private static void setSpeakerOrder(GenericInteractionCreateEvent event, Game game) {
@@ -284,11 +308,11 @@ public class FrankenDraftBagService {
             BagDraft draft, DraftBag bag, DraftItem.Category cat, Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("### ").append(cat.toString()).append(" (");
-        if (game.isTwilightsFallMode() && cat.toString().equalsIgnoreCase("tech")) {
+        if (game.isTwilightsFallMode() && "tech".equalsIgnoreCase(cat.toString())) {
             sb = new StringBuilder();
             sb.append("### ").append("ABILITY ").append(" (");
         }
-        if (game.isTwilightsFallMode() && cat.toString().equalsIgnoreCase("agent")) {
+        if (game.isTwilightsFallMode() && "agent".equalsIgnoreCase(cat.toString())) {
             sb = new StringBuilder();
             sb.append("### ").append("GENOME ").append(" (");
         }
@@ -364,14 +388,18 @@ public class FrankenDraftBagService {
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
             next = Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
-        String message =
-                "# " + game.getPing() + " Franken Draft has started!\n" + "> As a reminder, for the first bag you pick "
-                        + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
-                        + next + " item" + (next == 1 ? "" : "s") + ".\n"
-                        + "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n"
-                        + "> Once you have made your "
-                        + next + " pick" + (next == 1 ? "" : "s") + " (" + first
-                        + " in the first bag), the bags will automatically be passed once everyone is ready.";
+        String draftName = "Franken Draft";
+        if (draft instanceof InauguralSpliceFrankenDraft) {
+            draftName = "Inaugural Splice";
+        }
+        String message = "# " + game.getPing() + " " + draftName + " has started!\n"
+                + "> As a reminder, for the first bag you pick "
+                + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick "
+                + next + " item" + (next == 1 ? "" : "s") + ".\n"
+                + "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n"
+                + "> Once you have made your "
+                + next + " pick" + (next == 1 ? "" : "s") + " (" + first
+                + " in the first bag), the bags will automatically be passed once everyone is ready.";
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
     }

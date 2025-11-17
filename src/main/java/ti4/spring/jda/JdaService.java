@@ -24,6 +24,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
+import ti4.cron.CategoryCleanupCron;
 import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
@@ -37,6 +38,7 @@ import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.ThreadArchiveCron;
+import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
 import ti4.executors.ExecutorServiceManager;
@@ -49,6 +51,7 @@ import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
+import ti4.listeners.BanListener;
 import ti4.listeners.BotRuntimeStatsListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
@@ -75,6 +78,8 @@ import ti4.settings.GlobalSettings.ImplementedSettings;
 public class JdaService {
 
     // TODO: Eventually we need to make these non-static and autowire in this service.
+    //       Another thought: we may not want to trust any old "Admin" role on a server
+    //       should actually have admin rights
     public static final Set<Role> adminRoles = new HashSet<>();
     public static final Set<Role> developerRoles = new HashSet<>();
     public static final Set<Role> bothelperRoles = new HashSet<>();
@@ -98,6 +103,7 @@ public class JdaService {
     public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     private static Guild guildMegagame;
+    private static Guild guildTourney;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new ArrayList<>();
@@ -110,12 +116,10 @@ public class JdaService {
         String[] args = applicationArguments.getSourceArgs();
         jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves
-                // (including kicks).
-                // This is required to cache all members of a guild (including chunking)
+                // (including kicks). This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 // This is a privileged gateway intent this is only used to enable access to the user content in
-                // messages
-                // (also including embeds/attachments/components).
+                // messages (also including embeds/attachments/components).
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
                 .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
@@ -130,17 +134,22 @@ public class JdaService {
 
         BotLogger.info("INITIALIZING LISTENERS");
         jda.addEventListener(
+                // Priority Listeners First
                 new BotRuntimeStatsListener(),
                 new MessageListener(),
-                new DeletionListener(),
-                new ChannelCreationListener(),
                 new SlashCommandListener(),
                 ButtonListener.getInstance(),
-                ModalListener.getInstance(),
-                new SelectionMenuListener(),
                 new UserJoinServerListener(),
+                new AutoCompleteListener(),
+                new BanListener(),
+
+                // Non-Priority Listeners
+                new DeletionListener(),
+                new SelectionMenuListener(),
+                new ChannelCreationListener(),
                 new UserLeaveServerListener(),
-                new AutoCompleteListener());
+                ModalListener.getInstance() // ModalListener has a long init time
+                );
 
         BotLogger.info("AWAITING JDA READY");
         try {
@@ -220,18 +229,24 @@ public class JdaService {
             fowServers.add(guildFogOfWarSecondary);
         }
 
-        // Async: 10th Server
+        // Async: Tournament Server 1
         if (args.length >= 16) {
-            guildDecenary = initGuild(args[15], true);
+            guildTourney = initGuild(args[15], false);
         }
-        // Async: 11th Server
+
+        // Async: Great Carrier Reef
         if (args.length >= 17) {
-            guildUndenary = initGuild(args[16], true);
+            guildDecenary = initGuild(args[16], true);
+        }
+
+        // Async: PDStrians
+        if (args.length >= 18) {
+            guildUndenary = initGuild(args[17], true);
         }
 
         // Async: 12th Server
-        if (args.length >= 18) {
-            guildDuodenary = initGuild(args[17], true);
+        if (args.length >= 19) {
+            guildDuodenary = initGuild(args[18], true);
         }
 
         if (guildPrimary == null || guilds.isEmpty()) {
@@ -293,6 +308,7 @@ public class JdaService {
         LogCacheStatsCron.register();
         WinningPathCron.register();
         UploadStatsCron.register();
+        UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
         EndOldGamesCron.register();
         LogButtonRuntimeStatisticsCron.register();
@@ -303,12 +319,12 @@ public class JdaService {
         ThreadArchiveCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
+        CategoryCleanupCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        updatePresence();
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
+        updatePresence();
     }
 
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
@@ -373,7 +389,7 @@ public class JdaService {
 
     public static void updatePresence() {
         long activeGames = GameManager.getActiveGameCount();
-        jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
+        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(activeGames + " games of Async TI4"));
     }
 
     /**
@@ -397,8 +413,9 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1312882116597518422")); // Async Septenary (Duder's Domain)
         adminRoles.add(jda.getRoleById("1378702133297414170")); // Async Octonary (What's up Dock)
         adminRoles.add(jda.getRoleById("1410728648817770532")); // Async Nonary (Ship Flag)
-        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
-        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        adminRoles.add(jda.getRoleById("1434632452097446046")); // Async Tourney
+        adminRoles.add(jda.getRoleById("1434180793139204204")); // Async Decenary (Great Carrier Reef)
+        adminRoles.add(jda.getRoleById("1434181175944941655")); // Async Undenary (PDStrians)
         adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1429853811899502675")); // FoW Server Chapter 2
@@ -436,8 +453,9 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1312882116597518421")); // Async Septenary (Duder's Domain)
         developerRoles.add(jda.getRoleById("1378702133297414169")); // Async Octonary (What's up Dock)
         developerRoles.add(jda.getRoleById("1410728648817770531")); // Async Nonary (Ship Flag)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        developerRoles.add(jda.getRoleById("1434632452097446045")); // Async Tourney
+        developerRoles.add(jda.getRoleById("1434180793139204203")); // Async Decenary (Great Carrier Reef)
+        developerRoles.add(jda.getRoleById("1434181175944941654")); // Async Undenary (PDStrians)
         developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1429853811882594528")); // FoW Server Chapter 2
@@ -468,8 +486,9 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1312882116597518419")); // Async Septenary (Duder's Domain)
         bothelperRoles.add(jda.getRoleById("1378702133297414167")); // Async Octonary (What's up Dock)
         bothelperRoles.add(jda.getRoleById("1410728648817770529")); // Async Nonary (Ship Flag)
-        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Decenary (TBD)
-        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Undenary (TBD)
+        bothelperRoles.add(jda.getRoleById("1434632452097446043")); // Async Tourney
+        bothelperRoles.add(jda.getRoleById("1434180793139204201")); // Async Decenary (Great Carrier Reef)
+        bothelperRoles.add(jda.getRoleById("1434181175944941652")); // Async Undenary (PDStrians)
         bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin

@@ -71,6 +71,10 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasSpaceStation()) {
+            buttons.add(
+                    Buttons.gray("startTradeStationConvert", "Convert Comms by Exhausting Station", MiscEmojis.comm));
+        }
         if (player.hasUnexhaustedLeader("researchagent")) {
             buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
         }
@@ -80,7 +84,10 @@ public class CardsInfoService {
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
-        if (game.getPlayers().values().stream().anyMatch(p -> p.getAbilities().contains("galvanize"))) {
+        if (!game.isFowMode()
+                        && game.getPlayers().values().stream()
+                                .anyMatch(p -> p.getAbilities().contains("galvanize"))
+                || game.isFowMode() && player.getAbilities().contains("galvanize")) {
             buttons.add(Buttons.gray("getToggleGalvanizeTiles", "Galvanize Units", FactionEmojis.Bastion));
         }
         if (player.hasUnlockedBreakthrough("titansbt")) {
@@ -107,6 +114,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("florzenagent")) {
             buttons.add(Buttons.gray("getAgentSelection_florzenagent", "Use Florzen Agent", FactionEmojis.florzen));
+        }
+        if (player.hasUnexhaustedLeader("naazagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_naazagent", "Use NRA Agent", FactionEmojis.Naaz));
         }
         if (player.hasUnexhaustedLeader("nokaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_nokaragent", "Use Nokar Agent", FactionEmojis.nokar));
@@ -158,6 +168,9 @@ public class CardsInfoService {
                     player.getFinsFactionCheckerPrefix() + "useLawsOrder",
                     "Pay To Ignore Laws",
                     FactionEmojis.Keleres));
+        }
+        if (game.isVeiledHeartMode()) {
+            buttons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
         }
         if (player.hasAbility("military_industrial_complex")) {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));

@@ -231,7 +231,7 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
-                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")) {
+                                if ("sig01".equals(tile.getTileID()) && "garbozia".equals(unitHolderName)) {
                                     // DELETE ME
                                     unitHolderName = "bozgarbia";
                                 }
@@ -729,6 +729,7 @@ class GameLoadService {
                     game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
+                case Constants.NO_FRACTURE -> game.setNoFractureMode(loadBooleanOrDefault(info, false));
                 case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(loadBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->
                     game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));
@@ -737,6 +738,7 @@ class GameLoadService {
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));
+                case Constants.VEILED_HEART_MODE -> game.setVeiledHeartMode(loadBooleanOrDefault(info, false));
                 case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(loadBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(loadBooleanOrDefault(info, false));
                 case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(loadBooleanOrDefault(info, false));

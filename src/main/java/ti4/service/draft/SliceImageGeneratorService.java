@@ -45,16 +45,15 @@ public class SliceImageGeneratorService {
         SliceDraftable sliceDraftable = (SliceDraftable) draftManager.getDraftable(SliceDraftable.TYPE);
         if (sliceDraftable == null) return null;
 
-        Function<String, String> getPlayerFromSlice = (sliceName) -> {
-            return draftManager.getPlayersWithChoiceKey(SliceDraftable.TYPE, sliceName).stream()
-                    .findFirst()
-                    .orElse(null);
-        };
+        Function<String, String> getPlayerFromSlice =
+                (sliceName) -> draftManager.getPlayersWithChoiceKey(SliceDraftable.TYPE, sliceName).stream()
+                        .findFirst()
+                        .orElse(null);
         Function<String, FactionModel> getFactionFromPlayer = (playerUserID) -> {
             if (playerUserID == null) return null;
             List<DraftChoice> factionChoices = draftManager.getPlayerPicks(playerUserID, FactionDraftable.TYPE);
             if (!factionChoices.isEmpty()) {
-                return FactionDraftable.getFactionByChoice(factionChoices.get(0));
+                return FactionDraftable.getFactionByChoice(factionChoices.getFirst());
             }
             return null;
         };

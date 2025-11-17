@@ -39,6 +39,7 @@ import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
+import ti4.commands.tf.TwilightFallCommand;
 import ti4.commands.tigl.TiglCommand;
 import ti4.commands.tokens.AddCCCommand;
 import ti4.commands.tokens.AddFrontierTokensCommand;
@@ -114,6 +115,7 @@ public class CommandManager {
                     new CaptureCommand(),
                     new GenericButtonCommand(),
                     new DiscordantStarsCommand(),
+                    new TwilightFallCommand(),
                     new StatisticsCommand(),
                     new TechCommand(),
                     new BreakthroughCommand(),

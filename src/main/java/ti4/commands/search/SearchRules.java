@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.model.RuleModel;
 import ti4.model.Source.ComponentSource;
 
 class SearchRules extends SearchComponentModelSubcommand {
@@ -30,7 +31,7 @@ class SearchRules extends SearchComponentModelSubcommand {
 
         List<MessageEmbed> messageEmbeds = Mapper.getRules().values().stream()
                 .filter(model -> model.search(searchString, source))
-                .map(model -> model.getRepresentationEmbed())
+                .map(RuleModel::getRepresentationEmbed)
                 .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

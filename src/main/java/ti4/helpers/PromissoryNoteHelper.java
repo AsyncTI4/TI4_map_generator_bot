@@ -342,7 +342,7 @@ public class PromissoryNoteHelper {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
                     + ". Use buttons to gain 2 command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             ActionCardHelper.sendPlotCardInfo(game, owner);
             MessageHelper.sendMessageToChannel(
@@ -350,6 +350,8 @@ public class PromissoryNoteHelper {
                     owner.getRepresentation() + " place a plot into play with " + player.getRepresentationNoPing()
                             + " token on it from black ops");
             owner.removeOwnedPromissoryNoteByID(id);
+            player.removePromissoryNote(id);
+            owner.removePromissoryNote(id);
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =

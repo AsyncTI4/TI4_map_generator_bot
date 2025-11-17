@@ -52,7 +52,8 @@ public class BastionTechService {
 
                         boolean hasSD = planet.getUnitCount(UnitType.Spacedock, player.getColorID()) > 0;
                         boolean hasHelios = player.hasUnit("bastion_spacedock");
-                        boolean hasHeliosUpgrade = player.hasUnit("bastion_spacedock2");
+                        boolean hasHeliosUpgrade =
+                                player.hasUnit("bastion_spacedock2") || player.hasUnit("tf-heliosentity");
 
                         if (hasSD && hasHelios && !planet.getTokenList().contains(Constants.HELIOS_ATTACHMENT_1)) {
                             planet.addToken(Constants.HELIOS_ATTACHMENT_1);
@@ -110,7 +111,7 @@ public class BastionTechService {
                 }
             }
 
-            var units = CombatRollService.getProximaBombardUnit(tile, p1);
+            var units = CombatRollService.getProximaBombardUnit(p1);
 
             var rollMods = CombatModHelper.getModifiers(
                     p1,

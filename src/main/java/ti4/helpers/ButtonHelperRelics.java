@@ -16,7 +16,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
-class ButtonHelperRelics {
+public class ButtonHelperRelics {
 
     @ButtonHandler("jrResolution_")
     public static void jrResolution(String buttonID, Game game, ButtonInteractionEvent event) {
@@ -92,13 +92,41 @@ class ButtonHelperRelics {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
+    public static void offerTitansHeroButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (game.getPlanetsInfo().get(planet) == null) continue;
+
+            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planet, game, false, null);
+            if (!legendaryOrHome || game.isTwilightsFallMode()) {
+                buttons.add(Buttons.green("titansHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        String message = "Please choose which planet you wish to attach _Titans Hero_ to.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
     @ButtonHandler("nanoforgePlanet_")
-    public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("nanoforgePlanet_", "");
         Planet planetReal = game.getPlanetsInfo().get(planet);
         planetReal.addToken("attachment_nanoforge.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Attached _Nano-Forge_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
         ButtonHelper.deleteMessage(event);
+        CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
+    }
+
+    @ButtonHandler("titansHeroPlanet_")
+    public static void titansHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        String planet = buttonID.replace("titansHeroPlanet_", "");
+        Planet planetReal = game.getPlanetsInfo().get(planet);
+        planetReal.addToken("attachment_titanshero.png");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Attached _Titans Hero_ to " + Helper.getPlanetRepresentation(planet, game) + " and readied it.");
+        ButtonHelper.deleteMessage(event);
+        player.refreshPlanet(planet);
+        CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
     }
 }

@@ -191,7 +191,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && getAfbDieCount() == 0) return 3;
+        if (player.hasRelic("metalivoidarmaments") && afbDieCount == 0) return 3;
         if (capacityValue > 0
                 && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
                 && getExpectedAfbHits() < 0.6) {
@@ -224,6 +224,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 return 2;
             }
         }
+        if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
+            return 1;
+        }
+
         return spaceCannonDieCount;
     }
 
@@ -234,11 +238,18 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 return 5;
             }
         }
+        if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
+            if (player.hasTech("pds2")) {
+                return 5;
+            } else {
+                return 6;
+            }
+        }
         return spaceCannonHitsOn;
     }
 
     public int getAfbHitsOn(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && getAfbHitsOn() == 0) return 6;
+        if (player.hasRelic("metalivoidarmaments") && afbHitsOn == 0) return 6;
         if (capacityValue > 0
                 && player.getGame().getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
                 && getExpectedAfbHits() < 0.6) {
@@ -296,6 +307,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player) {
+        return switch (rollType) {
+            case combatround -> getCombatHitsOn();
+            case AFB -> getAfbHitsOn(player);
+            case bombardment -> getBombardHitsOn(player);
+            case SpaceCannonOffence -> getSpaceCannonHitsOn(player);
+            case SpaceCannonDefence -> getSpaceCannonHitsOn(player);
+        };
+    }
+
+    public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player, UnitHolder uH) {
         return switch (rollType) {
             case combatround -> getCombatHitsOn();
             case AFB -> getAfbHitsOn(player);
@@ -442,6 +463,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             if ("spacedock".equalsIgnoreCase(baseType)) {
                 return true;
             }
+        }
+        if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
+            return player.hasTech("pds2");
         }
         return getDeepSpaceCannon();
     }

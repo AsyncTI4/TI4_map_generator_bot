@@ -1025,7 +1025,7 @@
         "name": "Ghost Squad",
         "phase": "Action",
         "window": "After a player commits units to land on a planet you control",
-        "text": "Move any number of ground forces from any planet you control in the active system to any other planet you control in the active system.",
+        "text": "Move any number of your ground forces from any planet you control in the active system to any other planet you control in the active system.",
         "flavorText": "The L1 advance team was expecting to find the outpost abandoned. What they found - unfortunately for them - was Connor.",
         "source": "codex1"
     },

@@ -60,7 +60,7 @@
         "basicProduction": "res",
         "capacityValue": 3,
         "isStructure": true,
-        "ability": "The resource value of this planet is increased by 2. [Note: unconfirmed]"
+        "ability": "The resource value of this planet is increased by 2."
     },
     {
         "id": "deepwrought_flagship",
@@ -309,7 +309,6 @@
         "source": "thunders_edge",
         "faction": "naaz",
         "moveValue": 3,
-        "capacityUsed": 1,
         "combatHitsOn": 4,
         "combatDieCount": 4,
         "sustainDamage": true,

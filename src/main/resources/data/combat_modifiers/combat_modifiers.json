@@ -561,7 +561,7 @@
     },
     {
         "alias": "plus1_per_opponent_sftt",
-        "type": "result_modifier",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "opponent_sftt",
         "persistenceType": "CONDITIONAL",
@@ -836,6 +836,36 @@
             {
                 "type": "tech",
                 "alias": "tf-unrelenting"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus2_fracture_all",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "tf-planesplitter"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_fracture_all",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "obsidiancommander"
             }
         ],
         "forCombatAbility": "combatround"

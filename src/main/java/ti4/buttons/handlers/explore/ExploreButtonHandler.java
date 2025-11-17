@@ -29,12 +29,12 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
-import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -117,6 +117,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_.";
         message +=
@@ -163,6 +164,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
 
         PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. ";
@@ -203,6 +205,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. ";
         message += " Gained 1 trade good " + player.gainTG(1, true) + ".";
@@ -248,6 +251,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
 
         AddUnitService.addUnits(
                 event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);

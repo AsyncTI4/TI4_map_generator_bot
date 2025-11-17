@@ -117,11 +117,8 @@ public final class StringHelper {
             } else {
                 sb.append(separator);
             }
-            line = line.replace(
-                    String.valueOf(ESCAPE_CHARACTER),
-                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ESCAPE_CHARACTER));
-            line = line.replace(
-                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + String.valueOf(separator));
+            line = line.replace(String.valueOf(ESCAPE_CHARACTER), String.valueOf(ESCAPE_CHARACTER) + ESCAPE_CHARACTER);
+            line = line.replace(String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + separator);
             sb.append(line);
         }
         return sb.toString();
@@ -154,7 +151,7 @@ public final class StringHelper {
             }
         }
         // Add the last line if there's any content
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString());
         }
 
@@ -169,7 +166,7 @@ public final class StringHelper {
         return replaceWithEmojis(initial, false);
     }
 
-    private static Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
+    private static final Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
 
     private static String replaceWithEmojis(String initial, boolean replaceWithBlank) {
         StringBuilder output = new StringBuilder();
@@ -181,7 +178,7 @@ public final class StringHelper {
                 output.append(initial.substring(index));
                 break;
             }
-            output.append(initial.substring(index, pos));
+            output.append(initial, index, pos);
 
             int end = initial.indexOf('>', pos);
             if (end == -1) {
@@ -230,19 +227,19 @@ public final class StringHelper {
                 }
                 if (currentMessage.length() + chunk.length() + sep.length() > maxLength) {
                     // This chunk would make the message too big, so start a new message
-                    if (currentMessage.length() > 0) {
+                    if (!currentMessage.isEmpty()) {
                         messages.add(currentMessage.toString());
                     }
                     currentMessage = new StringBuilder(chunk);
                 } else {
                     // This chunk fits in the current message
-                    if (currentMessage.length() > 0) {
+                    if (!currentMessage.isEmpty()) {
                         currentMessage.append(sep);
                     }
                     currentMessage.append(chunk);
                 }
             }
-            if (currentMessage.length() > 0) {
+            if (!currentMessage.isEmpty()) {
                 messages.add(currentMessage.toString());
             }
             if (!messages.isEmpty()) {

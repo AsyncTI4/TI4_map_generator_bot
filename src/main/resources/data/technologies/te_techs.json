@@ -19,7 +19,7 @@
         "requirements": "YY",
         "faction": "bastion",
         "baseUpgrade": "sd2",
-        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nThe resource value of this planet is increased by 2. [Note: not confirmed]\nUp to 3 fighters in this system do not count against your ships' capacity.",
+        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nThe resource value of this planet is increased by 2. \nUp to 3 fighters in this system do not count against your ships' capacity.",
         "source": "thunders_edge"
     },
     {
@@ -64,7 +64,7 @@
         "requirements": "RR",
         "faction": "crimson",
         "baseUpgrade": "dd2",
-        "text": "Cost 1, Combat 8, Move 2, ANTI-FIGHTER BARRAGE 6 (x3). At the end of any players' combat in this unit's system or up to 2 systems away, you may place 1 active or inactive breach in that system.",
+        "text": "Cost 1, Combat 7, Move 2, ANTI-FIGHTER BARRAGE 6 (x3). At the end of any players' combat in this unit's system or up to 2 systems away, you may place 1 active or inactive breach in that system.",
         "source": "thunders_edge"
     },
     {
@@ -92,7 +92,7 @@
     },
     {
         "alias": "planesplitter-firm",
-        "name": "Planesplitter",
+        "name": "Planesplitter (Firmament)",
         "types": [
             "CYBERNETIC"
         ],
@@ -103,7 +103,7 @@
     },
     {
         "alias": "parasite-firm",
-        "name": "Neural Parasite",
+        "name": "Neural Parasite (Firmament)",
         "types": [
             "BIOTIC"
         ],
@@ -114,7 +114,7 @@
     },
     {
         "alias": "planesplitter-obs",
-        "name": "Planesplitter",
+        "name": "Planesplitter (Obsidian)",
         "types": [
             "CYBERNETIC"
         ],
@@ -125,7 +125,7 @@
     },
     {
         "alias": "parasite-obs",
-        "name": "Neural Parasite",
+        "name": "Neural Parasite (Obsidian)",
         "types": [
             "BIOTIC"
         ],

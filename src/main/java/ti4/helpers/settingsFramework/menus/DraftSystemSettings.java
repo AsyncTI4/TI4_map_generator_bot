@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.ReadOnlyTextSetting;
@@ -53,7 +54,7 @@ public class DraftSystemSettings extends SettingsMenu {
     private final PublicSnakeDraftSettings publicSnakeDraftSettings;
     // Bonus Attributes
     @Setter
-    private String preset = null;
+    private String preset;
 
     @JsonIgnore
     private final Game game;
@@ -203,6 +204,16 @@ public class DraftSystemSettings extends SettingsMenu {
             }
             settings.setupNucleusPreset();
         }
+        if ("_andcatPreset".equals(preset)) {
+
+            if (game.getPlayers().size() > 8) {
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        "This draft supports at most 8 players; you'll need to remove excess players from the draft.");
+            }
+            settings.setupAndcatTwilightsFallPreset();
+            ButtonHelper.deleteMessage(event);
+        }
         game.setDraftSystemSettings(settings);
         settings.postMessageAndButtons(event);
     }
@@ -212,25 +223,24 @@ public class DraftSystemSettings extends SettingsMenu {
     }
 
     public void setupNucleusPreset() {
-        getDraftablesList()
-                .setKeys(List.of(
-                        FactionDraftable.class.getSimpleName(),
-                        SliceDraftable.class.getSimpleName(),
-                        SeatDraftable.class.getSimpleName(),
-                        SpeakerOrderDraftable.class.getSimpleName()));
-        getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
-        getSliceSettings().getMapGenerationMode().setChosenKey("Nucleus");
+        draftablesList.setKeys(List.of(
+                FactionDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                SeatDraftable.class.getSimpleName(),
+                SpeakerOrderDraftable.class.getSimpleName()));
+        draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
+        sliceSettings.getMapGenerationMode().setChosenKey("Nucleus");
         setPreset("Nucleus Draft");
     }
 
     public void setupAndcatTwilightsFallPreset() {
-        getDraftablesList()
-                .setKeys(List.of(
-                        AndcatReferenceCardsDraftable.class.getSimpleName(),
-                        SliceDraftable.class.getSimpleName(),
-                        MahactKingDraftable.class.getSimpleName()));
-        getDraftOrchestrator().setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
-        getSliceSettings().getMapGenerationMode().setChosenKey("Milty");
+        draftablesList.setKeys(List.of(
+                AndcatReferenceCardsDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                MahactKingDraftable.class.getSimpleName()));
+        draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
+        sliceSettings.getMapGenerationMode().setChosenKey("Milty");
+        sourceSettings.getTeDemo().setVal(true);
         setPreset("Twilights Fall (Andcat Draft)");
     }
 }

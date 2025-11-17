@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,6 +35,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
@@ -64,6 +66,7 @@ import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
@@ -153,9 +156,20 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasSpaceStation() {
-        return getPlanets().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
-                .anyMatch(Planet::isSpaceStation);
+        for (String planet : getPlanets()) {
+            if (!game.getPlanetsInfo().containsKey(planet)) {
+                MessageHelper.sendMessageToChannel(
+                        getCorrectChannel(),
+                        getRepresentationNoPing()
+                                + " seems to have planets that dont exist. Try removing them with /planet remove. The planet ID is "
+                                + planet);
+            } else {
+                if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public int numberOfSpaceStations() {
@@ -163,6 +177,23 @@ public class Player extends PlayerProperties {
                 .map(planet -> game.getPlanetsInfo().get(planet))
                 .filter(Planet::isSpaceStation)
                 .count();
+    }
+
+    public int numberOfFakePlanets() {
+        return (int) getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(planet -> planet.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
+                .count();
+    }
+
+    public boolean hasUnplayedSCs() {
+        boolean hadAnyUnplayedSCs = false;
+        for (Integer SC : getSCs()) {
+            if (!game.getPlayedSCs().contains(SC)) {
+                hadAnyUnplayedSCs = true;
+            }
+        }
+        return hadAnyUnplayedSCs;
     }
 
     public List<String> getOceans() {
@@ -327,7 +358,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public Set<TechnologyType> getSynergies() {
-        Set<TechnologyType> synergies = new HashSet<>();
+        Set<TechnologyType> synergies = EnumSet.noneOf(TechnologyType.class);
         if (isBreakthroughUnlocked()) {
             synergies.addAll(getBreakthroughModel().getSynergy());
         }
@@ -417,6 +448,9 @@ public class Player extends PlayerProperties {
     }
 
     public String finChecker() {
+        if (isNpc() || isDummy()) {
+            return dummyPlayerSpoof();
+        }
         return getFinsFactionCheckerPrefix();
     }
 
@@ -443,6 +477,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("so2")
                 || getTechs().contains("inf2")
                 || getTechs().contains("tf-specops")
+                || hasUnit("tf-yinclone")
                 || getTechs().contains("lw2")
                 || getTechs().contains("batyriinf")
                 || getTechs().contains("dscymiinf")
@@ -455,14 +490,18 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean hasWarsunTech() {
-        return getTechs().contains("pws2")
-                || getTechs().contains("dsrohdws")
-                || getTechs().contains("ws")
-                || getTechs().contains("absol_ws")
-                || getTechs().contains("baxanws")
-                || getTechs().contains("absol_pws2")
-                || hasUnit("muaat_warsun")
-                || hasUnit("rohdhna_warsun");
+        return getUnitByBaseType("warsun") != null;
+        // return getTechs().contains("pws2")
+        //         || getTechs().contains("dsrohdws")
+        //         || getTechs().contains("ws")
+        //         || hasUnit("tf_warsun")
+        //         || hasUnit("tf-universitywarsun")
+        //         || hasUnit("tf-pws")
+        //         || getTechs().contains("absol_ws")
+        //         || getTechs().contains("baxanws")
+        //         || getTechs().contains("absol_pws2")
+        //         || hasUnit("muaat_warsun")
+        //         || hasUnit("rohdhna_warsun");
     }
 
     @JsonIgnore
@@ -631,6 +670,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
+        if ("researchteam".equalsIgnoreCase(ability) && getTechs().contains("tf-pacifist")) {
+            return true;
+        }
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
@@ -672,7 +714,7 @@ public class Player extends PlayerProperties {
 
     public List<String> getPlayableActionCards() {
         List<String> cards = new ArrayList<>(actionCards.keySet());
-        Game game = getGame();
+        Game game = this.game;
         if (game != null) {
             List<String> garboziaCards = game.getDiscardACStatus().keySet().stream()
                     .filter(ac -> game.getDiscardACStatus().get(ac) == ACStatus.garbozia)
@@ -711,12 +753,16 @@ public class Player extends PlayerProperties {
     }
 
     public boolean isOtherPlayerPuppeted(Player p2) {
-        for (List<String> puppets : getPlotCardsFactions().values()) {
+        for (List<String> puppets : plotCardsFactions.values()) {
             if (puppets.contains(p2.getFaction())) {
                 return true;
             }
         }
         return false;
+    }
+
+    public List<String> getPuppetedFactionsForPlot(String plot) {
+        return plotCardsFactions.getOrDefault(plot, List.of());
     }
 
     public Map<String, Integer> getTrapCards() {
@@ -729,6 +775,10 @@ public class Player extends PlayerProperties {
 
     public boolean hasTheZeroToken() {
         if (hasAbility("telepathic")) {
+            if (game.isTwilightsFallMode()
+                    && !game.getStoredValue("shouldntChangeTurnOrder").isEmpty()) {
+                return false;
+            }
             for (Player p : game.getPlayers().values())
                 if (p.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) return false;
             return true;
@@ -746,7 +796,7 @@ public class Player extends PlayerProperties {
 
     public boolean hasUnit(String unitID) {
         if (unitID.contains("flagship") && hasUnlockedBreakthrough("nekrobt")) {
-            return ValefarZService.hasFlagshipAbility(getGame(), this, unitID);
+            return ValefarZService.hasFlagshipAbility(game, this, unitID);
         }
         return getUnitsOwned().contains(unitID);
     }
@@ -814,9 +864,9 @@ public class Player extends PlayerProperties {
 
     private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
-        if (unit.getAlias().equals("naaz_voltron")) // Always, ALWAYS use voltron, if available
+        if ("naaz_voltron".equals(unit.getAlias())) // Always, ALWAYS use voltron, if available
         score += 99;
-        if (unit.getAlias().equals("mentak_cruiser3")) // Always, ALWAYS use corsair, if available
+        if ("mentak_cruiser3".equals(unit.getAlias())) // Always, ALWAYS use corsair, if available
         score += 99;
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
                 && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
@@ -826,6 +876,10 @@ public class Player extends PlayerProperties {
                 && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
                         || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
+        if (unit.getID().contains("tf-")
+                && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {
+            score = 0;
+        }
 
         return score;
     }
@@ -924,7 +978,7 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasPlayablePromissoryInHand(String pn) {
-        if (pn.equals("malevolency")) return getPromissoryNotes().containsKey(pn);
+        if ("malevolency".equals(pn)) return promissoryNotes.containsKey(pn);
         return promissoryNotes.containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
     }
 
@@ -1525,7 +1579,7 @@ public class Player extends PlayerProperties {
         }
         if (hasAbility("puppetsoftheblade")) {
             List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values());
-            allPlots.stream().forEach(plot -> setPlotCard(plot.getAlias()));
+            allPlots.forEach(plot -> setPlotCard(plot.getAlias()));
         }
     }
 
@@ -1861,6 +1915,21 @@ public class Player extends PlayerProperties {
 
         getFollowedSCs().add(sc);
         if (game != null && game.getActivePlayer() != null) {
+
+            if (game.isTwilightsFallMode() && (sc == 2 || sc == 6 || sc == 7)) {
+                Player holder = null;
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!p2.hasFollowedSC(sc)) {
+                        return;
+                    }
+                    if (p2.getSCs().contains(sc)) {
+                        holder = p2;
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        holder.getCorrectChannel(),
+                        holder.getRepresentation() + " everyone has reacted to the splice.");
+            }
             if (game.getStoredValue("endTurnWhenSCFinished")
                     .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
@@ -1901,7 +1970,7 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
-    public int getAc() {
+    public int getAcCount() {
         return actionCards.size();
     }
 
@@ -2037,6 +2106,9 @@ public class Player extends PlayerProperties {
                 return true;
             }
         }
+        if ("ah".equalsIgnoreCase(techID) && getTechs().contains("tf-ahl")) {
+            return true;
+        }
         if (getTechs().contains("tf-" + techID)) {
             return true;
         }
@@ -2072,6 +2144,40 @@ public class Player extends PlayerProperties {
             }
         }
         return newPlanets;
+    }
+
+    public Set<Planet> getPlanetsForScoring(boolean secret) {
+        Game game = this.game;
+
+        // All planets the player owns count for scoring, except oceans. Oceans are fake
+        Set<Planet> playerPlanets = getPlanets().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(Objects::nonNull)
+                .filter(p -> !p.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
+                .filter(p -> !p.isSpaceStation())
+                .collect(Collectors.toSet());
+
+        // Current coexisting framework is really very dumb
+        Set<Planet> coexistingPlanets = game.getPlanetsInfo().values().stream()
+                .filter(planet -> planet.hasGroundForces(this) || planet.hasStructures(this))
+                .collect(Collectors.toSet());
+        playerPlanets.addAll(coexistingPlanets);
+
+        // firmament commander allows you to use planets in systems that contain your ships for scoring SECRET
+        // OBJECTIVES
+        if (secret && game.playerHasLeaderUnlockedOrAlliance(this, "firmamentcommander")
+                || hasTech("tf-theburningeye")) {
+            Set<Planet> planetsUnderShips = game.getPlanetsInfo().values().stream()
+                    .filter(planet -> {
+                        Tile t = game.getTileFromPlanet(planet.getName());
+                        return t != null
+                                && t.containsPlayersUnitsWithModelCondition(this, UnitModel::getIsShip)
+                                && !planet.isSpaceStation();
+                    })
+                    .collect(Collectors.toSet());
+            playerPlanets.addAll(planetsUnderShips);
+        }
+        return playerPlanets;
     }
 
     public List<String> getUniquePlanets() {
@@ -2132,6 +2238,27 @@ public class Player extends PlayerProperties {
         return hasRelic(relicID) && !getExhaustedRelics().contains(relicID);
     }
 
+    @JsonIgnore
+    public Set<String> getTradableRelics() {
+        return SetUtils.intersection(getActualRelics(), Set.of("thesilverflame", "silverflame"));
+    }
+
+    @JsonIgnore
+    public Set<String> getActualRelics() {
+        return getRelics().stream()
+                .filter(Mapper::isValidRelic)
+                .filter(r -> !Mapper.getRelic(r).isFakeRelic())
+                .collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Set<String> getFakeRelics() {
+        return getRelics().stream()
+                .filter(Mapper::isValidRelic)
+                .filter(r -> Mapper.getRelic(r).isFakeRelic())
+                .collect(Collectors.toSet());
+    }
+
     public void clearExhaustedTechs() {
         getExhaustedTechs().clear();
     }
@@ -2158,6 +2285,9 @@ public class Player extends PlayerProperties {
 
     public void addTech(String techID) {
         if (getTechs().contains(techID)) {
+            return;
+        }
+        if (Mapper.getTech(techID) == null) {
             return;
         }
         getTechs().add(techID);
@@ -2195,14 +2325,20 @@ public class Player extends PlayerProperties {
             setAtsCount(0);
         }
 
+        if ("tf-telepathic".equalsIgnoreCase(techID)) {
+            game.setStoredValue("shouldntChangeTurnOrder", "true");
+        }
+
         // Add Custodia Vigilia when researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
             gainCustodiaVigilia();
         }
 
-        if ("planesplitter-firm".equalsIgnoreCase(techID)) {
-            FractureService.spawnFracture(null, game);
-            FractureService.spawnIngressTokens(null, game, this, false);
+        if ("planesplitter-firm".equalsIgnoreCase(techID) || "tf-planesplitter".equalsIgnoreCase(techID)) {
+            if (!FractureService.isFractureInPlay(game)) {
+                FractureService.spawnFracture(null, game);
+                FractureService.spawnIngressTokens(null, game, this, false);
+            }
         }
 
         // Update Owned Units when Researching a Unit Upgrade
@@ -2229,9 +2365,10 @@ public class Player extends PlayerProperties {
             addOwnedUnitByID("mentak_cruiser3");
         }
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
-        if (!techModel.getFaction().isPresent()
+        if (techModel.getFaction().isEmpty()
                 && obsidian != null
-                && obsidian.getPlotCardsFactions().get("extract").contains(getFaction())
+                && !obsidian.is(this)
+                && obsidian.getPuppetedFactionsForPlot("extract").contains(getFaction())
                 && !obsidian.getTechs().contains(techID)) {
             String msg = obsidian.getRepresentation()
                     + ", your _Extract_ plot card allows you to gain a copy of the newly researched tech **"
@@ -2681,7 +2818,7 @@ public class Player extends PlayerProperties {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = getUserSettings().getPreferredColors().stream()
                 .filter(c -> !ColorChangeHelper.colorIsExclusive(c, this))
-                .filter(c -> getGame().getUnusedColors().contains(Mapper.getColor(c)))
+                .filter(c -> game.getUnusedColors().contains(Mapper.getColor(c)))
                 .findFirst()
                 .orElse(game.getUnusedColorsPreferringBase().stream()
                         .filter(nonExclusive)
@@ -2845,9 +2982,12 @@ public class Player extends PlayerProperties {
         if (getFaction() == null) {
             return null;
         }
+        if (game.getStoredValue("silverFlamed").contains(getFaction())) {
+            return null;
+        }
         if (getHomeSystemPosition() != null) {
             Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
-            if (frankenHs != null) {
+            if (frankenHs != null && frankenHs.isHomeSystem()) {
                 return frankenHs;
             }
         }

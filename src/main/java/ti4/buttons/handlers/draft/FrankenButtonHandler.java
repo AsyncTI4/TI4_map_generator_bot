@@ -43,7 +43,7 @@ class FrankenButtonHandler {
         event.editButton(draftItem.getRemoveButton()).queue();
 
         // Handle Errata
-        if (draftItem.Errata != null) {
+        if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
                 for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
@@ -72,7 +72,7 @@ class FrankenButtonHandler {
         event.editButton(draftItem.getAddButton()).queue();
 
         // Handle Errata
-        if (draftItem.Errata != null) {
+        if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
                 for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
@@ -101,7 +101,18 @@ class FrankenButtonHandler {
             case ABILITY -> FrankenAbilityService.addAbilities(event, player, List.of(itemID));
             case TECH -> {
                 if (player.getGame().isTwilightsFallMode()) {
-                    player.addTech(itemID);
+                    if (player.getGame().isVeiledHeartMode()) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCardsInfoThread(),
+                                "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                        player.getGame()
+                                .setStoredValue(
+                                        "veiledCards" + player.getFaction(),
+                                        player.getGame().getStoredValue("veiledCards" + player.getFaction()) + itemID
+                                                + "_");
+                    } else {
+                        player.addTech(itemID);
+                    }
                 } else {
                     FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
                 }
@@ -110,12 +121,39 @@ class FrankenButtonHandler {
                 FactionModel faction = Mapper.getFaction(itemID);
                 // add Mahact Faction tech
                 player.setFaction(itemID);
-                FrankenUnitService.addUnits(event, player, List.of(itemID + "_flagship", itemID + "_mech"), false);
+                FrankenUnitService.addUnits(
+                        event, player, List.of(itemID + "_flagship", itemID + "_mech", "tf_warsun"), false);
                 PlayerStatsService.setTotalCommodities(
                         event, player, (player.getCommoditiesTotal(true) + faction.getCommodities()));
             }
-            case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP, UNIT -> FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+            case AGENT, COMMANDER, HERO -> {
+                if (player.getGame().isVeiledHeartMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                    player.getGame()
+                            .setStoredValue(
+                                    "veiledCards" + player.getFaction(),
+                                    player.getGame().getStoredValue("veiledCards" + player.getFaction()) + itemID
+                                            + "_");
+                } else {
+                    FrankenLeaderService.addLeaders(event, player, List.of(itemID));
+                }
+            }
+            case MECH, FLAGSHIP, UNIT -> {
+                if (player.getGame().isVeiledHeartMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                    player.getGame()
+                            .setStoredValue(
+                                    "veiledCards" + player.getFaction(),
+                                    player.getGame().getStoredValue("veiledCards" + player.getFaction()) + itemID
+                                            + "_");
+                } else {
+                    FrankenUnitService.addUnits(event, player, List.of(itemID), false);
+                }
+            }
             case COMMODITIES ->
                 PlayerStatsService.setTotalCommodities(
                         event,
@@ -132,9 +170,16 @@ class FrankenButtonHandler {
         String itemID = draftItem.ItemId;
         switch (draftItem.ItemCategory) {
             case ABILITY -> FrankenAbilityService.removeAbilities(event, player, List.of(itemID));
-            case TECH -> FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
+            case TECH -> {
+                if (player.getGame().isTwilightsFallMode()) {
+                    player.removeTech(itemID);
+                } else {
+                    FrankenFactionTechService.removeFactionTechs(event, player, List.of(itemID));
+                }
+            }
+
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.removeLeaders(event, player, List.of(itemID));
-            case MECH, FLAGSHIP -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
+            case MECH, FLAGSHIP, UNIT -> FrankenUnitService.removeUnits(event, player, List.of(itemID));
             case COMMODITIES ->
                 PlayerStatsService.setTotalCommodities(
                         event,
@@ -215,7 +260,8 @@ class FrankenButtonHandler {
                                     game.getActionsChannel(), game.getPing() + " the Inaugural Splice is complete!");
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
-                            Button randomizeButton = Buttons.green("startFrankenSliceBuild", "Randomize your slices");
+                            Button randomizeButton =
+                                    Buttons.green("startFrankenSliceBuild", "Randomize your slices (sorta)");
                             Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),

@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.commands.special.SetupNeutralPlayer;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
@@ -14,6 +17,7 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -22,6 +26,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.ColorModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -43,14 +48,14 @@ public class TeHelperActionCards {
 
         switch (card.getAlias().replaceAll("\\d", "")) {
             case "blackmarketdealing" ->
-                buttons.add(Buttons.green(ffcc + "transact_BMD", "Start Black Market Transaction"));
+                buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
             case "crisis" -> nop(); // preset
             case "exchangeprogram" ->
                 buttons.add(Buttons.green(ffcc + "exchangeProgramStart", "Start Exchange Program"));
             case "extremeduress" -> nop(); // preset
-            case "lieinwait" -> nop();
+            case "lieinwait" -> buttons.add(Buttons.green(ffcc + "lieInWait", resolve));
             case "mercenarycontract" -> buttons.add(Buttons.green(ffcc + "teMercenaryContract_page0", resolve));
             case "piratecontract" -> buttons.add(Buttons.green(ffcc + "pirateContract", resolve));
             case "piratefleet" -> buttons.add(Buttons.green(ffcc + "pirateFleet", resolve));
@@ -60,7 +65,7 @@ public class TeHelperActionCards {
             case "strategize" -> buttons.add(Buttons.green(ffcc + "strategize", resolve));
         }
 
-        if (buttons != null && buttons.size() > 0) {
+        if (buttons != null && !buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), introMsg, buttons);
             return true;
         }
@@ -97,6 +102,49 @@ public class TeHelperActionCards {
         }
         String message = "Choose the player who you are trying to have an exchange with.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("concedeToED")
+    private static void concedeToED(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        ActionCardHelper.discardRandomAC(event, game, player, player.getAcCount());
+        if (player.getTg() > 0) {
+            p2.gainTG(player.getTg(), true);
+            player.setTg(0);
+        }
+        if (!player.getSecretsUnscored().isEmpty()) {
+            SecretObjectiveHelper.showAll(player, p2, game);
+        }
+        String message = player.getRepresentation()
+                + " lost all their ACs, gave all their tgs to the player who played extreme duress, and showed their secrets to them as well.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("lieInWait")
+    private static void lieInWait(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : player.getNeighbouringPlayers(true)) {
+            if (p2 == player || p2.getAcCount() == 0) {
+                continue;
+            }
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
+            } else {
+                Button button =
+                        Buttons.gray(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        String message = player.getRepresentationUnfogged()
+                + ", please tell the bot which neighbor of your's did the transaction";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -226,7 +274,6 @@ public class TeHelperActionCards {
     @ButtonHandler("strategize")
     private static void resolveStrategize(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("spendAStratCC", "Spend a Strategy CC"));
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
             buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs", CardEmojis.SC1));
@@ -235,7 +282,7 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            buttons.add(Buttons.gray("draw2ac", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             buttons.add(Buttons.green("construction_spacedock", "Place A SD", UnitEmojis.spacedock));
@@ -255,7 +302,12 @@ public class TeHelperActionCards {
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving"));
 
-        String message = "Resolve strategize using the buttons. Be sure to spend a strategy CC if applicable:";
+        String message = "Resolve strategize using the buttons. ";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("spendAStratCC", "Spend a Strategy CC"));
+        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
+        message = "## Unless you are resolving leadership, please spend a strategy command token. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -283,6 +335,14 @@ public class TeHelperActionCards {
 
         String prefix = player.finChecker() + "teMercenaryContract_";
         String message = player.getRepresentation() + " choose a planet to place 2 neutral infantry on:";
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
         ButtonHelper.deleteMessage(event);
@@ -354,6 +414,8 @@ public class TeHelperActionCards {
         String message = player.getRepresentation() + " choose a system to place the pirates! 🦜☠";
         if (allowRes) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+            Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), "Use buttons to pay the kind pirates", buttons);
         } else {
@@ -378,6 +440,14 @@ public class TeHelperActionCards {
     @ButtonHandler("resolvePirateContract_")
     private static void resolvePirateContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolvePirateContract_" + RegexHelper.posRegex();
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             resolvePiratesGeneric(event, game, player, tile, "dd");
@@ -392,6 +462,14 @@ public class TeHelperActionCards {
     @ButtonHandler("resolvePirateFleet_")
     private static void resolvePirateFleet(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolvePirateFleet_" + RegexHelper.posRegex();
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             resolvePiratesGeneric(event, game, player, tile, "cv, ca, dd, 2 ff");
@@ -421,7 +499,7 @@ public class TeHelperActionCards {
             }
         }
         for (Player p : game.getRealPlayers()) {
-            if (p.getBreakthroughID() != null && !player.isBreakthroughUnlocked()) {
+            if (p.getBreakthroughID() != null && !p.isBreakthroughUnlocked()) {
                 String id = "resolveBrillianceUnlock_" + p.getFaction();
                 String label = "Unlock " + p.getBreakthroughModel().getName();
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));

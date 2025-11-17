@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.model.WormholeModel.Wormhole;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 
 @Data
@@ -22,6 +23,10 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     private Boolean isAnomaly;
     private Boolean isRift;
     private Boolean isNebula;
+    private Boolean isAsteroids;
+    private Boolean isNova;
+    private Boolean isScar;
+    private Boolean isEmpty;
     private Boolean isFullPlanetToken;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
@@ -38,7 +43,7 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return getId();
+        return id;
     }
 
     public UnitHolderType getUnitHolderType() {
@@ -69,15 +74,31 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
     }
 
     public boolean isRift() {
-        return getIsRift() != null && getIsRift();
+        return isRift != null && isRift;
     }
 
     public boolean isNebula() {
-        return getIsNebula() != null && getIsNebula();
+        return isNebula != null && isNebula;
+    }
+
+    public boolean isNova() {
+        return isNova != null && isNova;
+    }
+
+    public boolean isAsteroids() {
+        return isAsteroids != null && isAsteroids;
+    }
+
+    public boolean isScar() {
+        return isScar != null && isScar;
+    }
+
+    public boolean isEmpty() {
+        return isEmpty != null && isEmpty;
     }
 
     public boolean isAnomaly() {
-        return (getIsAnomaly() != null && getIsAnomaly()) || isRift() || isNebula();
+        return (isAnomaly != null && isAnomaly) || isRift() || isNebula() || isNova() || isAsteroids() || isScar();
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -91,28 +112,30 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
         eb.setTitle(getID());
 
         StringBuilder sb = new StringBuilder();
-        // if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
-        // if (isSupernova()) sb.append(MiscEmojis.Supernova);
+        if (isEmpty()) sb.append(ExploreEmojis.Frontier);
+        if (isNova()) sb.append(MiscEmojis.Supernova);
         if (isNebula()) sb.append(MiscEmojis.Nebula);
         if (isRift()) sb.append(MiscEmojis.GravityRift);
-        if (getIsFullPlanetToken()) sb.append("\nPlanet: ").append(getTokenPlanetName());
+        if (isAsteroids()) sb.append(MiscEmojis.Asteroids);
+        if (isScar()) sb.append(MiscEmojis.Anomaly);
+        if (isFullPlanetToken) sb.append("\nPlanet: ").append(tokenPlanetName);
         eb.setDescription(sb.toString());
 
         // Image
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/"
-                + getImagePath() + "?raw=true");
+                + imagePath + "?raw=true");
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliasList());
         return eb.build();
     }
 
     public boolean search(String searchString) {
-        return getId().toLowerCase().contains(searchString)
+        return id.toLowerCase().contains(searchString)
                 || (getAliasList() != null
                         && getAliasList().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
     }
 
     public String getAutoCompleteName() {
-        return getId();
+        return id;
     }
 }

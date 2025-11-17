@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -151,7 +150,7 @@ public class PlayerStatsService {
         for (Player playerStats : players.values()) {
             if (playerStats.getSCs().contains(scNumber)) {
                 MessageHelper.sendMessageToChannel(
-                        (MessageChannel) event.getChannel(), Helper.getSCName(scNumber, game) + " is already picked.");
+                        (MessageChannel) event.getChannel(), game.getSCName(scNumber) + " is already picked.");
                 return false;
             }
             if (scNumber == 9 && !RiftSetModeService.canPickSacrifice(player, game)) {
@@ -161,8 +160,8 @@ public class PlayerStatsService {
 
         player.addSC(scNumber);
         if (game.isFowMode()) {
-            String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked "
-                    + Helper.getSCName(scNumber, game);
+            String messageToSend =
+                    ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber);
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
         }
 
@@ -179,19 +178,21 @@ public class PlayerStatsService {
         }
 
         Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
-        String msg = player.getRepresentationUnfogged() + " picked " + Helper.getSCRepresentation(game, scNumber) + ".";
+        String msg = player.getRepresentationUnfogged() + " picked " + scModel.getEmojiWordRepresentation();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
+            if (player.hasTech("tf-futurepath")) {
+                tgCount *= 3;
+            }
             tg += tgCount;
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                            + " from picking " + Helper.getSCName(scNumber, game) + ".");
+                            + " from picking " + game.getSCName(scNumber) + ".");
             if (game.isFowMode()) {
-                String messageToSend =
-                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
-                                + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game) + ".";
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
+                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + game.getSCName(scNumber) + ".";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

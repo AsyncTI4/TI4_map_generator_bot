@@ -293,7 +293,7 @@
         "types": [
             "PROPULSION"
         ],
-        "text": "After another player moves ships into a system that contains 1 or more of your ships: You may place 1 token from your strategy pool in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
+        "text": "After another player moves ships into a system that contains 1 or more of your ships: You may place 1 token from your reinforcements in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
         "source": "twilights_fall",
         "faction": "naalu"
     },
@@ -553,7 +553,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After any player's genome becomes exhausted: You may spend 3 influence to ready that genome; if you ready another player's genome you may perform a transaction with that player. ",
+        "text": "After any player's genome becomes exhausted: You may spend 1 command token from any pool to ready that genome; if you ready another player's genome you may perform a transaction with that player. [Note: Cost changed from 3 influence to 1 CC, to combat infinite loops and with Dane's assent.)",
         "source": "twilights_fall",
         "faction": "nomad"
     },

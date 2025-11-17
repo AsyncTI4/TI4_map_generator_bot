@@ -35,7 +35,6 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
-import ti4.service.PlanetService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
@@ -45,6 +44,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -297,7 +297,7 @@ public class ButtonHelperAgents {
             if (ownedUnit != null && ownedUnit.getCost() <= removedUnit.getCost() + 2) {
                 String buttonID = finChecker + "arboAgentPutShip_" + ownedUnit.getBaseType() + "_" + tile.getPosition();
                 String buttonText = "Place " + ownedUnit.getName();
-                buttons.add(Buttons.red(buttonID, buttonText, ownedUnit.getUnitEmoji()));
+                buttons.add(Buttons.green(buttonID, buttonText, ownedUnit.getUnitEmoji()));
             }
         }
 
@@ -966,8 +966,8 @@ public class ButtonHelperAgents {
                             + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("solagent", p2.getFaction());
         }
-        if ("valientagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valient genome.";
+        if ("valiantagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valiant genome.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1003,7 +1003,8 @@ public class ButtonHelperAgents {
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getPlanets()) {
                 if (game.getUnitHolderFromPlanet(planet) != null
-                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)) {
+                        && !game.getUnitHolderFromPlanet(planet).isHomePlanet(game)
+                        && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
                     buttons.add(Buttons.gray(
                             player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));
@@ -1517,10 +1518,10 @@ public class ButtonHelperAgents {
                 if (game.isTwilightsFallMode()) {
                     buttons2.add(Buttons.green(
                             p2.getFinsFactionCheckerPrefix() + "useTCS_" + agent + "_" + player.getFaction(),
-                            "Spend 3 influence to Ready " + agent));
+                            "Spend A Command Token to Ready " + agent));
                     buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
-                    msg = p2.getRepresentationUnfogged()
-                            + " you have the opportunity to spend 3 influence via _ Temporal Command Suite_ to ready "
+                    msg = p2.getRepresentationNoPing()
+                            + " you have the opportunity to spend a command token via _ Temporal Command Suite_ to ready "
                             + agent
                             + " and potentially resolve a transaction.";
                 } else {
@@ -1528,11 +1529,11 @@ public class ButtonHelperAgents {
                             p2.getFinsFactionCheckerPrefix() + "exhaustTCS_" + agent + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + agent));
                     buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
-                    msg = p2.getRepresentationUnfogged()
+                    msg = p2.getRepresentationNoPing()
                             + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready " + agent
                             + " and potentially resolve a transaction.";
                 }
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons2);
             }
         }
     }
@@ -1811,6 +1812,9 @@ public class ButtonHelperAgents {
                 continue;
             }
             UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (uh == null) {
+                continue;
+            }
             for (String token : uh.getTokenList()) {
                 if (!token.contains("attachment")) {
                     continue;
@@ -2795,6 +2799,7 @@ public class ButtonHelperAgents {
                         + "Doctor Sucaban, the Jol-Nar"
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + unitHName);
+        ButtonHelper.resolveInfantryRemoval(player, 1);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);
         }

@@ -28,6 +28,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.SowingReapingService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -160,6 +161,29 @@ public class StatusHelper {
                             player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
                                     + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
                 }
+            }
+            if (player.hasTech("tf-geneticresearch")) {
+                int maxNum = 0;
+                for (TechnologyType type : TechnologyType.mainFour) {
+                    maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
+                }
+                player.setTg(player.getTg() + maxNum);
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " you gained " + maxNum + " trade good"
+                                + (maxNum == 1 ? "" : "s") + " due to the Genetic Research technology.");
+            }
+            if (player.hasTech("tf-radicaladvancement")) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "radicalAdvancementStart", "Replace a tech"));
+                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + " choose if you want to use Radical Advancement.",
+                        buttons);
             }
             if (player.hasTech("radical")) {
                 List<Button> buttons = new ArrayList<>();
@@ -339,6 +363,7 @@ public class StatusHelper {
             if (Helper.checkEndGame(game, player)) {
                 break;
             }
+            ActionCardHelper.sendPlotCardInfo(game, player);
         }
 
         List<Button> poButtons = getScoreObjectiveButtons(game);
@@ -503,7 +528,7 @@ public class StatusHelper {
 
             Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
             if (obsidian != null
-                    && obsidian.getPlotCardsFactions().get("seethe").contains(p2.getFaction())) {
+                    && obsidian.getPuppetedFactionsForPlot("seethe").contains(p2.getFaction())) {
                 String seetheMsg = obsidian.getRepresentation() + " use the buttons to destroy one of "
                         + p2.getRepresentation() + " infantry using seethe.";
                 List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
@@ -513,11 +538,14 @@ public class StatusHelper {
 
         // Optional abilities
         sendMitosisButtons(game);
+        sendYinCloneButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
         sendNeuralParasiteButtons(game);
         sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
+        SowingReapingService.resolveTheReaping(game);
+
         // Obligatory abilities
         resolveSolFlagship(game);
     }
@@ -565,6 +593,25 @@ public class StatusHelper {
                 arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
     }
 
+    private static void sendYinCloneButtons(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
+                    List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
+                    String msg = player.getRepresentation() + " Use buttons to revive infantry. You have "
+                            + player.getStasisInfantry() + " infantry left to revive.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                } else {
+                    String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
+                    msg += " the bot couldn't find any planets you control in your home system to place them on";
+                    msg += ", so per the rules they now disappear into the ether.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    player.setStasisInfantry(0);
+                }
+            }
+        }
+    }
+
     private static void handleMonumentToTheAges(Game game) {
         if (!game.isMonumentToTheAgesMode()) {
             return;
@@ -594,8 +641,13 @@ public class StatusHelper {
                 }
             }
         }
-        for (Player player : scars.keySet()) {
+        for (Map.Entry<Player, Integer> entry : scars.entrySet()) {
+            Player player = entry.getKey();
             List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
+            if (game.isTwilightsFallMode()) {
+                factionTechs.add("antimatter");
+                factionTechs.add("wavelength");
+            }
             player.getTechs().forEach(factionTechs::remove);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {
@@ -616,7 +668,7 @@ public class StatusHelper {
             if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
                 scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
                         + " available to exhaust (This will be spent first)";
-            for (int i = 0; i < techs && i < scars.get(player); i++) {
+            for (int i = 0; i < techs && i < entry.getValue(); i++) {
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
             }
@@ -681,6 +733,7 @@ public class StatusHelper {
                         && !key.contains("Seed of an")
                         && !key.contains("Mutiny")
                         && !key.contains("Stellar Atomics")
+                        && !key.contains("(Plotted)")
                         && !key.contains("Crown of Emphidia")
                         && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
                     poName = key;

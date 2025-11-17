@@ -48,9 +48,9 @@ import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
-import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -62,6 +62,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
@@ -85,7 +86,7 @@ public class StartPhaseService {
                 ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" ->
                 ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
-            case "ixthian" -> AgendaHelper.rollIxthian(game, false);
+            case "ixthian" -> IxthianArtifactService.rollIxthian(game, false);
             case "gameTitles" -> PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
@@ -95,6 +96,7 @@ public class StartPhaseService {
             case "finFixScrewedRelics" -> game.fixScrewedRelics();
             case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
+            case "offerSetup" -> CreateGameService.presentSetupToPlayers(game);
             case "cptiExplores" -> {
                 game.setCptiExploreMode(true);
                 DeckModel deckModel = Mapper.getDeck("explores_cpti");
@@ -225,6 +227,10 @@ public class StartPhaseService {
             round++;
             game.setRound(round);
         }
+        if (game.getRound() == 1) {
+            Helper.setOrder(game);
+        }
+        game.removeStoredValue("shouldntChangeTurnOrder");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
             BannerGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
@@ -255,6 +261,11 @@ public class StartPhaseService {
                     && game.getStoredValue("Deflection").contains(player2.getFaction())
                     && player2.getActionCards().containsKey("deflection")) {
                 ActionCardHelper.playAC(event, game, player2, "deflection", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("Tartarus") != null
+                    && game.getStoredValue("Tartarus").contains(player2.getFaction())
+                    && player2.getActionCards().containsKey("tf-tartarus")) {
+                ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
             }
             if (player2.hasLeader("zealotshero")
                     && player2.getLeader("zealotshero").get().isActive()
@@ -982,6 +993,9 @@ public class StartPhaseService {
         game.setPhaseOfGame("action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
         for (Player p2 : game.getRealPlayers()) {
+            ButtonHelperActionCards.checkForAssigningExtremeDuress(game, p2);
+            ButtonHelperActionCards.checkForAssigningCrisis(game, p2);
+            ButtonHelperActionCards.checkForAssigningStasis(game, p2);
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
             if (game.getStoredValue("Play Naalu PN") != null
                     && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
@@ -990,7 +1004,7 @@ public class StartPhaseService {
                     PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
             }
-            game.setStoredValue("autoProveEndurance_" + p2.getFaction(), "");
+            game.removeStoredValue("autoProveEndurance_" + p2.getFaction());
         }
 
         if (game.hasAnyPriorityTrackMode()) {

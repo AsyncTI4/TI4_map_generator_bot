@@ -36,6 +36,9 @@ class OtherHeroButtonHandler {
 
     private static void purgeHeroPreamble(
             ButtonInteractionEvent event, Player player, Game game, String heroId, String heroTitle) {
+        if (heroId.contains("redcreuss") && player.hasLeaderUnlocked("crimsonhero")) {
+            heroId = "crimsonhero";
+        }
         Leader playerLeader = player.unsafeGetLeader(heroId);
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
@@ -235,10 +238,26 @@ class OtherHeroButtonHandler {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("purgeBastionHero_")
+    public static void purgeBastionHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
+        StringBuilder p = new StringBuilder("p");
+        while (RandomHelper.isOneInX(12)) {
+            p.append("p");
+        }
+        purgeHeroPreamble(event, player, game, "bastionhero", "Lyra Keen, the Bastion hero");
+        String msg = player.getRepresentationNoPing()
+                + ", please choose the galvanized unit that recently died, with which you wish to resolve _Intelligence Unshackledl_.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                msg,
+                ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("purgeRedCreussHero_")
     public static void purgeRedCreussHero(
             ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
-        purgeHeroPreamble(event, player, game, "redcreusshero", "\"A Tall Stranger\", the Red Creuss hero");
+        purgeHeroPreamble(event, player, game, "redcreusshero", "the Crimson hero");
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         UnitHolder captureUnitHolder = player.getNombox();

@@ -2,14 +2,15 @@ package ti4.commands.map;
 
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyModel;
 
 class RemoveBorderAnomaly extends GameStateSubcommand {
 
@@ -27,23 +28,24 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
                 "Side of the system the anomaly is on",
                 false,
                 true);
+        addOption(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly to remove", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
-        Set<String> tiles;
-        if (Constants.ALL.equals(tilesString)) {
-            tiles = game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
-        } else {
-            tiles = AddBorderAnomaly.resolveTiles(event, game);
-        }
+        BorderAnomalyModel.BorderAnomalyType anomalyType = new BorderAnomalyModel()
+                .getBorderAnomalyTypeFromString(
+                        event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString));
+        Set<String> tiles = Helper.getSetFromCSV(tilesString);
 
+        if (Constants.ALL.equals(tilesString)) {
+            tiles = game.getTileMap().keySet();
+        }
         Set<Integer> directions = AddBorderAnomaly.resolveDirections(event);
 
-        if (Constants.ALL.equals(tilesString) && directions.isEmpty()) {
+        if (Constants.ALL.equals(tilesString) && directions.isEmpty() && anomalyType == null) {
             // No need to loop, just set as empty
             int amountOfBorderAnomalies = game.getBorderAnomalies().size();
             game.setBorderAnomalies(new ArrayList<>());
@@ -58,7 +60,10 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
         int amountRemoved = 0;
         for (String tile : tiles) {
             for (int d : directions) {
-                if (game.hasBorderAnomalyOn(tilesString, d)) {
+                if (game.getBorderAnomalies().stream()
+                        .anyMatch(anom -> anom.getTile().equals(tile)
+                                && anom.getDirection() == d
+                                && (anomalyType == null || anom.getType() == anomalyType))) {
                     game.removeBorderAnomaly(tile, d);
                     amountRemoved++;
                 }

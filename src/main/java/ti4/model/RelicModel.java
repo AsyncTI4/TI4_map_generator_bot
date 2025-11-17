@@ -32,7 +32,13 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getSimpleRepresentation() {
-        return source.emoji() + String.format("_%s_ - %s (%s)", name, text, source);
+        return getSimpleRepresentation(true);
+    }
+
+    public String getSimpleRepresentation(boolean includeCardText) {
+        if (includeCardText)
+            return getSource().emoji() + String.format("_%s_ - %s (%s)", getName(), getText(), getSource());
+        return getSource().emoji() + String.format("_%s_", getName());
     }
 
     /**

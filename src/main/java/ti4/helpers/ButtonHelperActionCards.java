@@ -338,6 +338,9 @@ public class ButtonHelperActionCards {
     @ButtonHandler("checkForAllACAssignments")
     public static void checkForAllAssignmentACs(Game game, Player player) {
         checkForAssigningCoup(game, player);
+        checkForAssigningExtremeDuress(game, player);
+        checkForAssigningStasis(game, player);
+        checkForAssigningCrisis(game, player);
         checkForAssigningPublicDisgrace(game, player);
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
@@ -557,7 +560,7 @@ public class ButtonHelperActionCards {
                 + ", which hits on a " + numHit + ", to have been _Courageous To The End_.";
         if (game.isTwilightsFallMode()) {
             msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
-                    + ", which hits on a " + numHit + ", to have been the target of the Valient Genome.";
+                    + ", which hits on a " + numHit + ", to have been the target of the Valiant Genome.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         String result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
@@ -756,9 +759,9 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
-        String message =
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to resolve _Parley_ on."
-                        + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
+        String message = player.getRepresentationUnfogged()
+                + ", please choose the planet you wish to resolve remove enemy landed ground forces from."
+                + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(
@@ -792,6 +795,12 @@ public class ButtonHelperActionCards {
                     spaceUnitHolder.addUnitsWithStates(key, removed);
                 }
             }
+        }
+        if (game.isTwilightsFallMode()) {
+            List<Button> buttons = ButtonHelperModifyUnits.getOpposingUnitsToHit(player, game, tile, true);
+            String msg = player.getRepresentation()
+                    + " choose the opposing unit (which attempted to land) that you wish to destroy.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -923,7 +932,7 @@ public class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
+            if (p2 == player && !game.isTwilightsFallMode()) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -1607,7 +1616,7 @@ public class ButtonHelperActionCards {
                     && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                 continue;
             }
-            if (planet.equalsIgnoreCase("triad")
+            if ("triad".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;
@@ -1686,14 +1695,14 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(game, pos, player, false)) {
             Tile tile = game.getTileByPosition(tilePos);
-            if (!tile.isHomeSystem(game)) {
+            if (!tile.isHomeSystem(game) || game.isTwilightsFallMode()) {
                 buttons.add(Buttons.gray(
                         "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
             }
         }
         Tile tile = game.getTileByPosition(pos);
-        if (!tile.isHomeSystem(game)) {
+        if (!tile.isHomeSystem(game) || game.isTwilightsFallMode()) {
             buttons.add(Buttons.gray(
                     "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
@@ -1740,7 +1749,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+            if (uH != null && uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 if (!game.getTileFromPlanet(planet).isHomeSystem(game)) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
@@ -1916,6 +1925,75 @@ public class ButtonHelperActionCards {
         }
     }
 
+    public static void checkForAssigningExtremeDuress(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("extremeduress")) {
+            game.setStoredValue("ExtremeDuress", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player you wish to experience extreme duress."
+                    + " _Extreme Duress_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (!p2.hasUnplayedSCs()) {
+                    continue;
+                }
+                String label = "Expreme Duress " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_ExtremeDuress_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningCrisis(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("crisis")) {
+            game.setStoredValue("Crisis Target", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with crisis."
+                    + " _Crisis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayers()) {
+                String label = "Crisis On " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_Crisis Target_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningStasis(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("tf-stasis")) {
+            game.setStoredValue("Stasis Target", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with statis."
+                    + " _stasis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                String label = "Statis On " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_Statis Target_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
     public static void checkForPlayingSummit(Game game, Player player) {
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
@@ -1993,6 +2071,16 @@ public class ButtonHelperActionCards {
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("resolvePreassignment_Deflection", "Pre-Play Deflection"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+        if (player.getActionCards().containsKey("tf-tartarus")) {
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-play _Tartarus_."
+                    + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_Tartarus", "Pre-Play Deflection"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
@@ -2677,6 +2765,27 @@ public class ButtonHelperActionCards {
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
                 ActionCardHelper.sendActionCardInfo(game, player);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveTwin_")
+    public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String acName = buttonID.replace("resolveTwin_", "");
+        List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        for (String acStringID : acStrings) {
+            ActionCardModel actionCard = Mapper.getActionCard(acStringID);
+            String actionCardTitle = actionCard.getName();
+            if (acName.equalsIgnoreCase(actionCardTitle)) {
+                boolean picked = game.pickActionCard(
+                        player.getUserID(), game.getDiscardActionCards().get(acStringID));
+                if (!picked) {
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(), "No such action card ID found, please retry.");
+                    return;
+                }
+                ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
             }
         }
         ButtonHelper.deleteMessage(event);

@@ -17,6 +17,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperHeroes;
+import ti4.helpers.ButtonHelperRelics;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
@@ -40,12 +41,17 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.LeaderModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
-import ti4.service.PlanetService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.planet.PlanetService;
+import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -124,20 +130,60 @@ public class PlayHeroService {
             case "kollecchero" ->
                 RelicHelper.drawWithAdvantage(
                         player, game, game.getRealPlayers().size());
-            case "xxchahero-te" -> {
-                ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            case "xxchahero-te" -> ButtonHelperHeroes.xxchaHeroTEStart(game, player);
+            case "ralnelhero" -> {
+                // You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and
+                // purge this card
+                player.setPassed(false);
+                String prefix = player.getFinsFactionCheckerPrefix();
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(prefix + "gain_CC", "Gain 2 CCs"));
+                buttons.add(Buttons.green(prefix + "drawActionCards_1", "Draw 1 AC"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), "Use buttons to gain 2 CCs then draw 1 action card:", buttons);
+            }
+            case "obsidianhero" -> {
+                player.clearExhaustedPlanets(false);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + ", all of your planets have been readied.");
+            }
+            case "firmamenthero" -> {
+                ActionCardHelper.sendPlotCardInfo(game, player);
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + ", select a plot from cards info to put into play.");
+            }
+            case "deepwroughthero" -> {
+                List<Button> buttons = new ArrayList<>();
+                for (TechnologyType type : TechnologyType.mainFive) {
+                    List<TechnologyModel> techs =
+                            ListTechService.getAllTechOfAType(game, type.toString(), player, false, false, true);
+                    for (TechnologyModel tech : techs) {
+                        if (tech.isUnitUpgrade() || tech.getFaction().isPresent()) {
+                            continue;
+                        }
+                        buttons.add(Buttons.gray(
+                                "dwsHeroPurge_" + tech.getAlias(), tech.getName(), tech.getSingleTechEmoji()));
+                    }
+                }
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getRepresentationUnfogged() + ", select a tech you would like to purge.",
+                        buttons);
             }
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
-                if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
+                if (!game.isTwilightsFallMode()
+                        && game.getTileFromPlanet("elysium") != null
+                        && game.getTileFromPlanet("elysium") == t) {
                     t.addToken("attachment_titanshero.png", "elysium");
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(), "Elysium has had Ul The Progenitor attached, and been readied.");
                     PlanetService.refreshPlanet(player, "elysium");
                 } else {
-                    MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(),
-                            "Use the following command to add the attachment: `/add_token token:titanshero`");
+                    ButtonHelperRelics.offerTitansHeroButtons(player, game, event);
                 }
             }
             case "onyxxahero" -> {
@@ -438,9 +484,17 @@ public class PlayHeroService {
                                 + ", please choose which planet you wish to get a technology and trade goods from (and kill any enemy units).",
                         buttons);
             }
-            case "lawshero" -> {
-                ButtonHelperTwilightsFallActionCards.resolveLawsHero(game, player);
+            case "witchinghero" -> {
+                String assignSpeakerMessage = player.getRepresentation()
+                        + ", please choose a faction below to receive the Speaker token."
+                        + MiscEmojis.SpeakerToken;
+
+                List<Button> assignSpeakerActionRow =
+                        PlayStrategyCardService.getPoliticsAssignSpeakerButtons(game, player);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
             }
+            case "lawshero" -> ButtonHelperTwilightsFallActionCards.resolveLawsHero(game, player);
             case "devourhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -452,7 +506,7 @@ public class PlayHeroService {
             case "voicehero" -> {
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
                 }
                 List<Button> buttons = new ArrayList<>();
                 List<MessageEmbed> embeds = new ArrayList<>();
@@ -479,9 +533,7 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText) + ", please use the buttons to resolve.",
                         buttons);
             }
-            case "poisonhero" -> {
-                ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
-            }
+            case "poisonhero" -> ButtonHelperTwilightsFallActionCards.resolvePoison(game, player);
             case "eternityhero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("searchSpliceDeck_ability", "Search For Ability"));
@@ -596,7 +648,7 @@ public class PlayHeroService {
             }
             case "yssarilhero" -> {
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player || p2.getAc() == 0) {
+                    if (p2 == player || p2.getAcCount() == 0) {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(getYssarilHeroActionCardButtons(player, p2));

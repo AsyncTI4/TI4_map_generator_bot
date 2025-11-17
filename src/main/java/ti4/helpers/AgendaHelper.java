@@ -13,14 +13,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -36,7 +32,6 @@ import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.cron.AutoPingCron;
-import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.BannerGenerator;
@@ -59,7 +54,6 @@ import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.async.DrumrollService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -77,27 +71,8 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
-import ti4.spring.jda.JdaService;
 
 public class AgendaHelper {
-
-    @Nullable
-    public static String watchPartyPing(Game game) {
-        List<Role> roles = JdaService.guildPrimary.getRolesByName("Ixthian Watch Party", true);
-        if (!game.isFowMode() && !roles.isEmpty()) {
-            return roles.getFirst().getAsMention();
-        }
-        return null;
-    }
-
-    @Nullable
-    public static TextChannel watchPartyChannel(Game game) {
-        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName("ixthian-watch-party", true);
-        if (!game.isFowMode() && !channels.isEmpty()) {
-            return channels.getFirst();
-        }
-        return null;
-    }
 
     public static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
@@ -260,6 +235,16 @@ public class AgendaHelper {
                 names.add(actionCard.getName());
             }
         }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("When an agenda is revealed")) {
+                    names.add(actionCard.getName());
+                }
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
                 names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
@@ -383,6 +368,17 @@ public class AgendaHelper {
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 names.add(actionCard.getName());
+            }
+        }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("After an agenda is revealed")
+                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
+                    names.add(actionCard.getName());
+                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
@@ -917,7 +913,14 @@ public class AgendaHelper {
 
     private static boolean playerDoesNotHaveShenanigans(Player player) {
         Set<String> shenanigans = Set.of("deadly_plot", "bribery", "confounding", "confusing");
-        return player.getActionCards().keySet().stream().noneMatch(shenanigans::contains);
+        if (player.getActionCards().keySet().stream().anyMatch(shenanigans::contains)) {
+            return false;
+        }
+        if (player.hasPlanet("garbozia")) {
+            return ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet().stream()
+                    .noneMatch(shenanigans::contains);
+        }
+        return true;
     }
 
     public static void offerEveryonePreAbstain(Game game) {
@@ -1001,68 +1004,6 @@ public class AgendaHelper {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-    }
-
-    public static void rollIxthian(Game game, boolean publish) {
-        String activeGamePing = game.getPing();
-        TextChannel watchParty = watchPartyChannel(game);
-        String watchPartyPing = watchPartyPing(game);
-        List<MessageChannel> watchPartyList = publish && watchParty != null ? List.of(watchParty) : null;
-        List<String> altMessages = watchPartyPing == null ? null : List.of(watchPartyPing);
-
-        int rand = 6 + ThreadLocalRandom.current().nextInt(6);
-        if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
-            rand += 8 + ThreadLocalRandom.current().nextInt(14);
-        }
-        Predicate<Game> resolve = futureGame -> {
-            resolveIxthianRoll(futureGame, publish && watchParty != null);
-            return false;
-        };
-        DrumrollService.doDrumrollMultiChannel(
-                game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, altMessages);
-    }
-
-    private static void resolveIxthianRoll(Game game, boolean publish) {
-        TextChannel watchParty = watchPartyChannel(game);
-        String watchPartyPing = watchPartyPing(game);
-
-        Die d1 = new Die(6);
-        if (game.getAgendaDeckID().toLowerCase().contains("absol")) {
-            d1 = new Die(7);
-        }
-        String msg = "# Rolled a " + d1.getResult() + " for Ixthian Artifact!";
-        if (d1.isSuccess()) {
-            msg += TechEmojis.Propulsion3 + " " + TechEmojis.Biotic3 + " " + TechEmojis.Cybernetic3 + " "
-                    + TechEmojis.Warfare3;
-        } else {
-            msg += "💥 💥 💥 💥";
-        }
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-        if (watchParty != null && publish) {
-            String watchMsg = watchPartyPing + " " + game.getName() + " has finished rolling:\n" + msg;
-            MessageHelper.sendMessageToChannel(watchParty, watchMsg);
-        }
-        if (d1.isSuccess() && !game.isFowMode()) {
-            if (Helper.getPlayerFromAbility(game, "propagation") != null) {
-                Player player = Helper.getPlayerFromAbility(game, "propagation");
-                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation()
-                        + ", you would research a technology, but because of **Propagation**, you instead gain 6 command tokens."
-                        + " Your current command tokens are " + player.getCCRepresentation()
-                        + ". Use buttons to gain command tokens.";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
-                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-            }
-            MessageHelper.sendMessageToChannelWithButton(
-                    game.getMainGameChannel(),
-                    "You may use the button to get your two technologies.",
-                    Buttons.GET_A_TECH);
-        } else if (!d1.isSuccess() && !game.isFowMode()) {
-            Tile tile = game.getMecatolTile();
-            ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Please destroy units in or adjacent to the Mecatol Rex system.");
-        }
     }
 
     private static void pingAboutDebt(Game game) {
@@ -1342,7 +1283,9 @@ public class AgendaHelper {
                 }
                 if ((game.getLaws() == null
                                 || (!game.getLaws().containsKey("rep_govt")
-                                        && !game.getLaws().containsKey("absol_government")))
+                                                && !game.getLaws().containsKey("absol_government")
+                                        || !game.getStoredValue("executiveOrder")
+                                                .isEmpty()))
                         && (player.ownsPromissoryNote("blood_pact")
                                 || player.getPromissoryNotesInPlayArea().contains("blood_pact"))) {
                     for (Player p2 : getWinningVoters(winner, game)) {
@@ -2079,15 +2022,16 @@ public class AgendaHelper {
                 String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 Player keleres = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                 if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
-                    int size = getLosingVoters(outcome, game).size();
+                    int size = getLosingVoters(outcome, game).size()
+                            + getAbainingVoters(winner, game).size();
                     String message = keleres.getRepresentation()
                             + " You have Odlynn Myrr, the Keleres (Xxcha) Hero, to resolve. There were " + size
-                            + " players who voted for a different outcome, so you get that many trade goods and command tokens. ";
+                            + " players who abstained or voted for a different outcome, so you get that many trade goods and command tokens. ";
                     MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), message);
                     if (size > 0) {
                         keleres.setTg(keleres.getTg() + size);
-                        String msg2 = "Gained 3 trade goods (" + (keleres.getTg() - size) + " -> **" + keleres.getTg()
-                                + "**).";
+                        String msg2 = "Gained " + size + " trade goods (" + (keleres.getTg() - size) + " -> **"
+                                + keleres.getTg() + "**).";
                         ButtonHelperAbilities.pillageCheck(keleres, game);
                         ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);
@@ -2490,6 +2434,20 @@ public class AgendaHelper {
         return losers;
     }
 
+    public static List<Player> getAbainingVoters(String winner, Game game) {
+        List<Player> abstainers = new ArrayList<>();
+        List<Player> losers = getLosingVoters(winner, game);
+        List<Player> winners = getWinningVoters(winner, game);
+        for (Player player : game.getRealPlayers()) {
+            int[] voteInfo = getVoteTotal(player, game);
+            if (!losers.contains(player) && !winners.contains(player) && voteInfo[0] > 0) {
+                abstainers.add(player);
+            }
+        }
+
+        return abstainers;
+    }
+
     public static void atokeraCommanderUnlockCheck(Game game) {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         Player highestVoter = null;
@@ -2573,7 +2531,9 @@ public class AgendaHelper {
             voteCount = 0;
         }
 
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
+        if (game.getLaws() != null
+                && (game.getLaws().containsKey("rep_govt"))
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             voteCount = 1;
         }
 
@@ -3278,7 +3238,7 @@ public class AgendaHelper {
                         String emoji = FactionEmojis.getFactionIcon(outcome.toLowerCase())
                                 .toString();
                         Player outcomerP = game.getPlayerFromColorOrFaction(outcome.toLowerCase());
-                        if (outcomerP != null && outcomerP.getFactionEmoji() != null) {
+                        if (outcomerP != null) {
                             emoji = outcomerP.getFactionEmoji();
                         }
 
@@ -3396,7 +3356,8 @@ public class AgendaHelper {
             }
             sb.append("  ").append(additionalVotesText);
         } else sb.append("**");
-        if (game.getLaws().containsKey("rep_govt")) {
+        if (game.getLaws().containsKey("rep_govt")
+                && game.getStoredValue("executiveOrder").isEmpty()) {
             sb = new StringBuilder();
             sb.append(" vote count (_Representative Government_): **1**");
         }
@@ -3463,7 +3424,12 @@ public class AgendaHelper {
 
         boolean executive = player.getFaction().equalsIgnoreCase(game.getStoredValue("executiveOrder"));
         if (player.hasUnlockedBreakthrough("xxchabt") || executive) {
-            voteCount = Math.max(baseResourceCount, baseInfluenceCount);
+            int baseMixedCount = planets.stream()
+                    .map(planetsInfo::get)
+                    .filter(Objects::nonNull)
+                    .mapToInt(Planet::getHigherofInfluenceOrResource)
+                    .sum();
+            voteCount = baseMixedCount;
         }
 
         if (executive) {
@@ -3682,7 +3648,9 @@ public class AgendaHelper {
 
     @ButtonHandler("outcome_")
     public static void outcome(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
+        if (game.getLaws() != null
+                && (game.getLaws().containsKey("rep_govt")
+                        && game.getStoredValue("executiveOrder").isEmpty())) {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
             String outcome = buttonID.substring(buttonID.indexOf('_') + 1);

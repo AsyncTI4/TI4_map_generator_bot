@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -343,9 +344,11 @@ public class CombatModHelper {
                         && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
                     meetsCondition = true;
                 }
-                if (onTile.getPlanets().stream()
-                        .anyMatch(planetId -> StringUtils.isNotBlank(
-                                Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
+                if (onTile != null
+                        && onTile.getPlanets() != null
+                        && onTile.getPlanets().stream()
+                                .anyMatch(planetId -> StringUtils.isNotBlank(
+                                        Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
                 if (onTile.getPlanets().contains(Constants.MR)) {
@@ -365,6 +368,8 @@ public class CombatModHelper {
                 meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile)
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
+            case "fracture_combat" ->
+                meetsCondition = tile != null && tile.getPosition().contains("frac");
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 meetsCondition = false;
                 if (unitsByQuantity.size() == 1) {
@@ -461,6 +466,17 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "galvanized" -> {
+                if (tile != null) {
+                    UnitHolder uh = getCorrectUnitHolder(unitsByQuantity, tile, opponent);
+                    for (UnitKey uk :
+                            uh.getUnitsByStateForPlayer(player.getColorID()).keySet()) {
+                        if (uh.getGalvanizedUnitCount(uk) > 0) {
+                            meetsCondition = true;
+                        }
+                    }
+                }
+            }
             case "opponent_has_sftt" -> {
                 if (player.hasUnlockedBreakthrough("winnubt") && getOpponentSfttCount(opponent) > 0) {
                     meetsCondition = true;
@@ -468,7 +484,7 @@ public class CombatModHelper {
             }
             case "opponent_has_been_asailed" -> {
                 if (player.hasAbility("marionettes")
-                        && player.getPlotCardsFactions().get("assail").contains(opponent.getFaction())) {
+                        && player.getPuppetedFactionsForPlot("assail").contains(opponent.getFaction())) {
                     meetsCondition = true;
                 }
             }
@@ -544,6 +560,22 @@ public class CombatModHelper {
             default -> meetsCondition = true;
         }
         return meetsCondition;
+    }
+
+    public static UnitHolder getCorrectUnitHolder(Map<UnitModel, Integer> units, Tile t, Player p) {
+        record UhScore(UnitHolder uh, int score) {}
+        return t.getUnitHolders().values().stream()
+                .map(uh -> {
+                    int score = 0;
+                    for (Entry<UnitModel, Integer> e : units.entrySet()) {
+                        UnitKey uk = Units.getUnitKey(e.getKey().getUnitType(), p.getColorID());
+                        if (uh.getUnitCount(uk) == e.getValue()) score++;
+                    }
+                    return new UhScore(uh, score);
+                })
+                .max(Comparator.comparingInt(UhScore::score))
+                .map(UhScore::uh)
+                .orElse(t.getSpaceUnitHolder());
     }
 
     private static Integer getVariableModValue(
@@ -686,10 +718,11 @@ public class CombatModHelper {
                     scalingCount += count;
                     scalingCount = Math.min(scalingCount, 2);
                 }
-                case "opponent_sftt" -> getOpponentSfttCount(opponent);
-                case "nonhome_system_with_planet" -> getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" -> getGalvanizedUnitCount(game, activeSystem, origUnit, player);
-                case "unique_ships" -> getUniqueNonFighterShipCount(game, activeSystem, player);
+                case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
+                case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
+                case "galvanized_unit_count" ->
+                    scalingCount = getGalvanizedUnitCount(game, activeSystem, origUnit, player);
+                case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
@@ -732,7 +765,7 @@ public class CombatModHelper {
     public static int getOpponentSfttCount(Player player) {
         return (int) player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
-                .filter(pn -> pn.getName().equals("Support for the Throne"))
+                .filter(pn -> "Support for the Throne".equals(pn.getName()))
                 .count();
     }
 

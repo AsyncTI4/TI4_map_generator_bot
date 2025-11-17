@@ -28,6 +28,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.emoji.CardEmojis;
@@ -137,7 +138,7 @@ public class StartTurnService {
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
-        Helper.startOfTurnSaboWindowReminders(game, player);
+        SabotageService.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = game.isFowMode();
 
         if (game.isShowBanners()) {
@@ -196,10 +197,13 @@ public class StartTurnService {
             }
         }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
+        if ((game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
+                        || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander"))
+                && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!p2.equals(player)
-                        && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                        && (game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
+                                || game.playerHasLeaderUnlockedOrAlliance(p2, "crimsoncommander"))
                         && p2.getCommodities() > 0
                         && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
@@ -216,6 +220,53 @@ public class StartTurnService {
                                     + "\n-# \"Partial Wash\" will only swap commodities for an equal number of commodities. \"Full Wash\" will also swap trade goods, to wash as many commodities as possible."
                                     + " If both player have the same number of commodities, the buttons are identical.",
                             buttonsRedCreuss);
+                }
+            }
+        }
+        if (game.getStoredValue("ExtremeDuress").equalsIgnoreCase(player.getColor()) && player.hasUnplayedSCs()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("extremeduress")) {
+                    game.removeStoredValue("ExtremeDuress");
+                    ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "concedeToED_" + p2.getFaction(),
+                            "Lose ACs, TGs, Show Secrets"));
+                    buttons2.add(Buttons.green("deleteButtons", "Give in and Play SC (or sabo Extreme Duress)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
+        if (game.getStoredValue("Crisis Target").equalsIgnoreCase(player.getColor())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("crisis")) {
+                    game.removeStoredValue("Crisis Target");
+                    ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End turn"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
+        if (game.getStoredValue("Stasis Target").equalsIgnoreCase(player.getColor())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("tf-stasis")) {
+                    game.removeStoredValue("Stasis Target");
+                    ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(ButtonHelper.getEndTurnButton(game, player));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
                 }
             }
         }
@@ -237,7 +288,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf")) {
+        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf") && !player.hasUnit("tf-yinclone")) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
@@ -251,6 +302,7 @@ public class StartTurnService {
                 player.setStasisInfantry(0);
             }
         }
+
         if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
             String msg1 = player.getRepresentation() + "The Starlit path points you towards a "
                     + game.getStoredValue("pathOf" + player.getFaction()) + ".";
@@ -274,6 +326,14 @@ public class StartTurnService {
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
+            if (game.getStrategyCardModelByInitiative(sc)
+                    .map(strat -> strat.getAlias().equals("te6warfare"))
+                    .orElse(false)) {
+                if (game.isWarfareAction() && !game.isComponentAction()) {
+                    // skip warning for warfare if we are presently resolving warfare
+                    continue;
+                }
+            }
             if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1);
@@ -286,7 +346,7 @@ public class StartTurnService {
                 }
             }
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(Helper.getSCRepresentation(game, sc));
+                sb.append("> ").append(game.getSCEmojiWordRepresentation(sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                     sb.append(" ").append(game.getStoredValue("scPlay" + sc));
                 }
@@ -402,6 +462,21 @@ public class StartTurnService {
         }
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (game.getStoredValue("ralnelHero") != null) {}
+
+                String presetRalnelHero =
+                        "You have the ralnel hero unlocked! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
+                presetRalnelHero +=
+                        "to automatically use your hero when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                List<Button> ralnelHeroButtons = new ArrayList<>();
+                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset RalNel Hero"));
+                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+            }
+
             startButtons.add(ButtonHelper.getPassButton(game, player));
             if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
@@ -439,7 +514,7 @@ public class StartTurnService {
                 String label = (player == nomad ? "Use" : "Use/Request") + " Thunder's Paradox";
                 startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
             }
-            if (player.hasTech("parasite-obs")) {
+            if (player.hasTech("parasite-obs") || player.hasTech("tf-neuralparasite")) {
                 startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
             }
 
@@ -468,6 +543,12 @@ public class StartTurnService {
                             .isEmpty()) {
                 startButtons.add(Buttons.gray(
                         finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
+            }
+            if (player.hasUnit("tf-vortexer")
+                    && !ButtonHelperFactionSpecific.getVortexerReleaseButtons(player, game)
+                            .isEmpty()) {
+                startButtons.add(Buttons.gray(
+                        finChecker + "startVortexerRevive", "Release Vortexer Infantry/Fighters", FactionEmojis.Cabal));
             }
             if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(
@@ -528,9 +609,18 @@ public class StartTurnService {
             startButtons.add(Buttons.green(
                     finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
         }
-        if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
+        if (player.hasUnexhaustedLeader("nekroagent") && player.getAcCount() > 0) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+        }
+        if (player.hasUnexhaustedLeader("hyperagent")) {
+            startButtons.add(Buttons.gray(
+                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+        }
+
+        if (game.isVeiledHeartMode()
+                && !game.getStoredValue("veiledCards" + player.getFaction()).isEmpty()) {
+            startButtons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
         }
 
         GameMessageManager.remove(game.getName(), GameMessageType.TURN)

@@ -9,6 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
@@ -108,6 +109,7 @@ public class WebPlayerArea {
     private List<Integer> unfollowedSCs;
     private List<Integer> exhaustedSCs;
     private List<String> promissoryNotesInPlayArea;
+    private List<String> customPromissoryNotes;
 
     // Technologies
     private List<String> techs;
@@ -166,6 +168,8 @@ public class WebPlayerArea {
     // Special token reinforcements
     private Integer sleeperTokensReinf;
     private List<String> ghostWormholesReinf;
+    private Integer breachTokensReinf;
+    private Integer galvanizeTokensReinf;
 
     // Mahact faction-specific: edict "stolen" fleet supply
     private List<String> mahactEdict;
@@ -181,6 +185,9 @@ public class WebPlayerArea {
 
     // Faction abilities
     private List<String> abilities;
+
+    // Decal ID
+    private String decalId;
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -265,6 +272,16 @@ public class WebPlayerArea {
         webPlayerArea.setExhaustedSCs(player.getExhaustedSCs());
         webPlayerArea.setPromissoryNotesInPlayArea(player.getPromissoryNotesInPlayArea());
 
+        // Custom promissory notes (faction-specific only, excluding generic ones)
+        List<String> customPromissoryNotes = new ArrayList<>();
+        for (String pnID : player.getPromissoryNotesOwned()) {
+            var pnModel = Mapper.getPromissoryNote(pnID);
+            if (pnModel != null && pnModel.getFaction().isPresent()) {
+                customPromissoryNotes.add(pnID);
+            }
+        }
+        webPlayerArea.setCustomPromissoryNotes(customPromissoryNotes);
+
         // Technologies
         webPlayerArea.setTechs(player.getTechs());
         webPlayerArea.setExhaustedTechs(player.getExhaustedTechs());
@@ -273,7 +290,17 @@ public class WebPlayerArea {
 
         // Planets
         webPlayerArea.setPlanets(player.getPlanets());
-        webPlayerArea.setExhaustedPlanets(player.getExhaustedPlanets());
+        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
+        // Ensure Custodia Vigilia is in exhausted planets if the player has it
+        // (it's always exhausted when gained via gainCustodiaVigilia())
+        if (player.getPlanets().contains("custodiavigilia") && !exhaustedPlanets.contains("custodiavigilia")) {
+            exhaustedPlanets.add("custodiavigilia");
+        }
+        // Also handle custodiavigiliaplus if it exists
+        if (player.getPlanets().contains("custodiavigiliaplus") && !exhaustedPlanets.contains("custodiavigiliaplus")) {
+            exhaustedPlanets.add("custodiavigiliaplus");
+        }
+        webPlayerArea.setExhaustedPlanets(exhaustedPlanets);
         webPlayerArea.setExhaustedPlanetAbilities(player.getExhaustedPlanetsAbilities());
 
         // Relics and fragments
@@ -316,7 +343,7 @@ public class WebPlayerArea {
 
         // card counts
         webPlayerArea.setSoCount(player.getSo());
-        webPlayerArea.setAcCount(player.getAc());
+        webPlayerArea.setAcCount(player.getAcCount());
         webPlayerArea.setPnCount(player.getPnCount());
 
         // victory points
@@ -327,6 +354,9 @@ public class WebPlayerArea {
 
         // Faction abilities
         webPlayerArea.setAbilities(new ArrayList<>(player.getAbilities()));
+
+        // Decal ID
+        webPlayerArea.setDecalId(player.getDecalSet());
 
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
@@ -347,11 +377,16 @@ public class WebPlayerArea {
         // Plot cards (Firmament/Obsidian)
         List<PlotCardInfo> plotCardsList = new ArrayList<>();
         if (player.hasAbility("bladesorchestra") || player.hasAbility("plotsplots")) {
+            // Only reveal plot names when player has become Obsidian (bladesorchestra ability)
+            // Firmament players (plotsplots only) should not have plot names revealed
+            boolean isObsidian = player.hasAbility("bladesorchestra");
             for (Map.Entry<String, Integer> plotEntry : player.getPlotCards().entrySet()) {
                 String plotAlias = plotEntry.getKey();
                 Integer identifier = plotEntry.getValue();
                 List<String> factions = player.getPlotCardsFactions().getOrDefault(plotAlias, new ArrayList<>());
-                plotCardsList.add(new PlotCardInfo(plotAlias, identifier, factions));
+                // Set plotAlias to null if player hasn't become Obsidian yet
+                String plotAliasToUse = isObsidian ? plotAlias : null;
+                plotCardsList.add(new PlotCardInfo(plotAliasToUse, identifier, factions));
             }
         }
         webPlayerArea.setPlotCards(plotCardsList);
@@ -392,6 +427,32 @@ public class WebPlayerArea {
             webPlayerArea.setGhostWormholesReinf(ghostWormholesInReinf);
         } else {
             webPlayerArea.setGhostWormholesReinf(new ArrayList<>());
+        }
+
+        // Breach tokens (Crimson Rebellion faction only)
+        if (player.hasAbility("incursion")) {
+            int maxBreachTokens = 7;
+            int totalBreaches = (int) game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .flatMap(uh -> uh.getTokenList().stream())
+                    .filter(tok ->
+                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                    .count();
+            webPlayerArea.setBreachTokensReinf(Math.max(0, maxBreachTokens - totalBreaches));
+        } else {
+            webPlayerArea.setBreachTokensReinf(0);
+        }
+
+        // Galvanize tokens (Bastion faction only)
+        if (player.hasAbility("galvanize")) {
+            int maxGalvanizeTokens = 7;
+            int totGalvanized = game.getTileMap().values().stream()
+                    .flatMap(t -> t.getUnitHolders().values().stream())
+                    .mapToInt(UnitHolder::getTotalGalvanizedCount)
+                    .sum();
+            webPlayerArea.setGalvanizeTokensReinf(Math.max(0, maxGalvanizeTokens - totGalvanized));
+        } else {
+            webPlayerArea.setGalvanizeTokensReinf(0);
         }
 
         // get reinforcement count

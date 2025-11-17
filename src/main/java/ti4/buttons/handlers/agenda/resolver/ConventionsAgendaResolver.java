@@ -19,7 +19,7 @@ public class ConventionsAgendaResolver implements AgendaResolver {
         if (!"for".equalsIgnoreCase(winner)) {
             List<Player> winOrLose = AgendaHelper.getWinningVoters(winner, game);
             for (Player playerWL : winOrLose) {
-                ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAc());
+                ActionCardHelper.discardRandomAC(event, game, playerWL, playerWL.getAcCount());
             }
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Discarded the action cards of those who voted \"Against\".");

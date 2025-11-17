@@ -45,7 +45,7 @@ public class FrankenAbilityService {
             if ("puppetsoftheblade".equalsIgnoreCase(abilityID)) {
                 List<GenericCardModel> allPlots =
                         new ArrayList<>(Mapper.getPlots().values());
-                allPlots.stream().forEach(plot -> player.setPlotCard(plot.getAlias()));
+                allPlots.forEach(plot -> player.setPlotCard(plot.getAlias()));
             }
 
             if ("private_fleet".equalsIgnoreCase(abilityID)) {

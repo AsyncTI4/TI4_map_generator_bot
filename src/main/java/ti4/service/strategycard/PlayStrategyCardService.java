@@ -25,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -83,9 +84,7 @@ public class PlayStrategyCardService {
         }
 
         // HANDLE COUP
-        if (!winnuHero
-                && game.getStoredValue("Coup") != null
-                && game.getStoredValue("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && game.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("Coup").contains(p2.getFaction())
                         && p2.getActionCards().containsKey("coup")) {
@@ -114,14 +113,14 @@ public class PlayStrategyCardService {
         game.setStoredValue(
                 "currentActionSummary" + player.getFaction(),
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
-                        + Helper.getSCRepresentation(game, scToPlay) + ".");
+                        + game.getSCEmojiWordRepresentation(scToPlay));
 
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
         ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getSCRepresentation(game, scToPlay)).append(" played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
@@ -164,7 +163,7 @@ public class PlayStrategyCardService {
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (!winnuHero) {
             if (scModel.hasImageFile()) {
-                MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getScImageUrl(scToPlay, game));
+                MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
             } else {
                 baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
             }
@@ -259,6 +258,9 @@ public class PlayStrategyCardService {
         if (scToPlay == 9 && RiftSetModeService.isActive(game)) {
             RiftSetModeService.resolveSacrifice(event, game, player);
         }
+        if (player.hasTech("planesplitter-obs")) {
+            TeHelperTechs.initializePlanesplitterStep1(game, player);
+        }
 
         if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
@@ -295,8 +297,15 @@ public class PlayStrategyCardService {
             }
         }
 
+        if (scModel.usesAutomationForSCID("tf6")) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "## " + game.getPing()
+                            + " Dane has said that if you are using the secondary to produce at home, you do not need to spend the 4 resources.");
+        }
+
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
-        if (obsidian != null && obsidian.getPlotCardsFactions().get("enervate").contains(player.getFaction())) {
+        if (obsidian != null && obsidian.getPuppetedFactionsForPlot("enervate").contains(player.getFaction())) {
             if (!scModel.usesAutomationForSCID("pok1leadership")) {
                 String enervateMsg = obsidian.getRepresentation()
                         + " the puppeted player for Enervate has played a strategy card, so you have been marked as following for free. ";
@@ -309,7 +318,7 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (!scModel.usesAutomationForSCID("pok1leadership")) {
+        if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
@@ -337,7 +346,7 @@ public class PlayStrategyCardService {
                         continue;
                     }
                     empNMahButtons.addFirst(
-                            Buttons.red("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
+                            Buttons.green("mahactA_follow_" + scToPlay, "Use Mahact Agent", FactionEmojis.Mahact));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player3.getCardsInfoThread(),
                             player3.getRepresentationUnfogged() + " You may follow **" + stratCardName + "** with "
@@ -353,13 +362,20 @@ public class PlayStrategyCardService {
         conclusionButtons.add(ButtonHelper.getEndTurnButton(game, player));
         conclusionButtons.add(
                 Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action"));
-        conclusionButtons.add(Buttons.red(
-                player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
-                "End Turn When All Have Reacted"));
-        if (player.hasTech("fl")) {
+
+        if (game.isTwilightsFallMode() && (scToPlay == 2 || scToPlay == 6 || scToPlay == 7)) {
+            conclusionButtons.add(Buttons.blue(
+                    player.getFinsFactionCheckerPrefix() + "endTurnWhenSpliceEnds_" + scToPlay,
+                    "End Turn When Splice Ends"));
+        } else {
             conclusionButtons.add(Buttons.red(
-                    player.getFinsFactionCheckerPrefix() + "fleetLogWhenAllReactedTo_" + scToPlay,
-                    "Use Fleet Logistics When All Have Reacted"));
+                    player.getFinsFactionCheckerPrefix() + "endTurnWhenAllReactedTo_" + scToPlay,
+                    "End Turn When All Have Reacted"));
+            if (player.hasTech("fl")) {
+                conclusionButtons.add(Buttons.red(
+                        player.getFinsFactionCheckerPrefix() + "fleetLogWhenAllReactedTo_" + scToPlay,
+                        "Use Fleet Logistics When All Have Reacted"));
+            }
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
@@ -483,6 +499,7 @@ public class PlayStrategyCardService {
                 } else {
                     if (scToPlay == 6
                             && !p2.hasUnit("ghoti_flagship")
+                            && !game.isTwilightsFallMode()
                             && !CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                             game, p2, Units.UnitType.Spacedock)
                                     .contains(p2.getHomeSystemTile())) {
@@ -569,7 +586,7 @@ public class PlayStrategyCardService {
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
-                    MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                    MessageHelper.sendMessageToChannel(m5, scModel.getImageFileUrl());
                     if (ShouldPrintFollowOrder(game, scModel)) {
                         List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
                         StringBuilder playerOrder =
@@ -624,6 +641,7 @@ public class PlayStrategyCardService {
                                 new StringBuilder("__Not__ neighbors with the **Trade** holder:");
                         boolean anyNeighbours = false;
                         boolean allNeighbours = true;
+                        StringBuilder spaceStation = new StringBuilder();
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
                                 if (player.getNeighbouringPlayers(true).contains(p2)) {
@@ -632,6 +650,9 @@ public class PlayStrategyCardService {
                                 } else {
                                     notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
                                     allNeighbours = false;
+                                }
+                                if (p2.hasSpaceStation()) {
+                                    spaceStation.append(" ").append(p2.getFactionEmoji());
                                 }
                             }
                         }
@@ -643,6 +664,12 @@ public class PlayStrategyCardService {
                                     m5, "The **Trade** player is neighbors with __no__ other players.");
                         } else {
                             MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                        }
+                        if (player.hasSpaceStation() && !allNeighbours) {
+                            MessageHelper.sendMessageToChannel(
+                                    m5,
+                                    "The **Trade** player has a space station and can transact with players who also have a space station ("
+                                            + spaceStation + ")");
                         }
                     }
                 }
@@ -831,9 +858,10 @@ public class PlayStrategyCardService {
         Button refreshButton = Buttons.green(
                 player.getFinsFactionCheckerPrefix() + "primaryOfAnarchy7", "Resolve PRODUCTION in a system");
         Button participate = Buttons.blue("participateInSplice_6", "Participate In Splice");
+        Button homeBuild = Buttons.green("warfareTeBuild", "Build At Home");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
-        return List.of(start, refreshButton, participate, noFollowButton);
+        return List.of(start, refreshButton, homeBuild, participate, noFollowButton);
     }
 
     private static List<Button> getTF7Buttons(int sc, Player player) {
@@ -898,7 +926,7 @@ public class PlayStrategyCardService {
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
-    private static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
+    public static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             if (!player.isSpeaker()) {

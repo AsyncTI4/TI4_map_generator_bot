@@ -18,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -271,6 +272,9 @@ public class TacticalActionOutputService {
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
+        if (game.isTwilightsFallMode()) {
+            tileHasWormhole = FoWHelper.doesTileHaveWHs(game, tile.getPosition());
+        }
         Tile activeSystem = getActiveSystem(game);
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
@@ -299,6 +303,9 @@ public class TacticalActionOutputService {
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }
+        if (player.hasUnit("tf-echoofascension") && model.getUnitType() == UnitType.Flagship) {
+            bonusMoveValue++;
+        }
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
@@ -307,6 +314,10 @@ public class TacticalActionOutputService {
         }
 
         if (player.hasUnlockedBreakthrough("cabalbt") && tile.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
+        if (player.hasTech("tf-planesplitter") && tile.getPosition().contains("frac")) {
             bonusMoveValue++;
         }
 

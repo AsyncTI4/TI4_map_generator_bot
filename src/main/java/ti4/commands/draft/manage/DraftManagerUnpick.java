@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.draft.DraftManager;
 import ti4.service.draft.Draftable;
@@ -56,7 +57,7 @@ class DraftManagerUnpick extends GameStateSubcommand {
         List<String> players = playerIds.stream()
                 .map(game::getPlayer)
                 .filter(Objects::nonNull)
-                .map(p -> p.getRepresentation())
+                .map(Player::getRepresentation)
                 .collect(Collectors.toList());
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
