@@ -352,7 +352,7 @@ public class PuppetSoftHeBladeService {
 
             if (newKey != null || newValue != null) {
                 newKey = newKey == null ? entry.getKey() : newKey;
-                newValue = newValue == null ? entry.getKey() : newValue;
+                newValue = newValue == null ? entry.getValue() : newValue;
                 game.getMessagesThatICheckedForAllReacts().remove(entry.getKey());
                 game.getMessagesThatICheckedForAllReacts().put(newKey, newValue);
             }
