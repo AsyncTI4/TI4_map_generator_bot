@@ -48,7 +48,7 @@ public class TeHelperActionCards {
 
         switch (card.getAlias().replaceAll("\\d", "")) {
             case "blackmarketdealing" ->
-                buttons.add(Buttons.green(ffcc + "transact_BMD", "Start Black Market Transaction"));
+                buttons.add(Buttons.green(ffcc + "transaction_BMD", "Start Black Market Transaction"));
             case "brilliance" -> buttons.add(Buttons.green(ffcc + "brilliance", resolve));
             case "crashlanding" -> buttons.add(Buttons.green(ffcc + "crashLandingStart", "Start Crash Landing"));
             case "crisis" -> nop(); // preset

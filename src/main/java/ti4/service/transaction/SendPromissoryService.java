@@ -46,6 +46,16 @@ public class SendPromissoryService {
 
     private static boolean valid(
             GenericInteractionCreateEvent event, Game game, Player sender, Player receiver, String alias) {
+        if (game.isNoSwapMode()) {
+            if (alias.endsWith("sftt")
+                    && sender.getPromissoryNotesInPlayArea().contains(receiver.getColor() + "_sftt")) {
+                MessageHelper.sendMessageToChannel(
+                        sender.getCardsInfoThread(),
+                        sender.getRepresentation()
+                                + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
+                return false;
+            }
+        }
         if (!sender.getPromissoryNotes().containsKey(alias)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Error sending promissory note.");
             return false;
@@ -76,6 +86,9 @@ public class SendPromissoryService {
             if (id.startsWith("dspnveld") && !receiver.getAllianceMembers().contains(owner.getFaction())) {
                 PromissoryNoteHelper.resolvePNPlay(id, receiver, game, event);
             }
+        }
+        if (id.contains("blackops") && !receiver.getAllianceMembers().contains(sender.getFaction())) {
+            PromissoryNoteHelper.resolvePNPlay(id, receiver, game, event);
         }
     }
 
