@@ -89,6 +89,7 @@ public class EndTurnService {
         TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
+        game.removeStoredValue("heartWarnedThisTurn");
         game.setActiveSystem("");
     }
 
