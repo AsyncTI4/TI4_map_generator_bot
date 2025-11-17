@@ -733,8 +733,8 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
-                String cyberMessage =
-                        player.getRepresentationUnfogged() + ", a reminder you should gain 1 less Command token here due to Malevolency";
+                String cyberMessage = player.getRepresentationUnfogged()
+                        + ", a reminder you should gain 1 less Command token here due to Malevolency";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
             if (!player.ownsPromissoryNote("sigma_machinations") && "sigma_machinations".equalsIgnoreCase(pn)) {

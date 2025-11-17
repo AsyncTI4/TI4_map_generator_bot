@@ -1,16 +1,12 @@
 package ti4.service.fow;
 
+import com.nimbusds.jose.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.nimbusds.jose.util.Pair;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -19,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.commands.tokens.AddTokenCommand;
@@ -121,7 +118,9 @@ public class FOWPlusService {
 
     // Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game) || FoWHelper.getTilePositionsToShow(game, player).contains(position) || game.isWarfareAction();
+        return !isActive(game)
+                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
+                || game.isWarfareAction();
     }
 
     // Hide all 0b tiles from FoW map
