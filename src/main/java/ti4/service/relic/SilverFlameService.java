@@ -79,9 +79,6 @@ public class SilverFlameService {
 
     private void resolveSilverFlameRoll(Game game, Player flamePlayer, int target) {
         Die result = new Die(target);
-        while (!result.eligibleForHeart()) {
-            result = new Die(target);
-        }
 
         String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled a " + result.getResult() + " for " + rep()
                 + "! " + result.getGreenDieIfSuccessOrRedDieIfFailure();
