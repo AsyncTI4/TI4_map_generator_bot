@@ -944,7 +944,7 @@ public class ButtonHelperFactionSpecific {
     public static void checkForStymie(Game game, Player activePlayer, Tile tile) {
         for (Player p2 : ButtonHelper.getOtherPlayersWithUnitsInTheSystem(activePlayer, game, tile)) {
             if ((p2.getPromissoryNotes().containsKey("stymie") && game.getPNOwner("stymie") != p2)
-                    || p2.hasTech("tf_stymie")) {
+                    || p2.hasTech("tf-stymie")) {
                 String msg = p2.getRepresentationUnfogged() + ", you have the opportunity to _Stymie_ "
                         + activePlayer.getFactionEmojiOrColor() + ".";
                 List<Button> buttons = new ArrayList<>();

@@ -16,6 +16,7 @@ class TransientGameInfoUpdater {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkTombWorlds(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
+            DiscordantStarsHelper.checkTFTerraform(game);
             DiscordantStarsHelper.checkSigil(game);
             DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
