@@ -262,7 +262,7 @@ public class SecretObjectiveHelper {
                 if (soName != null) {
                     soButtons.add(Buttons.blue(
                             "discardSecret_" + idValue + suffix,
-                            "(" + idValue + ") " + soName,
+                            "Discard (" + idValue + ") " + soName,
                             CardEmojis.SecretObjective));
                 }
             }

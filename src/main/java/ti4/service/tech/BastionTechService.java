@@ -1,12 +1,16 @@
 package ti4.service.tech;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.CombatModHelper;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
@@ -23,6 +27,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetTypeModel.PlanetType;
+import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -112,6 +117,31 @@ public class BastionTechService {
             }
 
             var units = CombatRollService.getProximaBombardUnit(p1);
+            Player player = p1;
+            String planetN = planet.getName();
+            game.setStoredValue("bombardmentTarget" + player.getFaction(), planetN);
+            for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
+                for (int x = 0; x < entry.getValue(); x++) {
+                    String name = entry.getKey().getAsyncId() + "_" + x;
+
+                    String assignedUnit = name + "_" + planetN;
+                    game.setStoredValue(
+                            "assignedBombardment" + p1.getFaction(),
+                            game.getStoredValue("assignedBombardment" + p1.getFaction()) + assignedUnit + ";");
+                }
+            }
+            if (player.hasTech("ps") || player.hasTech("absol_ps")) {
+                game.setStoredValue(
+                        "assignedBombardment" + player.getFaction(),
+                        game.getStoredValue("assignedBombardment" + player.getFaction()) + "plasma_99_" + planetN
+                                + ";");
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+                game.setStoredValue(
+                        "assignedBombardment" + player.getFaction(),
+                        game.getStoredValue("assignedBombardment" + player.getFaction()) + "argentcommander_99_"
+                                + planetN + ";");
+            }
 
             var rollMods = CombatModHelper.getModifiers(
                     p1,
@@ -142,10 +172,58 @@ public class BastionTechService {
             tempMods.addAll(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
                     p2, tile.getTileModel(), planet, true, CombatRollType.bombardment));
 
-            CombatRollService.rollForUnits(
+            String message = CombatMessageHelper.displayCombatSummary(player, tile, planet, CombatRollType.bombardment);
+            message += CombatRollService.rollForUnits(
                     units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.bombardment, event, tile, planet);
-            CombatRollService.rollForUnits(
+            String hits = substringAfter(message, "Total hits ");
+            hits = hits.split(" ")[0].replace("*", "");
+            int h = Integer.parseInt(hits);
+            if (message != null && message.endsWith(";\n")) {
+                message = message.substring(0, message.length() - 2);
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            if (h > 0) {
+                String msg = p2.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
+                        + ".";
+                List<Button> buttons = new ArrayList<>();
+                String finChecker = "FFCC_" + p2.getFaction() + "_";
+                buttons.add(Buttons.green(
+                        finChecker + "autoAssignGroundHits_" + planetN + "_" + h,
+                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            }
+            message = CombatMessageHelper.displayCombatSummary(player, tile, planet, CombatRollType.bombardment);
+            message += CombatRollService.rollForUnits(
                     units, rollMods, flatMods, tempMods, p1, p1, game, CombatRollType.bombardment, event, tile, planet);
+            hits = substringAfter(message, "Total hits ");
+            hits = hits.split(" ")[0].replace("*", "");
+            h = Integer.parseInt(hits);
+            if (message != null && message.endsWith(";\n")) {
+                message = message.substring(0, message.length() - 2);
+            }
+            if (player.hasTech("tf-proxima") && h > 0) {
+                message += "\nProxima cancelled 1 hit automatically";
+                h--;
+            } else {
+                if (planet.getGalvanizedUnitCount(player.getColorID()) > 0 && h > 0) {
+                    int oldH = h;
+                    h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
+                    message += "\nProxima cancelled " + (oldH - h) + " hit(s) automatically";
+                }
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            if (h > 0) {
+                String msg = p1.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
+                        + ".";
+                List<Button> buttons = new ArrayList<>();
+                String finChecker = "FFCC_" + p1.getFaction() + "_";
+                buttons.add(Buttons.green(
+                        finChecker + "autoAssignGroundHits_" + planetN + "_" + h,
+                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+            }
         });
     }
 }

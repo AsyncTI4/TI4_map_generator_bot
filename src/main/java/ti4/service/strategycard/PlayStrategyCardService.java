@@ -540,7 +540,7 @@ public class PlayStrategyCardService {
                                         + "** because you told the bot earlier that you wished to pass on it.");
                     }
                 } else {
-                    if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount()) {
+                    if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
