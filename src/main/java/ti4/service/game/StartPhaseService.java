@@ -50,6 +50,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -85,7 +86,7 @@ public class StartPhaseService {
                 ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" ->
                 ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
-            case "ixthian" -> AgendaHelper.rollIxthian(game, false);
+            case "ixthian" -> IxthianArtifactService.rollIxthian(game, false);
             case "gameTitles" -> PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);

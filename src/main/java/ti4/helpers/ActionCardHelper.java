@@ -665,6 +665,12 @@ public class ActionCardHelper {
             }
         }
 
+        if ("blackmarketdealing".equals(acID)
+                && game.getPhaseOfGame().toLowerCase().contains("agenda")
+                && game.isHiddenAgendaMode()) {
+            return "You cannot make transactions during the agenda phase in Hidden Agenda mode. Cancelling this action card automatically";
+        }
+
         if ("Action".equalsIgnoreCase(actionCardWindow)
                 && game.getPlayer(activePlayerID) != player
                 && !game.isTwilightsFallMode()) {
@@ -737,57 +743,62 @@ public class ActionCardHelper {
                 "Cancel Action Card With Sabotage",
                 MiscEmojis.Sabotage);
         buttons.add(sabotageButton);
-        Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
-        if (empy != null
-                && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
-                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            Button empyButton = Buttons.gray(
-                    "sabotage_empy_" + actionCardTitle + "_" + player.getFaction(),
-                    "Cancel " + actionCardTitle + " With Watcher",
-                    UnitEmojis.mech);
-            List<Button> empyButtons = new ArrayList<>();
-            empyButtons.add(empyButton);
-            Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
-            empyButtons.add(refuse);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    empy.getCardsInfoThread(),
-                    empy.getRepresentationUnfogged()
-                            + "You have one or more mechs adjacent to some units of the player who played _"
-                            + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
-                    empyButtons);
-        }
-        Player tfTriune = Helper.getPlayerFromUnit(game, "tf-triune");
-        if (tfTriune != null && ButtonHelperFactionSpecific.isNextToTriunes(game, player, tfTriune)) {
-            Button tfButton = Buttons.gray(
-                    "sabotage_tf_" + actionCardTitle + "_" + player.getFaction(),
-                    "Cancel " + actionCardTitle + " With Triunes",
-                    UnitEmojis.fighter);
-            List<Button> tfButtons = new ArrayList<>();
-            tfButtons.add(tfButton);
-            Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
-            tfButtons.add(refuse);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    tfTriune.getCardsInfoThread(),
-                    tfTriune.getRepresentationUnfogged()
-                            + "You have three fighters adjacent to some units of the player who played _"
-                            + actionCardTitle + "_. Use buttons to decide whether to Shatter this action card.",
-                    tfButtons);
-        }
-        String instinctTrainingID = "it";
-        for (Player player2 : game.getPlayers().values()) {
-            if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
-                List<Button> xxchaButtons = new ArrayList<>();
-                xxchaButtons.add(Buttons.gray(
-                        "sabotage_xxcha_" + actionCardTitle + "_" + player.getFaction(),
-                        "Cancel " + actionCardTitle + " With Instinct Training",
-                        FactionEmojis.Xxcha));
-                xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+
+        if (!acID.equals("blackmarketdealing")) {
+            Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
+            if (empy != null
+                    && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
+                    && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+                Button empyButton = Buttons.gray(
+                        "sabotage_empy_" + actionCardTitle + "_" + player.getFaction(),
+                        "Cancel " + actionCardTitle + " With Watcher",
+                        UnitEmojis.mech);
+                List<Button> empyButtons = new ArrayList<>();
+                empyButtons.add(empyButton);
+                Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
+                empyButtons.add(refuse);
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player2.getCardsInfoThread(),
-                        player2.getRepresentationUnfogged()
-                                + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
-                                + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.",
-                        xxchaButtons);
+                        empy.getCardsInfoThread(),
+                        empy.getRepresentationUnfogged()
+                                + "You have one or more mechs adjacent to some units of the player who played _"
+                                + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
+                        empyButtons);
+            }
+            Player tfTriune = Helper.getPlayerFromUnit(game, "tf-triune");
+            if (tfTriune != null && ButtonHelperFactionSpecific.isNextToTriunes(game, player, tfTriune)) {
+                Button tfButton = Buttons.gray(
+                        "sabotage_tf_" + actionCardTitle + "_" + player.getFaction(),
+                        "Cancel " + actionCardTitle + " With Triunes",
+                        UnitEmojis.fighter);
+                List<Button> tfButtons = new ArrayList<>();
+                tfButtons.add(tfButton);
+                Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
+                tfButtons.add(refuse);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        tfTriune.getCardsInfoThread(),
+                        tfTriune.getRepresentationUnfogged()
+                                + "You have three fighters adjacent to some units of the player who played _"
+                                + actionCardTitle + "_. Use buttons to decide whether to Shatter this action card.",
+                        tfButtons);
+            }
+            String instinctTrainingID = "it";
+            for (Player player2 : game.getPlayers().values()) {
+                if (!player.equals(player2)
+                        && player2.hasTechReady(instinctTrainingID)
+                        && player2.getStrategicCC() > 0) {
+                    List<Button> xxchaButtons = new ArrayList<>();
+                    xxchaButtons.add(Buttons.gray(
+                            "sabotage_xxcha_" + actionCardTitle + "_" + player.getFaction(),
+                            "Cancel " + actionCardTitle + " With Instinct Training",
+                            FactionEmojis.Xxcha));
+                    xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player2.getCardsInfoThread(),
+                            player2.getRepresentationUnfogged()
+                                    + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
+                                    + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.",
+                            xxchaButtons);
+                }
             }
         }
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
@@ -796,9 +807,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (acID.contains("sabo") || acID.contains("shatter")) {
+        if (acID.contains("sabo") || acID.contains("shatter") || acID.contains("blackmarketdealing")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
-            if (game.isWildWildGalaxyMode()) {
+            if (game.isWildWildGalaxyMode() && !acID.contains("blackmarketdealing")) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
