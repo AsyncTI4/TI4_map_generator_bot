@@ -655,14 +655,12 @@ public class ButtonHelperTwilightsFall {
             if (leaderModel != null) {
                 if ("agent".equalsIgnoreCase(leaderModel.getType())) {
                     buttons.add(Buttons.blue(
-                            "revealSpecificVeiledCard_genome_" + card,
-                            leaderModel.getLeaderPositionAndFaction()));
+                            "revealSpecificVeiledCard_genome_" + card, leaderModel.getLeaderPositionAndFaction()));
                     embeds.add(leaderModel.getRepresentationEmbed());
                 }
                 if ("hero".equalsIgnoreCase(leaderModel.getType())) {
                     buttons.add(Buttons.red(
-                            "revealSpecificVeiledCard_paradigm_" + card,
-                            leaderModel.getLeaderPositionAndFaction()));
+                            "revealSpecificVeiledCard_paradigm_" + card, leaderModel.getLeaderPositionAndFaction()));
                     embeds.add(leaderModel.getRepresentationEmbed());
                 }
             }
