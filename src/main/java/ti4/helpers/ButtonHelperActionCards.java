@@ -932,7 +932,7 @@ public class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
+            if (p2 == player && !game.isTwilightsFallMode()) {
                 continue;
             }
             if (game.isFowMode()) {
