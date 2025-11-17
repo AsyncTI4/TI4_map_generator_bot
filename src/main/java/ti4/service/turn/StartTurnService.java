@@ -326,6 +326,14 @@ public class StartTurnService {
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
+            if (game.getStrategyCardModelByInitiative(sc)
+                    .map(strat -> strat.getAlias().equals("te6warfare"))
+                    .orElse(false)) {
+                if (game.isWarfareAction() && !game.isComponentAction()) {
+                    // skip warning for warfare if we are presently resolving warfare
+                    continue;
+                }
+            }
             if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1);

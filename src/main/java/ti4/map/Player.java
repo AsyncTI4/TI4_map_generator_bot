@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
@@ -2235,6 +2236,27 @@ public class Player extends PlayerProperties {
 
     public boolean hasRelicReady(String relicID) {
         return hasRelic(relicID) && !getExhaustedRelics().contains(relicID);
+    }
+
+    @JsonIgnore
+    public Set<String> getTradableRelics() {
+        return SetUtils.intersection(getActualRelics(), Set.of("thesilverflame", "silverflame"));
+    }
+
+    @JsonIgnore
+    public Set<String> getActualRelics() {
+        return getRelics().stream()
+                .filter(Mapper::isValidRelic)
+                .filter(r -> !Mapper.getRelic(r).isFakeRelic())
+                .collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Set<String> getFakeRelics() {
+        return getRelics().stream()
+                .filter(Mapper::isValidRelic)
+                .filter(r -> Mapper.getRelic(r).isFakeRelic())
+                .collect(Collectors.toSet());
     }
 
     public void clearExhaustedTechs() {
