@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -291,6 +290,25 @@ public class CombatRollService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
+        if (rollType == CombatRollType.bombardment
+                && opponent != null
+                && opponent != player
+                && opponent.hasTech("proxima")
+                && h > 0) {
+            if (opponent.hasTech("tf-proxima") && h > 0) {
+                message += "\nProxima cancelled 1 hit automatically";
+                h--;
+            } else {
+                if (!bombardPlanet.isEmpty()) {
+                    UnitHolder planet = game.getUnitHolderFromPlanet(bombardPlanet);
+                    if (planet != null && planet.getGalvanizedUnitCount(player.getColorID()) > 0) {
+                        int oldH = h;
+                        h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
+                        message += "\nProxima cancelled " + (oldH - h) + " hit(s) automatically";
+                    }
+                }
+            }
+        }
         if (message.endsWith(";\n")) {
             message = message.substring(0, message.length() - 2);
         }
@@ -653,6 +671,14 @@ public class CombatRollService {
             result = "Repaired the Arc Secundus at start of this combat round with its ability.\n" + result;
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
+        }
+        if (rollType == CombatRollType.combatround
+                && player.ownsUnit("naaz_voltron")
+                && "space".equalsIgnoreCase(unitHolder.getName())
+                && unitHolder.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
+            result = "Repaired the Naaz Rohka Supermech at start of this combat round with its ability.\n" + result;
+            activeSystem.removeUnitDamage(
+                    unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
         StringBuilder resultBuilder = new StringBuilder(result);
         boolean metaliVoidCounted = false;
@@ -1312,7 +1338,11 @@ public class CombatRollService {
     public static Map<UnitModel, Integer> getProximaBombardUnit(Player player) {
         UnitModel proximaFakeUnit = new UnitModel();
         proximaFakeUnit.setBombardDieCount(3);
-        proximaFakeUnit.setBombardHitsOn(8);
+        if (player.hasTech("tf-proxima")) {
+            proximaFakeUnit.setBombardHitsOn(7);
+        } else {
+            proximaFakeUnit.setBombardHitsOn(8);
+        }
         proximaFakeUnit.setName(Mapper.getTech("proxima").getName());
         proximaFakeUnit.setAsyncId("ProximaBombard");
         proximaFakeUnit.setId("ProximaBombard");

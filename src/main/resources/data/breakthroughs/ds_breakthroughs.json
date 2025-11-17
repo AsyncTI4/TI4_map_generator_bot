@@ -180,15 +180,15 @@
         "source": "ds"
     },
     {
-        "alias": "kolumebt",
-        "name": "Synchronicity VI",
-        "displayName": "Synchronicity VI",
-        "faction": "kolume",
+        "alias": "florzenbt",
+        "name": "Reverie Implants",
+        "displayName": "Reverie\nImplants",
+        "faction": "florzen",
         "synergy": [
             "PROPULSION",
-            "CYBERNETIC"
+            "BIOTIC"
         ],
-        "text": "ACTION: Exhaust this card to either gain 1 command token, or spend 3 influence to research a technology of the same color as 1 of your exhausted technologies.",
+        "text": "At the end of your turn, you may exhaust this card and choose 1 other player; you and that player each secretly spend 0, 1, or 2 trade goods. Then, reveal the spent trade goods; if you spent the same number of trade goods, take 1 promissory note from that player's hand, at random.",
         "source": "ds"
     },
     {

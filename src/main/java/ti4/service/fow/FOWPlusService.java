@@ -118,7 +118,9 @@ public class FOWPlusService {
 
     // Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game) || FoWHelper.getTilePositionsToShow(game, player).contains(position);
+        return !isActive(game)
+                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
+                || game.isWarfareAction();
     }
 
     // Hide all 0b tiles from FoW map
