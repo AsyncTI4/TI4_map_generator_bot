@@ -637,10 +637,6 @@ public class StartCombatService {
 
     private static void offerRedGhostCommanderButtons(
             Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
-        if (game.isFowMode() && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition())) {
-            return;
-        }
-
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
