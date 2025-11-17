@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -26,7 +27,9 @@ import ti4.model.GenericCardModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.HeroUnlockCheckService;
 
+@UtilityClass
 public class PuppetSoftHeBladeService {
+
     @ButtonHandler("componentActionRes_ability_puppetsoftheblade") // puppet soft he blade
     private static void convertFactionToObsidian(ButtonInteractionEvent event, Game game, Player player) {
         if (!player.hasAbility("puppetsoftheblade")) return;
@@ -107,7 +110,7 @@ public class PuppetSoftHeBladeService {
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, extractButtons);
     }
 
-    public static void flipFactionToObsidian(Game game, Player player) {
+    private static void flipFactionToObsidian(Game game, Player player) {
         FactionModel oldFactionModel = player.getFactionModel();
         FactionModel newFactionModel = Mapper.getFaction("obsidian");
 
@@ -349,25 +352,27 @@ public class PuppetSoftHeBladeService {
 
             if (newKey != null || newValue != null) {
                 newKey = newKey == null ? entry.getKey() : newKey;
-                newValue = newValue == null ? entry.getKey() : newValue;
+                newValue = newValue == null ? entry.getValue() : newValue;
                 game.getMessagesThatICheckedForAllReacts().remove(entry.getKey());
                 game.getMessagesThatICheckedForAllReacts().put(newKey, newValue);
             }
         }
 
         // Update Expedition Tokens
-        if (game.getExpeditions().getTradeGoods().equals(oldFaction.getAlias()))
-            game.getExpeditions().setTradeGoods(newFaction.getAlias());
-        if (game.getExpeditions().getFiveInf().equals(oldFaction.getAlias()))
-            game.getExpeditions().setFiveInf(newFaction.getAlias());
-        if (game.getExpeditions().getFiveRes().equals(oldFaction.getAlias()))
-            game.getExpeditions().setFiveRes(newFaction.getAlias());
-        if (game.getExpeditions().getTechSkip().equals(oldFaction.getAlias()))
-            game.getExpeditions().setTechSkip(newFaction.getAlias());
-        if (game.getExpeditions().getActionCards().equals(oldFaction.getAlias()))
-            game.getExpeditions().setActionCards(newFaction.getAlias());
-        if (game.getExpeditions().getSecret().equals(oldFaction.getAlias()))
-            game.getExpeditions().setSecret(newFaction.getAlias());
+        String oldAlias = oldFaction.getAlias();
+        String newAlias = newFaction.getAlias();
+        if (oldAlias.equals(game.getExpeditions().getTradeGoods()))
+            game.getExpeditions().setTradeGoods(newAlias);
+        if (oldAlias.equals(game.getExpeditions().getFiveInf()))
+            game.getExpeditions().setFiveInf(newAlias);
+        if (oldAlias.equals(game.getExpeditions().getFiveRes()))
+            game.getExpeditions().setFiveRes(newAlias);
+        if (oldAlias.equals(game.getExpeditions().getTechSkip()))
+            game.getExpeditions().setTechSkip(newAlias);
+        if (oldAlias.equals(game.getExpeditions().getActionCards()))
+            game.getExpeditions().setActionCards(newAlias);
+        if (oldAlias.equals(game.getExpeditions().getSecret()))
+            game.getExpeditions().setSecret(newAlias);
 
         return "Successfully (?) updated game stored values.";
     }

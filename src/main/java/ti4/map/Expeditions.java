@@ -284,7 +284,7 @@ public class Expeditions {
         if (success) {
             exp.expeditionFactions.put(expeditionType, player.getFaction());
             if (exp.getRemainingExpeditionCount() == 0) {
-                String message = "# ATTENTION " + game.getPing() + "\n";
+                String message = !game.isFowMode() ? "# ATTENTION " + game.getPing() + "\n" : "";
                 message += player.getRepresentation()
                         + " has completed the last expedition! They can now place the __**Thunder's Edge**__ planet on the board:";
                 message +=

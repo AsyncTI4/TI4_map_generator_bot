@@ -13,14 +13,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -36,7 +32,6 @@ import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.cron.AutoPingCron;
-import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.BannerGenerator;
@@ -59,7 +54,6 @@ import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.async.DrumrollService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -77,27 +71,8 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
-import ti4.spring.jda.JdaService;
 
 public class AgendaHelper {
-
-    @Nullable
-    public static String watchPartyPing(Game game) {
-        List<Role> roles = JdaService.guildPrimary.getRolesByName("Ixthian Watch Party", true);
-        if (!game.isFowMode() && !roles.isEmpty()) {
-            return roles.getFirst().getAsMention();
-        }
-        return null;
-    }
-
-    @Nullable
-    public static TextChannel watchPartyChannel(Game game) {
-        List<TextChannel> channels = JdaService.guildPrimary.getTextChannelsByName("ixthian-watch-party", true);
-        if (!game.isFowMode() && !channels.isEmpty()) {
-            return channels.getFirst();
-        }
-        return null;
-    }
 
     public static void offerEveryonePrepassOnShenanigans(Game game) {
         if (game.islandMode()) return;
@@ -1029,68 +1004,6 @@ public class AgendaHelper {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-    }
-
-    public static void rollIxthian(Game game, boolean publish) {
-        String activeGamePing = game.getPing();
-        TextChannel watchParty = watchPartyChannel(game);
-        String watchPartyPing = watchPartyPing(game);
-        List<MessageChannel> watchPartyList = publish && watchParty != null ? List.of(watchParty) : null;
-        List<String> altMessages = watchPartyPing == null ? null : List.of(watchPartyPing);
-
-        int rand = 6 + ThreadLocalRandom.current().nextInt(6);
-        if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
-            rand += 8 + ThreadLocalRandom.current().nextInt(14);
-        }
-        Predicate<Game> resolve = futureGame -> {
-            resolveIxthianRoll(futureGame, publish && watchParty != null);
-            return false;
-        };
-        DrumrollService.doDrumrollMultiChannel(
-                game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, altMessages);
-    }
-
-    private static void resolveIxthianRoll(Game game, boolean publish) {
-        TextChannel watchParty = watchPartyChannel(game);
-        String watchPartyPing = watchPartyPing(game);
-
-        Die d1 = new Die(6);
-        if (game.getAgendaDeckID().toLowerCase().contains("absol")) {
-            d1 = new Die(7);
-        }
-        String msg = "# Rolled a " + d1.getResult() + " for Ixthian Artifact!";
-        if (d1.isSuccess()) {
-            msg += TechEmojis.Propulsion3 + " " + TechEmojis.Biotic3 + " " + TechEmojis.Cybernetic3 + " "
-                    + TechEmojis.Warfare3;
-        } else {
-            msg += "💥 💥 💥 💥";
-        }
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-        if (watchParty != null && publish) {
-            String watchMsg = watchPartyPing + " " + game.getName() + " has finished rolling:\n" + msg;
-            MessageHelper.sendMessageToChannel(watchParty, watchMsg);
-        }
-        if (d1.isSuccess() && !game.isFowMode()) {
-            if (Helper.getPlayerFromAbility(game, "propagation") != null) {
-                Player player = Helper.getPlayerFromAbility(game, "propagation");
-                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation()
-                        + ", you would research a technology, but because of **Propagation**, you instead gain 6 command tokens."
-                        + " Your current command tokens are " + player.getCCRepresentation()
-                        + ". Use buttons to gain command tokens.";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
-                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-            }
-            MessageHelper.sendMessageToChannelWithButton(
-                    game.getMainGameChannel(),
-                    "You may use the button to get your two technologies.",
-                    Buttons.GET_A_TECH);
-        } else if (!d1.isSuccess() && !game.isFowMode()) {
-            Tile tile = game.getMecatolTile();
-            ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Please destroy units in or adjacent to the Mecatol Rex system.");
-        }
     }
 
     private static void pingAboutDebt(Game game) {
