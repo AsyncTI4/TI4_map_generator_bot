@@ -2,6 +2,7 @@ package ti4.service.tech;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -23,6 +24,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetTypeModel.PlanetType;
+import ti4.model.UnitModel;
 import ti4.model.enums.CombatMod.CombatModType;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -112,6 +114,30 @@ public class BastionTechService {
             }
 
             var units = CombatRollService.getProximaBombardUnit(p1);
+            Player player = p1;
+            String planetN = planet.getName();
+            for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
+                for (int x = 0; x < entry.getValue(); x++) {
+                    String name = entry.getKey().getAsyncId() + "_" + x;
+
+                    String assignedUnit = name + "_" + planetN;
+                    game.setStoredValue(
+                            "assignedBombardment" + p1.getFaction(),
+                            game.getStoredValue("assignedBombardment" + p1.getFaction()) + assignedUnit + ";");
+                }
+            }
+            if (player.hasTech("ps") || player.hasTech("absol_ps")) {
+                game.setStoredValue(
+                        "assignedBombardment" + player.getFaction(),
+                        game.getStoredValue("assignedBombardment" + player.getFaction()) + "plasma_99_" + planetN
+                                + ";");
+            }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+                game.setStoredValue(
+                        "assignedBombardment" + player.getFaction(),
+                        game.getStoredValue("assignedBombardment" + player.getFaction()) + "argentcommander_99_"
+                                + planetN + ";");
+            }
 
             var rollMods = CombatModHelper.getModifiers(
                     p1,

@@ -13,9 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.jetbrains.annotations.NotNull;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -28,6 +25,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
@@ -2047,7 +2045,7 @@ public class UnfiledButtonHandlers {
                             properGain += 1;
                             reasons += (properGain == 1 ? "" : ", ") + "_Inheritance Systems_";
                         }
-                        if(malevolency){
+                        if (malevolency) {
                             properGain -= 1;
                             reasons += (properGain == 1 ? "" : ", ") + "_Malevolency_";
                         }
