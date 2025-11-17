@@ -2,7 +2,9 @@ package ti4.helpers.thundersedge;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -105,8 +107,11 @@ public class TeHelperGeneral {
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
         if ((matcher = Pattern.compile(part1).matcher(buttonID)).matches()) {
-            List<Tile> tiles = game.getTileMap().values().stream()
-                    .filter(Tile.tileMayHaveThundersEdge())
+            Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
+            List<Tile> tiles = game.getTileMap().entrySet().stream()
+                    .filter(entry -> Tile.tileMayHaveThundersEdge().test(entry.getValue()))
+                    .filter(entry -> !game.isFowMode() || visiblePositions.contains(entry.getKey()))
+                    .map(Map.Entry::getValue)
                     .toList();
             tiles.stream()
                     .map(t -> Buttons.green(
@@ -125,9 +130,7 @@ public class TeHelperGeneral {
                     "\nYou must select one of the players with the most completed expeditions to place infantry on Thunder's Edge:";
             exp.getFactionsWithMostComplete().forEach(faction -> {
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
-                if (p2 != null)
-                    newButtons.add(
-                            Buttons.blue(prefix + faction, p2.getFactionModel().getFactionName()));
+                if (p2 != null) newButtons.add(Buttons.blue(prefix + faction, p2.getFactionNameOrColor()));
             });
 
         } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
