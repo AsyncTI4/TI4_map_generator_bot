@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -653,6 +653,14 @@ public class CombatRollService {
             result = "Repaired the Arc Secundus at start of this combat round with its ability.\n" + result;
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("fs"), player.getColorID()), 1);
+        }
+        if (rollType == CombatRollType.combatround
+                && player.ownsUnit("naaz_voltron")
+                && "space".equalsIgnoreCase(unitHolder.getName())
+                && unitHolder.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
+            result = "Repaired the Naaz Rohka Supermech at start of this combat round with its ability.\n" + result;
+            activeSystem.removeUnitDamage(
+                    unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
         StringBuilder resultBuilder = new StringBuilder(result);
         boolean metaliVoidCounted = false;
