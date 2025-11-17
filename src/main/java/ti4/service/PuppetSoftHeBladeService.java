@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -26,7 +27,9 @@ import ti4.model.GenericCardModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.HeroUnlockCheckService;
 
+@UtilityClass
 public class PuppetSoftHeBladeService {
+
     @ButtonHandler("componentActionRes_ability_puppetsoftheblade") // puppet soft he blade
     private static void convertFactionToObsidian(ButtonInteractionEvent event, Game game, Player player) {
         if (!player.hasAbility("puppetsoftheblade")) return;
@@ -107,7 +110,7 @@ public class PuppetSoftHeBladeService {
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, extractButtons);
     }
 
-    public static void flipFactionToObsidian(Game game, Player player) {
+    private static void flipFactionToObsidian(Game game, Player player) {
         FactionModel oldFactionModel = player.getFactionModel();
         FactionModel newFactionModel = Mapper.getFaction("obsidian");
 
