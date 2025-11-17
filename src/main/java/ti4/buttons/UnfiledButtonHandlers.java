@@ -93,7 +93,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.LoreService;
@@ -3687,19 +3686,6 @@ public class UnfiledButtonHandlers {
         }
         player.exhaustTech("sc");
         ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler("rollIxthian")
-    public static void rollIxthian(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (game.getSpeakerUserID().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
-            AgendaHelper.rollIxthian(game, true);
-        } else {
-            Button ixthianButton =
-                    Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
-            String msg = "The speaker should roll for _Ixthian Artifact_. Click this button to roll anyway!";
-            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
-        }
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("removeCCFromBoard_")
