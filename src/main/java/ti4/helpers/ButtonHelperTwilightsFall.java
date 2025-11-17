@@ -24,6 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
+import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
@@ -651,11 +652,18 @@ public class ButtonHelperTwilightsFall {
                         Mapper.getUnit(card).getName()));
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
-            if (Mapper.getLeader(card) != null) {
-                buttons.add(Buttons.blue(
-                        "revealSpecificVeiledCard_genome_" + card,
-                        Mapper.getLeader(card).getLeaderPositionAndFaction()));
-                embeds.add(Mapper.getLeader(card).getRepresentationEmbed());
+            LeaderModel leaderModel = Mapper.getLeader(card);
+            if (leaderModel != null) {
+                if ("agent".equalsIgnoreCase(leaderModel.getType())) {
+                    buttons.add(Buttons.blue(
+                            "revealSpecificVeiledCard_genome_" + card, leaderModel.getLeaderPositionAndFaction()));
+                    embeds.add(leaderModel.getRepresentationEmbed());
+                }
+                if ("hero".equalsIgnoreCase(leaderModel.getType())) {
+                    buttons.add(Buttons.red(
+                            "revealSpecificVeiledCard_paradigm_" + card, leaderModel.getLeaderPositionAndFaction()));
+                    embeds.add(leaderModel.getRepresentationEmbed());
+                }
             }
         }
         if (buttons.size() > 0) {
@@ -680,7 +688,7 @@ public class ButtonHelperTwilightsFall {
             player.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the ability: "
+                    player.getRepresentation() + " has unveiled the ability: "
                             + Mapper.getTech(cardID).getName(),
                     Mapper.getTech(cardID).getRepresentationEmbed());
         }
@@ -688,9 +696,18 @@ public class ButtonHelperTwilightsFall {
             player.addLeader(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the following card: "
+                    player.getRepresentation() + " has unveiled the genome: "
                             + Mapper.getLeader(cardID).getName(),
                     Mapper.getLeader(cardID).getRepresentationEmbed());
+        }
+        if ("paradigm".equalsIgnoreCase(type)) {
+            player.addLeader(cardID);
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has unveiled the paradigm: "
+                            + Mapper.getLeader(cardID).getName(),
+                    Mapper.getLeader(cardID).getRepresentationEmbed());
+            player.getLeaderByID(cardID).get().setLocked(false);
         }
         if ("units".equalsIgnoreCase(type)) {
             UnitModel unitModel = Mapper.getUnit(cardID);
@@ -707,7 +724,7 @@ public class ButtonHelperTwilightsFall {
             player.addOwnedUnitByID(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " has acquired the unit: "
+                    player.getRepresentation() + " has unveiled the unit: "
                             + Mapper.getUnit(cardID).getName(),
                     Mapper.getUnit(cardID).getRepresentationEmbed());
         }
@@ -857,7 +874,7 @@ public class ButtonHelperTwilightsFall {
 
     public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
         List<MessageEmbed> embeds = new ArrayList<>();
-        List<String> cards = getDeckForSplicing(game, type, 100);
+        List<String> cards = getDeckForSplicing(game, type, 100, true);
         if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getTech(card).getRepresentationEmbed());
@@ -1121,9 +1138,14 @@ public class ButtonHelperTwilightsFall {
     }
 
     public static List<String> getDeckForSplicing(Game game, String type, int size) {
+        return getDeckForSplicing(game, type, size, false);
+    }
+
+    public static List<String> getDeckForSplicing(Game game, String type, int size, boolean includeVeiledCards) {
         List<String> cards = new ArrayList<>();
+        List<String> allCards = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
-            List<String> allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
+            allCards = Mapper.getDeck("techs_tf").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getTechs()) {
                     allCards.remove(tech);
@@ -1137,52 +1159,17 @@ public class ButtonHelperTwilightsFall {
                 if (game.getStoredValue("purgedAbilities").contains("_" + card)) {
                     allCards.remove(card);
                 }
-                if (game.isVeiledHeartMode()) {
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                            allCards.remove(card);
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
             }
         }
         if ("genome".equalsIgnoreCase(type)) {
-            List<String> allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
+            allCards = Mapper.getDeck("tf_genome").getNewShuffledDeck();
             for (Player p : game.getRealPlayers()) {
                 for (String tech : p.getLeaderIDs()) {
                     allCards.remove(tech);
                 }
             }
-            List<String> someCardList = new ArrayList<>(allCards);
-            for (String card : someCardList) {
-                if (game.isVeiledHeartMode()) {
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                            allCards.remove(card);
-                        }
-                    }
-                }
-            }
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
-            }
-        }
-        if ("paradigm".equalsIgnoreCase(type)) {
-            List<String> allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
-            List<String> alreadyDrawn =
-                    List.of(game.getStoredValue("savedParadigms").split("_"));
-            for (String card : alreadyDrawn) {
-                allCards.remove(card);
-            }
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
-            }
         }
         if ("units".equalsIgnoreCase(type)) {
-            List<String> allCards = new ArrayList<>();
             Map<String, UnitModel> allUnits = Mapper.getUnits();
             for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
                 UnitModel mod = entry.getValue();
@@ -1198,20 +1185,39 @@ public class ButtonHelperTwilightsFall {
                     allCards.remove(unit);
                 }
             }
-            List<String> someCardList = new ArrayList<>(allCards);
-            for (String card : someCardList) {
-                if (game.isVeiledHeartMode()) {
+            Collections.shuffle(allCards);
+        }
+        if ("paradigm".equalsIgnoreCase(type)) {
+            allCards = Mapper.getDeck("tf_paradigm").getNewShuffledDeck();
+            List<String> alreadyDrawn =
+                    List.of(game.getStoredValue("savedParadigms").split("_"));
+            for (String card : alreadyDrawn) {
+                // savedParadigms includes veiled paradigms, which should only be removed if includeVeiledCards is false
+                boolean shouldRemove = true;
+                if (game.isVeiledHeartMode() & includeVeiledCards) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
-                            allCards.remove(card);
+                            shouldRemove = false;
+                            break;
                         }
                     }
                 }
+                if (shouldRemove) {
+                    allCards.remove(card);
+                }
             }
-            Collections.shuffle(allCards);
-            for (int i = 0; i < size && !allCards.isEmpty(); i++) {
-                cards.add(allCards.removeFirst());
+        } else if (game.isVeiledHeartMode() && !includeVeiledCards) {
+            List<String> someCardList = new ArrayList<>(allCards);
+            for (String card : someCardList) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                        allCards.remove(card);
+                    }
+                }
             }
+        }
+        for (int i = 0; i < size && !allCards.isEmpty(); i++) {
+            cards.add(allCards.removeFirst());
         }
 
         return cards;
