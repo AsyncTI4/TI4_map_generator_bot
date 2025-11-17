@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -262,7 +263,7 @@ public class SecretObjectiveHelper {
                 if (soName != null) {
                     soButtons.add(Buttons.blue(
                             "discardSecret_" + idValue + suffix,
-                            "(" + idValue + ") " + soName,
+                            "Discard (" + idValue + ") " + soName,
                             CardEmojis.SecretObjective));
                 }
             }

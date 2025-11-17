@@ -1,9 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +13,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.jetbrains.annotations.NotNull;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
@@ -28,7 +28,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
@@ -2018,17 +2017,22 @@ public class UnfiledButtonHandlers {
             shortCCs = shortCCs.substring(0, shortCCs.indexOf(' '));
             if (event.getMessage().getContentRaw().contains("Net gain")) {
                 boolean cyber = false;
+                boolean malevolency = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                 finalCCs += ". You gained a net total of " + netGain + " command token" + (netGain == 1 ? "" : "s");
                 for (String pn : player.getPromissoryNotes().keySet()) {
                     if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                         cyber = true;
                     }
+                    if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
+                        malevolency = true;
+                    }
                 }
                 if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
                     if (player.hasAbility("versatile")
                             || player.hasTech("hm")
                             || cyber
+                            || malevolency
                             || player.hasTech("tf-inheritancesystems")) {
                         int properGain = 2;
                         String reasons = "";
@@ -2044,11 +2048,15 @@ public class UnfiledButtonHandlers {
                             properGain += 1;
                             reasons += (properGain == 1 ? "" : ", ") + "_Inheritance Systems_";
                         }
+                        if(malevolency){
+                            properGain -= 1;
+                            reasons += (properGain == 1 ? "" : ", ") + "_Malevolency_";
+                        }
                         if (cyber) {
                             properGain += 1;
                             reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
                         }
-                        if (netGain < properGain && netGain != 1) {
+                        if (netGain != properGain) {
                             MessageHelper.sendMessageToChannel(
                                     player.getCorrectChannel(),
                                     player.getRepresentationUnfogged()
