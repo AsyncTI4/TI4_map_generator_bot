@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -338,6 +339,8 @@ public class DraftManager extends DraftPlayerManager {
         ButtonHelper.updateMap(game, event);
 
         if (game.isTwilightsFallMode()) {
+            // The inaugural splice uses the seating order, so it's set here already
+            Helper.setOrder(game);
             game.setBagDraft(new InauguralSpliceFrankenDraft(game));
             FrankenDraftBagService.startDraft(game);
         }
