@@ -82,12 +82,15 @@ public class ButtonHelperRelics {
         List<Button> buttons = new ArrayList<>();
         for (String planetName : player.getPlanetsAllianceMode()) {
             Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null || planet.isFake()) continue;
-
-            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null);
-            if (!legendaryOrHome) {
-                buttons.add(Buttons.green("nanoforgePlanet_" + planetName, Helper.getPlanetRepresentation(planetName, game)));
+            if (planet == null || planet.isFake()) {
+                continue;
             }
+            if (ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null)) {
+                continue;
+            }
+            String buttonID = "nanoforgePlanet_" + planetName;
+            String buttonLabel = Helper.getPlanetRepresentation(planetName, game);
+            buttons.add(Buttons.green(buttonID, buttonLabel));
         }
         String message = "Please choose which planet you wish to attach _Nano-Forge_ to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -99,10 +102,9 @@ public class ButtonHelperRelics {
             Planet planet = game.getPlanetsInfo().get(planetName);
             if (planet == null || planet.isFake()) continue;
 
-            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null);
-            if (!legendaryOrHome || game.isTwilightsFallMode()) {
-                buttons.add(Buttons.green("titansHeroPlanet_" + planetName, Helper.getPlanetRepresentation(planetName, game)));
-            }
+            String buttonID = "titansHeroPlanet_" + planetName;
+            String buttonLabel = Helper.getPlanetRepresentation(planetName, game);
+            buttons.add(Buttons.green(buttonID, buttonLabel));
         }
         String message = "Please choose which planet you wish to attach _Titans Hero_ to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
