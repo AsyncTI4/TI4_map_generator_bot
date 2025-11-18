@@ -74,6 +74,7 @@ public class WinningPathHelper {
         if (normalized.contains("censure")) return "censure";
         if (normalized.contains("crown") || normalized.contains("emph")) return "crown";
         if (normalized.contains("latvinia")) return "latvinia";
+        if (normalized.contains("song")) return "styx";
         return "other (probably _Classified Document Leaks_)";
     }
 }
