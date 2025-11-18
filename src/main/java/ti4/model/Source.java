@@ -27,6 +27,7 @@ public class Source {
         codex4,
         thunders_edge,
         twilights_fall,
+        neutral, // neutral faction
 
         // big homebrew
         ds,
@@ -111,7 +112,7 @@ public class Source {
 
         public boolean isOfficial() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, thunders_edge -> true;
+                case base, pok, codex1, codex2, codex3, codex4, thunders_edge, neutral -> true;
                 default -> false;
             };
         }
