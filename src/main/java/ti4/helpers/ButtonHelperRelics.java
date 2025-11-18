@@ -80,12 +80,13 @@ public class ButtonHelperRelics {
 
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanetsAllianceMode()) {
-            if (game.getPlanetsInfo().get(planet) == null) continue;
+        for (String planetName : player.getPlanetsAllianceMode()) {
+            Planet planet = game.getPlanetsInfo().get(planetName);
+            if (planet == null || planet.isFake()) continue;
 
-            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planet, game, false, null);
+            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null);
             if (!legendaryOrHome) {
-                buttons.add(Buttons.green("nanoforgePlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                buttons.add(Buttons.green("nanoforgePlanet_" + planetName, Helper.getPlanetRepresentation(planetName, game)));
             }
         }
         String message = "Please choose which planet you wish to attach _Nano-Forge_ to.";
@@ -94,12 +95,13 @@ public class ButtonHelperRelics {
 
     public static void offerTitansHeroButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanetsAllianceMode()) {
-            if (game.getPlanetsInfo().get(planet) == null) continue;
+        for (String planetName : player.getPlanetsAllianceMode()) {
+            Planet planet = game.getPlanetsInfo().get(planetName);
+            if (planet == null || planet.isFake()) continue;
 
-            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planet, game, false, null);
+            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null);
             if (!legendaryOrHome || game.isTwilightsFallMode()) {
-                buttons.add(Buttons.green("titansHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                buttons.add(Buttons.green("titansHeroPlanet_" + planetName, Helper.getPlanetRepresentation(planetName, game)));
             }
         }
         String message = "Please choose which planet you wish to attach _Titans Hero_ to.";
