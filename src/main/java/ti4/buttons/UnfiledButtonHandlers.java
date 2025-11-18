@@ -269,7 +269,6 @@ public class UnfiledButtonHandlers {
                             .toList();
                     String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
                     game.setupNeutralPlayer(color);
-                    neutral = game.getPlayerFromColorOrFaction("neutral");
                 }
             }
         }

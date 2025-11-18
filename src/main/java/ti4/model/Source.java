@@ -42,7 +42,6 @@ public class Source {
         keleresplus,
         little_omega,
         project_pi,
-        neutral,
         lost_star_charts_of_ixth,
         flagshipping,
         promises_promises,
@@ -146,7 +145,6 @@ public class Source {
                         case promises_promises -> SourceEmojis.PromisesPromises;
                         case miltymod -> SourceEmojis.MiltyMod;
                         case lazax -> FactionEmojis.Lazax;
-                        case neutral -> FactionEmojis.Neutral;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
                         default -> null;

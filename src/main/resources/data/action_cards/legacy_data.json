@@ -10,15 +10,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "blackmail",
-        "name": "Blackmail",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Choose another player. That player may give you 1 random promissory note from their hand; otherwise, they must cast at least 1 vote for an outcome of your choice during this agenda, if able.",
-        "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
-        "source": "deprecated"
-    },
-    {
         "alias": "adrenaline_shots",
         "name": "Adrenaline Shots",
         "phase": "Action",
@@ -826,15 +817,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "liberation",
-        "name": "Liberation",
-        "phase": "Any",
-        "window": "After you gain control of a planet",
-        "text": "Place 3 infantry from your reinforcements on that planet.",
-        "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
-        "source": "deprecated"
-    },
-    {
         "alias": "last_minute_deliberation",
         "name": "Last Minute Deliberation",
         "phase": "Agenda",
@@ -1079,15 +1061,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "opportunists",
-        "name": "Opportunists",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Choose 1 system that contains another player's ships and no planets. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
-        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
-        "source": "deprecated"
-    },
-    {
         "alias": "miraculous_escape",
         "name": "Miraculous Escape",
         "phase": "Any",
@@ -1133,15 +1106,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "flawless_strategy",
-        "name": "Flawless Strategy",
-        "phase": "Action",
-        "window": "After you exhaust your strategy card",
-        "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
-        "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
-        "source": "deprecated"
-    },
-    {
         "alias": "skilled_retreat1_acd2",
         "name": "Skilled Retreat",
         "phase": "Action",
@@ -1179,15 +1143,6 @@
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "The armada followed the Hil Colish into the fading wormhole.",
-        "source": "deprecated"
-    },
-    {
-        "alias": "strategic_focus",
-        "name": "Strategic Focus",
-        "phase": "Action",
-        "window": "After you pass",
-        "text": "Resolve the secondary ability of 1 readied or unchosen strategy card; do not spend or place a command token to resolve that ability.",
-        "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
         "source": "deprecated"
     },
     {
