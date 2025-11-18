@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,7 +19,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -415,53 +413,6 @@ public class TacticalActionService {
 
     private boolean shouldSkipLandingOnPlanet(Planet planet) {
         return planet.getTokenList().stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
-    }
-
-    /**
-     * Check if a game is standard PoK or only uses 4/4/4 homebrew.
-     * Duplicated here to mirror URL selection logic used for the Website View button.
-     */
-    private static boolean isStandardPoKOrOnly444(Game game) {
-        if (game == null) return false;
-
-        if (game.isHomebrew()
-                || game.isExtraSecretMode()
-                || game.isFowMode()
-                || game.isAgeOfExplorationMode()
-                || game.isFacilitiesMode()
-                || game.isMinorFactionsMode()
-                || game.isLightFogMode()
-                || game.isRedTapeMode()
-                || game.isDiscordantStarsMode()
-                || game.isFrankenGame()
-                || game.isMiltyModMode()
-                || game.isAbsolMode()
-                || game.isVotcMode()
-                || game.isPromisesPromisesMode()
-                || game.isFlagshippingMode()
-                || game.isAllianceMode()
-                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
-                || game.isHomebrewSCMode()
-                || game.isCommunityMode()
-                || game.getPlayerCountForMap() < 3
-                || game.getPlayerCountForMap() > 8) {
-            return false;
-        }
-
-        try {
-            if (!game.checkAllDecksAreOfficial()
-                    || !game.checkAllTilesAreOfficial()
-                    || game.getFactions().stream()
-                            .map(Mapper::getFaction)
-                            .filter(Objects::nonNull)
-                            .anyMatch(faction -> !faction.getSource().isOfficial())) {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
     }
 
     private void addLandingAndUnlandingButtonsForPlanet(
