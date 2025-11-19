@@ -368,10 +368,20 @@ public class ButtonHelperTwilightsFall {
         if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
             msg = player.getRepresentation() + " select a card to remove from the splice:";
         }
-        if (game.isVeiledHeartMode()) {
-            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), msg, embeds, buttons);
+        if (player.isNpc()) {
+            selectASpliceCard(
+                    game,
+                    player,
+                    buttons.getFirst().getCustomId().replace(player.getFinsFactionCheckerPrefix(), ""),
+                    null);
         } else {
-            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
+            if (game.isVeiledHeartMode()) {
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                        player.getCardsInfoThread(), msg, embeds, buttons);
+            } else {
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                        player.getCorrectChannel(), msg, embeds, buttons);
+            }
         }
     }
 

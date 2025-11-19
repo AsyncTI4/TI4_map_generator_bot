@@ -2405,6 +2405,15 @@ public class ButtonHelperFactionSpecific {
                 event.getChannel(), "Something went wrong - couldn't find the other player.");
     }
 
+    @ButtonHandler("passMalevolencyTo")
+    public static void passMalevolencyTo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String id = "naaluHeroSend_" + p2.getFaction() + "_"
+                + player.getPromissoryNotes().get("malevolency");
+        ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, null);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("redCreussWashFull")
     public static void redCreussWashFull(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (player.getCommodities() == 0) {

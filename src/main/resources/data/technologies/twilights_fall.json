@@ -843,7 +843,7 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "Once per action, when you resolve one a unit's PRODUCTION ability: You may resolve another of your unit's PRODUCTION abilities in any system.",
+        "text": "Once per action, when you resolve a unit's PRODUCTION ability: You may resolve another of your unit's PRODUCTION abilities in any system.",
         "source": "twilights_fall",
         "faction": "keleres"
     },
