@@ -1098,10 +1098,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public int getMaxSOCount() {
         int maxSOCount = game.getMaxSOCountPerPlayer();
-        if (hasRelic("obsidian")) maxSOCount++;
-        if (hasRelic("absol_obsidian")) maxSOCount++;
-        if (hasAbility("information_brokers")) maxSOCount++;
-        return maxSOCount;
+        int bonus = 0;
+        if (hasRelic("obsidian")) bonus++;
+        if (hasRelic("absol_obsidian")) bonus++;
+        if (hasAbility("information_brokers")) bonus++;
+        return maxSOCount + Math.max(bonus, getBonusScoredSecrets());
     }
 
     public Map<String, Integer> getSecrets() {

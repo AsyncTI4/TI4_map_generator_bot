@@ -892,6 +892,7 @@ class GameSaveService {
 
             writer.write(Constants.TOTAL_EXPENSES + " " + player.getTotalExpenses());
             writer.write(System.lineSeparator());
+            writeIntLine(writer, Constants.BONUS_SCORED_SECRETS, player.getBonusScoredSecrets());
 
             writer.write(Constants.TURN_COUNT + " " + player.getInRoundTurnCount());
             writer.write(System.lineSeparator());

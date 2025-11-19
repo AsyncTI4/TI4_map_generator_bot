@@ -214,6 +214,7 @@ public class RelicHelper {
         Helper.checkEndGame(game, player);
     }
 
+    /** Meant to be called AFTER removing the relic from the player */
     public void resolveRelicLossEffects(GenericInteractionCreateEvent event, Game game, Player p1, String relicID) {
         // HANDLE LOSING SHARD OF THE THRONE
         String shardCustomPOName = null;
@@ -221,20 +222,30 @@ public class RelicHelper {
         switch (relicID) {
             case "shard" -> {
                 shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get("Shard of the Throne");
+                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
                 shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
             }
+            case "thetriad" -> {
+                p1.removePlanet("triad");
+            }
+            case "obsidian", "absol_obsidian" -> {
+                if (p1.getSoScored() > p1.getMaxSOCount()) {
+                    // do something for 4 scored secrets
+                    p1.setBonusScoredSecrets(p1.getBonusScoredSecrets() + 1);
+                }
+            }
         }
+
         if (shardCustomPOName != null
                 && shardPublicObjectiveID != null
                 && game.getCustomPublicVP().containsKey(shardCustomPOName)
                 && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
             game.unscorePublicObjective(p1.getUserID(), shardPublicObjectiveID);
-            String msg = p1.getRepresentation() + " unscored _" + shardCustomPOName + "_.";
+            String msg = p1.getRepresentation() + " lost 1 point due to losing _" + shardCustomPOName + "_.";
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
         }
     }
