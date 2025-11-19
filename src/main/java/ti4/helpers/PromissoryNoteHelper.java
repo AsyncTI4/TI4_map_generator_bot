@@ -381,7 +381,7 @@ public class PromissoryNoteHelper {
             ButtonHelper.deleteTheOneButton(event);
             buttons = new ArrayList<>();
             for (Player p2 : player.getNeighbouringPlayers(true)) {
-                buttons.add(Buttons.green("passMalevolencyTo_" + p2.getFaction(), p2.getDisplayName()));
+                buttons.add(Buttons.green("passMalevolencyTo_" + p2.getFaction(), p2.getFactionNameOrColor()));
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

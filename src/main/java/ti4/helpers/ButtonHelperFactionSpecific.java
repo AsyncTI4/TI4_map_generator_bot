@@ -2408,7 +2408,8 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("passMalevolencyTo")
     public static void passMalevolencyTo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String id = "naaluHeroSend_" + p2.getFaction() + "_malevolency";
+        String id = "naaluHeroSend_" + p2.getFaction() + "_"
+                + player.getPromissoryNotes().get("malevolency");
         ButtonHelperHeroes.resolveNaaluHeroSend(player, game, id, null);
         ButtonHelper.deleteMessage(event);
     }

@@ -641,17 +641,7 @@ public class ButtonHelperTacticalAction {
                         + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
             }
-            if (player.hasPlayablePromissoryInHand("malevolency")) {
-                Button transact = Buttons.green("resolvePNPlay_malevolency", "Play Malevolency");
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(transact);
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged()
-                                + " Reminder you have the Malevolency promissory note, and now is the window to cackle evilly and pass it on if you so wish.",
-                        buttons);
-            }
+
             Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();
             if (player.hasAbility("incursion")
                     && (tokens.contains(Constants.TOKEN_BREACH_ACTIVE)
