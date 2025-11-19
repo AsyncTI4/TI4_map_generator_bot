@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -42,6 +43,9 @@ public class RearmamentAgendaResolver implements ForAgainstAgendaResolver {
                         capChecker.addUnit(infKey, count);
                     }
                 }
+            }
+            if (player.hasActiveBreakthrough("naazbt")) {
+                BreakthroughCommandHelper.deactivateBreakthrough(player);
             }
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Removed all mechs.");

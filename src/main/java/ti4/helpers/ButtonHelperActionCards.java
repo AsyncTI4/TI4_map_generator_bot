@@ -16,6 +16,7 @@ import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -651,6 +652,11 @@ public class ButtonHelperActionCards {
                     player.setActualHits(player.getActualHits() + totalHits);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
                     uH.removeUnit(key, hitRolls);
+                    if (hitRolls > 0
+                            && key.getUnitType().equals(UnitType.Mech)
+                            && player_.hasActiveBreakthrough("naazbt")) {
+                        BreakthroughCommandHelper.deactivateBreakthrough(player_);
+                    }
                 }
             }
         }
