@@ -4927,6 +4927,17 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
+        if (player.hasPlayablePromissoryInHand("malevolency")) {
+            Button transact = Buttons.green("resolvePNPlay_malevolency", "Play Malevolency");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(transact);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + " Reminder you have the Malevolency promissory note, and now is the window to cackle evilly and pass it on if you so wish.",
+                    buttons);
+        }
         if (player.hasUnit("winnu_mech") && !isLawInPlay(game, "articles_war")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 int mechCount = uH.getUnitCount(UnitType.Mech, player.getColor());
