@@ -654,8 +654,8 @@ public class ButtonHelperActionCards {
                     uH.removeUnit(key, hitRolls);
                     if (hitRolls > 0
                             && key.getUnitType().equals(UnitType.Mech)
-                            && player.hasActiveBreakthrough("naazbt")) {
-                        BreakthroughCommandHelper.deactivateBreakthrough(player);
+                            && player_.hasActiveBreakthrough("naazbt")) {
+                        BreakthroughCommandHelper.deactivateBreakthrough(player_);
                     }
                 }
             }
