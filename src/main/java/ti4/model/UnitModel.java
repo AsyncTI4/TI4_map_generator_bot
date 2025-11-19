@@ -64,8 +64,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isSpaceOnly;
     private Boolean isPlanetOnly;
     private String ability;
+    private String flavourText;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
+    private String automationID;
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();

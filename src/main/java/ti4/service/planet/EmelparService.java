@@ -132,7 +132,7 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             player2.setBreakthroughExhausted(false);
-            String readyItem = player.getBreakthroughModel().getNameRepresentation();
+            String readyItem = player2.getBreakthroughModel().getNameRepresentation();
             postSummary(event, player, readyItem);
         });
     }
