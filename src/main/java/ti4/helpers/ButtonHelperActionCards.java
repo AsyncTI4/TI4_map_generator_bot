@@ -16,6 +16,7 @@ import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -651,6 +652,11 @@ public class ButtonHelperActionCards {
                     player.setActualHits(player.getActualHits() + totalHits);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
                     uH.removeUnit(key, hitRolls);
+                    if (hitRolls > 0
+                            && key.getUnitType().equals(UnitType.Mech)
+                            && player_.hasActiveBreakthrough("naazbt")) {
+                        BreakthroughCommandHelper.deactivateBreakthrough(player_);
+                    }
                 }
             }
         }
@@ -1980,14 +1986,14 @@ public class ButtonHelperActionCards {
         if (player.getActionCards().containsKey("tf-stasis")) {
             game.setStoredValue("Stasis Target", "");
             String msg = player.getRepresentation()
-                    + ", you have the option to pre-assign which player whose turn you wish to skip with statis."
-                    + " _stasis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with _Stasis_."
+                    + " _Stasis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                String label = "Statis On " + p2.getFactionNameOrColor();
+                String label = "Stasis On " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
-                scButtons.add(Buttons.gray("resolvePreassignment_Statis Target_" + p2.getColor(), label, scEmoji));
+                scButtons.add(Buttons.gray("resolvePreassignment_Stasis Target_" + p2.getColor(), label, scEmoji));
             }
             scButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);

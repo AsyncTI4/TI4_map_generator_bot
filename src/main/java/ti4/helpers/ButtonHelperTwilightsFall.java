@@ -883,8 +883,13 @@ public class ButtonHelperTwilightsFall {
     }
 
     public static void sendSpliceDeck(Game game, String type, ButtonInteractionEvent event) {
-        List<MessageEmbed> embeds = new ArrayList<>();
         List<String> cards = getDeckForSplicing(game, type, 100, true);
+        if (cards.isEmpty()) {
+            String messageText = "There are no more cards in the " + type + " deck.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
+            return;
+        }
+        List<MessageEmbed> embeds = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 embeds.add(Mapper.getTech(card).getRepresentationEmbed());
