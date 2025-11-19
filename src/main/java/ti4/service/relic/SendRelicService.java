@@ -2,7 +2,6 @@ package ti4.service.relic;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
@@ -26,7 +25,7 @@ public class SendRelicService {
         player2.addRelic(relicID);
 
         // Remove points etc from p1, then resolve effects for p2
-        resolveRelicLossEffects(event, game, player1, relicID);
+        RelicHelper.resolveRelicLossEffects(event, game, player1, relicID);
         RelicHelper.resolveRelicEffects(event, game, player2, relicID);
 
         // Additionally exhaust the relic after gaining, if applicable
@@ -49,28 +48,5 @@ public class SendRelicService {
         MessageHelper.sendMessageToChannel(player1.getCorrectChannel(), sb);
         if (game.isFowMode()) MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         Helper.checkEndGame(game, player2);
-    }
-
-    private void resolveRelicLossEffects(GenericInteractionCreateEvent event, Game game, Player p1, String relicID) {
-        // HANDLE LOSING SHARD OF THE THRONE
-        String shardCustomPOName = null;
-        Integer shardPublicObjectiveID = null;
-        switch (relicID) {
-            case "shard" -> {
-                shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get("Shard of the Throne");
-            }
-            case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
-                int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
-                shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
-            }
-        }
-        if (shardCustomPOName != null
-                && shardPublicObjectiveID != null
-                && game.getCustomPublicVP().containsKey(shardCustomPOName)
-                && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
-            game.unscorePublicObjective(p1.getUserID(), shardPublicObjectiveID);
-        }
     }
 }
