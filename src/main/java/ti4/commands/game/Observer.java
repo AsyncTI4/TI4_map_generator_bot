@@ -57,7 +57,8 @@ class Observer extends Subcommand {
         }
 
         // INVITE TO GAME SERVER IF MISSING
-        if (member == null || !CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
+        if (member == null 
+                || !CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
                 .isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
