@@ -92,7 +92,7 @@
         "cost": 3,
         "combatHitsOn": 5,
         "combatDieCount": 1,
-        "bombardHitsOn": 5,
+        "bombardHitsOn": 4,
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
