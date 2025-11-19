@@ -642,10 +642,15 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
             }
             if (player.hasPlayablePromissoryInHand("malevolency")) {
-                MessageHelper.sendMessageToPlayerCardsInfoThread(
-                        player,
+                Button transact = Buttons.green("resolvePNPlay_malevolency", "Play Malevolency");
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(transact);
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
                         player.getRepresentationUnfogged()
-                                + " Reminder you have the Malevolency promissory note, and now is the window to pass it on if you so wish.");
+                                + " Reminder you have the Malevolency promissory note, and now is the window to cackle evilly and pass it on if you so wish.",
+                        buttons);
             }
             Set<String> tokens = activeSystem.getSpaceUnitHolder().getTokenList();
             if (player.hasAbility("incursion")
