@@ -45,6 +45,7 @@ import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -1929,6 +1930,9 @@ public class Player extends PlayerProperties {
                 MessageHelper.sendMessageToChannel(
                         holder.getCorrectChannel(),
                         holder.getRepresentation() + " everyone has reacted to the splice.");
+                if (holder.isNpc()) {
+                    ButtonHelperTwilightsFall.startSplice(game, holder, "startSplice_" + sc, null);
+                }
             }
             if (game.getStoredValue("endTurnWhenSCFinished")
                     .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
