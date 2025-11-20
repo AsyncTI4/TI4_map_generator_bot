@@ -1361,6 +1361,21 @@
         "forCombatAbility": "bombardment"
     },
     {
+        "alias": "plus1_roll_bluetf_mech",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "mechs_in_space_area",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bluetf_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus_x_frag_always_flagship_afb",
         "type": "mods",
         "value": "+1",

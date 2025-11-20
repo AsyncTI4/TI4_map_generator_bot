@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -244,7 +243,7 @@ public class PuppetSoftHeBladeService {
                 failed.add(tech);
                 return;
             }
-            String replacableTech = tech.replace("-obs","-firm");
+            String replacableTech = tech.replace("-obs", "-firm");
             for (Player p2 : game.getPlayers().values()) {
                 // replace tech for all players because nekro i guess
                 if (p2.hasTech(replacableTech)) {

@@ -12,9 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -700,6 +698,9 @@ public class CombatModHelper {
                             scalingCount += 1;
                         }
                     }
+                }
+                case "mechs_in_space_area" -> {
+                    scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                 }
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
