@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.map.FractureService;
 
 @UtilityClass
 public class GameStatisticsFilterer {
@@ -27,6 +28,7 @@ public class GameStatisticsFilterer {
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
     private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
+    private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
 
     private static final int MINIMUM_ROUND = 3;
 
@@ -60,6 +62,8 @@ public class GameStatisticsFilterer {
                 OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Filter games by if the game has a galactic event"));
         filters.add(
                 new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
+        filters.add(new OptionData(
+                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if the fracture was in play"));
         return filters;
     }
 
@@ -83,6 +87,7 @@ public class GameStatisticsFilterer {
         String winningFactionFilter = event.getOption(WINNING_FACTION_FILTER, null, OptionMapping::getAsString);
         Boolean galacticEventFilter = event.getOption(HAS_GALACTIC_EVENT_FILTER, null, OptionMapping::getAsBoolean);
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
+        Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -96,6 +101,7 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnWinningFaction(winningFactionFilter, game))
                 .and(game -> filterOnGalacticEvent(galacticEventFilter, game))
                 .and(game -> filterOnScenario(scenarioFilter, game))
+                .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
@@ -210,6 +216,10 @@ public class GameStatisticsFilterer {
         }
         boolean hasScenario = game.isLiberationC4Mode() || game.isOrdinianC1Mode();
         return scenarioFilter == hasScenario;
+    }
+
+    private static boolean filterOnFractureInPlay(Boolean fractureInPlayFilter, Game game) {
+        return fractureInPlayFilter == null || fractureInPlayFilter == FractureService.isFractureInPlay(game);
     }
 
     private static boolean isDiscordantStarsGame(Game game) {

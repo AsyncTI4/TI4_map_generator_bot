@@ -80,13 +80,11 @@ public class ActionCardHelper {
     private static void sendGarboziaInfo(Game game, Player player) {
         if (player.hasPlanet("garbozia")) {
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    getGarboziaInfo(game, player),
-                    getPurgeGarboziaActionCardButtons(game));
+                    player.getCardsInfoThread(), getGarboziaInfo(game), getPurgeGarboziaActionCardButtons(game));
         }
     }
 
-    private static String getGarboziaInfo(Game game, Player player) {
+    private static String getGarboziaInfo(Game game) {
         StringBuilder sb = new StringBuilder();
         // ACTION CARDS
         sb.append("### ")
@@ -122,7 +120,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    public static Map<String, Integer> getGarboziaActionCards(Game game) {
+    static Map<String, Integer> getGarboziaActionCards(Game game) {
         Map<String, Integer> cards = new HashMap<>();
         for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
             if (discard.getValue() != ACStatus.garbozia) continue;
@@ -199,7 +197,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    public static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
+    private static String getTrapCardRepresentation(String trapID, Map<String, String> trapCardsPlanets) {
         StringBuilder sb = new StringBuilder();
         GenericCardModel trap = Mapper.getTrap(trapID);
         String planet = trapCardsPlanets.get(trapID);
@@ -221,13 +219,13 @@ public class ActionCardHelper {
         if (player.hasAbility("plotsplots")
                 || player.hasAbility("bladesorchestra")
                 || player.hasAbility("puppetsoftheblade")) { // firmament/obsidian plot abilities
-            List<Button> buttons = getPlotCardButtons(game, player);
+            List<Button> buttons = getPlotCardButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(), getPlotCardInfo(game, player), buttons);
         }
     }
 
-    public static List<Button> getPlotCardButtons(Game game, Player player) {
+    private static List<Button> getPlotCardButtons(Player player) {
         boolean hasManageAbility = player.hasAbility("plotsplots");
         if (player.hasLeader("firmamenthero")) hasManageAbility = true;
         if (!hasManageAbility) return new ArrayList<>();
@@ -273,7 +271,7 @@ public class ActionCardHelper {
         return buttons;
     }
 
-    public static String getPlotCardInfo(Game game, Player player) {
+    private static String getPlotCardInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder("### **__Plot Cards:__**\n");
         player.getPlotCards().entrySet().stream()
                 .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
@@ -397,7 +395,7 @@ public class ActionCardHelper {
         return CollectionUtils.containsAny(prePlayable, actionCards);
     }
 
-    public static List<Button> getGarboziaComponentActionCards(Game game, Player player) {
+    private static List<Button> getGarboziaComponentActionCards(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> garboziaCards = getGarboziaActionCards(player.getGame());
         if (player.hasPlanet("garbozia") && !garboziaCards.isEmpty()) {
@@ -438,11 +436,11 @@ public class ActionCardHelper {
                 }
             }
         }
-        acButtons.addAll(getGarboziaComponentActionCards(player.getGame(), player));
+        acButtons.addAll(getGarboziaComponentActionCards(player));
         return acButtons;
     }
 
-    public static List<Button> getGarboziaCombatActionCards(Game game, Player player) {
+    private static List<Button> getGarboziaCombatActionCards(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> garboziaCards = getGarboziaActionCards(player.getGame());
         if (player.hasPlanet("garbozia") && !garboziaCards.isEmpty()) {
@@ -489,7 +487,7 @@ public class ActionCardHelper {
                 }
             }
         }
-        acButtons.addAll(getGarboziaCombatActionCards(player.getGame(), player));
+        acButtons.addAll(getGarboziaCombatActionCards(player));
         return acButtons;
     }
 
@@ -744,7 +742,7 @@ public class ActionCardHelper {
                 MiscEmojis.Sabotage);
         buttons.add(sabotageButton);
 
-        if (!acID.equals("blackmarketdealing")) {
+        if (!"blackmarketdealing".equals(acID)) {
             Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
             if (empy != null
                     && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
