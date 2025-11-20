@@ -243,7 +243,7 @@ public class PuppetSoftHeBladeService {
                 failed.add(tech);
                 return;
             }
-            String replacableTech = Mapper.getTech(tech).getName().replace("Obsidian", "Firmament");
+            String replacableTech = tech.replace("-obs", "-firm");
             for (Player p2 : game.getPlayers().values()) {
                 // replace tech for all players because nekro i guess
                 if (p2.hasTech(replacableTech)) {

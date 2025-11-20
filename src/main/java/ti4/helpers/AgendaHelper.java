@@ -1889,6 +1889,7 @@ public class AgendaHelper {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                         + ", you are being skipped because the bot thinks you can't vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
+                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     skippedMessage = realIdentity
                             + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue(
@@ -1897,6 +1898,7 @@ public class AgendaHelper {
                     nextInLine.resetSpentThings();
                 }
                 if (willPrevote) {
+                    ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
                     skippedMessage = realIdentity + " had logged a pre-vote.";
                     String votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
                     game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
@@ -4335,7 +4337,7 @@ public class AgendaHelper {
                     }
                 } else {
                     sb.append(
-                            "The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard.");
+                            "The top agenda is currently in somebody's hand. If you are not currently resolving the covert legislation agenda and politics player is done assigning agendas, fix this situation by running the command: /agenda reset_draw_state_for_deck confirm:YES.");
                 }
             } else if (agendaID != null) {
                 embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
