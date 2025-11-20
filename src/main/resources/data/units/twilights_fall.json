@@ -658,7 +658,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "While this unit is being transported, choose 1 unit in its system that has a capacity value to roll 1 additional die on its combat roll."
+        "ability": "While this unit is in the space area, choose 1 unit in its system that has a capacity value to roll 1 additional die on its combat roll."
     },
     {
         "id": "orangetf_flagship",

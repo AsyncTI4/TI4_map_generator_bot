@@ -690,6 +690,18 @@ public class CombatModHelper {
                         }
                     }
                 }
+                case "adjacent_anomaly" -> {
+                    for (String pos :
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = game.getTileByPosition(pos);
+                        if (tile.isAnomaly(game)) {
+                            scalingCount += 1;
+                        }
+                    }
+                }
+                case "mechs_in_space_area" -> {
+                    scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                }
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
                     if (origUnit.getIsGroundForce()
