@@ -30,6 +30,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.website.EgressClientManager;
+import ti4.service.map.FractureService;
 
 public class GameStatsDashboardPayload {
 
@@ -327,6 +328,11 @@ public class GameStatsDashboardPayload {
 
     public boolean hasCompleted() {
         return game.getWinner().isPresent() && game.isHasEnded();
+    }
+
+    @JsonProperty("fracture_in_play")
+    public boolean isFractureInPlay() {
+        return FractureService.isFractureInPlay(game) && !game.isNoFractureMode();
     }
 
     public boolean isHomebrew() {
