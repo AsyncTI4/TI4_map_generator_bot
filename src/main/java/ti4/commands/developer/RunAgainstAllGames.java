@@ -1,6 +1,5 @@
 package ti4.commands.developer;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Objects;
@@ -8,9 +7,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.Subcommand;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 class RunAgainstAllGames extends Subcommand {
 
@@ -29,6 +30,7 @@ class RunAgainstAllGames extends Subcommand {
         GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
             boolean changed = makeChanges(game);
             if (changed) {
+                BotLogger.info("Changes made to " + game.getName() + ".");
                 GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
             }
         });
@@ -60,10 +62,9 @@ class RunAgainstAllGames extends Subcommand {
         }
 
         try {
-            return new SimpleDateFormat("yyyy.MM.dd")
-                    .parse(game.getCreationDate())
-                    .getTime();
+            return GameHelper.getCreationDateAsEpochMillis(game);
         } catch (Exception e) {
+            BotLogger.info("Could not handle creation date for " + game.getName() + ": " + e.getMessage());
             return CUTOFF_DATE;
         }
     }
