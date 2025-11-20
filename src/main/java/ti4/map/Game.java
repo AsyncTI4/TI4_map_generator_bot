@@ -829,6 +829,7 @@ public class Game extends GameProperties {
         gameModes.put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
         gameModes.put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
         gameModes.put("Thunder's Edge", isThundersEdge());
+        gameModes.put("Thunder's Edge Demo", isThundersEdgeDemo());
         gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
         gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
         gameModes.put("Community", isCommunityMode());
@@ -4807,6 +4808,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public boolean isThundersEdgeDemo() {
+        return getTags().contains("ThundersEdgeDemo");
+    }
+
+    @JsonIgnore
     public boolean hasHomebrew() {
         return isHomebrew()
                 || isExtraSecretMode()
@@ -4817,6 +4823,7 @@ public class Game extends GameProperties {
                 || isDiscordantStarsMode()
                 || isFrankenGame()
                 || isMiltyModMode()
+                || isThundersEdgeDemo()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()
