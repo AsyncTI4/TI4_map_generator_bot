@@ -3,7 +3,8 @@ package ti4.service.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,7 +14,6 @@ import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -24,14 +24,14 @@ import ti4.model.ColorModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
-import ti4.service.regex.RegexService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.unit.AddUnitService;
 
+@UtilityClass
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-        return List.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7").stream()
+        return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                 .allMatch(pos -> game.getTileByPosition(pos) != null);
     }
 
@@ -42,7 +42,7 @@ public class FractureService {
             String msg = player.getRepresentation(false, false)
                     + " has Cabal breakthrough so the Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             spawnFracture(event, game);
             spawnIngressTokens(event, game, player, true);
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
@@ -51,7 +51,7 @@ public class FractureService {
             if (result == 1 || result == 10) { // success
                 String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
                         + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, true);
             } else { // fail
@@ -138,7 +138,7 @@ public class FractureService {
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), automatic.toString());
 
-        final int countPer = numberOfIngressPerTechType;
+        int countPer = numberOfIngressPerTechType;
         for (TechnologyType type : techTypesToAddIngress) {
             List<Tile> tilesWithSkip = getTilesWithSkipAndNoIngressAndNotAdding(game, type, automaticAdds);
             if (tilesWithSkip.size() <= numberOfIngressPerTechType) continue;
@@ -153,6 +153,7 @@ public class FractureService {
 
             String msg =
                     player.getRepresentation() + " choose tiles with a " + type.emoji() + " to place an Ingress token:";
+            buttons.add(Buttons.gray("deleteButtons", "Done resolving"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
 
@@ -162,34 +163,13 @@ public class FractureService {
     @ButtonHandler("addIngressToken_")
     private static void addIngressTokenButtonHandler(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        Pattern regex = Pattern.compile(
-                "addIngressToken_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("remaining"));
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            Tile tile = game.getTileByPosition(matcher.group("pos"));
-            int remaining = Integer.parseInt(matcher.group("remaining"));
-            tile.addToken(Constants.TOKEN_INGRESS, "space");
 
-            if (remaining <= 1) {
-                ButtonHelper.deleteMessage(event);
-            } else {
-                List<Button> buttons = event.getMessage().getButtons();
-                List<Button> newButtons = new ArrayList<>();
-                for (Button b : buttons) {
-                    if (b.getCustomId().endsWith(buttonID)) continue;
-                    if (b.getCustomId().toLowerCase().contains("undo")) {
-                        newButtons.add(b);
-                        continue;
-                    }
-                    String ffcc = player.finChecker();
-                    String idSansChecker = b.getCustomId().replace(player.finChecker(), "");
-                    RegexService.runMatcher(regex, idSansChecker, m2 -> {
-                        String pos = matcher.group("pos");
-                        newButtons.add(b.withCustomId(ffcc + "addIngressToken_" + pos + "_" + (remaining - 1)));
-                    });
-                }
-                MessageHelper.editMessageButtons(event, newButtons);
-            }
-        });
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons());
+        tile.addToken(Constants.TOKEN_INGRESS, "space");
+
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     private static List<Tile> getTilesWithSkipAndNoIngressAndNotAdding(

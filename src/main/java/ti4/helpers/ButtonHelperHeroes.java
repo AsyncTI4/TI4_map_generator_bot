@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +38,6 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
-import ti4.service.PlanetService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -49,6 +50,7 @@ import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
@@ -74,14 +76,15 @@ public class ButtonHelperHeroes {
     public static List<Button> argentBreakthroughStep1(Game game, Player player, Tile activeSystem) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(
-                "argentHeroStep2_" + activeSystem.getPosition(),
+                player.getFinsFactionCheckerPrefix() + "argentHeroStep2_" + activeSystem.getPosition(),
                 activeSystem.getRepresentationForButtons(game, player)));
         for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, activeSystem.getPosition(), player, false)) {
             Tile tile = game.getTileByPosition(pos);
             if (CommandCounterHelper.hasCC(player, tile)
                     && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 buttons.add(Buttons.green(
-                        "argentHeroStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                        player.getFinsFactionCheckerPrefix() + "argentHeroStep2_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)));
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Done resolving"));
@@ -1259,6 +1262,27 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("dwsHeroPurge_")
+    public static void dwsHeroPurge(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String techID = buttonID.replace("dwsHeroPurge_", "");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " purged "
+                        + Mapper.getTech(techID).getName()
+                        + " with their hero. Those who owned the tech can now research one tech");
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2.getTechs().contains(techID)) {
+                ButtonHelperActionCards.resolveResearch(game, p2, event);
+            }
+            p2.purgeTech(techID);
+            String msg = p2.getRepresentationUnfogged() + " purged "
+                    + Mapper.getTech(techID).getName();
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("nekroHeroStep2_")
     public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -1403,7 +1427,7 @@ public class ButtonHelperHeroes {
             message.append("### Resolving for tile ")
                     .append(tile.getRepresentationForButtons())
                     .append("\n");
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) {
                     continue;
                 }
@@ -1439,7 +1463,8 @@ public class ButtonHelperHeroes {
                         if (key.getUnitType() == UnitType.Infantry
                                 || key.getUnitType() == UnitType.Mech
                                 || key.getUnitType() == UnitType.Fighter
-                                || key.getUnitType() == UnitType.Spacedock) {
+                                || key.getUnitType() == UnitType.Spacedock
+                                || key.getUnitType() == UnitType.Pds) {
                             continue;
                         }
 
@@ -1807,7 +1832,7 @@ public class ButtonHelperHeroes {
     public static void executeCabalHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
         String pos = buttonID.replace("cabalHeroTile_", "");
         Tile tile = game.getTileByPosition(pos);
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNNeutral()) {
             if (p2 == player) {
                 continue;
             }
@@ -1831,7 +1856,7 @@ public class ButtonHelperHeroes {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> empties = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)) {
+            if (!tile.getPlanetUnitHolders().isEmpty() || !FoWHelper.playerHasShipsInSystem(player, tile)) {
                 continue;
             }
             empties.add(Buttons.blue(
@@ -2446,7 +2471,10 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         Tile tile1 = game.getTileByPosition(pos1);
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPosition().contains("t") || tile.getPosition().contains("b") || tile == tile1) {
+            if (tile.getPosition().contains("t")
+                    || tile.getPosition().contains("b")
+                    || tile == tile1
+                    || tile.getPosition().contains("frac")) {
                 continue;
             }
             if (FoWHelper.doesTileHaveWHs(game, tile.getPosition()) || FoWHelper.playerHasUnitsInSystem(player, tile)) {
@@ -2589,6 +2617,11 @@ public class ButtonHelperHeroes {
                     game.getMainGameChannel(),
                     game.getPing()
                             + " reminder that the others cannot follow this. Only the Overrule player gets to do anything.");
+            if (sc == 5) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "# Reminder that the primary of trade does not enable the secondary of trade. You cannot replenish others with overrule.");
+            }
         } else {
             if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
                 MessageHelper.sendMessageToChannel(

@@ -23,16 +23,19 @@ class DrawSpecificAC extends GameStateSubcommand {
         var game = getGame();
         var player = getPlayer();
         String acId = event.getOption(Constants.AC_ID).getAsString();
-        int currentAcCount = player.getAc();
+        int currentAcCount = player.getAcCount();
 
         game.drawSpecificActionCard(acId, player.getUserID());
 
-        if (currentAcCount == player.getAc()) {
+        if (currentAcCount == player.getAcCount()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
-                    "Card not drawn. It could be in someone's hand, or you could be using the wrong ID."
-                            + " Remember, you need the word ID (i.e `scramble` for _Scramble Frequency_) and not the number ID. You may find the word ID with the `/search action_cards` command."
-                            + "\n\nIf it is in the discard, you need a different command, try /ac pick_from_discard");
+                    """
+                    Card not drawn. It could be in someone's hand, or you could be using the wrong ID.\
+                     Remember, you need the word ID (i.e `scramble` for _Scramble Frequency_) and not the number ID. You may find the word ID with the `/search action_cards` command.\
+
+
+                    If it is in the discard, you need a different command, try /ac pick_from_discard""");
             return;
         }
 

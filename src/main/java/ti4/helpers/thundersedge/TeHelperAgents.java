@@ -28,6 +28,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+import ti4.model.UnitModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -44,7 +45,6 @@ public class TeHelperAgents {
         if (target == null) target = player;
         switch (leaderID) {
             case "crimsonagent" -> postCrimsonAgentStep1(game, target);
-            case "deepwroughtagent" -> postDeepwroughtAgentStep1(game);
             case "ralnelagent" -> postRalNelAgentStep1(event, game, target);
             default -> {
                 return false;
@@ -60,7 +60,7 @@ public class TeHelperAgents {
 
         List<Button> buttons = new ArrayList<>();
         List<String> newACs = acsAfter.keySet().stream()
-                .filter(key -> !acsBefore.keySet().contains(key))
+                .filter(key -> !acsBefore.containsKey(key))
                 .toList();
         for (String ac : newACs) {
             ActionCardModel model = Mapper.getActionCard(ac);
@@ -119,7 +119,7 @@ public class TeHelperAgents {
     }
 
     private static void postCrimsonAgentStep1(Game game, Player player) {
-        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> um.getIsShip());
+        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
         String message = player.getRepresentation() + " Choose the first tile to swap a unit from:";
         List<Button> buttons =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "handleCrimsonAgent", pred, false);
@@ -129,7 +129,7 @@ public class TeHelperAgents {
     @ButtonHandler("handleCrimsonAgent_")
     private static void handleCrimsonAgent(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String prefix = buttonID + "_";
-        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> um.getIsShip());
+        Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
 
         String part1 = "handleCrimsonAgent";
         String part2 = part1 + "_" + RegexHelper.posRegex(game, "tileA");
@@ -221,11 +221,6 @@ public class TeHelperAgents {
         }
     }
 
-    private static void postDeepwroughtAgentStep1(Game game) {
-        // "placeIntoCoexist_[planet]_[unitList]"
-
-    }
-
     public static void serveNaaluAgentButtons(Game game, Player player, Tile tile, Player p2) {
         // Not allowed in fow if you can't see the tile
         if (game.isFowMode() && tile.hasFog(player)) return;
@@ -254,12 +249,34 @@ public class TeHelperAgents {
         String regex = "useNaaluAgent_" + RegexHelper.posRegex(game) + "_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
-            Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
+            Player p3 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
 
             player.getLeaderByID("naaluagent-te").ifPresent(zeu -> {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
-                RemoveCommandCounterService.fromTile(event, p2, tile);
+                RemoveCommandCounterService.fromTile(event, p3, tile);
             });
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
+                    List<Button> buttons2 = new ArrayList<>();
+                    String msg;
+                    if (game.isTwilightsFallMode()) {
+                        buttons2.add(Buttons.green(
+                                p2.getFinsFactionCheckerPrefix() + "useTCS_naaluagent-te_" + player.getFaction(),
+                                "Spend A Command Token to Ready Naalu Agent"));
+                        buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                        msg = p2.getRepresentationUnfogged()
+                                + " you have the opportunity to spend a command token via _ Temporal Command Suite_ to ready Naalu Agent and potentially resolve a transaction.";
+                    } else {
+                        buttons2.add(Buttons.green(
+                                p2.getFinsFactionCheckerPrefix() + "exhaustTCS_naaluagent-te_" + player.getFaction(),
+                                "Exhaust Temporal Command Suite to Ready Naalu Agent"));
+                        buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                        msg = p2.getRepresentationUnfogged()
+                                + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready Naalu Agent and potentially resolve a transaction.";
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
+                }
+            }
         });
         ButtonHelper.deleteMessage(event);
     }

@@ -52,7 +52,7 @@ public class DraftButtonService {
             ButtonHelper.deleteMessage(event);
         } else if (outcome.startsWith(USER_MISTAKE_PREFIX)) {
             String userMessage = outcome.substring(USER_MISTAKE_PREFIX.length());
-            if (userMessage == null || userMessage.isEmpty()) {
+            if (userMessage.isEmpty()) {
                 userMessage = "You can't use this button.";
             }
             if (event instanceof ButtonInteractionEvent bevent) {

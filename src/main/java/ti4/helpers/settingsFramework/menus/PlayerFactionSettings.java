@@ -178,11 +178,11 @@ public class PlayerFactionSettings extends SettingsMenu {
     }
 
     private String prioritizeTEFactions() {
-        if (parent != null && parent instanceof MiltySettings ms) {
+        if (parent != null && parent instanceof MiltySettings) {
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if (model.getAlias().equalsIgnoreCase("obsidian")) {
+                if ("obsidian".equalsIgnoreCase(model.getAlias())) {
                     continue;
                 }
                 if (model.getSource() == ComponentSource.thunders_edge) newKeys.add(model.getAlias());

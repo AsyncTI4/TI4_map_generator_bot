@@ -215,9 +215,11 @@ public class PromissoryNoteHelper {
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
         } else {
-            player.removePromissoryNote(id);
-            if (!"dspncymi".equalsIgnoreCase(id)) {
-                owner.setPromissoryNote(id);
+            if (!id.equalsIgnoreCase("malevolency")) {
+                player.removePromissoryNote(id);
+                if (!"dspncymi".equalsIgnoreCase(id)) {
+                    owner.setPromissoryNote(id);
+                }
             }
             // PN Info is refreshed later
         }
@@ -342,8 +344,7 @@ public class PromissoryNoteHelper {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
                     + ". Use buttons to gain 2 command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons(
-                    (MessageChannel) player.getCorrectChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             ActionCardHelper.sendPlotCardInfo(game, owner);
             MessageHelper.sendMessageToChannel(
@@ -351,6 +352,8 @@ public class PromissoryNoteHelper {
                     owner.getRepresentation() + " place a plot into play with " + player.getRepresentationNoPing()
                             + " token on it from black ops");
             owner.removeOwnedPromissoryNoteByID(id);
+            player.removePromissoryNote(id);
+            owner.removePromissoryNote(id);
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =
@@ -364,6 +367,26 @@ public class PromissoryNoteHelper {
             }
             String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        }
+        if ("malevolency".equalsIgnoreCase(id)) {
+
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getFactionEmojiOrColor() + " is paying 1 influence to pass a note to a neighbor.");
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(doneExhausting);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), "Please spend 1 influence.", buttons);
+            ButtonHelper.deleteTheOneButton(event);
+            buttons = new ArrayList<>();
+            for (Player p2 : player.getNeighbouringPlayers(true)) {
+                buttons.add(Buttons.green("passMalevolencyTo_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " Choose a neighbor to pass the note to",
+                    buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps") && !id.contains("absol")) {
             if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {

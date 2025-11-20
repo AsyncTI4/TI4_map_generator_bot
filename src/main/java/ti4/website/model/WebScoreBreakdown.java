@@ -1,6 +1,14 @@
 package ti4.website.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -72,6 +80,7 @@ public class WebScoreBreakdown {
     private static final String CUSTOM_PO_SHARD = "Shard of the Throne";
     private static final String CUSTOM_PO_SHARD_PREFIX = "Shard of the Throne (";
     private static final String CUSTOM_PO_SUPPORT_FOR_THRONE = "support_for_the_throne";
+    private static final String CUSTOM_PO_STYX = "A Song Like Marrow";
 
     // Hardcoded metadata for losable agendas
     private static final Set<String> LOSABLE_AGENDAS = Set.of("political_censure", "mutiny");
@@ -88,6 +97,7 @@ public class WebScoreBreakdown {
             RELIC_LATVINIA,
             RELIC_LATVINIA_BALDRICK,
             RELIC_STYX,
+            CUSTOM_PO_STYX,
             CUSTOM_PO_SUPPORT_FOR_THRONE);
 
     public static WebScoreBreakdown fromPlayer(Player player, Game game) {
@@ -206,7 +216,8 @@ public class WebScoreBreakdown {
         }
 
         // Styx token - losable (homebrew)
-        if (hasStyx(player)) {
+        // Check if player has scored "A Song Like Marrow"
+        if (hasStyx(player, game)) {
             ScoreBreakdownEntry entry = createEntry(EntryType.STYX, null, null, EntryState.SCORED, true, 1, null, null);
             entry.setDescription(buildDescription(EntryType.STYX, EntryState.SCORED, null, null, player, game));
             relicEntries.add(entry);
@@ -321,11 +332,28 @@ public class WebScoreBreakdown {
             }
         }
 
-        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL), 3) progress % (desc)
+        // Sort candidates by: 1) point value (desc), 2) state (QUALIFIES before POTENTIAL),
+        // 3) For QUALIFIES: by absolute progress (desc) - prioritize fully complete objectives
+        // 4) For POTENTIAL: by progress % (desc)
         candidates.sort(Comparator.comparingInt((PublicObjectiveCandidate c) -> c.pointValue)
+                .reversed()
                 .thenComparingInt(c -> c.state == EntryState.QUALIFIES ? 0 : 1)
-                .thenComparingDouble(c -> c.threshold > 0 ? (double) c.progress / c.threshold : 0.0)
-                .reversed());
+                .thenComparing((PublicObjectiveCandidate c1, PublicObjectiveCandidate c2) -> {
+                    // Within QUALIFIES group, prioritize by absolute progress (higher is better)
+                    if (c1.state == EntryState.QUALIFIES && c2.state == EntryState.QUALIFIES) {
+                        return Integer.compare(c2.progress, c1.progress); // Descending
+                    }
+                    // If one is QUALIFIES and one is POTENTIAL, QUALIFIES should already be first from previous
+                    // comparison
+                    // So this should only be called when both are same state
+                    if (c1.state == EntryState.POTENTIAL && c2.state == EntryState.POTENTIAL) {
+                        // Sort POTENTIAL by progress percentage (descending)
+                        double pct1 = c1.threshold > 0 ? (double) c1.progress / c1.threshold : 0.0;
+                        double pct2 = c2.threshold > 0 ? (double) c2.progress / c2.threshold : 0.0;
+                        return Double.compare(pct2, pct1); // Descending
+                    }
+                    return 0; // Shouldn't happen, but keep them in current order
+                }));
 
         // Add top N candidates to entries
         for (int i = 0; i < Math.min(maxPublicObjectives, candidates.size()); i++) {
@@ -476,34 +504,25 @@ public class WebScoreBreakdown {
             EntryType type, EntryState state, String objectiveKey, String agendaKey, Player player, Game game) {
         // For SCORED entries - just show the name
         if (state == EntryState.SCORED) {
-            switch (type) {
-                case PO_1:
-                case PO_2:
+            return switch (type) {
+                case PO_1, PO_2 -> {
                     PublicObjectiveModel po = Mapper.getPublicObjective(objectiveKey);
-                    return po != null ? po.getName() : objectiveKey;
-                case SECRET:
-                    return Mapper.getSecretObjective(objectiveKey) != null
+                    yield po != null ? po.getName() : objectiveKey;
+                }
+                case SECRET ->
+                    Mapper.getSecretObjective(objectiveKey) != null
                             ? Mapper.getSecretObjective(objectiveKey).getName()
                             : objectiveKey;
-                case CUSTODIAN:
-                    return "Custodians Point";
-                case IMPERIAL:
-                    return "Imperial Point";
-                case CROWN:
-                    return "Crown of Emphidia";
-                case LATVINIA:
-                    return "Book of Latvinia";
-                case SFTT:
-                    return "Support for the Throne";
-                case SHARD:
-                    return "Shard of the Throne";
-                case STYX:
-                    return "Styx Token";
-                case AGENDA:
-                    return agendaKey != null ? agendaKey : "Agenda Point";
-                default:
-                    return "";
-            }
+                case CUSTODIAN -> "Custodians Point";
+                case IMPERIAL -> "Imperial Point";
+                case CROWN -> "Crown of Emphidia";
+                case LATVINIA -> "Book of Latvinia";
+                case SFTT -> "Support for the Throne";
+                case SHARD -> "Shard of the Throne";
+                case STYX -> "A Song Like Marrow";
+                case AGENDA -> agendaKey != null ? agendaKey : "Agenda Point";
+                default -> "";
+            };
         }
 
         // For POTENTIAL PO entries - show when they can be scored
@@ -517,25 +536,23 @@ public class WebScoreBreakdown {
 
         // For other POTENTIAL/QUALIFIES entries - just show the name
         if (state == EntryState.POTENTIAL || state == EntryState.QUALIFIES) {
-            switch (type) {
-                case SECRET:
+            return switch (type) {
+                case SECRET ->
                     // Secrets should never leak the name unless SCORED
                     // POTENTIAL and QUALIFIES both hide the secret
-                    return "Drawn Secret";
-                case CUSTODIAN:
+                    "Drawn Secret";
+                case CUSTODIAN -> {
                     List<String> custodianOpportunities = getScoringOpportunities(player, game);
-                    return "Custodians (" + String.join(" or ", custodianOpportunities) + ")";
-                case CROWN:
-                    return "Crown of Emphidia";
-                case LATVINIA:
-                    return "Book of Latvinia";
-                case PO_1:
-                case PO_2:
+                    yield "Custodians (" + String.join(" or ", custodianOpportunities) + ")";
+                }
+                case CROWN -> "Crown of Emphidia";
+                case LATVINIA -> "Book of Latvinia";
+                case PO_1, PO_2 -> {
                     PublicObjectiveModel po = Mapper.getPublicObjective(objectiveKey);
-                    return po != null ? po.getName() : objectiveKey;
-                default:
-                    return "";
-            }
+                    yield po != null ? po.getName() : objectiveKey;
+                }
+                default -> "";
+            };
         }
 
         // UNSCORED state - description set elsewhere
@@ -610,7 +627,7 @@ public class WebScoreBreakdown {
         if (player == null) return false;
 
         Optional<Leader> heroOpt = player.getLeader("winnuhero");
-        if (!heroOpt.isPresent()) return false;
+        if (heroOpt.isEmpty()) return false;
 
         Leader hero = heroOpt.get();
         return hero.isActive() && !hero.isExhausted();
@@ -676,14 +693,19 @@ public class WebScoreBreakdown {
         }
 
         // Player must have a strategy token to follow Imperial
-        boolean hasStrategyToken = player.getStrategicCC() > 0;
 
-        return hasStrategyToken;
+        return player.getStrategicCC() > 0;
     }
 
-    private static boolean hasStyx(Player player) {
-        if (player == null) return false;
-        return player.hasRelic(RELIC_STYX);
+    private static boolean hasStyx(Player player, Game game) {
+        if (player == null || game == null) return false;
+        // Check if player has scored "A Song Like Marrow" (the custom PO for Styx)
+        Map<String, List<String>> scoredPublics = game.getScoredPublicObjectives();
+        if (scoredPublics != null) {
+            List<String> scoringPlayers = scoredPublics.get(CUSTOM_PO_STYX);
+            return scoringPlayers != null && scoringPlayers.contains(player.getUserID());
+        }
+        return false;
     }
 
     private static boolean alreadyHasEntry(List<ScoreBreakdownEntry> entries, EntryType type) {

@@ -110,7 +110,7 @@ class RelicButtonHandler {
         player.removeRelic(relic);
         player.removeExhaustedRelic(relic);
         game.removeRevealedObjective(poID);
-        String msg = player.getRepresentation() + " is using _Neuraloop_, purge "
+        String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purge "
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
                 + ", to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

@@ -133,7 +133,7 @@ public abstract class BagDraft {
                     sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
                 }
             } else {
-                if (this.getItemLimitForCategory(cat) > 0) {
+                if (getItemLimitForCategory(cat) > 0) {
                     sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
                 }
             }

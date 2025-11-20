@@ -16,6 +16,7 @@ import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -338,6 +339,9 @@ public class ButtonHelperActionCards {
     @ButtonHandler("checkForAllACAssignments")
     public static void checkForAllAssignmentACs(Game game, Player player) {
         checkForAssigningCoup(game, player);
+        checkForAssigningExtremeDuress(game, player);
+        checkForAssigningStasis(game, player);
+        checkForAssigningCrisis(game, player);
         checkForAssigningPublicDisgrace(game, player);
         checkForPlayingManipulateInvestments(game, player);
         checkForPlayingSummit(game, player);
@@ -648,6 +652,11 @@ public class ButtonHelperActionCards {
                     player.setActualHits(player.getActualHits() + totalHits);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
                     uH.removeUnit(key, hitRolls);
+                    if (hitRolls > 0
+                            && key.getUnitType().equals(UnitType.Mech)
+                            && player_.hasActiveBreakthrough("naazbt")) {
+                        BreakthroughCommandHelper.deactivateBreakthrough(player_);
+                    }
                 }
             }
         }
@@ -929,7 +938,7 @@ public class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
+            if (p2 == player && !game.isTwilightsFallMode()) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -1613,7 +1622,7 @@ public class ButtonHelperActionCards {
                     && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                 continue;
             }
-            if (planet.equalsIgnoreCase("triad")
+            if ("triad".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;
@@ -1692,14 +1701,14 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(game, pos, player, false)) {
             Tile tile = game.getTileByPosition(tilePos);
-            if (!tile.isHomeSystem(game)) {
+            if (!tile.isHomeSystem(game) || game.isTwilightsFallMode()) {
                 buttons.add(Buttons.gray(
                         "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
             }
         }
         Tile tile = game.getTileByPosition(pos);
-        if (!tile.isHomeSystem(game)) {
+        if (!tile.isHomeSystem(game) || game.isTwilightsFallMode()) {
             buttons.add(Buttons.gray(
                     "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
@@ -1746,7 +1755,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+            if (uH != null && uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 if (!game.getTileFromPlanet(planet).isHomeSystem(game)) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
@@ -1916,6 +1925,75 @@ public class ButtonHelperActionCards {
                     button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningExtremeDuress(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("extremeduress")) {
+            game.setStoredValue("ExtremeDuress", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player you wish to experience extreme duress."
+                    + " _Extreme Duress_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (!p2.hasUnplayedSCs()) {
+                    continue;
+                }
+                String label = "Expreme Duress " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_ExtremeDuress_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningCrisis(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("crisis")) {
+            game.setStoredValue("Crisis Target", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with crisis."
+                    + " _Crisis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayers()) {
+                String label = "Crisis On " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_Crisis Target_" + p2.getColor(), label, scEmoji));
+            }
+            scButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
+        }
+    }
+
+    public static void checkForAssigningStasis(Game game, Player player) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+            return;
+        }
+        if (player.getActionCards().containsKey("tf-stasis")) {
+            game.setStoredValue("Stasis Target", "");
+            String msg = player.getRepresentation()
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with _Stasis_."
+                    + " _Stasis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                    + " Feel free to ignore this message if you don't intend to play it any time soon.";
+            List<Button> scButtons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                String label = "Stasis On " + p2.getFactionNameOrColor();
+                String scEmoji = p2.getFactionEmojiOrColor();
+                scButtons.add(Buttons.gray("resolvePreassignment_Stasis Target_" + p2.getColor(), label, scEmoji));
             }
             scButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, scButtons);
@@ -2698,9 +2776,9 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("resolveTwinning_")
+    @ButtonHandler("resolveTwin_")
     public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.replace("resolveTwinning_", "");
+        String acName = buttonID.replace("resolveTwin_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);

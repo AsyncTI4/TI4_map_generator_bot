@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -29,7 +30,7 @@ import ti4.service.emoji.TechEmojis;
 public class EdictPhaseHandler {
 
     @ButtonHandler("edictPhase")
-    public static void edictPhase(ButtonInteractionEvent event, Game game) {
+    public static void edictPhase(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("agenda");
         List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
         List<Button> buttons = new ArrayList<>();
@@ -109,8 +110,11 @@ public class EdictPhaseHandler {
     @ButtonHandler("conveneStep1_")
     public static void conveneStep1_(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
         String cardID = buttonID.split("_")[1];
-        if (player == game.getSpeaker()) {
-            Player tyrant = game.getTyrant();
+        if (player == game.getSpeaker()
+                && !game.getStoredValue("conveneStarter").isEmpty()) {
+            Player tyrant = game.getPlayerFromColorOrFaction(game.getStoredValue("conveneStarter"));
+            game.removeStoredValue("conveneStarter");
+            game.setStoredValue("convenePlayers", game.getStoredValue("convenePlayers") + tyrant.getFaction());
             tyrant.addTech(cardID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getActionsChannel(),
@@ -163,7 +167,7 @@ public class EdictPhaseHandler {
 
     @ButtonHandler("resolveEdict_")
     public static void resolveEdict(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
-        String edict = buttonID.split("_")[1];
+        String edict = buttonID.replace("resolveEdict_", "").replace("_orangetf", "");
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> embeds = new ArrayList<>();
         game.removeStoredValue("convenePlayers");
@@ -181,7 +185,7 @@ public class EdictPhaseHandler {
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "startSplice_7_all", "Initiate Ability Splice"));
                 buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome Splice"));
+                        player.getFinsFactionCheckerPrefix() + "startSplice_2_all", "Initiate Genome (Agent) Splice"));
                 buttons.add(Buttons.blue(
                         player.getFinsFactionCheckerPrefix() + "startSplice_6_all", "Initiate Unit Upgrade Splice"));
             }
@@ -194,10 +198,10 @@ public class EdictPhaseHandler {
             case "tf-arbitrate" -> {
                 buttons.add(Buttons.red("discardSpliceCard_ability", "Discard 1 Ability"));
                 buttons.add(Buttons.red("discardSpliceCard_units", "Discard 1 Unit Upgrade"));
-                buttons.add(Buttons.red("discardSpliceCard_genome", "Discard 1 Genome"));
+                buttons.add(Buttons.red("discardSpliceCard_genome", "Discard 1 Genome (Agent)"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
             }
             case "tf-legacy_of_ixth" -> {
                 Die d1 = new Die(6);
@@ -207,7 +211,7 @@ public class EdictPhaseHandler {
                             + TechEmojis.Warfare3;
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
                     buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
+                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
                 } else {
                     msg += "💥 💥 💥 💥";
                     Tile tile = game.getMecatolTile();
@@ -223,7 +227,7 @@ public class EdictPhaseHandler {
                     game.removeStoredValue("artificeParadigms");
                 } else {
                     ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
-                    String relic = game.getAllRelics().get(0);
+                    String relic = game.getAllRelics().getFirst();
                     RelicModel mod = Mapper.getRelic(relic);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             player.getCorrectChannel(),
@@ -233,7 +237,7 @@ public class EdictPhaseHandler {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "artificeStep2_" + (x) + "_"
                                         + (vpDifference - x),
-                                "Draw " + x + " Extra Relics and " + (vpDifference - x) + "Extra Paradigms"));
+                                "Draw " + x + " Extra Relics and " + (vpDifference - x) + " Extra Paradigms"));
                     }
                 }
             }
@@ -246,6 +250,7 @@ public class EdictPhaseHandler {
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolvePlagueStep13", "Resolve Execute"));
             }
             case "tf-convene" -> {
+                game.setStoredValue("conveneStarter", player.getFaction());
                 List<String> techs = ButtonHelperTwilightsFall.getDeckForSplicing(
                         game, "ability", game.getRealPlayers().size());
 
@@ -256,7 +261,7 @@ public class EdictPhaseHandler {
                     embeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                 }
                 msg += "\n\n" + game.getSpeaker().getRepresentation()
-                        + " needs to assign the first ability to the tyrant, then the tyrant does the rest";
+                        + " needs to assign the first ability to the player resolving the edict, then that player does the rest";
             }
             case "tf-foretell" -> {
                 int loc = 1;
@@ -277,7 +282,8 @@ public class EdictPhaseHandler {
                     if (p2 == player) {
                         continue;
                     }
-                    buttons.add(Buttons.green("electCensure_" + p2.getFaction(), p2.getFactionNameOrColor()));
+                    buttons.add(Buttons.green(
+                            "electCensure_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
                 }
                 msg += "\n\nChoose the player to censure.";
             }
@@ -295,10 +301,11 @@ public class EdictPhaseHandler {
                         + " after resolving the edict, use this button to resolve an additional edict from your flagship.";
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
                 if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf(edict2 -> edict2.equalsIgnoreCase("tf-censure"));
+                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
                 }
                 Button proceedToStrategyPhase = Buttons.green(
-                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.get(0) + "_orangetf",
+                        yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.getFirst()
+                                + "_orangetf",
                         "Resolve 1 Edict");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
             } else {

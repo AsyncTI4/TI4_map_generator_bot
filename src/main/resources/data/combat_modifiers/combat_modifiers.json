@@ -841,6 +841,36 @@
         "forCombatAbility": "combatround"
     },
     {
+        "alias": "plus2_fracture_all",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "tf-planesplitter"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_fracture_all",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "obsidiancommander"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus2_2_matching_non_ff",
         "type": "mods",
         "value": "+2",
@@ -1331,6 +1361,21 @@
         "forCombatAbility": "bombardment"
     },
     {
+        "alias": "plus1_roll_bluetf_mech",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "mechs_in_space_area",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bluetf_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus_x_frag_always_flagship_afb",
         "type": "mods",
         "value": "+1",
@@ -1450,6 +1495,21 @@
             {
                 "type": "unit",
                 "alias": "uydai_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_1_for_every_nearby_anomaly",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_anomaly",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "purpletf_mech"
             }
         ],
         "forCombatAbility": "combatround"

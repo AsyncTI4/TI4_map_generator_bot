@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.unit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +24,10 @@ import ti4.service.regex.RegexService;
 public class GalvanizeService {
 
     @ButtonHandler("getToggleGalvanizeTiles")
-    private static void postToggleGalvanizeTiles(Game game, Player player) {
+    public static void postToggleGalvanizeTiles(Game game, Player player) {
         List<Button> buttons = ButtonHelper.getTilesWithUnitsForAction(player, game, "toggleGalvanize", true);
-        String message =
-                player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
+        String message = player.getRepresentationUnfogged()
+                + " Use the buttons to select the tile in which you wish to modify units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

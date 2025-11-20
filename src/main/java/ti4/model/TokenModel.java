@@ -1,5 +1,6 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,8 +16,14 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private String attachmentID;
     private String tokenPlanetName;
     private Boolean isAnomaly;
+    private Boolean isAsteroids;
     private Boolean isRift;
     private Boolean isNebula;
+
+    @JsonIgnore
+    private Boolean isNova;
+
+    private Boolean isScar;
     private List<String> aliasList;
     private List<Wormhole> wormholes;
     private ComponentSource source;
@@ -69,8 +76,11 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         if (attachmentID != null) sb.append("Attachment: ").append(attachmentID).append("\n");
         if (wormholes != null) sb.append("Wormhole(s): ").append(wormholes).append("\n");
         if (isAnomaly != null) sb.append("Anomaly ");
+        if (isAsteroids != null) sb.append("Asteroids ");
         if (isRift != null) sb.append("Rift ");
         if (isNebula != null) sb.append("Nebula ");
+        if (isNova != null) sb.append("Supernova ");
+        if (isScar != null) sb.append("Entropic Scar ");
         eb.setDescription(sb.toString());
 
         sb = new StringBuilder();
@@ -94,8 +104,11 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
                 || (attachmentID != null && attachmentID.toLowerCase().contains(searchString.toLowerCase()))
                 || (wormholes != null && wormholes.toString().toLowerCase().contains(searchString.toLowerCase()))
                 || (isAnomaly != null && isAnomaly && "anomaly".contains(searchString.toLowerCase()))
+                || (isAsteroids != null && isAsteroids && "asteroids".contains(searchString.toLowerCase()))
                 || (isRift != null && isRift && "gravity rift".contains(searchString.toLowerCase()))
                 || (isNebula != null && isNebula && "nebula".contains(searchString.toLowerCase()))
+                || (isNova != null && isNova && "nova".contains(searchString.toLowerCase()))
+                || (isScar != null && isScar && "scar".contains(searchString.toLowerCase()))
                 || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
 }

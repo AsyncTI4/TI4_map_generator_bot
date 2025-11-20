@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -26,7 +25,6 @@ import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -54,8 +52,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -70,7 +66,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -116,73 +111,6 @@ public class Helper {
             }
         }
         return null;
-    }
-
-    public static boolean isSaboAllowed(Game game, Player player) {
-        if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
-            return false;
-        }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
-            return false;
-        }
-        if ((player.hasTech("tp") || player.hasTech("tf-crafty"))
-                && game.getActivePlayerID() != null
-                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (!p2.isPassed()) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    public static String noSaboReason(Game game, Player player) {
-        if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
-            return "All _Sabotages_ are in the discard.";
-        }
-        if (player.hasTech("tp")
-                && game.getActivePlayerID() != null
-                && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) continue;
-                if (!p2.isPassed()) return null;
-            }
-            return "Player has " + FactionEmojis.Yssaril
-                    + " _Transparasteel Plating_, and all other players have passed.";
-        }
-        if (player.hasTech("baarvag")) {
-            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
-        }
-        return null;
-    }
-
-    private static boolean checkForAllSabotagesDiscarded(Game game) {
-        return game.getDiscardActionCards().containsKey("sabo1")
-                && game.getDiscardActionCards().containsKey("sabo2")
-                && game.getDiscardActionCards().containsKey("sabo3")
-                && game.getDiscardActionCards().containsKey("sabo4");
-    }
-
-    private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
-        return game.isAcd2()
-                && game.getDiscardActionCards().containsKey("sabotage1_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage2_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage3_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage4_acd2");
-    }
-
-    public static boolean doesAnyoneOwnPlanet(Game game, String planet) {
-        for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(planet)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
@@ -464,10 +392,9 @@ public class Helper {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
-        List<Player> arrayPlayers = new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
+        return new ArrayList<>(PriorityTrackHelper.GetPriorityTrack(game).stream()
                 .filter(Objects::nonNull)
                 .toList());
-        return arrayPlayers;
     }
 
     public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
@@ -512,35 +439,6 @@ public class Helper {
             }
         }
         return players;
-    }
-
-    public static void startOfTurnSaboWindowReminders(Game game, Player player) {
-        var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
-        for (GameMessageManager.GameMessage gameMessage : gameMessages) {
-            if (ReactionService.checkForSpecificPlayerReact(gameMessage.messageId(), player, game)) continue;
-
-            game.getMainGameChannel()
-                    .retrieveMessageById(gameMessage.messageId())
-                    .queue(mainMessage -> {
-                        Emoji reactionEmoji = getPlayerReactionEmoji(game, player, gameMessage.messageId());
-                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                        if (reaction == null) {
-                            Calendar rightNow = Calendar.getInstance();
-                            if (rightNow.get(Calendar.DAY_OF_YEAR)
-                                                    - mainMessage
-                                                            .getTimeCreated()
-                                                            .getDayOfYear()
-                                            > 2
-                                    || rightNow.get(Calendar.DAY_OF_YEAR)
-                                                    - mainMessage
-                                                            .getTimeCreated()
-                                                            .getDayOfYear()
-                                            < -100) {
-                                GameMessageManager.remove(game.getName(), gameMessage.messageId());
-                            }
-                        }
-                    });
-        }
     }
 
     public static Player getPlayerFromUnlockedLeader(Game game, String leader) {
@@ -1270,6 +1168,7 @@ public class Helper {
                     && !thing.contains("tg_")
                     && !thing.contains("boon")
                     && !thing.contains("warmachine")
+                    && !thing.contains("manifest")
                     && !thing.contains("ghostbt")
                     && !thing.contains("dwsDiscount")
                     && !thing.contains("aida")
@@ -1366,7 +1265,9 @@ public class Helper {
                     if (game.isFowMode()) {
                         faction = "someone";
                     }
-                    msg.append("> Used " + faction + "'s Commander Discount ")
+                    msg.append("> Used ")
+                            .append(faction)
+                            .append("'s Commander Discount ")
                             .append(MiscEmojis.Resources_1)
                             .append("\n");
                     res += 1;
@@ -1383,6 +1284,12 @@ public class Helper {
                     if (game.isWildWildGalaxyMode()) {
                         res += 4;
                     }
+                }
+                if (thing.contains("manifest")) {
+                    msg.append("> Used Manifest for 3r")
+                            .append(CardEmojis.ActionCard)
+                            .append("\n");
+                    res += 3;
                 }
                 if (thing.contains("ghostbt")) {
                     int wormholes =
@@ -1548,6 +1455,8 @@ public class Helper {
             if (activeSystem != null && tile == activeSystem && getProductionValue(player, game, tile, false) > 0) {
                 if (!player.hasUnit("arborec_mech")
                         && !player.hasUnit("arborec_infantry")
+                        && !player.hasUnit("tf-lataniwarrior")
+                        && !player.hasUnit("deepwrought_mech")
                         && !player.hasUnit("arborec_infantry2")) {
 
                     productionLimit = getProductionValue(player, game, tile, false);
@@ -1664,6 +1573,10 @@ public class Helper {
                                 && uH.getUnitCount(UnitType.Mech, player) > 0) {
                             productionValue = Math.max(5, productionValue);
                         }
+                    } else {
+                        if (productionValue == 2 || productionValue == 4) {
+                            productionValue = 0;
+                        }
                     }
                     if (IsPlayerElectedService.isPlayerElected(game, player, "absol_minsindus")) {
                         productionValue += 4;
@@ -1689,8 +1602,16 @@ public class Helper {
         String planet = uH.getName();
         int planetUnitVal = 0;
         if ("space".equals(uH.getName())) {
-            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (tile.isSupernova()
+                    && player.hasTech("mr")
+                    && (FoWHelper.playerHasUnitsInSystem(player, tile) || game.isTwilightsFallMode())) {
                 productionValueTotal += 5;
+            } else {
+                if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
+                                .contains(tile)
+                        && player.hasTech("tf-mr")) {
+                    productionValueTotal += 5;
+                }
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && !tile.getWormholes(game).isEmpty()
@@ -1993,8 +1914,9 @@ public class Helper {
                     cost += (int) removedUnit.getCost() * entry.getValue();
                 }
                 totalUnits += entry.getValue();
-                if (player.hasUnit("arvaxi_mech") && removedUnit.getUnitType() == UnitType.Mech) {
-                    totalUnits -= entry.getValue();
+                if ((player.hasUnit("arvaxi_mech") || player.hasUnit("tf-valefarprime"))
+                        && removedUnit.getUnitType() == UnitType.Mech) {
+                    cost -= entry.getValue();
                 }
             }
         }
@@ -2959,10 +2881,13 @@ public class Helper {
                     && "17"
                             .equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition())
                                     .getTileID());
-            if ((player.getFaction().contains("ghost") && game.getTile("17") != null) && ghostish) {
+            if (((player.getFaction().contains("ghost") || (tile != null && "51".equalsIgnoreCase(tile.getTileID())))
+                            && game.getTile("17") != null)
+                    && ghostish) {
                 tile = game.getTile("17");
             }
-            if ((player.getFaction().contains("crimson") && game.getTile("94") != null)) {
+            if (((player.getFaction().contains("crimson") || (tile != null && "118".equalsIgnoreCase(tile.getTileID())))
+                    && game.getTile("94") != null)) {
                 tile = game.getTile("94");
             }
             if (tile != null) {

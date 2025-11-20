@@ -133,7 +133,7 @@ public class NucleusSliceGeneratorService {
 
         String mostCommonFailure = failureReasons.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
-                .map(Map.Entry<String, Integer>::getKey)
+                .map(Map.Entry::getKey)
                 .orElse("No registered failures");
         return new NucleusOutcome(null, mostCommonFailure);
     }
@@ -153,7 +153,7 @@ public class NucleusSliceGeneratorService {
             return new NucleusOutcome(null, "No draft tiles available to generate nucleus and slices.");
         }
 
-        Integer numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), nucleusSpecs.numSlices());
+        int numPlayerSlices = Math.max(mapTemplate.getPlayerCount(), nucleusSpecs.numSlices());
         Integer numNucleusSlices = mapTemplate.getNucleusSliceCount();
         List<Integer> mapWormholeOptions =
                 ListHelper.listOfIntegers(nucleusSpecs.minMapWormholes(), nucleusSpecs.maxMapWormholes());
@@ -172,10 +172,10 @@ public class NucleusSliceGeneratorService {
                 ListHelper.listOfIntegers(nucleusSpecs.minMapLegendaries(), nucleusSpecs.maxMapLegendaries());
         Integer numMapLegendaries = ListHelper.randomPick(mapLegendaryOptions);
 
-        List<MiltyDraftTile> alphaTiles = tileManager.filterAll(tile -> tile.isHasAlphaWH());
-        List<MiltyDraftTile> betaTiles = tileManager.filterAll(tile -> tile.isHasBetaWH());
+        List<MiltyDraftTile> alphaTiles = tileManager.filterAll(MiltyDraftTile::isHasAlphaWH);
+        List<MiltyDraftTile> betaTiles = tileManager.filterAll(MiltyDraftTile::isHasBetaWH);
 
-        List<MiltyDraftTile> legendaryTiles = tileManager.filterAll(tile -> tile.isLegendary());
+        List<MiltyDraftTile> legendaryTiles = tileManager.filterAll(MiltyDraftTile::isLegendary);
         List<MapTemplateTile> nucleusTiles = new ArrayList<>(mapTemplate.getTemplateTiles().stream()
                 .filter(tile -> tile.getNucleusNumbers() != null
                         && !tile.getNucleusNumbers().isEmpty())
@@ -203,9 +203,9 @@ public class NucleusSliceGeneratorService {
         List<PlacedTile> placedLegendaryTiles =
                 distributeByDistance(nucleusTiles, legendaryTiles, numNucleusLegendaries, distanceTool, null);
 
-        Integer remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
-        Integer remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
-        Integer requiredLegendaries = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
+        int remainingAlphaWormholes = Math.max(numMapAlphaWormholes - placedAlphaTiles.size(), 0);
+        int remainingBetaWormholes = Math.max(numMapBetaWormholes - placedBetaTiles.size(), 0);
+        int requiredLegendaries = Math.max(numMapLegendaries - placedLegendaryTiles.size(), 0);
 
         List<PlacedTile> allPlacedTiles = new ArrayList<>();
         allPlacedTiles.addAll(placedAlphaTiles);
@@ -213,7 +213,7 @@ public class NucleusSliceGeneratorService {
         allPlacedTiles.addAll(placedLegendaryTiles);
 
         List<MiltyDraftTile> availableTiles = new ArrayList<>(
-                tileManager.filterAll(tile -> !allPlacedTiles.stream().anyMatch(pt -> pt.draftTile.equals(tile))));
+                tileManager.filterAll(tile -> allPlacedTiles.stream().noneMatch(pt -> pt.draftTile.equals(tile))));
         Collections.shuffle(availableTiles);
         List<MiltyDraftSlice> playerSlices = generatePlayerSlices(
                 tileManager,
@@ -329,7 +329,7 @@ public class NucleusSliceGeneratorService {
                 coreSpends.values().stream().min(Integer::compareTo).orElse(0);
         Integer maxCoreSpend =
                 coreSpends.values().stream().max(Integer::compareTo).orElse(0);
-        Integer coreSliceBalance = maxCoreSpend - minCoreSpend;
+        int coreSliceBalance = maxCoreSpend - minCoreSpend;
 
         Integer coreRedTiles = (int) placedTiles.stream()
                 .filter(pt ->
@@ -339,16 +339,16 @@ public class NucleusSliceGeneratorService {
                 .flatMap(slice -> slice.getTiles().stream())
                 .filter(t -> t.getTierList() == TierList.red || t.getTierList() == TierList.anomaly)
                 .count();
-        Integer totalRedTiles = coreRedTiles + sliceRedTiles;
+        int totalRedTiles = coreRedTiles + sliceRedTiles;
 
         boolean anomaliesTouching = false;
         for (int i = 0; i < placedTiles.size(); ++i) {
             PlacedTile tileA = placedTiles.get(i);
-            if (tileA.draftTile.getTile().isAnomaly() == false) continue;
+            if (!tileA.draftTile.getTile().isAnomaly()) continue;
 
             for (int j = i + 1; j < placedTiles.size(); ++j) {
                 PlacedTile tileB = placedTiles.get(j);
-                if (tileB.draftTile.getTile().isAnomaly() == false) continue;
+                if (!tileB.draftTile.getTile().isAnomaly()) continue;
 
                 if (distanceTool.getNattyDistance(tileA.mapTile.getPos(), tileB.mapTile.getPos()) == 1) {
                     anomaliesTouching = true;
@@ -539,16 +539,12 @@ public class NucleusSliceGeneratorService {
     private record PlanetTraits(int cultural, int industrial, int hazardous) {
         public PlanetTraits add(PlanetTraits other) {
             return new PlanetTraits(
-                    this.cultural + other.cultural,
-                    this.industrial + other.industrial,
-                    this.hazardous + other.hazardous);
+                    cultural + other.cultural, industrial + other.industrial, hazardous + other.hazardous);
         }
 
         public PlanetTraits subtract(PlanetTraits other) {
             return new PlanetTraits(
-                    this.cultural - other.cultural,
-                    this.industrial - other.industrial,
-                    this.hazardous - other.hazardous);
+                    cultural - other.cultural, industrial - other.industrial, hazardous - other.hazardous);
         }
 
         public int get(PlanetType type) {
@@ -626,8 +622,7 @@ public class NucleusSliceGeneratorService {
             DraftTileManager draftTileManager,
             DistanceTool distanceTool,
             boolean strictMode) {
-        for (int i = 0; i < coreSliceLocations.size(); i++) {
-            List<MapTemplateTile> sliceLocations = coreSliceLocations.get(i);
+        for (List<MapTemplateTile> sliceLocations : coreSliceLocations) {
             List<TierList> sliceTiers = getRandomTierPicks(sliceLocations.size());
 
             // Generate tierlist picks for this nucleus slice
@@ -639,8 +634,7 @@ public class NucleusSliceGeneratorService {
 
             // First, iterate through each location to see what already has something placed
             List<MapTemplateTile> unplacedLocations = new ArrayList<>();
-            for (int j = 0; j < sliceLocations.size(); j++) {
-                MapTemplateTile location = sliceLocations.get(j);
+            for (MapTemplateTile location : sliceLocations) {
                 MiltyDraftTile placedTile = placedTiles.stream()
                         .filter(pt -> pt.mapTile.equals(location))
                         .map(pt -> pt.draftTile)
@@ -692,8 +686,8 @@ public class NucleusSliceGeneratorService {
                     candidateTiles = tieredAvailableTiles.entrySet().stream()
                             // Sorting an enum in java puts it in the order it was declared
                             // so this will check high -> mid -> low -> red / anomaly
-                            .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
-                            .map(e -> e.getValue())
+                            .sorted(Comparator.comparing(Map.Entry::getKey))
+                            .map(Map.Entry::getValue)
                             .map(tiles ->
                                     tiles.stream().filter(anomalyPredicate).toList())
                             .filter(tiles -> !tiles.isEmpty())
@@ -770,8 +764,8 @@ public class NucleusSliceGeneratorService {
                     }
                     // Place the chosen tile, then remove it from all candidacy lists
                     placedTiles.add(new PlacedTile(location, chosenTile));
-                    for (TierList tier : tieredAvailableTiles.keySet()) {
-                        tieredAvailableTiles.get(tier).remove(chosenTile);
+                    for (List<MiltyDraftTile> miltyDraftTiles : tieredAvailableTiles.values()) {
+                        miltyDraftTiles.remove(chosenTile);
                     }
                 }
             }
@@ -802,11 +796,11 @@ public class NucleusSliceGeneratorService {
         // Get a random selection of tiles to satisfy our required counts
         Collections.shuffle(availableSystems);
         List<MiltyDraftTile> alphaTiles =
-                ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasAlphaWH(), numAlphas);
+                ListHelper.removeByPredicate(availableSystems, MiltyDraftTile::isHasAlphaWH, numAlphas);
         List<MiltyDraftTile> betaTiles =
-                ListHelper.removeByPredicate(availableSystems, tile -> tile.isHasBetaWH(), numBetas);
+                ListHelper.removeByPredicate(availableSystems, MiltyDraftTile::isHasBetaWH, numBetas);
         List<MiltyDraftTile> legendaryTiles =
-                ListHelper.removeByPredicate(availableSystems, tile -> tile.isLegendary(), numLegendaries);
+                ListHelper.removeByPredicate(availableSystems, MiltyDraftTile::isLegendary, numLegendaries);
 
         // Prepare required tiles. Placing required tiles sequentially is important;
         // it results in distributing them across slices, the e.g. alphas will be
@@ -855,7 +849,7 @@ public class NucleusSliceGeneratorService {
                     TierList tier = sliceTiers.removeFirst();
                     List<MiltyDraftTile> tierFillerTiles = tieredFillerTiles.get(tier);
                     if (tierFillerTiles != null && !tierFillerTiles.isEmpty()) {
-                        tile = tierFillerTiles.remove(0);
+                        tile = tierFillerTiles.removeFirst();
                     }
 
                     if (tile == null) {
@@ -894,7 +888,8 @@ public class NucleusSliceGeneratorService {
             int i = 0;
             Collections.shuffle(slices);
             for (MiltyDraftSlice slice : slices) {
-                slice.setName(String.valueOf((char) ('A' + i++)));
+                slice.setName(String.valueOf((char) ('A' + i)));
+                i++;
                 Collections.shuffle(slice.getTiles());
             }
 

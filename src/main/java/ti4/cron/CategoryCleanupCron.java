@@ -10,7 +10,7 @@ public class CategoryCleanupCron {
 
     public static void register() {
         CronManager.schedulePeriodically(
-                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 1, 30, TimeUnit.MINUTES);
+                CategoryCleanupCron.class, CategoryCleanupCron::cleanupCategories, 6, 24, TimeUnit.HOURS);
     }
 
     private static void cleanupCategories() {

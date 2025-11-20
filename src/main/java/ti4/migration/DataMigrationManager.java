@@ -152,7 +152,7 @@ public class DataMigrationManager {
     public static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
         Tile old = null;
         for (Tile t : game.getTileMap().values()) {
-            if (t.getTileID().equals("sig01")) {
+            if ("sig01".equals(t.getTileID())) {
                 old = t;
                 break;
             }

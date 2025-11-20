@@ -28,6 +28,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
 import ti4.service.emoji.CardEmojis;
@@ -137,7 +138,7 @@ public class StartTurnService {
         game.updateActivePlayer(player);
         game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
-        Helper.startOfTurnSaboWindowReminders(game, player);
+        SabotageService.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = game.isFowMode();
 
         if (game.isShowBanners()) {
@@ -222,6 +223,53 @@ public class StartTurnService {
                 }
             }
         }
+        if (game.getStoredValue("ExtremeDuress").equalsIgnoreCase(player.getColor()) && player.hasUnplayedSCs()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("extremeduress")) {
+                    game.removeStoredValue("ExtremeDuress");
+                    ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "concedeToED_" + p2.getFaction(),
+                            "Lose ACs, TGs, Show Secrets"));
+                    buttons2.add(Buttons.green("deleteButtons", "Give in and Play SC (or sabo Extreme Duress)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
+        if (game.getStoredValue("Crisis Target").equalsIgnoreCase(player.getColor())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("crisis")) {
+                    game.removeStoredValue("Crisis Target");
+                    ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End turn"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
+        if (game.getStoredValue("Stasis Target").equalsIgnoreCase(player.getColor())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.getActionCards().containsKey("tf-stasis")) {
+                    game.removeStoredValue("Stasis Target");
+                    ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(ButtonHelper.getEndTurnButton(game, player));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            buttons2);
+                }
+            }
+        }
 
         if (goingToPass) {
             PassService.passPlayerForRound(event, game, player, true);
@@ -240,7 +288,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf")) {
+        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf") && !player.hasUnit("tf-yinclone")) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
@@ -278,6 +326,14 @@ public class StartTurnService {
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
+            if (game.getStrategyCardModelByInitiative(sc)
+                    .map(strat -> strat.getAlias().equals("te6warfare"))
+                    .orElse(false)) {
+                if (game.isWarfareAction() && !game.isComponentAction()) {
+                    // skip warning for warfare if we are presently resolving warfare
+                    continue;
+                }
+            }
             if ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName())) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1);
@@ -488,6 +544,12 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(
                         finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
+            if (player.hasUnit("tf-vortexer")
+                    && !ButtonHelperFactionSpecific.getVortexerReleaseButtons(player, game)
+                            .isEmpty()) {
+                startButtons.add(Buttons.gray(
+                        finChecker + "startVortexerRevive", "Release Vortexer Infantry/Fighters", FactionEmojis.Cabal));
+            }
             if (player.hasTech("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(
                         finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
@@ -547,9 +609,18 @@ public class StartTurnService {
             startButtons.add(Buttons.green(
                     finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
         }
-        if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
+        if (player.hasUnexhaustedLeader("nekroagent") && player.getAcCount() > 0) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+        }
+        if (player.hasUnexhaustedLeader("hyperagent")) {
+            startButtons.add(Buttons.gray(
+                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+        }
+
+        if (game.isVeiledHeartMode()
+                && !game.getStoredValue("veiledCards" + player.getFaction()).isEmpty()) {
+            startButtons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
         }
 
         GameMessageManager.remove(game.getName(), GameMessageType.TURN)

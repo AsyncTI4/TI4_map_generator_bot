@@ -83,11 +83,13 @@ public class EndTurnService {
         game.removeStoredValue("fortuneSeekers");
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
+        game.removeStoredValue("endTurnWhenSpliceEnds");
         game.removeStoredValue("fleetLogWhenSCFinished");
         ButtonHelperAbilities.oceanBoundCheck(game);
         TeHelperGeneral.checkCoexistTransfer(game);
         game.removeStoredValue("mahactHeroTarget");
         game.removeStoredValue("possiblyUsedRift");
+        game.removeStoredValue("heartWarnedThisTurn");
         game.setActiveSystem("");
     }
 

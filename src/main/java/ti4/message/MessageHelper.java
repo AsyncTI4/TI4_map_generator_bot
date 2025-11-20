@@ -254,20 +254,20 @@ public class MessageHelper {
             StringTokenizer players =
                     switch (messageType) {
                         case STATUS_SCORING -> {
-                            String scored = "";
+                            StringBuilder scored = new StringBuilder();
                             for (Player player : game.getRealPlayers()) {
                                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
                                 String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
 
                                 if (!po.isEmpty() && !so.isEmpty()) {
-                                    if (scored.isEmpty()) {
-                                        scored = player.getFaction();
+                                    if (scored.length() == 0) {
+                                        scored = new StringBuilder(player.getFaction());
                                     } else {
-                                        scored += "_" + player.getFaction();
+                                        scored.append("_").append(player.getFaction());
                                     }
                                 }
                             }
-                            yield new StringTokenizer(scored, "_");
+                            yield new StringTokenizer(scored.toString(), "_");
                         }
                         case AGENDA_WHEN -> {
                             String oldMessageId = GameMessageManager.replace(
@@ -295,12 +295,9 @@ public class MessageHelper {
                             }
                             yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
                         }
-                        case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT -> {
-                            yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
-                        }
-                        case AGENDA_DEADLY_PLOT -> {
-                            yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
-                        }
+                        case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT ->
+                            new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
+                        case AGENDA_DEADLY_PLOT -> new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                         default -> {
                             BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
                             yield null;
@@ -1050,8 +1047,27 @@ public class MessageHelper {
                                     "Error creating thread channel: " + threadName + " in channel: "
                                             + channel.getAsMention(),
                                     error));
-        } else if (channel instanceof ThreadChannel) {
-            sendMessageToChannelWithEmbeds(channel, null, embeds);
+        } else if (channel instanceof ThreadChannel thread) {
+            if (embeds.size() > 8 && thread.getParentChannel() instanceof TextChannel chan) {
+                chan.createThreadChannel(threadName)
+                        .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                        .queueAfter(
+                                500,
+                                TimeUnit.MILLISECONDS,
+                                t -> {
+                                    sendMessageToChannelWithEmbeds(t, null, embeds);
+                                    sendMessageToChannel(
+                                            channel,
+                                            "Redirected your results to the following thread: " + t.getJumpUrl());
+                                },
+                                error -> BotLogger.error(
+                                        "Error creating thread channel: " + threadName + " in channel: "
+                                                + chan.getAsMention(),
+                                        error));
+
+            } else {
+                sendMessageToChannelWithEmbeds(channel, null, embeds);
+            }
         }
     }
 

@@ -23,7 +23,7 @@ class DeleteFOWCommThreads extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!event.getOption(Constants.CONFIRM).getAsString().equalsIgnoreCase("YES")) {
+        if (!"YES".equalsIgnoreCase(event.getOption(Constants.CONFIRM).getAsString())) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must confirm with YES.");
             return;
         }

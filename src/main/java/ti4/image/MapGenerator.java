@@ -108,7 +108,7 @@ public class MapGenerator implements AutoCloseable {
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
-    private int fractureYbump = 0;
+    private int fractureYbump;
     private boolean isFoWPrivate;
     private Player fowPlayer;
 
@@ -870,7 +870,10 @@ public class MapGenerator implements AutoCloseable {
     private void drawExpeditionTracker(int x, int y) {
         Expeditions exp = game.getExpeditions();
         boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
-        if (!game.isThundersEdge() || exp.getRemainingExpeditionCount() == 0 || thundersEdgeOnBoard) return;
+        if (!game.isThundersEdge()
+                || exp.getRemainingExpeditionCount() == 0
+                || thundersEdgeOnBoard
+                || game.isTwilightsFallMode()) return;
 
         drawGeneralImage(x, y, "Expeditions.png");
         if (exp.getTradeGoods() != null) {
@@ -1506,7 +1509,8 @@ public class MapGenerator implements AutoCloseable {
                     }
                     x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
                 }
-            } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
+            } else if (displayType == DisplayType.anomalies
+                    && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
                 UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
                 int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
                 unitNum = (unitNum == 0
@@ -1787,6 +1791,15 @@ public class MapGenerator implements AutoCloseable {
                     graphics.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
                 }
             }
+            if (player.isTyrant()) {
+                String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+                BufferedImage img = ImageHelper.read(speakerFile);
+                if (img != null) {
+                    point = PositionMapper.getPlayerStats("newspeaker");
+                    point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));
+                    graphics.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
+                }
+            }
         }
 
         { // PAINT PASSED/ACTIVE/AFK
@@ -1986,7 +1999,7 @@ public class MapGenerator implements AutoCloseable {
             }
         }
         if (player.isTyrant()) {
-            String speakerFile = ResourceHelper.getInstance().getTokenFile("tyrant");
+            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);

@@ -92,31 +92,35 @@ public class FOWPlusService {
 
             MessageHelper.sendMessageToChannel(
                     GMService.getGMChannel(game),
-                    "### FoW+ mode activated. Following options are forced:\n"
-                            + "- No comms in agenda phase\n"
-                            + "- Hide total votes and vote order\n"
-                            + "- Player stats only visible from HS\n"
-                            + "- Hide explore/relic decks\n"
-                            + "- Hide unexplored (0b) map tiles\n"
-                            + "- Hide anchored player info areas\n"
-                            + "### In addition, following changes are in effect:\n"
-                            + "- Can only activate tiles you can see (Blind Tile button to activate any other tile)\n"
-                            + "- Activating a tile without a tile is valid and will send ships into The Void\n"
-                            + "- Cannot remove tokens from tiles you cannot see\n"
-                            + "- Explore deck set to `explores_fowplus`");
+                    """
+                    ### FoW+ mode activated. Following options are forced:
+                    - No comms in agenda phase
+                    - Hide total votes and vote order
+                    - Player stats only visible from HS
+                    - Hide explore/relic decks
+                    - Hide unexplored (0b) map tiles
+                    - Hide anchored player info areas
+                    ### In addition, following changes are in effect:
+                    - Can only activate tiles you can see (Blind Tile button to activate any other tile)
+                    - Activating a tile without a tile is valid and will send ships into The Void
+                    - Cannot remove tokens from tiles you cannot see
+                    - Explore deck set to `explores_fowplus`""");
         } else {
             game.removeTag(FOWPLUS_TAG);
             MessageHelper.sendMessageToChannel(
                     GMService.getGMChannel(game),
-                    "### FoW+ mode disabled.\n"
-                            + "Use `/fow fow_options` to reset options.\n"
-                            + "Use `/game set_deck` to reset explore deck.");
+                    """
+                    ### FoW+ mode disabled.
+                    Use `/fow fow_options` to reset options.
+                    Use `/game set_deck` to reset explore deck.""");
         }
     }
 
     // Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game) || FoWHelper.getTilePositionsToShow(game, player).contains(position);
+        return !isActive(game)
+                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
+                || game.isWarfareAction();
     }
 
     // Hide all 0b tiles from FoW map

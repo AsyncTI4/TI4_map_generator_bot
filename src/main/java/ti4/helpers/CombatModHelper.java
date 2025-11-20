@@ -344,9 +344,11 @@ public class CombatModHelper {
                         && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
                     meetsCondition = true;
                 }
-                if (onTile.getPlanets().stream()
-                        .anyMatch(planetId -> StringUtils.isNotBlank(
-                                Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
+                if (onTile != null
+                        && onTile.getPlanets() != null
+                        && onTile.getPlanets().stream()
+                                .anyMatch(planetId -> StringUtils.isNotBlank(
+                                        Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
                 if (onTile.getPlanets().contains(Constants.MR)) {
@@ -366,6 +368,8 @@ public class CombatModHelper {
                 meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile)
                                 .isEmpty()
                         || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
+            case "fracture_combat" ->
+                meetsCondition = tile != null && tile.getPosition().contains("frac");
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 meetsCondition = false;
                 if (unitsByQuantity.size() == 1) {
@@ -569,8 +573,7 @@ public class CombatModHelper {
                     }
                     return new UhScore(uh, score);
                 })
-                .sorted(Comparator.comparingInt(UhScore::score).reversed())
-                .findFirst()
+                .max(Comparator.comparingInt(UhScore::score))
                 .map(UhScore::uh)
                 .orElse(t.getSpaceUnitHolder());
     }
@@ -687,6 +690,18 @@ public class CombatModHelper {
                         }
                     }
                 }
+                case "adjacent_anomaly" -> {
+                    for (String pos :
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = game.getTileByPosition(pos);
+                        if (tile.isAnomaly(game)) {
+                            scalingCount += 1;
+                        }
+                    }
+                }
+                case "mechs_in_space_area" -> {
+                    scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                }
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
                     if (origUnit.getIsGroundForce()
@@ -715,10 +730,11 @@ public class CombatModHelper {
                     scalingCount += count;
                     scalingCount = Math.min(scalingCount, 2);
                 }
-                case "opponent_sftt" -> getOpponentSfttCount(opponent);
-                case "nonhome_system_with_planet" -> getSystemsWithControlledPlanets(game, player);
-                case "galvanized_unit_count" -> getGalvanizedUnitCount(game, activeSystem, origUnit, player);
-                case "unique_ships" -> getUniqueNonFighterShipCount(game, activeSystem, player);
+                case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
+                case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
+                case "galvanized_unit_count" ->
+                    scalingCount = getGalvanizedUnitCount(game, activeSystem, origUnit, player);
+                case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
                         scalingCount = opponent.getTechs().stream()
@@ -761,7 +777,7 @@ public class CombatModHelper {
     public static int getOpponentSfttCount(Player player) {
         return (int) player.getPromissoryNotesInPlayArea().stream()
                 .map(Mapper::getPromissoryNote)
-                .filter(pn -> pn.getName().equals("Support for the Throne"))
+                .filter(pn -> "Support for the Throne".equals(pn.getName()))
                 .count();
     }
 

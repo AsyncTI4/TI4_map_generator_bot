@@ -39,6 +39,7 @@ public class HeroUnlockCheckService {
                             .anyMatch(so -> so.getName().equals(scoredPublic.getKey()))
                     || scoredPublic.getKey().contains("Throne of the False Emperor")
                     || scoredPublic.getKey().contains("Liberate Ordinian")
+                    || scoredPublic.getKey().contains("(Plotted)")
                     || scoredPublic.getKey().contains("Control Ordinian")) {
                 if (scoredPublic.getValue().contains(player.getUserID())) {
                     scoredPOCount++;

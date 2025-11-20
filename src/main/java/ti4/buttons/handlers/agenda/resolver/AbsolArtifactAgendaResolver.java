@@ -11,6 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.PlanetEmojis;
 
 public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
@@ -21,8 +22,8 @@ public class AbsolArtifactAgendaResolver implements ForAgainstAgendaResolver {
 
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
-        TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
-        String watchPartyPing = AgendaHelper.watchPartyPing(game);
+        TextChannel watchParty = IxthianArtifactService.watchPartyChannel(game);
+        String watchPartyPing = IxthianArtifactService.watchPartyPing(game);
         if (watchParty != null && !game.isFowMode()) {
             Tile tile = game.getMecatolTile();
             if (tile != null) {

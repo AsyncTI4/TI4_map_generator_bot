@@ -69,6 +69,11 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
+    public boolean isFake() {
+        return getPlanetTypes().contains(PlanetType.FAKE);
+    }
+
+    @JsonIgnore
     public String getAlias() {
         return id;
     }
@@ -87,7 +92,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getLegendaryNameRepresentation() {
-        return MiscEmojis.LegendaryPlanet + " __" + getLegendaryAbilityName() + "__";
+        return MiscEmojis.LegendaryPlanet + " __" + legendaryAbilityName + "__";
     }
 
     public boolean getShrinkNamePNAttach() {

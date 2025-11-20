@@ -29,7 +29,7 @@ public class ChannelCreationListener extends ListenerAdapter {
 
         String parentName = channel.getParentChannel().getName();
         if (parentName.equalsIgnoreCase(PBD_MAKING_GAMES_CHANNEL)
-                || parentName.equalsIgnoreCase("making-private-games")) {
+                || "making-private-games".equalsIgnoreCase(parentName)) {
             String message =
                     """
                 To launch a new game, please run the command `/game create_game_button`, \

@@ -1143,7 +1143,7 @@ public class TileGenerator {
                         }
                     }
 
-                    if (!traitFile.isEmpty()) {
+                    if (traitFile != null && !traitFile.isEmpty()) {
                         BufferedImage bufferedImage = ImageHelper.read(traitFile);
                         bufferedImage = ImageHelper.scale(bufferedImage, (float)
                                 Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
@@ -1700,8 +1700,8 @@ public class TileGenerator {
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
             float scale = 0.95f;
-            List<String> smallLegendaries =
-                    List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "industrex");
+            List<String> smallLegendaries = List.of(
+                    "mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "industrex", "thundersedge");
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                     && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
@@ -1727,7 +1727,7 @@ public class TileGenerator {
                 }
                 float scale = 0.85f;
                 List<String> smallLegendaries =
-                        List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
+                        List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "thundersedge");
                 boolean isLegendary = Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null;
                 if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     scale = 0.3f;
@@ -1811,7 +1811,7 @@ public class TileGenerator {
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
                     List<String> smallLegendaries =
-                            List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus");
+                            List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "thundersedge");
                     if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                             && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;

@@ -16,6 +16,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -50,7 +51,7 @@ public class EmelparService {
         for (Leader leader : player.getLeaders()) {
             if (leader.isExhausted()) {
                 String leaderName =
-                        leader.getLeaderModel().map(lm -> lm.getName()).orElse(leader.getId());
+                        leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
                 buttons.add(Buttons.gray(
                         prefix + leader.getId(),
                         "Ready leader " + leaderName,
@@ -98,7 +99,7 @@ public class EmelparService {
     private static void getEmelparButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String msg = player.getRepresentationUnfogged() + " select a component to ready:";
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = EmelparService.getReadyComponentButtons(game, player2);
+        List<Button> buttons = getReadyComponentButtons(game, player2);
 
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -131,7 +132,7 @@ public class EmelparService {
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             player2.setBreakthroughExhausted(false);
-            String readyItem = player.getBreakthroughModel().getNameRepresentation();
+            String readyItem = player2.getBreakthroughModel().getNameRepresentation();
             postSummary(event, player, readyItem);
         });
     }
@@ -147,7 +148,7 @@ public class EmelparService {
             if (leader != null) {
                 leader.setExhausted(false);
                 String readyMsg = leader.getLeaderModel()
-                        .map(l -> l.getNameRepresentation())
+                        .map(LeaderModel::getNameRepresentation)
                         .orElse(leaderID);
                 postSummary(event, player, readyMsg);
             }

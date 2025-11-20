@@ -39,7 +39,7 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                                     + ", there is no point in choosing a player to place an infantry."
                                     + " Feel free to curry favour with another player by claiming you would have chosen them.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), dmzString);
-                    continue;
+                    return;
                 }
                 if (AgendaHelper.getPlayersWithLeastPoints(game).size() == 1) {
                     Player p2 = AgendaHelper.getPlayersWithLeastPoints(game).getFirst();
@@ -50,7 +50,7 @@ public class RedistributionAgendaResolver implements AgendaResolver {
                             + " outright has the fewest victory points, and so 1 of their infantry infantry was added to "
                             + Helper.getPlanetRepresentation(winner, game) + " automatically.";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), resolveStr);
-                    continue;
+                    return;
                 }
                 List<Button> buttons = new ArrayList<>();
                 for (Player player2 : AgendaHelper.getPlayersWithLeastPoints(game)) {

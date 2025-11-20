@@ -140,12 +140,18 @@ public class SpinRingsHelper {
             game.setTile(tile);
         }
         if (!customHyperlanesToMove.isEmpty()) {
-            Map<String, String> currentData = game.getCustomHyperlaneData();
-            Map<String, String> previousData = new HashMap<>(currentData);
+            Map<String, String> currentData = new HashMap<>(game.getCustomHyperlaneData());
+            Map<String, String> newData = new HashMap<>();
             for (String[] pair : customHyperlanesToMove) {
-                currentData.remove(pair[0]);
-                currentData.put(pair[1], previousData.get(pair[0]));
+                String from = pair[0];
+                String to = pair[1];
+                String previousValue = currentData.remove(from);
+                if (previousValue != null) {
+                    newData.put(to, previousValue);
+                }
             }
+            currentData.putAll(newData);
+            game.setCustomHyperlaneData(currentData);
         }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
@@ -186,10 +192,10 @@ public class SpinRingsHelper {
                     if ((x - 2) < 1) {
                         tile.setPosition(2 + "" + ((x - 2) + (2 * 6)));
                     } else {
-                        if ((x - y) < 10) {
-                            tile.setPosition(y + "0" + (x - y));
+                        if ((x - 2) < 10) {
+                            tile.setPosition(2 + "0" + (x - 2));
                         } else {
-                            tile.setPosition(y + "" + (x - y));
+                            tile.setPosition(2 + "" + (x - 2));
                         }
                     }
                 } else {

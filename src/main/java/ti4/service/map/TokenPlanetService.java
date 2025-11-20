@@ -78,7 +78,7 @@ public class TokenPlanetService {
 
         Point planetCenter =
                 new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
-        if (planetName.equalsIgnoreCase("thundersedge")) {
+        if ("thundersedge".equalsIgnoreCase(planetName)) {
             planetCenter = Constants.SPACE_CENTER_POSITION;
         }
         Planet planetObject = new Planet(planetName, planetCenter);

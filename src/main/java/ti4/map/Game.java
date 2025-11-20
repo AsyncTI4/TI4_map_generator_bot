@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -263,8 +263,7 @@ public class Game extends GameProperties {
     public void fixScrewedRelics() {
 
         for (Player p2 : getRealPlayers()) {
-            List<String> relics = new ArrayList<>();
-            relics.addAll(p2.getRelics());
+            List<String> relics = new ArrayList<>(p2.getRelics());
             for (String relic : relics) {
                 if (Mapper.getRelic(relic) == null) {
                     p2.removeRelic(relic);
@@ -830,6 +829,7 @@ public class Game extends GameProperties {
         gameModes.put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
         gameModes.put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
         gameModes.put("Thunder's Edge", isThundersEdge());
+        gameModes.put("Thunder's Edge Demo", isThundersEdgeDemo());
         gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
         gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
         gameModes.put("Community", isCommunityMode());
@@ -853,6 +853,7 @@ public class Game extends GameProperties {
         gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Veiled Heart", isVeiledHeartMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
@@ -1052,10 +1053,6 @@ public class Game extends GameProperties {
         checkingForAllReacts.put(messageID, factionsWhoReacted);
     }
 
-    public void removeMessageIDFromCurrentReacts(String messageID) {
-        checkingForAllReacts.remove(messageID);
-    }
-
     public Map<String, String> getMessagesThatICheckedForAllReacts() {
         return checkingForAllReacts;
     }
@@ -1075,6 +1072,7 @@ public class Game extends GameProperties {
     }
 
     public void setStoredValue(String key, String value) {
+        if (value == null) return;
         value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);
     }
@@ -1323,7 +1321,10 @@ public class Game extends GameProperties {
 
     @Override
     public boolean isHomebrewSCMode() {
-        return !"pok".equals(getScSetID()) && !"base_game".equals(getScSetID()) && !"te".equals(getScSetID());
+        return !"pok".equals(getScSetID())
+                && !"base_game".equals(getScSetID())
+                && !"te".equals(getScSetID())
+                && !"twilights_fall_sc".equals(getScSetID());
     }
 
     public void setSpecificThalnosUnit(String unit, int count) {
@@ -2775,8 +2776,8 @@ public class Game extends GameProperties {
                 .toList();
         getActionCards().addAll(acsToShuffle);
         Collections.shuffle(getActionCards());
-        acsToShuffle.stream().forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
-        acsToShuffle.stream().forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
+        acsToShuffle.forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
+        acsToShuffle.forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
         String msg = "# " + getPing()
                 + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
@@ -3087,7 +3088,8 @@ public class Game extends GameProperties {
     }
 
     public void checkSOLimit(Player player) {
-        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
+        if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()
+                && !player.getSecretsUnscored().isEmpty()) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                     + player.getMaxSOCount()
                     + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
@@ -3609,7 +3611,7 @@ public class Game extends GameProperties {
         for (String ac : oldDeck) {
             newDeck.remove(ac);
         }
-        if (!getDiscardActionCards().isEmpty()) {
+        if (!getDiscardActionCards().isEmpty() && !isTwilightsFallMode()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
@@ -3792,13 +3794,12 @@ public class Game extends GameProperties {
 
     @JsonSetter
     public void setDiscardActionCards(Map<String, Integer> discardActionCards) {
-        discardActionCards.entrySet().stream()
-                .forEach(e -> getDiscardActionCards().put(e.getKey(), e.getValue()));
+        discardActionCards.entrySet().forEach(e -> getDiscardActionCards().put(e.getKey(), e.getValue()));
     }
 
     @JsonSetter
     public void setDiscardActionCardStatus(Map<String, ACStatus> discardACStatus) {
-        discardACStatus.entrySet().stream().forEach(e -> getDiscardACStatus().put(e.getKey(), e.getValue()));
+        discardACStatus.entrySet().forEach(e -> getDiscardACStatus().put(e.getKey(), e.getValue()));
     }
 
     public void setDiscardActionCards(List<String> discardActionCardList) {
@@ -4061,7 +4062,7 @@ public class Game extends GameProperties {
     }
 
     public void removeAllTiles() {
-        for (Tile tile : new ArrayList<Tile>(tileMap.values())) {
+        for (Tile tile : new ArrayList<>(tileMap.values())) {
             removeTile(tile.getPosition());
         }
     }
@@ -4100,6 +4101,9 @@ public class Game extends GameProperties {
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
             if ("custodiavigilia".equalsIgnoreCase(getStoredValue("terraformedPlanet"))) {
                 planets.get("custodiavigilia").addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+            }
+            if (isThundersEdge()) {
+                planets.get("custodiavigilia").addToken("attachment_negativeinf.png");
             }
             planets.put("custodiavigiliaplus", new Planet("custodiavigiliaplus", new Point(0, 0)));
             planets.put("nevermore", new Planet("nevermore", new Point(0, 0)));
@@ -4234,6 +4238,9 @@ public class Game extends GameProperties {
         }
 
         if ("sardakkcommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-valkyrie")) {
+            return true;
+        }
+        if ("crimsoncommander".equalsIgnoreCase(leaderID) && player.hasTech("tf-entropicharvest")) {
             return true;
         }
 
@@ -4638,11 +4645,6 @@ public class Game extends GameProperties {
         return tile_.getUnitHolderFromPlanet(planetName);
     }
 
-    public boolean isPlanetSpaceStation(String planet) {
-        return getUnitHolderFromPlanet(planet) != null
-                && getUnitHolderFromPlanet(planet).isSpaceStation();
-    }
-
     @Nullable
     public Player getPlayerFromColorOrFaction(String factionOrColor) {
         if (factionOrColor == null) {
@@ -4806,6 +4808,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public boolean isThundersEdgeDemo() {
+        return getTags().contains("ThundersEdgeDemo");
+    }
+
+    @JsonIgnore
     public boolean hasHomebrew() {
         return isHomebrew()
                 || isExtraSecretMode()
@@ -4816,6 +4823,7 @@ public class Game extends GameProperties {
                 || isDiscordantStarsMode()
                 || isFrankenGame()
                 || isMiltyModMode()
+                || isThundersEdgeDemo()
                 || isAbsolMode()
                 || isVotcMode()
                 || isPromisesPromisesMode()
@@ -4941,6 +4949,9 @@ public class Game extends GameProperties {
 
     public void setStrategyCardSet(String scSetID) {
         StrategyCardSetModel strategyCardModel = Mapper.getStrategyCardSets().get(scSetID);
+        if (strategyCardModel == null) {
+            throw new IllegalArgumentException("Strategy card set not found for ID: " + scSetID);
+        }
         setHomebrewSCMode(!"pok".equals(scSetID) && !"base_game".equals(scSetID) && !"te".equals(scSetID));
 
         Map<Integer, Integer> oldTGs = getScTradeGoods();

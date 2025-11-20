@@ -43,6 +43,7 @@ public enum FactionEmojis implements TI4Emoji {
     Deepwrought,
     Firmament,
     Obsidian,
+    Neutral,
 
     // Twilight's Fall
 
@@ -172,7 +173,6 @@ public enum FactionEmojis implements TI4Emoji {
     saera,
     shadows, // Eronous
     Lazax,
-    Neutral,
     RandomFaction,
     AdminsFaction,
     netharii,
@@ -225,7 +225,6 @@ public enum FactionEmojis implements TI4Emoji {
             case "yin" -> Yin;
 
             case "lazax" -> Lazax;
-            case "neutral" -> Neutral;
 
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
             case "redcreuss", "redghost" -> RedCreuss;
@@ -236,6 +235,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "deepwrought" -> Deepwrought;
             case "obsidian" -> Obsidian;
             case "firmament" -> Firmament;
+            case "neutral" -> Neutral;
+
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;

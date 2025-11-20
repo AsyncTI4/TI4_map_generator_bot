@@ -20,6 +20,7 @@ public class CombatMod {
     public enum CombatModScaling {
         adjacent_mech,
         adjacent_asteroid,
+        adjacent_anomaly,
         combat_round,
         damaged_units_same_type,
         destroyers,
@@ -55,6 +56,7 @@ public class CombatMod {
         opponent_has_sftt,
         galvanized,
         spacecombat,
+        fracture_combat,
 
         // ds
         opponent_no_cc_fleet,

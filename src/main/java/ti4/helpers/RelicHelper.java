@@ -167,6 +167,9 @@ public class RelicHelper {
                 } else {
                     List<String> startingTechOptions =
                             new ArrayList<>(Arrays.asList("amd", "det", "nm", "pa", "st", "sdn", "ps", "aida"));
+                    if (game.isTwilightsFallMode()) {
+                        startingTechOptions = new ArrayList<>(Arrays.asList("wavelength", "antimatter"));
+                    }
                     List<TechnologyModel> techs = new ArrayList<>();
                     if (!startingTechOptions.isEmpty()) {
                         for (String tech : game.getTechnologyDeck()) {
@@ -187,7 +190,18 @@ public class RelicHelper {
                             + ", please use the buttons to research a technology with no prerequisites:";
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        if (game.isTwilightsFallMode()) {
+                            buttons = ButtonHelper.getGainCCButtons(player);
+                            String message2 = player.getRepresentation()
+                                    + ", you would research two technologies, but because you have none to research, you instead gain 4 command tokens."
+                                    + " Your current command tokens are " + player.getCCRepresentation()
+                                    + ". Use buttons to gain command tokens.";
+                            MessageHelper.sendMessageToChannelWithButtons(
+                                    player.getCorrectChannel(), message2, buttons);
+                            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                        } else {
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        }
                     } else {
                         for (int x = 0; x < 2; x++) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -314,7 +328,9 @@ public class RelicHelper {
             int x = 1;
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n" + x + ". ")
+                text.append("\n")
+                        .append(x)
+                        .append(". ")
                         .append(ExploreEmojis.Relic)
                         .append(" _")
                         .append(relicName)

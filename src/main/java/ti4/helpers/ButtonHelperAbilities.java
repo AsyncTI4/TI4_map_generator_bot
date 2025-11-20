@@ -829,7 +829,7 @@ public class ButtonHelperAbilities {
             }
 
             var userSettings = UserSettingsManager.get(player.getUserID());
-            if (!userSettings.isPrefersPillageMsg()) {
+            if (!userSettings.isPrefersPillageMsg() || game.isTwilightsFallMode()) {
                 pillagerMessage = player.getRepresentationUnfogged()
                         + " you succesfully **Pillage**'d, so your ~~doubloons~~ trade goods have gone from "
                         + player.getTg() + " to "
@@ -1845,6 +1845,10 @@ public class ButtonHelperAbilities {
                             || (nekro.hasTech("vax") || nekro.getFactionTechs().contains("vax"))
                             || (nekro.hasTech("vay") || nekro.getFactionTechs().contains("vay"))
                             || !Mapper.getTech(tech).isFactionTech()) {
+                        if (game.isTwilightsFallMode()
+                                && ("wavelength".equalsIgnoreCase(tech) || "antimatter".equalsIgnoreCase(tech))) {
+                            continue;
+                        }
                         techToGain.add(tech);
                     }
                 }

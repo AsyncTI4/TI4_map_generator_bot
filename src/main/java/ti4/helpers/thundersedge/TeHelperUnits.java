@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
@@ -55,6 +56,14 @@ public class TeHelperUnits {
     @ButtonHandler("revenantDeploy_")
     private static void revenantDeploy(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String regex = "revenantDeploy_" + RegexHelper.unitHolderRegex(game, "planet");
+        if (!game.getTileByPosition(game.getActiveSystem())
+                .getSpaceUnitHolder()
+                .getTokenList()
+                .contains(Constants.TOKEN_BREACH_ACTIVE)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "The system must have an active breach in it to deploy a mech.");
+            return;
+        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
@@ -65,14 +74,13 @@ public class TeHelperUnits {
 
             String msg = ThreadLocalRandom.current().nextInt(10) == 0 ? flavorMsg : boringMsg;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            game.setStoredValue("revenantDone", "true");
             ButtonHelper.deleteButtonsWithPartialID(event, "revenantDeploy_");
         });
     }
 
     public static boolean affectedByQuietus(Game game, Player player, UnitHolder uh) {
         // Get the actual space unit holder if able
-        if (!uh.getName().equals("space")) {
+        if (!"space".equals(uh.getName())) {
             Tile t = game.getTileFromPlanet(uh.getName());
             if (t == null) return false;
             uh = t.getSpaceUnitHolder();
@@ -115,8 +123,8 @@ public class TeHelperUnits {
                 TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
 
         // Part 1 (no error)
-        final String regex1 = "startForerunner_" + RegexHelper.posRegex();
-        final Pattern part1 = Pattern.compile(regex1);
+        String regex1 = "startForerunner_" + RegexHelper.posRegex();
+        Pattern part1 = Pattern.compile(regex1);
         boolean succ = RegexService.runMatcher(
                 part1,
                 buttonID,
@@ -132,8 +140,8 @@ public class TeHelperUnits {
         if (succ) return;
 
         // Part 2
-        final String regex2 = regex1 + "_" + RegexHelper.posRegex("source");
-        final Pattern part2 = Pattern.compile(regex2);
+        String regex2 = regex1 + "_" + RegexHelper.posRegex("source");
+        Pattern part2 = Pattern.compile(regex2);
         RegexService.runMatcher(part2, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             Tile source = game.getTileByPosition(matcher.group("source"));
@@ -190,12 +198,12 @@ public class TeHelperUnits {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> forerunnerMap =
                     TeHelperAbilities.readMoveMap(game.getStoredValue("forerunnerMovementMap"));
-            for (String source : forerunnerMap.keySet()) {
+            for (Map.Entry<String, List<String>> entry : forerunnerMap.entrySet()) {
                 List<String> units =
-                        forerunnerMap.get(source).stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+                        entry.getValue().stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
                                 .map(e -> e.getValue().size() + " " + e.getKey())
                                 .toList();
-                List<String> unitsTo = forerunnerMap.get(source).stream()
+                List<String> unitsTo = entry.getValue().stream()
                         .map(unit -> unit.substring(0, unit.indexOf(' ')) + " " + matcher.group("combatPlanet"))
                         .collect(Collectors.groupingBy(s -> s))
                         .entrySet()
@@ -206,7 +214,7 @@ public class TeHelperUnits {
                 String unitStrTo = String.join(", ", unitsTo);
 
                 RemoveUnitService.removeUnits(
-                        event, game.getTileByPosition(source), game, player.getColor(), unitStrFrom);
+                        event, game.getTileByPosition(entry.getKey()), game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("forerunnerMovementMap");
@@ -270,7 +278,7 @@ public class TeHelperUnits {
                 String uhName = Helper.getPlanetRepresentation(data[1], game);
                 if (type != null) {
                     String id = player.finChecker() + "undoForerunner_" + destination.getPosition() + "_"
-                            + source.getPosition() + "_" + type.toString() + "_" + data[1];
+                            + source.getPosition() + "_" + type + "_" + data[1];
                     String label = "Return " + type.humanReadableName() + " to " + uhName;
                     buttons.add(Buttons.red(id, label, type.getUnitTypeEmoji()));
                 }
@@ -310,7 +318,7 @@ public class TeHelperUnits {
     public static void serveIconoclastDeployAbility(Game game, Player relicDrawer) {
         for (Player player : game.getRealPlayers()) {
             if (player.is(relicDrawer)) continue;
-            if (!player.hasUnit("naalu_mech_te")) continue;
+            if (!player.hasUnit("naalu_mech_te") || ButtonHelper.isLawInPlay(game, "articles_war")) continue;
 
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                 List<Button> buttons = new ArrayList<>(

@@ -19,7 +19,7 @@ public class ExecutionDirectiveAgendaResolver implements AgendaResolver {
         if (player2 == null) return;
         String message =
                 "Discarded the elected player's action cards and marked them as unable to vote on the next agenda.";
-        ActionCardHelper.discardRandomAC(event, game, player2, player2.getAc());
+        ActionCardHelper.discardRandomAC(event, game, player2, player2.getAcCount());
         game.setStoredValue("PublicExecution", player2.getFaction());
         if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
             for (Player p4 : Helper.getSpeakerOrFullPriorityOrderFromPlayer(player2, game)) {
