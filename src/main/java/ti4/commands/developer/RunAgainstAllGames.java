@@ -60,7 +60,9 @@ class RunAgainstAllGames extends Subcommand {
         }
 
         try {
-            return new SimpleDateFormat("yyyy.MM.dd").parse(game.getCreationDate()).getTime();
+            return new SimpleDateFormat("yyyy.MM.dd")
+                    .parse(game.getCreationDate())
+                    .getTime();
         } catch (Exception e) {
             return CUTOFF_DATE;
         }
