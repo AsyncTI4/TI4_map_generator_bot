@@ -35,8 +35,8 @@ public class ThundersEdgeBreakthroughStatisticsService {
             List<Player> winners = game.getWinners();
             boolean gameCompleted = !winners.isEmpty();
             for (Player player : game.getRealPlayers()) {
-                FactionBreakthroughStats factionStats = factionBreakthroughs
-                        .computeIfAbsent(player.getFaction(), faction -> new FactionBreakthroughStats());
+                FactionBreakthroughStats factionStats = factionBreakthroughs.computeIfAbsent(
+                        player.getFaction(), faction -> new FactionBreakthroughStats());
                 factionStats.incrementGames();
 
                 if (player.isBreakthroughUnlocked()) {
@@ -64,12 +64,11 @@ public class ThundersEdgeBreakthroughStatisticsService {
         double percent = (gamesWithBreakthroughs.get() * 100.0) / thunderEdgeGames.get();
         String message = String.format(
                 "Thunder's Edge Breakthrough unlocks: %d players (%.1f%% of games) across %d games.",
-                playersWithBreakthroughs.get(),
-                percent,
-                thunderEdgeGames.get());
+                playersWithBreakthroughs.get(), percent, thunderEdgeGames.get());
         StringBuilder detailedMessage = new StringBuilder(message).append("\n\nFaction breakdown:\n");
 
-        List<Map.Entry<String, FactionBreakthroughStats>> sortedFactions = new ArrayList<>(factionBreakthroughs.entrySet());
+        List<Map.Entry<String, FactionBreakthroughStats>> sortedFactions =
+                new ArrayList<>(factionBreakthroughs.entrySet());
         sortedFactions.sort(Comparator.comparing(Map.Entry::getKey));
         for (Map.Entry<String, FactionBreakthroughStats> entry : sortedFactions) {
             String faction = entry.getKey();
@@ -85,10 +84,7 @@ public class ThundersEdgeBreakthroughStatisticsService {
 
             detailedMessage.append(String.format(
                     "%s: %d unlocks (%.1f%% of their games), %.1f%% wins in completed games with an unlock.%n",
-                    faction,
-                    stats.gamesWithUnlock,
-                    unlockPercent,
-                    winPercent));
+                    faction, stats.gamesWithUnlock, unlockPercent, winPercent));
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), detailedMessage.toString());
