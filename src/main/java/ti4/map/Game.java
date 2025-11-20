@@ -877,6 +877,12 @@ public class Game extends GameProperties {
                 .collect(Collectors.joining(", "));
     }
 
+    public boolean isThundersEdgeDemo() {
+        return getTags().stream()
+                .map(String::trim)
+                .anyMatch(tag -> "Thunder's Edge Demo".equalsIgnoreCase(tag));
+    }
+
     public boolean isAcd2() {
         return getAcDeckID().startsWith("action_deck_2");
     }

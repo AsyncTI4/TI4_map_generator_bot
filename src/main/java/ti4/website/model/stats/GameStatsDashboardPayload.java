@@ -211,6 +211,7 @@ public class GameStatsDashboardPayload {
                         Map.entry("Base Game", (Supplier<Boolean>) game::isBaseGameMode),
                         Map.entry("Prophecy of Kings", (Supplier<Boolean>) game::isProphecyOfKings),
                         Map.entry("Thunder's Edge", (Supplier<Boolean>) game::isThundersEdge),
+                        Map.entry("Thunder's Edge Demo", (Supplier<Boolean>) game::isThundersEdgeDemo),
                         Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
                         Map.entry("Age of Exploration", (Supplier<Boolean>) game::isAgeOfExplorationMode),
                         Map.entry("Facilities", (Supplier<Boolean>) game::isFacilitiesMode),
