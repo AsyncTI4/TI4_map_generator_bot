@@ -1485,6 +1485,21 @@
         "forCombatAbility": "combatround"
     },
     {
+        "alias": "plus_1_for_every_nearby_anomaly",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_anomaly",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "purpletf_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "roll_1_for_every_adjacent_mech_comb",
         "type": "extrarolls",
         "value": "+1",

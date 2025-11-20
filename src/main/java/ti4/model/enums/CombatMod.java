@@ -20,6 +20,7 @@ public class CombatMod {
     public enum CombatModScaling {
         adjacent_mech,
         adjacent_asteroid,
+        adjacent_anomaly,
         combat_round,
         damaged_units_same_type,
         destroyers,
