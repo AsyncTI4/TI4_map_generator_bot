@@ -12,7 +12,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -686,6 +688,15 @@ public class CombatModHelper {
                             FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         if (tile.isAsteroidField()) {
+                            scalingCount += 1;
+                        }
+                    }
+                }
+                case "adjacent_anomaly" -> {
+                    for (String pos :
+                            FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = game.getTileByPosition(pos);
+                        if (tile.isAnomaly(game)) {
                             scalingCount += 1;
                         }
                     }
