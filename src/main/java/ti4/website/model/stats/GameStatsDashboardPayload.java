@@ -1,7 +1,5 @@
 package ti4.website.model.stats;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -16,20 +14,16 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.map.helper.GameHelper;
 import ti4.map.pojo.PlayerProperties;
-import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
-import ti4.website.EgressClientManager;
 import ti4.service.map.FractureService;
 
 public class GameStatsDashboardPayload {
@@ -40,16 +34,6 @@ public class GameStatsDashboardPayload {
         this.game = game;
     }
 
-    @JsonIgnore
-    public String getJson() {
-        try {
-            return EgressClientManager.getObjectMapper().writeValueAsString(this);
-        } catch (Exception e) {
-            BotLogger.error("Could not get GameStatsDashboardPayload JSON for Game ", e);
-            return null;
-        }
-    }
-
     public String getAsyncGameID() {
         return game.getID();
     }
@@ -58,22 +42,10 @@ public class GameStatsDashboardPayload {
         return game.getCustomName();
     }
 
-    @JsonIgnore // not currently used for Dashboard
-    public String getActiveSystem() {
-        String activeSystemPosition = game.getActiveSystem();
-        if (StringUtils.isEmpty(activeSystemPosition)) return null;
-
-        Tile tile = game.getTileByPosition(activeSystemPosition);
-        if (tile == null) return null;
-
-        return tile.getTileID();
-    }
-
     public String getHexSummary() {
         return game.getHexSummary();
     }
 
-    @JsonProperty("isPoK")
     public boolean isPoK() {
         return game.isProphecyOfKings();
     }
@@ -326,13 +298,12 @@ public class GameStatsDashboardPayload {
         return game.getWinners().stream().map(PlayerProperties::getUserID).toList();
     }
 
-    public boolean hasCompleted() {
+    public boolean isCompleted() {
         return game.getWinner().isPresent() && game.isHasEnded();
     }
 
-    @JsonProperty("fracture_in_play")
     public boolean isFractureInPlay() {
-        return FractureService.isFractureInPlay(game) && !game.isNoFractureMode();
+        return FractureService.isFractureInPlay(game);
     }
 
     public boolean isHomebrew() {

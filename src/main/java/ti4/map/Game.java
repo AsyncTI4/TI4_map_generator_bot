@@ -3088,7 +3088,7 @@ public class Game extends GameProperties {
 
     public void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()
-                && player.getSecretsUnscored().size() > 0) {
+                && !player.getSecretsUnscored().isEmpty()) {
             String msg = player.getRepresentationUnfogged() + " you have more secret objectives than the limit ("
                     + player.getMaxSOCount()
                     + ") and should discard one. If your game is playing with a higher secret objective limit, you may change that in `/game setup`.";
