@@ -116,6 +116,7 @@ class Replace extends GameStateSubcommand {
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
         replacedPlayer.setNumberOfTurns(0);
+        replacedPlayer.setNpc(false);
         replacedPlayer.removeTeamMateID(oldPlayerUserId);
         if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(replacementUser.getId());

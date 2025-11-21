@@ -152,12 +152,17 @@ public class PlotCardsService {
                 String disastermsg = "Moments before disaster in game " + game.getName();
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
+            String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
+                    + " has been eradicated with an obsidian plot.";
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), disastermsg);
 
             planet.getUnitsByState().clear();
 
+            ButtonHelper.deleteMessage(event);
+
             if (disaster) {
-                String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
-                        + " has been eradicated with an obsidian plot.";
+
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
         });

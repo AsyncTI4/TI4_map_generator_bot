@@ -608,7 +608,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "DEPLOY: At the start of your turn, you may discard one of your abilities to place this unit from your reinforcement into a system that contains your ships."
+        "ability": "DEPLOY: At the start of your turn, you may discard one of your abilities or genomes to place this unit from your reinforcement into a system that contains your ships."
     },
     {
         "id": "redtf_mech",
