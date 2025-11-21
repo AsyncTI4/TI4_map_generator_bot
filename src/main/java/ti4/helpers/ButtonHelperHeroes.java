@@ -1878,9 +1878,6 @@ public class ButtonHelperHeroes {
             return;
         }
         String message2;
-        // String ident = p1.getRepresentation();
-        String ident2 =
-                game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, p2, p1) ? "???" : p2.getRepresentation();
         String id = null;
         int pnIndex;
         pnIndex = Integer.parseInt(amountToTrans);
@@ -1917,13 +1914,13 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         if (sendSftT || sendAlliance) {
             String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
-            message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2 + ".";
+            message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of ";
         } else {
-            message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2 + ".";
+            message2 = p1.getRepresentation() + " sent a promissory note to the hand of ";
         }
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message2 + p2.getRepresentation() + ".");
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
+            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2 + p2.getColorIfCanSeeStats(p1));
         }
         ButtonHelper.deleteMessage(event);
         Helper.checkEndGame(game, p2);
