@@ -1216,7 +1216,7 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("rapid_fulfillment".equals(automationID)) {
+            if ("rapid_fulfillment".equals(automationID) || "contingency".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRapidFulfillment", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
