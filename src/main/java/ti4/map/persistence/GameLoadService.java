@@ -924,6 +924,8 @@ class GameLoadService {
                 case Constants.EXPECTED_HITS_TIMES_10 ->
                     player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_EXPENSES -> player.setTotalExpenses(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.BONUS_SCORED_SECRETS ->
+                    player.setBonusScoredSecrets(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TURN_COUNT -> player.setInRoundTurnCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
