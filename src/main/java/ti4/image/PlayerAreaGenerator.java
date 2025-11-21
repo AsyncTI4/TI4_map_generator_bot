@@ -2203,6 +2203,12 @@ class PlayerAreaGenerator {
                     }
                 }
             }
+            if (player.getGame()
+                    .getPlayersPlanetsThatOthersAreCoexistingOn(player)
+                    .contains(planetName)) {
+                coexist = true;
+            }
+
             graphics.setColor(isExhausted ? Color.GRAY : Color.WHITE);
 
             String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
@@ -2230,6 +2236,10 @@ class PlayerAreaGenerator {
                 if (planetTypes.contains("cultural")) planetDisplayIcon += "C";
                 if (planetTypes.contains("hazardous")) planetDisplayIcon += "H";
                 if (planetTypes.contains("industrial")) planetDisplayIcon += "I";
+            }
+
+            if (coexist && coexistFaction.isEmpty()) {
+                drawFactionIconImage(graphics, "coexist", x + deltaX - 2 + 20, y - 2 + 40, 30, 30);
             }
 
             if (planetDisplayIcon != null && !planetDisplayIcon.isEmpty()) {

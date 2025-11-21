@@ -7,10 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Units.UnitKey;
@@ -700,7 +698,11 @@ public class CombatModHelper {
                     }
                 }
                 case "mechs_in_space_area" -> {
-                    scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                    if (!unitHolder.getName().equalsIgnoreCase("space")) {
+                        scalingCount = 0;
+                    } else {
+                        scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
+                    }
                 }
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders().get("space");
@@ -782,12 +784,22 @@ public class CombatModHelper {
     }
 
     public static int getSystemsWithControlledPlanets(Game game, Player player) {
-        return (int) player.getPlanetsAllianceMode().stream()
-                .map(game::getTileFromPlanet)
-                .distinct()
-                .filter(Objects::nonNull)
-                .filter(Predicate.not(Tile::isHomeSystem))
-                .count();
+
+        int count = 0;
+
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isHomeSystem(game)) {
+                continue;
+            }
+            boolean found = false;
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (!found && player.getPlanetsAllianceMode().contains(uH.getName())) {
+                    count++;
+                    found = true;
+                }
+            }
+        }
+        return count;
     }
 
     public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {

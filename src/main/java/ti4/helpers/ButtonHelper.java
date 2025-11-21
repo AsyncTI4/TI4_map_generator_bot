@@ -1474,6 +1474,31 @@ public class ButtonHelper {
                     player.getCorrectChannel(),
                     "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work in an entropic scar.");
         }
+
+        if (!game.isFowMode()) {
+            if (game.isTwilightsFallMode()) {
+                boolean sent = false;
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    if (p2.hasTech("tf-smotheringpresence")) {
+                        for (String tilePos :
+                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                            Tile t2 = game.getTileByPosition(tilePos);
+                            for (UnitHolder uH : t2.getUnitHolders().values()) {
+                                if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
+                                        || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+                                    if (!sent) {
+                                        sent = true;
+                                        MessageHelper.sendMessageToChannel(
+                                                player.getCorrectChannel(),
+                                                "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work when next to another player's structure when they have smothering presence, like this tile is.");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if (game.isL1Hero()) {
             return 0;
         }

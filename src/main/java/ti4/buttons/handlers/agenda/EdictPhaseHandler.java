@@ -279,9 +279,6 @@ public class EdictPhaseHandler {
             }
             case "tf-censure" -> {
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player) {
-                        continue;
-                    }
                     buttons.add(Buttons.green(
                             "electCensure_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
                 }
