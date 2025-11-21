@@ -350,7 +350,7 @@ class Stats extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
                 msg = game.getPing()
-                        + " A player has turned NPC. NPCs will auto pass on everything, and their only actions will be to pick the lowest iniative strategy card, play it as soon as possible, and then pass. If this doesn't sound quite right for this situation, we invite you to seek a replacement on the hub server channel #finding-replacements.";
+                        + " A player has turned NPC. NPCs will auto pass on everything, and their only actions will be to pick the lowest initiative strategy card, play it as soon as possible, and then pass. If this doesn't sound quite right for this situation, we invite you to seek a replacement on the hub server channel #finding-replacements.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

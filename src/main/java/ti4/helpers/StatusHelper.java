@@ -648,8 +648,8 @@ public class StatusHelper {
                 factionTechs.add("antimatter");
                 factionTechs.add("wavelength");
             }
-            factionTechs.add("vax");
-            factionTechs.add("vay");
+            factionTechs.remove("vax");
+            factionTechs.remove("vay");
             player.getTechs().forEach(factionTechs::remove);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {
