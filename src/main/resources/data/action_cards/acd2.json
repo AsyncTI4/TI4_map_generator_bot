@@ -824,7 +824,7 @@
         "window": "When you perform a strategic action",
         "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
         "flavorText": "Mathis was not fooled. The pageantry and endless bandying of crooked words with these witless worms was yet another scheme.",
-        "source": "deprecated"
+        "source": "action_deck_2"
     },
     {
         "alias": "swindle",
@@ -1206,7 +1206,7 @@
         "window": "ACTION",
         "text": "Place 3 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
         "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
-        "source": "deprecated"
+        "source": "action_deck_2"
     },
     {
         "alias": "sacrifice1",

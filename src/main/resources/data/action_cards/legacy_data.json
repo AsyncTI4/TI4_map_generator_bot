@@ -1326,7 +1326,7 @@
         "window": "ACTION",
         "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
         "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
-        "source": "action_deck_2"
+        "source": "deprecated"
     },
     {
         "alias": "armament_rider",
