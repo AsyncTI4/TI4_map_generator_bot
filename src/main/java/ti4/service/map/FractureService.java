@@ -14,6 +14,7 @@ import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
+import ti4.helpers.FoWHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -168,6 +169,10 @@ public class FractureService {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons());
         tile.addToken(Constants.TOKEN_INGRESS, "space");
+
+        if (game.isFowMode()) {
+            FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into the Fracture.", false);
+        }
 
         ButtonHelper.deleteTheOneButton(event);
     }
