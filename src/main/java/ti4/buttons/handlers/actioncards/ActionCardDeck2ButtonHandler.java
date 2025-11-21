@@ -101,7 +101,7 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = Helper.getPlaceUnitButtons(
                 event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskip");
         String message = player.getRepresentation()
-                + ", use the buttons to place up to 2 ships that have a combined cost of 4 or less.";
+                + ", use the buttons to place up to 2 ships that have a combined cost of 3 or less.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }

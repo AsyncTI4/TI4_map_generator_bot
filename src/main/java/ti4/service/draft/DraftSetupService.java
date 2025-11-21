@@ -71,8 +71,8 @@ public class DraftSetupService {
                 specs.numFactions,
                 specs.factionSources,
                 specs.priorityFactions,
-                specs.bannedFactions,
-                game.isThundersEdge());
+                specs.bannedFactions
+        );
         draftManager.addDraftable(factionDraftable);
 
         SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
