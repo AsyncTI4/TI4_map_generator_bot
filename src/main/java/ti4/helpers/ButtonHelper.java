@@ -19,13 +19,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
@@ -51,6 +45,9 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1483,24 +1480,24 @@ public class ButtonHelper {
                 boolean sent = false;
                 for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                     if (p2.hasTech("tf-smotheringpresence")) {
-                        for (String tilePos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        for (String tilePos :
+                                FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                             Tile t2 = game.getTileByPosition(tilePos);
                             for (UnitHolder uH : t2.getUnitHolders().values()) {
                                 if (uH.getUnitCount(UnitType.Pds, p2.getColor()) > 0
                                         || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                                            if(!sent){
-                                            sent = true;
-                                    MessageHelper.sendMessageToChannel(
-                                    player.getCorrectChannel(),
-                                    "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work when next to another player's structure when they have smothering presence, like this tile is.");
+                                    if (!sent) {
+                                        sent = true;
+                                        MessageHelper.sendMessageToChannel(
+                                                player.getCorrectChannel(),
+                                                "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work when next to another player's structure when they have smothering presence, like this tile is.");
                                     }
                                 }
                             }
                         }
                     }
                 }
-        }
-           
+            }
         }
         if (game.isL1Hero()) {
             return 0;

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -79,11 +78,12 @@ public class PdsCoverageHelper {
                             continue;
                         }
                         if (("ralnel_destroyer2".equalsIgnoreCase(model.getId())
-                                        && unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
+                                && unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
                             continue;
                         }
-                        if ((UnitType.Pds == model.getUnitType() && player.hasAbility("miniaturization")
-                                        && unitHolder.getName().equalsIgnoreCase("space"))) {
+                        if ((UnitType.Pds == model.getUnitType()
+                                && player.hasAbility("miniaturization")
+                                && unitHolder.getName().equalsIgnoreCase("space"))) {
                             continue;
                         }
 

@@ -3,7 +3,6 @@ package ti4.commands.player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -319,7 +318,12 @@ class Stats extends GameStateSubcommand {
 
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (event.getChannel() instanceof TextChannel channel) {
-                    SusSlashCommandService.reportSusSlashCommand(event, channel.getJumpUrl() +" Round "+game.getRound() +"; Space Resources: "+player.getTotalResourceValueOfUnits("space")+"; VP: "+player.getTotalVictoryPoints() +";\nTrack record: "+userSettings.getTrackRecord());
+                    SusSlashCommandService.reportSusSlashCommand(
+                            event,
+                            channel.getJumpUrl() + " Round " + game.getRound() + "; Space Resources: "
+                                    + player.getTotalResourceValueOfUnits("space") + "; VP: "
+                                    + player.getTotalVictoryPoints() + ";\nTrack record: "
+                                    + userSettings.getTrackRecord());
                 }
                 userSettings.setTrackRecord(
                         userSettings.getTrackRecord() + " Was set as an NPC in " + game.getName() + ". ");
@@ -340,7 +344,14 @@ class Stats extends GameStateSubcommand {
                 String msg = player.getRepresentation()
                         + " do you want to remove yourself from the game channels? If so, press this button.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-                
+
+                msg = player.getRepresentation()
+                        + " You should know that NPC is only to be used in doomed scenariors, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+                msg = game.getPing()
+                        + " A player has turned NPC. NPCs will auto pass on everything, and their only actions will be to pick the lowest iniative strategy card, play it as soon as possible, and then pass. If this doesn't sound quite right for this situation, we invite you to seek a replacement on the hub server channel #finding-replacements.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
     }

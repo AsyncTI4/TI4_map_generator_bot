@@ -648,6 +648,8 @@ public class StatusHelper {
                 factionTechs.add("antimatter");
                 factionTechs.add("wavelength");
             }
+            factionTechs.add("vax");
+            factionTechs.add("vay");
             player.getTechs().forEach(factionTechs::remove);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {
@@ -662,6 +664,10 @@ public class StatusHelper {
 
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
+            if (game.isTwilightsFallMode() && techs == 0) {
+                techs++;
+                buttons.add(Buttons.blue("redistributeCCButtons", "Gain 2 Command Tokens (And Spend 1 Strat)"));
+            }
             String scarMessage = player.getRepresentation()
                     + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
             scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";

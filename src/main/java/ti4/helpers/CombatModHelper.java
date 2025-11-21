@@ -10,9 +10,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -700,9 +698,9 @@ public class CombatModHelper {
                     }
                 }
                 case "mechs_in_space_area" -> {
-                    if(!unitHolder.getName().equalsIgnoreCase("space")){
+                    if (!unitHolder.getName().equalsIgnoreCase("space")) {
                         scalingCount = 0;
-                    }else{
+                    } else {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
                     }
                 }
@@ -789,13 +787,13 @@ public class CombatModHelper {
 
         int count = 0;
 
-        for(Tile tile : game.getTileMap().values()){
-            if(tile.isHomeSystem(game)){
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isHomeSystem(game)) {
                 continue;
             }
             boolean found = false;
-            for(UnitHolder uH : tile.getPlanetUnitHolders()){
-                if(!found && player.getPlanetsAllianceMode().contains(uH.getName())){
+            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (!found && player.getPlanetsAllianceMode().contains(uH.getName())) {
                     count++;
                     found = true;
                 }
