@@ -167,9 +167,9 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(
-                player.getRepresentation() + " you are #" + number + " pick in this Strategy Phase and so can queue "
-                        + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ");
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you are #" + number
+                + " pick in this Strategy Phase and so can queue " + number + " strategy cards."
+                + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
             msg = new StringBuilder(player.getRepresentation() + " you can queue up to 8 cards."
                     + " So far you have queued " + numQueued + " cards. ");

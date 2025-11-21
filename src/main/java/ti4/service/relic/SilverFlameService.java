@@ -114,7 +114,7 @@ public class SilverFlameService {
         }
         Helper.checkEndGame(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteAllButtons(event);
         if (!FractureService.isFractureInPlay(game)) {
             FractureService.spawnFracture(null, game);
             FractureService.spawnIngressTokens(null, game, player, false);
