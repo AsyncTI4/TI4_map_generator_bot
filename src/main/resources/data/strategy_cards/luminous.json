@@ -3,8 +3,14 @@
         "id": "luminous1",
         "initiative": 1,
         "name": "Anticipation",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Ready up to 2 planets you control.",
+            "Ready a technology, an agent, or a relic you control.",
+            "Redistribute any any number of the command tokens on your sheet."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to ready up to 2 planets you control."
+        ],
         "imageFileName": "luminous_1",
         "source": "other"
     },
@@ -12,8 +18,15 @@
         "id": "luminous2",
         "initiative": 2,
         "name": "Diplomacy",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Choose a system, other than Mecatol Rex, that contains a planet you control; each other player places a token from their reinforcements in that system.",
+            "Look at the top card of each exploration deck.",
+            "Explore 2 planets you contorl.",
+            "Draw 1 action card."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to explore 1 planet you control and draw 1 action card."
+        ],
         "imageFileName": "luminous_2",
         "source": "other"
     },
@@ -52,8 +65,12 @@
         "id": "luminous5",
         "initiative": 5,
         "name": "Construction",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Place up to 2 structures on planets you control."
+        ],
+        "secondaryTexts": [
+            "Place 1 token from your strategy pool in any system; you may place either 1 space dock or 1 PDS on a planet you control in that system."
+        ],
         "botSCAutomationID": "pok4construction",
         "imageFileName": "luminous_5",
         "source": "other"
@@ -78,8 +95,13 @@
         "id": "luminous7",
         "initiative": 7,
         "name": "Warfare",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Choose 1 system. You may use the PRODUCTION ability of one of your units in that system. If you do, place a command token from your reinforcements into that system.",
+            "Remove one of your commmand tokens from the game board. Then, gain 1 command token."
+        ],
+        "secondaryTexts": [
+            "Spend 1 of your command tokens from your strategy pool to use the PRODUCTION ability of 1 of your space docks in your home system."
+        ],
         "imageFileName": "luminous_7",
         "source": "other"
     },
@@ -102,8 +124,13 @@
         "id": "luminous9",
         "initiative": 9,
         "name": "Espionage",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Score 1 public objective if you fullfill the requirements.",
+            "You may perform the secondary ability of any exhuasted strategy card, spending tokens from your reinforcements."
+        ],
+        "secondaryTexts": [
+            "Resolve this ability as if it were instead the ability of any one exhausted strategy card."
+        ],
         "imageFileName": "luminous_9",
         "source": "other"
     },
@@ -112,8 +139,8 @@
         "initiative": 10,
         "name": "Imperial",
         "primaryTexts": [
-            "Immediately score 1 public objective if you fulfill its requirements.",
-            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
+            "Gain 1 victory point if you control Mecatol Rex. Otherwise, draw 1 secret objective.",
+            "Draw 1 secret objective."
         ],
         "secondaryTexts": [
             "Spend 1 token from your strategy pool to draw 1 secret objective."
