@@ -1,7 +1,6 @@
 package ti4.commands.developer;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
@@ -15,8 +14,7 @@ import ti4.message.logging.BotLogger;
 
 class RunAgainstAllGames extends Subcommand {
 
-    private static final long CUTOFF_DATE =
-            LocalDate.of(2025, 10, 31).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+    private static final long CUTOFF_DATE = Instant.ofEpochMilli(1761924840000L).toEpochMilli();
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
