@@ -64,6 +64,10 @@ public class ThreadArchiveHelper {
                     .toList();
         }
 
+        // If there are fewer channels in the list than requested to close, close them all
+        if (threadChannels.size() < (threadCount - 1)) {
+            threadChannels = activeThreadChannels.stream().limit(threadCount).toList();
+        }
         if (skipArchiveStep) {
             return threadChannels;
         }
