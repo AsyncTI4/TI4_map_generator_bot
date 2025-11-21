@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -569,6 +570,7 @@ public class ButtonHelperActionCards {
         // Actually roll for each unit
         int totalHits = 0;
         UnitModel unit = player.getUnitByBaseType(baseType);
+        unit = player.getPriorityUnitByAsyncID(unit.getAsyncId(), null);
         int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround, player);
         int modifierToHit = 0;
         int extraRollsForUnit = 0;
@@ -2086,7 +2088,7 @@ public class ButtonHelperActionCards {
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_Tartarus", "Pre-Play Deflection"));
+            buttons.add(Buttons.green("resolvePreassignment_Tartarus", "Pre-Play Tartarus"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
