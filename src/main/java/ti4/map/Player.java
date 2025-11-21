@@ -569,6 +569,7 @@ public class Player extends PlayerProperties {
 
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
         List<ThreadChannel> hiddenThreadChannels = new ArrayList<>();
+        List<ThreadChannel> allActiveChannels = new ArrayList<>();
 
         // ATTEMPT TO FIND BY ID
         try {
@@ -589,9 +590,9 @@ public class Player extends PlayerProperties {
                 }
 
                 // SEARCH FOR EXISTING ACTIVE THREAD
-                hiddenThreadChannels =
+                allActiveChannels =
                         actionsChannel.getGuild().retrieveActiveThreads().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                for (ThreadChannel threadChannel_ : allActiveChannels) {
                     if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
@@ -636,9 +637,11 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING ACTIVE THREAD
-            hiddenThreadChannels =
-                    actionsChannel.getGuild().retrieveActiveThreads().complete();
-            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+            if (allActiveChannels.isEmpty()) {
+                allActiveChannels =
+                        actionsChannel.getGuild().retrieveActiveThreads().complete();
+            }
+            for (ThreadChannel threadChannel_ : allActiveChannels) {
                 if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;
@@ -646,9 +649,10 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (hiddenThreadChannels.isEmpty())
+            if (hiddenThreadChannels.isEmpty()) {
                 hiddenThreadChannels =
                         actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            }
             for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                 if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
@@ -671,10 +675,10 @@ public class Player extends PlayerProperties {
         if (isPrivateChannel) {
             threadAction = threadAction.setInvitable(false);
         }
-        String message = "Hello " + getPing() + "! This is your private channel.";
         ThreadChannel threadChannel = threadAction.complete();
-        setCardsInfoThreadID(threadChannel.getId());
+        String message = "Hello " + getPing() + "! This is your private channel.";
         MessageHelper.sendMessageToChannel(threadChannel, message);
+        setCardsInfoThreadID(threadChannel.getId());
         return threadChannel;
     }
 

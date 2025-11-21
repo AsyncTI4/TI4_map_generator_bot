@@ -44,6 +44,7 @@ class ServerLimitStats extends Subcommand {
         List<ThreadChannel> threadChannels =
                 guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
         int threadCount = threadChannels.size(); // 1000
+        int activeThreadCount = guild.retrieveActiveThreads().complete().size();
         List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream()
                 .filter(ThreadChannel::isArchived)
                 .toList();
@@ -67,12 +68,12 @@ class ServerLimitStats extends Subcommand {
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
 
-        String sb =
+        String message =
                 """
             ## Server Limit Statistics:
             ### Server: %s
             - %d / %d%s - members
-            - %d - boosts
+            - %d boosts
             - %d / %d%s - emojis
             - %d / 250%s - roles
             - space for **%d** more games
@@ -81,8 +82,9 @@ class ServerLimitStats extends Subcommand {
               - %d   %s  categories
               - %d   %s  '%s' channels
             ### Threads:
-            - **%d / 1000%s - threads**
-              - %d - loaded archived threads
+            - **%d / 1000%s - cached threads**
+              - %d cached archived threads
+              - %d active threads
             - %d   %s  private threads
               - %d   %s  'Cards Info' threads (/cards_info)
             - %d   %s  public threads
@@ -107,10 +109,11 @@ class ServerLimitStats extends Subcommand {
                                 getPercentage(categoryChannelCount, channelCount),
                                 pbdChannelCount,
                                 getPercentage(pbdChannelCount, channelCount),
-                                (!isFoWGuild ? "pdb" : "fow"),
+                                (!isFoWGuild ? "pbd" : "fow"),
                                 threadCount,
                                 getPercentage(threadCount, 1000),
                                 threadArchivedCount,
+                                activeThreadCount,
                                 privateThreadCount,
                                 getPercentage(privateThreadCount, threadCount),
                                 cardsInfoThreadCount,
@@ -121,7 +124,7 @@ class ServerLimitStats extends Subcommand {
                                 getPercentage(botThreadCount, threadCount),
                                 roundThreadCount,
                                 getPercentage(roundThreadCount, threadCount));
-        MessageHelper.sendMessageToEventChannel(event, sb);
+        MessageHelper.sendMessageToEventChannel(event, message);
     }
 
     private String getPercentage(double numerator, double denominator) {
