@@ -846,7 +846,7 @@ public class ButtonHelperModifyUnits {
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                         + uH.getName() + "_" + player.getColor(),
-                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                type.humanReadableName() + " from " + tile.getRepresentationForButtons() + " "
                                         + ("space".equals(uH.getName())
                                                 ? "in Space"
                                                 : "on " + StringUtils.capitalize(uH.getName()))));
