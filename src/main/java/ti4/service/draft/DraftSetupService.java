@@ -68,11 +68,7 @@ public class DraftSetupService {
 
         FactionDraftable factionDraftable = new FactionDraftable();
         factionDraftable.initialize(
-                specs.numFactions,
-                specs.factionSources,
-                specs.priorityFactions,
-                specs.bannedFactions
-        );
+                specs.numFactions, specs.factionSources, specs.priorityFactions, specs.bannedFactions);
         draftManager.addDraftable(factionDraftable);
 
         SpeakerOrderDraftable speakerOrderDraftable = new SpeakerOrderDraftable();
