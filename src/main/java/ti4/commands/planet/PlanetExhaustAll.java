@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class PlanetExhaustAll extends GameStateSubcommand {
 
-    public PlanetExhaustAll() {
+    PlanetExhaustAll() {
         super(Constants.PLANET_EXHAUST_ALL, "Exhaust All Planets", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
