@@ -35,7 +35,7 @@ public class CrisisAgendaResolver implements AgendaResolver {
             case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
             case "7" -> {
                 scButtons.add(Buttons.GET_A_TECH);
-                if (Helper.getPlayerFromAbility(game, "propagation") != null) {
+                if (!game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
                     scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Gain 3 Command Tokens (for Nekro)"));
                 }
             }
