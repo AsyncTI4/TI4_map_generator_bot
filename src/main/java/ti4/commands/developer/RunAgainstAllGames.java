@@ -16,7 +16,7 @@ import ti4.message.logging.BotLogger;
 class RunAgainstAllGames extends Subcommand {
 
     private static final long CUTOFF_DATE =
-            LocalDate.of(2024, 10, 31).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
+            LocalDate.of(2025, 10, 31).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
