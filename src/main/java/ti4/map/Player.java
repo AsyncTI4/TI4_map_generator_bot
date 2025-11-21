@@ -561,11 +561,10 @@ public class Player extends PlayerProperties {
                             + game.getName());
             return null;
         }
-
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
-                + getUserName().replace("/", "");
+        String userName = getUserName().replace("/", "");
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + userName;
         if (game.isFowMode()) {
-            threadName = game.getName() + "-" + "cards-info-" + getUserName().replace("/", "") + "-private";
+            threadName = game.getName() + "-cards-info-" + userName + "-private";
         }
 
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
@@ -574,14 +573,25 @@ public class Player extends PlayerProperties {
         // ATTEMPT TO FIND BY ID
         try {
             String cardsInfoThreadID = getCardsInfoThreadID();
-            boolean hasCardsInfoThreadId =
-                    cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !"null".equals(cardsInfoThreadID);
-            if (cardsInfoThreadID != null && hasCardsInfoThreadId) {
+            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !"null".equals(cardsInfoThreadID)) {
                 ThreadChannel threadChannel = actionsChannel.getGuild().getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null) return threadChannel;
+                if (threadChannel != null) {
+                    setCardsInfoThreadID(threadChannel.getId());
+                    return threadChannel;
+                }
 
-                // SEARCH FOR EXISTING OPEN THREAD
+                // SEARCH FOR EXISTING OPEN THREAD IN CACHE
                 for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+
+                // SEARCH FOR EXISTING ACTIVE THREAD
+                hiddenThreadChannels =
+                        actionsChannel.getGuild().retrieveActiveThreads().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
@@ -608,12 +618,27 @@ public class Player extends PlayerProperties {
 
         // ATTEMPT TO FIND BY NAME
         try {
-            List<ThreadChannel> threadChannels2 = actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
-            if (!threadChannels2.isEmpty()) {
-                return threadChannels2.getFirst();
+            // FIND DIRECTLY BY NAME
+            List<ThreadChannel> threadChannelsByName =
+                    actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
+            if (!threadChannelsByName.isEmpty()) {
+                ThreadChannel threadChannel = threadChannelsByName.getFirst();
+                setCardsInfoThreadID(threadChannel.getId());
+                return threadChannel;
             }
-            // SEARCH FOR EXISTING OPEN THREAD
+
+            // SEARCH FOR EXISTING OPEN THREAD IN CACHE
             for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
+                }
+            }
+
+            // SEARCH FOR EXISTING ACTIVE THREAD
+            hiddenThreadChannels =
+                    actionsChannel.getGuild().retrieveActiveThreads().complete();
+            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                 if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;

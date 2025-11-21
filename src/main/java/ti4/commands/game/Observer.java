@@ -52,9 +52,14 @@ class Observer extends Subcommand {
         Guild guild = game.getGuild();
         Member member = guild.getMemberById(user.getId());
 
+        if (member == null && event.getGuild() != null) {
+            member = event.getGuild().getMemberById(user.getId());
+        }
+
         // INVITE TO GAME SERVER IF MISSING
-        if (!CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
-                .isEmpty()) {
+        if (member == null
+                || !CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
+                        .isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     "User was not a member of the Game's server (" + guild.getName()
