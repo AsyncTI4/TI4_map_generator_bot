@@ -1,7 +1,6 @@
 package ti4.service.statistics.game;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ public class ThundersEdgeBreakthroughStatisticsService {
 
     private static void sendBreakthroughStatistics(SlashCommandInteractionEvent event) {
         AtomicInteger thunderEdgeGames = new AtomicInteger();
-        AtomicInteger gamesWithBreakthroughs = new AtomicInteger();
         AtomicInteger playersWithBreakthroughs = new AtomicInteger();
         Map<String, FactionBreakthroughStats> factionBreakthroughs = new HashMap<>();
 
@@ -31,7 +29,6 @@ public class ThundersEdgeBreakthroughStatisticsService {
                 return;
             }
             thunderEdgeGames.incrementAndGet();
-            boolean breakthroughUnlockedInGame = false;
             List<Player> winners = game.getWinners();
             boolean gameCompleted = !winners.isEmpty();
             for (Player player : game.getRealPlayers()) {
@@ -41,7 +38,6 @@ public class ThundersEdgeBreakthroughStatisticsService {
 
                 if (player.isBreakthroughUnlocked()) {
                     playersWithBreakthroughs.incrementAndGet();
-                    breakthroughUnlockedInGame = true;
                     factionStats.incrementGamesWithUnlock();
                     if (gameCompleted) {
                         factionStats.incrementCompletedGamesWithUnlock();
@@ -51,9 +47,6 @@ public class ThundersEdgeBreakthroughStatisticsService {
                     }
                 }
             }
-            if (breakthroughUnlockedInGame) {
-                gamesWithBreakthroughs.incrementAndGet();
-            }
         });
 
         if (thunderEdgeGames.get() == 0) {
@@ -61,7 +54,6 @@ public class ThundersEdgeBreakthroughStatisticsService {
             return;
         }
 
-        double percent = (gamesWithBreakthroughs.get() * 100.0) / thunderEdgeGames.get();
         String message = String.format(
                 "Thunder's Edge Breakthrough unlocks: %d players (%.1f%% of games) across %d games.",
                 playersWithBreakthroughs.get(), percent, thunderEdgeGames.get());
@@ -69,7 +61,7 @@ public class ThundersEdgeBreakthroughStatisticsService {
 
         List<Map.Entry<String, FactionBreakthroughStats>> sortedFactions =
                 new ArrayList<>(factionBreakthroughs.entrySet());
-        sortedFactions.sort(Comparator.comparing(Map.Entry::getKey));
+        sortedFactions.sort(Map.Entry.comparingByKey());
         for (Map.Entry<String, FactionBreakthroughStats> entry : sortedFactions) {
             String faction = entry.getKey();
             FactionBreakthroughStats stats = entry.getValue();
