@@ -1105,7 +1105,7 @@
         "name": "Alliance Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Reveal the alliance ability of a random, unused faction and predict aloud an outcome of this agenda. If your prediction is correct, gain that ability; otherwise, purge it.",
+        "text": "You cannot vote on this agenda. Reveal the alliance ability of a random, unused faction and predict aloud an outcome of this agenda. If your prediction is correct, gain that ability; otherwise, return it to the deck.",
         "flavorText": "S'ula limped toward the podium. Execution or subservience? Their desperation wrung a pained laugh and a rude gesture from her.",
         "source": "action_deck_2"
     },
