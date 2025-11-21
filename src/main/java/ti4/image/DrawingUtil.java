@@ -1,9 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -27,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import javax.annotation.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -313,6 +312,9 @@ public class DrawingUtil {
             return null;
         }
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
+        if(factionID.equalsIgnoreCase("coexist")){
+            factionFile = ResourceHelper.getInstance().getGeneralFile(factionID+".png");
+        }
         if (factionFile == null) {
             // Handle homebrew factions based on real factions
             if (Mapper.getFaction(factionID) != null

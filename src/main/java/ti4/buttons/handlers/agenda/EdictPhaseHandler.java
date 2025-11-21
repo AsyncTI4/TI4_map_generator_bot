@@ -2,6 +2,7 @@ package ti4.buttons.handlers.agenda;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -279,9 +280,6 @@ public class EdictPhaseHandler {
             }
             case "tf-censure" -> {
                 for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player) {
-                        continue;
-                    }
                     buttons.add(Buttons.green(
                             "electCensure_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
                 }

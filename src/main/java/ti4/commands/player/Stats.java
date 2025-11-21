@@ -3,6 +3,7 @@ package ti4.commands.player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -317,9 +318,11 @@ class Stats extends GameStateSubcommand {
                 }
 
                 var userSettings = UserSettingsManager.get(player.getUserID());
-
+                if (event.getChannel() instanceof TextChannel channel) {
+                    SusSlashCommandService.reportSusSlashCommand(event, channel.getJumpUrl() +" Round "+game.getRound() +"; Space Resources: "+player.getTotalResourceValueOfUnits("space")+"; VP: "+player.getTotalVictoryPoints() +";\nTrack record: "+userSettings.getTrackRecord());
+                }
                 userSettings.setTrackRecord(
-                        userSettings.getTrackRecord() + " was set as an NPC in " + game.getName() + ". ");
+                        userSettings.getTrackRecord() + " Was set as an NPC in " + game.getName() + ". ");
 
                 UserSettingsManager.save(userSettings);
 
@@ -337,9 +340,7 @@ class Stats extends GameStateSubcommand {
                 String msg = player.getRepresentation()
                         + " do you want to remove yourself from the game channels? If so, press this button.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-                if (event.getChannel() instanceof TextChannel channel) {
-                    SusSlashCommandService.reportSusSlashCommand(event, channel.getJumpUrl());
-                }
+                
             }
         }
     }

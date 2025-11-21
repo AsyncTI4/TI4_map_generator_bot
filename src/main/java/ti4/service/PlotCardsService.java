@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -152,12 +154,17 @@ public class PlotCardsService {
                 String disastermsg = "Moments before disaster in game " + game.getName();
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
+            String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
+                        + " has been eradicated with an obsidian plot.";
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), disastermsg);
 
             planet.getUnitsByState().clear();
 
+            ButtonHelper.deleteMessage(event);
+
             if (disaster) {
-                String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
-                        + " has been eradicated with an obsidian plot.";
+                
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
         });
