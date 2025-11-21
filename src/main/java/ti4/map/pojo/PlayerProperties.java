@@ -62,6 +62,9 @@ public class PlayerProperties {
     private int expectedHitsTimes10;
     private int totalExpenses;
 
+    // For if a player loses obsidian after scoring all their secrets
+    private int bonusScoredSecrets = 0;
+
     // Statistics
     private int numberOfTurns;
     private long totalTurnTime;

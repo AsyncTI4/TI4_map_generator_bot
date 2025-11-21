@@ -1,5 +1,6 @@
 package ti4.commands.uncategorized;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -34,11 +35,11 @@ public class ShowDistancesCommand extends GameStateCommand {
 
     @Override
     public List<OptionData> getOptions() {
-        return List.of(
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+        List<OptionData> options = new ArrayList<>();
+        options.add(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name", true, true));
+        options.add(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check"));
+        options.add(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color", false, true));
+        return options;
     }
 
     @Override
