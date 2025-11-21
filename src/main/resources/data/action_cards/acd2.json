@@ -481,7 +481,7 @@
         "phase": "Any",
         "window": "When 1 of your units would be destroyed",
         "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
-        "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he’d been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
+        "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he'd been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
         "source": "action_deck_2"
     },
     {
@@ -1105,8 +1105,8 @@
         "name": "Alliance Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Reveal the alliance ability of a random, unused faction and predict aloud an outcome of this agenda. If your prediction is correct, gain that ability; otherwise, return it to the deck.",
-        "flavorText": "S’ula limped toward the podium. Execution or subservience? Their desperation wrung a pained laugh and a rude gesture from her.",
+        "text": "You cannot vote on this agenda. Reveal the alliance ability of a random, unused faction and predict aloud an outcome of this agenda. If your prediction is correct, gain that ability; otherwise, purge it.",
+        "flavorText": "S'ula limped toward the podium. Execution or subservience? Their desperation wrung a pained laugh and a rude gesture from her.",
         "source": "action_deck_2"
     },
     {
