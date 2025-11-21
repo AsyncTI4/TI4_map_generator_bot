@@ -42,9 +42,11 @@ public class ThreadArchiveHelper {
         });
     }
 
-    public static void archiveOldThreads(Guild guild, Integer threadCount) {
-        // Try gathering all threads that are not bot-map or cards-info threads
-        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
+    public static List<ThreadChannel> archiveOldThreads(Guild guild, Integer threadCount) {
+        return archiveOldThreads(guild, threadCount, false);
+    }
+
+    public static List<ThreadChannel> archiveOldThreads(Guild guild, Integer threadCount, boolean skipArchiveStep) {
                 .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
                 .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates")
                         && !threadChannel.getName().contains("cards-info"))
@@ -62,8 +64,12 @@ public class ThreadArchiveHelper {
                     .toList();
         }
 
+        if (skipArchiveStep) {
+            return threadChannels;
+        }
         for (ThreadChannel threadChannel : threadChannels) {
             threadChannel.getManager().setArchived(true).queue(null, BotLogger::catchRestError);
         }
+        return threadChannels;
     }
 }
