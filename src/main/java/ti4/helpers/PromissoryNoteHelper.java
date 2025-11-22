@@ -215,7 +215,7 @@ public class PromissoryNoteHelper {
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
         } else {
-            if (!id.equalsIgnoreCase("malevolency")) {
+            if (!"malevolency".equalsIgnoreCase(id)) {
                 player.removePromissoryNote(id);
                 if (!"dspncymi".equalsIgnoreCase(id)) {
                     owner.setPromissoryNote(id);

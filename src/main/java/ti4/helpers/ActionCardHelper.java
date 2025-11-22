@@ -820,15 +820,14 @@ public class ActionCardHelper {
             String automationID = actionCard.getAutomationID();
 
             if (SabotageService.isSaboAllowed(game, player)) {
-                // Can be "sabotaged", basically every card
-                String sabo = "Sabotage";
+                String cancelName = "Sabotage";
                 if (game.isTwilightsFallMode()) {
-                    sabo = "Shatter";
+                    cancelName = "Shatter";
                 }
-                buttons.add(Buttons.blue("no_sabotage", "No " + sabo, MiscEmojis.NoSabo));
+                buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For " + sabo));
+                        "Pause Timer While Waiting For " + cancelName));
                 MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
                         mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {

@@ -38,15 +38,15 @@ public class GlobalSettings {
         }
 
         public int getAsInt(int defaultValue) {
-            return GlobalSettings.getSetting(this.toString(), Integer.class, defaultValue);
+            return getSetting(toString(), Integer.class, defaultValue);
         }
 
         public boolean getAsBoolean(boolean defaultValue) {
-            return GlobalSettings.getSetting(this.toString(), Boolean.class, defaultValue);
+            return getSetting(toString(), Boolean.class, defaultValue);
         }
 
         public String getAsString(String defaultValue) {
-            return GlobalSettings.getSetting(this.toString(), String.class, defaultValue);
+            return getSetting(toString(), String.class, defaultValue);
         }
     }
 
