@@ -21,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 import ti4.spring.jda.JdaService;
 
 class ServerGameStats extends Subcommand {
@@ -72,9 +73,9 @@ class ServerGameStats extends Subcommand {
         for (Guild guild : guilds) {
             sb.append("**").append(guild.getName()).append("**\n");
             int roleCount = guild.getRoles().size(); // 250
-            int guildRoomForGames = 250 - roleCount;
             int channelCount = guild.getChannels().size(); // 500
-            guildRoomForGames = Math.min(guildRoomForGames, (500 - channelCount) / 2);
+            int guildRoomForGames = (int) (Math.min(
+                    250f - roleCount, (500f - channelCount) / CreateGameService.getChannelCountRequiredForEachGame()));
             int gameCount = guildToGameCount.get(guild.getId());
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
