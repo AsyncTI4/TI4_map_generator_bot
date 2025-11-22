@@ -36,21 +36,33 @@ public class GlobalSettings {
         public String toString() {
             return super.toString().toLowerCase();
         }
+
+        public int getAsInt(int defaultValue) {
+            return GlobalSettings.getSetting(this.toString(), Integer.class, defaultValue);
+        }
+
+        public boolean getAsBoolean(boolean defaultValue) {
+            return GlobalSettings.getSetting(this.toString(), Boolean.class, defaultValue);
+        }
+
+        public String getAsString(String defaultValue) {
+            return GlobalSettings.getSetting(this.toString(), String.class, defaultValue);
+        }
     }
 
     private static Map<String, Object> settings = new HashMap<>();
 
-    public static <T> T getSetting(String attr, Class<T> clazz, T def) {
-        if (!settings.containsKey(attr)) return def;
+    public static <T> T getSetting(String attr, Class<T> clazz, T defaultValue) {
+        if (!settings.containsKey(attr)) return defaultValue;
         return clazz.cast(settings.get(attr));
     }
 
-    public static <T> void setSetting(ImplementedSettings setting, T val) {
-        setSetting(setting.toString(), val);
+    public static <T> void setSetting(ImplementedSettings setting, T value) {
+        setSetting(setting.toString(), value);
     }
 
-    public static <T> void setSetting(String attr, T val) {
-        settings.put(attr, val);
+    public static <T> void setSetting(String attr, T value) {
+        settings.put(attr, value);
         saveSettings();
     }
 
