@@ -2,12 +2,12 @@ package ti4.service.unit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -44,14 +44,15 @@ public class GalvanizeService {
     public static List<Button> getToggleGalvanizeButtons(Player player, Game game, Tile tile) {
         String finChecker = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
-        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         String pos = tile.getPosition() + "_";
-        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
-            if (representation == null) representation = name;
-
-            UnitHolder unitHolder = entry.getValue();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            String uhName = unitHolder.getName();
+            String uhRepresentation;
+            if ("space".equalsIgnoreCase(uhName)) {
+                uhRepresentation = " in Space " + tile.getPosition();
+            } else {
+                uhRepresentation = " on " + Helper.getPlanetRepresentation(uhName, game);
+            }
             for (UnitKey unit : unitHolder.getUnitsByState().keySet()) {
                 int total = unitHolder.getUnitCount(unit);
                 if (!player.unitBelongsToPlayer(unit) || total <= 0) {
@@ -60,16 +61,16 @@ public class GalvanizeService {
                 int galvanized = unitHolder.getGalvanizedUnitCount(unit);
                 int ungalvanized = total - galvanized;
 
-                String unitIdPart = pos + unit.asyncID() + "_" + unitHolder.getName();
+                String unitIdPart = pos + unit.asyncID() + "_" + uhName;
                 if (ungalvanized > 0)
                     buttons.add(Buttons.green(
                             finChecker + "galvanize_" + unitIdPart,
-                            "Galvanize 1 " + unit.unitName(),
+                            "Galvanize 1 " + unit.unitName() + uhRepresentation,
                             unit.unitEmoji()));
                 if (galvanized > 0)
                     buttons.add(Buttons.red(
                             finChecker + "ungalvanize_" + unitIdPart,
-                            "Ungalvanize 1 " + unit.unitName(),
+                            "Ungalvanize 1 " + unit.unitName() + uhRepresentation,
                             unit.unitEmoji()));
             }
         }
