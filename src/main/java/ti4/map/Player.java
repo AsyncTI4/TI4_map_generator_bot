@@ -1560,7 +1560,7 @@ public class Player extends PlayerProperties {
             Emoji e = Emoji.fromFormatted(emoji);
             TI4Emoji repl = TI4Emoji.findEmojiFromJustName(e.getName());
             if (repl != null) {
-                super.setFactionEmoji(repl.emojiString());
+                setFactionEmoji(repl.emojiString());
             }
         }
     }

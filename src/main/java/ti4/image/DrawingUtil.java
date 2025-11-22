@@ -1,6 +1,9 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -310,7 +313,7 @@ public class DrawingUtil {
             return null;
         }
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
-        if (factionID.equalsIgnoreCase("coexist")) {
+        if ("coexist".equalsIgnoreCase(factionID)) {
             factionFile = ResourceHelper.getInstance().getGeneralFile(factionID + ".png");
         }
         if (factionFile == null) {

@@ -269,7 +269,7 @@ public class FoWHelper {
         Set<String> wormholeAdjacencies = getWormholeAdjacencies(game, position, player);
         adjacentPositions.addAll(wormholeAdjacencies);
 
-        Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position, player);
+        Set<String> otherAdjacencies = getNonWormholeAdjacencies(game, position);
         adjacentPositions.addAll(otherAdjacencies);
 
         // If player has ghoti commander, is active player and has activated a system
@@ -305,14 +305,7 @@ public class FoWHelper {
         return adjacentPositions;
     }
 
-    private static Set<String> getNonWormholeAdjacencies(Game game, String position, Player player) {
-        enum Feature {
-            ingress,
-            egress,
-            breach,
-            scar
-        }
-
+    private static Set<String> getNonWormholeAdjacencies(Game game, String position) {
         Set<String> adjacentPositions = new HashSet<>();
         Set<Tile> allTiles = new HashSet<>(game.getTileMap().values());
         Tile tile = game.getTileByPosition(position);
@@ -1107,5 +1100,12 @@ public class FoWHelper {
     public static boolean isGameMaster(String userId, Game game) {
         return game.getPlayersWithGMRole().stream()
                 .anyMatch(player -> player.getUserID().equals(userId));
+    }
+
+    private enum Feature {
+        ingress,
+        egress,
+        breach,
+        scar
     }
 }
