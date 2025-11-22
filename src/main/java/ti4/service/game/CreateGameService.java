@@ -648,9 +648,11 @@ public class CreateGameService {
         }
 
         // Derive a category name logically
-        int settingForMaxGamePerCategory = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
-        int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamePerCategory));
+        int maxGamesPerCategory = getMaxGamesPerCategory();
+        if (maxGamesPerCategory == 1) {
+            return "PBD #" + gameNumber;
+        }
+
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
