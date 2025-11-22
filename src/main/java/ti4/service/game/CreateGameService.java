@@ -551,7 +551,7 @@ public class CreateGameService {
         int roleCount = guild.getRoles().size();
         if (roleCount >= MAX_ROLE_COUNT) {
             BotLogger.warning("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
-                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                    + guild.getName() + "** currently has **" + roleCount + "** / 250 roles.");
             return false;
         }
         return true;
@@ -574,7 +574,7 @@ public class CreateGameService {
                 GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
         int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamesPerCategory));
 
-        // SPACE FOR 25 ROLES
+        // SPACE FOR ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > (MAX_ROLE_COUNT - maxGamesPerCategory)) {
             BotLogger.warning(
@@ -584,15 +584,15 @@ public class CreateGameService {
             return false;
         }
 
-        // SPACE FOR 50 CHANNELS
+        // SPACE FOR CHANNELS
         int channelCount = guild.getChannels().size();
-        int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
-        if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewCategory)) {
+        int channelCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
+        if (channelCount > (MAX_CHANNEL_COUNT - channelCountRequiredForNewCategory)) {
             BotLogger.warning(
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                             + guild.getName() + "** currently has " + channelCount
-                            + " channels and a new category requires space for "
-                            + channelsCountRequiredForNewCategory
+                            + " / 500 channels and a new category requires space for "
+                            + channelCountRequiredForNewCategory
                             + " new channels (including 1 for the category itself)");
             return false;
         }
@@ -682,12 +682,8 @@ public class CreateGameService {
         return createCategoryAction.complete();
     }
 
-    // TODO: Can this just be guild.getRolesByName?
     public static Role getRole(String name, Guild guild) {
-        return guild.getRoles().stream()
-                .filter(role -> role.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+        return guild.getRolesByName(name, true).stream().findFirst().orElse(null);
     }
 
     public static String getNewPlayerInfoText() {
