@@ -46,7 +46,7 @@ public class OldUndoFileCleanupCron {
         }
 
         BotLogger.info(String.format(
-                "OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)",
+                "OldUndoFileCleanupCron: Cleaned up `%,d` undo files that were over `%d` days old (%s)",
                 count, daysOld, cutoff));
     }
 
