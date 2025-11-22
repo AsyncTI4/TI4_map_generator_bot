@@ -777,6 +777,9 @@ public class ExploreService {
                                 + UnitEmojis.infantry
                                 + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetID)
                                 + ", however this placement is __optional__.";
+                        if (tile.getPosition().startsWith("frac")) {
+                            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+                        }
                     } else {
                         message = "Planet has the _Demilitarized Zone_ attached, so no infantry could be placed.";
                     }
