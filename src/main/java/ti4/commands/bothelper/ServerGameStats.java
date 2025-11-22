@@ -75,7 +75,8 @@ class ServerGameStats extends Subcommand {
             int roleCount = guild.getRoles().size(); // 250
             int channelCount = guild.getChannels().size(); // 500
             int guildRoomForGames = (int) (Math.min(
-                    250f - roleCount, (500f - channelCount) / CreateGameService.getChannelCountRequiredForEachGame()));
+                    250.0f - roleCount,
+                    (500.0f - channelCount) / CreateGameService.getChannelCountRequiredForEachGame()));
             int gameCount = guildToGameCount.get(guild.getId());
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");

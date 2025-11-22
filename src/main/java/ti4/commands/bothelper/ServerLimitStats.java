@@ -39,8 +39,8 @@ class ServerLimitStats extends Subcommand {
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); // 500
         int roomForGames = (int) Math.min(
-                250f - roleCount,
-                (500f - channelCount) / (!isFoWGuild ? CreateGameService.getChannelCountRequiredForEachGame() : 10));
+                250.0f - roleCount,
+                (500.0f - channelCount) / (!isFoWGuild ? CreateGameService.getChannelCountRequiredForEachGame() : 10));
         long pbdChannelCount = channels.stream()
                 .filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow"))
                 .count();

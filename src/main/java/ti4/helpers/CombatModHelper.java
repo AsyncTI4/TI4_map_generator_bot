@@ -698,7 +698,7 @@ public class CombatModHelper {
                     }
                 }
                 case "mechs_in_space_area" -> {
-                    if (!unitHolder.getName().equalsIgnoreCase("space")) {
+                    if (!"space".equalsIgnoreCase(unitHolder.getName())) {
                         scalingCount = 0;
                     } else {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);

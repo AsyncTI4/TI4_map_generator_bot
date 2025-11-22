@@ -41,13 +41,10 @@ public class HeartOfIxthService {
     public List<Button> makeHeartOfIxthButtons(Game game, Player rollingPlayer, Button good, Button bad, Die result) {
         if (rollingPlayer == null) return null;
         List<Button> buttons = new ArrayList<>();
-        Player heart = HeartOfIxthService.getHeartOfIxthPlayer(game, false);
+        Player heart = getHeartOfIxthPlayer(game, false);
 
-        boolean blockForFog = false;
-        if (!rollingPlayer.is(heart) && game.isFowMode()) {
-            // For now, not sure how to handle this in FoW unless the "player rolling" also has heart
-            blockForFog = true;
-        }
+        boolean blockForFog = !rollingPlayer.is(heart) && game.isFowMode();
+        // For now, not sure how to handle this in FoW unless the "player rolling" also has heart
 
         if (heart == null || !result.eligibleForHeart() || blockForFog) {
             if (result.isSuccess()) buttons.add(good);
