@@ -164,13 +164,13 @@ public class SabotageService {
         return null;
     }
 
+    private static boolean allSabotagesAreDiscarded(Game game, Player player) {
+        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+    }
+
     private static boolean isTwilightFallAndAllShattersAreDiscarded(Game game, Player player) {
         return game.isTwilightsFallMode()
                 && SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
-
-    private static boolean allSabotagesAreDiscarded(Game game, Player player) {
-        return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
     private static boolean isAcd2AndAllSabotagesAreDiscarded(Game game, Player player) {
@@ -179,7 +179,9 @@ public class SabotageService {
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
-        return game.getDiscardACStatus().entrySet().stream()
+        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
+        return game.getDiscardActionCards().containsKey(acAlias) ||
+            game.getDiscardACStatus().entrySet().stream()
                 .filter(entry ->
                         entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
                 .map(Map.Entry::getKey)
