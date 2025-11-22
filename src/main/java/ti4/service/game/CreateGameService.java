@@ -663,11 +663,11 @@ public class CreateGameService {
         return JdaService.getAvailablePBDCategories();
     }
 
-    public static Category createNewCategory(String categoryName) {
+    public static Category createNewGameCategory(String categoryName) {
         Guild guild = getServerWithMostCapacity();
         if (guild == null) {
             BotLogger.warning(
-                    "`CreateGameService.createNewCategory` No available servers to create a new game category");
+                    "`CreateGameService.createNewGameCategory` No available servers to create a new game category");
             return null;
         }
 
