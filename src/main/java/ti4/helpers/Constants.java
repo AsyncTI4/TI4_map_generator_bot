@@ -1481,7 +1481,6 @@ public class Constants {
     public static final String BAG_DRAFT_STATUS_MESSAGE_ID = "bag_draft_status_message_id";
     public static final String SHOW_ALL_UNITS = "show_all_units";
     public static final String GAME_LAUNCH_THREAD_ID = "game_launch_thread_id";
-    public static final String INCLUDE_HUB = "include_hub";
     public static final String GAME_TAGS = "game_tags";
     public static final String SHOW_UNPLAYED_AC = "show_unplayed_ac";
     public static final String TIGL_RANK = "tigl_rank";
