@@ -154,6 +154,8 @@ public class ButtonHelperStats {
             siphonMsg += "(" + obsidian.getTg() + "->" + (obsidian.getTg() + realGain) + ")";
             MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), siphonMsg);
             obsidian.setTg(obsidian.getTg() + realGain);
+
+            ButtonHelperAbilities.pillageCheck(obsidian, game);
         }
     }
 
