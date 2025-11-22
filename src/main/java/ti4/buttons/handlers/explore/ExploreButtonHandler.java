@@ -458,10 +458,11 @@ class ExploreButtonHandler {
     static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = bID.startsWith("dsdihmy_");
+        boolean scanlink = bID.startsWith("scanlink_");
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
         ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
+                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(
