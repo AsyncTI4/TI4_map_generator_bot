@@ -180,12 +180,12 @@ public class SabotageService {
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
         // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
-        return game.getDiscardActionCards().containsKey(acAlias) ||
-            game.getDiscardACStatus().entrySet().stream()
-                .filter(entry ->
-                        entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
-                .map(Map.Entry::getKey)
-                .anyMatch(acAlias::equals);
+        return game.getDiscardActionCards().containsKey(acAlias)
+                || game.getDiscardACStatus().entrySet().stream()
+                        .filter(entry ->
+                                entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
+                        .map(Map.Entry::getKey)
+                        .anyMatch(acAlias::equals);
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
