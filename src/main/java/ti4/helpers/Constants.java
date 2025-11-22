@@ -260,6 +260,7 @@ public class Constants {
     public static final String SEARCH_COMMANDS = "commands";
     public static final String SEARCH_GAMES = "games";
     public static final String SEARCH_MY_GAMES = "my_games";
+    public static final String STATISTICS_THUNDERS_EDGE_BREAKTHROUGHS = "thunders_edge_breakthroughs";
     public static final String STATISTICS_FACTION_GAMES = "faction_games";
     public static final String STATISTICS_POLITICS_POSITION = "politics_position";
     public static final String SEARCH_FOR_GAME = "for_game";
