@@ -63,8 +63,8 @@ class ExploreButtonHandler {
                     "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
             return;
         }
-        AddUnitService.addUnits(
-                event, TileHelper.getTile(event, planetName, game), game, player.getColor(), "mech " + planetName);
+        Tile tile = TileHelper.getTile(event, planetName, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null
                 ? "`error?`"
                 : Mapper.getPlanet(planetName).getName();
@@ -76,6 +76,9 @@ class ExploreButtonHandler {
                     player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     @ButtonHandler("resolveVolatileMech_")
