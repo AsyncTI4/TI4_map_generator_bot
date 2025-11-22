@@ -53,8 +53,7 @@ class ArchiveOldThreads extends Subcommand {
         StringBuilder sb = new StringBuilder("## __Least Active Threads:__\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
-            Duration duration = Duration.between(
-                    latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            Duration duration = Duration.between(latestActivityTime, OffsetDateTime.now());
             sb.append("- `")
                     .append(latestActivityTime)
                     .append(" (")

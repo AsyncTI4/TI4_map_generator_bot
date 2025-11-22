@@ -1,15 +1,21 @@
 package ti4.commands.bothelper;
 
 import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 import ti4.spring.jda.JdaService;
 
 class ServerLimitStats extends Subcommand {
@@ -23,16 +29,18 @@ class ServerLimitStats extends Subcommand {
         boolean isFoWGuild = JdaService.fowServers.contains(event.getGuild());
 
         int memberCount = guild.getMemberCount();
-        int roomForGames;
         int memberMax = guild.getMaxMembers();
         int boostCount = guild.getBoostCount();
         int roleCount = guild.getRoles().size(); // 250
-        roomForGames = 250 - roleCount;
+        int emojiCount = guild.getEmojis().size();
+        int emojiMax = guild.getMaxEmojis();
 
         // CHANNELS
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); // 500
-        roomForGames = Math.min(roomForGames, (500 - channelCount) / (!isFoWGuild ? 2 : 10));
+        int roomForGames = (int) Math.min(
+                250f - roleCount,
+                (500f - channelCount) / (!isFoWGuild ? CreateGameService.getChannelCountRequiredForEachGame() : 10));
         long pbdChannelCount = channels.stream()
                 .filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow"))
                 .count();
@@ -41,38 +49,36 @@ class ServerLimitStats extends Subcommand {
                 .count();
 
         // THREADS
-        List<ThreadChannel> threadChannels =
-                guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
-        int threadCount = threadChannels.size(); // 1000
-        int activeThreadCount = guild.retrieveActiveThreads().complete().size();
-        List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream()
-                .filter(ThreadChannel::isArchived)
+        List<ThreadChannel> cachedThreadChannels = guild.getThreadChannels();
+        int cachedThreadCount = cachedThreadChannels.size();
+        List<ThreadChannel> activeThreadChannels = guild.retrieveActiveThreads().complete().stream()
+                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
                 .toList();
+        int activeThreadCount = activeThreadChannels.size();
+        List<ThreadChannel> threadChannelsArchived =
+                cachedThreadChannels.stream().filter(ThreadChannel::isArchived).toList();
         int threadArchivedCount = threadChannelsArchived.size();
-        long cardsInfoThreadCount = threadChannels.stream()
+        long cardsInfoThreadCount = cachedThreadChannels.stream()
                 .filter(t -> !isFoWGuild
                         ? t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX)
                         : t.getName().contains("-cards-info"))
                 .count();
-        long botThreadCount = threadChannels.stream()
+        long botThreadCount = cachedThreadChannels.stream()
                 .filter(t -> t.getName().contains("-bot-map-updates"))
                 .count();
-        long roundThreadCount = threadChannels.stream()
+        long roundThreadCount = cachedThreadChannels.stream()
                 .filter(t -> t.getName().contains("-round-"))
                 .count();
         long privateThreadCount =
-                threadChannels.stream().filter(t -> !t.isPublic()).count();
+                cachedThreadChannels.stream().filter(t -> !t.isPublic()).count();
         long publicThreadCount =
-                threadChannels.stream().filter(ThreadChannel::isPublic).count();
-
-        int emojiCount = guild.getEmojis().size();
-        int emojiMax = guild.getMaxEmojis();
+                cachedThreadChannels.stream().filter(ThreadChannel::isPublic).count();
 
         String message =
                 """
             ## Server Limit Statistics:
             ### Server: %s
-            - %d / %d%s - members
+            - %,d / %,d%s - members
             - %d boosts
             - %d / %d%s - emojis
             - %d / 250%s - roles
@@ -82,9 +88,10 @@ class ServerLimitStats extends Subcommand {
               - %d   %s  categories
               - %d   %s  '%s' channels
             ### Threads:
-            - **%d / 1000%s - cached threads**
+            - %s
+            - **%d / 1000%s - active threads**
+              - %d cached threads
               - %d cached archived threads
-              - %d active threads
             - %d   %s  private threads
               - %d   %s  'Cards Info' threads (/cards_info)
             - %d   %s  public threads
@@ -110,20 +117,21 @@ class ServerLimitStats extends Subcommand {
                                 pbdChannelCount,
                                 getPercentage(pbdChannelCount, channelCount),
                                 (!isFoWGuild ? "pbd" : "fow"),
-                                threadCount,
-                                getPercentage(threadCount, 1000),
-                                threadArchivedCount,
+                                getThreadAgeInHoursString(activeThreadChannels.getFirst()),
                                 activeThreadCount,
+                                getPercentage(activeThreadCount, 1000),
+                                cachedThreadCount,
+                                threadArchivedCount,
                                 privateThreadCount,
-                                getPercentage(privateThreadCount, threadCount),
+                                getPercentage(privateThreadCount, cachedThreadCount),
                                 cardsInfoThreadCount,
-                                getPercentage(cardsInfoThreadCount, threadCount),
+                                getPercentage(cardsInfoThreadCount, cachedThreadCount),
                                 publicThreadCount,
-                                getPercentage(publicThreadCount, threadCount),
+                                getPercentage(publicThreadCount, cachedThreadCount),
                                 botThreadCount,
-                                getPercentage(botThreadCount, threadCount),
+                                getPercentage(botThreadCount, cachedThreadCount),
                                 roundThreadCount,
-                                getPercentage(roundThreadCount, threadCount));
+                                getPercentage(roundThreadCount, cachedThreadCount));
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
@@ -133,5 +141,11 @@ class ServerLimitStats extends Subcommand {
         String formatted = formatPercent.format(denominator == 0 ? 0.0 : (numerator / denominator));
         formatted = " *(" + formatted + ")* ";
         return formatted;
+    }
+
+    private String getThreadAgeInHoursString(ThreadChannel threadChannel) {
+        OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
+        Duration duration = Duration.between(latestActivityTime, OffsetDateTime.now());
+        return "oldest thread is %,d hours old".formatted(duration.toHours());
     }
 }

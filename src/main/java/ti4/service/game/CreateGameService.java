@@ -551,7 +551,7 @@ public class CreateGameService {
         int roleCount = guild.getRoles().size();
         if (roleCount >= MAX_ROLE_COUNT) {
             BotLogger.warning("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
-                    + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                    + guild.getName() + "** currently has **" + roleCount + "** / 250 roles.");
             return false;
         }
         return true;
@@ -570,11 +570,9 @@ public class CreateGameService {
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
 
-        int settingForMaxGamesPerCategory = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
-        int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamesPerCategory));
+        int maxGamesPerCategory = getMaxGamesPerCategory();
 
-        // SPACE FOR 25 ROLES
+        // SPACE FOR ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > (MAX_ROLE_COUNT - maxGamesPerCategory)) {
             BotLogger.warning(
@@ -584,20 +582,33 @@ public class CreateGameService {
             return false;
         }
 
-        // SPACE FOR 50 CHANNELS
+        // SPACE FOR CHANNELS
         int channelCount = guild.getChannels().size();
-        int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
-        if (channelCount > (MAX_CHANNEL_COUNT - channelsCountRequiredForNewCategory)) {
+        int channelCountRequiredForNewCategory = getChannelCountForNewCategory();
+        if (channelCount > (MAX_CHANNEL_COUNT - channelCountRequiredForNewCategory)) {
             BotLogger.warning(
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                             + guild.getName() + "** currently has " + channelCount
-                            + " channels and a new category requires space for "
-                            + channelsCountRequiredForNewCategory
+                            + " / 500 channels and a new category requires space for "
+                            + channelCountRequiredForNewCategory
                             + " new channels (including 1 for the category itself)");
             return false;
         }
 
         return true;
+    }
+
+    private static int getMaxGamesPerCategory() {
+        int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
+        return Math.max(1, Math.min(25, maxGamesPerCategory));
+    }
+
+    private static int getChannelCountForNewCategory() {
+        return 1 + 2 * getMaxGamesPerCategory();
+    }
+
+    public static float getChannelCountRequiredForEachGame() {
+        return (1.0f * getChannelCountForNewCategory()) / (1.0f * getMaxGamesPerCategory());
     }
 
     private static boolean serverHasRoomForNewChannels(Guild guild) {
@@ -637,9 +648,11 @@ public class CreateGameService {
         }
 
         // Derive a category name logically
-        int settingForMaxGamePerCategory = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
-        int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamePerCategory));
+        int maxGamesPerCategory = getMaxGamesPerCategory();
+        if (maxGamesPerCategory == 1) {
+            return "PBD #" + gameNumber;
+        }
+
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
@@ -650,11 +663,11 @@ public class CreateGameService {
         return JdaService.getAvailablePBDCategories();
     }
 
-    public static Category createNewCategory(String categoryName) {
+    public static Category createNewGameCategory(String categoryName) {
         Guild guild = getServerWithMostCapacity();
         if (guild == null) {
             BotLogger.warning(
-                    "`CreateGameService.createNewCategory` No available servers to create a new game category");
+                    "`CreateGameService.createNewGameCategory` No available servers to create a new game category");
             return null;
         }
 
@@ -682,12 +695,8 @@ public class CreateGameService {
         return createCategoryAction.complete();
     }
 
-    // TODO: Can this just be guild.getRolesByName?
     public static Role getRole(String name, Guild guild) {
-        return guild.getRoles().stream()
-                .filter(role -> role.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+        return guild.getRolesByName(name, true).stream().findFirst().orElse(null);
     }
 
     public static String getNewPlayerInfoText() {
