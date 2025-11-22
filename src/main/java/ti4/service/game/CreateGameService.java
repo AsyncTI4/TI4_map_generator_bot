@@ -570,9 +570,7 @@ public class CreateGameService {
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
         if (guild == null) return false;
 
-        int settingForMaxGamesPerCategory = GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10);
-        int maxGamesPerCategory = Math.max(1, Math.min(25, settingForMaxGamesPerCategory));
+        int maxGamesPerCategory = getMaxGamesPerCategory();
 
         // SPACE FOR ROLES
         int roleCount = guild.getRoles().size();
@@ -586,7 +584,7 @@ public class CreateGameService {
 
         // SPACE FOR CHANNELS
         int channelCount = guild.getChannels().size();
-        int channelCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
+        int channelCountRequiredForNewCategory = getChannelCountForNewCategory();
         if (channelCount > (MAX_CHANNEL_COUNT - channelCountRequiredForNewCategory)) {
             BotLogger.warning(
                     "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
@@ -598,6 +596,19 @@ public class CreateGameService {
         }
 
         return true;
+    }
+
+    private static int getMaxGamesPerCategory() {
+        int maxGamesPerCategory = GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.getAsInt(10);
+        return Math.max(1, Math.min(25, maxGamesPerCategory));
+    }
+
+    private static int getChannelCountForNewCategory() {
+        return 1 + 2 * getMaxGamesPerCategory();
+    }
+
+    public static float getChannelCountRequiredForEachGame() {
+        return (1.0f * getChannelCountForNewCategory()) / (1.0f * getMaxGamesPerCategory());
     }
 
     private static boolean serverHasRoomForNewChannels(Guild guild) {
