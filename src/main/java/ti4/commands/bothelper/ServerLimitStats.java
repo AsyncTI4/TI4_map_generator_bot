@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 import ti4.spring.jda.JdaService;
 
 class ServerLimitStats extends Subcommand {
@@ -37,7 +38,9 @@ class ServerLimitStats extends Subcommand {
         // CHANNELS
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); // 500
-        int roomForGames = Math.min(250 - roleCount, (500 - channelCount) / (!isFoWGuild ? 2 : 10));
+        int roomForGames = (int) Math.min(
+                250f - roleCount,
+                (500f - channelCount) / (!isFoWGuild ? CreateGameService.getChannelCountRequiredForEachGame() : 10));
         long pbdChannelCount = channels.stream()
                 .filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow"))
                 .count();
