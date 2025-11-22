@@ -42,6 +42,10 @@ public class ExecutionLockManager {
         return locks.computeIfAbsent(lockName, k -> new ReentrantReadWriteLock());
     }
 
+    public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task) {
+        return wrapWithTryLockAndRelease(lockName, lockType, task, null);
+    }
+
     public static Runnable wrapWithTryLockAndRelease(
             String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
         return () -> {
@@ -66,10 +70,6 @@ public class ExecutionLockManager {
         } finally {
             unlock(lockName, lockType);
         }
-    }
-
-    public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task) {
-        return wrapWithTryLockAndRelease(lockName, lockType, task, null);
     }
 
     public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {

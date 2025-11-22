@@ -98,7 +98,7 @@ class CreateGameChannels extends Subcommand {
                     break;
                 }
             }
-            if (categoryChannel == null) categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
+            if (categoryChannel == null) categoryChannel = CreateGameService.createNewGameCategory(categoryChannelName);
             if (categoryChannel == null) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
