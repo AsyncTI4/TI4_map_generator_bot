@@ -1,5 +1,6 @@
 package ti4.website;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -92,13 +93,28 @@ public class UltimateStatisticsWebsiteHelper {
     }
 
     private static void logHttpError(String url, String json, Throwable e) {
-        BotLogger.error(String.format("An exception occurred during HTTP call to %s: %s", url, json), e);
+        BotLogger.error(
+                String.format(
+                        "An exception occurred during HTTP call to %s: %s <@206450549371961346>", url, json),
+                e);
     }
 
     private static void handleErrorResponse(
             HttpResponse<String> response, MessageChannel channel, String failureMessage) {
         String body = response.body();
         BotLogger.error(failureMessage + "\n```" + body + "```");
+        try {
+            JsonNode node = EgressClientManager.getObjectMapper().readTree(body);
+            String title = node.path("problemDetails").path("title").asText();
+            String detail = node.path("problemDetails").path("detail").asText();
+            if (!title.isEmpty() || !detail.isEmpty()) {
+                String details = detail.isEmpty() ? title : title + " - " + detail;
+                MessageHelper.sendMessageToChannel(channel, String.format("%s (%s)", failureMessage, details));
+                return;
+            }
+        } catch (IOException e) {
+            BotLogger.error("Failed to parse TI4 Ultimate error response", e);
+        }
         MessageHelper.sendMessageToChannel(channel, failureMessage);
     }
 }

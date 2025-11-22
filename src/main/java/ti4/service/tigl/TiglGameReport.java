@@ -7,7 +7,12 @@ import lombok.Data;
 public class TiglGameReport {
     private String gameId;
     private int score;
+    private int round;
+    private int playerCount;
     private List<TiglPlayerResult> playerResults;
     private String source;
-    private long timestamp;
+    private long startTimestamp;
+    private long endTimestamp;
+    private String league;
+    private List<String> events;
 }
