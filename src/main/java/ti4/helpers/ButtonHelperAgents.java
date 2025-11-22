@@ -458,32 +458,30 @@ public class ButtonHelperAgents {
     @ButtonHandler("mercerMove_")
     public static void resolveMercerMove(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planetDestination = buttonID.split("_")[1];
+        Tile tileDestination = game.getTileFromPlanet(planetDestination);
         String pos = buttonID.split("_")[2];
-        Tile tile = game.getTileByPosition(pos);
+        Tile tileRemoval = game.getTileByPosition(pos);
         String planetRemoval = buttonID.split("_")[3];
         String unit = buttonID.split("_")[4];
-        UnitHolder uH = tile.getUnitHolders().get(planetRemoval);
+        UnitHolder uH = tileRemoval.getUnitHolders().get(planetRemoval);
         String message;
         if ("space".equalsIgnoreCase(planetRemoval)) {
             message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from space area of "
-                    + tile.getRepresentation() + " to " + Helper.getPlanetRepresentation(planetDestination, game);
+                    + tileRemoval.getRepresentation() + " to "
+                    + Helper.getPlanetRepresentation(planetDestination, game);
             planetRemoval = "";
         } else {
             message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from "
                     + Helper.getPlanetRepresentation(planetRemoval, game) + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
         }
-        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), unit + " " + planetRemoval);
-        AddUnitService.addUnits(
-                event,
-                game.getTileFromPlanet(planetDestination),
-                game,
-                player.getColor(),
-                unit + " " + planetDestination);
+        RemoveUnitService.removeUnits(event, tileRemoval, game, player.getColor(), unit + " " + planetRemoval);
+        AddUnitService.addUnits(event, tileDestination, game, player.getColor(), unit + " " + planetDestination);
         if ("mech".equalsIgnoreCase(unit)) {
             if (uH.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
                 ButtonHelper.deleteTheOneButton(event);
             }
+            CommanderUnlockCheckService.checkPlayer(player, "naaz");
         } else {
             if ("pds".equalsIgnoreCase(unit)) {
                 if (uH.getUnitCount(UnitType.Pds, player.getColor()) < 1) {
@@ -492,6 +490,9 @@ public class ButtonHelperAgents {
             } else if (uH.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
                 ButtonHelper.deleteTheOneButton(event);
             }
+        }
+        if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
@@ -2343,7 +2344,8 @@ public class ButtonHelperAgents {
                 + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 sd " + planet);
+        Tile tile = game.getTileFromPlanet(planet);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 sd " + planet);
         if (player.getCommodities() > 1) {
             player.setCommodities(player.getCommodities() - 2);
             msg += "\n" + player.getFactionEmoji() + " Paid 2 commodities";
@@ -2352,6 +2354,9 @@ public class ButtonHelperAgents {
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
