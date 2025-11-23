@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.message.MessageHelper;
@@ -14,6 +15,7 @@ import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglUsernameChangeRequest;
 
 @Slf4j
+@UtilityClass
 public class UltimateStatisticsWebsiteHelper {
 
     private static final String TI4_ULTIMATE_STATISTICS_API_KEY = System.getenv("TI4_ULTIMATE_STATISTICS_API_KEY");
@@ -29,6 +31,7 @@ public class UltimateStatisticsWebsiteHelper {
     private static final String PLAYER_SETTINGS_SUCCESS_MESSAGE =
             "Successfully logged your decision. Feel free to check out stats at <https://www.ti4ultimate.com/community/async/>.";
     private static final String PLAYER_SETTINGS_FAILURE_MESSAGE = "Failed to change TI4 Ultimate settings.";
+    private static final String LAZIK_DISCORD_NOTIFICATION = "<@206450549371961346>";
 
     public static void sendTiglGameReport(TiglGameReport request, MessageChannel channel) {
         sendJson(
@@ -94,7 +97,9 @@ public class UltimateStatisticsWebsiteHelper {
 
     private static void logHttpError(String url, String json, Throwable e) {
         BotLogger.error(
-                String.format("An exception occurred during HTTP call to %s: %s <@206450549371961346>", url, json), e);
+                String.format(
+                        "An exception occurred during HTTP call to %s: %s %s", url, json, LAZIK_DISCORD_NOTIFICATION),
+                e);
     }
 
     private static void handleErrorResponse(

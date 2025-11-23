@@ -88,8 +88,8 @@ public class TiglReportService {
         report.setRound(game.getRound());
         report.setPlayerCount(resolvePlayerCount(game));
         report.setSource("Async");
-        report.setStartTimestamp(determineStartTimestamp(game));
-        report.setEndTimestamp(determineEndTimestamp(game));
+        report.setStartTimestamp(determineStartTimestamp(game) / 1000);
+        report.setEndTimestamp(determineEndTimestamp(game) / 1000);
         report.setLeague(determineLeague(game));
         report.setEvents(getEnabledGalacticEvents(game));
 
@@ -122,25 +122,11 @@ public class TiglReportService {
         if (game.getStartedDate() > 0) {
             return game.getStartedDate();
         }
-        long parsedCreationDate = parseCreationDate(game.getCreationDate());
-        if (parsedCreationDate > 0) {
-            return parsedCreationDate;
-        }
-        if (game.getLastModifiedDate() > 0) {
-            return game.getLastModifiedDate();
-        }
-        long endTimestamp = determineEndTimestamp(game);
-        if (endTimestamp > 0) {
-            return endTimestamp;
-        }
-        return System.currentTimeMillis();
+        return parseCreationDate(game.getCreationDate());
     }
 
     private static long determineEndTimestamp(Game game) {
-        if (game.getEndedDate() > 0) {
-            return game.getEndedDate();
-        }
-        return System.currentTimeMillis();
+        return game.getEndedDate();
     }
 
     private static long parseCreationDate(String creationDate) {
@@ -176,7 +162,7 @@ public class TiglReportService {
 
     private static String determineLeague(Game game) {
         List<String> tags = Optional.ofNullable(game.getTags()).orElse(List.of());
-        boolean hasFracturedTag = tags.stream().anyMatch(tag -> "fractured".equalsIgnoreCase(tag));
+        boolean hasFracturedTag = tags.stream().anyMatch("fractured"::equalsIgnoreCase);
         return hasFracturedTag ? "Fractured" : "ThundersEdge";
     }
 
