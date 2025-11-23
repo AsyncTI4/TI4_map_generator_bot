@@ -4,7 +4,7 @@ enum LogSeverity {
     Info("bot-log-info", "### INFO\n"),
     Warning("bot-log-warning", "## WARNING\n"),
     Error("bot-log-error", "## ERROR\n"),
-    Critical("bot-log-critical", "# CRITICAL\n");
+    Critical("bot-log-critical", "## CRITICAL\n");
 
     final String channelName;
     final String headerText;
