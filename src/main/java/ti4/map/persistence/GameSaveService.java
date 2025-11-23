@@ -75,7 +75,7 @@ class GameSaveService {
 
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Could not save map: " + game.getName(), e);
+            BotLogger.critical(new LogOrigin(game), "Could not save map: " + game.getName(), e);
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(), "Failed to save the game during the last command.");
             return false;
