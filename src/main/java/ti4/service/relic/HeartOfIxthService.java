@@ -91,7 +91,7 @@ public class HeartOfIxthService {
 
     public boolean waitForHeartToResolve(ButtonInteractionEvent event, Game game, Player player) {
         boolean wait = false;
-        for (Button b : event.getMessage().getButtons()) {
+        for (Button b : event.getMessage().getComponentTree().findAll(Button.class)) {
             if (b.getCustomId().contains("exhaustHeartOfIxth")) wait = true;
             if (b.getCustomId().contains("declineHeartOfIxth")) wait = true;
         }
@@ -107,7 +107,7 @@ public class HeartOfIxthService {
     }
 
     private List<Button> getButtonsAfterUsingHeart(ButtonInteractionEvent event, boolean used) {
-        List<Button> originalButtons = event.getMessage().getButtons();
+        List<Button> originalButtons = event.getMessage().getComponentTree().findAll(Button.class);
         List<Button> newButtons = new ArrayList<>();
         for (Button button : originalButtons) {
             // get rid of the exhaust/decline buttons
