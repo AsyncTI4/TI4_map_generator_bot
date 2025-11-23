@@ -180,7 +180,12 @@ public class DrawSecretService {
                 }
             }
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));
+            String message = "Reveal Objectives and Start Strategy Phase";
+            if (!game.getStoredValue("needsInauguralSplice").isEmpty()) {
+                message = "Reveal Objectives and Start Inaugural Splice";
+            }
+            buttons.add(Buttons.green("startOfGameObjReveal", message));
+
             MessageHelper.sendMessageToChannelWithButtons(
                     game.getMainGameChannel(), "Press this button after everyone has discarded.", buttons);
             Player speaker = null;

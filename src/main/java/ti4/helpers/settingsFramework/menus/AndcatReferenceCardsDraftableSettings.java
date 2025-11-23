@@ -26,7 +26,6 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
     // Setting
     private final IntegerSetting numPackages;
     private final ListSetting<FactionModel> banFactions;
-    private final ListSetting<FactionModel> priFactions;
 
     private static final String MENU_ID = "dsAndcatRefPackage";
 
@@ -38,34 +37,14 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         // Initialize values & keys for ban/priority factions
         Set<String> empty = new HashSet<>();
         Set<Entry<String, FactionModel>> allFactions = new HashSet<>();
-        Set<String> keleres = new HashSet<>();
-        // TODO: Fix Keleres start
-        keleres.add("keleresm");
         banFactions = new ListSetting<>(
-                "BanFactionCards",
-                "Banned faction cards",
-                "Ban faction",
-                "Unban faction",
-                allFactions,
-                keleres,
-                keleres);
-        priFactions = new ListSetting<>(
-                "PriFactionCards",
-                "Prioritized faction cards",
-                "Prioritize faction",
-                "Unprioritize faction",
-                allFactions,
-                empty,
-                empty);
+                "BanFactionCards", "Banned faction cards", "Ban faction", "Unban faction", allFactions, empty, empty);
 
         // Emojis
         banFactions.setGetEmoji(FactionModel::getFactionEmoji);
-        priFactions.setGetEmoji(FactionModel::getFactionEmoji);
 
         // Other Initialization
         banFactions.setShow(FactionModel::getAlias);
-        priFactions.setShow(FactionModel::getAlias);
-        priFactions.setExtraInfo("These factions will be included in the draft first!");
 
         // Finish initializing transient settings here
         updateTransientSettings();
@@ -76,7 +55,6 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
                 || !MENU_ID.equals(json.get("menuId").asText("")))) {
             numPackages.initialize(json.get("numPackages"));
             banFactions.initialize(json.get("banFactions"));
-            priFactions.initialize(json.get("priFactions"));
         }
     }
 
@@ -85,7 +63,6 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
         List<SettingInterface> ls = new ArrayList<>();
         ls.add(numPackages);
         ls.add(banFactions);
-        ls.add(priFactions);
         return ls;
     }
 
@@ -106,7 +83,6 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
                             || "keleresm".equals(model.getAlias())) // Limit the pool to only 1 keleres flavor
                     .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
-            priFactions.setAllValues(allFactions);
         }
     }
 }
