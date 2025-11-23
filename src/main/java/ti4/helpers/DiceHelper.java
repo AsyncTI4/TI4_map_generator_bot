@@ -60,16 +60,19 @@ public class DiceHelper {
         public boolean eligibleForHeartMinus() {
             return result == threshold;
         }
+
+        private Die(int threshold, int result) {
+            this.threshold = threshold;
+            this.result = result;
+        }
+
+        public static Die spoof(int threshold, int result) {
+            return new Die(threshold, result);
+        }
     }
 
     private static Die rollDie(int threshold) {
         return new Die(threshold);
-    }
-
-    public static Die spoof(int threshold, int result) {
-        Die d = new Die(threshold);
-        while (d.getResult() != result) d = new Die(threshold);
-        return d;
     }
 
     public static List<Die> rollDice(int threshold, int numDice) {

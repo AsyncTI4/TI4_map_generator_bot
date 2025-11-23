@@ -8,13 +8,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperTwilightsFall;
-import ti4.helpers.ButtonHelperTwilightsFallActionCards;
+import ti4.helpers.*;
 import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -23,7 +18,9 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
+import ti4.service.agenda.IxthianArtifactService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 
 @UtilityClass
@@ -165,6 +162,12 @@ public class EdictPhaseHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("legacyOfIxth")
+    public static void legacyOfIxth(ButtonInteractionEvent event, Player player, Game game) {
+        IxthianArtifactService.rollIxthian(event, player, game, !game.isFowMode());
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("resolveEdict_")
     public static void resolveEdict(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
         String edict = buttonID.replace("resolveEdict_", "").replace("_orangetf", "");
@@ -204,20 +207,28 @@ public class EdictPhaseHandler {
                 buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
             }
             case "tf-legacy_of_ixth" -> {
-                Die d1 = new Die(6);
-                msg += "\n\n# Rolled a " + d1.getResult() + " for legacy of ixth!";
-                if (d1.isSuccess()) {
-                    msg += TechEmojis.Propulsion3 + " " + TechEmojis.Biotic3 + " " + TechEmojis.Cybernetic3 + " "
-                            + TechEmojis.Warfare3;
-                    buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
-                    buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
-                    buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
-                } else {
-                    msg += "💥 💥 💥 💥";
-                    Tile tile = game.getMecatolTile();
-                    ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
+                {
+                    Die d1 = new Die(6);
+                    msg += "\n\n# Rolled a " + d1.getResult() + " for legacy of ixth!";
+                    if (d1.isSuccess()) {
+                        msg += TechEmojis.Propulsion3 + " " + TechEmojis.Biotic3 + " " + TechEmojis.Cybernetic3 + " "
+                                + TechEmojis.Warfare3;
+                        buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
+                        buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
+                        buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
+                    } else {
+                        msg += "💥 💥 💥 💥";
+                        Tile tile = game.getMecatolTile();
+                        ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(
+                                game, tile);
+                    }
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "legacyOfIxth",
+                        "Roll Legacy of Ixth",
+                        PlanetEmojis.Mecatol));
+                msg = player.getRepresentation() + " click this button to roll for _Legacy of Ixth_! 🥁";
             }
             case "tf-artifice" -> {
                 int vpDifference = Math.max(game.getHighestScore() - player.getTotalVictoryPoints(), 0);
