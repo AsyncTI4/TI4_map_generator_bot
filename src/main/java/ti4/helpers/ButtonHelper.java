@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Data;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
@@ -129,6 +133,7 @@ import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
 
+@UtilityClass
 public class ButtonHelper {
 
     public static List<Tile> getTilesOfPlayersSpecificUnits(Game game, Player p1, Units.UnitType... type) {
@@ -7500,8 +7505,8 @@ public class ButtonHelper {
         return false;
     }
 
-    public static boolean shouldConfirmPrePass(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static boolean shouldConfirmPrePass(
+        ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String whatToPreset = buttonID.split("_")[1];
         boolean confirmed = buttonID.endsWith("_confirm");
 
@@ -7510,9 +7515,9 @@ public class ButtonHelper {
         return false;
     }
 
-    public static void sendConfirmPrePass(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static void sendConfirmPrePass(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Button btn = event.getButton()
-                .withId(buttonID + "_confirm")
+                .withCustomId(buttonID + "_confirm")
                 .withLabel("Confirm " + event.getButton().getLabel());
         StringBuilder message = new StringBuilder(
                 player.getRepresentation()
