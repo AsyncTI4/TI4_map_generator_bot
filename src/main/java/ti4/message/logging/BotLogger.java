@@ -123,9 +123,18 @@ public class BotLogger {
         logToChannel(null, message, null, LogSeverity.Error);
     }
 
+    public static void critical(@Nonnull String message) {
+        logToChannel(null, message, null, LogSeverity.Critical);
+    }
+
     public static void error(
             @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
         logToChannel(new LogOrigin(event), message, throwable, LogSeverity.Error);
+    }
+
+    public static void critical(
+            @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
+        logToChannel(new LogOrigin(event), message, throwable, LogSeverity.Critical);
     }
 
     /**
@@ -142,8 +151,16 @@ public class BotLogger {
         logToChannel(null, message, err, LogSeverity.Error);
     }
 
+    public static void critical(@Nonnull String message, @Nullable Throwable err) {
+        logToChannel(null, message, err, LogSeverity.Critical);
+    }
+
     public static void error(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
         logToChannel(logOrigin, message, err, LogSeverity.Error);
+    }
+
+    public static void critical(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(logOrigin, message, err, LogSeverity.Critical);
     }
 
     /**
@@ -158,6 +175,10 @@ public class BotLogger {
      */
     public static void error(@Nullable LogOrigin origin, @Nonnull String message) {
         logToChannel(origin, message, null, LogSeverity.Error);
+    }
+
+    public static void critical(@Nullable LogOrigin origin, @Nonnull String message) {
+        logToChannel(origin, message, null, LogSeverity.Critical);
     }
 
     public static void errorToThread(@Nonnull String message, @Nonnull String threadName) {
@@ -198,7 +219,7 @@ public class BotLogger {
             @Nonnull LogSeverity severity,
             @Nullable String threadName) {
         // Count Error-severity logs once per entry
-        if (severity == LogSeverity.Error) {
+        if (severity.isErrorOrHigher()) {
             SREStats.incrementErrorCount();
         }
 

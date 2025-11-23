@@ -87,12 +87,12 @@ class GameLoadService {
             Game game = readGame(file);
 
             if (game == null || game.getName() == null) {
-                BotLogger.warning("Could not load game. Game or game name is null: " + file.getName());
+                BotLogger.critical("Could not load game. Game or game name is null: " + file.getName());
                 return null;
             }
             return new ManagedGame(game);
         } catch (Exception e) {
-            BotLogger.error("Could not load game: " + file.getName(), e);
+            BotLogger.critical("Could not load game: " + file.getName(), e);
         }
         return null;
     }
@@ -111,7 +111,7 @@ class GameLoadService {
     @Nullable
     private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
-            BotLogger.error("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
+            BotLogger.critical("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
             return null;
         }
         try {
@@ -141,7 +141,7 @@ class GameLoadService {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.error(
+                        BotLogger.critical(
                                 "Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
                         return null;
                     }
@@ -172,7 +172,7 @@ class GameLoadService {
             }
             Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
             if (tileMap == null) {
-                BotLogger.error("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                BotLogger.critical("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
                 return null;
             }
             game.setTileMap(tileMap);
@@ -180,7 +180,7 @@ class GameLoadService {
             game.setStoredValue("loadedGame", "yes");
             return game;
         } catch (Exception e) {
-            BotLogger.error("Data read error: " + gameFile.getName(), e);
+            BotLogger.critical("Data read error: " + gameFile.getName(), e);
             return null;
         }
     }
@@ -290,7 +290,7 @@ class GameLoadService {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Data read error: " + gameFile.getName(), e);
+            BotLogger.critical(new LogOrigin(game), "Data read error: " + gameFile.getName(), e);
             return null;
         }
         return tileMap;
