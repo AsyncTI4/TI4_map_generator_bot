@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -83,6 +84,7 @@ import ti4.service.statistics.game.GameStatTypes;
 import ti4.settings.GlobalSettings;
 import ti4.spring.jda.JdaService;
 
+@UtilityClass
 public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
@@ -440,7 +442,8 @@ public class AutoCompleteProvider {
                         "facilities",
                         "total_war",
                         "liberation",
-                        "ordinian");
+                        "ordinian",
+                        "te");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }

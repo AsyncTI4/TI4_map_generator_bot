@@ -1,20 +1,15 @@
 package ti4.commands.developer;
 
-import java.time.Instant;
-import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
-import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 
 class RunAgainstAllGames extends Subcommand {
-
-    private static final long CUTOFF_DATE = Instant.ofEpochMilli(1761924840000L).toEpochMilli();
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
@@ -37,37 +32,10 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        long startedDate = getStartedDate(game);
-        if (startedDate >= CUTOFF_DATE) {
-            return false;
+        boolean removed = game.getTags().remove("ThundersEdgeDemo");
+        if (removed) {
+            game.getTags().add("Thunder's Edge Demo");
         }
-
-        if (!hasCompletedExpedition(game)) {
-            return false;
-        }
-
-        if (game.getTags().contains("ThundersEdgeDemo")) {
-            return false;
-        }
-
-        return game.addTag("ThundersEdgeDemo");
-    }
-
-    private static long getStartedDate(Game game) {
-        long startedDate = game.getStartedDate();
-        if (startedDate > 0) {
-            return startedDate;
-        }
-
-        try {
-            return GameHelper.getCreationDateAsEpochMillis(game);
-        } catch (Exception e) {
-            BotLogger.info("Could not handle creation date for " + game.getName() + ": " + e.getMessage());
-            return CUTOFF_DATE;
-        }
-    }
-
-    private static boolean hasCompletedExpedition(Game game) {
-        return game.getExpeditions().getExpeditionFactions().values().stream().anyMatch(Objects::nonNull);
+        return removed;
     }
 }
