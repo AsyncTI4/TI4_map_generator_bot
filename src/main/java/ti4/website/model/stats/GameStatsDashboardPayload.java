@@ -1,5 +1,6 @@
 package ti4.website.model.stats;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -46,6 +47,7 @@ public class GameStatsDashboardPayload {
         return game.getHexSummary();
     }
 
+    @JsonProperty("isPoK")
     public boolean isPoK() {
         return game.isProphecyOfKings();
     }
@@ -183,7 +185,8 @@ public class GameStatsDashboardPayload {
                         Map.entry("Voice of the Council", (Supplier<Boolean>) game::isVotcMode),
                         Map.entry("Base Game", (Supplier<Boolean>) game::isBaseGameMode),
                         Map.entry("Prophecy of Kings", (Supplier<Boolean>) game::isProphecyOfKings),
-                        Map.entry("Thunder's Edge", (Supplier<Boolean>) game::isThundersEdge),
+                        Map.entry("Thunder's Edge", (Supplier<Boolean>)
+                                () -> game.isThundersEdge() && !game.isThundersEdgeDemo()),
                         Map.entry("Thunder's Edge Demo", (Supplier<Boolean>) game::isThundersEdgeDemo),
                         Map.entry("Twilight's Fall", (Supplier<Boolean>) game::isTwilightsFallMode),
                         Map.entry("Age of Exploration", (Supplier<Boolean>) game::isAgeOfExplorationMode),
