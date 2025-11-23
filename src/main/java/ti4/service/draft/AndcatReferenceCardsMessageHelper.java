@@ -1,7 +1,10 @@
 package ti4.service.draft;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.container.Container;
@@ -12,7 +15,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.Constants;
 import ti4.helpers.twilightsfall.TwilightsFallInfoHelper;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.componentsV2.MessageV2Builder;
@@ -84,7 +89,6 @@ public class AndcatReferenceCardsMessageHelper {
         }
         List<FactionModel> factionsInPackage = AndcatReferenceCardsDraftable.getFactionsInPackage(refPackage);
         MessageV2Builder messageBuilder = new MessageV2Builder(cardsInfoThread, 3);
-        boolean isChoiceFinalized = false;
 
         messageBuilder.appendLine(player.getRepresentation() + " Select how each faction will be used.");
 
@@ -229,11 +233,14 @@ public class AndcatReferenceCardsMessageHelper {
                 }
             }
 
+            Button refreshButton = Buttons.blue(draftable.makeButtonId("assign_refresh"), "Re-send buttons");
+
             // Fall back to sending it again
             draftManager
                     .getGame()
                     .getActionsChannel()
                     .sendMessage(messageBuilder.toString())
+                    .setComponents(ActionRow.of(refreshButton))
                     .queue();
         });
     }
@@ -341,6 +348,9 @@ public class AndcatReferenceCardsMessageHelper {
             String factionName,
             String factionEmoji) {
         String buttonId = draftable.makeButtonId("assign_" + setupPart + "_" + factionAlias);
+        if (factionName.toLowerCase().contains("keleres")) {
+            factionName = "Keleres";
+        }
         Button button = Buttons.green(buttonId, "Pick " + factionName, factionEmoji);
         if (factionAlias.equals(factionForPart)) {
             button = Buttons.red(buttonId, "Unpick " + factionName, factionEmoji);
@@ -364,6 +374,28 @@ public class AndcatReferenceCardsMessageHelper {
             return "Invalid assign command: " + commandKey;
         }
         String setupPart = tokens[0];
+
+        if ("refresh".equals(setupPart)) {
+            for (Entry<String, PlayerDraftState> entry : draftManager.playerStates.entrySet()) {
+                String otherPlayerUserId = entry.getKey();
+                Player otherPlayer = draftManager.getGame().getPlayer(otherPlayerUserId);
+                List<DraftChoice> otherPlayerPicks =
+                        draftManager.getPlayerPicks(otherPlayerUserId, draftable.getType());
+                if (otherPlayerPicks.isEmpty()) {
+                    continue;
+                }
+                ReferenceCardPackage otherRefPackage =
+                        draftable.getPackageByChoiceKey(otherPlayerPicks.get(0).getChoiceKey());
+                if (otherRefPackage == null) {
+                    continue;
+                }
+
+                updatePackageButtons(event, draftManager, otherPlayer, otherRefPackage);
+            }
+            updatePackagePickSummary(draftManager);
+
+            return null;
+        }
 
         String playerChoiceKey = draftManager.getPlayerPicks(playerUserId, draftable.getType()).stream()
                 .map(DraftChoice::getChoiceKey)
@@ -407,8 +439,8 @@ public class AndcatReferenceCardsMessageHelper {
             updatePackagePickSummary(draftManager);
 
             if (draftable.whatsStoppingSetup(draftManager) == null) {
-                // TODO: Print speaker order and priority numbers
-                // TODO: Block for Keleres to pick their HS tile
+                printSpeakerOrder(draftManager);
+
                 // TODO: Make sure setup messages go to the main game channel, not the event channel (e.g. frontier
                 // tokens)
                 draftManager.trySetupPlayers(event);
@@ -522,5 +554,68 @@ public class AndcatReferenceCardsMessageHelper {
         updatePackagePickSummary(draftManager);
 
         return null;
+    }
+
+    private void printSpeakerOrder(DraftManager draftManager) {
+        Map<Integer, String> playersByPriorityNumber = new HashMap<>();
+        List<String> unorderedPlayers = new ArrayList<>();
+        for (Entry<String, PlayerDraftState> entry : draftManager.playerStates.entrySet()) {
+            String playerUserId = entry.getKey();
+            PlayerDraftState playerDraftState = entry.getValue();
+            List<DraftChoice> picks = playerDraftState.getPicks(AndcatReferenceCardsDraftable.TYPE);
+            if (picks.isEmpty()) {
+                unorderedPlayers.add(playerUserId);
+                continue;
+            }
+
+            ReferenceCardPackage refPackage =
+                    this.draftable.getPackageByChoiceKey(picks.get(0).getChoiceKey());
+
+            if (refPackage.speakerOrderFaction() == null) {
+                unorderedPlayers.add(playerUserId);
+                continue;
+            }
+
+            FactionModel faction = Mapper.getFaction(refPackage.speakerOrderFaction());
+            if (faction == null || faction.getPriorityNumber() == null) {
+                unorderedPlayers.add(playerUserId);
+                continue;
+            }
+
+            playersByPriorityNumber.put(faction.getPriorityNumber(), playerUserId);
+        }
+
+        List<Entry<Integer, String>> sortedEntries = playersByPriorityNumber.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .toList();
+
+        StringBuilder message = new StringBuilder();
+        message.append("### Speaker Order Priority").append(System.lineSeparator());
+        int order = 1;
+        for (Entry<Integer, String> entry : sortedEntries) {
+            String playerUserId = entry.getValue();
+            Player player = draftManager.getGame().getPlayer(playerUserId);
+            Integer priorityNumber = entry.getKey();
+            message.append("> ")
+                    .append(order)
+                    .append(". ")
+                    .append(player.getRepresentation(false, true, true, true))
+                    .append(" (**")
+                    .append(priorityNumber)
+                    .append("**)")
+                    .append(System.lineSeparator());
+        }
+        if (!unorderedPlayers.isEmpty()) {
+            BotLogger.warning(
+                    new LogOrigin(draftManager.getGame()),
+                    Constants.jabberwockyPing() + " Could not place all players in speaker order by priority number");
+            message.append("### Unordered Players").append(System.lineSeparator());
+            for (String playerUserId : unorderedPlayers) {
+                Player player = draftManager.getGame().getPlayer(playerUserId);
+                message.append("> - ").append(player.getRepresentation()).append(System.lineSeparator());
+            }
+        }
+
+        MessageHelper.sendMessageToChannel(draftManager.getGame().getActionsChannel(), message.toString());
     }
 }

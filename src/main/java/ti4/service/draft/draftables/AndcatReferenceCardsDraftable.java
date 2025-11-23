@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -25,10 +25,12 @@ import ti4.helpers.settingsFramework.menus.AndcatReferenceCardsDraftableSettings
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.SettingsMenu;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.helpers.twilightsfall.TwilightsFallInfoHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.FactionModel;
@@ -71,65 +73,80 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return "Faction Reference Cards";
     }
 
-    public String initialize(
-            int numPackages, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
+    public String initialize(int numPackages, List<ComponentSource> sources, List<String> bannedFactions) {
 
         List<String> availableFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
                 .filter(f -> !bannedFactions.contains(f.getAlias()))
-                .filter(f -> !presetFactions.contains(f.getAlias()))
                 .filter(f -> f.getPriorityNumber() != null)
                 .filter(f -> sources.contains(f.getSource()))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor
                 .map(FactionModel::getAlias)
                 .toList());
-        List<String> randomOrder = new ArrayList<>(presetFactions);
-        Collections.shuffle(randomOrder);
-        Collections.shuffle(availableFactions);
-        randomOrder.addAll(availableFactions);
-        randomOrder = new LinkedList<>(randomOrder.stream().distinct().toList());
 
-        if (randomOrder.size() < numPackages * 3) {
-            return "Not enough factions to fill Andcat Reference Card Packages. " + "Requested "
-                    + numPackages + " packages (requiring " + (numPackages * 3) + " factions) but only "
-                    + randomOrder.size()
-                    + " factions available.";
-        }
-
-        List<String> selectedFactions = randomOrder.stream()
-                .limit(numPackages * 3L)
+        // Sort the available factions by priority number
+        List<String> sortedFactions = availableFactions.stream()
                 .sorted((p1, p2) -> {
                     FactionModel f1 = Mapper.getFaction(p1);
                     FactionModel f2 = Mapper.getFaction(p2);
                     return Integer.compare(f1.getPriorityNumber(), f2.getPriorityNumber());
                 })
-                .toList();
-        List<List<String>> partitionedFactions = ListUtils.partition(selectedFactions, numPackages);
-        if (partitionedFactions.size() < 3) {
-            BotLogger.warning(Constants.jabberwockyPing()
-                    + " Not enough factions to fill Andcat Reference Card Packages after prioritization. "
-                    + "Requested " + numPackages + " packages but only " + partitionedFactions.size() + " packages "
-                    + "available after prioritization.");
-            return "Couldn't fill all reference card packages for some reason. A developer has been pinged. You can try enabling more factions in the meantime.";
-        }
-        if (partitionedFactions.getLast().size() < numPackages) {
-            BotLogger.warning(Constants.jabberwockyPing()
-                    + " Last Andcat Reference Card Package has less than 3 factions after prioritization. "
-                    + "Requested " + numPackages + " packages but last package only has "
-                    + partitionedFactions.getLast().size() + " factions.");
-            return "Couldn't fill all reference card packages for some reason. A developer has been pinged. You can try enabling more factions in the meantime.";
+                .collect(Collectors.toList());
+
+        // Break factions into 3 same-size groups, segmented by priority number
+        int partitionSize = (int) Math.ceil((double) sortedFactions.size() / 3); // Typically 10
+        List<List<String>> partitions = ListUtils.partition(sortedFactions, partitionSize);
+
+        // Shuffle each faction group
+        for (List<String> partition : partitions) {
+            Collections.shuffle(partition);
         }
 
-        for (int packageKey = 1; packageKey <= numPackages; packageKey++) {
-            List<String> packageFactions = new ArrayList<>();
-            packageFactions.add(partitionedFactions.get(0).get(packageKey - 1));
-            packageFactions.add(partitionedFactions.get(1).get(packageKey - 1));
-            packageFactions.add(partitionedFactions.get(2).get(packageKey - 1));
+        // To get a nice distribution of factions, we want to build at least ~80% of all possible packages
+        // This results in pulling out more of the powerful/weak factions before picking the fully random final faction.
+        int packagesPossible = partitionSize;
+        if (numPackages > packagesPossible) {
+            return "Not enough factions to fill Andcat Reference Card Packages. "
+                    + "Requested " + numPackages + " packages but only "
+                    + packagesPossible + " unique packages possible with " + availableFactions.size() + " factions.";
+        }
+        int buildPackages = Math.max(numPackages, (int) Math.ceil(packagesPossible * 0.8));
+
+        List<List<String>> packages = new ArrayList<>(buildPackages);
+
+        List<String> strongFactions = new ArrayList<>(partitions.get(0));
+        List<String> midFactions = new ArrayList<>(partitions.get(1));
+        List<String> weakFactions = new ArrayList<>(partitions.get(2));
+
+        // First add powerful factions
+        for (int i = 0; i < buildPackages; i++) {
+            packages.add(new ArrayList<>());
+            packages.get(i).add(strongFactions.remove(0));
+        }
+        // Then add weak factions
+        for (int i = 0; i < buildPackages; i++) {
+            packages.get(i).add(weakFactions.remove(0));
+        }
+        // Then mix ALL remaining factions together
+        List<String> remainingFactions = new ArrayList<>();
+        remainingFactions.addAll(strongFactions);
+        remainingFactions.addAll(weakFactions);
+        remainingFactions.addAll(midFactions); // Medium factions last to mix better
+        Collections.shuffle(remainingFactions);
+
+        // Finish filling packages from the remaining pool
+        // We only need to finish numPackages
+        for (int i = 0; i < numPackages; i++) {
+            packages.get(i).add(remainingFactions.remove(0));
+            Collections.shuffle(packages.get(i));
+
+            // Add package to finalized list
+            int packageKey = i + 1;
             ReferenceCardPackage refCardPackage =
-                    new ReferenceCardPackage(packageKey, packageFactions, null, null, null, null);
+                    new ReferenceCardPackage(packageKey, packages.get(i), null, null, null, null);
             referenceCardPackages.put(packageKey, refCardPackage);
         }
-
+        
         return null;
     }
 
@@ -171,26 +188,47 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             Integer packageKey = entry.getKey();
             List<FactionModel> factionsInPackage = getFactionsInPackage(entry.getValue());
             String choiceKey = getChoiceKey(packageKey);
-            String unformattedName = "Package " + packageKey;
-            String formattedName = "Package " + packageKey + " ("
-                    + String.join(
-                            ", ",
-                            factionsInPackage.stream()
-                                    .map(FactionModel::getShortName)
-                                    .toList()) + ")";
+            String unformattedName = makePackageText(factionsInPackage, false, false);
+            String formattedName = makePackageText(factionsInPackage, true, true);
             String identifyingEmoji = factionsInPackage.stream()
                     .map(FactionModel::getFactionEmoji)
                     .reduce("", String::concat);
             DraftChoice choice = new DraftChoice(
                     TYPE,
                     choiceKey,
-                    makeChoiceButton(choiceKey, formattedName, null),
+                    makeChoiceButton(choiceKey, makePackageText(factionsInPackage, true, false), null),
                     formattedName,
                     unformattedName,
                     identifyingEmoji);
             choices.add(choice);
         }
         return choices;
+    }
+
+    private String makePackageText(
+            List<FactionModel> factionsInPackage, boolean includePriority, boolean includeEmojis) {
+        StringBuilder formattedNameBuilder = new StringBuilder();
+        for (int i = 0; i < 3; ++i) {
+            FactionModel pFaction = factionsInPackage.get(i);
+            if (includeEmojis) {
+                formattedNameBuilder.append(pFaction.getFactionEmoji()).append(" ");
+            }
+            if (pFaction.getShortName().toLowerCase().contains("keleres")) {
+                formattedNameBuilder.append("Keleres");
+            } else {
+                formattedNameBuilder.append(pFaction.getShortName());
+            }
+            if (includePriority) {
+                formattedNameBuilder
+                        .append(" [")
+                        .append(pFaction.getPriorityNumber())
+                        .append("]");
+            }
+            if (i < 2) {
+                formattedNameBuilder.append(", ");
+            }
+        }
+        return formattedNameBuilder.toString();
     }
 
     @Override
@@ -257,7 +295,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                     Arrays.stream(tokens).map(this::getPackageByChoiceKey).toList();
             new AndcatReferenceCardsMessageHelper(this).sendPackageInfos(draftManager, playerUserId, informPackages);
         } else if (commandKey.startsWith("assign_")) {
-            new AndcatReferenceCardsMessageHelper(this)
+            return new AndcatReferenceCardsMessageHelper(this)
                     .handleAssignButton(event, draftManager, playerUserId, commandKey);
         } else {
             return "Unknown command: " + commandKey;
@@ -397,7 +435,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return initialize(
                 settings.getNumPackages().getVal(),
                 sourceSettings.getFactionSources(),
-                settings.getPriFactions().getKeys().stream().toList(),
                 settings.getBanFactions().getKeys().stream().toList());
     }
 
@@ -417,6 +454,9 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             andcatMessageHelper.sendPackageButtons(draftManager, player, refPackage);
         }
         andcatMessageHelper.updatePackagePickSummary(draftManager);
+
+        // This draftable indicates an Inaugural Splice will be needed
+        draftManager.getGame().setStoredValue("needsInauguralSplice", "true");
     }
 
     @Override
@@ -468,11 +508,44 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
             playerSetupState.setPositionHS(homeTilePosition);
         }
 
-        // After setting a home system position, the slice can be placed
+        // If the home system faction is Keleres, we switch them here to a random unused faction.
+        ReferenceCardPackage updatedPackage;
+        if (refPackage.homeSystemFaction() != null
+                && refPackage.homeSystemFaction().startsWith("keleres")) {
+
+            FactionModel newKeleresFaction = getKeleresHomeSystemFaction(draftManager);
+            if (newKeleresFaction != null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(game.getPlayer(playerUserId).getRepresentation());
+                sb.append(" had Keleres as their home system faction, and drew a random unused home system tile.");
+                sb.append(System.lineSeparator());
+                sb.append(TwilightsFallInfoHelper.getFactionSetupInfo(newKeleresFaction, false, true, false));
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
+
+                updatedPackage = new ReferenceCardPackage(
+                        refPackage.key(),
+                        refPackage.factions(),
+                        newKeleresFaction.getAlias(),
+                        refPackage.startingUnitsFaction(),
+                        refPackage.speakerOrderFaction(),
+                        refPackage.choicesFinal());
+                referenceCardPackages.put(refPackage.key(), updatedPackage);
+            } else {
+                BotLogger.error(
+                        new LogOrigin(game),
+                        Constants.jabberwockyPing()
+                                + " Could not find a new faction for Keleres home system assignment.");
+                updatedPackage = refPackage;
+            }
+        } else {
+            updatedPackage = refPackage;
+        }
+
+        // After setting a home system position, the home system + slice can be placed
         PartialMapService.tryUpdateMap(draftManager, null, true);
 
         // Place planets and units after faction and color are properly set
-        return (Player player) -> doPostSetupWork(draftManager, player, refPackage);
+        return (Player player) -> doPostSetupWork(draftManager, player, updatedPackage);
     }
 
     private void doPostSetupWork(DraftManager draftManager, Player player, ReferenceCardPackage refPackage) {
@@ -564,5 +637,46 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
     private boolean shouldAlsoSetSeat(DraftManager draftManager) {
         return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
+    }
+
+    private FactionModel getKeleresHomeSystemFaction(DraftManager draftManager) {
+        // Try and lookup the faction sources to get a list of possible factions
+        Game game = draftManager.getGame();
+        List<ComponentSource> factionSources;
+        List<String> bannedFactions;
+        if (game.getDraftSystemSettingsUnsafe() != null || game.getDraftSystemSettingsJson() != null) {
+            factionSources =
+                    game.initializeDraftSystemSettings().getSourceSettings().getFactionSources();
+            bannedFactions = game
+                    .initializeDraftSystemSettings()
+                    .getAndcatReferenceCardsDraftableSettings()
+                    .getBanFactions()
+                    .getKeys()
+                    .stream()
+                    .toList();
+        } else {
+            BotLogger.warning(
+                    new LogOrigin(game),
+                    "Could not find draft system settings to lookup faction sources for Keleres home system assignment.");
+            factionSources = List.of(ComponentSource.base, ComponentSource.pok, ComponentSource.thunders_edge);
+            bannedFactions = List.of();
+        }
+
+        List<String> usedFactions = new ArrayList<>();
+        for (ReferenceCardPackage packages : referenceCardPackages.values()) {
+            if (packages.homeSystemFaction() != null) {
+                usedFactions.add(packages.homeSystemFaction());
+            }
+        }
+
+        List<FactionModel> availableFactions = Mapper.getFactionsValues().stream()
+                .filter(f -> !bannedFactions.contains(f.getAlias()))
+                .filter(f -> factionSources.contains(f.getSource()))
+                .filter(f -> !usedFactions.contains(f.getAlias()))
+                .filter(f -> f.getPriorityNumber() != null)
+                .filter(f -> !f.getAlias().contains("keleres"))
+                .collect(Collectors.toList());
+        Collections.shuffle(availableFactions);
+        return availableFactions.isEmpty() ? null : availableFactions.get(0);
     }
 }
