@@ -7506,7 +7506,7 @@ public class ButtonHelper {
     }
 
     private static boolean shouldConfirmPrePass(
-        ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String whatToPreset = buttonID.split("_")[1];
         boolean confirmed = buttonID.endsWith("_confirm");
 

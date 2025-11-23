@@ -44,9 +44,9 @@ public class HeartOfIxthService {
         Player heart = getHeartOfIxthPlayer(game, false);
 
         boolean blockForFog = !rollingPlayer.is(heart) && game.isFowMode();
-      // For now, not sure how to handle this in FoW unless the "player rolling" also has heart
+        // For now, not sure how to handle this in FoW unless the "player rolling" also has heart
 
-      if (heart == null || !result.eligibleForHeart() || blockForFog) {
+        if (heart == null || !result.eligibleForHeart() || blockForFog) {
             if (result.isSuccess()) buttons.add(good);
             if (!result.isSuccess()) buttons.add(bad);
         } else {
