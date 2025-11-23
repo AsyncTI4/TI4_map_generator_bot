@@ -604,6 +604,7 @@ public class AndcatReferenceCardsMessageHelper {
                     .append(priorityNumber)
                     .append("**)")
                     .append(System.lineSeparator());
+            order++;
         }
         if (!unorderedPlayers.isEmpty()) {
             BotLogger.warning(
