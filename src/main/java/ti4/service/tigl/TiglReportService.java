@@ -169,7 +169,7 @@ public class TiglReportService {
     private static String resolveDiscordTag(Player player) {
         User user = player.getUser();
         if (user != null) {
-            return user.getAsTag();
+            return user.getEffectiveName();
         }
         return player.getUserName();
     }
