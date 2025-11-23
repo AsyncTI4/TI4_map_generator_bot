@@ -146,7 +146,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                     new ReferenceCardPackage(packageKey, packages.get(i), null, null, null, null);
             referenceCardPackages.put(packageKey, refCardPackage);
         }
-        
+
         return null;
     }
 
