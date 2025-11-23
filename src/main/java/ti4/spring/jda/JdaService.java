@@ -58,6 +58,7 @@ import ti4.listeners.ChannelCreationListener;
 import ti4.listeners.DeletionListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
+import ti4.listeners.RosterInteractionListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
@@ -146,6 +147,7 @@ public class JdaService {
                 // Non-Priority Listeners
                 new DeletionListener(),
                 new SelectionMenuListener(),
+                new RosterInteractionListener(),
                 new ChannelCreationListener(),
                 new UserLeaveServerListener(),
                 ModalListener.getInstance() // ModalListener has a long init time

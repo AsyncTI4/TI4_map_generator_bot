@@ -30,13 +30,10 @@ public class ChannelCreationListener extends ListenerAdapter {
         String parentName = channel.getParentChannel().getName();
         if (parentName.equalsIgnoreCase(PBD_MAKING_GAMES_CHANNEL)
                 || "making-private-games".equalsIgnoreCase(parentName)) {
-            String message =
-                    """
-                To launch a new game, please run the command `/game create_game_button`, \
-                filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members \
-                are correct.
-                """;
-            channel.sendMessage(message)
+            // Build an interactive roster message (message-driven roster). Buttons will edit this message.
+            String content = ti4.roster.RosterUiBuilder.renderRoster("TBD", java.util.Collections.emptyList());
+            channel.sendMessage(content)
+                    .setComponents(ti4.roster.RosterUiBuilder.initialActionRows())
                     .queueAfter(
                             5, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel
             // having no messages.

@@ -27,3 +27,5 @@ runlocally clean.ps1
 runlocally.ps1
 *.tar
 *.log
+.env
+start.sh
