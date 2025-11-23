@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -26,6 +27,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.relic.HeartOfIxthService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
@@ -52,7 +54,7 @@ public class IxthianArtifactService {
     @ButtonHandler("rollIxthian")
     public static void rollIxthian(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         if (game.getSpeakerUserID().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
-            rollIxthian(game, !game.isFowMode());
+            rollIxthian(event, player, game, !game.isFowMode());
         } else {
             Button ixthianButton =
                     Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
@@ -70,7 +72,7 @@ public class IxthianArtifactService {
         return rand;
     }
 
-    public static void rollIxthian(Game game, boolean publish) {
+    public static void rollIxthian(GenericInteractionCreateEvent event, Player player, Game game, boolean publish) {
         String gameMsg = game.getPing();
         String gameName = game.getName();
         MessageChannel chan = game.getMainGameChannel();
@@ -78,7 +80,7 @@ public class IxthianArtifactService {
         String watchMsg = watchPartyPing(game);
 
         Predicate<Game> resolve = futureGame -> {
-            resolveIxthianRoll(futureGame, publish && partyChan != null);
+            resolveIxthianRoll(event, player, futureGame, publish && partyChan != null);
             return false;
         };
 
@@ -128,7 +130,8 @@ public class IxthianArtifactService {
         return 6;
     }
 
-    private static void resolveIxthianRoll(Game game, boolean publish) {
+    private static void resolveIxthianRoll(
+            GenericInteractionCreateEvent event, Player player, Game game, boolean publish) {
         TextChannel partyChan = watchPartyChannel(game);
 
         Die result = new Die(getIxthianThreshold(game));
@@ -136,7 +139,7 @@ public class IxthianArtifactService {
             if (result.isSuccess()) {
                 resolveIxthianTech(game, result, false, publish);
             } else {
-                resolveIxthianDestroy(game, result, false, publish);
+                resolveIxthianDestroy(event, game, result, false, publish);
             }
         } else {
             Player heartPlayer = HeartOfIxthService.getHeartOfIxthPlayer(game, true);
@@ -173,7 +176,7 @@ public class IxthianArtifactService {
         if (res.isSuccess() ^ heart) {
             resolveIxthianTech(game, res, heart, publish);
         } else {
-            resolveIxthianDestroy(game, res, heart, publish);
+            resolveIxthianDestroy(event, game, res, heart, publish);
         }
     }
 
@@ -212,10 +215,19 @@ public class IxthianArtifactService {
                 game.getMainGameChannel(), "You may use the button to get your two technologies.", Buttons.GET_A_TECH);
     }
 
-    private void resolveIxthianDestroy(Game game, Die result, boolean usedHeart, boolean publish) {
+    private static void resolveIxthianDestroy(
+            GenericInteractionCreateEvent event, Game game, Die result, boolean usedHeart, boolean publish) {
         informGameAndWatchPartyAndExhaustHeart(game, result, usedHeart, publish);
 
         Tile tile = game.getMecatolTile();
+        {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral != null) {
+                DestroyUnitService.destroyAllPlayerUnitsInSystem(event, game, neutral, tile, false);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Destroyed all neutral units in the Mecatol Rex system.");
+            }
+        }
         ButtonHelperTwilightsFallActionCards.sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
         String msg = "Please destroy units in or adjacent to the Mecatol Rex system.";
         if (game.isFowMode()) {

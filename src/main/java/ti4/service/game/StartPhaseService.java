@@ -86,7 +86,7 @@ public class StartPhaseService {
                 ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" ->
                 ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
-            case "ixthian" -> IxthianArtifactService.rollIxthian(game, false);
+            case "ixthian" -> IxthianArtifactService.rollIxthian(event, game, false);
             case "gameTitles" -> PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
