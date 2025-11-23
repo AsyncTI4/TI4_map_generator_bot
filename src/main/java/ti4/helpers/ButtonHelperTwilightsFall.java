@@ -306,9 +306,15 @@ public class ButtonHelperTwilightsFall {
             Collections.reverse(participants);
             Collections.rotate(participants, 1);
         }
-        if (!game.getStoredValue("engineerACSplice").isEmpty()) {
-            participants.addFirst(startPlayer);
-            participants.addFirst(startPlayer);
+        {
+            String engineerACSplice = game.getStoredValue("engineerACSplice");
+            if ("take_remove_remove".equalsIgnoreCase(engineerACSplice)) {
+                participants.addFirst(startPlayer);
+                participants.addFirst(startPlayer);
+            } else if (!engineerACSplice.isEmpty()) {
+                // Cleans up any dirty values left over from e.g. playing Engineer without finishing the splice
+                game.removeStoredValue("engineerACSplice");
+            }
         }
         if (!game.getStoredValue("paid6ForSplice").isEmpty()) {
             participants.add(startPlayer);
