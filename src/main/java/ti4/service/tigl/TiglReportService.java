@@ -88,8 +88,8 @@ public class TiglReportService {
         report.setRound(game.getRound());
         report.setPlayerCount(resolvePlayerCount(game));
         report.setSource("Async");
-        report.setStartTimestamp(determineStartTimestamp(game) / 1000);
-        report.setEndTimestamp(determineEndTimestamp(game) / 1000);
+        report.setStartTimestamp(determineStartTimestamp(game));
+        report.setEndTimestamp(determineEndTimestamp(game));
         report.setLeague(determineLeague(game));
         report.setEvents(getEnabledGalacticEvents(game));
 
