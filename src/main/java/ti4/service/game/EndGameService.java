@@ -372,7 +372,6 @@ public class EndGameService {
         return sb.toString();
     }
 
-
     private static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
         Category inLimboCategory =
                 guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();

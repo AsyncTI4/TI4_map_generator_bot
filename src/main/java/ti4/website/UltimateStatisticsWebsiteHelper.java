@@ -94,9 +94,7 @@ public class UltimateStatisticsWebsiteHelper {
 
     private static void logHttpError(String url, String json, Throwable e) {
         BotLogger.error(
-                String.format(
-                        "An exception occurred during HTTP call to %s: %s <@206450549371961346>", url, json),
-                e);
+                String.format("An exception occurred during HTTP call to %s: %s <@206450549371961346>", url, json), e);
     }
 
     private static void handleErrorResponse(

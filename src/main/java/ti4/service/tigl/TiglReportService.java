@@ -115,11 +115,7 @@ public class TiglReportService {
     }
 
     private static int resolvePlayerCount(Game game) {
-        int playerCount = game.getPlayerCountForMap();
-        if (playerCount <= 0) {
-            playerCount = game.getPlayers().size();
-        }
-        return playerCount;
+        return game.getRealAndEliminatedPlayers().size();
     }
 
     private static long determineStartTimestamp(Game game) {
@@ -201,7 +197,8 @@ public class TiglReportService {
                         Map.entry("Weird Wormholes", (Supplier<Boolean>) game::isWeirdWormholesMode),
                         Map.entry("Wild, Wild Galaxy", (Supplier<Boolean>) game::isWildWildGalaxyMode),
                         Map.entry("Call of the Void", (Supplier<Boolean>) game::isCallOfTheVoidMode),
-                        Map.entry("Conventions of War Abandoned", (Supplier<Boolean>) game::isConventionsOfWarAbandonedMode),
+                        Map.entry("Conventions of War Abandoned", (Supplier<Boolean>)
+                                game::isConventionsOfWarAbandonedMode),
                         Map.entry("Advent of the Warsun", (Supplier<Boolean>) game::isAdventOfTheWarsunMode),
                         Map.entry("Civilized Society", (Supplier<Boolean>) game::isCivilizedSocietyMode),
                         Map.entry("Stellar Atomics", (Supplier<Boolean>) game::isStellarAtomicsMode),
