@@ -34,7 +34,7 @@ public class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("resolveEngineer")
     public static void resolveEngineer(Game game, Player player, ButtonInteractionEvent event) {
-        game.setStoredValue("engineerACSplice", "True");
+        game.setStoredValue("engineerACSplice", "take_remove_remove");
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
