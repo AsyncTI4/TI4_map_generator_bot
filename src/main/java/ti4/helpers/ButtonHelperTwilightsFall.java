@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -1248,5 +1249,12 @@ public class ButtonHelperTwilightsFall {
                 game.setStoredValue("savedSpliceCards", game.getStoredValue("savedSpliceCards") + "_" + card);
             }
         }
+    }
+
+    public static void startInauguralSplice(Game game) {
+        // The inaugural splice uses the seating order, so it's set here already
+        Helper.setOrder(game);
+        game.setBagDraft(new InauguralSpliceFrankenDraft(game));
+        FrankenDraftBagService.startDraft(game);
     }
 }

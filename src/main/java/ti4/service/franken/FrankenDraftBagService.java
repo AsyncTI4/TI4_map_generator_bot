@@ -120,13 +120,13 @@ public class FrankenDraftBagService {
 
         if (includeGameSetup) {
             game.setShowMapSetup(true);
-        }
 
-        MessageHelper.sendMessageToChannelWithButtons(
-                game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
-                "Press this button after every player has chosen their components.",
-                List.of(Buttons.green(
-                        "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
+                    "Press this button after every player has chosen their components.",
+                    List.of(Buttons.green(
+                            "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
+        }
     }
 
     private static void setSpeakerOrder(GenericInteractionCreateEvent event, Game game) {

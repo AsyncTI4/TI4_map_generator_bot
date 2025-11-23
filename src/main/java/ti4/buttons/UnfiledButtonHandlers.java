@@ -43,6 +43,7 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperTacticalAction;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
@@ -3820,6 +3821,19 @@ public class UnfiledButtonHandlers {
         } else {
             RevealPublicObjectiveService.revealTwoStage1(game);
         }
+
+        if (game.isTwilightsFallMode()
+                && !game.getStoredValue("needsInauguralSplice").isEmpty()) {
+            game.removeStoredValue("needsInauguralSplice");
+            ButtonHelperTwilightsFall.startInauguralSplice(game);
+        } else {
+            startOfGameStrategyPhase(event, game);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("startOfGameStrategyPhase")
+    public static void startOfGameStrategyPhase(ButtonInteractionEvent event, Game game) {
         StartPhaseService.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);

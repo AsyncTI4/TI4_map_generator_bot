@@ -98,10 +98,7 @@ public class TestData {
     public AndcatReferenceCardsDraftable createAndcatReferenceCardsDraftable() {
         AndcatReferenceCardsDraftable draftable = new AndcatReferenceCardsDraftable();
         draftable.initialize(
-                6,
-                List.of(ComponentSource.base, ComponentSource.pok, ComponentSource.thunders_edge),
-                List.of(),
-                List.of());
+                6, List.of(ComponentSource.base, ComponentSource.pok, ComponentSource.thunders_edge), List.of());
         return draftable;
     }
 

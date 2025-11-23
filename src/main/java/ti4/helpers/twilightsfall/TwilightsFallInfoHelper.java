@@ -28,40 +28,36 @@ public class TwilightsFallInfoHelper {
             throw new IllegalArgumentException("FactionModel cannot be null");
         }
 
+        boolean keleres = faction.getAlias().toLowerCase().contains("keleres");
         StringBuilder setupInfo = new StringBuilder();
-        setupInfo
-                .append(faction.getFactionEmoji())
-                .append(" ")
-                .append(faction.getFactionName())
-                .append(System.lineSeparator());
+
+        // Display name
+        setupInfo.append(faction.getFactionEmoji()).append(" ");
+        if (keleres) {
+            setupInfo.append("The Council Keleres");
+        } else {
+            setupInfo.append(faction.getFactionName());
+        }
+        setupInfo.append(System.lineSeparator());
+
+        // Starting units
         if (includeUnits) {
             setupInfo
                     .append("> Starting Units: ")
                     .append(Helper.getUnitListEmojis(faction.getStartingFleet()))
                     .append(System.lineSeparator());
         }
+
+        // Home system tile
         if (includeSystem) {
-            TileModel homeTile = TileHelper.getTileById(faction.getHomeSystem());
-            String homeAttributes = buildHomeSystemAttributes(homeTile);
-            List<String> planetNames = faction.getHomePlanets();
-            List<PlanetModel> planets = planetNames.stream()
-                    .map(Mapper::getPlanet)
-                    .filter(Objects::nonNull)
-                    .toList();
-            List<String> planetRepresentations =
-                    planets.stream().map(p -> "> - " + buildPlanetString(p)).toList();
-            setupInfo.append("> Home System: ").append(homeAttributes).append(System.lineSeparator());
-            setupInfo
-                    .append(String.join(System.lineSeparator(), planetRepresentations))
-                    .append(System.lineSeparator());
-            List<String> legendaryAbilities = planets.stream()
-                    .filter(PlanetModel::isLegendary)
-                    .map(p -> "**" + p.getShortName() + "**: " + p.getLegendaryAbilityText())
-                    .toList();
-            for (String ability : legendaryAbilities) {
-                setupInfo.append("> ").append(ability).append(System.lineSeparator());
+            if (keleres) {
+                setupInfo.append("> Home System: Random unused home system").append(System.lineSeparator());
+            } else {
+                setupInfo.append(buildHomeSystemString(faction));
             }
         }
+
+        // Priority Number
         if (includePriority) {
             if (faction.getPriorityNumber() != null) {
                 setupInfo
@@ -73,6 +69,32 @@ public class TwilightsFallInfoHelper {
         }
 
         return setupInfo.toString();
+    }
+
+    private static String buildHomeSystemString(FactionModel faction) {
+        StringBuilder homeInfo = new StringBuilder();
+
+        TileModel homeTile = TileHelper.getTileById(faction.getHomeSystem());
+        String homeAttributes = buildHomeSystemAttributes(homeTile);
+        List<String> planetNames = faction.getHomePlanets();
+        List<PlanetModel> planets = planetNames.stream()
+                .map(Mapper::getPlanet)
+                .filter(Objects::nonNull)
+                .toList();
+        List<String> planetRepresentations =
+                planets.stream().map(p -> "> - " + buildPlanetString(p)).toList();
+        homeInfo.append("> Home System: ").append(homeAttributes).append(System.lineSeparator());
+        homeInfo.append(String.join(System.lineSeparator(), planetRepresentations))
+                .append(System.lineSeparator());
+        List<String> legendaryAbilities = planets.stream()
+                .filter(PlanetModel::isLegendary)
+                .map(p -> "**" + p.getShortName() + "**: " + p.getLegendaryAbilityText())
+                .toList();
+        for (String ability : legendaryAbilities) {
+            homeInfo.append("> ").append(ability).append(System.lineSeparator());
+        }
+
+        return homeInfo.toString();
     }
 
     private static String buildHomeSystemAttributes(TileModel homeTile) {
