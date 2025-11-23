@@ -140,9 +140,13 @@ public class WebTileUnitData {
     }
 
     /**
-     * Handles setting commodities (Discordant Stars "CommsOnPlanet") and planetary shields.
+     * Handles setting commodities (Discordant Stars "CommsOnPlanet"), planetary shields, and resources/influence.
      */
     private static void updatePlanetMetadata(Game game, Planet planet, WebTilePlanet planetData) {
+        // Set resources and influence
+        planetData.setResources(planet.getResources());
+        planetData.setInfluence(planet.getInfluence());
+
         // Set commodities count for Discordant Stars comms on planets functionality
         String commsStorageKey = "CommsOnPlanet" + planet.getName();
         if (!game.getStoredValue(commsStorageKey).isEmpty()) {
@@ -330,6 +334,10 @@ public class WebTileUnitData {
 
             // Extract tokens and attachments (no units, no commodities)
             extractTokens(planet, planetData.getEntities(), false);
+
+            // Set resources and influence
+            planetData.setResources(planet.getResources());
+            planetData.setInfluence(planet.getInfluence());
 
             // Set planetary shield status
             planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
