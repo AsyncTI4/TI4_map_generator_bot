@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -5663,7 +5660,7 @@ public class ButtonHelper {
 
             buttons.add(Buttons.green("transitDiodes_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done Resolving Transit Diodes"));
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", use buttons to choose the planet you wish to move troops to.",
@@ -5684,8 +5681,19 @@ public class ButtonHelper {
 
     public static List<Button> getButtonsForMovingGroundForcesToAPlanet(Game game, String planetName, Player player) {
         List<Button> buttons = new ArrayList<>();
+        boolean bioplasmosis = game.getPhaseOfGame().contains("status");
+        Tile destination = game.getTileFromPlanet(planetName);
         for (Tile tile : game.getTileMap().values()) {
+            if (bioplasmosis && destination != null) {
+                if (!FoWHelper.getAdjacentTiles(game, destination.getPosition(), player, false, true)
+                        .contains(tile.getPosition())) {
+                    continue;
+                }
+            }
             for (UnitHolder uH : tile.getUnitHolders().values()) {
+                if (uH.getName().equalsIgnoreCase(planetName)) {
+                    continue;
+                }
                 if (uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
@@ -5694,11 +5702,13 @@ public class ButtonHelper {
                                 "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
-                        buttons.add(Buttons.green(
-                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
-                                        + "_infantry",
-                                "Move Infantry from Space of " + tile.getRepresentation() + " to "
-                                        + Helper.getPlanetRepresentation(planetName, game)));
+                        if (!bioplasmosis) {
+                            buttons.add(Buttons.green(
+                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
+                                            + "_infantry",
+                                    "Move Infantry from Space of " + tile.getRepresentation() + " to "
+                                            + Helper.getPlanetRepresentation(planetName, game)));
+                        }
                     }
                 }
                 if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
@@ -5708,10 +5718,13 @@ public class ButtonHelper {
                                 "Move Mech from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
-                        buttons.add(Buttons.green(
-                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_mech",
-                                "Move Mech from Space of " + tile.getRepresentation() + " to "
-                                        + Helper.getPlanetRepresentation(planetName, game)));
+                        if (!bioplasmosis) {
+                            buttons.add(Buttons.green(
+                                    "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
+                                            + "_mech",
+                                    "Move Mech from Space of " + tile.getRepresentation() + " to "
+                                            + Helper.getPlanetRepresentation(planetName, game)));
+                        }
                     }
                 }
                 if (player.hasUnit("titans_pds") || player.hasTech("ht2")) {

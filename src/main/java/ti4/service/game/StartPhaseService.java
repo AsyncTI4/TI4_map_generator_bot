@@ -659,6 +659,11 @@ public class StartPhaseService {
                     player.getRepresentationUnfogged() + ", you may use these buttons to resolve _Maw Of Worlds_.",
                     ButtonHelper.getMawButtons());
         }
+        if (player.hasTech("bioplasmosis")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), player.getRepresentationUnfogged() + " can resolve Bioplasmosis now");
+            ButtonHelper.resolveTransitDiodesStep1(game, player);
+        }
         if (game.isCustodiansScored() && player.hasTech("dsrohdy")) {
             TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
             MessageHelper.sendMessageToChannel(

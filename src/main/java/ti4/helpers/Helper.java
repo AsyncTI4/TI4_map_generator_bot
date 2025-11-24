@@ -63,6 +63,7 @@ import ti4.model.MapTemplateModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
+import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -643,16 +644,22 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            String techType;
+            String techType = "";
             String techEmoji = "";
             if (Mapper.getPlanet(planetID) != null
                     && Mapper.getPlanet(planetID).getTechSpecialties() != null
                     && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
-                techType = Mapper.getPlanet(planetID)
-                        .getTechSpecialties()
-                        .getFirst()
-                        .toString()
-                        .toLowerCase();
+                if (Mapper.getPlanet(planetID).getTechSpecialties().size() > 1) {
+                    for (TechSpecialty type : Mapper.getPlanet(planetID).getTechSpecialties()) {
+                        techType += type.toString().toLowerCase();
+                    }
+                } else {
+                    techType = Mapper.getPlanet(planetID)
+                            .getTechSpecialties()
+                            .getFirst()
+                            .toString()
+                            .toLowerCase();
+                }
             } else {
                 techType = ButtonHelper.getTechSkipAttachments(game, AliasHandler.resolvePlanet(planetID));
             }
@@ -662,6 +669,19 @@ public class Helper {
                     case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
                     case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
                     case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
+                    case "propulsionpropulsion" -> techEmoji = TechEmojis.PropulsionPropulsion.toString();
+                    case "warfarewarfare" -> techEmoji = TechEmojis.WarfareWarfare.toString();
+                    case "cyberneticcybernetic" -> techEmoji = TechEmojis.CyberneticCybernetic.toString();
+                    case "bioticbiotic" -> techEmoji = TechEmojis.BioticBiotic.toString();
+                    case "warfarepropulsion", "propulsionwarfare" ->
+                        techEmoji = TechEmojis.WarfarePropulsion.toString();
+                    case "cyberneticpropulsion", "propulsioncybernetic" ->
+                        techEmoji = TechEmojis.CyberneticPropulsion.toString();
+                    case "cyberneticwarfare", "warfarecybernetic" ->
+                        techEmoji = TechEmojis.CyberneticWarfare.toString();
+                    case "bioticwarfare", "warfarebiotic" -> techEmoji = TechEmojis.BioticWarfare.toString();
+                    case "bioticcybernetic", "cyberneticbiotic" -> techEmoji = TechEmojis.BioticCybernetic.toString();
+                    case "bioticpropulsion", "propulsionbiotic" -> techEmoji = TechEmojis.BioticPropulsion.toString();
                 }
             }
             return getPlanetRepresentationPlusEmoji(planetID) + " "
@@ -685,15 +705,21 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            String techType;
+            String techType = "";
             String techEmoji = "";
             if (Mapper.getPlanet(planetID).getTechSpecialties() != null
                     && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
-                techType = Mapper.getPlanet(planetID)
-                        .getTechSpecialties()
-                        .getFirst()
-                        .toString()
-                        .toLowerCase();
+                if (Mapper.getPlanet(planetID).getTechSpecialties().size() > 1) {
+                    for (TechSpecialty type : Mapper.getPlanet(planetID).getTechSpecialties()) {
+                        techType += type.toString().toLowerCase();
+                    }
+                } else {
+                    techType = Mapper.getPlanet(planetID)
+                            .getTechSpecialties()
+                            .getFirst()
+                            .toString()
+                            .toLowerCase();
+                }
             } else {
                 techType = ButtonHelper.getTechSkipAttachments(game, planetID);
             }
@@ -703,6 +729,19 @@ public class Helper {
                     case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
                     case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
                     case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
+                    case "propulsionpropulsion" -> techEmoji = TechEmojis.PropulsionPropulsion.toString();
+                    case "warfarewarfare" -> techEmoji = TechEmojis.WarfareWarfare.toString();
+                    case "cyberneticcybernetic" -> techEmoji = TechEmojis.CyberneticCybernetic.toString();
+                    case "bioticbiotic" -> techEmoji = TechEmojis.BioticBiotic.toString();
+                    case "warfarepropulsion", "propulsionwarfare" ->
+                        techEmoji = TechEmojis.WarfarePropulsion.toString();
+                    case "cyberneticpropulsion", "propulsioncybernetic" ->
+                        techEmoji = TechEmojis.CyberneticPropulsion.toString();
+                    case "cyberneticwarfare", "warfarecybernetic" ->
+                        techEmoji = TechEmojis.CyberneticWarfare.toString();
+                    case "bioticwarfare", "warfarebiotic" -> techEmoji = TechEmojis.BioticWarfare.toString();
+                    case "bioticcybernetic", "cyberneticbiotic" -> techEmoji = TechEmojis.BioticCybernetic.toString();
+                    case "bioticpropulsion", "propulsionbiotic" -> techEmoji = TechEmojis.BioticPropulsion.toString();
                 }
             }
             return getPlanetRepresentationPlusEmoji(planetID) + " "
@@ -814,18 +853,24 @@ public class Helper {
                 planetButtons.add(button);
                 continue;
             }
-            String techType;
+            String techType = "";
             if (Mapper.getPlanet(planet).getTechSpecialties() != null
                     && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty()) {
-                techType = Mapper.getPlanet(planet)
-                        .getTechSpecialties()
-                        .getFirst()
-                        .toString()
-                        .toLowerCase();
+                if (Mapper.getPlanet(planet).getTechSpecialties().size() > 1) {
+                    for (TechSpecialty type : Mapper.getPlanet(planet).getTechSpecialties()) {
+                        techType += type.toString().toLowerCase();
+                    }
+                } else {
+                    techType = Mapper.getPlanet(planet)
+                            .getTechSpecialties()
+                            .getFirst()
+                            .toString()
+                            .toLowerCase();
+                }
             } else {
                 techType = ButtonHelper.getTechSkipAttachments(game, planet);
             }
-            if ("none".equalsIgnoreCase(techType)) {
+            if ("none".equalsIgnoreCase(techType) || "".equalsIgnoreCase(techType)) {
                 Button button =
                         Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
                 planetButtons.add(button);
@@ -837,6 +882,22 @@ public class Helper {
                     case "warfare" -> techB = techB.withEmoji(TechEmojis.WarfareTech.asEmoji());
                     case "cybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticTech.asEmoji());
                     case "biotic" -> techB = techB.withEmoji(TechEmojis.BioticTech.asEmoji());
+                    case "propulsionpropulsion" -> techB = techB.withEmoji(TechEmojis.PropulsionPropulsion.asEmoji());
+                    case "warfarewarfare" -> techB = techB.withEmoji(TechEmojis.WarfareWarfare.asEmoji());
+                    case "cyberneticcybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticCybernetic.asEmoji());
+                    case "bioticbiotic" -> techB = techB.withEmoji(TechEmojis.BioticBiotic.asEmoji());
+                    case "warfarepropulsion", "propulsionwarfare" ->
+                        techB = techB.withEmoji(TechEmojis.WarfarePropulsion.asEmoji());
+                    case "cyberneticpropulsion", "propulsioncybernetic" ->
+                        techB = techB.withEmoji(TechEmojis.CyberneticPropulsion.asEmoji());
+                    case "cyberneticwarfare", "warfarecybernetic" ->
+                        techB = techB.withEmoji(TechEmojis.CyberneticWarfare.asEmoji());
+                    case "bioticwarfare", "warfarebiotic" ->
+                        techB = techB.withEmoji(TechEmojis.BioticWarfare.asEmoji());
+                    case "bioticcybernetic", "cyberneticbiotic" ->
+                        techB = techB.withEmoji(TechEmojis.BioticCybernetic.asEmoji());
+                    case "bioticpropulsion", "propulsionbiotic" ->
+                        techB = techB.withEmoji(TechEmojis.BioticPropulsion.asEmoji());
                 }
                 planetButtons.add(techB);
             }
@@ -883,6 +944,10 @@ public class Helper {
                 continue;
             }
             if (game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
+                continue;
+            }
+            if (game.getUnitHolderFromPlanet(planet) == null
+                    || game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 continue;
             }
             String id = player.finChecker() + prefix + "_" + unit + "_" + planet;
@@ -2180,7 +2245,11 @@ public class Helper {
                         continue;
                     }
                 }
-                if ("tacticalAction".equalsIgnoreCase(warfareNOtherstuff)
+                if (planet.isSpaceStation()) {
+                    continue;
+                }
+                if (("tacticalAction".equalsIgnoreCase(warfareNOtherstuff)
+                                || "warfare".equalsIgnoreCase(warfareNOtherstuff))
                         && getProductionValueOfUnitHolder(player, game, tile, unitHolder) == 0
                         && getProductionValueOfUnitHolder(
                                         player,
@@ -2190,6 +2259,7 @@ public class Helper {
                                 == 0) {
                     continue;
                 }
+
                 if (warfareNOtherstuff.contains("integrated")
                         && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
                     continue;

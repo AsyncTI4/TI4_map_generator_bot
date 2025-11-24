@@ -38,7 +38,8 @@ class Undo extends GameStateSubcommand {
 
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Undo failed - Must confirm with YES");
+            MessageHelper.replyToMessage(
+                    event, "Undo failed - Must confirm with YES (case sensitive/full uppercase YES)");
             return;
         }
 
