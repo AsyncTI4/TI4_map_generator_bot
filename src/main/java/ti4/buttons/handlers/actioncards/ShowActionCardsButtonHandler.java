@@ -18,4 +18,9 @@ class ShowActionCardsButtonHandler {
     public static void showDiscardFullText(GenericInteractionCreateEvent event, Game game) {
         ShowActionCardsService.showDiscard(game, event, true);
     }
+
+    @ButtonHandler(value = "ACShowUnplayedFullText", save = false)
+    public static void showUnplayedFullText(GenericInteractionCreateEvent event, Game game) {
+        ShowActionCardsService.showUnplayedACs(game, event, true);
+    }
 }
