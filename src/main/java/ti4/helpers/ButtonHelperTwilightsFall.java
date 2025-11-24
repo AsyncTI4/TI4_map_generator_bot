@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -306,10 +307,15 @@ public class ButtonHelperTwilightsFall {
             Collections.reverse(participants);
             Collections.rotate(participants, 1);
         }
-        if (!game.getStoredValue("engineerACSplice").isEmpty()) {
-            participants.addFirst(startPlayer);
-            participants.addFirst(startPlayer);
-            game.removeStoredValue("engineerACSplice");
+        {
+            String engineerACSplice = game.getStoredValue("engineerACSplice");
+            if ("take_remove_remove".equals(engineerACSplice)) {
+                participants.addFirst(startPlayer);
+                participants.addFirst(startPlayer);
+            } else if (!engineerACSplice.isEmpty()) {
+                // Cleans up any dirty values left over from e.g. playing Engineer without finishing the splice
+                game.removeStoredValue("engineerACSplice");
+            }
         }
         if (!game.getStoredValue("paid6ForSplice").isEmpty()) {
             participants.add(startPlayer);
@@ -321,7 +327,6 @@ public class ButtonHelperTwilightsFall {
             game.removeStoredValue("researchagentSplice");
         }
         game.removeStoredValue("savedParticipants");
-        game.removeStoredValue("lastSplicer");
         setNewSpliceCards(game, spliceType, size);
 
         for (Player p : participants) {
@@ -364,8 +369,7 @@ public class ButtonHelperTwilightsFall {
         List<Button> buttons = getSpliceButtons(game, type, cards, player);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
         String msg = player.getRepresentation() + " Select a card to splice into your faction:";
-        String lastSplicer = game.getStoredValue("lastSplicer");
-        if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
+        if (game.getStoredValue("engineerACSplice").startsWith("remove")) {
             msg = player.getRepresentation() + " select a card to remove from the splice:";
         }
         if (player.isNpc()) {
@@ -537,7 +541,16 @@ public class ButtonHelperTwilightsFall {
     @ButtonHandler("selectASpliceCard_")
     public static void selectASpliceCard(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String cardID = buttonID.split("_")[1];
-        String lastSplicer = game.getStoredValue("lastSplicer");
+        boolean remove;
+        {
+            String[] engineerACSplice = game.getStoredValue("engineerACSplice").split("_", 2);
+            if (engineerACSplice.length > 1) {
+                game.setStoredValue("engineerACSplice", engineerACSplice[1]);
+            } else {
+                game.removeStoredValue("engineerACSplice");
+            }
+            remove = "remove".equals(engineerACSplice[0]);
+        }
         String type = game.getStoredValue("spliceType");
         if ("antimatter".equalsIgnoreCase(cardID) || "wavelength".equalsIgnoreCase(cardID)) {
             player.addTech(cardID);
@@ -559,7 +572,7 @@ public class ButtonHelperTwilightsFall {
                         "savedSpliceCards",
                         game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
             }
-            if (lastSplicer.equalsIgnoreCase(player.getFaction())) {
+            if (remove) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has removed a spliced card from the draft");
@@ -616,7 +629,6 @@ public class ButtonHelperTwilightsFall {
         participants.remove(player);
         game.removeStoredValue("savedParticipants");
         if (!participants.isEmpty()) {
-            game.setStoredValue("lastSplicer", player.getFaction());
             sendPlayerSpliceOptions(game, participants.getFirst());
             for (Player p : participants) {
                 if (game.getStoredValue("savedParticipants").isEmpty()) {
@@ -627,7 +639,6 @@ public class ButtonHelperTwilightsFall {
                 }
             }
         } else {
-            game.removeStoredValue("lastSplicer");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), game.getPing() + " The splice is complete.");
             if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                 Player p2 = game.getActivePlayer();
@@ -870,14 +881,15 @@ public class ButtonHelperTwilightsFall {
                         Mapper.getUnit(card).getUnitEmoji()));
             }
         }
-        String lastSplicer = game.getStoredValue("lastSplicer");
-        if (!player.hasTech("wavelength") && !lastSplicer.equalsIgnoreCase(player.getFaction())) {
-            buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "selectASpliceCard_wavelength", "Select Wavelength"));
-        }
-        if (!player.hasTech("antimatter") && !lastSplicer.equalsIgnoreCase(player.getFaction())) {
-            buttons.add(Buttons.green(
-                    player.getFinsFactionCheckerPrefix() + "selectASpliceCard_antimatter", "Select Antimatter"));
+        if (!game.getStoredValue("engineerACSplice").startsWith("remove")) {
+            if (!player.hasTech("wavelength")) {
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_wavelength", "Select Wavelength"));
+            }
+            if (!player.hasTech("antimatter")) {
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_antimatter", "Select Antimatter"));
+            }
         }
         return buttons;
     }
@@ -1248,5 +1260,12 @@ public class ButtonHelperTwilightsFall {
                 game.setStoredValue("savedSpliceCards", game.getStoredValue("savedSpliceCards") + "_" + card);
             }
         }
+    }
+
+    public static void startInauguralSplice(Game game) {
+        // The inaugural splice uses the seating order, so it's set here already
+        Helper.setOrder(game);
+        game.setBagDraft(new InauguralSpliceFrankenDraft(game));
+        FrankenDraftBagService.startDraft(game);
     }
 }

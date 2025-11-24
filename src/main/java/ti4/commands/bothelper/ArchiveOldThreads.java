@@ -2,12 +2,10 @@ package ti4.commands.bothelper;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Comparator;
 import java.util.List;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.TimeUtil;
@@ -22,35 +20,41 @@ class ArchiveOldThreads extends Subcommand {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
         addOptions(
                 new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)")
-                        .setRequired(true));
+                        .setRequired(true),
+                new OptionData(
+                                OptionType.BOOLEAN,
+                                "dry_run",
+                                "If true, will only list the threads without archiving them. Default is true.")
+                        .setRequired(false));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        int threadCount = event.getOption(Constants.THREAD_COUNT).getAsInt();
+        int threadCount = event.getOption(Constants.THREAD_COUNT, 1, OptionMapping::getAsInt);
         if (threadCount < 1 || threadCount > 1000) {
             MessageHelper.sendMessageToEventChannel(event, "Please choose a number between 1 and 1000");
             return;
         }
-        MessageHelper.sendMessageToEventChannel(event, "Archiving " + threadCount + " threads");
-        MessageHelper.sendMessageToEventChannel(event, getOldThreadsMessage(event.getGuild(), threadCount));
 
-        ThreadArchiveHelper.archiveOldThreads(event.getGuild(), threadCount);
+        boolean dryRun = event.getOption("dry_run", true, OptionMapping::getAsBoolean);
+        if (dryRun) {
+            List<ThreadChannel> threadChannels =
+                    ThreadArchiveHelper.archiveOldThreads(event.getGuild(), threadCount, true);
+            MessageHelper.sendMessageToEventChannel(event, getOldThreadsMessage(threadChannels));
+            MessageHelper.sendMessageToEventChannel(event, "Dry run complete. No threads were archived.");
+            return;
+        }
+
+        List<ThreadChannel> threadChannels = ThreadArchiveHelper.archiveOldThreads(event.getGuild(), threadCount);
+        MessageHelper.sendMessageToEventChannel(event, getOldThreadsMessage(threadChannels));
+        MessageHelper.sendMessageToEventChannel(event, "Archiving all " + threadCount + " threads shown above.");
     }
 
-    private static String getOldThreadsMessage(Guild guild, Integer channelCount) {
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
-        threadChannels = threadChannels.stream()
-                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
-                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                .limit(channelCount)
-                .toList();
-
-        StringBuilder sb = new StringBuilder("Least Active Threads:\n");
+    private static String getOldThreadsMessage(List<ThreadChannel> threadChannels) {
+        StringBuilder sb = new StringBuilder("## __Least Active Threads:__\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
-            Duration duration = Duration.between(
-                    latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `")
+            Duration duration = Duration.between(latestActivityTime, OffsetDateTime.now());
+            sb.append("- `")
                     .append(latestActivityTime)
                     .append(" (")
                     .append(duration.toHours())

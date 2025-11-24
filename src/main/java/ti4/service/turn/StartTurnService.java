@@ -327,7 +327,7 @@ public class StartTurnService {
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
             if (game.getStrategyCardModelByInitiative(sc)
-                    .map(strat -> strat.getAlias().equals("te6warfare"))
+                    .map(strat -> "te6warfare".equals(strat.getAlias()))
                     .orElse(false)) {
                 if (game.isWarfareAction() && !game.isComponentAction()) {
                     // skip warning for warfare if we are presently resolving warfare

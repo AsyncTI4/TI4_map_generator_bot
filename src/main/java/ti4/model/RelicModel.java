@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,9 +36,8 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getSimpleRepresentation(boolean includeCardText) {
-        if (includeCardText)
-            return getSource().emoji() + String.format("_%s_ - %s (%s)", getName(), getText(), getSource());
-        return getSource().emoji() + String.format("_%s_", getName());
+        if (includeCardText) return source.emoji() + String.format("_%s_ - %s (%s)", name, text, source);
+        return source.emoji() + String.format("_%s_", name);
     }
 
     /**

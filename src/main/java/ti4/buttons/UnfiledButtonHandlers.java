@@ -43,6 +43,7 @@ import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperTacticalAction;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
@@ -1787,7 +1788,11 @@ public class UnfiledButtonHandlers {
     public static void retreat(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.split("_")[1];
         boolean skilled = false;
+        boolean feint = false;
         if (buttonID.contains("skilled")) {
+            if (game.isTwilightsFallMode()) {
+                feint = true;
+            }
             skilled = true;
             ButtonHelper.deleteMessage(event);
         }
@@ -1806,16 +1811,15 @@ public class UnfiledButtonHandlers {
             }
             skilled = true;
         }
-        String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
-        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled)
-                .isEmpty()) {
-            message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
+        {
+            String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
+            List<Button> retreatButtons =
+                    ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
+            if (retreatButtons.isEmpty()) {
+                message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
+            }
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                message,
-                ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled));
-
         if (game.getTileByPosition(pos).isGravityRift()
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {
@@ -2884,7 +2888,7 @@ public class UnfiledButtonHandlers {
                     player.getRepresentation() + ", a reminder that you are at the command token limit right now,"
                             + " so may need to pull a command token off your command sheet in order to retreat (unless you retreat to a system that already has one).");
         }
-        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, game.getActiveSystem(), false)
+        if (ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, game.getActiveSystem(), false, false)
                 .isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "## However, there are no valid systems to retreat to!");
@@ -3820,6 +3824,19 @@ public class UnfiledButtonHandlers {
         } else {
             RevealPublicObjectiveService.revealTwoStage1(game);
         }
+
+        if (game.isTwilightsFallMode()
+                && !game.getStoredValue("needsInauguralSplice").isEmpty()) {
+            game.removeStoredValue("needsInauguralSplice");
+            ButtonHelperTwilightsFall.startInauguralSplice(game);
+        } else {
+            startOfGameStrategyPhase(event, game);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("startOfGameStrategyPhase")
+    public static void startOfGameStrategyPhase(ButtonInteractionEvent event, Game game) {
         StartPhaseService.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);

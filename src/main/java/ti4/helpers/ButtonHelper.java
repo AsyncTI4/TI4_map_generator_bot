@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Data;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
@@ -129,6 +133,7 @@ import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
 
+@UtilityClass
 public class ButtonHelper {
 
     public static List<Tile> getTilesOfPlayersSpecificUnits(Game game, Player p1, Units.UnitType... type) {
@@ -3337,7 +3342,7 @@ public class ButtonHelper {
             if (planetReal != null
                     && isNotBlank(planetReal.getOriginalPlanetType())
                     && !player.getExhaustedPlanets().contains(planetReal.getName())) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, true);
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, true, false);
                 buttons.addAll(planetButtons);
             }
         }
@@ -5322,7 +5327,7 @@ public class ButtonHelper {
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
             if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, false, true);
                 buttons.addAll(planetButtons);
             }
         }
@@ -5367,11 +5372,11 @@ public class ButtonHelper {
     }
 
     public static List<Button> getPlanetExplorationButtons(Game game, Planet planet, Player player) {
-        return getPlanetExplorationButtons(game, planet, player, false);
+        return getPlanetExplorationButtons(game, planet, player, false, false);
     }
 
     private static List<Button> getPlanetExplorationButtons(
-            Game game, Planet planet, Player player, boolean impressment) {
+            Game game, Planet planet, Player player, boolean impressment, boolean scanlink) {
         if (planet == null || game == null) return null;
 
         String planetId = planet.getName();
@@ -5389,12 +5394,9 @@ public class ButtonHelper {
 
         for (String trait : explorationTraits) {
             if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
+                String source = impressment ? "dsdihmy_" : (scanlink ? "scanlink_" : "filler_");
                 String buttonId =
-                        player.getFinsFactionCheckerPrefix() + "movedNExplored_filler_" + planetId + "_" + trait;
-                if (impressment) {
-                    buttonId =
-                            player.getFinsFactionCheckerPrefix() + "movedNExplored_dsdihmy_" + planetId + "_" + trait;
-                }
+                        player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId + "_" + trait;
                 String buttonMessage =
                         "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
                 buttons.add(Buttons.gray(buttonId, buttonMessage, ExploreEmojis.getTraitEmoji(trait)));
@@ -7525,7 +7527,7 @@ public class ButtonHelper {
         return false;
     }
 
-    public static boolean shouldConfirmPrePass(
+    private static boolean shouldConfirmPrePass(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String whatToPreset = buttonID.split("_")[1];
         boolean confirmed = buttonID.endsWith("_confirm");
@@ -7535,9 +7537,9 @@ public class ButtonHelper {
         return false;
     }
 
-    public static void sendConfirmPrePass(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private static void sendConfirmPrePass(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Button btn = event.getButton()
-                .withId(buttonID + "_confirm")
+                .withCustomId(buttonID + "_confirm")
                 .withLabel("Confirm " + event.getButton().getLabel());
         StringBuilder message = new StringBuilder(
                 player.getRepresentation()

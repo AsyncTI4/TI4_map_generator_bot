@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
@@ -79,6 +80,7 @@ import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.fow.LoreService;
@@ -569,6 +571,7 @@ public class Player extends PlayerProperties {
 
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
         List<ThreadChannel> hiddenThreadChannels = new ArrayList<>();
+        List<ThreadChannel> allActiveChannels = new ArrayList<>();
 
         // ATTEMPT TO FIND BY ID
         try {
@@ -589,9 +592,9 @@ public class Player extends PlayerProperties {
                 }
 
                 // SEARCH FOR EXISTING ACTIVE THREAD
-                hiddenThreadChannels =
+                allActiveChannels =
                         actionsChannel.getGuild().retrieveActiveThreads().complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                for (ThreadChannel threadChannel_ : allActiveChannels) {
                     if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
@@ -636,9 +639,11 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING ACTIVE THREAD
-            hiddenThreadChannels =
-                    actionsChannel.getGuild().retrieveActiveThreads().complete();
-            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+            if (allActiveChannels.isEmpty()) {
+                allActiveChannels =
+                        actionsChannel.getGuild().retrieveActiveThreads().complete();
+            }
+            for (ThreadChannel threadChannel_ : allActiveChannels) {
                 if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;
@@ -646,9 +651,10 @@ public class Player extends PlayerProperties {
             }
 
             // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            if (hiddenThreadChannels.isEmpty())
+            if (hiddenThreadChannels.isEmpty()) {
                 hiddenThreadChannels =
                         actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            }
             for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                 if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
@@ -671,10 +677,10 @@ public class Player extends PlayerProperties {
         if (isPrivateChannel) {
             threadAction = threadAction.setInvitable(false);
         }
-        String message = "Hello " + getPing() + "! This is your private channel.";
         ThreadChannel threadChannel = threadAction.complete();
-        setCardsInfoThreadID(threadChannel.getId());
+        String message = "Hello " + getPing() + "! This is your private channel.";
         MessageHelper.sendMessageToChannel(threadChannel, message);
+        setCardsInfoThreadID(threadChannel.getId());
         return threadChannel;
     }
 
@@ -1094,10 +1100,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public int getMaxSOCount() {
         int maxSOCount = game.getMaxSOCountPerPlayer();
-        if (hasRelic("obsidian")) maxSOCount++;
-        if (hasRelic("absol_obsidian")) maxSOCount++;
-        if (hasAbility("information_brokers")) maxSOCount++;
-        return maxSOCount;
+        int bonus = 0;
+        if (hasRelic("obsidian")) bonus++;
+        if (hasRelic("absol_obsidian")) bonus++;
+        if (hasAbility("information_brokers")) bonus++;
+        return maxSOCount + Math.max(bonus, getBonusScoredSecrets());
     }
 
     public Map<String, Integer> getSecrets() {
@@ -1536,6 +1543,7 @@ public class Player extends PlayerProperties {
     public String getFactionEmoji() {
         String emoji = null;
         if (StringUtils.isNotBlank(super.getFactionEmoji()) && !"null".equals(super.getFactionEmoji())) {
+            cleanupFactionEmoji();
             emoji = super.getFactionEmoji();
         }
         if (emoji == null && getFactionModel() != null) {
@@ -1544,6 +1552,17 @@ public class Player extends PlayerProperties {
         return emoji != null
                 ? emoji
                 : FactionEmojis.getFactionIcon(getFaction()).toString();
+    }
+
+    private void cleanupFactionEmoji() {
+        String emoji = super.getFactionEmoji();
+        if (StringUtils.isNotBlank(emoji) && !"null".equals(emoji)) {
+            Emoji e = Emoji.fromFormatted(emoji);
+            TI4Emoji repl = TI4Emoji.findEmojiFromJustName(e.getName());
+            if (repl != null) {
+                setFactionEmoji(repl.emojiString());
+            }
+        }
     }
 
     @JsonIgnore

@@ -41,13 +41,10 @@ public class HeartOfIxthService {
     public List<Button> makeHeartOfIxthButtons(Game game, Player rollingPlayer, Button good, Button bad, Die result) {
         if (rollingPlayer == null) return null;
         List<Button> buttons = new ArrayList<>();
-        Player heart = HeartOfIxthService.getHeartOfIxthPlayer(game, false);
+        Player heart = getHeartOfIxthPlayer(game, false);
 
-        boolean blockForFog = false;
-        if (!rollingPlayer.is(heart) && game.isFowMode()) {
-            // For now, not sure how to handle this in FoW unless the "player rolling" also has heart
-            blockForFog = true;
-        }
+        boolean blockForFog = !rollingPlayer.is(heart) && game.isFowMode();
+        // For now, not sure how to handle this in FoW unless the "player rolling" also has heart
 
         if (heart == null || !result.eligibleForHeart() || blockForFog) {
             if (result.isSuccess()) buttons.add(good);
@@ -94,7 +91,7 @@ public class HeartOfIxthService {
 
     public boolean waitForHeartToResolve(ButtonInteractionEvent event, Game game, Player player) {
         boolean wait = false;
-        for (Button b : event.getMessage().getButtons()) {
+        for (Button b : event.getMessage().getComponentTree().findAll(Button.class)) {
             if (b.getCustomId().contains("exhaustHeartOfIxth")) wait = true;
             if (b.getCustomId().contains("declineHeartOfIxth")) wait = true;
         }
@@ -110,7 +107,7 @@ public class HeartOfIxthService {
     }
 
     private List<Button> getButtonsAfterUsingHeart(ButtonInteractionEvent event, boolean used) {
-        List<Button> originalButtons = event.getMessage().getButtons();
+        List<Button> originalButtons = event.getMessage().getComponentTree().findAll(Button.class);
         List<Button> newButtons = new ArrayList<>();
         for (Button button : originalButtons) {
             // get rid of the exhaust/decline buttons

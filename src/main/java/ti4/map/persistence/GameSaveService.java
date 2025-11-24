@@ -75,7 +75,7 @@ class GameSaveService {
 
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Could not save map: " + game.getName(), e);
+            BotLogger.critical(new LogOrigin(game), "Could not save map: " + game.getName(), e);
             MessageHelper.sendMessageToChannel(
                     game.getActionsChannel(), "Failed to save the game during the last command.");
             return false;
@@ -892,6 +892,7 @@ class GameSaveService {
 
             writer.write(Constants.TOTAL_EXPENSES + " " + player.getTotalExpenses());
             writer.write(System.lineSeparator());
+            writeIntLine(writer, Constants.BONUS_SCORED_SECRETS, player.getBonusScoredSecrets());
 
             writer.write(Constants.TURN_COUNT + " " + player.getInRoundTurnCount());
             writer.write(System.lineSeparator());

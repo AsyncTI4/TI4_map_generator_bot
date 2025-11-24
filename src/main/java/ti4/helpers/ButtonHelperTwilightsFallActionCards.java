@@ -34,7 +34,7 @@ public class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("resolveEngineer")
     public static void resolveEngineer(Game game, Player player, ButtonInteractionEvent event) {
-        game.setStoredValue("engineerACSplice", "True");
+        game.setStoredValue("engineerACSplice", "take_remove_remove");
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
@@ -193,7 +193,8 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String relic = buttonID.split("_")[2];
         p2.removeRelic(relic);
-        String msg = player.getRepresentation() + " choose to unravel "
+        RelicHelper.resolveRelicLossEffects(event, game, player, relic);
+        String msg = player.getRepresentation() + " chose to unravel "
                 + Mapper.getRelic(relic).getName() + " owned by " + p2.getRepresentation();
         if (p2 == player) {
             if (!FractureService.isFractureInPlay(game)) {

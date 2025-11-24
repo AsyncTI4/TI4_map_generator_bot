@@ -102,7 +102,7 @@ public class GameStatisticsUploadService {
 
         long fileSize = Files.size(tempFile);
         String msg = String.format(
-                "# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
+                "# Uploading statistics to S3 (%.2f MB)... \nOut of %,d eligible games, %,d games are being uploaded.",
                 fileSize / (1024.0d * 1024.0d), eligible, uploaded);
         if (eligible != uploaded) {
             msg += "\nBad games (first 10):\n- "

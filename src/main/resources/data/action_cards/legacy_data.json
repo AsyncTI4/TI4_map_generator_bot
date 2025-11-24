@@ -1326,7 +1326,7 @@
         "window": "ACTION",
         "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
         "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
-        "source": "action_deck_2"
+        "source": "deprecated"
     },
     {
         "alias": "armament_rider",
@@ -1392,15 +1392,6 @@
         "source": "deprecated"
     },
     {
-        "alias": "strategic_aid",
-        "name": "Strategic Aid",
-        "phase": "Action",
-        "window": "When you perform a strategic action",
-        "text": "Choose up to 2 other players. During this strategic action, those players may spend command tokens from their reinforcements instead of their strategy pool.",
-        "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
-        "source": "deprecated"
-    },
-    {
         "alias": "classified_weapons_acd2",
         "name": "Classified Weapons",
         "phase": "Action",
@@ -1452,6 +1443,51 @@
         "window": "After an agenda is revealed",
         "text": "Place 1 infantry from your reinforcements into coexistence on a non-home planet controlled by another player and exhaust each planet in its system.",
         "flavorText": "The pageantry and endless bandying of crooked words with these uncertain allies was yet another of their schemes.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "rapid_fulfillment",
+        "name": "Rapid Fulfillment",
+        "phase": "Action",
+        "window": "After a player activates a system that contains your units",
+        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less. [Note: This transaction does not require you to be neighbors or count towards your transaction limit.]",
+        "flavorText": "\"Money can't buy true happiness, huh?\" Tai said smugly as he appraised their new ship.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "hijacked_signal",
+        "name": "Hijacked Signal",
+        "phase": "Any",
+        "window": "After you resolve the secondary ability of another player's strategy card",
+        "text": "Place 1 command token from that player's reinforcements in any non-home system.",
+        "flavorText": "The Hacan paid heavily to contain the breach. 2RAM identified the culprit as Acidos and warned them that the worst was yet to come.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "proclamation",
+        "name": "Proclamation",
+        "phase": "Any",
+        "window": "When a public objective is revealed",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
+        "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "corruption_legacy",
+        "name": "Corruption",
+        "phase": "Any",
+        "window": "When a public objective is revealed",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
+        "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "corruption_acd2",
+        "name": "Corruption",
+        "phase": "Any",
+        "window": "When a public objective is revealed",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
+        "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "deprecated"
     }
 ]

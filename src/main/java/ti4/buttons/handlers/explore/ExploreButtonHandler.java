@@ -63,8 +63,8 @@ class ExploreButtonHandler {
                     "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
             return;
         }
-        AddUnitService.addUnits(
-                event, TileHelper.getTile(event, planetName, game), game, player.getColor(), "mech " + planetName);
+        Tile tile = TileHelper.getTile(event, planetName, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null
                 ? "`error?`"
                 : Mapper.getPlanet(planetName).getName();
@@ -76,6 +76,9 @@ class ExploreButtonHandler {
                     player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     @ButtonHandler("resolveVolatileMech_")
@@ -458,10 +461,11 @@ class ExploreButtonHandler {
     static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = bID.startsWith("dsdihmy_");
+        boolean scanlink = bID.startsWith("scanlink_");
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
         ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
+                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(
