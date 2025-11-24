@@ -1,5 +1,7 @@
 package ti4.service.tigl;
 
+import static ti4.helpers.Constants.TIGL_FRACTURED_TAG;
+
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -162,7 +164,7 @@ public class TiglReportService {
 
     private static String determineLeague(Game game) {
         List<String> tags = Optional.ofNullable(game.getTags()).orElse(List.of());
-        boolean hasFracturedTag = tags.stream().anyMatch("fractured"::equalsIgnoreCase);
+        boolean hasFracturedTag = tags.stream().anyMatch(TIGL_FRACTURED_TAG::equals);
         return hasFracturedTag ? "Fractured" : "ThundersEdge";
     }
 
