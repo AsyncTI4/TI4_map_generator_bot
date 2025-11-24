@@ -404,7 +404,7 @@ public class Mapper {
 
     public static ActionCardModel getActionCard(String id) {
         if (isBlank(id)) {
-            return null;
+            throw new IllegalArgumentException("AC id cannot be blank.");
         }
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
