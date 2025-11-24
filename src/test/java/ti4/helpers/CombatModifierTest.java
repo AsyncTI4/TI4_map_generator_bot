@@ -47,7 +47,7 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     @Test
-    public void testWinnuCombatMods() {
+    void testWinnuCombatMods() {
         Tile mecatol = new Tile("112", getNextPosition());
         testGame.setTile(mecatol);
         mecatol.addUnit("space", Units.getUnitKey(UnitType.Flagship, winnu.getColorID()), 1);
@@ -63,7 +63,7 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     @Test
-    public void testBastionCombatMods() {
+    void testBastionCombatMods() {
         Tile t = new Tile("92", getNextPosition());
         testGame.setTile(t);
         t.addUnit("space", Units.getUnitKey(UnitType.Flagship, bastion.getColorID()), 1);
@@ -80,7 +80,7 @@ public class CombatModifierTest extends BaseTi4Test {
 
     @Test
     @Disabled("Doesn't work")
-    public void testLetnevCombatMods() {
+    void testLetnevCombatMods() {
         Tile arcprime = new Tile("10", getNextPosition());
         testGame.setTile(arcprime);
         arcprime.addUnit("space", Units.getUnitKey(UnitType.Flagship, letnev.getColorID()), 1);
