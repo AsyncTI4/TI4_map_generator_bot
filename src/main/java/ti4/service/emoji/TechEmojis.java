@@ -3,21 +3,31 @@ package ti4.service.emoji;
 import org.jetbrains.annotations.NotNull;
 
 public enum TechEmojis implements TI4Emoji {
+    PropulsionPropulsion,
     PropulsionTech,
     PropulsionDisabled,
     Propulsion2,
     Propulsion3,
 
+    BioticBiotic,
+    BioticPropulsion,
+    BioticWarfare,
+    BioticCybernetic,
     BioticTech,
     BioticDisabled,
     Biotic2,
     Biotic3,
 
+    CyberneticWarfare,
+    CyberneticPropulsion,
+    CyberneticCybernetic,
     CyberneticTech,
     CyberneticDisabled,
     Cybernetic2,
     Cybernetic3,
 
+    WarfarePropulsion,
+    WarfareWarfare,
     WarfareTech,
     WarfareDisabled,
     Warfare2,
