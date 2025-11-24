@@ -490,7 +490,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -505,7 +505,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -520,7 +520,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -535,7 +535,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -550,7 +550,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
