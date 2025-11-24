@@ -1,6 +1,7 @@
 package ti4.commands.tokens;
 
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -37,7 +38,7 @@ public class RemoveAllCC extends GameStateCommand {
                 tile.removeAllCC();
             }
         } else {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
         }
     }
 }

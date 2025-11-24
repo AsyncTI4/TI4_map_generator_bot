@@ -28,7 +28,7 @@ class InitTspmap extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         if (!"YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
             return;
         }
 
