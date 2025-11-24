@@ -59,7 +59,7 @@ public class SleeperTokenHelper {
     }
 
     @ButtonHandler("selectPlayerToSleeper")
-    public static void selectPlayerToSleeper(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void selectPlayerToSleeper(ButtonInteractionEvent event, Game game, Player player) {
         String msg =
                 "Choose the player who owns the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
         List<Button> buttons = new ArrayList<>();
@@ -74,7 +74,7 @@ public class SleeperTokenHelper {
     }
 
     @ButtonHandler("addSleeperViaBt_")
-    public static void addSleeperViaBt(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void addSleeperViaBt(String buttonID, ButtonInteractionEvent event, Game game) {
         String msg =
                 "Choose the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
         List<Button> buttons = new ArrayList<>();
