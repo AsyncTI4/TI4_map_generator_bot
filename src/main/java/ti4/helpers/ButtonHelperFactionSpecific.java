@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2009,7 +2011,7 @@ public class ButtonHelperFactionSpecific {
 
         int amount = 0;
         for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
-            if (unit.equalsIgnoreCase("infantry")) {
+            if ("infantry".equalsIgnoreCase(unit)) {
                 amount = Math.max(amount, unitHolder.getUnitCount(UnitType.Infantry, player));
             } else {
                 amount = Math.max(unitHolder.getUnitCount(UnitType.Fighter, player), amount);

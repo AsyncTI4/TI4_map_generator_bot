@@ -653,9 +653,7 @@ public class ButtonHelperActionCards {
                     player.setActualHits(player.getActualHits() + totalHits);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
                     uH.removeUnit(key, hitRolls);
-                    if (hitRolls > 0
-                            && key.getUnitType().equals(UnitType.Mech)
-                            && player_.hasActiveBreakthrough("naazbt")) {
+                    if (hitRolls > 0 && key.getUnitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
                         BreakthroughCommandHelper.deactivateBreakthrough(player_);
                     }
                 }
@@ -1098,6 +1096,9 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
         CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
+        if (tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     @ButtonHandler("probeStep2_")

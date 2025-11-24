@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.RelicHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -20,6 +19,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.relic.NeuraloopService;
 
 @UtilityClass
 public class RevealPublicObjectiveService {
@@ -39,7 +39,7 @@ public class RevealPublicObjectiveService {
         }
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
+        NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
         var channel = game.getActionsChannel();
         if (game.isLiberationC4Mode()) {
             if (game.getRevealedPublicObjectives().get("Control Ordinian") == null
@@ -110,8 +110,8 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
 
-        RelicHelper.offerInitialNeuraLoopChoice(game, objective1.getKey());
-        RelicHelper.offerInitialNeuraLoopChoice(game, objective2.getKey());
+        NeuraloopService.offerInitialNeuraloopChoice(game, objective1.getKey());
+        NeuraloopService.offerInitialNeuraloopChoice(game, objective2.getKey());
 
         MessageHelper.sendMessageToChannel(
                 channel, game.getPing() + ", two stage 2 public objectives has been revealed.");
@@ -137,7 +137,7 @@ public class RevealPublicObjectiveService {
 
     public static void revealSO(Game game, MessageChannel channel) {
         Map.Entry<String, Integer> objective = game.revealSecretObjective();
-        RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
+        NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
 
         SecretObjectiveModel po = Mapper.getSecretObjective(objective.getKey());
         if (po == null) {
@@ -173,7 +173,7 @@ public class RevealPublicObjectiveService {
                 channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
         channel.sendMessageEmbeds(po.getRepresentationEmbed())
                 .queue(m -> m.pin().queue());
-        RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
+        NeuraloopService.offerInitialNeuraloopChoice(game, objective.getKey());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode() && !Objects.equals(objective.getKey(), Constants.IMPERIUM_REX_ID)) {
                 MessageHelper.sendMessageToChannel(

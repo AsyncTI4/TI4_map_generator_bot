@@ -674,6 +674,7 @@ public class Constants {
     public static final String ACTUAL_HITS = "actual_hits";
     public static final String EXPECTED_HITS_TIMES_10 = "expected_hits_times_10";
     public static final String TOTAL_EXPENSES = "total_expenses";
+    public static final String BONUS_SCORED_SECRETS = "bonus_scored_secrets";
     public static final String TURN_COUNT = "turn_count";
     public static final String COMMODITIES = "commodities";
     public static final String PERSONAL_PING_INTERVAL = "personal_ping_interval";
@@ -1481,13 +1482,14 @@ public class Constants {
     public static final String BAG_DRAFT_STATUS_MESSAGE_ID = "bag_draft_status_message_id";
     public static final String SHOW_ALL_UNITS = "show_all_units";
     public static final String GAME_LAUNCH_THREAD_ID = "game_launch_thread_id";
-    public static final String INCLUDE_HUB = "include_hub";
     public static final String GAME_TAGS = "game_tags";
     public static final String SHOW_UNPLAYED_AC = "show_unplayed_ac";
     public static final String TIGL_RANK = "tigl_rank";
     public static final String TIGL = "tigl";
     public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
     public static final String TIGL_NICKNAME = "nickname";
+    public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
+    public static final String IS_FRACTURED = "is_fractured";
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";

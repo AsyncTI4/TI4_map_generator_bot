@@ -2643,6 +2643,10 @@ public class Helper {
         return true;
     }
 
+    public static boolean isBoolean(String value) {
+        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
+    }
+
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
         if (game.isCommunityMode()) {
             return;

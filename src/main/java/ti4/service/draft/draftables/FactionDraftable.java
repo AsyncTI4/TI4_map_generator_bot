@@ -46,11 +46,7 @@ public class FactionDraftable extends SinglePickDraftable {
     public static final DraftableType TYPE = DraftableType.of("Faction");
 
     public void initialize(
-            int numFactions,
-            List<ComponentSource> sources,
-            List<String> presetFactions,
-            List<String> bannedFactions,
-            boolean isThundersEdgeDemo) {
+            int numFactions, List<ComponentSource> sources, List<String> presetFactions, List<String> bannedFactions) {
 
         List<String> effBannedFactions = new ArrayList<>(bannedFactions);
 
@@ -404,8 +400,7 @@ public class FactionDraftable extends SinglePickDraftable {
                 factionSettings.getNumFactions().getVal(),
                 sourceSettings.getFactionSources(),
                 factionSettings.getPriFactions().getKeys().stream().toList(),
-                factionSettings.getBanFactions().getKeys().stream().toList(),
-                game.isThundersEdge());
+                factionSettings.getBanFactions().getKeys().stream().toList());
 
         return null;
     }

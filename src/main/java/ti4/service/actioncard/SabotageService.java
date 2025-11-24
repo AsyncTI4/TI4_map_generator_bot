@@ -46,13 +46,7 @@ public class SabotageService {
             return false;
         }
 
-        if (player.hasUnit("tf-triune")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
-                        .isEmpty()) {
-            return true;
-        }
-
-        if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game)) {
+        if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game) || couldUseTriune(player, game)) {
             return true;
         }
 
@@ -60,9 +54,9 @@ public class SabotageService {
             return false;
         }
 
-        if (checkForAllSabotagesDiscarded(game, player)
-                || checkAcd2ForAllSabotagesDiscarded(game, player)
-                || checkForAllShattersDiscarded(game, player)) {
+        if (allSabotagesAreDiscarded(game, player)
+                || isAcd2AndAllSabotagesAreDiscarded(game, player)
+                || isTwilightFallAndAllShattersAreDiscarded(game, player)) {
             return false;
         }
 
@@ -87,20 +81,14 @@ public class SabotageService {
                         .isEmpty();
     }
 
-    public static boolean canSabotage(Player player, Game game) {
-        if (player.hasTechReady("it") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
-            return true;
-        }
-
-        if (player.hasUnit("empyrean_mech")
-                && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Mech)
-                        .isEmpty()) {
-            return true;
-        }
-
-        if (player.hasUnit("tf-triune")
+    private static boolean couldUseTriune(Player player, Game game) {
+        return player.hasUnit("tf-triune")
                 && !CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, Units.UnitType.Fighter)
-                        .isEmpty()) {
+                        .isEmpty();
+    }
+
+    public static boolean canSabotage(Player player, Game game) {
+        if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game) || couldUseTriune(player, game)) {
             return true;
         }
 
@@ -116,11 +104,9 @@ public class SabotageService {
     }
 
     public static boolean isSaboAllowed(Game game, Player player) {
-        if (game.isTwilightsFallMode()) {
-            if (checkForAllShattersDiscarded(game, player)) {
-                return false;
-            }
-        } else if (checkForAllSabotagesDiscarded(game, player) || checkAcd2ForAllSabotagesDiscarded(game, player)) {
+        if (isTwilightFallAndAllShattersAreDiscarded(game, player)
+                || allSabotagesAreDiscarded(game, player)
+                || isAcd2AndAllSabotagesAreDiscarded(game, player)) {
             return false;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -150,11 +136,9 @@ public class SabotageService {
     }
 
     public static String noSaboReason(Game game, Player player) {
-        if (game.isTwilightsFallMode()) {
-            if (checkForAllShattersDiscarded(game, player)) {
-                return "All _Shatter_ cards are in the discard.";
-            }
-        } else if (checkForAllSabotagesDiscarded(game, player) || checkAcd2ForAllSabotagesDiscarded(game, player)) {
+        if (isTwilightFallAndAllShattersAreDiscarded(game, player)) {
+            return "All _Shatter_ cards are in the discard.";
+        } else if (allSabotagesAreDiscarded(game, player) || isAcd2AndAllSabotagesAreDiscarded(game, player)) {
             return "All _Sabotages_ are in the discard.";
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
@@ -180,25 +164,28 @@ public class SabotageService {
         return null;
     }
 
-    private static boolean checkForAllShattersDiscarded(Game game, Player player) {
-        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
-    }
-
-    private static boolean checkForAllSabotagesDiscarded(Game game, Player player) {
+    private static boolean allSabotagesAreDiscarded(Game game, Player player) {
         return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean checkAcd2ForAllSabotagesDiscarded(Game game, Player player) {
+    private static boolean isTwilightFallAndAllShattersAreDiscarded(Game game, Player player) {
+        return game.isTwilightsFallMode()
+                && SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+    }
+
+    private static boolean isAcd2AndAllSabotagesAreDiscarded(Game game, Player player) {
         return game.isAcd2()
                 && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean isActionCardNotPlayable(Game game, Player player, String sabotageAlias) {
-        return game.getDiscardACStatus().entrySet().stream()
-                .filter(entry ->
-                        entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
-                .map(Map.Entry::getKey)
-                .anyMatch(sabotageAlias::equals);
+    private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {
+        // this first condition could go away if getDiscardACStatus starts correctly tracking discarded ACs
+        return game.getDiscardActionCards().containsKey(acAlias)
+                || game.getDiscardACStatus().entrySet().stream()
+                        .filter(entry ->
+                                entry.getValue() != ActionCardHelper.ACStatus.garbozia || !player.hasPlanet("garbozia"))
+                        .map(Map.Entry::getKey)
+                        .anyMatch(acAlias::equals);
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {

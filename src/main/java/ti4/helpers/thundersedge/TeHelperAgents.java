@@ -110,7 +110,8 @@ public class TeHelperAgents {
                 if (game.isFowMode())
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
-                            player.getRepresentation() + " sent an action card to " + p2.getRepresentation(true, true));
+                            (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation())
+                                    + " sent an action card to " + p2.getRepresentation(true, true));
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Error, player2 is null");
             }

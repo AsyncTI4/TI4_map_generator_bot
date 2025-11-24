@@ -16,13 +16,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
-import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
@@ -34,14 +31,11 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.emoji.ColorEmojis;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.statistics.game.WinningPathPersistenceService;
-import ti4.service.tigl.TiglGameReport;
-import ti4.service.tigl.TiglPlayerResult;
+import ti4.service.tigl.TiglReportService;
 import ti4.spring.jda.JdaService;
-import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -236,20 +230,7 @@ public class EndGameService {
                 }
 
                 // TIGL Extras
-                if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
-                    MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
-                    TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
-                    if (!game.isReplacementMade()) {
-                        UltimateStatisticsWebsiteHelper.sendTiglGameReport(
-                                buildTiglReport(game), event.getMessageChannel());
-                    } else {
-                        MessageHelper.sendMessageToChannel(
-                                event.getMessageChannel(),
-                                "This game had a replacement. Please report the results manually: https://www.ti4ultimate.com/community/tigl/report-game");
-                    }
-                }
+                TiglReportService.handleTiglReporting(game, event);
             });
         } else if (publish) { // FOW SUMMARY
             if (summaryChannel == null) {
@@ -389,67 +370,6 @@ public class EndGameService {
         }
 
         return sb.toString();
-    }
-
-    private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
-        sb.append("This was a TIGL game! 👑")
-                .append(game.getWinner().get().getPing())
-                .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-        sb.append("```\nMatch Start Date: ")
-                .append(Helper.getDateRepresentationTIGL(game.getEndedDate()))
-                .append(" (TIGL wants Game End Date for Async)\n");
-        sb.append("Match Start Time: 00:00\n\n");
-        sb.append("Players:").append("\n");
-        int index = 1;
-        for (Player player : game.getRealPlayers()) {
-            int playerVP = player.getTotalVictoryPoints();
-            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
-            sb.append("  ").append(index).append(". ");
-            sb.append(player.getFaction()).append(" - ");
-            if (user.isPresent()) {
-                sb.append(user.get().getName());
-            } else {
-                sb.append(player.getUserName());
-            }
-            sb.append(" - ").append(playerVP).append(" VP\n");
-            index++;
-        }
-
-        sb.append("\n");
-        sb.append("Platform: Async\n");
-        sb.append("Additional Notes: Async Game '").append(game.getName());
-        if (!StringUtils.isBlank(game.getCustomName())) sb.append("   ").append(game.getCustomName());
-        sb.append("'\n```");
-
-        return sb.toString();
-    }
-
-    private static TiglGameReport buildTiglReport(Game game) {
-        var report = new TiglGameReport();
-        report.setGameId(game.getID());
-        report.setScore(game.getVp());
-
-        var tiglPlayerResults = game.getRealPlayers().stream()
-                .map(player -> {
-                    var tiglPlayerResult = new TiglPlayerResult();
-                    tiglPlayerResult.setScore(player.getTotalVictoryPoints());
-                    if (player.getFactionModel() != null) {
-                        tiglPlayerResult.setFaction(player.getFactionModel().getFactionName());
-                    } else {
-                        tiglPlayerResult.setFaction(player.getFaction());
-                    }
-                    tiglPlayerResult.setDiscordId(player.getUserID());
-                    tiglPlayerResult.setDiscordTag(player.getUserName());
-                    return tiglPlayerResult;
-                })
-                .toList();
-
-        report.setPlayerResults(tiglPlayerResults);
-        report.setSource("Async");
-        report.setTimestamp(System.currentTimeMillis() / 1000);
-        return report;
     }
 
     private static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
@@ -24,10 +23,17 @@ import ti4.service.emoji.MiscEmojis;
 public class ShowActionCardsService {
 
     public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event) {
+        showUnplayedACs(game, event, false);
+    }
+
+    public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
         List<String> unplayedACs = Helper.unplayedACs(game);
         String title = game.getName() + " - Unplayed Action Cards";
-        String actionCardString = ActionCardHelper.actionCardListCondensedNoIds(unplayedACs, title);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), actionCardString);
+        String actionCardString = unplayedActionCardsText(unplayedACs, title, showFullText, game);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getMessageChannel(),
+                actionCardString,
+                showFullText ? null : Buttons.green("ACShowUnplayedFullText", "Show Full Text"));
     }
 
     public static void showDiscard(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
@@ -65,8 +71,10 @@ public class ShowActionCardsService {
             sb.append(acDiscardText(showFullText, garbozia, title, game));
         }
 
-        Button showFullTextButton = showFullText ? Buttons.green("ACShowDiscardFullText", "Show Full Text") : null;
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), sb.toString(), showFullTextButton);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getMessageChannel(),
+                sb.toString(),
+                showFullText ? null : Buttons.green("ACShowDiscardFullText", "Show Full Text"));
     }
 
     public static String acDiscardText(
@@ -137,6 +145,38 @@ public class ShowActionCardsService {
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));
+        }
+        return sb.toString();
+    }
+
+    private static String unplayedActionCardsText(
+            List<String> unplayedACs, String title, boolean showFullText, Game game) {
+        if (showFullText) return unplayedActionCardsFullText(unplayedACs, title, game);
+        return ActionCardHelper.actionCardListCondensedNoIds(unplayedACs, title);
+    }
+
+    private static String unplayedActionCardsFullText(List<String> unplayedACs, String title, Game game) {
+        Map<String, List<String>> cardsByName = new LinkedHashMap<>();
+        unplayedACs.forEach(ac -> {
+            if (Mapper.getActionCard(ac) != null) {
+                String name = Mapper.getActionCard(ac).getName();
+                cardsByName.computeIfAbsent(name, key -> new ArrayList<>()).addFirst(ac);
+            } else {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Null AC with id " + ac);
+            }
+        });
+
+        List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
+        displayOrder.sort(Map.Entry.comparingByKey());
+
+        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
+        int index = 1;
+        for (Map.Entry<String, List<String>> entry : displayOrder) {
+            sb.append("\n").append(index).append("\\. ");
+            index++;
+            sb.append(CardEmojis.ActionCard.toString().repeat(entry.getValue().size()));
+            sb.append(" _").append(entry.getKey()).append("_\n> ");
+            sb.append(Mapper.getActionCard(entry.getValue().getFirst()).getRepresentationJustText());
         }
         return sb.toString();
     }

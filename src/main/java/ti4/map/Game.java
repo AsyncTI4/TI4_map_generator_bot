@@ -829,7 +829,6 @@ public class Game extends GameProperties {
         gameModes.put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
         gameModes.put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
         gameModes.put("Thunder's Edge", isThundersEdge());
-        gameModes.put("Thunder's Edge Demo", isThundersEdgeDemo());
         gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
         gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
         gameModes.put("Community", isCommunityMode());
@@ -3166,7 +3165,7 @@ public class Game extends GameProperties {
         return false;
     }
 
-    public void setDiscardActionCard(String id, ACStatus status) {
+    private void setDiscardActionCard(String id, ACStatus status) {
         Collection<Integer> values = getDiscardActionCards().values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -3174,15 +3173,6 @@ public class Game extends GameProperties {
         }
         getDiscardActionCards().put(id, identifier);
         if (status != null) getDiscardACStatus().put(id, status);
-    }
-
-    private void setDiscardActionCard(String id, int oldNum) {
-        Collection<Integer> values = getDiscardActionCards().values();
-        int identifier = oldNum;
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        getDiscardActionCards().put(id, identifier);
     }
 
     private void setPurgedActionCard(String id) {
@@ -3794,12 +3784,12 @@ public class Game extends GameProperties {
 
     @JsonSetter
     public void setDiscardActionCards(Map<String, Integer> discardActionCards) {
-        discardActionCards.entrySet().forEach(e -> getDiscardActionCards().put(e.getKey(), e.getValue()));
+        discardActionCards.forEach((key, value) -> getDiscardActionCards().put(key, value));
     }
 
     @JsonSetter
     public void setDiscardActionCardStatus(Map<String, ACStatus> discardACStatus) {
-        discardACStatus.entrySet().forEach(e -> getDiscardACStatus().put(e.getKey(), e.getValue()));
+        discardACStatus.forEach((key, value) -> getDiscardACStatus().put(key, value));
     }
 
     public void setDiscardActionCards(List<String> discardActionCardList) {
@@ -4809,7 +4799,7 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean isThundersEdgeDemo() {
-        return getTags().contains("ThundersEdgeDemo");
+        return getTags().contains("Thunder's Edge Demo");
     }
 
     @JsonIgnore

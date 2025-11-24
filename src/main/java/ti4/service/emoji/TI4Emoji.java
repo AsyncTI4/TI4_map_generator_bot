@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
@@ -22,6 +23,7 @@ public interface TI4Emoji {
         return Emoji.fromFormatted(mention);
     }
 
+    /** Returns the formatted emoji string {@code <EmojiName:ident>} */
     default String emojiString() {
         CachedEmoji emoji = ApplicationEmojiService.getApplicationEmoji(name());
         if (emoji == null) {
@@ -82,6 +84,18 @@ public interface TI4Emoji {
             case "misc", "miscemojis" -> getEmojiFromName(MiscEmojis.class, name);
             default -> null;
         };
+    }
+
+    @Nullable
+    static TI4Emoji findEmojiFromJustName(String name) {
+        TI4Emoji uniq = null;
+        for (TI4Emoji emoji : allEmojiEnums()) {
+            if (emoji.name().equals(name)) {
+                if (uniq == null) uniq = emoji;
+                else return null;
+            }
+        }
+        return uniq;
     }
 
     static TI4Emoji getRandomGoodDog() {

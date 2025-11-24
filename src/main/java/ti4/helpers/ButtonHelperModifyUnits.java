@@ -846,7 +846,7 @@ public class ButtonHelperModifyUnits {
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                         + uH.getName() + "_" + player.getColor(),
-                                type.humanReadableName() + " from " + tile.getRepresentation() + " "
+                                type.humanReadableName() + " from " + tile.getRepresentationForButtons() + " "
                                         + ("space".equals(uH.getName())
                                                 ? "in Space"
                                                 : "on " + StringUtils.capitalize(uH.getName()))));
@@ -1004,7 +1004,8 @@ public class ButtonHelperModifyUnits {
                         + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
     }
 
-    public static List<Button> getRetreatSystemButtons(Player player, Game game, String pos1, boolean skilled) {
+    public static List<Button> getRetreatSystemButtons(
+            Player player, Game game, String pos1, boolean skilled, boolean feint) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         String skilledS = "";
@@ -1023,7 +1024,7 @@ public class ButtonHelperModifyUnits {
             if (pos1.equalsIgnoreCase(pos2) || skipNonFrontierEmptySystem) {
                 continue; // skip empty systems like hyperlanes
             }
-            if (canRetreatTo(game, player, tile, skilled)) {
+            if (canRetreatTo(game, player, tile, skilled, feint)) {
                 buttons.add(Buttons.gray(
                         finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,
                         "Retreat to " + tile.getRepresentationForButtons(game, player)));
@@ -1032,7 +1033,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
-    private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
+    private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat, boolean feint) {
         if ((tile.isAsteroidField()
                         && !player.hasTech("amd")
                         && !player.hasTech("wavelength")
@@ -1045,7 +1046,7 @@ public class ButtonHelperModifyUnits {
                 || FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
-        if (skilledRetreat && !game.isTwilightsFallMode()) {
+        if (skilledRetreat && !feint) {
             return true;
         }
         if (Tile.playerCanRetreatHere(player).test(tile)) {
@@ -1617,6 +1618,10 @@ public class ButtonHelperModifyUnits {
                         event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
             }
         }
+
+        if (tile2 != null && tile2.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     /**
@@ -1947,6 +1952,9 @@ public class ButtonHelperModifyUnits {
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
 
         CommanderUnlockCheckService.checkPlayer(
                 player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
@@ -2219,6 +2227,9 @@ public class ButtonHelperModifyUnits {
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
+        }
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
 
         ButtonHelper.deleteMessage(event);

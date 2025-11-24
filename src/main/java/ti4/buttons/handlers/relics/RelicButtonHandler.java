@@ -18,7 +18,6 @@ import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.tactical.TacticalActionService;
 
 @UtilityClass
@@ -88,43 +87,6 @@ class RelicButtonHandler {
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("neuraloopPart1")
-    static void neuraloopPart1(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String poID = buttonID.split(";")[1];
-        String type = buttonID.split(";")[2];
-        String msg = player.getRepresentation()
-                + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
-        List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("neuraloopPart2")
-    static void neuraloopPart2(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String poID = buttonID.split(";")[1];
-        String type = buttonID.split(";")[2];
-        String relic = buttonID.split(";")[3];
-        player.removeRelic(relic);
-        player.removeExhaustedRelic(relic);
-        game.removeRevealedObjective(poID);
-        String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purge "
-                + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
-                + ", to replace the recently revealed objective with a random " + type + ".";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), game.getPing() + " Revealed objective `" + poID + "` was replaced.");
-        }
-        if ("stage1".equalsIgnoreCase(type)) {
-            RevealPublicObjectiveService.revealS1(game, event, true);
-        } else if ("stage2".equalsIgnoreCase(type)) {
-            RevealPublicObjectiveService.revealS2(game, event, true);
-        } else {
-            RevealPublicObjectiveService.revealSO(game, game.getActionsChannel());
-        }
         ButtonHelper.deleteMessage(event);
     }
 

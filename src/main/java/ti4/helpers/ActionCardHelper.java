@@ -820,15 +820,14 @@ public class ActionCardHelper {
             String automationID = actionCard.getAutomationID();
 
             if (SabotageService.isSaboAllowed(game, player)) {
-                // Can be "sabotaged", basically every card
-                String sabo = "Sabotage";
+                String cancelName = "Sabotage";
                 if (game.isTwilightsFallMode()) {
-                    sabo = "Shatter";
+                    cancelName = "Shatter";
                 }
-                buttons.add(Buttons.blue("no_sabotage", "No " + sabo, MiscEmojis.NoSabo));
+                buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For " + sabo));
+                        "Pause Timer While Waiting For " + cancelName));
                 MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
                         mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
@@ -1216,7 +1215,7 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "destroyed ship"), codedButtons);
             }
 
-            if ("rapid_fulfillment".equals(automationID)) {
+            if ("rapid_fulfillment".equals(automationID) || "contingency".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRapidFulfillment", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -2150,6 +2149,7 @@ public class ActionCardHelper {
         } else if (count > 5) {
             sb.append("\n> Total of ").append(count);
         }
+        CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
     }
 

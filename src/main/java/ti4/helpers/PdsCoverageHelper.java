@@ -81,9 +81,9 @@ public class PdsCoverageHelper {
                                 && unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
                             continue;
                         }
-                        if ((UnitType.Pds == model.getUnitType()
+                        if ((model.getUnitType() == UnitType.Pds
                                 && player.hasAbility("miniaturization")
-                                && unitHolder.getName().equalsIgnoreCase("space"))) {
+                                && "space".equalsIgnoreCase(unitHolder.getName()))) {
                             continue;
                         }
 
