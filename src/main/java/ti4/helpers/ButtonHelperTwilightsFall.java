@@ -308,7 +308,7 @@ public class ButtonHelperTwilightsFall {
         }
         {
             String engineerACSplice = game.getStoredValue("engineerACSplice");
-            if ("take_remove_remove".equalsIgnoreCase(engineerACSplice)) {
+            if ("take_remove_remove".equals(engineerACSplice)) {
                 participants.addFirst(startPlayer);
                 participants.addFirst(startPlayer);
             } else if (!engineerACSplice.isEmpty()) {
@@ -548,7 +548,7 @@ public class ButtonHelperTwilightsFall {
             } else {
                 game.removeStoredValue("engineerACSplice");
             }
-            remove = "remove".equalsIgnoreCase(engineerACSplice[0]);
+            remove = "remove".equals(engineerACSplice[0]);
         }
         String type = game.getStoredValue("spliceType");
         if ("antimatter".equalsIgnoreCase(cardID) || "wavelength".equalsIgnoreCase(cardID)) {
