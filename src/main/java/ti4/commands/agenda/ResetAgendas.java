@@ -21,7 +21,7 @@ class ResetAgendas extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping confirmOption = event.getOption(Constants.CONFIRM);
         if (confirmOption == null || !"YES".equals(confirmOption.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
             return;
         }
 

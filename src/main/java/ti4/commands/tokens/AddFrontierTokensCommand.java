@@ -35,7 +35,7 @@ public class AddFrontierTokensCommand extends GameStateCommand {
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             AddFrontierTokensService.addFrontierTokens(event, getGame());
         } else {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
         }
     }
 }

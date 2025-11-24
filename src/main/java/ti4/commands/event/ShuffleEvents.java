@@ -20,7 +20,7 @@ class ShuffleEvents extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
             return;
         }
         getGame().shuffleEvents();

@@ -1,7 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,10 +12,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
+
 import javax.annotation.Nullable;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -34,6 +38,7 @@ import ti4.image.TileHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
@@ -738,8 +743,20 @@ public class Tile {
         if ("0g".equalsIgnoreCase(tileID)) {
             return true;
         }
+        TileModel tileM = TileHelper.getTileById(tileID);
+        if(tileM != null){
+            if(tileM.getTileBack() == TileBack.GREEN){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
+                if(planetHolder.isSpaceStation()){
+                    continue;
+                }
                 boolean oneOfThree = (unitHolder.getTokenList() != null
                                 && unitHolder.getTokenList().contains("attachment_threetraits.png"))
                         || ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())

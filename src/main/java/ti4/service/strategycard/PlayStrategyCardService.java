@@ -3,6 +3,7 @@ package ti4.service.strategycard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
@@ -178,8 +179,9 @@ public class PlayStrategyCardService {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
 
-        if (scModel.usesAutomationForSCID("pok4construction")
+        if ((scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
                 && !game.isFowMode()
+                && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Buttons.gray(
                     "titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));

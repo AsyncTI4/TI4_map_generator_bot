@@ -39,7 +39,7 @@ class GameEnd extends GameStateSubcommand {
         }
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (!"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with 'YES'");
+            MessageHelper.replyToMessage(event, "Must confirm with 'YES' (case sensitive/full uppercase YES)");
             return;
         }
         boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
