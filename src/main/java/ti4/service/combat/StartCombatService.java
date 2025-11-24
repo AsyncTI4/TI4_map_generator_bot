@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -1754,11 +1755,16 @@ public class StartCombatService {
             buttons.add(Buttons.gray(
                     "announceReadyForDice_" + p1.getColor() + "_" + p2.getColor(), "Declare Ready To Throw Dice"));
         }
-        if (isSpaceCombat && p2.hasAbility("foresight") && p2.getStrategicCC() > 0 && !game.isFowMode()) {
-            buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
-        }
-        if (isSpaceCombat && p1.hasAbility("foresight") && p1.getStrategicCC() > 0) {
-            buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
+        if (isSpaceCombat) {
+            Consumer<Player> addForesightButton = (player) -> {
+                if (player.hasAbility("foresight") && (player.getStrategicCC() > 0 || game.isTwilightsFallMode())) {
+                    buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
+                }
+            };
+            if (!game.isFowMode()) {
+                addForesightButton.accept(p2);
+            }
+            addForesightButton.accept(p1);
         }
         // if (p2.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty()
         // && !game.isFowMode()) {
