@@ -164,8 +164,7 @@ public class TiglReportService {
 
     private static String determineLeague(Game game) {
         List<String> tags = Optional.ofNullable(game.getTags()).orElse(List.of());
-        boolean hasFracturedTag =
-                tags.stream().anyMatch(TIGL_FRACTURED_TAG::equals);
+        boolean hasFracturedTag = tags.stream().anyMatch(TIGL_FRACTURED_TAG::equals);
         return hasFracturedTag ? "Fractured" : "ThundersEdge";
     }
 
