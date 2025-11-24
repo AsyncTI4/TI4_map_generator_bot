@@ -403,6 +403,10 @@ public class Mapper {
             id = id.replace("extra1", "");
             id = id.replace("extra2", "");
         }
+        if (!actionCards.containsKey(id)) {
+            BotLogger.critical("Action card not found: " + id);
+            return null;
+        }
         return actionCards.get(id);
     }
 
@@ -1185,7 +1189,6 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-
         return tokensFromProperties.getProperty(tokenID);
     }
 
