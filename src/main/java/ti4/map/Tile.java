@@ -1,5 +1,7 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,16 +14,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
-
 import javax.annotation.Nullable;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -744,17 +740,17 @@ public class Tile {
             return true;
         }
         TileModel tileM = TileHelper.getTileById(tileID);
-        if(tileM != null){
-            if(tileM.getTileBack() == TileBack.GREEN){
+        if (tileM != null) {
+            if (tileM.getTileBack() == TileBack.GREEN) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
-        
+
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
-                if(planetHolder.isSpaceStation()){
+                if (planetHolder.isSpaceStation()) {
                     continue;
                 }
                 boolean oneOfThree = (unitHolder.getTokenList() != null

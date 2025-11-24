@@ -2298,6 +2298,28 @@ class PlayerAreaGenerator {
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
             if (StringUtils.isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
+                if (planet.getTechSpecialities().size() > 1) {
+                    String techType = "";
+                    for (String type : planet.getTechSpecialities()) {
+                        techType += type.toLowerCase();
+                    }
+                    String abbrev = "";
+                    switch (techType) {
+                        case "propulsionpropulsion" -> abbrev = "bb";
+                        case "warfarewarfare" -> abbrev = "rr";
+                        case "cyberneticcybernetic" -> abbrev = "yy";
+                        case "bioticbiotic" -> abbrev = "gg";
+                        case "warfarepropulsion", "propulsionwarfare" -> abbrev = "br";
+                        case "cyberneticpropulsion", "propulsioncybernetic" -> abbrev = "by";
+                        case "cyberneticwarfare", "warfarecybernetic" -> abbrev = "ry";
+                        case "bioticwarfare", "warfarebiotic" -> abbrev = "gr";
+                        case "bioticcybernetic", "cyberneticbiotic" -> abbrev = "gy";
+                        case "bioticpropulsion", "propulsionbiotic" -> abbrev = "bg";
+                    }
+                    if (!abbrev.isEmpty()) {
+                        planetTechSkip = "pc_tech_" + abbrev + statusOfPlanet + ".png";
+                    }
+                }
                 drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
                 List<String> techSpeciality = planet.getTechSpeciality();
