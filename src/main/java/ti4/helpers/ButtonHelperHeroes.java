@@ -2830,12 +2830,10 @@ public class ButtonHelperHeroes {
             }
 
             ActionCardModel ac = Mapper.getActionCard(acStringID);
-            if (ac != null) {
-                MessageHelper.sendMessageToChannelWithEmbed(
-                        yssaril.getCardsInfoThread(),
-                        "For your reference, the text of the action cards offered reads as:",
-                        ac.getRepresentationEmbed());
-            }
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    yssaril.getCardsInfoThread(),
+                    "For your reference, the text of the action cards offered reads as:",
+                    ac.getRepresentationEmbed());
         }
     }
 

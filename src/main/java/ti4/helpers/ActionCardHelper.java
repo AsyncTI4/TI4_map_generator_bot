@@ -109,12 +109,8 @@ public class ActionCardHelper {
                     .append(index)
                     .append(".")
                     .append(Helper.leftpad("(" + value, 4))
-                    .append(")`");
-            if (actionCard == null) {
-                sb.append("Something broke here");
-            } else {
-                sb.append(actionCard.getRepresentation());
-            }
+                    .append(")`")
+                    .append(actionCard.getRepresentation());
             index++;
         }
         return sb.toString();
@@ -352,10 +348,8 @@ public class ActionCardHelper {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                if (acName != null) {
-                    acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
-                }
+                acButtons.add(Buttons.red(
+                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
             }
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -405,7 +399,7 @@ public class ActionCardHelper {
                 String ac_name = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (ac_name != null && "action".equalsIgnoreCase(actionCardWindow)) {
+                if ("action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value,
                             "(" + value + ") " + ac_name,
@@ -430,7 +424,7 @@ public class ActionCardHelper {
                 String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (acName != null && "action".equalsIgnoreCase(actionCardWindow)) {
+                if ("action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
                 }
@@ -450,15 +444,13 @@ public class ActionCardHelper {
                 String ac_name = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (ac_name != null) {
-                    if (actionCardWindow.contains("combat")
-                            || actionCardWindow.contains("roll")
-                            || actionCardWindow.contains("hit")) {
-                        acButtons.add(Buttons.red(
-                                Constants.AC_PLAY_FROM_HAND + value,
-                                "(" + value + ") " + ac_name,
-                                MiscEmojis.LegendaryPlanet));
-                    }
+                if (actionCardWindow.contains("combat")
+                        || actionCardWindow.contains("roll")
+                        || actionCardWindow.contains("hit")) {
+                    acButtons.add(Buttons.red(
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + ac_name,
+                            MiscEmojis.LegendaryPlanet));
                 }
             }
         }
@@ -475,15 +467,11 @@ public class ActionCardHelper {
                 String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (acName != null) {
-                    if (actionCardWindow.contains("combat")
-                            || actionCardWindow.contains("roll")
-                            || actionCardWindow.contains("hit")) {
-                        acButtons.add(Buttons.red(
-                                Constants.AC_PLAY_FROM_HAND + value,
-                                "(" + value + ") " + acName,
-                                CardEmojis.ActionCard));
-                    }
+                if (actionCardWindow.contains("combat")
+                        || actionCardWindow.contains("roll")
+                        || actionCardWindow.contains("hit")) {
+                    acButtons.add(Buttons.red(
+                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
                 }
             }
         }
@@ -517,12 +505,8 @@ public class ActionCardHelper {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                if (acName != null) {
-                    acButtons.add(Buttons.blue(
-                            "ac_discard_from_hand_" + value + suffix,
-                            "(" + value + ") " + acName,
-                            CardEmojis.ActionCard));
-                }
+                acButtons.add(Buttons.blue(
+                        "ac_discard_from_hand_" + value + suffix, "(" + value + ") " + acName, CardEmojis.ActionCard));
             }
         }
         return acButtons;
@@ -536,10 +520,8 @@ public class ActionCardHelper {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                if (acName != null) {
-                    acButtons.add(
-                            Buttons.red("takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.ActionCard));
-                }
+                acButtons.add(
+                        Buttons.red("takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.ActionCard));
             }
         }
         return acButtons;

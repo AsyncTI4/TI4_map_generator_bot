@@ -116,9 +116,6 @@ public class ListSlashCommandsUsedService {
         }
         for (String acID : game.getDiscardActionCards().keySet()) {
             ActionCardModel ac = Mapper.getActionCard(acID);
-            if (ac == null) {
-                continue;
-            }
             String acName = ac.getName();
             int numUsed = 1;
             int numUsed2 = 0;
@@ -129,9 +126,6 @@ public class ListSlashCommandsUsedService {
         }
         for (String acID : game.getPurgedActionCards().keySet()) {
             ActionCardModel ac = Mapper.getActionCard(acID);
-            if (ac == null) {
-                continue;
-            }
             String acName = ac.getName();
             int numUsed = 1;
             int numUsed2 = 0;
