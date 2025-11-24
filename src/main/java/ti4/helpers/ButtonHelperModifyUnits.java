@@ -1004,7 +1004,8 @@ public class ButtonHelperModifyUnits {
                         + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
     }
 
-    public static List<Button> getRetreatSystemButtons(Player player, Game game, String pos1, boolean skilled, boolean feint) {
+    public static List<Button> getRetreatSystemButtons(
+            Player player, Game game, String pos1, boolean skilled, boolean feint) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         String skilledS = "";
