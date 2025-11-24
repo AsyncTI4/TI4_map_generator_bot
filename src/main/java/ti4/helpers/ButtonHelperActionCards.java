@@ -1096,6 +1096,9 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
         CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
+        if (tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     @ButtonHandler("probeStep2_")
