@@ -61,8 +61,8 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         nucleusLegendaries =
                 new IntegerRangeSetting("NucleusLeg", "Nucleus Legendaries", 1, 0, 3, suggestLegendariesMax, 0, 3, 1);
         int suggestLegendariesMin = Math.min(2, suggestLegendariesMax);
-        totalLegendaries =
-                new IntegerRangeSetting("TotalLeg", "Total Legendaries", suggestLegendariesMin, 0, 5, suggestLegendariesMax, 0, 5, 1);
+        totalLegendaries = new IntegerRangeSetting(
+                "TotalLeg", "Total Legendaries", suggestLegendariesMin, 0, 5, suggestLegendariesMax, 0, 5, 1);
         minimumSliceRes = new IntegerSetting("MinSliceRes", "Min Slice Resources", 0, 0, 5, 1);
         minimumSliceInf = new IntegerSetting("MinSliceInf", "Min Slice Influence", 0, 0, 5, 1);
         sliceValue = new IntegerRangeSetting("SliceVal", "Slice Optimal Value", 4, 0, 8, 9, 3, 12, 1);
