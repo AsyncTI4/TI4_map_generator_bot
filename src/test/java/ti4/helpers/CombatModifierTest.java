@@ -117,10 +117,14 @@ public class CombatModifierTest extends BaseTi4Test {
         List<UnitModel> playerUnits = new ArrayList<>(unitsMap.keySet());
         UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
 
-        UnitModel warsun =
-                playerUnits.stream().filter(u -> "warsun".equalsIgnoreCase(u.getBaseType())).findFirst().orElseThrow();
-        UnitModel fighter =
-                playerUnits.stream().filter(u -> "fighter".equalsIgnoreCase(u.getBaseType())).findFirst().orElseThrow();
+        UnitModel warsun = playerUnits.stream()
+                .filter(u -> "warsun".equalsIgnoreCase(u.getBaseType()))
+                .findFirst()
+                .orElseThrow();
+        UnitModel fighter = playerUnits.stream()
+                .filter(u -> "fighter".equalsIgnoreCase(u.getBaseType()))
+                .findFirst()
+                .orElseThrow();
 
         int warsunMods = CombatModHelper.getCombinedModifierForUnit(
                 warsun,
