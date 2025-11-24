@@ -162,7 +162,8 @@ public class TiglReportService {
 
     private static String determineLeague(Game game) {
         List<String> tags = Optional.ofNullable(game.getTags()).orElse(List.of());
-        boolean hasFracturedTag = tags.stream().anyMatch("fractured"::equalsIgnoreCase);
+        boolean hasFracturedTag =
+                tags.stream().anyMatch(tag -> StringUtils.containsIgnoreCase(tag, "fractured"));
         return hasFracturedTag ? "Fractured" : "ThundersEdge";
     }
 
