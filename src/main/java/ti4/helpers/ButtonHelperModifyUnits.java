@@ -1617,6 +1617,10 @@ public class ButtonHelperModifyUnits {
                         event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
             }
         }
+
+        if (tile2 != null && tile2.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     /**
@@ -1947,6 +1951,9 @@ public class ButtonHelperModifyUnits {
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
 
         CommanderUnlockCheckService.checkPlayer(
                 player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
@@ -2219,6 +2226,9 @@ public class ButtonHelperModifyUnits {
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
+        }
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
 
         ButtonHelper.deleteMessage(event);
