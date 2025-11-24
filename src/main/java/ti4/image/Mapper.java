@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -77,6 +78,7 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.CardEmojis;
 
+@UtilityClass
 public class Mapper {
 
     // private static final Properties colors = new Properties();
