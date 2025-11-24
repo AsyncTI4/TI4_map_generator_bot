@@ -3342,7 +3342,7 @@ public class ButtonHelper {
             if (planetReal != null
                     && isNotBlank(planetReal.getOriginalPlanetType())
                     && !player.getExhaustedPlanets().contains(planetReal.getName())) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, true);
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, true, false);
                 buttons.addAll(planetButtons);
             }
         }
@@ -5327,7 +5327,7 @@ public class ButtonHelper {
             Planet planetReal = (Planet) planetUnit;
             String planet = planetReal.getName();
             if (FoWHelper.playerHasUnitsOnPlanet(player, tile, planet)) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, false, true);
                 buttons.addAll(planetButtons);
             }
         }
@@ -5372,11 +5372,11 @@ public class ButtonHelper {
     }
 
     public static List<Button> getPlanetExplorationButtons(Game game, Planet planet, Player player) {
-        return getPlanetExplorationButtons(game, planet, player, false);
+        return getPlanetExplorationButtons(game, planet, player, false, false);
     }
 
     private static List<Button> getPlanetExplorationButtons(
-            Game game, Planet planet, Player player, boolean impressment) {
+            Game game, Planet planet, Player player, boolean impressment, boolean scanlink) {
         if (planet == null || game == null) return null;
 
         String planetId = planet.getName();
@@ -5394,12 +5394,9 @@ public class ButtonHelper {
 
         for (String trait : explorationTraits) {
             if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
+                String source = impressment ? "dsdihmy_" : (scanlink ? "scanlink_" : "filler_");
                 String buttonId =
-                        player.getFinsFactionCheckerPrefix() + "movedNExplored_filler_" + planetId + "_" + trait;
-                if (impressment) {
-                    buttonId =
-                            player.getFinsFactionCheckerPrefix() + "movedNExplored_dsdihmy_" + planetId + "_" + trait;
-                }
+                        player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId + "_" + trait;
                 String buttonMessage =
                         "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
                 buttons.add(Buttons.gray(buttonId, buttonMessage, ExploreEmojis.getTraitEmoji(trait)));
