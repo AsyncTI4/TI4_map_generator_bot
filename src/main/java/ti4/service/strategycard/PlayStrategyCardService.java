@@ -178,8 +178,9 @@ public class PlayStrategyCardService {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
 
-        if (scModel.usesAutomationForSCID("pok4construction")
+        if ((scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
                 && !game.isFowMode()
+                && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Buttons.gray(
                     "titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));

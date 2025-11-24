@@ -227,6 +227,7 @@ public class MiltyService {
             String f = randomOrder.get(i);
             i++;
             if (output.contains(f)) continue;
+            if (!factions.contains(f)) continue;
             output.add(f);
         }
         return output;

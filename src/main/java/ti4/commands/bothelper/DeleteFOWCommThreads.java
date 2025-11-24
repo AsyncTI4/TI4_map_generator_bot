@@ -24,7 +24,8 @@ class DeleteFOWCommThreads extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if (!"YES".equalsIgnoreCase(event.getOption(Constants.CONFIRM).getAsString())) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must confirm with YES.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Must confirm with YES. (case sensitive/full uppercase YES)");
             return;
         }
 

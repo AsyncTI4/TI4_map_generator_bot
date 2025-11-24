@@ -37,7 +37,7 @@ public class RemoveAllCC extends GameStateCommand {
                 tile.removeAllCC();
             }
         } else {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
         }
     }
 }
