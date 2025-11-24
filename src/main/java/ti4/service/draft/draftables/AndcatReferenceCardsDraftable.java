@@ -137,13 +137,18 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // Finish filling packages from the remaining pool
         // We only need to finish numPackages
         for (int i = 0; i < numPackages; i++) {
-            packages.get(i).add(remainingFactions.remove(0));
-            Collections.shuffle(packages.get(i));
+            List<String> currentPackage = packages.get(i);
+            currentPackage.add(remainingFactions.remove(0));
+            currentPackage.sort((p1, p2) -> {
+                FactionModel f1 = Mapper.getFaction(p1);
+                FactionModel f2 = Mapper.getFaction(p2);
+                return Integer.compare(f1.getPriorityNumber(), f2.getPriorityNumber());
+            });
 
             // Add package to finalized list
             int packageKey = i + 1;
             ReferenceCardPackage refCardPackage =
-                    new ReferenceCardPackage(packageKey, packages.get(i), null, null, null, null);
+                    new ReferenceCardPackage(packageKey, currentPackage, null, null, null, null);
             referenceCardPackages.put(packageKey, refCardPackage);
         }
 
