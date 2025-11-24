@@ -29,8 +29,6 @@ public class CombatModifierTest extends BaseTi4Test {
     private static Player winnu;
     private static Player bastion;
     private static Player letnev;
-    private static Player obsidian;
-    private static Player puppet;
 
     @BeforeAll
     static void setupTestGame() {
@@ -46,8 +44,6 @@ public class CombatModifierTest extends BaseTi4Test {
         winnu = setupPlayer("winnu");
         bastion = setupPlayer("bastion");
         letnev = setupPlayer("letnev");
-        obsidian = setupPlayer("obsidian");
-        puppet = setupPlayer("xxcha");
     }
 
     @Test
