@@ -22,7 +22,7 @@ import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.testUtils.BaseTi4Test;
 
-public class CombatModifierTest extends BaseTi4Test {
+class CombatModifierTest extends BaseTi4Test {
 
     private static Game testGame;
     private static Player neutral;
