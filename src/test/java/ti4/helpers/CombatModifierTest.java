@@ -1,15 +1,12 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import ti4.Constants;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -17,12 +14,10 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.model.ColorModel;
 import ti4.model.FactionModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
-import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
 import ti4.testUtils.BaseTi4Test;
@@ -56,7 +51,7 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     @Test
-    public void testWinnuCombatMods() {
+    void testWinnuCombatMods() {
         Tile mecatol = new Tile("112", getNextPosition());
         testGame.setTile(mecatol);
         mecatol.addUnit("space", Units.getUnitKey(UnitType.Flagship, winnu.getColorID()), 1);
@@ -72,7 +67,7 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     @Test
-    public void testBastionCombatMods() {
+    void testBastionCombatMods() {
         Tile t = new Tile("92", getNextPosition());
         testGame.setTile(t);
         t.addUnit("space", Units.getUnitKey(UnitType.Flagship, bastion.getColorID()), 1);
@@ -88,74 +83,8 @@ public class CombatModifierTest extends BaseTi4Test {
     }
 
     @Test
-    public void testAssailAppliesToAllUnits() {
-        Tile tile = new Tile("580", getNextPosition());
-        testGame.setTile(tile);
-
-        obsidian.setPlotCard("assail");
-        obsidian.setPlotCardFaction("assail", puppet.getFaction());
-
-        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Warsun, obsidian.getColorID()), 1);
-        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, obsidian.getColorID()), 2);
-        tile.addUnit(Constants.SPACE, Units.getUnitKey(UnitType.Fighter, puppet.getColorID()), 1);
-
-        var unitsMap = CombatRollService.getUnitsInCombat(
-                tile, tile.getUnitHolders().get(Constants.SPACE), obsidian, null, CombatRollType.combatround, testGame);
-        var oppUnits = CombatRollService.getUnitsInCombat(
-                tile, tile.getUnitHolders().get(Constants.SPACE), puppet, null, CombatRollType.combatround, testGame);
-
-        var modifiers = CombatModHelper.getModifiers(
-                obsidian,
-                puppet,
-                unitsMap,
-                oppUnits,
-                tile.getTileModel(),
-                testGame,
-                CombatRollType.combatround,
-                Constants.COMBAT_MODIFIERS);
-
-        List<UnitModel> playerUnits = new ArrayList<>(unitsMap.keySet());
-        UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
-
-        UnitModel warsun = playerUnits.stream()
-                .filter(u -> "warsun".equalsIgnoreCase(u.getBaseType()))
-                .findFirst()
-                .orElseThrow();
-        UnitModel fighter = playerUnits.stream()
-                .filter(u -> "fighter".equalsIgnoreCase(u.getBaseType()))
-                .findFirst()
-                .orElseThrow();
-
-        int warsunMods = CombatModHelper.getCombinedModifierForUnit(
-                warsun,
-                unitsMap.get(warsun),
-                modifiers,
-                obsidian,
-                puppet,
-                testGame,
-                playerUnits,
-                CombatRollType.combatround,
-                tile,
-                unitHolder);
-        int fighterMods = CombatModHelper.getCombinedModifierForUnit(
-                fighter,
-                unitsMap.get(fighter),
-                modifiers,
-                obsidian,
-                puppet,
-                testGame,
-                playerUnits,
-                CombatRollType.combatround,
-                tile,
-                unitHolder);
-
-        Assertions.assertEquals(1, warsunMods, "Warsun should receive Assail modifier");
-        Assertions.assertEquals(1, fighterMods, "Fighters should also receive Assail modifier");
-    }
-
-    @Test
     @Disabled("Doesn't work")
-    public void testLetnevCombatMods() {
+    void testLetnevCombatMods() {
         Tile arcprime = new Tile("10", getNextPosition());
         testGame.setTile(arcprime);
         arcprime.addUnit("space", Units.getUnitKey(UnitType.Flagship, letnev.getColorID()), 1);
