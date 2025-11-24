@@ -683,12 +683,10 @@ public class PlayHeroService {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                if (acName != null) {
-                    acButtons.add(Buttons.gray(
-                            "yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(),
-                            acName,
-                            CardEmojis.ActionCard));
-                }
+                acButtons.add(Buttons.gray(
+                        "yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(),
+                        acName,
+                        CardEmojis.ActionCard));
             }
         }
         return acButtons;

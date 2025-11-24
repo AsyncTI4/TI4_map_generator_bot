@@ -732,11 +732,9 @@ public class Game extends GameProperties {
         for (String ac : getDiscardActionCards().keySet()) {
             ACStatus status = getDiscardACStatus().get(ac);
             ActionCardModel acModel = Mapper.getActionCard(ac);
-            if (acModel != null && acModel.getName().contains(name)) {
+            if (acModel.getName().contains(name)) {
                 // true = it cannot be played, false = it's on garbozia
                 return Arrays.asList(null, ACStatus.ralnelbt, ACStatus.purged).contains(status);
-            } else if (acModel == null) {
-                BotLogger.error(ac + " is returning a null AC when sent to Mapper in game " + getName());
             }
         }
         return false;
