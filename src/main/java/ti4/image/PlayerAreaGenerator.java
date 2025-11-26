@@ -76,6 +76,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
@@ -1271,7 +1272,16 @@ class PlayerAreaGenerator {
         List<Leader> allLeaders = new ArrayList<>(player.getLeaders());
         allLeaders.sort(leaderComparator);
 
+        boolean shouldDrawVeiledGenomes = game.isVeiledHeartMode();
         for (Leader leader : allLeaders) {
+            if (shouldDrawVeiledGenomes && !Constants.AGENT.equalsIgnoreCase(leader.getType())) {
+                // The last unveiled genome has been drawn, so now draw the veiled genomes.
+                deltaX = VeiledHeartService.veiledField(
+                        graphics, x, y, VeiledHeartService.VeiledCardType.GENOME, deltaX, player);
+                // The veiled genomes have been drawn, so don't draw them again.
+                shouldDrawVeiledGenomes = false;
+            }
+
             boolean isExhaustedLocked = leader.isExhausted() || leader.isLocked();
             if (isExhaustedLocked) {
                 graphics.setColor(Color.GRAY);
@@ -1336,6 +1346,18 @@ class PlayerAreaGenerator {
             }
 
             deltaX += 48;
+        }
+
+        if (game.isVeiledHeartMode()) {
+            if (shouldDrawVeiledGenomes) {
+                // The veiled genomes were not drawn earlier because there are no non-agent leaders.
+                // The veiled genomes should still be drawn, so do it now.
+                deltaX = VeiledHeartService.veiledField(
+                        graphics, x, y, VeiledHeartService.VeiledCardType.GENOME, deltaX, player);
+            }
+            // Draw the veiled paradigms after all other leaders (directly after the heroes, if any).
+            deltaX = VeiledHeartService.veiledField(
+                    graphics, x, y, VeiledHeartService.VeiledCardType.PARADIGM, deltaX, player);
         }
 
         if (player.hasAbility("imperia")) {
@@ -2450,8 +2472,19 @@ class PlayerAreaGenerator {
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
 
+        if (game.isVeiledHeartMode()) {
+            deltaX = VeiledHeartService.veiledField(
+                    graphics, x, y, VeiledHeartService.VeiledCardType.ABILITY, deltaX, player);
+        }
+
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
         deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
+
+        if (game.isVeiledHeartMode()) {
+            deltaX = VeiledHeartService.veiledField(
+                    graphics, x, y, VeiledHeartService.VeiledCardType.UNIT, deltaX, player);
+        }
+
         deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
         return x + deltaX + 20;
     }
