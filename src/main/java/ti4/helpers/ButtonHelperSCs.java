@@ -421,7 +421,8 @@ public class ButtonHelperSCs {
         player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            StrategyCardModel model = game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            StrategyCardModel model =
+                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
             if (model != null && model.usesAutomationForSCID("pok5trade")) {
                 scModel = model;
                 break;
@@ -490,7 +491,8 @@ public class ButtonHelperSCs {
 
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            StrategyCardModel model = game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            StrategyCardModel model =
+                    game.getStrategyCardModelByInitiative(scNum).orElse(null);
             if (model != null && model.usesAutomationForSCID("pok5trade")) {
                 scModel = model;
                 break;
