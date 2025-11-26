@@ -90,7 +90,10 @@ public class UltimateStatisticsWebsiteHelper {
                         return null;
                     });
         } catch (IOException e) {
-            BotLogger.error("An IOException occurred while sending a request to TI4 Ultimate Stats: " + url, e);
+            BotLogger.error(
+                    LAZIK_DISCORD_NOTIFICATION + " An IOException occurred while sending a request to TI4 "
+                            + "Ultimate Stats: " + url,
+                    e);
             MessageHelper.sendMessageToChannel(channel, failureMessage);
         }
     }
@@ -98,14 +101,14 @@ public class UltimateStatisticsWebsiteHelper {
     private static void logHttpError(String url, String json, Throwable e) {
         BotLogger.error(
                 String.format(
-                        "An exception occurred during HTTP call to %s: %s %s", url, json, LAZIK_DISCORD_NOTIFICATION),
+                        "%s An exception occurred during HTTP call to %s: %s", LAZIK_DISCORD_NOTIFICATION, url, json),
                 e);
     }
 
     private static void handleErrorResponse(
             HttpResponse<String> response, MessageChannel channel, String failureMessage) {
         String body = response.body();
-        BotLogger.error(failureMessage + "\n```" + body + "```");
+        BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
         try {
             JsonNode node = EgressClientManager.getObjectMapper().readTree(body);
             String title = node.path("problemDetails").path("title").asText();
