@@ -59,7 +59,7 @@
         "alias": "tf-manipulate",
         "name": "Manipulate",
         "phase": "Action",
-        "window": "After another player initiates a splice that you are not participating in",
+        "window": "After cards are drawn for a splice that you are not participating in",
         "text": "Take the spliced cards. Choose which card each participating player will take.",
         "source": "twilights_fall"
     },

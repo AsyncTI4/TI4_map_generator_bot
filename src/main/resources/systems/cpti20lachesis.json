@@ -1,0 +1,18 @@
+{
+    "id": "cpti20lachesis",
+    "name": "Clotho/Lachesis",
+    "aliases": [
+        "cpti20lachesis",
+        "lachesis",
+        "clotho"
+    ],
+    "imagePath": "cpti20-lachesisclotho.png",
+    "planets": [
+        "lachesis",
+        "clotho"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "fracture",
+    "isScar": true,
+    "source": "other"
+}

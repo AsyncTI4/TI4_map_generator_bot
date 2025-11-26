@@ -89,8 +89,8 @@ public class TransactionGenerator {
         // ACs
         if (p1.hasAbility("arbiters")
                 || p2.hasAbility("arbiters")
-                || p1.hasTech("tf-guild_ships")
-                || p2.hasTech("tf-guild_ships")) {
+                || p1.hasTech("tf-guildships")
+                || p2.hasTech("tf-guildships")) {
             x += emojiSize + 5;
             drawEmojiWithCenteredInt(
                     g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
