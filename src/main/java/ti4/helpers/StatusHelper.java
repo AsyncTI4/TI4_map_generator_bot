@@ -571,6 +571,9 @@ public class StatusHelper {
 
         for (Player player : firmaments) {
             Tile home = player.getHomeSystemTile();
+            if (home == null) {
+                continue;
+            }
             List<Button> buttons = new ArrayList<>();
             for (Planet planet : home.getPlanetUnitHolders()) {
                 String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
