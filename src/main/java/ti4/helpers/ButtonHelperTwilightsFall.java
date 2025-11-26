@@ -1112,7 +1112,14 @@ public class ButtonHelperTwilightsFall {
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
-        String cardID = getDeckForSplicing(game, type, 1).getFirst();
+        List<String> cardsToDraw = getDeckForSplicing(game, type, 1);
+        if (cardsToDraw.isEmpty()) {
+            String messageText = "There are no more cards in the " + type + " deck.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        String cardID = cardsToDraw.getFirst();
         if (buttonID.split("_").length > 2) {
             cardID = buttonID.split("_")[2];
             ButtonHelper.deleteMessage(event);

@@ -1,5 +1,7 @@
 package ti4.image;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -401,10 +403,11 @@ public class Mapper {
     }
 
     public static ActionCardModel getActionCard(String id) {
-        if (id != null) {
-            id = id.replace("extra1", "");
-            id = id.replace("extra2", "");
+        if (isBlank(id)) {
+            throw new IllegalArgumentException("AC id cannot be blank.");
         }
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         if (!actionCards.containsKey(id)) {
             BotLogger.critical("Action card not found: " + id);
             return null;

@@ -30,11 +30,8 @@ class ShowPurgedActionCards extends GameStateSubcommand {
                     .append(index)
                     .append(".")
                     .append(Helper.leftpad("(" + ac.getValue(), 4))
-                    .append(")` - ");
-            if (Mapper.getActionCard(ac.getKey()) != null) {
-                sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
-            }
-
+                    .append(")` - ")
+                    .append(Mapper.getActionCard(ac.getKey()).getRepresentation());
             index++;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

@@ -89,14 +89,9 @@ public class ShowActionCardsService {
         Collections.reverse(aclist);
         Map<String, List<Map.Entry<String, Integer>>> cardsByName = new LinkedHashMap<>();
         aclist.forEach(ac -> {
-            if (Mapper.getActionCard(ac.getKey()) != null) {
-                String name = Mapper.getActionCard(ac.getKey()).getName();
-                if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
-                cardsByName.get(name).addFirst(ac);
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), "Null AC with id " + ac.getKey() + " " + ac.getValue());
-            }
+            String name = Mapper.getActionCard(ac.getKey()).getName();
+            if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
+            cardsByName.get(name).addFirst(ac);
         });
         List<Map.Entry<String, List<Map.Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
         Collections.reverse(entries);
