@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
+import ti4.helpers.Storage;
+import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.map.*;
 import ti4.model.LeaderModel;
@@ -64,5 +66,18 @@ public class VeiledHeartService {
             });
         });
         return veiledCardsByType;
+    }
+
+    public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
+        graphics.setColor(Color.LIGHT_GRAY);
+        graphics.setFont(Storage.getFont18());
+        String text = "VEILED\n" + type.toString();
+        long cardCount = getVeiledCards(type, player).count();
+        for (long l = 0; l < cardCount; ++l) {
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, text, x + deltaX + 7, y + 116, 116);
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            deltaX += 48;
+        }
+        return deltaX;
     }
 }
