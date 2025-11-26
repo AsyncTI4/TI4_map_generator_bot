@@ -517,7 +517,7 @@ class PlayerAreaGenerator {
             xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea);
         }
 
-        if (!player.getLeaders().isEmpty()) {
+        if (!player.getLeaders().isEmpty() || game.isVeiledHeartMode()) {
             xDelta = leaderInfo(player, xDelta, yPlayArea, game);
         }
 
