@@ -14,8 +14,8 @@
         "unitHolderName": "atropos",
         "resourcesLocation": "BottomRight",
         "centerPosition": {
-            "x": 200.0,
-            "y": 210.0
+            "x": 100.0,
+            "y": 80.0
         }
     },
     "source": "other"

@@ -10,6 +10,8 @@
     "planetTypes": [
         "NONE"
     ],
+    "legendaryAbilityName": "The Big Yeet",
+    "legendaryAbilityText": "When you pass, you may move up to 3 ground forces on Campe and Typhon to planets you control in the main galaxy, place any other player's units into coexistence. Units on Typhon are also on Campe.",
     "planetLayout": {
         "unitHolderName": "typhon",
         "resourcesLocation": "TopLeft",
