@@ -421,12 +421,20 @@ public class ButtonHelperSCs {
         player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
-                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            StrategyCardModel model = game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            if (model != null && model.usesAutomationForSCID("pok5trade")) {
+                scModel = model;
+                break;
             }
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        if (scModel == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Unable to locate the Trade strategy card. Commodity washing was not processed.");
+            return;
         }
         int tradeInitiative = scModel.getInitiative();
         if (!player.getFollowedSCs().contains(tradeInitiative)) {
@@ -482,12 +490,20 @@ public class ButtonHelperSCs {
 
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
-            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
-                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            StrategyCardModel model = game.getStrategyCardModelByInitiative(scNum).orElse(null);
+            if (model != null && model.usesAutomationForSCID("pok5trade")) {
+                scModel = model;
+                break;
             }
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        if (scModel == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Unable to locate the Trade strategy card. Commodity washing was not processed.");
+            return;
         }
         int tradeInitiative = scModel.getInitiative();
         if (!player.getFollowedSCs().contains(tradeInitiative)) {
