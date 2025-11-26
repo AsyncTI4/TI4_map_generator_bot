@@ -52,6 +52,7 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -2750,6 +2751,9 @@ public class ButtonHelperFactionSpecific {
             }
             buttons3.add(Buttons.green(
                     "discardAgent_" + leaderID, Mapper.getLeader(leaderID).getName()));
+        }
+        if (game.isVeiledHeartMode()) {
+            buttons3.addAll(VeiledHeartService.getVeiledDiscardButtonsForRedDeploy(p1));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please discard an ability or genome.", buttons3);
