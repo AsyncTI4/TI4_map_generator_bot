@@ -1,0 +1,22 @@
+{
+    "id": "typhon",
+    "tileId": "cpti20campe",
+    "name": "Typhon",
+    "aliases": [
+        "typhon"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "NONE"
+    ],
+    "planetLayout": {
+        "unitHolderName": "typhon",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "other"
+}

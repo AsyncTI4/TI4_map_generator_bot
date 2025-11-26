@@ -1,0 +1,22 @@
+{
+    "id": "lachesis",
+    "tileId": "cpti20lachesis",
+    "name": "Lachesis",
+    "aliases": [
+        "lachesis"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "lachesis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 250.0,
+            "y": 110.0
+        }
+    },
+    "source": "other"
+}

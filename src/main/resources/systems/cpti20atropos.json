@@ -1,0 +1,16 @@
+{
+    "id": "cpti20atropos",
+    "name": "The Watchtower",
+    "aliases": [
+        "cpti20atropos",
+        "atropos"
+    ],
+    "imagePath": "cpti20-atropos.png",
+    "planets": [
+        "atropos"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "red",
+    "isAsteroidField": true,
+    "source": "other"
+}

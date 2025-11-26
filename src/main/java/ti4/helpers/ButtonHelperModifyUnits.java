@@ -2199,13 +2199,13 @@ public class ButtonHelperModifyUnits {
                         && !ButtonHelper.isLawInPlay(game, "articles_war")
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                     orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
+                    orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).",
+                            orbFollowUp);
                 }
-                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).",
-                        orbFollowUp);
             }
             if (xxchaTEhero && player.getExhaustedPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(

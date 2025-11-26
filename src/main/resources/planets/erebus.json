@@ -1,0 +1,25 @@
+{
+    "id": "erebus",
+    "tileId": "cpti20erebus",
+    "name": "Erebus",
+    "aliases": [
+        "erebus"
+    ],
+    "resources": 3,
+    "influence": 3,
+    "planetTypes": [
+        "NONE"
+    ],
+    "legendaryAbilityName": "Ixthian Imposter",
+    "legendaryAbilityText": "When you pass, you may exhaust this card to roll 1 die. On a result of 1-4, each player must remove 3 units from the fracture if able, if this removes the last units on a planet, place 2 neutral infantry there and return it to the planet deck. On a result of 5-10, start an Evolution splice with each player in the Fracture participating.",
+    "legendaryAbilityFlavourText": "The last memory of the universe before.",
+    "planetLayout": {
+        "unitHolderName": "erebus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170.0,
+            "y": 150.0
+        }
+    },
+    "source": "other"
+}

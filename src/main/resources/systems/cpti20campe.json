@@ -1,0 +1,17 @@
+{
+    "id": "cpti20campe",
+    "name": "Campe/Typhon",
+    "aliases": [
+        "cpti20campe",
+        "campe",
+        "typhon"
+    ],
+    "imagePath": "cpti20-campetyphon.png",
+    "planets": [
+        "campe",
+        "typhon"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "fracture",
+    "source": "other"
+}
