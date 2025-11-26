@@ -99,7 +99,6 @@ public class PlotCardsService {
 
                 Planet p = tile.getUnitHolderFromPlanet(planet);
                 if (p == null) continue;
-                if (p.getUnitCount() <= 0) continue;
 
                 String id = player.finChecker() + "resolveSeethe_" + planet;
                 String label = Helper.getPlanetRepresentation(planet, game) + " [" + p.getUnitCount() + " units]";

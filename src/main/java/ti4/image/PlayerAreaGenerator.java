@@ -2458,7 +2458,9 @@ class PlayerAreaGenerator {
 
     private int breakthroughInfo(Player player, int x, int y, Game game) {
         BreakthroughModel bt = player.getBreakthroughModel();
-        if (bt == null || !game.isThundersEdge() || game.isTwilightsFallMode()) return x;
+        if (bt == null
+                || ((!game.isThundersEdge() || game.isTwilightsFallMode())
+                        && !player.hasUnlockedBreakthrough(bt.getID()))) return x;
         String name = bt.getDisplayName() == null ? bt.getName() : bt.getDisplayName();
         String faction = bt.getFaction().orElse(null);
         boolean exh = player.isBreakthroughExhausted();

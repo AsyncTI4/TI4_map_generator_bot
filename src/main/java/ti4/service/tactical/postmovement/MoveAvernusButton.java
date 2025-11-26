@@ -13,7 +13,8 @@ public final class MoveAvernusButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player.hasUnlockedBreakthrough("muaatbt")
                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(ctx.game, ctx.player, UnitType.Warsun)
-                        .contains(ctx.tile);
+                        .contains(ctx.tile)
+                && !ctx.tile.isHomeSystem(ctx.game);
     }
 
     public List<Button> build(PostMovementButtonContext ctx) {

@@ -7102,12 +7102,12 @@ public class ButtonHelper {
                             || ("xxcha_mech".equalsIgnoreCase(model.getId()) && isLawInPlay(game, "articles_war"))) {
                         continue;
                     }
-                    if (player.hasUnit("ralnel_destroyer2") && "space".equalsIgnoreCase(unitHolder.getName())) {
+                    if (owningPlayer.hasUnit("ralnel_destroyer2") && "space".equalsIgnoreCase(unitHolder.getName())) {
                         if (model.getUnitType() == UnitType.Pds || model.getUnitType() == UnitType.Spacedock) {
                             continue;
                         }
                         if (model.getUnitType() == UnitType.Destroyer
-                                && (unitHolder.getUnitCount(UnitType.Pds, player) < 1)) {
+                                && (unitHolder.getUnitCount(UnitType.Pds, owningPlayer) < 1)) {
                             continue;
                         }
                     }

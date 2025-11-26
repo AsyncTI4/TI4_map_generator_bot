@@ -1,0 +1,22 @@
+{
+    "id": "clotho",
+    "tileId": "cpti20lachesis",
+    "name": "Clotho",
+    "aliases": [
+        "clotho"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "clotho",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "other"
+}

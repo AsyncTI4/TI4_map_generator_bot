@@ -1,24 +1,22 @@
 {
-    "id": "lethe",
-    "tileId": "fracture7",
-    "name": "Lethe",
+    "id": "campe",
+    "tileId": "cpti20campe",
+    "name": "Campe",
     "aliases": [
-        "leth",
-        "lathe",
-        "lethe"
+        "campe"
     ],
-    "resources": 0,
-    "influence": 2,
+    "resources": 1,
+    "influence": 0,
     "planetTypes": [
         "NONE"
     ],
     "planetLayout": {
-        "unitHolderName": "lethe",
+        "unitHolderName": "campe",
         "resourcesLocation": "TopLeft",
         "centerPosition": {
             "x": 135.0,
             "y": 85.0
         }
     },
-    "source": "thunders_edge"
+    "source": "other"
 }

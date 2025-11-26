@@ -1,0 +1,22 @@
+{
+    "id": "atropos",
+    "tileId": "cpti20atropos",
+    "name": "Atropos",
+    "aliases": [
+        "atropos"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "SPACESTATION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "atropos",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 200.0,
+            "y": 210.0
+        }
+    },
+    "source": "other"
+}
