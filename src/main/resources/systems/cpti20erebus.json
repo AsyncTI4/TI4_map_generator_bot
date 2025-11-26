@@ -1,0 +1,14 @@
+{
+    "id": "cpti20erebus",
+    "name": "Erebus",
+    "aliases": [
+        "cpti20erebus"
+    ],
+    "imagePath": "cpti20-erebus.png",
+    "planets": [
+        "erebus"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "source": "other"
+}

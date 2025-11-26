@@ -1730,8 +1730,8 @@ public class TransactionHelper {
         }
         if ((p1.hasAbility("arbiters")
                         || p2.hasAbility("arbiters")
-                        || p1.hasTech("tf-guild_ships")
-                        || p2.hasTech("tf-guild_ships")
+                        || p1.hasTech("tf-guildships")
+                        || p2.hasTech("tf-guildships")
                         || blackMarket)
                 && p1.getAcCount() > 0) {
             stuffToTransButtons.add(
@@ -1888,8 +1888,8 @@ public class TransactionHelper {
         }
         if ((p1.hasAbility("arbiters")
                         || (!game.isFowMode() && p2.hasAbility("arbiters"))
-                        || p1.hasTech("tf-guild_ships")
-                        || (!game.isFowMode() && p2.hasTech("tf-guild_ships")))
+                        || p1.hasTech("tf-guildships")
+                        || (!game.isFowMode() && p2.hasTech("tf-guildships")))
                 && p1.getAcCount() > 0) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_ACs_" + p2.getFaction(), "Action Cards"));
         }

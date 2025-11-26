@@ -1,0 +1,32 @@
+{
+    "id": "gyges",
+    "tileId": "cpti20cottus",
+    "name": "Gyges",
+    "aliases": [
+        "gyges"
+    ],
+    "positionInTile": {
+        "x": 83.0,
+        "y": 139.0
+    },
+    "resources": 1,
+    "influence": 0,
+    "factionHomeworld": null,
+    "planetType": "INDUSTRIAL",
+    "cardImagePath": null,
+    "techSpecialties": [
+        "BIOTIC",
+        "PROPULSION"
+    ],
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "planetLayout": {
+        "unitHolderName": "gyges",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 83,
+            "y": 139
+        }
+    },
+    "source": "other"
+}

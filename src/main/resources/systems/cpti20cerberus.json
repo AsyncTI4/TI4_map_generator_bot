@@ -1,0 +1,15 @@
+{
+    "id": "cpti20cerberus",
+    "name": "Cerberus",
+    "aliases": [
+        "cpti20cerberus",
+        "cerberuscpti"
+    ],
+    "imagePath": "cpti20-cerberus.png",
+    "planets": [
+        "cerberuscpti"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "fracture",
+    "source": "other"
+}
