@@ -1024,7 +1024,13 @@ public class StartPhaseService {
             }
         }
 
-        Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
+        List<Player> actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
+        if (actionPhaseTurnOrder.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Unable to start action phase: no turn order set.");
+            return;
+        }
+        Player nextPlayer = actionPhaseTurnOrder.getFirst();
         if (nextPlayer == null) {
             return;
         }
