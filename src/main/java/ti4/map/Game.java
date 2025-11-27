@@ -4837,7 +4837,6 @@ public class Game extends GameProperties {
                         .anyMatch(leader -> !leader.getSource().isOfficial());
     }
 
-
     public boolean checkAllDecksAreOfficial() {
         // Decks
         List<String> deckIDs = new ArrayList<>();
