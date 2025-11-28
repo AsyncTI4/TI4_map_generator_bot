@@ -127,8 +127,10 @@ public class EdictPhaseHandler {
                 if (p2 == player || game.getStoredValue("convenePlayers").contains(p2.getFaction())) {
                     continue;
                 }
-                buttons.add(
-                        Buttons.green("conveneStep2_" + cardID + "_" + p2.getFaction(), p2.getFactionNameOrColor()));
+                buttons.add(Buttons.green(
+                        "conveneStep2_" + cardID + "_" + p2.getFaction(),
+                        p2.getFactionNameOrColor(),
+                        p2.fogSafeEmoji()));
             }
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -280,7 +282,7 @@ public class EdictPhaseHandler {
             case "tf-censure" -> {
                 for (Player p2 : game.getRealPlayers()) {
                     buttons.add(Buttons.green(
-                            "electCensure_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+                            "electCensure_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
                 }
                 msg += "\n\nChoose the player to censure.";
             }

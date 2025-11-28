@@ -880,10 +880,11 @@ public class ButtonHelperSCs {
             ReactionService.addReaction(event, game, player, message);
         }
         Tile tile = player.getHomeSystemTile();
+        boolean singleDock = !game.isTwilightsFallMode() && !game.isThundersEdge();
         buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
-        int val = Helper.getProductionValue(player, game, tile, true);
+        int val = Helper.getProductionValue(player, game, tile, singleDock);
         String message = player.getRepresentation()
-                + " Use the buttons to produce. Reminder that when following **Warfare**, you may only use 1 space dock in your home system. "
+                + " Use the buttons to produce."
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true) + "\n"
                 + "You have " + val + " PRODUCTION value in this system.";
         if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {

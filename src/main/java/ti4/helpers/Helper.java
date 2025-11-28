@@ -626,6 +626,7 @@ public class Helper {
         planetID = planetID.toLowerCase().replace(" ", "");
         planetID = planetID.replace("'", "");
         planetID = planetID.replace("-", "");
+        planetID = planetID.replace(".", "");
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return "Unable to find planet unitholder for " + planetID;
@@ -1669,7 +1670,9 @@ public class Helper {
         if ("space".equals(uH.getName())) {
             if (tile.isSupernova()
                     && player.hasTech("mr")
-                    && (FoWHelper.playerHasUnitsInSystem(player, tile) || game.isTwilightsFallMode())) {
+                    && (FoWHelper.playerHasUnitsInSystem(player, tile)
+                            || (game.isTwilightsFallMode()
+                                    && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))) {
                 productionValueTotal += 5;
             } else {
                 if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
@@ -1902,8 +1905,7 @@ public class Helper {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 for (UnitKey unit : uH.getUnits().keySet()) {
                     if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                        UnitModel unitModel =
-                                player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                        UnitModel unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
                         if (!"sd".equals(unitModel.getAsyncId())) {
                             continue;
                         }

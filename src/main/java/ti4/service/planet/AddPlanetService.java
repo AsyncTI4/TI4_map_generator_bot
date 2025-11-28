@@ -222,7 +222,8 @@ public class AddPlanetService {
         }
         if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
                 && player.hasTech("dxa")
-                && !doubleCheck) {
+                && !doubleCheck
+                && !setup) {
             String msg10 = player.getRepresentationUnfogged()
                     + " you may have an opportunity to use _Dacxive Animators_ on "
                     + Helper.getPlanetRepresentation(planet, game)
