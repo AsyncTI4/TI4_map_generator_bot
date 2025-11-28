@@ -285,6 +285,16 @@ public class VoteButtonHandler {
         for (String planet : planets) {
             Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && p.isSpaceStation()) continue;
+            String agendaDetails = game.getCurrentAgendaInfo().split("_")[1].toLowerCase();
+            if (agendaDetails.contains("non-home")) {
+                if (game.getTileFromPlanet(planet) != null
+                        && game.getTileFromPlanet(planet).isHomeSystem(game)) {
+                    continue;
+                }
+                if (planet.equalsIgnoreCase("mrte") || planet.equalsIgnoreCase("mr")) {
+                    continue;
+                }
+            }
             Button button;
             TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);
             if (rider == null) {

@@ -1012,6 +1012,9 @@ public class ButtonHelperModifyUnits {
         if (skilled) {
             skilledS = "_skilled";
         }
+        if (feint) {
+            skilledS += "feint";
+        }
         Set<String> positions = FoWHelper.getAdjacentTiles(game, pos1, player, false);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander") && player.getHomeSystemTile() != null) {
             positions.addAll(FoWHelper.getAdjacentTiles(game, player.getHomeSystemPosition(), player, false));
@@ -1567,7 +1570,7 @@ public class ButtonHelperModifyUnits {
                         player.getFactionEmoji()
                                 + " did not place a command token in system they retreated to due to the Eusosociality ability.");
             } else {
-                if (game.isTwilightsFallMode() && buttonID.contains("skilled")) {
+                if (game.isTwilightsFallMode() && buttonID.contains("skilled") && !buttonID.contains("feint")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             player.getFactionEmoji()

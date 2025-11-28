@@ -1,1 +1,26 @@
-{"id":"118","name":"Ahk Creuxx (Crimson)","aliases":["te06","creuxx","ahk","ahkcreuxx","crimson","rebellion","crimsonhs","rebellionhs","crimsonrebellion","crimsonrebellionhs"],"imagePath":"118_Crimson.png","planets":["ahkcreuxx"],"shipPositionsType":"TYPE09","wormholes":["EPSILON"],"tileBack":"green","source":"thunders_edge"}
+{
+    "id": "118",
+    "name": "Ahk Creuxx (Crimson)",
+    "aliases": [
+        "te06",
+        "creuxx",
+        "ahk",
+        "ahkcreuxx",
+        "crimson",
+        "rebellion",
+        "crimsonhs",
+        "rebellionhs",
+        "crimsonrebellion",
+        "crimsonrebellionhs"
+    ],
+    "imagePath": "118_Crimson.png",
+    "planets": [
+        "ahkcreuxx"
+    ],
+    "shipPositionsType": "TYPE09",
+    "wormholes": [
+        "EPSILON"
+    ],
+    "tileBack": "green",
+    "source": "thunders_edge"
+}

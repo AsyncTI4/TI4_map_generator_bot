@@ -1,1 +1,18 @@
-{"id":"105","name":"Neutera/Tinnes","aliases":["te17","neutera","tinnes"],"imagePath":"105_Neutera.png","planets":["neutera","tinnes"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"thunders_edge"}
+{
+    "id": "105",
+    "name": "New Terra/Tinnes",
+    "aliases": [
+        "te17",
+        "neutera",
+        "tinnes",
+        "newterra"
+    ],
+    "imagePath": "105_Neutera.png",
+    "planets": [
+        "neutera",
+        "tinnes"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "thunders_edge"
+}

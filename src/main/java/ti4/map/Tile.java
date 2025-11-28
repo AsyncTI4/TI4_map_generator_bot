@@ -741,7 +741,9 @@ public class Tile {
         }
         TileModel tileM = TileHelper.getTileById(tileID);
         if (tileM != null) {
-            if (tileM.getTileBack() == TileBack.GREEN) {
+            if (tileM.getTileBack() == TileBack.GREEN
+                    && !tileID.equalsIgnoreCase("17")
+                    && !tileID.equalsIgnoreCase("94")) {
                 return true;
             } else {
                 return false;
