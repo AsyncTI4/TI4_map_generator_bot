@@ -352,7 +352,7 @@ public class StartCombatService {
                 amount++;
             }
         }
-        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 20) {
+        if (amount > 2 || tile.getNumberOfUnitsInSystem() > 2) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, ButtonHelper.getTileSummaryMessage(game, true, tile, player1, event));
         }
