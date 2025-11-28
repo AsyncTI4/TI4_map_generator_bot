@@ -84,7 +84,9 @@ class ListPlayerInfoButtonHandler {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
                     for (Leader lead : p2.getLeaders()) {
-                        messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
+                        messageEmbeds.add(lead.getLeaderModel()
+                                .get()
+                                .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
                     }
                     for (String tech : p2.getFactionTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -155,8 +157,9 @@ class ListPlayerInfoButtonHandler {
                 case "agent", "commander", "hero" -> {
                     for (Leader lead : p2.getLeaders()) {
                         if (lead.getId().contains(category)) {
-                            messageEmbeds.add(
-                                    lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
+                            messageEmbeds.add(lead.getLeaderModel()
+                                    .get()
+                                    .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
                         }
                     }
                 }
