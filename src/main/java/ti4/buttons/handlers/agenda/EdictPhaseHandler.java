@@ -23,6 +23,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TechEmojis;
 
@@ -76,7 +77,7 @@ public class EdictPhaseHandler {
                         "Keep " + Mapper.getLeader(paradigm).getName()));
             }
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
+                    game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
                     player.getRepresentation() + " choose the paradigm you would like to keep.",
                     buttons);
         } else {
@@ -90,6 +91,13 @@ public class EdictPhaseHandler {
         String paradigm = buttonID.split("_")[1];
         for (String paradigmToLose : game.getStoredValue("artificeParadigms").split("_")) {
             if (!paradigmToLose.equalsIgnoreCase(paradigm)) {
+                if (game.isVeiledHeartMode()) {
+                    VeiledHeartService.doAction(
+                            VeiledHeartService.VeiledCardAction.DISCARD,
+                            VeiledHeartService.VeiledCardType.PARADIGM,
+                            player,
+                            paradigm);
+                }
                 player.removeLeader(paradigmToLose);
                 game.setStoredValue(
                         "savedParadigms",
@@ -99,7 +107,7 @@ public class EdictPhaseHandler {
             }
         }
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
+                game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
                 player.getRepresentation() + " kept the "
                         + Mapper.getLeader(paradigm).getName() + " paradigm.");
         game.removeStoredValue("artificeParadigms");
