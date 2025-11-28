@@ -65,7 +65,8 @@ public class PlayHeroService {
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " played:");
             player.getCorrectChannel()
-                    .sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, false, showFlavourText))
+                    .sendMessageEmbeds(leaderModel.getRepresentationEmbed(
+                            false, true, false, showFlavourText, game.isTwilightsFallMode()))
                     .queue();
         } else {
             MessageHelper.sendMessageToChannel(
