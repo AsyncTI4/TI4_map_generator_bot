@@ -173,7 +173,9 @@ public class RiftSetModeService {
         if (!isActive(game) || !game.isCustodiansScored()) return;
 
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        if (tile.getTileModel().isGravityRift() || tile.hasCabalSpaceDockOrGravRiftToken(game) || tile.isHomeSystem()) {
+        if (tile.getTileModel().isGravityRift()
+                || tile.hasCabalSpaceDockOrGravRiftToken(game)
+                || tile.isHomeSystem(game)) {
             return;
         }
 
