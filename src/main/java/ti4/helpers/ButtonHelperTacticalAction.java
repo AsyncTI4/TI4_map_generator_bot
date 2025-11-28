@@ -694,7 +694,7 @@ public class ButtonHelperTacticalAction {
         if (player.hasAbility("plague_reservoir") && player.hasTech("dxa")) {
             for (Planet planetUH : tile.getPlanetUnitHolders()) {
                 String planet = planetUH.getName();
-                if (player.getPlanetsAllianceMode().contains(planetUH.getName())) {
+                if (player.getPlanetsAllianceMode().contains(planetUH.getName()) && !planetUH.isSpaceStation()) {
                     String msg10 = player.getRepresentationUnfogged()
                             + " when you get to the invasion step of the tactical action, you may have an opportunity to use _Dacxive Animators_ on "
                             + Helper.getPlanetRepresentation(planet, game)
