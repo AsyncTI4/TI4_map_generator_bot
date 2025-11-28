@@ -2039,8 +2039,10 @@ public class ButtonHelperModifyUnits {
         String successMessage;
         String playerRep = player.getRepresentation();
 
-        Tile tile = game.getTileFromPositionOrAlias(planetName);
-        if (ButtonHelper.isNumeric(planetName) && (unitLong.contains("2gf") || unitLong.contains("mech"))) {
+        Tile tile = game.getTileByPosition(planetName);
+        if (tile == null) {
+            tile = game.getTile(AliasHandler.resolveTile(planetName));
+        } else if (unitLong.contains("2gf") || unitLong.contains("mech")) {
             planetName += "space";
         }
         if ("sd".equalsIgnoreCase(unitID)) {
