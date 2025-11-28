@@ -513,7 +513,7 @@ public class ButtonHelperTwilightsFall {
                 player.getCorrectChannel(),
                 player.getRepresentation() + " has discarded the genome: "
                         + Mapper.getLeader(cardID).getName(),
-                Mapper.getLeader(cardID).getRepresentationEmbed());
+                Mapper.getLeader(cardID).getRepresentationEmbed(true));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -678,12 +678,12 @@ public class ButtonHelperTwilightsFall {
                 if ("agent".equalsIgnoreCase(leaderModel.getType())) {
                     buttons.add(Buttons.blue(
                             "revealSpecificVeiledCard_genome_" + card, leaderModel.getLeaderPositionAndFaction()));
-                    embeds.add(leaderModel.getRepresentationEmbed());
+                    embeds.add(leaderModel.getRepresentationEmbed(true));
                 }
                 if ("hero".equalsIgnoreCase(leaderModel.getType())) {
                     buttons.add(Buttons.red(
                             "revealSpecificVeiledCard_paradigm_" + card, leaderModel.getLeaderPositionAndFaction()));
-                    embeds.add(leaderModel.getRepresentationEmbed());
+                    embeds.add(leaderModel.getRepresentationEmbed(true));
                 }
             }
         }
@@ -719,7 +719,7 @@ public class ButtonHelperTwilightsFall {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " has unveiled the genome: "
                             + Mapper.getLeader(cardID).getName(),
-                    Mapper.getLeader(cardID).getRepresentationEmbed());
+                    Mapper.getLeader(cardID).getRepresentationEmbed(true));
         }
         if ("paradigm".equalsIgnoreCase(type)) {
             player.addLeader(cardID);
@@ -727,7 +727,7 @@ public class ButtonHelperTwilightsFall {
                     player.getCorrectChannel(),
                     player.getRepresentation() + " has unveiled the paradigm: "
                             + Mapper.getLeader(cardID).getName(),
-                    Mapper.getLeader(cardID).getRepresentationEmbed());
+                    Mapper.getLeader(cardID).getRepresentationEmbed(true));
             player.getLeaderByID(cardID).get().setLocked(false);
         }
         if ("units".equalsIgnoreCase(type)) {
@@ -1139,7 +1139,7 @@ public class ButtonHelperTwilightsFall {
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has acquired the genome: "
                                 + Mapper.getLeader(cardID).getName(),
-                        Mapper.getLeader(cardID).getRepresentationEmbed());
+                        Mapper.getLeader(cardID).getRepresentationEmbed(true));
             }
             if ("units".equalsIgnoreCase(type)) {
                 UnitModel unitModel = Mapper.getUnit(cardID);
