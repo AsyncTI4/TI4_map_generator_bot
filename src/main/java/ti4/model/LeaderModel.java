@@ -105,7 +105,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getTFAbilityText() {
         if (tfAbilityText == null) {
-            return Optional.ofNullable(abilityWindow);
+            return Optional.ofNullable(abilityText);
         }
         return Optional.ofNullable(tfAbilityText);
     }
