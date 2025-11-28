@@ -80,6 +80,11 @@ public class EdictPhaseHandler {
                     game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
                     player.getRepresentation() + " choose the paradigm you would like to keep.",
                     buttons);
+            if (game.isVeiledHeartMode()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " is choosing which paradigm to keep.");
+            }
         } else {
             game.removeStoredValue("artificeParadigms");
         }
@@ -110,6 +115,11 @@ public class EdictPhaseHandler {
                 game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
                 player.getRepresentation() + " kept the "
                         + Mapper.getLeader(paradigm).getName() + " paradigm.");
+        if (game.isVeiledHeartMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " has chosen a paradigm to keep and discarded the others.");
+        }
         game.removeStoredValue("artificeParadigms");
 
         ButtonHelper.deleteMessage(event);
