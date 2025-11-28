@@ -62,7 +62,7 @@ public class VeiledHeartService {
         }
     }
 
-    private enum VeiledCardAction {
+    public enum VeiledCardAction {
         DISCARD,
         DRAW,
         SPLICE,
@@ -165,7 +165,7 @@ public class VeiledHeartService {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
+    public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
         if (action.equals(VeiledCardAction.DISCARD)) {
             setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
 

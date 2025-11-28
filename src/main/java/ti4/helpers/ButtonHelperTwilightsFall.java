@@ -835,7 +835,7 @@ public class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
-                            + " has taken a secret card. They may put it into play with a button in their cards info.");
+                            + " has taken a secret paradigm. They may put it into play with a button in their cards info.");
         } else {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
