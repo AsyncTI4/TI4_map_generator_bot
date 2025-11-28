@@ -3,8 +3,10 @@ package ti4.commands.map;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
+import ti4.commands.SuspicionLevel;
 import ti4.helpers.Constants;
 
 public class MapCommand implements ParentCommand {
@@ -48,5 +50,10 @@ public class MapCommand implements ParentCommand {
     @Override
     public Map<String, Subcommand> getSubcommands() {
         return subcommands;
+    }
+
+    @Override
+    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
+        return SuspicionLevel.NONE;
     }
 }

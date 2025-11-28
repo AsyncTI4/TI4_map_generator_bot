@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
+import ti4.commands.SuspicionLevel;
 import ti4.helpers.Constants;
 import ti4.spring.jda.JdaService;
 
@@ -41,5 +42,10 @@ public class DeveloperCommand implements ParentCommand {
     @Override
     public Map<String, Subcommand> getSubcommands() {
         return subcommands;
+    }
+
+    @Override
+    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
+        return SuspicionLevel.NONE;
     }
 }

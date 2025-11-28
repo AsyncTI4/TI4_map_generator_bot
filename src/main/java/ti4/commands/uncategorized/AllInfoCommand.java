@@ -3,6 +3,7 @@ package ti4.commands.uncategorized;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateCommand;
+import ti4.commands.SuspicionLevel;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
@@ -48,5 +49,10 @@ public class AllInfoCommand extends GameStateCommand {
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
+    }
+
+    @Override
+    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
+        return SuspicionLevel.NONE;
     }
 }

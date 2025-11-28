@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.SuspicionLevel;
 
 public interface ParentCommand extends Command {
 
@@ -38,6 +39,21 @@ public interface ParentCommand extends Command {
             subcommandGroup.preExecute(event);
             subcommandGroup.execute(event);
             subcommandGroup.postExecute(event);
+        }
+    }
+
+    @Override
+    default SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
+        String subcommandGroupName = event.getInteraction().getSubcommandGroup();
+        if (subcommandGroupName == null) {
+            String subcommandName = event.getInteraction().getSubcommandName();
+            Subcommand subcommand = getSubcommands().get(subcommandName);
+            return subcommand != null ? subcommand.getSuspicionLevel(event) : Command.super.getSuspicionLevel(event);
+        } else {
+            SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
+            return subcommandGroup != null
+                    ? subcommandGroup.getSuspicionLevel(event)
+                    : Command.super.getSuspicionLevel(event);
         }
     }
 
