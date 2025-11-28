@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2090,6 +2091,12 @@ public class ButtonHelperAbilities {
         Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
+        if (enemyPlayer.isEmpty()) {
+            String planetName = Helper.getPlanetRepresentation(planet, game);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "No eligible opponent found for combat on " + planetName + ".");
+            return;
+        }
         StartCombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
     }
 
