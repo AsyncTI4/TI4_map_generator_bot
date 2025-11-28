@@ -1768,6 +1768,117 @@ public class ButtonHelperAbilities {
         // buttons to move ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }
 
+    @ButtonHandler("startYssarilbt")
+    public static void startYssarilbt(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
+                buttons.add(Buttons.red(
+                        "yssarilbtStep2_scheming_" + p2.getFaction(),
+                        "Remove Scheming From " + p2.getFactionNameOrColor(),
+                        p2.fogSafeEmoji()));
+            } else {
+                buttons.add(Buttons.green(
+                        "yssarilbtStep2_scheming_" + p2.getFaction(),
+                        "Add Scheming To " + p2.getFactionNameOrColor(),
+                        p2.fogSafeEmoji()));
+            }
+        }
+        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", please use buttons to add or remove Scheming from factions.",
+                buttons);
+        buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
+                buttons.add(Buttons.red(
+                        "yssarilbtStep2_stalltactics_" + p2.getFaction(),
+                        "Remove Stall Tactics From " + p2.getFactionNameOrColor(),
+                        p2.fogSafeEmoji()));
+            } else {
+                buttons.add(Buttons.green(
+                        "yssarilbtStep2_stalltactics_" + p2.getFaction(),
+                        "Add Stall Tactics To " + p2.getFactionNameOrColor(),
+                        p2.fogSafeEmoji()));
+            }
+        }
+        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentationNoPing() + ", please use buttons to add or remove Stall Tactics from factions.",
+                buttons);
+    }
+
+    @ButtonHandler("yssarilbtStep2_")
+    public static void yssarilbtStep2_(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String type = buttonID.split("_")[1];
+        String faction = buttonID.split("_")[2];
+        List<Button> buttons = new ArrayList<>();
+        if (type.equalsIgnoreCase("scheming")) {
+            if (game.getStoredValue("schemingFactions").contains(faction)) {
+                game.setStoredValue(
+                        "schemingFactions",
+                        game.getStoredValue("schemingFactions").replace(faction, ""));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " removed scheming from "
+                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
+            } else {
+                game.setStoredValue("schemingFactions", game.getStoredValue("schemingFactions") + faction + "_");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " added scheming to "
+                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
+            }
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
+                    buttons.add(Buttons.red(
+                            "yssarilbtStep2_scheming_" + p2.getFaction(),
+                            "Remove Scheming From " + p2.getFactionNameOrColor(),
+                            p2.fogSafeEmoji()));
+                } else {
+                    buttons.add(Buttons.green(
+                            "yssarilbtStep2_scheming_" + p2.getFaction(),
+                            "Add Scheming To " + p2.getFactionNameOrColor(),
+                            p2.fogSafeEmoji()));
+                }
+            }
+        }
+        if (type.equalsIgnoreCase("stalltactics")) {
+            if (game.getStoredValue("stalltacticsFactions").contains(faction)) {
+                game.setStoredValue(
+                        "stalltacticsFactions",
+                        game.getStoredValue("stalltacticsFactions").replace(faction, ""));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " removed stall tactics from "
+                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
+            } else {
+                game.setStoredValue(
+                        "stalltacticsFactions", game.getStoredValue("stalltacticsFactions") + faction + "_");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationNoPing() + " added stall tactics to "
+                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
+            }
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
+                    buttons.add(Buttons.red(
+                            "yssarilbtStep2_stalltactics_" + p2.getFaction(),
+                            "Remove Stall Tactics From " + p2.getFactionNameOrColor()));
+                } else {
+                    buttons.add(Buttons.green(
+                            "yssarilbtStep2_stalltactics_" + p2.getFaction(),
+                            "Add Stall Tactics To " + p2.getFactionNameOrColor()));
+                }
+            }
+        }
+
+        buttons.add(Buttons.gray("deleteButtons", "Done"));
+        MessageHelper.editMessageButtons(event, buttons);
+    }
+
     public static void pillageCheck(Player player, Game game) {
         if (canBePillaged(player, game, player.getTg())) {
             for (Player neighbor : player.getNeighbouringPlayers(true)) {
@@ -1790,10 +1901,41 @@ public class ButtonHelperAbilities {
                 buttons.add(Buttons.red(
                         finChecker + "pillage_" + player.getColor() + "_unchecked",
                         "Pillage " + (game.isFowMode() ? playerIdent : player.getFlexibleDisplayName())));
-                buttons.add(Buttons.green(finChecker + "deleteButtons", "Decline Pillage Window"));
+                buttons.add(
+                        Buttons.green(finChecker + "declinePillage_" + player.getColor(), "Decline Pillage Window"));
                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
             }
         }
+    }
+
+    @ButtonHandler("declinePillage_")
+    public static void declinePillage(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player pillaged = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " officially declined to **Pillage** "
+                        + pillaged.getRepresentationNoPing() + ". How very generous of them!");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("setwillPillageOwnTransactions_")
+    public static void setwillPillageOwnTransactions(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String choice = buttonID.split("_")[1];
+        if ("yes".equalsIgnoreCase(choice)) {
+            game.setStoredValue("willPillageOwnTransactions" + player.getFaction(), "");
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationNoPing()
+                            + " will get pinged about pillage on their own trade transactions in future pillage opportunities.");
+        } else {
+            game.setStoredValue("willPillageOwnTransactions" + player.getFaction(), "no");
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged()
+                            + " will NOT get pinged about pillage on their own trade transactions in future pillage opportunities.");
+        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("mantleCrack_")

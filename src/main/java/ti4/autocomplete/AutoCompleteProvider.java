@@ -1320,7 +1320,7 @@ public class AutoCompleteProvider {
                 options = searchModels(event, Mapper.getFactions().values(), source);
             // no /search franken_errata yet
             // no /search generic_cards yet
-            case Constants.SEARCH_LEADERS ->
+            case Constants.SEARCH_LEADERS, Constants.SEARCH_GENOMES, Constants.SEARCH_PARADIGMS ->
                 options = searchModels(event, Mapper.getLeaders().values(), source);
             // no /search map_templates yet
             case Constants.SEARCH_PROMISSORY_NOTES ->

@@ -80,7 +80,7 @@
         "title": "Forlorn Shadow",
         "tfTitle": "Instability",
         "abilityWindow": "ACTION:",
-        "abilityText": "Exhaust this card to choose 1 player. That player may swap the position of 2 of their ships in any systems; they may transport units when they swap.",
+        "abilityText": "Exhaust this card to choose 1 player. That player may swap the position of 2 of their ships in any systems; they may transport units when they swap. [Note: async has decided that a swap is likely to be a move and thus will obey anomaly movement restrictions.]",
         "unlockCondition": "Always Unlocked",
         "source": "thunders_edge"
     },

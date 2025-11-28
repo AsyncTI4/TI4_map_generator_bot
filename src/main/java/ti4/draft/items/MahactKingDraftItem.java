@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
@@ -26,6 +27,12 @@ public class MahactKingDraftItem extends DraftItem {
             return getAlias();
         }
         return "Mahact King - " + faction.getFactionName().replace("\n", "");
+    }
+
+    @JsonIgnore
+    @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
     }
 
     @JsonIgnore

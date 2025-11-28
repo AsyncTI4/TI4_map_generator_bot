@@ -19,6 +19,8 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.draft.InauguralSpliceFrankenDraft;
+import ti4.draft.items.AgentDraftItem;
+import ti4.draft.items.HeroDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -327,7 +329,11 @@ public class FrankenDraftBagService {
                 continue;
             }
             sb.append("> ").append(item.getShortDescription()).append("\n");
-            sb.append("> - ").append(item.getLongDescription()).append("\n");
+            if (item instanceof AgentDraftItem || item instanceof HeroDraftItem) {
+                sb.append("> - ").append(item.getLongDescription(game)).append("\n");
+            } else {
+                sb.append("> - ").append(item.getLongDescription()).append("\n");
+            }
         }
         return sb.toString();
     }

@@ -149,6 +149,23 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
         }
+        if (player.hasUnlockedBreakthrough("yssarilbt")) {
+            buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
+        }
+        if (player.hasAbility("pillage")) {
+            if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
+                    .isEmpty()) {
+                buttons.add(Buttons.green(
+                        "setwillPillageOwnTransactions_no",
+                        "Turn off Pillage pings on your transactions",
+                        FactionEmojis.Mentak));
+            } else {
+                buttons.add(Buttons.red(
+                        "setwillPillageOwnTransactions_yes",
+                        "Turn on Pillage pings on your transactions",
+                        FactionEmojis.Mentak));
+            }
+        }
         if (player.hasUnexhaustedLeader("deepwroughtagent")) {
             buttons.add(Buttons.gray(
                     "getAgentSelection_deepwroughtagent",

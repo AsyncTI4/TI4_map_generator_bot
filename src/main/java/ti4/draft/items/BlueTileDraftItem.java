@@ -34,6 +34,12 @@ public class BlueTileDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public String getLongDescriptionImpl() {
         TileModel tile = TileHelper.getTileById(ItemId);
         StringBuilder sb = new StringBuilder();

@@ -28,6 +28,12 @@ public class CommoditiesDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public String getShortDescription() {
         return getFaction().getFactionName() + " Commodities";
     }

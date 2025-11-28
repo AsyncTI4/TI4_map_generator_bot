@@ -173,8 +173,17 @@ public class TransactionHelper {
 
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
-            ButtonHelperAbilities.pillageCheck(p1, game);
-            ButtonHelperAbilities.pillageCheck(p2, game);
+            if ((p1.hasAbility("pillage")
+                            && !game.getStoredValue("willPillageOwnTransactions" + p1.getFaction())
+                                    .isEmpty())
+                    || (p2.hasAbility("pillage")
+                            && !game.getStoredValue("willPillageOwnTransactions" + p2.getFaction())
+                                    .isEmpty())) {
+
+            } else {
+                ButtonHelperAbilities.pillageCheck(p1, game);
+                ButtonHelperAbilities.pillageCheck(p2, game);
+            }
             CommanderUnlockCheckService.checkPlayer(p1, "hacan");
             CommanderUnlockCheckService.checkPlayer(p2, "hacan");
         }

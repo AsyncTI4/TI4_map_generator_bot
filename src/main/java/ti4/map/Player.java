@@ -708,6 +708,16 @@ public class Player extends PlayerProperties {
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
+        if ("scheming".equalsIgnoreCase(ability)) {
+            if (getGame().getStoredValue("schemingFactions").contains(getFaction())) {
+                return true;
+            }
+        }
+        if ("stall_tactics".equalsIgnoreCase(ability)) {
+            if (getGame().getStoredValue("stalltacticsFactions").contains(getFaction())) {
+                return true;
+            }
+        }
         return getAbilities().contains(ability);
     }
 

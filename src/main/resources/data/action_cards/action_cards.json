@@ -1024,7 +1024,7 @@
         "alias": "ghost_squad",
         "name": "Ghost Squad",
         "phase": "Action",
-        "window": "After a player commits units to land on a planet you control",
+        "window": "After another player commits units to land on a planet you control",
         "text": "Move any number of your ground forces from any planet you control in the active system to any other planet you control in the active system.",
         "flavorText": "The L1 advance team was expecting to find the outpost abandoned. What they found - unfortunately for them - was Connor.",
         "source": "codex1"
@@ -1071,7 +1071,7 @@
         "name": "Master Plan",
         "phase": "Action",
         "window": "After you perform an action",
-        "text": "You may perform an additional action this turn.",
+        "text": "Perform an additional action.",
         "flavorText": "Viktor laced his long fingers with a wicked smile. Unlenn would be proud. The tactician's reputation was well-earned; even pawns could unseat kings.",
         "source": "codex1"
     },
@@ -1155,7 +1155,7 @@
         "name": "Solar Flare",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "During this movement, other players cannot use SPACE CANNON against your ships.",
+        "text": "During the \"Movement\" step of this tactical action, other players cannot use SPACE CANNON against your ships.",
         "flavorText": "Meian braced for combat as the fleet entered the Ordinian system, but there were no Valefar droneships waiting to meet them. The solar flare gambit had succeeded - they were completely undetected.",
         "source": "codex1"
     },

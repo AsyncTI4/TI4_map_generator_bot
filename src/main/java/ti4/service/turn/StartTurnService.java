@@ -202,6 +202,7 @@ public class StartTurnService {
                 && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!p2.equals(player)
+                        && !p2.getAllianceMembers().contains(player.getFaction())
                         && (game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander")
                                 || game.playerHasLeaderUnlockedOrAlliance(p2, "crimsoncommander"))
                         && p2.getCommodities() > 0

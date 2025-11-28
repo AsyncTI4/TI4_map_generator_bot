@@ -685,7 +685,6 @@ public class ButtonHelperTwilightsFallActionCards {
 
     @ButtonHandler("starFlareStep2_")
     public static void starFlareStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        player.setTacticalCC(player.getTacticalCC() - 1);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
         String msg =
