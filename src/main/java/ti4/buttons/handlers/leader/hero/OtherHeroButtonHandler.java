@@ -46,7 +46,7 @@ class OtherHeroButtonHandler {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " is playing " + heroTitle + ".",
-                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
+                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
