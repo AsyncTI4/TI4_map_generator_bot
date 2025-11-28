@@ -33,9 +33,9 @@
         "type": "extrarolls",
         "value": "+1",
         "applyEachForQuantity": true,
-        "persistenceType": "CONDITIONAL",
         "scope": "mf",
         "forCombatAbility": "combatround",
+        "persistenceType": "CONDITIONAL",
         "condition": "naazFS",
         "related": [
             {
@@ -1364,13 +1364,15 @@
         "alias": "plus1_roll_bluetf_mech",
         "type": "extrarolls",
         "value": "+1",
-        "persistenceType": "ALWAYS",
+        "persistenceType": "CONDITIONAL",
+        "condition": "bluetfMech",
         "valueScalingType": "mechs_in_space_area",
         "scope": "_best_",
         "related": [
             {
-                "type": "unit",
-                "alias": "bluetf_mech"
+                "type": "custom",
+                "alias": "custom",
+                "message": "Blue mechs in space area grant +1 die per mech"
             }
         ],
         "forCombatAbility": "combatround"

@@ -537,6 +537,16 @@ public class CombatModHelper {
                     meetsCondition = true;
                 }
             }
+            case "bluetfMech" -> {
+                if (player.hasUnit("bluetf_mech")) {
+                    for (UnitModel unitModel : unitsByQuantity.keySet()) {
+                        if (unitModel.getCapacityValue() > 0) {
+                            meetsCondition = true;
+                            break;
+                        }
+                    }
+                }
+            }
             case "wildMB" -> {
                 if (game.isWildWildGalaxyMode()
                         && !game.getStoredValue("wildMB" + player.getFaction()).isEmpty()) {
@@ -698,7 +708,7 @@ public class CombatModHelper {
                     }
                 }
                 case "mechs_in_space_area" -> {
-                    if (!"space".equalsIgnoreCase(unitHolder.getName())) {
+                    if (!"space".equalsIgnoreCase(unitHolder.getName()) || !player.hasUnit("bluetf_mech")) {
                         scalingCount = 0;
                     } else {
                         scalingCount = activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player);
