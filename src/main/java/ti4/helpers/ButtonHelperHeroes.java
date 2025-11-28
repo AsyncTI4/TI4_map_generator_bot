@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1364,7 +1362,6 @@ public class ButtonHelperHeroes {
                 Tile tileToAdd = game.getTileByPosition(pos);
                 if (!tileToAdd.getTileModel().isHyperlane()
                         && !adjTiles.contains(tileToAdd)
-                        && !tile.getPosition().equalsIgnoreCase(pos)
                         && FoWHelper.otherPlayersHaveShipsInSystem(player, tileToAdd, game)) {
                     adjTiles.add(tileToAdd);
                 }

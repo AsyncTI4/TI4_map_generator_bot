@@ -30,6 +30,12 @@ public class HomeSystemDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public String getLongDescriptionImpl() {
         if ("ghost".equals(ItemId)) {
             return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";

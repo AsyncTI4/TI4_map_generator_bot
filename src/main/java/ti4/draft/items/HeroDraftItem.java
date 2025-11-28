@@ -48,6 +48,22 @@ public class HeroDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        LeaderModel leader = getLeader();
+        if (leader != null) {
+            if (game.isTwilightsFallMode()) {
+                return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
+                        + leader.getTFAbilityWindow() + "* " + leader.getTFAbilityText();
+            } else {
+                return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
+                        + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+            }
+        }
+        return "";
+    }
+
+    @JsonIgnore
+    @Override
     public TI4Emoji getItemEmoji() {
         LeaderModel leader = getLeader();
         if (leader != null) {

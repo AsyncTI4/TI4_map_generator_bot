@@ -97,10 +97,16 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public Optional<String> getTFAbilityWindow() {
+        if (tfAbilityWindow == null) {
+            return Optional.ofNullable(abilityWindow);
+        }
         return Optional.ofNullable(tfAbilityWindow);
     }
 
     public Optional<String> getTFAbilityText() {
+        if (tfAbilityText == null) {
+            return Optional.ofNullable(abilityWindow);
+        }
         return Optional.ofNullable(tfAbilityText);
     }
 

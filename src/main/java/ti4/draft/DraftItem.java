@@ -23,6 +23,7 @@ import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
 import ti4.draft.items.UnitDraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -185,7 +186,36 @@ public abstract class DraftItem implements ModelInterface {
     }
 
     @JsonIgnore
+    public String getLongDescription(Game game) {
+        StringBuilder sb = new StringBuilder(getLongDescriptionImpl(game));
+        if (Errata != null) {
+            if (Errata.AdditionalComponents != null) {
+                sb.append("\n>  - *Also adds: ");
+                for (DraftErrataModel i : Errata.AdditionalComponents) {
+                    DraftItem item = generate(i.ItemCategory, i.ItemId);
+                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                    sb.append(", ");
+                }
+                sb.append("*");
+            }
+            if (Errata.OptionalSwaps != null) {
+                sb.append("\n>  - *Includes optional swaps: ");
+                for (DraftErrataModel i : Errata.OptionalSwaps) {
+                    DraftItem item = generate(i.ItemCategory, i.ItemId);
+                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                    sb.append(", ");
+                }
+                sb.append("*");
+            }
+        }
+        return sb.toString();
+    }
+
+    @JsonIgnore
     protected abstract String getLongDescriptionImpl();
+
+    @JsonIgnore
+    protected abstract String getLongDescriptionImpl(Game game);
 
     @JsonIgnore
     public abstract TI4Emoji getItemEmoji();

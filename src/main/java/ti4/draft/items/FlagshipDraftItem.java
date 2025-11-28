@@ -28,6 +28,12 @@ public class FlagshipDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public String getShortDescription() {
         UnitModel unit = getUnit();
         if (unit == null) {

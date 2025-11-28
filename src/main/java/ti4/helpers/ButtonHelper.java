@@ -91,6 +91,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -5675,7 +5676,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", use buttons to choose the troops you wish to move to "
-                        + Helper.getPlanetRepresentation(buttonID.split("_")[1] + ".", game),
+                        + Helper.getPlanetRepresentation(buttonID.split("_")[1], game) + ".",
                 buttons);
     }
 
@@ -6797,7 +6798,7 @@ public class ButtonHelper {
                         game, event, "setupStep4_" + userId + "_" + factionId + "_" + color + "_" + tile.getPosition());
                 return;
             }
-            if (tile.isHomeSystem()) {
+            if (tile.getTileModel().getTileBack() == TileBack.GREEN) {
                 String rep = tile.getRepresentation();
                 if (rep == null || rep.isEmpty()) {
                     rep = tile.getTileID() + "(" + tile.getPosition() + ")";
@@ -6926,7 +6927,9 @@ public class ButtonHelper {
         if (player.hasTech("mr") || player.hasTech("absol_mr")) {
             List<Tile> tilesWithNovaAndUnits = game.getTileMap().values().stream()
                     .filter(Tile::isSupernova)
-                    .filter(tile -> tile.containsPlayersUnits(player))
+                    .filter(tile -> tile.containsPlayersUnits(player)
+                            || (game.isTwilightsFallMode()
+                                    && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)))
                     .toList();
             tilesWithProduction.addAll(tilesWithNovaAndUnits);
         }

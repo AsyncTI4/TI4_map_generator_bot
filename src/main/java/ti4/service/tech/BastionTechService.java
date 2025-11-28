@@ -110,7 +110,7 @@ public class BastionTechService {
             Player p2 = null;
             for (Player p : game.getRealPlayers()) {
                 if (p1.isPlayerMemberOfAlliance(p)) continue;
-                if (FoWHelper.playerHasUnitsOnPlanet(p1, planet)) {
+                if (FoWHelper.playerHasUnitsOnPlanet(p, planet)) {
                     p2 = p;
                     break;
                 }

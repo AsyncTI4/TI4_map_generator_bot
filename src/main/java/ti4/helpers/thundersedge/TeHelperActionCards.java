@@ -316,10 +316,14 @@ public class TeHelperActionCards {
     private static void beginTeMercenaryContract(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = game.getPlanetsInfo().values().stream()
-                .filter(p -> !p.isHomePlanet(game) && !p.hasUnits())
+                .filter(p -> !p.isHomePlanet(game)
+                        && !p.hasUnits()
+                        && !player.getPlanetsAllianceMode().contains(p.getName()))
                 .filter(p -> game.getTileFromPlanet(p.getName()) != null)
                 .filter(p -> game.getUnitHolderFromPlanet(p.getName()) != null
-                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation())
+                        && !game.getUnitHolderFromPlanet(p.getName()).isSpaceStation()
+                        && !p.getTokenList().contains("dmz")
+                        && !p.getTokenList().contains("dmz_large"))
                 .map(p -> {
                     String id = player.finChecker() + "resolveTeMercenaryContract_" + p.getName();
                     String label = Helper.getPlanetRepresentation(p.getName(), game);

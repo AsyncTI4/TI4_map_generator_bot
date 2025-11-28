@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
@@ -26,6 +27,12 @@ public class UnitDraftItem extends DraftItem {
     @Override
     public String getShortDescription() {
         return "Unit - " + getUnit().getName() + " (" + getUnit().getUnitType().toString() + ")";
+    }
+
+    @JsonIgnore
+    @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
     }
 
     @JsonIgnore

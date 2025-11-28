@@ -31,6 +31,12 @@ public class SpeakerOrderDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public TI4Emoji getItemEmoji() {
         try {
             return MiltyDraftEmojis.getSpeakerPickEmoji(getSpeakerOrder());

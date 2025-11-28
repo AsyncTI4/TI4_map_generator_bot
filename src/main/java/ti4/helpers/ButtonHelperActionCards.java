@@ -72,7 +72,7 @@ public class ButtonHelperActionCards {
                 Tile tile = tileEntry.getValue();
                 UnitHolder space = tile.getUnitHolders().get("space");
                 boolean rightKindPresent = false;
-                for (Player p2 : game.getRealPlayers()) {
+                for (Player p2 : game.getRealPlayersNDummies()) {
                     if (space.getUnitCount(UnitType.Dreadnought, p2.getColor()) > 0
                             || space.getUnitCount(UnitType.Cruiser, p2.getColor()) > 0
                             || space.getUnitCount(UnitType.Destroyer, p2.getColor()) > 0) {
