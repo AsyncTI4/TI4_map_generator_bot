@@ -1948,6 +1948,13 @@ public class ButtonHelperAbilities {
         Optional<Player> enemyPlayer = playersWithUnitsOnPlanet.stream()
                 .filter(p -> player != p && !player.isPlayerMemberOfAlliance(p))
                 .findFirst();
+        if (enemyPlayer.isEmpty()) {
+            String planetName = Helper.getPlanetRepresentation(planet, game);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "No eligible opponent found for combat on " + planetName + ".");
+            return;
+        }
         StartCombatService.startGroundCombat(player, enemyPlayer.get(), game, event, unitHolder, tile);
     }
 
