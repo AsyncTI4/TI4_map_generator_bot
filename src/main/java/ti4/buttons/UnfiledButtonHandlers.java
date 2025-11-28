@@ -1,6 +1,9 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.io.File;
 import java.io.IOException;
@@ -539,14 +542,6 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("dacxive_")
     public static void daxcive(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("dacxive_", "");
-        Planet unitHolder = game.getUnitHolderFromPlanet(planet);
-        if (unitHolder != null && unitHolder.isSpaceStation()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Dacxive Animators cannot place infantry on a space station. Please choose a valid planet.");
-            ButtonHelper.deleteMessage(event);
-            return;
-        }
         AddUnitService.addUnits(
                 event, game.getTile(AliasHandler.resolveTile(planet)), game, player.getColor(), "infantry " + planet);
         MessageHelper.sendMessageToChannel(

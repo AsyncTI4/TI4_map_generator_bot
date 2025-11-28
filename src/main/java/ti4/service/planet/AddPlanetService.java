@@ -224,7 +224,6 @@ public class AddPlanetService {
                 && player.hasTech("dxa")
                 && !doubleCheck
                 && !setup
-                && unitHolder != null
                 && !unitHolder.isSpaceStation()) {
             String msg10 = player.getRepresentationUnfogged()
                     + " you may have an opportunity to use _Dacxive Animators_ on "
