@@ -61,6 +61,10 @@ public class EdictPhaseHandler {
     public static void artificeStep2(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
         int relics = Integer.parseInt(buttonID.split("_")[1]);
         int paradigms = Integer.parseInt(buttonID.split("_")[2]);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " has decided to draw " + relics + " extra relics and " + paradigms
+                        + " extra paradigms.");
         if (relics > 0) {
             RelicHelper.drawWithAdvantage(player, game, 1 + relics);
         } else {
@@ -243,14 +247,24 @@ public class EdictPhaseHandler {
                     RelicHelper.drawRelicAndNotify(player, event, game);
                     ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
                     game.removeStoredValue("artificeParadigms");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            "No player has more victory points than " + player.getRepresentationNoPing()
+                                    + ", so they were not able to draw any additional relics or paradigms.");
                 } else {
                     ButtonHelperTwilightsFall.drawParadigm(game, player, event, false);
                     String relic = game.getAllRelics().getFirst();
                     RelicModel mod = Mapper.getRelic(relic);
                     MessageHelper.sendMessageToChannelWithEmbed(
                             player.getCorrectChannel(),
-                            "You would draw the following relic:",
+                            player.getRepresentationNoPing() + " will draw the following relic:",
                             mod.getRepresentationEmbed());
+                    String plural = (vpDifference == 1 ? "" : "s");
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationNoPing() + " is " + vpDifference + " point" + plural
+                                    + "  behind the player with the most victory points, so they may draw "
+                                    + vpDifference + " additional card" + plural + " from either deck.");
                     for (int x = 0; x < vpDifference + 1; x++) {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "artificeStep2_" + (x) + "_"
