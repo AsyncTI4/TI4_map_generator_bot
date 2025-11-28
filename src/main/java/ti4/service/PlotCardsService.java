@@ -95,7 +95,7 @@ public class PlotCardsService {
             for (String planet : puppet.getPlanets()) {
                 Tile tile = game.getTileFromPlanet(planet);
                 if (tile == null) continue;
-                if (tile.isHomeSystem()) continue;
+                if (tile.isHomeSystem(game)) continue;
 
                 Planet p = tile.getUnitHolderFromPlanet(planet);
                 if (p == null) continue;
