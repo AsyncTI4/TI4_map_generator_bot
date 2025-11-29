@@ -787,9 +787,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (acID.contains("sabo") || acID.contains("shatter") || acID.contains("blackmarketdealing")) {
+        if (acID.contains("sabo") || acID.contains("shatter")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
-            if (game.isWildWildGalaxyMode() && !acID.contains("blackmarketdealing")) {
+            if (game.isWildWildGalaxyMode()) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
