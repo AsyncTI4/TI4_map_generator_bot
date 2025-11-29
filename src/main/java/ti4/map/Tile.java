@@ -795,7 +795,8 @@ public class Tile {
     }
 
     public static Predicate<Tile> playerCanRetreatHere(Player player) {
-        return tileHasPlayerShips(player).or(tileHasPlayerPlanet(player));
+        // No other player ships check is done elsewhere
+        return tileHasPlayerUnits(player).or(tileHasPlayerPlanet(player));
     }
 
     public String getHexTileSummary() {

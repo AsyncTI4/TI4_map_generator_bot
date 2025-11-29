@@ -22,22 +22,58 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class BanCleanupService {
 
-    public void banSpamAccount(AuditLogEntry log, User target, User admin) {
+    private User getUser(UserSnowflake id) {
+        return JdaService.jda.getUserById(id.getId());
+    }
+
+    private String getIdent(UserSnowflake id) {
+        if (id == null) return "NULL USER";
+
+        User user = getUser(id);
+        if (user != null) {
+            return "user `" + user.getEffectiveName() + "` with ID `" + id.getId() + "`";
+        } else {
+            return "user `unkownUser` with ID `" + id.getId() + "`";
+        }
+    }
+
+    public void banSpamAccount(AuditLogEntry log, UserSnowflake target, UserSnowflake admin) {
         if (shouldBanFromAllGuilds(log, target, admin)) {
+            BotLogger.info("Banning " + getIdent(target));
             int errors = removeUserFromAllGuilds(target, log.getReason());
             auditPostBanAction(target, log, errors);
         }
     }
 
-    private boolean shouldBanFromAllGuilds(AuditLogEntry log, User target, User admin) {
-        if (admin == null || target == null || log.getType() != ActionType.BAN) {
+    private boolean shouldBanFromAllGuilds(AuditLogEntry log, UserSnowflake target, UserSnowflake admin) {
+        // Don't need to audit these
+        if (log.getType() != ActionType.BAN) { // not a ban
+            return false;
+        }
+        if (admin != null && admin.getId().equals(JdaService.getBotId())) { // bot-propagated
+            return false;
+        }
+
+        // Go ahead and audit all other reasons for failing to propagate a ban
+        String prefix = "Could not fully ban " + getIdent(target);
+        prefix += " for audit log entry `" + log.getId() + "`: ";
+        if (admin == null) {
+            BotLogger.warning(prefix + " Initiating user not found.");
+            return false;
+        }
+        if (target == null) {
+            BotLogger.warning(prefix + " Target user not found.");
             return false;
         }
         ManagedPlayer mp = GameManager.getManagedPlayer(target.getId());
-        return mp == null && !admin.getId().equals(JdaService.getBotId());
+        if (mp != null && !mp.getGames().isEmpty()) {
+            BotLogger.warning(prefix + " User is in at least 1 game.");
+            return false;
+        }
+        return true;
     }
 
-    private int removeUserFromAllGuilds(User user, String reason) {
+    private int removeUserFromAllGuilds(UserSnowflake user, String reason) {
         int errors = 0;
         UserSnowflake snowflake = UserSnowflake.fromId(user.getId());
         Collection<UserSnowflake> banList = Collections.singleton(snowflake);
@@ -46,7 +82,7 @@ public class BanCleanupService {
                 guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue();
                 errors += cleanupBotQuestionChannel(guild, user);
             } catch (Exception e) {
-                String msg = "Error encountered trying to ban user `" + user.getName() + "`";
+                String msg = "Error encountered trying to ban " + getIdent(user);
                 msg += " from guild `" + guild.getName() + "`";
                 BotLogger.error(msg, e);
                 errors++;
@@ -55,14 +91,13 @@ public class BanCleanupService {
         return errors;
     }
 
-    private void auditPostBanAction(User user, AuditLogEntry log, int errors) {
-        String msg = "User `" + user.getName() + "` (ID:" + user.getId() + ") ";
-        msg += " was banned from primary server " + log.getGuild().getName();
+    private void auditPostBanAction(UserSnowflake target, AuditLogEntry log, int errors) {
+        String msg = getIdent(target);
+        msg += " was banned from server " + log.getGuild().getName();
         msg += " for the reason \"" + log.getReason() + "\".";
         if (errors > 0) {
             msg += "\n## Errors were encountered. Check the error log for more details.";
         }
-
         postMessageToModLog(msg);
     }
 
@@ -75,7 +110,7 @@ public class BanCleanupService {
         MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 
-    private int cleanupBotQuestionChannel(Guild guild, User user) {
+    private int cleanupBotQuestionChannel(Guild guild, UserSnowflake user) {
         int errors = 0;
         List<String> channelNames = List.of(
                 "bot-questions-and-support-and-feedback",
@@ -84,17 +119,20 @@ public class BanCleanupService {
                 "bot-questions-and-discussions");
 
         try {
+            User targetUser = getUser(user);
+            if (targetUser == null) return 0;
+
             for (String channelName : channelNames) {
                 List<TextChannel> channels = guild.getTextChannelsByName(channelName, true);
                 if (!channels.isEmpty()) {
                     TextChannel channel = channels.getFirst();
                     channel.getHistoryAround(channel.getLatestMessageId(), 100)
-                            .queue(hist -> findAndDeleteSpamPosts(user, hist), BotLogger::catchRestError);
+                            .queue(hist -> findAndDeleteSpamPosts(targetUser, hist), BotLogger::catchRestError);
                 }
             }
         } catch (Exception e) {
-            String msg = "Error encountered trying to clean up messages from synced channel while banning user `%s`";
-            BotLogger.error(String.format(msg, user.getName()), e);
+            String msg = "Error cleaning up messages from synced channel while banning " + getIdent(user);
+            BotLogger.error(msg, e);
             errors++;
         }
         return errors;

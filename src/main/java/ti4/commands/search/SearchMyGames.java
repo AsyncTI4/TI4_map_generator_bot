@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.SearchGameHelper;
+import ti4.service.async.RoleService;
 
 class SearchMyGames extends Subcommand {
 
@@ -50,7 +51,7 @@ class SearchMyGames extends Subcommand {
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
         User user2 = event.getOption(Constants.PLAYER2, null, OptionMapping::getAsUser);
-        SearchGameHelper.searchGames(
+        int amt = SearchGameHelper.searchGames(
                 user,
                 event,
                 onlyMyTurn,
@@ -62,5 +63,8 @@ class SearchMyGames extends Subcommand {
                 ignoreAborted,
                 false,
                 user2);
+        if (amt > 0) {
+            RoleService.checkIfNewUserIsInAnyGamesAndAddRole(user);
+        }
     }
 }
