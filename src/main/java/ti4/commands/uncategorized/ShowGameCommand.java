@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
-import ti4.commands.SuspicionLevel;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
@@ -69,10 +68,5 @@ public class ShowGameCommand extends GameStateCommand {
             displayType = DisplayType.all;
         }
         ShowGameService.simpleShowGame(game, event, displayType);
-    }
-
-    @Override
-    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
-        return SuspicionLevel.NONE;
     }
 }

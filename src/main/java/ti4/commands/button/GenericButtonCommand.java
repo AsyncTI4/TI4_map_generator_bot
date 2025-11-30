@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.buttons.Buttons;
 import ti4.commands.ParentCommand;
-import ti4.commands.SuspicionLevel;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -55,10 +54,5 @@ public class GenericButtonCommand implements ParentCommand {
         Button button = Buttons.gray(id, buttonText);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), message, Collections.singletonList(button));
-    }
-
-    @Override
-    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
-        return SuspicionLevel.NONE;
     }
 }

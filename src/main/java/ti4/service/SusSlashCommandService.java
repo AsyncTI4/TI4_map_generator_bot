@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.CommandManager;
 import ti4.commands.ParentCommand;
-import ti4.commands.SuspicionLevel;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -28,10 +27,7 @@ public class SusSlashCommandService {
         if (managedGame == null) return;
 
         ParentCommand command = CommandManager.getCommand(event.getInteraction().getName());
-        SuspicionLevel suspicionLevel = command != null
-                ? command.getSuspicionLevel(event)
-                : SuspicionLevel.NONE;
-        if (suspicionLevel == SuspicionLevel.NONE) return;
+        if (!command.isSuspicious(event)) return;
 
         if (EXCLUDED_GAMES.contains(managedGame.getName())) return;
 
@@ -41,10 +37,10 @@ public class SusSlashCommandService {
                 && event.getMessageChannel() != managedGame.getTableTalkChannel()
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
 
-        if (suspicionLevel.isEscalated()) {
-            reportSusSlashCommand(event, jumpUrl);
+        if (isReplaceOrLeaveCommand(event)) {
+            reportToModerationLog(event, jumpUrl);
         } else if (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread) {
-            reportLittleSusSlashCommand(event, jumpUrl);
+            reportToSusSlashCommandLog(event, jumpUrl);
         }
 
         if (managedGame.isFowMode()) {
@@ -61,7 +57,13 @@ public class SusSlashCommandService {
         }
     }
 
-    public static void reportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
+    private static boolean isReplaceOrLeaveCommand(SlashCommandInteractionEvent event) {
+        return event.getInteraction().getSubcommandName() != null
+                && ("replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())
+                        || "leave".equalsIgnoreCase(event.getInteraction().getSubcommandName()));
+    }
+
+    public static void reportToModerationLog(SlashCommandInteractionEvent event, String jumpUrl) {
         TextChannel moderationLogChannel =
                 JdaService.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
                         .findFirst()
@@ -71,7 +73,7 @@ public class SusSlashCommandService {
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
     }
 
-    public static void reportLittleSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
+    private static void reportToSusSlashCommandLog(SlashCommandInteractionEvent event, String jumpUrl) {
         TextChannel moderationLogChannel =
                 JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
                         .findFirst()

@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
-import ti4.commands.SuspicionLevel;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -69,10 +68,5 @@ public class ShowDistancesCommand extends GameStateCommand {
                 event,
                 DisplayType.map,
                 fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
-    }
-
-    @Override
-    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
-        return SuspicionLevel.NONE;
     }
 }

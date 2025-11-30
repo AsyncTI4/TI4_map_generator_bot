@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
-import ti4.commands.SuspicionLevel;
 import ti4.helpers.Constants;
 import ti4.spring.jda.JdaService;
 
@@ -38,11 +37,6 @@ public class BothelperCommand implements ParentCommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return ParentCommand.super.accept(event) && CommandHelper.acceptIfHasRoles(event, JdaService.bothelperRoles);
-    }
-
-    @Override
-    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
-        return SuspicionLevel.NONE;
     }
 
     @Override

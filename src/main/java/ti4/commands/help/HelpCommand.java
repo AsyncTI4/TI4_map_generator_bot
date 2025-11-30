@@ -6,11 +6,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
-import ti4.commands.SuspicionLevel;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -46,12 +44,7 @@ public class HelpCommand implements ParentCommand {
         return subcommands;
     }
 
-    @Override
-    public SuspicionLevel getSuspicionLevel(SlashCommandInteractionEvent event) {
-        return SuspicionLevel.NONE;
-    }
-
-    public static void showHelpText(GenericInteractionCreateEvent event, String helpFileName) {
+    static void showHelpText(GenericInteractionCreateEvent event, String helpFileName) {
         String path = ResourceHelper.getInstance().getHelpFile(helpFileName);
         try {
             String message = Files.readString(Paths.get(path));
