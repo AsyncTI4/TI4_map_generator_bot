@@ -7986,7 +7986,7 @@ public class ButtonHelper {
         return count;
     }
 
-    static void purge2StarCharters(Player player) {
+    static void purge2StarCharters(Player player, Game game) {
         var relics = new ArrayList<>(player.getRelics());
         int count = 0;
         for (String relic : relics) {
@@ -7994,6 +7994,9 @@ public class ButtonHelper {
                 count++;
                 player.removeRelic(relic);
             }
+        }
+        if (game.isFowMode()) {
+            FoWHelper.pingAllPlayersWithFullStats(game, null, player, "Purged 2 Star Charts.");
         }
     }
 
