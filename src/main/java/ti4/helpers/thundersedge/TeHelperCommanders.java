@@ -47,12 +47,12 @@ public class TeHelperCommanders {
 
         // Notify the DWS commander holder that their discount was used
         String message = dws.getRepresentation(true, true) + " ";
-        message += game.isFowMode() ? "someone" : player.getRepresentation(true, false);
+        message += game.isFowMode() ? player.getColorIfCanSeeStats(dws) : player.getRepresentation(true, false);
         message += " has used your commander to get a discount on tech.";
         message += " Use the buttons to gain or convert 1 commodity.";
         message += "\n-# You have (" + dws.getCommoditiesRepresentation() + ") commodities.";
         List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(dws, true);
-        MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(dws.getCorrectChannel(), message, buttons);
     }
 
     public static void offerCrimsonCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
