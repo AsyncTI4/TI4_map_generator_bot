@@ -48,9 +48,15 @@ public interface ParentCommand extends Command {
             String subcommandName = event.getInteraction().getSubcommandName();
             Subcommand subcommand = getSubcommands().get(subcommandName);
             return subcommand != null && subcommand.isSuspicious(event);
+        } else {
+            SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
+            if (subcommandGroup != null) {
+                String subcommandName = event.getInteraction().getSubcommandName();
+                Subcommand subcommand = subcommandGroup.getSubcommands().get(subcommandName);
+                return subcommand != null && subcommand.isSuspicious(event);
+            }
+            return false;
         }
-        SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
-        return subcommandGroup != null && subcommandGroup.isSuspicious(event);
     }
 
     default void register(CommandListUpdateAction commands) {
