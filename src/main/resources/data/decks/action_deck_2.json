@@ -217,7 +217,6 @@
 
             "artifact_hunters",
             "artifact_research",
-            "bounty",
             "black_market_raid",
             "data_archive",
             "derelict_station",
@@ -479,7 +478,6 @@
             "artifact_hunters",
             "artifact_research",
             "black_market_raid",
-            "bounty",
             "data_archive",
             "derelict_station",
             "exploration_rider",
