@@ -7,7 +7,7 @@ import ti4.service.tech.PlayerTechService;
 
 class TechUnpurge extends TechAddRemove {
 
-    public TechUnpurge() {
+    TechUnpurge() {
         super(Constants.TECH_UNPURGE, "Un-purge a technology that was previously purged");
     }
 

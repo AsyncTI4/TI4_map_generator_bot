@@ -45,4 +45,9 @@ class PeekPublicObjectiveDeck extends GameStateSubcommand {
         Player player = getPlayer();
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), null, publicObjectiveEmbedMessages);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

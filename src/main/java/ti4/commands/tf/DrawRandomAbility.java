@@ -10,7 +10,7 @@ import ti4.map.Player;
 
 class DrawRandomAbility extends GameStateSubcommand {
 
-    public DrawRandomAbility() {
+    DrawRandomAbility() {
         super(Constants.DRAW_RANDOM_ABILITY, "Draw a random TF Ability", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
@@ -21,5 +21,10 @@ class DrawRandomAbility extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         ButtonHelperTwilightsFall.drawSingularNewSpliceCard(getGame(), "spoof_ability", player, event);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

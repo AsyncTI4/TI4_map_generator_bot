@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
-import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -16,6 +15,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.RemoveCommandCounterService;
 
 class MoveAllUnits extends GameStateSubcommand {
 

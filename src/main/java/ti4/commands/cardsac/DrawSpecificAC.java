@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class DrawSpecificAC extends GameStateSubcommand {
 
-    public DrawSpecificAC() {
+    DrawSpecificAC() {
         super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the card you wish to draw")
                 .setRequired(true));
@@ -40,5 +40,10 @@ class DrawSpecificAC extends GameStateSubcommand {
         }
 
         ActionCardHelper.sendActionCardInfo(game, getPlayer());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

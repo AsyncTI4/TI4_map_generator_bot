@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class MakeCopiesOfACs extends GameStateSubcommand {
 
-    public MakeCopiesOfACs() {
+    MakeCopiesOfACs() {
         super(Constants.MAKE_AC_COPIES, "Make Copies of action cards", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many copies to make, 2 or 3")
                 .setRequired(true));
@@ -33,5 +33,10 @@ class MakeCopiesOfACs extends GameStateSubcommand {
             game.triplicateACs();
             game.triplicateSOs();
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

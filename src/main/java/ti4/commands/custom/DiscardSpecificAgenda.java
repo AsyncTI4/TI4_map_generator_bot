@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class DiscardSpecificAgenda extends GameStateSubcommand {
 
-    public DiscardSpecificAgenda() {
+    DiscardSpecificAgenda() {
         super(Constants.DISCARD_SPECIFIC_AGENDA, "Discard Specific Agenda", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID")
                 .setRequired(true)
@@ -27,5 +27,10 @@ class DiscardSpecificAgenda extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda not found in game deck");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

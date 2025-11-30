@@ -1,4 +1,4 @@
-package ti4.commands.commandcounter;
+package ti4.service;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;

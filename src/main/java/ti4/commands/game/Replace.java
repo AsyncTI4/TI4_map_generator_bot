@@ -244,4 +244,9 @@ class Replace extends GameStateSubcommand {
                 .replaceAll("^-|-$", "");
         return name;
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }
