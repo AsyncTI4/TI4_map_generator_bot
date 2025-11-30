@@ -197,7 +197,8 @@ public class StartTurnService {
             }
         }
 
-        if ((game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
+        if (!game.isFowMode()
+                && (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                         || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander"))
                 && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
