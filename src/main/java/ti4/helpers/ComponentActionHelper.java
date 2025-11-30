@@ -773,7 +773,7 @@ public class ComponentActionHelper {
                 }
             }
             case "doStarCharts" -> {
-                ButtonHelper.purge2StarCharters(p1);
+                ButtonHelper.purge2StarCharters(p1, game);
                 DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
             case "stellarAtomicsAction" -> {
