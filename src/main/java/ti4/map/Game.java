@@ -826,10 +826,10 @@ public class Game extends GameProperties {
         Map<String, Boolean> gameModes = new HashMap<>();
         gameModes.put(SourceEmojis.TI4PoK + "Normal", isNormalGame);
         gameModes.put(SourceEmojis.TI4BaseGame + "Base Game", isBaseGameMode());
+        gameModes.put("Prophecy of Kings", isProphecyOfKings());
         gameModes.put("Thunder's Edge", isThundersEdge());
-        gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
-        gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
-        gameModes.put("Community", isCommunityMode());
+        gameModes.put("Twilight's Fall", isTwilightsFallMode());
+
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
         gameModes.put("Hidden Agenda", isHiddenAgendaMode());
@@ -838,7 +838,6 @@ public class Game extends GameProperties {
         gameModes.put("Stellar Atomics", isStellarAtomicsMode());
         gameModes.put("Civilized Society", isCivilizedSocietyMode());
         gameModes.put("Age Of Fighters", isAgeOfFightersMode());
-
         gameModes.put("Advent of the Warsun", isAdventOfTheWarsunMode());
         gameModes.put("Cultural Exchange Program", isCulturalExchangeProgramMode());
         gameModes.put("Conventions of War Abandoned", isConventionsOfWarAbandonedMode());
@@ -847,15 +846,22 @@ public class Game extends GameProperties {
         gameModes.put("Weird Wormholes", isWeirdWormholesMode());
         gameModes.put("Cosmic Phenomenae", isCosmicPhenomenaeMode());
         gameModes.put("Wild wild Galaxy", isWildWildGalaxyMode());
-        gameModes.put("Zealous Orthoxy", isZealousOrthodoxyMode());
+        gameModes.put("Zealous Orthodoxy", isZealousOrthodoxyMode());
         gameModes.put("Mercenaries For Hire", isMercenariesForHireMode());
-        gameModes.put("No Support Swaps", isNoSwapMode());
-        gameModes.put("Veiled Heart", isVeiledHeartMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
+
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
+
+        gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Veiled Heart", isVeiledHeartMode());
+        gameModes.put(MiscEmojis.TIGL + "TIGL", isCompetitiveTIGLGame());
+        gameModes.put("Community", isCommunityMode());
         gameModes.put("FoW", isFowMode());
+
+        gameModes.put("Homebrew", isHomebrew());
+        gameModes.put(SourceEmojis.MiltyMod + "MiltyMod", isMiltyModMode());
         gameModes.put("Franken", isFrankenGame());
         gameModes.put(SourceEmojis.Absol + "Absol", isAbsolMode());
         gameModes.put("VotC", isVotcMode());
@@ -864,7 +870,6 @@ public class Game extends GameProperties {
         gameModes.put("AC Deck 2", isAcd2());
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
-        gameModes.put("Homebrew", isHomebrew());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
@@ -882,12 +887,29 @@ public class Game extends GameProperties {
     @JsonIgnore
     public boolean isNormalGame() {
         return !hasHomebrew()
-                && !isAgeOfExplorationMode()
-                && !isTotalWarMode()
-                && !isAgeOfCommerceMode()
                 && !isMinorFactionsMode()
+                && !isAgeOfExplorationMode()
+                && !isHiddenAgendaMode()
+                && !isTotalWarMode()
+                && !isDangerousWildsMode()
+                && !isStellarAtomicsMode()
+                && !isCivilizedSocietyMode()
+                && !isAgeOfFightersMode()
+                && !isAdventOfTheWarsunMode()
+                && !isCulturalExchangeProgramMode()
+                && !isConventionsOfWarAbandonedMode()
+                && !isRapidMobilizationMode()
+                && !isMonumentToTheAgesMode()
+                && !isWeirdWormholesMode()
+                && !isCosmicPhenomenaeMode()
+                && !isWildWildGalaxyMode()
+                && !isZealousOrthodoxyMode()
+                && !isMercenariesForHireMode()
+                && !isAgeOfCommerceMode()
                 && !isLiberationC4Mode()
-                && !isOrdinianC1Mode();
+                && !isOrdinianC1Mode()
+                && !isAllianceMode()
+                && !isTwilightsFallMode();
     }
 
     public boolean isFrankenGame() {
