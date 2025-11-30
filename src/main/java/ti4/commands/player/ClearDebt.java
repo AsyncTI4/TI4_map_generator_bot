@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 class ClearDebt extends GameStateSubcommand {
 
-    public ClearDebt() {
+    ClearDebt() {
         super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear")
                 .setRequired(true));
@@ -52,5 +52,10 @@ class ClearDebt extends GameStateSubcommand {
                 event,
                 clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt token"
                         + (debtCountToClear == 1 ? "" : "s") + " owned by " + clearedPlayer.getRepresentation() + ".");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

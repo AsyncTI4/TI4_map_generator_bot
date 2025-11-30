@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 
 class DiscardAC extends GameStateSubcommand {
 
-    public DiscardAC() {
+    DiscardAC() {
         super(Constants.DISCARD_AC, "Discard an Action Card", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")

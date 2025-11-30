@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class RelicAddBackIntoDeck extends GameStateSubcommand {
 
-    public RelicAddBackIntoDeck() {
+    RelicAddBackIntoDeck() {
         super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck")
                 .setAutoComplete(true)
@@ -29,5 +29,10 @@ class RelicAddBackIntoDeck extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Invalid relic or specified relic exists in deck");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

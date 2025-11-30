@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 class PoRemoveFromGame extends GameStateSubcommand {
 
-    public PoRemoveFromGame() {
+    PoRemoveFromGame() {
         super(Constants.REMOVE_PO_FROM_GAME, "Remove a public objective from the game", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "Public objective ID")
                 .setRequired(true)
@@ -25,5 +25,10 @@ class PoRemoveFromGame extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective not found in game deck.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

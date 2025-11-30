@@ -8,13 +8,12 @@ import ti4.message.MessageHelper;
 
 class ExploreShuffle extends GameStateSubcommand {
 
-    public ExploreShuffle() {
+    ExploreShuffle() {
         super(Constants.SHUFFLE_EXPLORES, "Shuffle all explores and relics", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Game game = getGame();
         game.shuffleExplores();
         game.shuffleRelics();

@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class ShuffleBackInUnrevealedObj extends GameStateSubcommand {
 
-    public ShuffleBackInUnrevealedObj() {
+    ShuffleBackInUnrevealedObj() {
         super(
                 Constants.SHUFFLE_BACK_IN_UNREVEALED_OBJ,
                 "Shuffle an unrevealed objective back in and redraw one in its place",
@@ -32,5 +32,10 @@ class ShuffleBackInUnrevealedObj extends GameStateSubcommand {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 "Shuffle objective at position " + loc1.getAsInt() + " back into the deck and drew a new one there.");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

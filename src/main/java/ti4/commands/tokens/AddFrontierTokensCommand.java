@@ -38,4 +38,9 @@ public class AddFrontierTokensCommand extends GameStateCommand {
             MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
         }
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

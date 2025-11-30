@@ -43,4 +43,9 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

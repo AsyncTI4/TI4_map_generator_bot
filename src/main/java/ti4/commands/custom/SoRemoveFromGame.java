@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class SoRemoveFromGame extends GameStateSubcommand {
 
-    public SoRemoveFromGame() {
+    SoRemoveFromGame() {
         super(Constants.REMOVE_SO_FROM_GAME, "Removes a secret objective from the game", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
                 .setRequired(true)
@@ -26,5 +26,10 @@ class SoRemoveFromGame extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective not found in game deck.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

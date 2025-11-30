@@ -10,7 +10,7 @@ import ti4.map.Player;
 
 class DrawRandomGenome extends GameStateSubcommand {
 
-    public DrawRandomGenome() {
+    DrawRandomGenome() {
         super(Constants.DRAW_RANDOM_GENOME, "Draw a random TF Genome", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
@@ -21,5 +21,10 @@ class DrawRandomGenome extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         ButtonHelperTwilightsFall.drawSingularNewSpliceCard(getGame(), "spoof_genome", player, event);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

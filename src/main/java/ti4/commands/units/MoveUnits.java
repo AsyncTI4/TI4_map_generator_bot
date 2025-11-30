@@ -127,4 +127,9 @@ public class MoveUnits extends GameStateCommand {
         UnitCommandHelper.handleCcUseOption(event, tileTo, color, game);
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

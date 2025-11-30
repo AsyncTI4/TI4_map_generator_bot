@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class PNReset extends GameStateSubcommand {
 
-    public PNReset() {
+    PNReset() {
         super(
                 Constants.PN_RESET,
                 "Reset your promissory notes and send details to your #cards-info thread",
@@ -37,5 +37,10 @@ class PNReset extends GameStateSubcommand {
         game.checkPromissoryNotes();
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, true, event);
         MessageHelper.sendMessageToEventChannel(event, "Promissory note information sent.");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

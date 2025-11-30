@@ -118,4 +118,9 @@ public class AddUnits extends GameStateCommand {
         }
         getPlayer().exhaustTech("sr");
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

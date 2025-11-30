@@ -16,7 +16,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 
 class PeekAtSecretDeck extends GameStateSubcommand {
 
-    public PeekAtSecretDeck() {
+    PeekAtSecretDeck() {
         super("peek_secret_objective_deck", "Peek at the top of the secret objective deck", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of secrets to peek at, default 1")
                 .setRequired(true));
@@ -61,5 +61,10 @@ class PeekAtSecretDeck extends GameStateSubcommand {
         if (shuffle) {
             Collections.shuffle(game.getSecretObjectives());
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

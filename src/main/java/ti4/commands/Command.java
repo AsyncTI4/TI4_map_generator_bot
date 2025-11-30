@@ -15,4 +15,8 @@ public interface Command {
     default void postExecute(SlashCommandInteractionEvent event) {}
 
     String getName();
+
+    default boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return false;
+    }
 }

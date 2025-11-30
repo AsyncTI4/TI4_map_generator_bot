@@ -30,7 +30,7 @@ import ti4.settings.users.UserSettingsManager;
 
 class Stats extends GameStateSubcommand {
 
-    public Stats() {
+    Stats() {
         super(Constants.STATS, "Player Stats: Command tokens, trade goods, commodities", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command token - example: 3/3/2 or +1/-1/+0"))
                 .addOptions(new OptionData(
@@ -318,7 +318,7 @@ class Stats extends GameStateSubcommand {
 
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (event.getChannel() instanceof TextChannel channel) {
-                    SusSlashCommandService.reportSusSlashCommand(
+                    SusSlashCommandService.reportToModerationLog(
                             event,
                             channel.getJumpUrl() + " Round " + game.getRound() + "; Space Resources: "
                                     + player.getTotalResourceValueOfUnits("space") + "; VP: "
@@ -358,5 +358,10 @@ class Stats extends GameStateSubcommand {
 
     private static String getGeneralMessage(OptionMapping option) {
         return ">  set **" + option.getName() + "** to " + option.getAsString();
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

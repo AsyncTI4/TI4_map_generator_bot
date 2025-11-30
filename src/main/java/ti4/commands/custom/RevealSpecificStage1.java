@@ -13,7 +13,7 @@ import ti4.model.PublicObjectiveModel;
 
 class RevealSpecificStage1 extends GameStateSubcommand {
 
-    public RevealSpecificStage1() {
+    RevealSpecificStage1() {
         super(Constants.REVEAL_SPECIFIC_STAGE1, "Reveal a specific stage 1 public objective", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "Public objective ID")
                 .setRequired(true)

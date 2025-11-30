@@ -13,7 +13,7 @@ import ti4.service.player.PlayerStatsService;
 
 class StasisInfantry extends GameStateSubcommand {
 
-    public StasisInfantry() {
+    StasisInfantry() {
         super(Constants.STASIS_INFANTRY, "Add/Remove Infantry to Stasis Capsule", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Infantry count").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
@@ -26,15 +26,11 @@ class StasisInfantry extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         String count = event.getOption(Constants.COUNT).getAsString();
-        setValue(event, player, player::setStasisInfantry, player::getStasisInfantry, count);
+        setValue(event, player::setStasisInfantry, player::getStasisInfantry, count);
     }
 
     private void setValue(
-            SlashCommandInteractionEvent event,
-            Player player,
-            Consumer<Integer> consumer,
-            Supplier<Integer> supplier,
-            String value) {
+            SlashCommandInteractionEvent event, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
@@ -56,5 +52,10 @@ class StasisInfantry extends GameStateSubcommand {
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Could not parse number for: " + Constants.COUNT);
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

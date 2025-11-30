@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class SoAddToGame extends GameStateSubcommand {
 
-    public SoAddToGame() {
+    SoAddToGame() {
         super(Constants.ADD_SO_TO_GAME, "Add a secret objective to the game", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
                 .setRequired(true)
@@ -34,5 +34,10 @@ class SoAddToGame extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Secret objective was not added for an unknown reason.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }
