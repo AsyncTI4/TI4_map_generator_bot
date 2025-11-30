@@ -188,7 +188,9 @@ public class FOWPlusService {
                         && centerTile.getTileModel().isHyperlane()) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ringTile_000"));
         }
-        if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
+        if (Collections.disjoint(
+                visiblePositions,
+                Arrays.asList("tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7"))) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ring_corners"));
         }
         for (Button button : new ArrayList<>(ringButtons)) {
