@@ -15,7 +15,7 @@ import ti4.service.unit.ParsedUnit;
 
 class RemoveCaptureUnits extends GameStateSubcommand {
 
-    public RemoveCaptureUnits() {
+    RemoveCaptureUnits() {
         super(Constants.REMOVE_UNITS, "Release captured units", true, true);
         addOptions(new OptionData(
                         OptionType.STRING,

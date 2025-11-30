@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class SetUpPeakableObjectives extends GameStateSubcommand {
 
-    public SetUpPeakableObjectives() {
+    SetUpPeakableObjectives() {
         super(
                 Constants.SETUP_PEAKABLE_OBJECTIVES,
                 "Set up how many remaining unrevealed objectives there are",

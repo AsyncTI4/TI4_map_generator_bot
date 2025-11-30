@@ -10,7 +10,7 @@ import ti4.service.objectives.DrawSecretService;
 
 class DrawSO extends GameStateSubcommand {
 
-    public DrawSO() {
+    DrawSO() {
         super(Constants.DRAW_SO, "Draw Secret Objective", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who draws")
@@ -23,5 +23,10 @@ class DrawSO extends GameStateSubcommand {
         count = Math.max(count, 1);
         count = Math.min(count, 10);
         DrawSecretService.drawSO(event, getGame(), getPlayer(), count, false);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

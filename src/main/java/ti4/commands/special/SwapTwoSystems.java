@@ -18,7 +18,7 @@ import ti4.service.map.CustomHyperlaneService;
 
 class SwapTwoSystems extends GameStateSubcommand {
 
-    public SwapTwoSystems() {
+    SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND")
                 .setRequired(true)
@@ -76,5 +76,10 @@ class SwapTwoSystems extends GameStateSubcommand {
         }
 
         return availableTiles.get(new Random().nextInt(availableTiles.size()));
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

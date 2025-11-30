@@ -359,4 +359,9 @@ class Stats extends GameStateSubcommand {
     private static String getGeneralMessage(OptionMapping option) {
         return ">  set **" + option.getName() + "** to " + option.getAsString();
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

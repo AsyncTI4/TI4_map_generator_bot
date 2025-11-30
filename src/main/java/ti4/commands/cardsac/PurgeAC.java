@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class PurgeAC extends GameStateSubcommand {
 
-    public PurgeAC() {
+    PurgeAC() {
         super(Constants.PURGE_AC, "Purge an Action Card", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")

@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 class ACRemoveFromGame extends GameStateSubcommand {
 
-    public ACRemoveFromGame() {
+    ACRemoveFromGame() {
         super(Constants.REMOVE_AC_FROM_GAME, "Remove an action card from the game", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "Action card ID")
                 .setRequired(true)
@@ -25,5 +25,10 @@ class ACRemoveFromGame extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Action card not found in game deck.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

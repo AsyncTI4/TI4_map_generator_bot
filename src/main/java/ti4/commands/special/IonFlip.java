@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class IonFlip extends GameStateSubcommand {
 
-    public IonFlip() {
+    IonFlip() {
         super(Constants.ION_TOKEN_FLIP, "Flip ION Storm Token", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                 .setRequired(true)
@@ -49,5 +49,10 @@ class IonFlip extends GameStateSubcommand {
             tile.removeToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

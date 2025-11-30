@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 class SCTradeGoods extends GameStateSubcommand {
 
-    public SCTradeGoods() {
+    SCTradeGoods() {
         super(Constants.SC_TRADE_GOODS, "Add trade goods to strategy cards", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card"));
@@ -70,5 +70,10 @@ class SCTradeGoods extends GameStateSubcommand {
                 game.setScTradeGood(scNumber, tgCount);
             }
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

@@ -7,12 +7,17 @@ import ti4.service.tech.PlayerTechService;
 
 class TechRefresh extends TechAddRemove {
 
-    public TechRefresh() {
+    TechRefresh() {
         super(Constants.TECH_REFRESH, "Ready a technology");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         PlayerTechService.refreshTech(event, player, techID);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

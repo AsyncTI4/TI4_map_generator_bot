@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class UnscorePublic extends GameStateSubcommand {
 
-    public UnscorePublic() {
+    UnscorePublic() {
         super(Constants.UNSCORE_OBJECTIVE, "Unscore Public Objective", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
                 .setRequired(true)

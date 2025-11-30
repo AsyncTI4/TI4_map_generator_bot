@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class SwapStage2 extends GameStateSubcommand {
 
-    public SwapStage2() {
+    SwapStage2() {
         super(Constants.SWAP_STAGE2, "Swap the place of 1 Objective With Another", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location 1").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION2, "Location 2").setRequired(true));
@@ -24,5 +24,10 @@ class SwapStage2 extends GameStateSubcommand {
         game.swapStage2(loc1, loc2);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Objectives at position " + loc1 + " and position " + loc2 + " swapped.");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

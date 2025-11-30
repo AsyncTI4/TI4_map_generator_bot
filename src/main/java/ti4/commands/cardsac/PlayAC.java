@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class PlayAC extends GameStateSubcommand {
 
-    public PlayAC() {
+    PlayAC() {
         super(Constants.PLAY_AC, "Play an Action Card", true, true);
         addOptions(new OptionData(
                         OptionType.STRING,

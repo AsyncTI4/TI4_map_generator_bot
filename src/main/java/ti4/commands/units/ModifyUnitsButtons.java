@@ -35,4 +35,9 @@ public class ModifyUnitsButtons extends GameStateCommand {
         String message = player.getRepresentation() + ", please choose the system in which you wish to modify units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

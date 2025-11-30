@@ -71,4 +71,9 @@ class ExplorePlanet extends GameStateSubcommand {
         }
         ExploreService.explorePlanet(event, tile, planetName, drawColor, getPlayer(), false, game, 1, over);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

@@ -10,7 +10,7 @@ import ti4.map.Player;
 
 class DrawRandomUnit extends GameStateSubcommand {
 
-    public DrawRandomUnit() {
+    DrawRandomUnit() {
         super(Constants.DRAW_RANDOM_UNIT, "Draw a random TF unit", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
@@ -21,5 +21,10 @@ class DrawRandomUnit extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         ButtonHelperTwilightsFall.drawSingularNewSpliceCard(getGame(), "spoof_units", player, event);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

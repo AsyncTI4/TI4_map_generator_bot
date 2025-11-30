@@ -7,7 +7,7 @@ import ti4.service.tech.PlayerTechService;
 
 class TechExhaust extends TechAddRemove {
 
-    public TechExhaust() {
+    TechExhaust() {
         super(Constants.TECH_EXHAUST, "Exhaust a technology");
     }
 
@@ -15,5 +15,10 @@ class TechExhaust extends TechAddRemove {
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         PlayerTechService.exhaustTechAndResolve(event, getGame(), player, techID);
         PlayerTechService.checkAndApplyCombatMods(event, player, techID);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

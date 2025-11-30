@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 
 class PickACFromDiscard extends GameStateSubcommand {
 
-    public PickACFromDiscard() {
+    PickACFromDiscard() {
         super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
@@ -23,5 +23,10 @@ class PickACFromDiscard extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
         ActionCardHelper.getActionCardFromDiscard(event, getGame(), getPlayer(), acIndex);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

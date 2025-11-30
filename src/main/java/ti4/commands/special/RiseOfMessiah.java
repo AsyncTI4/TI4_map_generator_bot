@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 
 class RiseOfMessiah extends GameStateSubcommand {
 
-    public RiseOfMessiah() {
+    RiseOfMessiah() {
         super(Constants.RISE_OF_A_MESSIAH, "RiseOfMessiah +1 Inf to each planet", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
@@ -20,5 +20,10 @@ class RiseOfMessiah extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         ActionCardHelper.doRise(getPlayer(), event, getGame());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }
