@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;
@@ -64,6 +65,7 @@ import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 
+@UtilityClass
 public class CommandManager {
 
     private static final Map<String, ParentCommand> commands = Stream.of(

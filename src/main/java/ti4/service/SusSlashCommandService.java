@@ -27,7 +27,7 @@ public class SusSlashCommandService {
         if (managedGame == null) return;
 
         ParentCommand command = CommandManager.getCommand(event.getInteraction().getName());
-        if (!command.isSuspicious(event)) return;
+        if (command == null || !command.isSuspicious(event)) return;
 
         if (EXCLUDED_GAMES.contains(managedGame.getName())) return;
 

@@ -19,10 +19,9 @@ public interface ParentCommand extends Command {
             Subcommand subcommand = getSubcommands().get(subcommandName);
             return subcommand == null
                     || getSubcommands().containsKey(event.getInteraction().getSubcommandName());
-        } else {
-            SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
-            return subcommandGroup == null || getSubcommandGroups().containsKey(subcommandGroupName);
         }
+        SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
+        return subcommandGroup == null || getSubcommandGroups().containsKey(subcommandGroupName);
     }
 
     default void execute(SlashCommandInteractionEvent event) {
@@ -44,19 +43,13 @@ public interface ParentCommand extends Command {
     @Override
     default boolean isSuspicious(SlashCommandInteractionEvent event) {
         String subcommandGroupName = event.getInteraction().getSubcommandGroup();
-        if (subcommandGroupName == null) {
-            String subcommandName = event.getInteraction().getSubcommandName();
-            Subcommand subcommand = getSubcommands().get(subcommandName);
-            return subcommand != null && subcommand.isSuspicious(event);
-        } else {
+        if (subcommandGroupName != null) {
             SubcommandGroup subcommandGroup = getSubcommandGroups().get(subcommandGroupName);
-            if (subcommandGroup != null) {
-                String subcommandName = event.getInteraction().getSubcommandName();
-                Subcommand subcommand = subcommandGroup.getSubcommands().get(subcommandName);
-                return subcommand != null && subcommand.isSuspicious(event);
-            }
-            return false;
+            return subcommandGroup != null && subcommandGroup.isSuspicious(event);
         }
+        String subcommandName = event.getInteraction().getSubcommandName();
+        Subcommand subcommand = getSubcommands().get(subcommandName);
+        return subcommand != null && subcommand.isSuspicious(event);
     }
 
     default void register(CommandListUpdateAction commands) {
