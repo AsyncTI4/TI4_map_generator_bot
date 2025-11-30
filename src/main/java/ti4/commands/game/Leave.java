@@ -40,4 +40,9 @@ public class Leave extends GameStateSubcommand {
         }
         return "Left map: " + game.getName() + " successful";
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }
