@@ -82,7 +82,7 @@ public class RoleService {
 
     public void checkIfNewUserIsInAnyGamesAndAddRole(User user) {
         ManagedPlayer player = GameManager.getManagedPlayer(user.getId());
-        if (!player.getGames().isEmpty()) {
+        if (player != null && !player.getGames().isEmpty()) {
             for (Guild guild : JdaService.guilds) {
                 Role role = getAsyncPlayerRole(guild);
                 if (guild.getMember(user) != null) {
