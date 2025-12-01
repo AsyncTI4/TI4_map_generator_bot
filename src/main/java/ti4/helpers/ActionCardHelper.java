@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -1753,21 +1754,23 @@ public class ActionCardHelper {
                 String reversePrefix =
                         Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_reverse_";
 
+                Set<String> cardNames = new HashSet<>();
                 for (String acID : actionCards) {
                     ActionCardModel model = Mapper.getActionCard(acID);
                     if (!model.getWindow().toLowerCase().startsWith("action")) {
                         continue;
                     }
-
                     if (game.getDiscardACStatus().get(acID) != null) {
                         if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
                         continue; // on RN bt or garbozia or purged
                     }
-
-                    String id = reversePrefix + model.getName();
-                    String label = "Reverse Engineer " + model.getName();
+                    cardNames.add(model.getName());
+                }
+                for (String name : cardNames) {
+                    String id = reversePrefix + name;
+                    String label = "Reverse Engineer " + name;
                     reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
-                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+                    if (actionCards.size() == 1) msg.append(name).append(".");
                 }
 
                 if (!reverseButtons.isEmpty()) {
