@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
@@ -29,6 +30,9 @@ import ti4.service.player.PlayerStatsService;
 import ti4.settings.users.UserSettingsManager;
 
 class Stats extends GameStateSubcommand {
+
+    private static final Set<String> SUS_OPTIONS = Set.of(
+            Constants.CC, Constants.TACTICAL, Constants.FLEET, Constants.STRATEGY, Constants.TG, Constants.COMMODITIES);
 
     Stats() {
         super(Constants.STATS, "Player Stats: Command tokens, trade goods, commodities", true, true);
@@ -362,6 +366,6 @@ class Stats extends GameStateSubcommand {
 
     @Override
     public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
+        return event.getOptions().stream().anyMatch(option -> SUS_OPTIONS.contains(option.getName()));
     }
 }
