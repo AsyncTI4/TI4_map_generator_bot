@@ -2773,6 +2773,7 @@ public class ButtonHelperActionCards {
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
                 ActionCardHelper.sendActionCardInfo(game, player);
+                break;
             }
         }
         ButtonHelper.deleteMessage(event);

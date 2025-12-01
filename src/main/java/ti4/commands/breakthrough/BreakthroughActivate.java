@@ -1,5 +1,6 @@
 package ti4.commands.breakthrough;
 
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -8,6 +9,8 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
+import ti4.service.breakthrough.DataSkimmerService;
+import ti4.service.breakthrough.VoidTetherService;
 
 class BreakthroughActivate extends GameStateSubcommand {
 
@@ -25,11 +28,24 @@ class BreakthroughActivate extends GameStateSubcommand {
         if (bt == null) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough");
         } else {
-            boolean active = player.isBreakthroughActive();
-            player.setBreakthroughActive(!active);
-            String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough "
-                    + bt.getName();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            List<String> activatable = List.of("naazbt");
+            List<String> usable = List.of("ralnelbt", "empyreanbt");
+
+            if (activatable.contains(bt.getAlias())) {
+                boolean active = player.isBreakthroughActive();
+                player.setBreakthroughActive(!active);
+                String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough "
+                        + bt.getName();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            } else if (usable.contains(bt.getAlias())) {
+                switch (bt.getAlias()) {
+                    case "ralnelbt" -> DataSkimmerService.fixDataSkimmer(getGame(), player);
+                    case "empyreanbt" -> VoidTetherService.fixVoidTether(getGame(), player);
+                }
+            } else {
+                String msg = player.getRepresentation() + "'s breakthrough, " + bt.getName() + ", cannot be activated.";
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            }
         }
     }
 
