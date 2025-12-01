@@ -15,4 +15,9 @@ class TechUnpurge extends TechAddRemove {
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         PlayerTechService.unpurgeTech(event, player, techID);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

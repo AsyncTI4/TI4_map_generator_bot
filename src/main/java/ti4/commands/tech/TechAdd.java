@@ -15,4 +15,9 @@ class TechAdd extends TechAddRemove {
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         PlayerTechService.addTech(event, getGame(), player, techID);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

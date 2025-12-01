@@ -75,9 +75,4 @@ abstract class TechAddRemove extends GameStateSubcommand {
     }
 
     protected abstract void doAction(Player player, String techID, SlashCommandInteractionEvent event);
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
-    }
 }
