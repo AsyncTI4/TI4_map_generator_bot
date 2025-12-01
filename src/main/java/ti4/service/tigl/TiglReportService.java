@@ -35,7 +35,6 @@ public class TiglReportService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
         TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
 
         if (!game.isReplacementMade()) {
