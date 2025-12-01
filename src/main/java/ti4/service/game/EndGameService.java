@@ -30,6 +30,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.service.async.RoleService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
@@ -62,6 +63,10 @@ public class EndGameService {
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), gameName);
+        for (Player player : game.getRealPlayers()) {
+            RoleService.checkIfNewUserIsInAnyGamesAndAddRole(player.getUser());
+        }
+
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "This game's channels' permissions have been updated.");
 

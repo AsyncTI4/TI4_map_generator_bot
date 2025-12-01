@@ -47,10 +47,10 @@ public class MindsieveService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseMindsieve(naalu, primary, scModel)) return;
 
-        StringBuilder msg = new StringBuilder(naalu.getRepresentation() + " since you have " + mindsieve()
-                + " you are able to send a promissory note to " + primary.getRepresentationNoPing());
-        msg.append(
-                " instead of spending a command token. If you would like to do so, choose which promissory note to send by clicking one of the buttons:");
+        StringBuilder msg = new StringBuilder(naalu.getRepresentation()).append(" since you have ");
+        msg.append(mindsieve()).append(" you are able to send a promissory note to ");
+        msg.append(primary.getRepresentationNoPing()).append(" instead of spending a command token.");
+        msg.append(" If you would like to do so, choose which promissory note to send by clicking a button:");
 
         List<Button> buttons = new ArrayList<>();
         for (String pn : naalu.getPromissoryNotes().keySet()) {
@@ -73,28 +73,36 @@ public class MindsieveService {
     @ButtonHandler("mindsieveFollow_")
     private void followWithMindsieve(ButtonInteractionEvent event, Game game, Player naalu, String buttonID) {
         String regex = "mindsieveFollow_" + RegexHelper.intRegex("sc") + "_" + RegexHelper.pnRegex(game, naalu);
-        RegexService.runMatcher(regex, buttonID, matcher -> {
-            int sc = Integer.parseInt(matcher.group("sc"));
-            String pn = matcher.group("pn");
+        RegexService.runMatcher(
+                regex,
+                buttonID,
+                matcher -> {
+                    int sc = Integer.parseInt(matcher.group("sc"));
+                    String pn = matcher.group("pn");
 
-            Player primary = game.getPlayerFromSC(sc);
-            StrategyCardModel scModel =
-                    game.getStrategyCardModelByInitiative(sc).orElse(null);
-            SendPromissoryService.sendPromissoryToPlayer(event, game, naalu, primary, pn);
+                    Player primary = game.getPlayerFromSC(sc);
+                    StrategyCardModel scModel =
+                            game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    SendPromissoryService.sendPromissoryToPlayer(event, game, naalu, primary, pn);
 
-            if (!naalu.getFollowedSCs().contains(sc))
-                ButtonHelperFactionSpecific.resolveVadenSCDebt(naalu, sc, game, event);
-            naalu.addFollowedSC(sc, event);
+                    if (!naalu.getFollowedSCs().contains(sc))
+                        ButtonHelperFactionSpecific.resolveVadenSCDebt(naalu, sc, game, event);
+                    naalu.addFollowedSC(sc, event);
 
-            String messageID = game.getStoredValue("scPlayMsgID" + sc);
-            ReactionService.addReaction(naalu, false, null, null, messageID, game);
+                    String messageID = game.getStoredValue("scPlayMsgID" + sc);
+                    ReactionService.addReaction(naalu, false, null, null, messageID, game);
 
-            MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
-            String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to the " + scModel.getName()
-                    + " holder ";
-            msg += "to follow the strategy card without spending a command token.";
-            MessageHelper.sendMessageToChannel(scChannel, msg);
-            ButtonHelper.deleteMessage(event);
-        });
+                    MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
+                    String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to the "
+                            + scModel.getName() + " holder ";
+                    msg += "to follow the strategy card without spending a command token.";
+                    MessageHelper.sendMessageToChannel(scChannel, msg);
+                    ButtonHelper.deleteMessage(event);
+                },
+                e -> {
+                    String message = "Failed to send promissory note using Mindsieve. ";
+                    message += "Are you sure you still have that promissory note in your hand?";
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                });
     }
 }

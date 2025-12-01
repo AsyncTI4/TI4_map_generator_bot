@@ -2,14 +2,12 @@ package ti4.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.CardEmojis;
@@ -79,55 +77,6 @@ public class Buttons {
             REFRESH_PLANET_INFO,
             FACTION_EMBED);
 
-    /**
-     * Check if a game is standard PoK or only uses 4/4/4 homebrew
-     */
-    private static boolean isStandardPoKOrOnly444(Game game) {
-        if (game == null) return false;
-
-        // FIRST: Check that NO other homebrew elements are present
-        if (game.isHomebrew() // explicit homebrew flag
-                || game.isExtraSecretMode()
-                || game.isFowMode()
-                || game.isAgeOfExplorationMode()
-                || game.isFacilitiesMode()
-                || game.isMinorFactionsMode()
-                || game.isLightFogMode()
-                || game.isRedTapeMode()
-                || game.isDiscordantStarsMode()
-                || game.isFrankenGame()
-                || game.isMiltyModMode()
-                || game.isAbsolMode()
-                || game.isVotcMode()
-                || game.isPromisesPromisesMode()
-                || game.isFlagshippingMode()
-                || game.isAllianceMode()
-                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
-                || game.isHomebrewSCMode()
-                || game.isCommunityMode()
-                || game.getPlayerCountForMap() < 3
-                || game.getPlayerCountForMap() > 8) {
-
-            return false; // Has other homebrew elements, not standard
-        }
-
-        // Check decks, tiles, and factions are official
-        try {
-            if (!game.checkAllDecksAreOfficial()
-                    || !game.checkAllTilesAreOfficial()
-                    || game.getFactions().stream()
-                            .map(Mapper::getFaction)
-                            .filter(Objects::nonNull)
-                            .anyMatch(faction -> !faction.getSource().isOfficial())) {
-                return false;
-            }
-        } catch (Exception e) {
-            return false; // If we can't verify, assume not standard
-        }
-
-        return true;
-    }
-
     public static List<Button> mapImageButtons(Game game) {
         List<Button> buttonsWeb = new ArrayList<>();
         if (game != null && !game.isFowMode()) {
@@ -139,7 +88,7 @@ public class Buttons {
         }
         buttonsWeb.add(REFRESH_CARDS_INFO);
         buttonsWeb.add(SHOW_DECKS);
-        if (game.isTwilightsFallMode()) {
+        if (game != null && game.isTwilightsFallMode()) {
             buttonsWeb.add(green("showSpliceDecks", "Show Twilight Fall Decks"));
         }
         buttonsWeb.add(REFRESH_MAP);

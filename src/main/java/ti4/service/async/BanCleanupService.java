@@ -75,12 +75,11 @@ public class BanCleanupService {
 
     private int removeUserFromAllGuilds(UserSnowflake user, String reason) {
         int errors = 0;
-        UserSnowflake snowflake = UserSnowflake.fromId(user.getId());
-        Collection<UserSnowflake> banList = Collections.singleton(snowflake);
+        Collection<UserSnowflake> banList = Collections.singleton(user);
         for (Guild guild : JdaService.guilds) {
             try {
                 guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue();
-                errors += cleanupBotQuestionChannel(guild, user);
+                errors += cleanupBotQuestionChannel(guild, getUser(user));
             } catch (Exception e) {
                 String msg = "Error encountered trying to ban " + getIdent(user);
                 msg += " from guild `" + guild.getName() + "`";
@@ -110,24 +109,33 @@ public class BanCleanupService {
         MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 
-    private int cleanupBotQuestionChannel(Guild guild, UserSnowflake user) {
+    public void cleanupBotQuestionChannels(User user) {
+        for (Guild guild : JdaService.guilds) {
+            try {
+                cleanupBotQuestionChannel(guild, user);
+            } catch (Exception e) {
+                String msg = "Error encountered trying to ban " + getIdent(user);
+                msg += " from guild `" + guild.getName() + "`";
+                BotLogger.error(msg, e);
+            }
+        }
+    }
+
+    public int cleanupBotQuestionChannel(Guild guild, User user) {
+        if (user == null) return 0;
         int errors = 0;
         List<String> channelNames = List.of(
                 "bot-questions-and-support-and-feedback",
                 "bot-questions-and-feedback",
                 "bot-questions-and-discussion",
                 "bot-questions-and-discussions");
-
         try {
-            User targetUser = getUser(user);
-            if (targetUser == null) return 0;
-
             for (String channelName : channelNames) {
                 List<TextChannel> channels = guild.getTextChannelsByName(channelName, true);
                 if (!channels.isEmpty()) {
                     TextChannel channel = channels.getFirst();
                     channel.getHistoryAround(channel.getLatestMessageId(), 100)
-                            .queue(hist -> findAndDeleteSpamPosts(targetUser, hist), BotLogger::catchRestError);
+                            .queue(hist -> findAndDeleteSpamPosts(user, hist), BotLogger::catchRestError);
                 }
             }
         } catch (Exception e) {

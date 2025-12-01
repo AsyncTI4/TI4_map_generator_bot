@@ -8,13 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.image.Mapper;
@@ -28,7 +25,7 @@ import ti4.service.emoji.CardEmojis;
 public class NewStuffHelper {
 
     public static List<Button> buttonPagination(List<Button> allButtons, String prefixID, int pageNum) {
-        return buttonPagination(allButtons, prefixID, 25, pageNum, false);
+        return buttonPagination(allButtons, null, prefixID, 25, pageNum, false);
     }
 
     /**
@@ -40,8 +37,14 @@ public class NewStuffHelper {
      * @return Page of buttons, with 2 additional "back" and "forward" buttons. Additional buttons are formatted like "prefixId_page1"
      */
     public static List<Button> buttonPagination(
-            List<Button> allButtons, String prefixID, int allottedSpace, int pageNum, boolean deleteButton) {
+            List<Button> allButtons,
+            List<Button> extraButtons,
+            String prefixID,
+            int allottedSpace,
+            int pageNum,
+            boolean deleteButton) {
         if (deleteButton) allottedSpace--;
+        if (extraButtons != null) allottedSpace -= extraButtons.size();
 
         if (allottedSpace < allButtons.size()) {
             if (allottedSpace < 3) {
@@ -56,19 +59,17 @@ public class NewStuffHelper {
 
             List<Button> buttonsToUse = new ArrayList<>();
             if (pageNum > 0) {
-                Button prevPage = Button.of(
-                        ButtonStyle.PRIMARY,
-                        prefixID + "page" + (pageNum - 1),
-                        "Previous Page",
-                        Emoji.fromUnicode("⏪"));
+                String prev = "Previous Page (" + pageNum + "/" + (maxPage + 1) + ")";
+                Button prevPage = Buttons.blue(prefixID + "page" + (pageNum - 1), prev, "⏪");
                 buttonsToUse.add(prevPage);
             }
             buttonsToUse.addAll(paginated.get(pageNum));
             if (pageNum < maxPage) {
-                Button nextPage = Button.of(
-                        ButtonStyle.PRIMARY, prefixID + "page" + (pageNum + 1), "Next Page", Emoji.fromUnicode("⏩"));
+                String next = "Next Page (" + (pageNum + 2) + "/" + (maxPage + 1) + ")";
+                Button nextPage = Buttons.blue(prefixID + "page" + (pageNum + 1), next, "⏩");
                 buttonsToUse.add(nextPage);
             }
+            if (extraButtons != null) buttonsToUse.addAll(extraButtons);
             if (deleteButton) buttonsToUse.add(Buttons.red("deleteButtons", "Delete these buttons"));
             return buttonsToUse;
         }
@@ -76,9 +77,20 @@ public class NewStuffHelper {
     }
 
     public static boolean checkAndHandlePaginationChange(
-            @NotNull GenericInteractionCreateEvent event,
+            GenericInteractionCreateEvent event,
             MessageChannel channel,
             List<Button> allButtons,
+            String message,
+            String buttonPrefix,
+            String buttonID) {
+        return checkAndHandlePaginationChange(event, channel, allButtons, null, message, buttonPrefix, buttonID);
+    }
+
+    public static boolean checkAndHandlePaginationChange(
+            GenericInteractionCreateEvent event,
+            MessageChannel channel,
+            List<Button> allButtons,
+            List<Button> extraButtons,
             String message,
             String buttonPrefix,
             String buttonID) {
@@ -86,8 +98,8 @@ public class NewStuffHelper {
         Matcher pageMatcher = Pattern.compile(pageRegex).matcher(buttonID);
         if (pageMatcher.find()) {
             int page = Integer.parseInt(pageMatcher.group("page"));
-            List<Button> buttons = buttonPagination(allButtons, buttonPrefix, 24, page, true);
-            sendOrEditButtons(event, event.getMessageChannel(), message, buttons);
+            List<Button> buttons = buttonPagination(allButtons, extraButtons, buttonPrefix, 24, page, true);
+            sendOrEditButtons(event, channel, message, buttons);
             return true;
         }
         return false;
@@ -95,7 +107,8 @@ public class NewStuffHelper {
 
     public static void sendOrEditButtons(
             GenericInteractionCreateEvent event, MessageChannel channel, String message, List<Button> buttons) {
-        if (event instanceof ButtonInteractionEvent bEvent
+        if (event != null
+                && event instanceof ButtonInteractionEvent bEvent
                 && bEvent.getMessage().getContentRaw().equals(message)) {
             // replace the buttons in the previous message
             List<List<ActionRow>> actionRows = MessageHelper.getPartitionedButtonLists(buttons);

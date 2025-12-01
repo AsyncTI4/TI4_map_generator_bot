@@ -824,7 +824,7 @@ public class MessageHelper {
      * @param messageText any non-null, non-empty string
      * @param maxLength maximum length, any positive integer
      */
-    private static List<String> splitLargeText(String messageText, int maxLength) {
+    public static List<String> splitLargeText(String messageText, int maxLength) {
         List<String> texts = new ArrayList<>();
         if (messageText == null || messageText.isEmpty()) return Collections.emptyList();
         int messageLength = messageText.length();

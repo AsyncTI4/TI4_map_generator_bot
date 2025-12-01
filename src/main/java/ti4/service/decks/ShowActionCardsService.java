@@ -38,43 +38,70 @@ public class ShowActionCardsService {
 
     public static void showDiscard(Game game, GenericInteractionCreateEvent event, boolean showFullText) {
         StringBuilder sb = new StringBuilder();
-        List<Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == null)
-                .toList();
-        List<Entry<String, Integer>> purged = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
-                .toList();
-        List<Entry<String, Integer>> dataSkimmer = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.ralnelbt)
-                .toList();
-        List<Entry<String, Integer>> garbozia = game.getDiscardActionCards().entrySet().stream()
-                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.garbozia)
-                .toList();
 
-        if (!purged.isEmpty()) {
-            String title = "PURGED Action cards";
-            sb.append(acDiscardText(showFullText, purged, title, game));
-            sb.append("\n\n");
+        String purgedText = getPurgedText(game, showFullText);
+        if (purgedText != null) {
+            sb.append(purgedText).append("\n\n");
         }
-        {
-            String title = "Action card discard list";
-            sb.append(acDiscardText(showFullText, discards, title, game));
+
+        String actionCardText = getActionCardDiscardPileText(game, showFullText);
+        sb.append(actionCardText);
+
+        String dataSkimmerText = getDataSkimmerDiscardText(game, showFullText);
+        if (dataSkimmerText != null) {
+            sb.append("\n\n").append(dataSkimmerText);
         }
-        if (!dataSkimmer.isEmpty()) {
-            sb.append("\n\n");
-            String title = "Action cards on " + FactionEmojis.Ralnel + " Data Skimmer";
-            sb.append(acDiscardText(showFullText, dataSkimmer, title, game));
-        }
-        if (!garbozia.isEmpty()) {
-            sb.append("\n\n");
-            String title = "Action cards on " + MiscEmojis.LegendaryPlanet + " Garbozia";
-            sb.append(acDiscardText(showFullText, garbozia, title, game));
+
+        String garboziaText = getGarboziaDiscardText(game, showFullText);
+        if (garboziaText != null) {
+            sb.append("\n\n").append(garboziaText);
         }
 
         MessageHelper.sendMessageToChannelWithButton(
                 event.getMessageChannel(),
                 sb.toString(),
                 showFullText ? null : Buttons.green("ACShowDiscardFullText", "Show Full Text"));
+    }
+
+    public static String getActionCardDiscardPileText(Game game, boolean showFullText) {
+        List<Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream()
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == null)
+                .toList();
+        String title = "Action card discard list";
+        return acDiscardText(showFullText, discards, title, game);
+    }
+
+    public static String getPurgedText(Game game, boolean showFullText) {
+        List<Entry<String, Integer>> purged = game.getDiscardActionCards().entrySet().stream()
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
+                .toList();
+        if (!purged.isEmpty()) {
+            String title = "PURGED Action cards";
+            return acDiscardText(showFullText, purged, title, game);
+        }
+        return null;
+    }
+
+    public static String getDataSkimmerDiscardText(Game game, boolean showFullText) {
+        List<Entry<String, Integer>> dataSkimmer = game.getDiscardActionCards().entrySet().stream()
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.ralnelbt)
+                .toList();
+        if (!dataSkimmer.isEmpty()) {
+            String title = "Action cards on " + FactionEmojis.Ralnel + " Data Skimmer";
+            return acDiscardText(showFullText, dataSkimmer, title, game);
+        }
+        return null;
+    }
+
+    public static String getGarboziaDiscardText(Game game, boolean showFullText) {
+        List<Entry<String, Integer>> garbozia = game.getDiscardActionCards().entrySet().stream()
+                .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.garbozia)
+                .toList();
+        if (!garbozia.isEmpty()) {
+            String title = "Action cards on " + MiscEmojis.LegendaryPlanet + " Garbozia";
+            return acDiscardText(showFullText, garbozia, title, game);
+        }
+        return null;
     }
 
     public static String acDiscardText(

@@ -3549,7 +3549,7 @@ public class ButtonHelper {
                     + button.getLabel() + ";" + button.getStyle();
             if (button.getEmoji() != null
                     && !"".equalsIgnoreCase(button.getEmoji().toString())) {
-                builder += ";" + button.getEmoji().toString();
+                builder += ";" + button.getEmoji().getFormatted();
             }
             game.saveButton(builder.replace(",", ""));
         }
@@ -3571,9 +3571,14 @@ public class ButtonHelper {
             String emoji = "";
             if (countMatches(buttonString, ";") > x + 2) {
                 emoji = buttonString.split(";")[x + 3];
-                String name = substringBetween(emoji, ":", "(");
-                String emojiID = substringBetween(emoji, "=", ")");
-                emoji = "<:" + name + ":" + emojiID + ">";
+                if (emoji.startsWith("CustomEmoji")) {
+                    String name = substringBetween(emoji, ":", "(");
+                    String emojiID = substringBetween(emoji, "=", ")");
+                    emoji = "<:" + name + ":" + emojiID + ">";
+                } else if (emoji.startsWith("UnicodeEmoji")) {
+                    String unicode = substringBetween(emoji, "=", ")");
+                    emoji = Emoji.fromUnicode(unicode).getFormatted();
+                }
             }
             if ("success".equalsIgnoreCase(style)) {
                 if (!emoji.isEmpty()) {
@@ -5481,7 +5486,7 @@ public class ButtonHelper {
         return getTilesWithPredicateForAction(player, game, action, hasPlayerUnits, includeDelete);
     }
 
-    private static List<Button> getTilesWithShipsForAction(
+    public static List<Button> getTilesWithShipsForAction(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerShips =
                 tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
@@ -5502,6 +5507,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    /** Returns a list of buttons with id: {@code finchecker_<action>_<position>} */
     public static List<Button> getTilesWithPredicateForAction(
             Player player, Game game, String action, Predicate<Tile> predicate, boolean includeDelete) {
         String finChecker = player.finChecker();
