@@ -1,6 +1,7 @@
 package ti4.buttons.handlers.agenda;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -30,6 +31,11 @@ import ti4.service.emoji.TechEmojis;
 @UtilityClass
 public class EdictPhaseHandler {
 
+    private final List<Button> edictBlessButtons = Arrays.asList(
+            Buttons.green("blessBoonTg", "Gain 3 TG"),
+            Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard),
+            Buttons.blue("redistributeCCButtons", "Gain 1 Command Token"));
+
     @ButtonHandler("edictPhase")
     public static void edictPhase(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("agenda");
@@ -55,6 +61,20 @@ public class EdictPhaseHandler {
         player.setTg(player.getTg() + 3);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 3);
+
+        if (game.isFowMode() && player == game.getTyrant()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 != game.getTyrant()) {
+                    List<Button> buttons = new ArrayList<>(edictBlessButtons);
+                    buttons.add(Buttons.DONE_DELETE_BUTTONS);
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged()
+                                    + " Bless Edict has been used - choose 1 of the following to resolve",
+                            buttons);
+                }
+            }
+        }
     }
 
     @ButtonHandler("artificeStep2")
@@ -200,10 +220,10 @@ public class EdictPhaseHandler {
         String msg = player.getRepresentation() + " use buttons to resolve the edict.";
         switch (edict) {
             case "tf-bless" -> {
-                buttons.add(Buttons.green("blessBoonTg", "Gain 3 TG"));
-                buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
-                buttons.add(Buttons.blue("redistributeCCButtons", "Gain 1 Command Token"));
-                msg += " " + game.getPing() + " other players get to resolve 1 of the 3 boons.";
+                buttons.addAll(edictBlessButtons);
+                if (!game.isFowMode()) {
+                    msg += " " + game.getPing() + " other players get to resolve 1 of the 3 boons.";
+                }
             }
             case "tf-splice" -> {
                 buttons.add(Buttons.green(
