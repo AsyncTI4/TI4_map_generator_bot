@@ -7,8 +7,9 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 
-public class BreakthroughExhaust extends GameStateSubcommand {
-    public BreakthroughExhaust() {
+class BreakthroughExhaust extends GameStateSubcommand {
+
+    BreakthroughExhaust() {
         super(Constants.BREAKTHROUGH_EXHAUST, "Exhaust breakthrough", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(

@@ -27,4 +27,9 @@ class LookAtAgenda extends GameStateSubcommand {
         Player player = getPlayer();
         LookAgendaService.lookAtAgendas(game, player, count, lookAtBottom);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }
