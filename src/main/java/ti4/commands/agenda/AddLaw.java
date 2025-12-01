@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 class AddLaw extends GameStateSubcommand {
 
-    public AddLaw() {
+    AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between the ()")
                 .setRequired(true)
@@ -55,5 +55,10 @@ class AddLaw extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

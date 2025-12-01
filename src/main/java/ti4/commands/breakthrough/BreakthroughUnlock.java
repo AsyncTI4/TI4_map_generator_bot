@@ -7,8 +7,9 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 
-public class BreakthroughUnlock extends GameStateSubcommand {
-    public BreakthroughUnlock() {
+class BreakthroughUnlock extends GameStateSubcommand {
+
+    BreakthroughUnlock() {
         super(Constants.BREAKTHROUGH_UNLOCK, "Unlock breakthrough", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
@@ -17,5 +18,10 @@ public class BreakthroughUnlock extends GameStateSubcommand {
 
     public void execute(SlashCommandInteractionEvent event) {
         BreakthroughCommandHelper.unlockBreakthrough(getGame(), getPlayer());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

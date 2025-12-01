@@ -8,8 +8,9 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 
-public class BreakthroughSetTg extends GameStateSubcommand {
-    public BreakthroughSetTg() {
+class BreakthroughSetTg extends GameStateSubcommand {
+
+    BreakthroughSetTg() {
         super(Constants.BREAKTHROUGH_SET_TG, "Add or remove trade goods on your breakthrough", true, true);
         addOption(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract", true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
@@ -22,5 +23,10 @@ public class BreakthroughSetTg extends GameStateSubcommand {
         OptionMapping optionTG = event.getOption(Constants.TG);
         if (optionTG == null) return;
         BreakthroughCommandHelper.updateBreakthroughTradeGoods(getPlayer(), optionTG.getAsString());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

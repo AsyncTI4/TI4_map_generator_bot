@@ -7,8 +7,9 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 
-public class BreakthroughReady extends GameStateSubcommand {
-    public BreakthroughReady() {
+class BreakthroughReady extends GameStateSubcommand {
+
+    BreakthroughReady() {
         super(Constants.BREAKTHROUGH_READY, "Ready breakthrough", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
@@ -18,5 +19,10 @@ public class BreakthroughReady extends GameStateSubcommand {
 
     public void execute(SlashCommandInteractionEvent event) {
         BreakthroughCommandHelper.readyBreakthrough(getPlayer());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

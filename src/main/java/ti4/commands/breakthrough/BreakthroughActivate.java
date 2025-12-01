@@ -9,8 +9,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
 
-public class BreakthroughActivate extends GameStateSubcommand {
-    public BreakthroughActivate() {
+class BreakthroughActivate extends GameStateSubcommand {
+
+    BreakthroughActivate() {
         super(Constants.BREAKTHROUGH_ACTIVATE, "Activate (or unactivate) breakthrough", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
@@ -30,5 +31,10 @@ public class BreakthroughActivate extends GameStateSubcommand {
                     + bt.getName();
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

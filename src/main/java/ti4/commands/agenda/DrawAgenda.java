@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 
 class DrawAgenda extends GameStateSubcommand {
 
-    public DrawAgenda() {
+    DrawAgenda() {
         super(Constants.DRAW, "Draw Agenda", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
         addOptions(new OptionData(OptionType.BOOLEAN, "from_bottom", "Whether to draw from bottom, default false"));

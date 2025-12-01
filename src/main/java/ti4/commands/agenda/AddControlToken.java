@@ -52,4 +52,9 @@ class AddControlToken extends GameStateSubcommand {
 
         game.setStoredValue("controlTokensOnAgenda" + lawId, msg);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

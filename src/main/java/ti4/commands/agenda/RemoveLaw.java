@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 class RemoveLaw extends GameStateSubcommand {
 
-    public RemoveLaw() {
+    RemoveLaw() {
         super(Constants.REMOVE_LAW, "Remove Law", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
                 .setRequired(true)
@@ -25,5 +25,10 @@ class RemoveLaw extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

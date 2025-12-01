@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 class RevealSpecificAgenda extends GameStateSubcommand {
 
-    public RevealSpecificAgenda() {
+    RevealSpecificAgenda() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck", true, false);
         addOptions(new OptionData(
                         OptionType.STRING, Constants.AGENDA_ID, "Agenda Card ID (text ID found in /search agendas)")
@@ -56,5 +56,10 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         }
         game.putAgendaBackIntoDeckOnTop(uniqueID);
         AgendaHelper.revealAgenda(event, false, game, channel);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }
