@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class ShuffleAgendas extends GameStateSubcommand {
 
-    public ShuffleAgendas() {
+    ShuffleAgendas() {
         super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
                 .setRequired(true));
@@ -26,5 +26,10 @@ class ShuffleAgendas extends GameStateSubcommand {
 
         getGame().shuffleAgendas();
         MessageHelper.replyToMessage(event, "Agenda deck shuffled");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

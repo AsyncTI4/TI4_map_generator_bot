@@ -72,7 +72,7 @@ public class VisionariaSelectService {
     public static void presetMoveAlongAfterVisionaria(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String msg = game.getPing()
-                + " the active player has elected to move the game along after everyone has finshed resolving "
+                + " the active player has elected to move the game along after everyone has finished resolving "
                 + visionariaRep() + ".";
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         game.setTemporaryPingDisable(true);

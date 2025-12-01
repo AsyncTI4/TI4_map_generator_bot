@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 
 class ReviseLaw extends GameStateSubcommand {
 
-    public ReviseLaw() {
+    ReviseLaw() {
         super(Constants.REVISE_LAW, "Revise a law", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
                 .setRequired(true)

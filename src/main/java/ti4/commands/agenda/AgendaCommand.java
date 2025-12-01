@@ -3,7 +3,6 @@ package ti4.commands.agenda;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -44,10 +43,5 @@ public class AgendaCommand implements ParentCommand {
     @Override
     public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
     }
 }

@@ -7,8 +7,9 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 
-public class BreakthroughLock extends GameStateSubcommand {
-    public BreakthroughLock() {
+class BreakthroughLock extends GameStateSubcommand {
+
+    BreakthroughLock() {
         super(Constants.BREAKTHROUGH_LOCK, "Lock breakthrough", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
