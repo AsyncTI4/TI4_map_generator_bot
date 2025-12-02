@@ -431,6 +431,16 @@ public class AgendaHelper {
                 buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
             }
         }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId : ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("After an agenda is revealed")
+                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
+                    buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
+                }
+            }
+        }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)) {
                 if (pnId.contains("rider") || pnId.contains("dspnedyn") || pnId.contains("dspnkyro")) {
