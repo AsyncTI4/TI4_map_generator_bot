@@ -432,7 +432,8 @@ public class AgendaHelper {
             }
         }
         if (player.hasPlanet("garbozia")) {
-            for (String acId : ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
                 ActionCardModel actionCard = Mapper.getActionCard(acId);
                 String actionCardWindow = actionCard.getWindow();
                 if (actionCardWindow.contains("After an agenda is revealed")
