@@ -20,8 +20,7 @@ public class TEOptionService {
     @ButtonHandler("startTFGame")
     public static void startTFGame(Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
-        String msg =
-                """
+        String msg = """
             There are currently two draft options for Twilight's Fall.
 
             There is a bag draft option, \

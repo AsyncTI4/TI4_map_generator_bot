@@ -38,9 +38,7 @@ public class CardsInfoService {
         ActionCardHelper.sendActionCardInfo(game, player);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(
-                player,
-                """
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, """
                 You may whisper to people from here by starting a message with `to[color]` or `to[faction]`.\
 
                 You may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`.\
