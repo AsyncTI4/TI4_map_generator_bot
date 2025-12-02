@@ -1345,8 +1345,8 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getAllTileModels(), source);
             case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getAllPlanetModels(), source);
 
-                /* From others */
-                // none of them are populated from here
+            /* From others */
+            // none of them are populated from here
         }
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue();

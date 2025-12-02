@@ -84,8 +84,7 @@ public class RiftSetModeService {
         game.addTag("RiftSet");
         game.setFowOption(FOWOption.RIFTSET_MODE, true);
 
-        String sb =
-                """
+        String sb = """
             RiftSet Mode activated.
             * Agenda deck set as `agendas_riftset`.
             * Explore deck set as `explores_riftset`.

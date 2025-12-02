@@ -126,8 +126,7 @@ public class LoreService {
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            String msg =
-                    """
+            String msg = """
                 ### Lore Management\
 
                 -# System Lore is shown to the first player to conclude an action with units in the system.\

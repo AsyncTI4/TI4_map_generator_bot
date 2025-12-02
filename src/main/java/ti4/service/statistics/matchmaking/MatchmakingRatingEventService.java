@@ -59,14 +59,12 @@ public class MatchmakingRatingEventService {
                 .mapToDouble(MatchmakingRating::rating)
                 .average()
                 .orElse(Double.NaN);
-        String formattedString = String.format(
-                """
+        String formattedString = String.format("""
 
                 This list only includes the top %d players with a high confidence in their rating.
 
                 The average rating of the player base is `%.3f`
-                """,
-                maxListSize, averageRating);
+                """, maxListSize, averageRating);
         sb.append(formattedString);
 
         playerRatings.stream()

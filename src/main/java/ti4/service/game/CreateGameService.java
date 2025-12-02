@@ -278,8 +278,7 @@ public class CreateGameService {
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
-        String expMsg =
-                """
+        String expMsg = """
                 Which expansion are you using for this game?
                 -# This will adjust available components accordingly. To elaborate on the options:
                 > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
@@ -312,8 +311,7 @@ public class CreateGameService {
     }
 
     private static void sendMessageAboutAggressionMetas(Game game) {
-        String aggressionMsg =
-                """
+        String aggressionMsg = """
             Strangers playing with each other for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
              Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
             .\s
