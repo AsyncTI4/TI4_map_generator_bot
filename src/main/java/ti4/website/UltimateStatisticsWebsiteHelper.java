@@ -22,10 +22,9 @@ public class UltimateStatisticsWebsiteHelper {
     private static final String PLAYER_SETTINGS_URL = "https://api.ti4ultimate.com/api/Async/player-settings";
     private static final String TIGL_REPORT_GAMES_URL = "https://api.ti4ultimate.com/api/Tigl/report-game";
     private static final String TIGL_CHANGE_USERNAME_URL = "https://api.ti4ultimate.com/api/Tigl/change-username";
-    private static final String TIGL_REPORT_GAMES_SUCCESS_MESSAGE =
-            "TIGL game test upload successful. Please log game as normal using the form.";
+    private static final String TIGL_REPORT_GAMES_SUCCESS_MESSAGE = "TIGL game upload successful.";
     private static final String TIGL_REPORT_GAMES_FAILURE_MESSAGE =
-            "Failed to report TIGL game. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game";
+            "Failed to report TIGL game. Please ping BLT or Lazik to check how to proceed.";
     private static final String TIGL_CHANGE_USERNAME_SUCCESS_MESSAGE = "TIGL nickname successfully updated.";
     private static final String TIGL_CHANGE_USERNAME_FAILURE_MESSAGE = "Failed to change TIGL nickname.";
     private static final String PLAYER_SETTINGS_SUCCESS_MESSAGE =
