@@ -125,7 +125,7 @@ public class EdictPhaseHandler {
                             VeiledHeartService.VeiledCardAction.DISCARD,
                             VeiledHeartService.VeiledCardType.PARADIGM,
                             player,
-                            paradigm);
+                            paradigmToLose);
                 }
                 player.removeLeader(paradigmToLose);
                 game.setStoredValue(
