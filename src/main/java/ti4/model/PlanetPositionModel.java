@@ -122,7 +122,7 @@ public class PlanetPositionModel {
                 case TYPE17 -> "Single planet, centered";
                 default -> "unknown";
 
-                    // Non-HS system layouts
+                // Non-HS system layouts
             };
         }
 

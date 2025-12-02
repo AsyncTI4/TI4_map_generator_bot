@@ -1490,7 +1490,8 @@ public class ButtonHelperActionCards {
                                 case 2 -> "Unbelievable";
                                 case 3 -> "Remarkable";
                                 default -> "Phenomenal";
-                            } + "!");
+                            }
+                            + "!");
         }
         ButtonHelper.deleteMessage(event);
     }

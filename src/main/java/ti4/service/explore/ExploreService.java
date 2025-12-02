@@ -90,8 +90,7 @@ public class ExploreService {
         }
         if ("bozgarbia".equalsIgnoreCase(planetName)) {
             if (player.hasAbility("distant_suns")) {
-                String reportMessage =
-                        """
+                String reportMessage = """
                     Bozgarbia exploration with **Distant Suns** is not implemented.\
 
                     Please use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\

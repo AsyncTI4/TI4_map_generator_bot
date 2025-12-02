@@ -294,8 +294,7 @@ public class AgendaHelper {
 
     @ButtonHandler("explainQueue")
     public static void explainQueue(ButtonInteractionEvent event) {
-        String msg =
-                """
+        String msg = """
             "When"s are any action card or ability that has a timing window of "when an agenda is revealed" and \
             "after"s are any action card or ability that has a timing window of "after an agenda is revealed". All "when"s need to be played (or declined to be played) \
             before any "after"s, and all "after"s need to be played (or declined to be played) before any votes are cast. The bot attempts to facilitate this process \

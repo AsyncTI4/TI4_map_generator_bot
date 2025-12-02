@@ -90,9 +90,7 @@ public class FOWPlusService {
             game.setExplorationDeckID(FOWPLUS_EXPLORE_DECK);
             game.addTag(FOWPLUS_TAG);
 
-            MessageHelper.sendMessageToChannel(
-                    GMService.getGMChannel(game),
-                    """
+            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), """
                     ### FoW+ mode activated. Following options are forced:
                     - No comms in agenda phase
                     - Hide total votes and vote order
@@ -107,9 +105,7 @@ public class FOWPlusService {
                     - Explore deck set to `explores_fowplus`""");
         } else {
             game.removeTag(FOWPLUS_TAG);
-            MessageHelper.sendMessageToChannel(
-                    GMService.getGMChannel(game),
-                    """
+            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), """
                     ### FoW+ mode disabled.
                     Use `/fow fow_options` to reset options.
                     Use `/game set_deck` to reset explore deck.""");

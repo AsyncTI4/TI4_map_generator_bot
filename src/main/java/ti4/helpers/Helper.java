@@ -3148,9 +3148,7 @@ public class Helper {
                     buttons);
             if (game.isFowMode()) {
                 GMService.sendMessageToGMChannel(game, "# GAME HAS ENDED", true);
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        """
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), """
                         ## Note about FoW
                         When you press **End Game** all the game channels will be deleted immediately!
                         A new thread will be generated under the **#fow-war-stories** channel.
