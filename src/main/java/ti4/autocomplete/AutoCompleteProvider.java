@@ -443,7 +443,8 @@ public class AutoCompleteProvider {
                         "total_war",
                         "liberation",
                         "ordinian",
-                        "te");
+                        "te",
+                        "tf");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
