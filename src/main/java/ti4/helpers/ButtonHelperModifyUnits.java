@@ -1816,12 +1816,12 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
+                int solBtLimit = player.getUnitFromUnitKey(unitKey).getCapacityValue();
+                if (solBtLimit > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
-                            "solBtBuild_" + tile.getPosition(),
-                            "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
-                                    + " Ground Forces and Fighters"));
+                            "solBtBuild_" + tile.getPosition() + "_" + solBtLimit,
+                            "Build Up To " + solBtLimit + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
                             + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline.  [Note: Finish your normal build first for best results.]";
