@@ -164,7 +164,7 @@ public class GameStatisticsFilterer {
             case "total_war" -> game.isTotalWarMode();
             case "liberation" -> game.isLiberationC4Mode();
             case "ordinian" -> game.isOrdinianC1Mode();
-            case "te" -> game.isThundersEdge();
+            case "te" -> game.isThundersEdge() && !game.isThundersEdgeDemo();
             default -> false;
         };
     }
