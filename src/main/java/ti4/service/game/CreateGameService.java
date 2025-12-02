@@ -63,6 +63,7 @@ public class CreateGameService {
         newGame.setOwnerID(ownerID);
         newGame.setOwnerName(gameOwner.getEffectiveName());
         newGame.setName(gameName);
+        newGame.setThundersEdge(true);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(12);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
@@ -275,16 +276,16 @@ public class CreateGameService {
                 tfOptions);
 
         List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         buttons.add(Buttons.green("chooseExp_newPoK", "New PoK"));
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
-        buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg =
                 """
                 Which expansion are you using for this game?
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
-                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5
-                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
+                > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge. It is the default if you do not press any of these buttons.
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards.
+                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5\
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, expMsg, buttons);
