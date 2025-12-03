@@ -1626,6 +1626,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             if ("triad".equalsIgnoreCase(planet)
+                    || "grove".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;

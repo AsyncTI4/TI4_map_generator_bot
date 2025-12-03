@@ -1373,9 +1373,9 @@ public class ButtonHelperHeroes {
                     finChecker + "cabalHeroTile_" + tile.getPosition(),
                     "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        if (!game.isTwilightsFallMode()) {
-            empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles [Experimental]"));
-        }
+        // if (!game.isTwilightsFallMode()) {
+        //     empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles [Experimental]"));
+        // }
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
@@ -1845,7 +1845,6 @@ public class ButtonHelperHeroes {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        ButtonHelper.deleteButtonsWithPartialID(event, "cabalHeroAll");
         ButtonHelper.deleteTheOneButton(event);
     }
 

@@ -1367,7 +1367,7 @@
         "persistenceType": "CONDITIONAL",
         "condition": "bluetfMech",
         "valueScalingType": "mechs_in_space_area",
-        "scope": "_best_",
+        "scope": "_bestCap_",
         "related": [
             {
                 "type": "custom",
