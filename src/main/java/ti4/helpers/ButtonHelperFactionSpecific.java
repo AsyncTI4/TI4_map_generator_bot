@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1439,6 +1437,7 @@ public class ButtonHelperFactionSpecific {
         saar = saar == null ? game.getPNOwner("sigma_raghs_call") : saar;
         for (String planet : saar.getPlanetsAllianceMode()) {
             if ("triad".equalsIgnoreCase(planet)
+                    || game.getUnitHolderFromPlanet(planet) == null
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;
@@ -3618,6 +3617,19 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("severResolve_")
+    public static void severCreussIFF(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(pos);
+        String msg;
+        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        tile.addToken(Constants.TOKEN_SEVERED, Constants.SPACE);
+        sb.append(" added the sever token to ").append(tile.getRepresentationForButtons(game, player));
+        msg = sb.toString();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        event.getMessage().delete().queue();
+    }
+
     private static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -3633,6 +3645,19 @@ public class ButtonHelperFactionSpecific {
         if (game.isFowMode()) {
             buttons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Blind Tile"));
         }
+        return buttons;
+    }
+
+    public static List<Button> getSeverLocationOptions(Game game, @NotNull Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                buttons.add(Buttons.green(
+                        "severResolve_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+            }
+        }
+        SortHelper.sortButtonsByTitle(buttons);
+
         return buttons;
     }
 
