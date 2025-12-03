@@ -12,6 +12,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.helpers.BreakthroughHelper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
@@ -76,6 +77,13 @@ public class BreakthroughCommandHelper {
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
                 BreakthroughHelper.resolveYinBreakthroughAbility(player.getGame(), player);
+            }
+            if ("khraskbt".equalsIgnoreCase(bt.getID())) {
+                player.addPlanet("grove");
+                Planet grove = game.getPlanetsInfo().get("grove");
+                if (grove != null) grove.updateGroveStats(player);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), "Added the Grove \"planet card\" to your play area.");
             }
             if ("mentakbt".equalsIgnoreCase(bt.getID())) {
                 if (player.hasTech("cr2")) {

@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1933,8 +1930,8 @@ public class ButtonHelper {
     public static String getTechSkipAttachments(Game game, String planetName) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if (tile == null) {
-            List<String> fakePlanets = new ArrayList<>(
-                    List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
+            List<String> fakePlanets = new ArrayList<>(List.of(
+                    "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
             if (!fakePlanets.contains(planetName))
                 BotLogger.warning(
                         new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
@@ -3438,8 +3435,14 @@ public class ButtonHelper {
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
         if (event instanceof ButtonInteractionEvent bevent) {
             boolean containsRealButton = false;
-            List<Button> buttons =
-                    new ArrayList<>(bevent.getMessage().getComponentTree().findAll(Button.class));
+            List<Button> buttons = new ArrayList<>();
+            for (ActionRow row : bevent.getMessage().getComponentTree().findAll(ActionRow.class)) {
+                for (ActionRowChildComponent item : row.getComponents()) {
+                    if (!(item instanceof Button b)) continue;
+                    if (b.getCustomId() == null) continue;
+                    buttons.add(b);
+                }
+            }
             List<Button> newButtons = new ArrayList<>();
             for (Button button : buttons) {
                 if (!button.getCustomId().contains(partialID)) {
@@ -5381,7 +5384,7 @@ public class ButtonHelper {
         return getPlanetExplorationButtons(game, planet, player, false, false);
     }
 
-    private static List<Button> getPlanetExplorationButtons(
+    public static List<Button> getPlanetExplorationButtons(
             Game game, Planet planet, Player player, boolean impressment, boolean scanlink) {
         if (planet == null || game == null) return null;
 
@@ -5709,14 +5712,14 @@ public class ButtonHelper {
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                         + "_infantry",
-                                "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
+                                "Move Inf from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
                                     "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                             + "_infantry",
-                                    "Move Infantry from Space of " + tile.getRepresentation() + " to "
+                                    "Move Inf from Space of " + tile.getPosition() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
                     }
@@ -5732,7 +5735,7 @@ public class ButtonHelper {
                             buttons.add(Buttons.green(
                                     "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                             + "_mech",
-                                    "Move Mech from Space of " + tile.getRepresentation() + " to "
+                                    "Move Mech from Space of " + tile.getPosition() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
                     }
@@ -7676,8 +7679,8 @@ public class ButtonHelper {
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
-        List<String> fakePlanets = new ArrayList<>(
-                List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
+        List<String> fakePlanets = new ArrayList<>(List.of(
+                "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
         List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
         ignoredPlanets.addAll(fakePlanets);
 

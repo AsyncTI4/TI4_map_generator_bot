@@ -672,6 +672,14 @@ public class FoWHelper {
             wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
         }
 
+        if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+            Set<String> keepers = new HashSet<>();
+            if (player.hasAbility("quantum_entanglement") || wh_recon || absol_recon) {
+                keepers.addAll(Set.of("alpha", "beta"));
+            }
+            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
+        }
+
         if (player != null
                 && "ghost".equals(player.getFaction())
                 && game.getPlayerFromColorOrFaction("crimson") != null) {

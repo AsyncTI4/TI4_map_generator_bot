@@ -1355,6 +1355,12 @@ public class Player extends PlayerProperties {
             if (Mapper.getPlanet(planet) != null && Mapper.getPlanet(planet).isSpaceStation()) {
                 bonus++;
             }
+            if (hasUnlockedBreakthrough("gledgebt")) {
+                Planet planetObj = game.getUnitHolderFromPlanet(planet);
+                if (planetObj != null && planetObj.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
+                    bonus++;
+                }
+            }
         }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
