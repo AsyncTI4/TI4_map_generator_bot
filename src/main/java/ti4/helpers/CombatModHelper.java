@@ -338,7 +338,7 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {
-                if (player.getHomeSystemTile() != null
+                if (onTile != null && player.getHomeSystemTile() != null
                         && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
                     meetsCondition = true;
                 }
@@ -349,10 +349,10 @@ public class CombatModHelper {
                                         Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
-                if (onTile.getPlanets().contains(Constants.MR)) {
+                if (onTile != null && onTile.getPlanets() != null && onTile.getPlanets().contains(Constants.MR)) {
                     meetsCondition = true;
                 }
-                if (game.getTile(onTile.getId()) != null) {
+                if (onTile != null && game.getTile(onTile.getId()) != null) {
                     if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()))) {
                         meetsCondition = true;
                     }
