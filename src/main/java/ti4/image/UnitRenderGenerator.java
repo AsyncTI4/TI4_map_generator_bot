@@ -84,16 +84,16 @@ class UnitRenderGenerator {
     private SystemContext ctx;
 
     UnitRenderGenerator(
-        Game game,
-        DisplayType displayType,
-        Tile tile,
-        Graphics tileGraphics,
-        List<Rectangle> rectangles,
-        int degree,
-        int degreeChange,
-        UnitHolder unitHolder,
-        int radius,
-        Player frogPlayer) {
+            Game game,
+            DisplayType displayType,
+            Tile tile,
+            Graphics tileGraphics,
+            List<Rectangle> rectangles,
+            int degree,
+            int degreeChange,
+            UnitHolder unitHolder,
+            int radius,
+            Player frogPlayer) {
         this.game = game;
         this.tile = tile;
         this.displayType = displayType;
