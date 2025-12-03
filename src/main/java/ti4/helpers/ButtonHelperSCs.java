@@ -1492,8 +1492,8 @@ public class ButtonHelperSCs {
         strategicCC--;
         player.setStrategicCC(strategicCC);
         if (scNum == -1) {
-            return " performing the secondary ability of a strategy card with **Grace**."
-                    + "1 command token has been spent from strategy pool.";
+            return " performing the secondary ability of a strategy card."
+                    + " 1 command token has been spent from strategy pool.";
         }
         String stratCardName = Helper.getSCName(scNum, game);
         return " following to perform the secondary ability of **" + stratCardName + "**."
