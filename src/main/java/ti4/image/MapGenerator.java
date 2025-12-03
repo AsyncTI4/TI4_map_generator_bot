@@ -1389,14 +1389,15 @@ public class MapGenerator implements AutoCloseable {
                     }
                     offBoardHighlighting++;
                 }
-            // } else if (displayType == DisplayType.empties) {
+                // } else if (displayType == DisplayType.empties) {
                 // boolean hasStellar = false; // not working
                 // String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
                 // boolean hasHero = false; // was not working
                 // String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
                 // if (player.hasLeaderUnlocked("muaathero")) {
                 //     heroFile =
-                //             ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");
+                //             ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/",
+                // "MuaatHero.png");
                 // }
                 // BufferedImage bufferedImage;
                 // if (hasStellar && hasHero) {
