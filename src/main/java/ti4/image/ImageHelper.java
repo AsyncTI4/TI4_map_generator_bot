@@ -1,5 +1,7 @@
 package ti4.image;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.luciad.imageio.webp.CompressionType;
 import com.luciad.imageio.webp.WebPWriteParam;
 import java.awt.Color;
@@ -29,16 +31,16 @@ public class ImageHelper {
 
     @Nullable
     public static BufferedImage read(String filePath) {
-        if (filePath == null) {
-            return null;
+        if (isBlank(filePath)) {
+            throw new IllegalArgumentException("File path cannot be blank");
         }
         return ImageCache.getOrLoadStaticImage(filePath, k -> readImage(filePath));
     }
 
     @Nullable
     public static BufferedImage readScaled(String filePath, float percent) {
-        if (filePath == null) {
-            return null;
+        if (isBlank(filePath)) {
+            throw new IllegalArgumentException("File path cannot be blank");
         }
         return ImageCache.getOrLoadStaticImage(percent + filePath, k -> {
             BufferedImage image = readImage(filePath);
@@ -51,8 +53,8 @@ public class ImageHelper {
 
     @Nullable
     public static BufferedImage readScaled(String filePath, int width, int height) {
-        if (filePath == null) {
-            return null;
+        if (isBlank(filePath)) {
+            throw new IllegalArgumentException("File path cannot be blank");
         }
         return ImageCache.getOrLoadStaticImage(width + "x" + height + filePath, k -> {
             BufferedImage image = readImage(filePath);
