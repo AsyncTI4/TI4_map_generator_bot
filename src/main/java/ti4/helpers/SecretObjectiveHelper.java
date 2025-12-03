@@ -100,6 +100,17 @@ public class SecretObjectiveHelper {
                         player.getFaction() + "round" + game.getRound() + "SO",
                         Mapper.getSecretObjective(entry.getKey()).getName());
             }
+            if (game.getPhaseOfGame().toLowerCase().contains("action")
+                    && Mapper.getSecretObjective(entry.getKey()) != null
+                    && Mapper.getSecretObjective(entry.getKey())
+                            .getPhase()
+                            .toLowerCase()
+                            .contains("action")
+                    && !game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "## " + game.getPing() + " a player has scored an action phase secret.");
+            }
             if ("dhw".equalsIgnoreCase(entry.getKey())) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();

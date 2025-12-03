@@ -1542,11 +1542,21 @@ public class TransactionHelper {
                 CardsInfoService.sendVariousAdditionalButtons(game, p2);
             }
             case "SOs" -> {
-                int soNum = Integer.parseInt(amountToTrans);
                 String soID = null;
-                for (Map.Entry<String, Integer> so : p1.getSecretsUnscored().entrySet()) {
-                    if (so.getValue().equals(soNum)) {
-                        soID = so.getKey();
+                int soNum = 0;
+                if (StringUtils.isNumeric(amountToTrans)) {
+                    soNum = Integer.parseInt(amountToTrans);
+                    for (Map.Entry<String, Integer> so : p1.getSecretsUnscored().entrySet()) {
+                        if (so.getValue().equals(soNum)) {
+                            soID = so.getKey();
+                        }
+                    }
+                } else {
+                    soID = amountToTrans;
+                    for (Map.Entry<String, Integer> so : p1.getSecretsUnscored().entrySet()) {
+                        if (so.getKey().equals(soID)) {
+                            soNum = so.getValue();
+                        }
                     }
                 }
 

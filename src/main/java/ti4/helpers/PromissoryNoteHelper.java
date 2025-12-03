@@ -273,6 +273,12 @@ public class PromissoryNoteHelper {
             String message = player.getRepresentationUnfogged() + ", please choose type of wormhole you wish to drop";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
+
+        if ("sever".equalsIgnoreCase(id)) {
+            List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getSeverLocationOptions(game, player));
+            String message = player.getRepresentationUnfogged() + ", please choose the system that you wish to sever";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        }
         if ("greyfire".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelperFactionSpecific.getGreyfireButtons(game);
             String message = player.getRepresentationUnfogged()

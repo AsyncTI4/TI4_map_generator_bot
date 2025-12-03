@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
@@ -59,6 +60,9 @@ public class StatusCleanupService {
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeAllCC();
                 unitHolder.removeAllUnitDamage();
+                if (unitHolder.getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                    unitHolder.removeToken(Constants.TOKEN_SEVERED);
+                }
             }
         }
         game.removeStoredValue("galacticThreatUsed");
