@@ -34,7 +34,8 @@ class RunAgainstSpecificGame extends Subcommand {
         if (changed) {
             BotLogger.info("Changes made to " + game.getName() + ".");
             GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against " + game.getName() + ".");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Finished custom command against " + game.getName() + ".");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No changes required for " + game.getName() + ".");
         }
