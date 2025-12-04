@@ -32,6 +32,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.service.fow.LoreService;
+import ti4.service.fow.LoreService.LoreEntry;
 
 @UtilityClass
 public class MapJsonIOService {
@@ -57,7 +58,7 @@ public class MapJsonIOService {
         try {
             MapDataIO mapData = new MapDataIO();
             List<TileIO> tiles = new ArrayList<>();
-            Map<String, String[]> savedLoreMap = LoreService.getSavedLore(game);
+            Map<String, LoreService.LoreEntry> savedLoreMap = LoreService.getGameLore(game);
 
             for (Tile tile : game.getTileMap().values()) {
                 TileIO t = new TileIO();
@@ -103,9 +104,9 @@ public class MapJsonIOService {
                         pi.setAttachments(new ArrayList<>(planet.getAttachments()));
                         planetHasExportedData = true;
                     }
-                    String[] loreData = savedLoreMap.get(planet.getName());
+                    LoreEntry loreData = savedLoreMap.get(planet.getName());
                     if (includeLore && loreData != null) {
-                        pi.setPlanetLore(Arrays.asList(loreData[0], loreData[1]));
+                        pi.setPlanetLore(loreData.toString());
                         planetHasExportedData = true;
                     }
                     if (planetHasExportedData) {
@@ -117,9 +118,9 @@ public class MapJsonIOService {
                 }
 
                 // system lore
-                String[] loreData = savedLoreMap.get(tile.getPosition());
+                LoreEntry loreData = savedLoreMap.get(tile.getPosition());
                 if (includeLore && loreData != null) {
-                    t.setSystemLore(Arrays.asList(loreData[0], loreData[1]));
+                    t.setSystemLore(loreData.toString());
                 }
 
                 // custom adjacencies / overrides
@@ -274,9 +275,9 @@ public class MapJsonIOService {
     }
 
     private static void handleSystemLore(TileIO tileIO, Game game, StringBuilder sb) {
-        List<String> systemLore = tileIO.getSystemLore();
-        if (systemLore != null && !systemLore.isEmpty()) {
-            LoreService.addLore(tileIO.getPosition(), systemLore.get(0), systemLore.get(1), game);
+        String loreString = tileIO.getSystemLore();
+        if (loreString != null && !loreString.isEmpty()) {
+            LoreService.addLoreFromString(loreString, game);
         }
     }
 
@@ -312,9 +313,9 @@ public class MapJsonIOService {
         if (tileIO.getPlanets() == null) return;
 
         for (PlanetIO planetIO : tileIO.getPlanets()) {
-            List<String> planetLore = planetIO.getPlanetLore();
-            if (planetLore != null && !planetLore.isEmpty()) {
-                LoreService.addLore(planetIO.getPlanetID(), planetLore.get(0), planetLore.get(1), game);
+            String loreString = planetIO.getPlanetLore();
+            if (loreString != null && !loreString.isEmpty()) {
+                LoreService.addLoreFromString(loreString, game);
             }
         }
     }
@@ -376,7 +377,7 @@ public class MapJsonIOService {
         private List<String> tokens;
         private String customHyperlaneString;
         private List<BorderAnomalyIO> borderAnomalies;
-        private List<String> systemLore;
+        private String systemLore;
         private List<String> customAdjacencies;
         private List<AdjacencyOverrideIO> adjacencyOverrides;
 
@@ -428,11 +429,11 @@ public class MapJsonIOService {
             this.borderAnomalies = borderAnomalies;
         }
 
-        public List<String> getSystemLore() {
+        public String getSystemLore() {
             return systemLore;
         }
 
-        public void setSystemLore(List<String> systemLore) {
+        public void setSystemLore(String systemLore) {
             this.systemLore = systemLore;
         }
 
@@ -457,7 +458,7 @@ public class MapJsonIOService {
     public static class PlanetIO {
         private String planetID;
         private List<String> attachments;
-        private List<String> planetLore;
+        private String planetLore;
 
         public String getPlanetID() {
             return planetID;
@@ -475,11 +476,11 @@ public class MapJsonIOService {
             this.attachments = attachments;
         }
 
-        public List<String> getPlanetLore() {
+        public String getPlanetLore() {
             return planetLore;
         }
 
-        public void setPlanetLore(List<String> planetLore) {
+        public void setPlanetLore(String planetLore) {
             this.planetLore = planetLore;
         }
     }
