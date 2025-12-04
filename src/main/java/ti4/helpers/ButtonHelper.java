@@ -2298,13 +2298,13 @@ public class ButtonHelper {
                 if (tile.isGravityRift(game) && grav < 1) {
                     grav = 1;
                 }
-                if (tile.isNebula() && nebula < 1) {
+                if (tile.isNebula(game) && nebula < 1) {
                     nebula = 1;
                 }
                 if (tile.isAsteroidField() && asteroids < 1) {
                     asteroids = 1;
                 }
-                if (!tile.isGravityRift(game) && !tile.isNebula() && !tile.isAsteroidField()) {
+                if (!tile.isGravityRift(game) && !tile.isNebula(game) && !tile.isAsteroidField()) {
                     count = 1;
                 }
 
@@ -2529,21 +2529,24 @@ public class ButtonHelper {
                 float hitChance;
                 if (removedUnit.getAfbDieCount(player) > 0) {
                     hitChance = ((11.0f - removedUnit.getAfbHitsOn(player)) / 10);
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                            || player.hasTech("tf-tacticalbrilliance")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
                     count += removedUnit.getAfbDieCount(player) * hitChance * uh.getUnitCount(unit);
                 }
                 if (removedUnit.getSpaceCannonDieCount(player) > 0) {
                     hitChance = ((11.0f - removedUnit.getSpaceCannonHitsOn(player)) / 10);
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                            || player.hasTech("tf-tacticalbrilliance")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
                     count += removedUnit.getSpaceCannonDieCount(player) * hitChance * uh.getUnitCount(unit);
                 }
                 if (removedUnit.getBombardDieCount() > 0) {
                     hitChance = ((11.0f - removedUnit.getBombardHitsOn()) / 10);
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                            || player.hasTech("tf-tacticalbrilliance")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
                     float combatValue = removedUnit.getBombardDieCount() * hitChance * uh.getUnitCount(unit);
@@ -4149,8 +4152,24 @@ public class ButtonHelper {
             passButtons.add(Buttons.green(finChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
         }
 
+        if (player.hasReadyBreakthrough("veldyrbt")) {
+            passButtons.add(Buttons.green(finChecker + "veldyrBTExplore", "Explore DET at Home", FactionEmojis.veldyr));
+        }
+
         passButtons.addAll(getEndOfTurnAbilities(player, game));
         return passButtons;
+    }
+
+    @ButtonHandler("veldyrBTExplore")
+    public static void veldyrBTExplore(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String pos = player.getHomeSystemTile().getPosition();
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " is using their breakthrough to explore the frontier deck in their home system.");
+        Tile tile = game.getTileByPosition(pos);
+        ExploreService.expFront(event, tile, game, player, true);
+        deleteTheOneButton(event);
     }
 
     public static Button getEndTurnButton(Game game, Player player) {

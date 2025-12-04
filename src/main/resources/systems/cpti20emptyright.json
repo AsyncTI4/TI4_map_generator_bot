@@ -1,0 +1,11 @@
+{
+    "id": "cpti20emptyright",
+    "name": "CPTI20 Empty Right",
+    "aliases": [
+        "cpti20emptyright"
+    ],
+    "imagePath": "cpti20-emptyright.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "source": "other"
+}
