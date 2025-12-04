@@ -1034,7 +1034,7 @@ public class ExploreService {
                 }
             }
             case "forgottentradestation" -> {
-                int tgGain = tile == null ? 0 : tile.getUnitHolders().size() - 1;
+                int tgGain = tile == null ? 0 : tile.getPlanetUnitHolders().size();
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(
