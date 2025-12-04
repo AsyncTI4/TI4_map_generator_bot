@@ -568,9 +568,11 @@ public class Tile {
     public boolean isNebula(Game game) {
         if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
             return true;
-        for (Player p : game.getPlayers().values()) {
-            if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
-                return true;
+        if (game != null) {
+            for (Player p : game.getPlayers().values()) {
+                if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
+                    return true;
+                }
             }
         }
         return getTileModel().isNebula();
