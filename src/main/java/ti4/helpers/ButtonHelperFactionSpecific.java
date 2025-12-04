@@ -1780,7 +1780,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     cabal.getCorrectChannel(),
                     cabal.getRepresentationUnfogged() + ", you released 1 of your own " + unit + " from your prison.");
-        } else if (game.isFowMode()) {
+        } else if (game.isFowMode() && player.isRealPlayer()) {
             MessageHelper.sendMessageToChannel(
                     cabal.getCorrectChannel(),
                     cabal.getRepresentationUnfogged() + ", you released 1 " + player.getFactionEmojiOrColor() + " "
