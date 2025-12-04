@@ -127,7 +127,7 @@ public class PdsCoverageHelper {
                 }
 
                 // Apply Argent Commander (duplicate best die)
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
                     diceCount.addFirst(diceCount.getFirst());
                 }
 
@@ -146,7 +146,8 @@ public class PdsCoverageHelper {
             Player player = game.getPlayer(entry.getKey());
             List<Integer> diceList = entry.getValue();
             int numberOfDice = diceList.size();
-            boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander");
+            boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                    || player.hasTech("tf-tacticalbrilliance");
 
             float expectedHits;
             if (rerolls) {
