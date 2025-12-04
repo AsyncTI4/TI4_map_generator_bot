@@ -85,7 +85,7 @@ public class CheckDistanceHelper {
                 int distance = i;
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
-                            || (tile.isNebula()
+                            || (tile.isNebula(game)
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
