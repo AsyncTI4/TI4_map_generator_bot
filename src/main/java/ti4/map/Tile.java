@@ -655,7 +655,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar()) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
