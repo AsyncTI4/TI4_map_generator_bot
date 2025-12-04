@@ -1,0 +1,13 @@
+{
+    "id": "grove",
+    "name": "The Grove",
+    "aliases": [
+        "grove"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "FAKE"
+    ],
+    "source": "ds"
+}

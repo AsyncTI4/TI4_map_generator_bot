@@ -480,6 +480,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "AFB"
@@ -630,6 +634,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "bombardment"
@@ -644,6 +652,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "SpaceCannonOffence"
@@ -658,6 +670,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "SpaceCannonDefence"
@@ -1367,7 +1383,7 @@
         "persistenceType": "CONDITIONAL",
         "condition": "bluetfMech",
         "valueScalingType": "mechs_in_space_area",
-        "scope": "_best_",
+        "scope": "_bestCap_",
         "related": [
             {
                 "type": "custom",

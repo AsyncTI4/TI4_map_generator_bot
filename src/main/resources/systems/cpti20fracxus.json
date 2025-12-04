@@ -1,0 +1,14 @@
+{
+    "id": "cpti20fracxus",
+    "name": "Fracxus",
+    "aliases": [
+        "fracxus",
+        "cpti20fracxus"
+    ],
+    "imagePath": "cpti20-fracxus.png",
+    "shipPositionsType": "TYPE08",
+    "planets": [],
+    "tileBack": "fracture",
+    "isGravityRift": true,
+    "source": "other"
+}

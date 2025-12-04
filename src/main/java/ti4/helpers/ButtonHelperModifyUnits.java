@@ -1572,7 +1572,7 @@ public class ButtonHelperModifyUnits {
                         player.getFactionEmoji()
                                 + " did not place a command token in system they retreated to due to the Eusosociality ability.");
             } else {
-                if (game.isTwilightsFallMode() && buttonID.contains("skilled") && !buttonID.contains("feint")) {
+                if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             player.getFactionEmoji()
@@ -1582,7 +1582,7 @@ public class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 player.getFactionEmoji()
-                                        + " did not place a command token in system they retreated to due to the Wild Wild Galacy Event.");
+                                        + " did not place a command token in system they retreated to due to the Wild Wild Galaxy Event.");
                     } else {
                         CommandCounterHelper.addCC(event, player, tile2, true);
                         Helper.isCCCountCorrect(player);

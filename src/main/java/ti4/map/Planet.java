@@ -119,6 +119,15 @@ public class Planet extends UnitHolder {
         }
     }
 
+    public void updateGroveStats(Player player) {
+        if ("grove".equals(getName())) {
+
+            influenceModifier =
+                    player.getGame().getPlanetsPlayerIsCoexistingOn(player).size();
+            resourcesModifier = 0;
+        }
+    }
+
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
