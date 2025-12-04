@@ -406,7 +406,7 @@ public class CombatModHelper {
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
                 if (onTile != null
-                        && (onTile.isNebula() || tile.isNebula())
+                        && (onTile.isNebula() || tile.isNebula(game))
                         && !game.getActivePlayerID().equals(player.getUserID())
                         && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
@@ -416,7 +416,7 @@ public class CombatModHelper {
             case "nebula_cosmic_defender" -> {
                 if (game.isCosmicPhenomenaeMode()
                         && onTile != null
-                        && (onTile.isNebula() || tile.isNebula())
+                        && (onTile.isNebula() || tile.isNebula(game))
                         && !game.getActivePlayerID().equals(player.getUserID())
                         && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
