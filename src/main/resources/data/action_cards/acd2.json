@@ -1194,7 +1194,7 @@
         "alias": "refugees",
         "name": "Refugees",
         "phase": "Action",
-        "window": "After you lose a ground combat",
+        "window": "After another player gains control of a planet you control",
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets that player controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
         "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
         "source": "action_deck_2"
