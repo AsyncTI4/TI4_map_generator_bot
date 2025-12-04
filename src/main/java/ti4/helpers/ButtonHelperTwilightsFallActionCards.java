@@ -163,8 +163,7 @@ public class ButtonHelperTwilightsFallActionCards {
             if (p2.getRelics().isEmpty()) {
                 continue;
             }
-            buttons.add(
-                    Buttons.gray("unravelStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(Buttons.gray("unravelStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player who owns the relic you wish to unravel.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -218,8 +217,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(Buttons.gray(
-                    "transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(
+                    Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to transpose with.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -230,8 +229,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveCoerce(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            buttons.add(
-                    Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to coerce.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -274,8 +272,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolvePoison(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            buttons.add(Buttons.gray(
-                    "poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(
+                    Buttons.gray("poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to poison.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -433,8 +431,8 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(Buttons.gray(
-                    "genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(
+                    Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
         String msg = player.getRepresentation() + " choose the neighbor you wish to genophage.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -445,7 +443,7 @@ public class ButtonHelperTwilightsFallActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             buttons.add(
-                    Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+                    Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
         String msg = player.getRepresentation() + " choose the player you wish to purge an ability from.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
