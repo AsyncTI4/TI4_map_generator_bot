@@ -10,7 +10,10 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -32,6 +35,7 @@ import ti4.model.UnitModel;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 
+@UtilityClass
 public class CombatModHelper {
 
     private static Boolean IsModInScopeForUnits(
@@ -338,7 +342,8 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {
-                if (player.getHomeSystemTile() != null
+                if (onTile != null
+                        && player.getHomeSystemTile() != null
                         && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
                     meetsCondition = true;
                 }
@@ -349,10 +354,12 @@ public class CombatModHelper {
                                         Mapper.getPlanet(planetId).getLegendaryAbilityName()))) {
                     meetsCondition = true;
                 }
-                if (onTile.getPlanets().contains(Constants.MR)) {
+                if (onTile != null
+                        && onTile.getPlanets() != null
+                        && onTile.getPlanets().contains(Constants.MR)) {
                     meetsCondition = true;
                 }
-                if (game.getTile(onTile.getId()) != null) {
+                if (onTile != null && game.getTile(onTile.getId()) != null) {
                     if (ButtonHelper.isTileLegendary(game.getTile(onTile.getId()))) {
                         meetsCondition = true;
                     }
@@ -369,7 +376,6 @@ public class CombatModHelper {
             case "fracture_combat" ->
                 meetsCondition = tile != null && tile.getPosition().contains("frac");
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
-                meetsCondition = false;
                 if (unitsByQuantity.size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
                     meetsCondition = unitByQuantity.getValue() == 2
@@ -401,7 +407,8 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_NEBULA_DEFENDER -> {
-                if ((onTile.isNebula() || tile.isNebula(game))
+                if (onTile != null
+                        && (onTile.isNebula() || tile.isNebula(game))
                         && !game.getActivePlayerID().equals(player.getUserID())
                         && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
                         && !game.getStoredValue("mahactHeroTarget").equalsIgnoreCase(player.getFaction())) {
@@ -410,6 +417,7 @@ public class CombatModHelper {
             }
             case "nebula_cosmic_defender" -> {
                 if (game.isCosmicPhenomenaeMode()
+                        && onTile != null
                         && (onTile.isNebula() || tile.isNebula(game))
                         && !game.getActivePlayerID().equals(player.getUserID())
                         && !game.getActivePlayer().getAllianceMembers().contains(player.getFaction())
@@ -570,7 +578,7 @@ public class CombatModHelper {
         return meetsCondition;
     }
 
-    public static UnitHolder getCorrectUnitHolder(Map<UnitModel, Integer> units, Tile t, Player p) {
+    private static UnitHolder getCorrectUnitHolder(Map<UnitModel, Integer> units, Tile t, Player p) {
         record UhScore(UnitHolder uh, int score) {}
         return t.getUnitHolders().values().stream()
                 .map(uh -> {
