@@ -2801,8 +2801,10 @@ public class Game extends GameProperties {
         acsToShuffle.forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
         acsToShuffle.forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
         String msg = "# " + getPing()
-                + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck. The shuffled cards are:\n"
-                + names;
+                + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
+        if (!isFowMode()) {
+            msg += "The shuffled cards are:\n" + names;
+        }
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
     }
 

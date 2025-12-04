@@ -31,6 +31,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.SortHelper;
 import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
@@ -518,15 +519,42 @@ public class LoreService {
         game.removeStoredValue(SYSTEM_LORE_KEY);
     }
 
+    private static final List<String> UNKNOWN_LORE_TARGETS = Arrays.asList(
+            "from Deep Unknown",
+            "from Silent Beyond",
+            "from Hidden Realms",
+            "from Shrouded Expanse",
+            "from Dark Horizon",
+            "from Nameless Void",
+            "from Fading Echoes",
+            "from Forgotten Reach",
+            "from Distant Silence",
+            "from Elsewhere",
+            "from Afar",
+            "from Beyond",
+            "from Nowhere",
+            "of Nameless Origins",
+            "of Shrouded Mystery",
+            "of Unknown Depths",
+            "of Silent Vastness",
+            "of Hidden Secrets",
+            "of Dark Enigmas",
+            "of Fading Legends",
+            "of Forgotten Tales",
+            "of Unseen Realms",
+            "of No Known Origin");
+
     private static MessageEmbed buildLoreEmbed(Game game, String target, LoreEntry lore, boolean isSystemLore) {
         Tile tile = isSystemLore ? game.getTileByPosition(target) : game.getTileFromPlanet(target);
         PlanetModel planet = isSystemLore ? null : Mapper.getPlanet(target);
-        String titleTile = "";
-        if (isSystemLore && tile != null && tile.getTileModel() != null) {
-            titleTile = target + " - " + tile.getTileModel().getNameNullSafe() + " "
+        String titleTile = "of ";
+        if (lore.receiver == RECEIVER.ALL) {
+            titleTile = RandomHelper.pickRandomFromList(UNKNOWN_LORE_TARGETS);
+        } else if (isSystemLore && tile != null && tile.getTileModel() != null) {
+            titleTile += target + " - " + tile.getTileModel().getNameNullSafe() + " "
                     + tile.getTileModel().getEmoji();
         } else if (planet != null) {
-            titleTile = planet.getName() + " " + planet.getEmoji();
+            titleTile += planet.getName() + " " + planet.getEmoji();
         }
 
         Color embedColor = Color.black;
@@ -540,7 +568,7 @@ public class LoreService {
         }
 
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("⭐ Lore of " + titleTile);
+        eb.setTitle("⭐ Lore " + titleTile);
         eb.setDescription(lore.loreText);
         eb.setFooter(lore.footerText);
         eb.setColor(embedColor);
