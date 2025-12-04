@@ -49,11 +49,10 @@ public class TiglReportService {
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑")
                 .append(game.getWinner().get().getPing())
-                .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-        sb.append("```\nMatch Start Date: ")
+                .append(" is the winner!\n");
+        sb.append("```\nMatch End Date: ")
                 .append(Helper.getDateRepresentationTIGL(game.getEndedDate()))
-                .append(" (TIGL wants Game End Date for Async)\n");
-        sb.append("Match Start Time: 00:00\n\n");
+                .append("\n");
         sb.append("Players:").append("\n");
         int index = 1;
         for (Player player : game.getRealPlayers()) {
