@@ -11,6 +11,9 @@
         "lachesis",
         "clotho"
     ],
+    "wormholes": [
+        "ZETA"
+    ],
     "shipPositionsType": "TYPE05",
     "tileBack": "fracture",
     "isScar": true,

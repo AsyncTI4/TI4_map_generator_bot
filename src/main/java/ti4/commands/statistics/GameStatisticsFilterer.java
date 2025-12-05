@@ -165,6 +165,7 @@ public class GameStatisticsFilterer {
             case "liberation" -> game.isLiberationC4Mode();
             case "ordinian" -> game.isOrdinianC1Mode();
             case "te" -> game.isThundersEdge();
+            case "tf" -> game.isTwilightsFallMode();
             default -> false;
         };
     }

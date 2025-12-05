@@ -998,7 +998,7 @@
         "name": "Oracle",
         "phase": "Action",
         "window": "ACTION",
-        "text": "You may look at each unrevealed public objective. If you do not, look at the top 5 cards of the secret objective deck; purge up to 2 of those cards and shuffle that deck.",
+        "text": "Look at each unrevealed public objective and the top 5 cards of the secret objective deck. Then, shuffle the secret objective deck.",
         "flavorText": "The Memoria loomed above Mecatol Rex, as it must. \"It is wrong,\" the Nomad said softly. \"Infinity before me, yet every choice I make collapses it. Foreknowledge diverts me onto a finite path and traps me in those deadly corridors.\"",
         "source": "action_deck_2"
     },
@@ -1194,7 +1194,7 @@
         "alias": "refugees",
         "name": "Refugees",
         "phase": "Action",
-        "window": "After you lose a ground combat",
+        "window": "After another player gains control of a planet you control",
         "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets that player controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
         "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
         "source": "action_deck_2"

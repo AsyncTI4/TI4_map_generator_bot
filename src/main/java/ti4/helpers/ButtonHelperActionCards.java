@@ -1490,7 +1490,8 @@ public class ButtonHelperActionCards {
                                 case 2 -> "Unbelievable";
                                 case 3 -> "Remarkable";
                                 default -> "Phenomenal";
-                            } + "!");
+                            }
+                            + "!");
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1625,6 +1626,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             if ("triad".equalsIgnoreCase(planet)
+                    || "grove".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;

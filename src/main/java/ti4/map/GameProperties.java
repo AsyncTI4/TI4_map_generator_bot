@@ -28,7 +28,10 @@ public class GameProperties {
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
     private @ExportableField int vp = 10;
+
+    @Deprecated // can be removed?
     private @ExportableField long startedDate;
+
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
