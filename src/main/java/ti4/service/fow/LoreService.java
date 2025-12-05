@@ -477,7 +477,7 @@ public class LoreService {
 
             return target;
         } else {
-            PlanetModel planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target));
+            PlanetModel planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target.replace(" ", "")));
             if (planet == null || !game.getPlanets().contains(planet.getID())) {
                 return null;
             }
@@ -496,10 +496,10 @@ public class LoreService {
         Map<String, LoreEntry> gameLoreMap = getGameLore(game);
         if (StringUtils.isBlank(entry.loreText)) {
             gameLoreMap.remove(entry.target);
-            sb.append("Removed Lore from ").append(entry.target).append("\n");
+            sb.append("Removed Lore from `").append(entry.target).append("`\n");
         } else {
             gameLoreMap.put(entry.target, entry);
-            sb.append("Set Lore to ").append(entry.target).append("\n");
+            sb.append("Set Lore to `").append(entry.target).append("`\n");
         }
     }
 
