@@ -284,7 +284,12 @@ public class ComponentActionHelper {
                     rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
                     enigmaticSeen = true;
                 } else {
-                    List<String> exhaustRelics = List.of("titanprototype", "absol_jr", "circletofthevoid");
+                    List<String> exhaustRelics = List.of(
+                            "titanprototype",
+                            "absol_jr",
+                            "circletofthevoid",
+                            "endurance_steroids",
+                            "the_incursion_gate");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
                             rButton = Buttons.blue(
@@ -985,6 +990,24 @@ public class ComponentActionHelper {
                     event.getMessageChannel(),
                     "Use buttons to choose which system contains the frontier token you wish to explore.",
                     buttons2);
+        } else if ("endurance_steroids".equalsIgnoreCase(relicID)) {
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(),
+                    "Use buttons to gain a command token from Endurance Steroids.",
+                    buttons2);
+        } else if ("the_incursion_gate".equalsIgnoreCase(relicID)) {
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+            Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though",
+                    buttons);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
@@ -1032,7 +1055,7 @@ public class ComponentActionHelper {
             }
             case "passturn" ->
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
-            case "titanprototype", "absol_jr", "circletofthevoid" -> {
+            case "titanprototype", "absol_jr", "circletofthevoid", "endurance_steroids", "the_incursion_gate" -> {
                 // handled above
             }
             case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);

@@ -1155,7 +1155,7 @@ public class UnfiledButtonHandlers {
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "ff", true));
 
         } else if ("xxcha".equalsIgnoreCase(type)) {
-            message += "_Instinct Training_! A command token removed from strategy pool.";
+            message += "_Instinct Training_! A command token was removed from strategy pool.";
             if (player.hasTech(AliasHandler.resolveTech("Instinct Training"))) {
                 if (game.isTwilightsFallMode()) {
                     message += " (Twilights Fall mode: no tech exhaustion)";

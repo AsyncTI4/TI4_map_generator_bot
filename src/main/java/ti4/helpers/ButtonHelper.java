@@ -3772,6 +3772,9 @@ public class ButtonHelper {
                             && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
                         capacity += player.getSoScored() * entry.getValue();
                     }
+                    if (player.hasRelic("metali_void_pods") && unit.getCapacityValue() > 0) {
+                        capacity += 1 * entry.getValue();
+                    }
                 }
                 // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())

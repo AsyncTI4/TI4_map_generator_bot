@@ -21,6 +21,7 @@ public class TeHelperBreakthroughs {
             case "saarbt" -> DeorbitBarrageService.postInitialButtons(game, player);
             case "mahactbt" -> VaultsOfTheHeirService.postInitialButtons(event, game, player);
             case "bastionbt" -> TheIconService.iconStepOne(event, game, player);
+            case "edynbt" -> DSHelperBreakthroughs.edynBTStep1(game, player);
             default -> {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
