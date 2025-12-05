@@ -31,8 +31,8 @@ class SearchParadigmsSubcommand extends SearchComponentModelSubcommand {
                 return;
             }
         }
-        List<MessageEmbed> messageEmbeds = Mapper.getLeaders().values().stream()
-                .filter(LeaderModel::isParadigm)
+        List<MessageEmbed> messageEmbeds = Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().stream()
+                .map(Mapper::getLeader)
                 .filter(model -> model.search(searchString, source))
                 .sorted(Comparator.comparing(LeaderModel::getID))
                 .map(model -> model.getRepresentationEmbed(true, true, false, true, true))

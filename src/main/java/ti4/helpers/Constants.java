@@ -979,9 +979,9 @@ public class Constants {
     // Twilight's Fall
     public static final String TF_ABILITY = "tf_ability";
     public static final String TF_UNIT_UPGRADE = "tf_unit_upgrade";
-    public static final String GENOME = "genome";
-    public static final String PARADIGM = "paradigm";
-    public static final String EDICT = "edict";
+    public static final String TF_GENOME = "tf_genome";
+    public static final String TF_PARADIGM = "tf_paradigm";
+    public static final String TF_EDICT = "tf_edict";
 
     public static final String HS_TILE_POSITION = "hs_tile_position";
 
