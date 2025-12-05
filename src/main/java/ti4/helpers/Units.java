@@ -296,6 +296,7 @@ public class Units {
             case "plenaryorbital" -> UnitType.PlenaryOrbital;
             case "tyrantslament" -> UnitType.TyrantsLament;
             case "lady" -> UnitType.Lady;
+            case "celegrom" -> UnitType.Celagrom;
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
             default -> null;

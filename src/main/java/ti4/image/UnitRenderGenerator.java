@@ -575,7 +575,7 @@ class UnitRenderGenerator {
             spoopy = ImageHelper.read(spoopyPath);
         }
         if (unitKey.getUnitType() == UnitType.Celagrom) {
-            String name = "units_ds_ghemina_celegrom_wht.png";
+            String name = "units_ds_ghemina_celagrom_wht.png";
             String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
         }
