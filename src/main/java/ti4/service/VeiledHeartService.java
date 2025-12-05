@@ -127,11 +127,20 @@ public class VeiledHeartService {
         };
     }
 
+    public static void sendVeiledButtons(VeiledCardAction action, Player player) {
+        for (VeiledCardType type : VeiledCardType.values()) {
+            sendVeiledButtons(action, type, player);
+        }
+    }
+
     private static void sendVeiledButtons(VeiledCardAction action, VeiledCardType type, Player player) {
         String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
         List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
                 .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
                 .toList());
+        if (buttons.isEmpty()) {
+            return;
+        }
         buttons.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -166,14 +175,25 @@ public class VeiledHeartService {
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
-        if (action.equals(VeiledCardAction.DISCARD)) {
-            setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
-
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has secretly discarded a veiled "
-                            + type.toString().toLowerCase() + ".");
+        String msg;
+        switch (action) {
+            case VeiledCardAction.DRAW -> {
+                setStoredValue(player, getStoredValue(player) + card + "_");
+                msg = player.getRepresentation() + " has secretly drawn a veiled "
+                        + type.toString().toLowerCase()
+                        + ". They may put it into play with a button in their cards info.";
+            }
+            case VeiledCardAction.DISCARD -> {
+                setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
+                msg = player.getRepresentation() + " has secretly discarded a veiled "
+                        + type.toString().toLowerCase() + ".";
+            }
+            default ->
+                msg = player.getRepresentation() + " tried to "
+                        + action.toString().toLowerCase() + " a veiled "
+                        + type.toString().toLowerCase() + ", but was unable to.";
         }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
