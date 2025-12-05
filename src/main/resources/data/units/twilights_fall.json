@@ -467,7 +467,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control."
+        "ability": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control. [Note: abilities that remove and then place will not trigger this ability.]"
     },
     {
         "id": "tf-productionbiomes",

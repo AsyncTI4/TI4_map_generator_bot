@@ -1389,65 +1389,66 @@ public class MapGenerator implements AutoCloseable {
                     }
                     offBoardHighlighting++;
                 }
-            } else if (displayType == DisplayType.empties) {
-                boolean hasStellar = false; // not working
-                String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
-                boolean hasHero = false; // was not working
-                String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
-                if (player.hasLeaderUnlocked("muaathero")) {
-                    heroFile =
-                            ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");
-                }
-                BufferedImage bufferedImage;
-                if (hasStellar && hasHero) {
-                    bufferedImage = ImageHelper.read(relicFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    - 30
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    bufferedImage = ImageHelper.read(heroFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    + 30
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    offBoardHighlighting += 2;
-                } else if (hasStellar) {
-                    bufferedImage = ImageHelper.read(relicFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    offBoardHighlighting++;
-                } else if (hasHero) {
-                    bufferedImage = ImageHelper.read(heroFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    offBoardHighlighting++;
-                }
+                // } else if (displayType == DisplayType.empties) {
+                // boolean hasStellar = false; // not working
+                // String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
+                // boolean hasHero = false; // was not working
+                // String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
+                // if (player.hasLeaderUnlocked("muaathero")) {
+                //     heroFile =
+                //             ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/",
+                // "MuaatHero.png");
+                // }
+                // BufferedImage bufferedImage;
+                // if (hasStellar && hasHero) {
+                //     bufferedImage = ImageHelper.read(relicFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     - 30
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     bufferedImage = ImageHelper.read(heroFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     + 30
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     offBoardHighlighting += 2;
+                // } else if (hasStellar) {
+                //     bufferedImage = ImageHelper.read(relicFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     offBoardHighlighting++;
+                // } else if (hasHero) {
+                //     bufferedImage = ImageHelper.read(heroFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     offBoardHighlighting++;
+                // }
             } else if (displayType == DisplayType.wormholes && "ghost".equalsIgnoreCase(player.getFaction())) {
                 boolean alphaOnMap = false;
                 boolean betaOnMap = false;
@@ -1574,6 +1575,10 @@ public class MapGenerator implements AutoCloseable {
                 if (offBoardHighlighting >= 2) {
                     for (int i = 0; i < offBoardHighlighting; i++) {
                         BufferedImage bufferedImage = ImageHelper.read(traitFiles.get(i));
+                        if (bufferedImage == null) {
+                            BotLogger.error("Could not load trait file " + traitFiles.get(i));
+                            continue;
+                        }
                         bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
                                 / offBoardHighlighting
                                 / bufferedImage.getWidth()

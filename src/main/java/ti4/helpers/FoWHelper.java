@@ -664,9 +664,19 @@ public class FoWHelper {
             }
         }
 
+        boolean hasQuantumEntanglement = player != null && player.hasAbility("quantum_entanglement");
+
         if (player != null && player.hasAbility("sundered")) {
             Set<String> keepers = new HashSet<>(Set.of("epsilon"));
-            if (player.hasAbility("quantum_entanglement") || wh_recon || absol_recon) {
+            if (hasQuantumEntanglement || wh_recon || absol_recon) {
+                keepers.addAll(Set.of("alpha", "beta"));
+            }
+            wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
+        }
+
+        if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+            Set<String> keepers = new HashSet<>();
+            if (hasQuantumEntanglement || wh_recon || absol_recon) {
                 keepers.addAll(Set.of("alpha", "beta"));
             }
             wormholeIDs.removeIf(wh -> !keepers.contains(wh.toLowerCase()));
@@ -678,7 +688,7 @@ public class FoWHelper {
             wormholeIDs.removeIf("epsilon"::equalsIgnoreCase);
         }
 
-        if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
+        if (hasQuantumEntanglement || wh_recon || absol_recon) {
             if (wormholeIDs.contains(Constants.ALPHA)) {
                 wormholeIDs.add(Constants.BETA);
             } else if (wormholeIDs.contains(Constants.BETA)) {

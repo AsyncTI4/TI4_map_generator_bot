@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -2794,11 +2794,17 @@ public class Game extends GameProperties {
                 .filter(ac -> getDiscardACStatus().get(ac) == null)
                 .toList();
         getActionCards().addAll(acsToShuffle);
+        String names = acsToShuffle.stream()
+                .map(ac -> Mapper.getActionCard(ac).getName())
+                .collect(Collectors.joining("\n"));
         Collections.shuffle(getActionCards());
         acsToShuffle.forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
         acsToShuffle.forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
         String msg = "# " + getPing()
                 + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
+        if (!isFowMode()) {
+            msg += "The shuffled cards are:\n" + names;
+        }
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
     }
 
@@ -4127,6 +4133,7 @@ public class Game extends GameProperties {
             planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
             planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
             planets.put("triad", new Planet("triad", new Point(0, 0)));
+            planets.put("grove", new Planet("grove", new Point(0, 0)));
         }
         return planets.keySet();
     }

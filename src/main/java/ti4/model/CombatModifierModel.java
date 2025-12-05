@@ -54,6 +54,20 @@ public class CombatModifierModel implements ModelInterface {
                 sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player)));
                 isInScope = Objects.equals(sortedAllUnits.getFirst().getAsyncId(), unit.getAsyncId());
             }
+            if ("_bestCap_".equals(scope)) {
+                List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
+                sortedAllUnits = sortedAllUnits.stream()
+                        .filter(u -> u.getCapacityValue() > 0)
+                        .toList();
+                List<UnitModel> sortedAllUnits2 = new ArrayList<>(sortedAllUnits);
+                if (sortedAllUnits2.size() > 0) {
+                    sortedAllUnits2.sort(
+                            Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player)));
+                    isInScope = Objects.equals(sortedAllUnits2.getFirst().getAsyncId(), unit.getAsyncId());
+                } else {
+                    isInScope = false;
+                }
+            }
             if (scope.contains("_mostdice_")) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
                 sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieCountForAbility(rollType, player)));

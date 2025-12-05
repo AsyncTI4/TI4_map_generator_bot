@@ -71,6 +71,11 @@ public class PlayerTechService {
                 message += "\nAutomatically added Mentak's cruiser 3.";
             }
         }
+        if ("dn2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
+            if (player.hasUnlockedBreakthrough("kortalibt")) {
+                message += "\nAutomatically added Kortal's dread 2.";
+            }
+        }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
         MessageHelper.sendMessageToEventChannel(event, message);
     }

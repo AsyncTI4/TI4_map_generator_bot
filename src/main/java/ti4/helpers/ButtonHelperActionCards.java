@@ -992,8 +992,12 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("plagueStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                p2.getPlanets().stream()
+                        .map(planet -> Buttons.gray(
+                                "plagueStep3_" + p2.getFaction() + "_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)))
+                        .forEach(buttons::add);
             } else {
                 Button button = Buttons.gray("plagueStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -1002,10 +1006,15 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteTheOneButton(event);
+        String msg = ", please choose who controls the planet that you wish to target.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPlanetSelection(
+                    game, player, buttons, "plagueStep3_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the planet you wish to target.";
+        }
+
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose who controls the planet that you wish to target.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveEBSStep1_")
@@ -1328,8 +1337,14 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("unstableStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                p2.getPlanets().stream()
+                        .filter(planet ->
+                                ButtonHelper.getTypeOfPlanet(game, planet).contains("hazardous"))
+                        .map(planet -> Buttons.gray(
+                                "unstableStep3_" + p2.getFaction() + "_" + planet,
+                                Helper.getPlanetRepresentation(planet, game)))
+                        .forEach(buttons::add);
             } else {
                 Button button = Buttons.gray("unstableStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -1338,11 +1353,14 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
+        String msg = ", please choose which player owns the soon-to-be _Unstable Planet_.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPlanetSelection(
+                    game, player, buttons, "unstableStep3_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the planet you wish to exhaust.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which player owns the soon-to-be _Unstable Planet_.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveABSStep1")
@@ -1490,7 +1508,8 @@ public class ButtonHelperActionCards {
                                 case 2 -> "Unbelievable";
                                 case 3 -> "Remarkable";
                                 default -> "Phenomenal";
-                            } + "!");
+                            }
+                            + "!");
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1625,6 +1644,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             if ("triad".equalsIgnoreCase(planet)
+                    || "grove".equalsIgnoreCase(planet)
                     || (game.getUnitHolderFromPlanet(planet) != null
                             && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
                 continue;

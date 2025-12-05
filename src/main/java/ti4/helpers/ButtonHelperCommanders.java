@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -721,6 +721,19 @@ public class ButtonHelperCommanders {
                 }
             }
         }
+        if (player.hasUnlockedBreakthrough("freesystemsbt")) {
+            List<Button> buttons = new ArrayList<>();
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                buttons.add(Buttons.green(
+                        "freeSystemsBT_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmojiOrColor()));
+            }
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", please tell the bot who was the active player when you spent this strategy token. You will be able to coexist with them due to your **Free Systems** breakthrough.",
+                    buttons);
+        }
         if (player.hasTech("tf-peaceaccords")) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(
                     game, player, event, player.getFinsFactionCheckerPrefix());
@@ -731,6 +744,37 @@ public class ButtonHelperCommanders {
                         buttons2);
             }
         }
+    }
+
+    @ButtonHandler("freeSystemsBT_")
+    public static void freeSystemsBT(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String colorID = buttonID.split("_")[1];
+        Player target = game.getPlayerFromColorOrFaction(colorID);
+        if (target == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + ", the selected player could not be found.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : target.getPlanetsAllianceMode()) {
+            if (game.getUnitHolderFromPlanet(planet) != null
+                    && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
+                    && !ButtonHelper.getPlanetExplorationButtons(
+                                    game, (Planet) game.getUnitHolderFromPlanet(planet), player, false, true)
+                            .isEmpty()) {
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
+                        Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Cancel"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", please choose a planet to coexist on with "
+                        + target.getFactionNameOrColor() + ".",
+                buttons);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game game) {
