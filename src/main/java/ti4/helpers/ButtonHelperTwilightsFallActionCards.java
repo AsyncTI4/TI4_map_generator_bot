@@ -249,7 +249,8 @@ public class ButtonHelperTwilightsFallActionCards {
                     p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability,
                     tech.getAutoCompleteName()));
         }
-        String msg = p2.getRepresentation() + " choose the ability you wish to give to " + player.getRepresentation();
+        String msg = p2.getRepresentationUnfogged() + " choose the ability you wish to give to "
+                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -261,7 +262,8 @@ public class ButtonHelperTwilightsFallActionCards {
         TechnologyModel tech1 = Mapper.getTech(ability1);
         player.removeTech(ability1);
         p2.addTech(ability1);
-        String msg = player.getRepresentation() + " lost " + tech1.getName() + " to " + p2.getFactionNameOrColor();
+        String msg = player.getRepresentation() + " lost " + tech1.getName() + " to "
+                + (game.isFowMode() ? p2.getColorIfCanSeeStats(player) : p2.getFactionNameOrColor());
         String msg2 =
                 p2.getRepresentation() + " you gained " + tech1.getName() + " from " + player.getFactionNameOrColor();
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
@@ -366,10 +368,11 @@ public class ButtonHelperTwilightsFallActionCards {
         player.addTech(ability2);
         p2.addTech(ability1);
 
-        String msg = player.getRepresentation() + " choose to exchange " + tech1.getAutoCompleteName() + " with "
-                + tech2.getAutoCompleteName() + " via transposing with " + p2.getFactionNameOrColor();
-        String msg2 = p2.getRepresentation() + " you exchanged " + tech2.getAutoCompleteName() + " for "
-                + tech1.getAutoCompleteName() + " via transposing with " + player.getFactionNameOrColor();
+        String msg = player.getRepresentationUnfogged() + " choose to exchange " + tech1.getAutoCompleteName()
+                + " with " + tech2.getAutoCompleteName() + " via transposing with " + p2.getFactionNameOrColor();
+        String msg2 = p2.getRepresentationUnfogged() + " you exchanged " + tech2.getAutoCompleteName() + " for "
+                + tech1.getAutoCompleteName() + " via transposing with "
+                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getFactionNameOrColor());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
