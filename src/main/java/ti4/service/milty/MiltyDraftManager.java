@@ -360,7 +360,8 @@ public class MiltyDraftManager {
                             Mapper.getFaction(item).getFactionTitle().replace("Keleres - Mentak", "Keleres");
                         case "order" -> StringHelper.ordinal(Integer.parseInt(item)) + " pick";
                         default -> "Error parsing milty button press: " + buttonID;
-                    } + "!";
+                    }
+                    + "!";
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         } catch (Exception e) {
             // Shouldn't get errors here, but fallback to a boring message

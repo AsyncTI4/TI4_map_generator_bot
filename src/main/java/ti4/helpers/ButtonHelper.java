@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1933,8 +1930,8 @@ public class ButtonHelper {
     public static String getTechSkipAttachments(Game game, String planetName) {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if (tile == null) {
-            List<String> fakePlanets = new ArrayList<>(
-                    List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
+            List<String> fakePlanets = new ArrayList<>(List.of(
+                    "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
             if (!fakePlanets.contains(planetName))
                 BotLogger.warning(
                         new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
@@ -2301,13 +2298,13 @@ public class ButtonHelper {
                 if (tile.isGravityRift(game) && grav < 1) {
                     grav = 1;
                 }
-                if (tile.isNebula() && nebula < 1) {
+                if (tile.isNebula(game) && nebula < 1) {
                     nebula = 1;
                 }
                 if (tile.isAsteroidField() && asteroids < 1) {
                     asteroids = 1;
                 }
-                if (!tile.isGravityRift(game) && !tile.isNebula() && !tile.isAsteroidField()) {
+                if (!tile.isGravityRift(game) && !tile.isNebula(game) && !tile.isAsteroidField()) {
                     count = 1;
                 }
 
@@ -2532,21 +2529,24 @@ public class ButtonHelper {
                 float hitChance;
                 if (removedUnit.getAfbDieCount(player) > 0) {
                     hitChance = ((11.0f - removedUnit.getAfbHitsOn(player)) / 10);
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                            || player.hasTech("tf-tacticalbrilliance")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
                     count += removedUnit.getAfbDieCount(player) * hitChance * uh.getUnitCount(unit);
                 }
                 if (removedUnit.getSpaceCannonDieCount(player) > 0) {
                     hitChance = ((11.0f - removedUnit.getSpaceCannonHitsOn(player)) / 10);
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                            || player.hasTech("tf-tacticalbrilliance")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
                     count += removedUnit.getSpaceCannonDieCount(player) * hitChance * uh.getUnitCount(unit);
                 }
                 if (removedUnit.getBombardDieCount() > 0) {
                     hitChance = ((11.0f - removedUnit.getBombardHitsOn()) / 10);
-                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                            || player.hasTech("tf-tacticalbrilliance")) {
                         hitChance = 1 - ((1 - hitChance) * (1 - hitChance));
                     }
                     float combatValue = removedUnit.getBombardDieCount() * hitChance * uh.getUnitCount(unit);
@@ -3438,8 +3438,14 @@ public class ButtonHelper {
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
         if (event instanceof ButtonInteractionEvent bevent) {
             boolean containsRealButton = false;
-            List<Button> buttons =
-                    new ArrayList<>(bevent.getMessage().getComponentTree().findAll(Button.class));
+            List<Button> buttons = new ArrayList<>();
+            for (ActionRow row : bevent.getMessage().getComponentTree().findAll(ActionRow.class)) {
+                for (ActionRowChildComponent item : row.getComponents()) {
+                    if (!(item instanceof Button b)) continue;
+                    if (b.getCustomId() == null) continue;
+                    buttons.add(b);
+                }
+            }
             List<Button> newButtons = new ArrayList<>();
             for (Button button : buttons) {
                 if (!button.getCustomId().contains(partialID)) {
@@ -3765,6 +3771,9 @@ public class ButtonHelper {
                     if (unit.getUnitType() == UnitType.Carrier
                             && (player.hasUnit("lunarium_carrier") || player.hasUnit("lunarium_carrier2"))) {
                         capacity += player.getSoScored() * entry.getValue();
+                    }
+                    if (player.hasRelic("metali_void_pods") && unit.getCapacityValue() > 0) {
+                        capacity += 1 * entry.getValue();
                     }
                 }
                 // System.out.println(unit.getBaseType());
@@ -4146,8 +4155,24 @@ public class ButtonHelper {
             passButtons.add(Buttons.green(finChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
         }
 
+        if (player.hasReadyBreakthrough("veldyrbt")) {
+            passButtons.add(Buttons.green(finChecker + "veldyrBTExplore", "Explore DET at Home", FactionEmojis.veldyr));
+        }
+
         passButtons.addAll(getEndOfTurnAbilities(player, game));
         return passButtons;
+    }
+
+    @ButtonHandler("veldyrBTExplore")
+    public static void veldyrBTExplore(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String pos = player.getHomeSystemTile().getPosition();
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " is using their breakthrough to explore the frontier deck in their home system.");
+        Tile tile = game.getTileByPosition(pos);
+        ExploreService.expFront(event, tile, game, player, true);
+        deleteTheOneButton(event);
     }
 
     public static Button getEndTurnButton(Game game, Player player) {
@@ -5381,7 +5406,7 @@ public class ButtonHelper {
         return getPlanetExplorationButtons(game, planet, player, false, false);
     }
 
-    private static List<Button> getPlanetExplorationButtons(
+    public static List<Button> getPlanetExplorationButtons(
             Game game, Planet planet, Player player, boolean impressment, boolean scanlink) {
         if (planet == null || game == null) return null;
 
@@ -5709,14 +5734,14 @@ public class ButtonHelper {
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                         + "_infantry",
-                                "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
+                                "Move Inf from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
                                     "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                             + "_infantry",
-                                    "Move Infantry from Space of " + tile.getRepresentation() + " to "
+                                    "Move Inf from Space of " + tile.getPosition() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
                     }
@@ -5732,7 +5757,7 @@ public class ButtonHelper {
                             buttons.add(Buttons.green(
                                     "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                             + "_mech",
-                                    "Move Mech from Space of " + tile.getRepresentation() + " to "
+                                    "Move Mech from Space of " + tile.getPosition() + " to "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
                     }
@@ -7676,8 +7701,8 @@ public class ButtonHelper {
     }
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
-        List<String> fakePlanets = new ArrayList<>(
-                List.of("custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad"));
+        List<String> fakePlanets = new ArrayList<>(List.of(
+                "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
         List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
         ignoredPlanets.addAll(fakePlanets);
 

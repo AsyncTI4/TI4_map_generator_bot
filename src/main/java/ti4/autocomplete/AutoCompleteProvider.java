@@ -443,7 +443,8 @@ public class AutoCompleteProvider {
                         "total_war",
                         "liberation",
                         "ordinian",
-                        "te");
+                        "te",
+                        "tf");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
@@ -798,6 +799,12 @@ public class AutoCompleteProvider {
 
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = mapTo25ChoicesThatContain(leaderIDs, enteredValue);
+                event.replyChoices(options).queue();
+            }
+            case Constants.PARADIGM -> {
+                List<String> paradigms = Mapper.getDeck("tf_paradigm").getNewDeck();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options = mapTo25ChoicesThatContain(paradigms, enteredValue);
                 event.replyChoices(options).queue();
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
@@ -1345,8 +1352,8 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getAllTileModels(), source);
             case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getAllPlanetModels(), source);
 
-                /* From others */
-                // none of them are populated from here
+            /* From others */
+            // none of them are populated from here
         }
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue();

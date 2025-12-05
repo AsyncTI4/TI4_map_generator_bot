@@ -74,8 +74,7 @@ class ServerLimitStats extends Subcommand {
         long publicThreadCount =
                 cachedThreadChannels.stream().filter(ThreadChannel::isPublic).count();
 
-        String message =
-                """
+        String message = """
             ## Server Limit Statistics:
             ### Server: %s
             - %,d / %,d%s - members
@@ -97,41 +96,40 @@ class ServerLimitStats extends Subcommand {
             - %d   %s  public threads
               - %d   %s  '-bot-map-updates' threads
               - %d   %s  '-round-' threads (/sc play and combat)
-            """
-                        .formatted(
-                                guild.getName(),
-                                memberCount,
-                                memberMax,
-                                getPercentage(memberCount, memberMax),
-                                boostCount,
-                                emojiCount,
-                                emojiMax,
-                                getPercentage(emojiCount, emojiMax),
-                                roleCount,
-                                getPercentage(roleCount, 250),
-                                roomForGames,
-                                channelCount,
-                                getPercentage(channelCount, 500),
-                                categoryChannelCount,
-                                getPercentage(categoryChannelCount, channelCount),
-                                pbdChannelCount,
-                                getPercentage(pbdChannelCount, channelCount),
-                                (!isFoWGuild ? "pbd" : "fow"),
-                                getThreadAgeInHoursString(activeThreadChannels.getFirst()),
-                                activeThreadCount,
-                                getPercentage(activeThreadCount, 1000),
-                                cachedThreadCount,
-                                threadArchivedCount,
-                                privateThreadCount,
-                                getPercentage(privateThreadCount, cachedThreadCount),
-                                cardsInfoThreadCount,
-                                getPercentage(cardsInfoThreadCount, cachedThreadCount),
-                                publicThreadCount,
-                                getPercentage(publicThreadCount, cachedThreadCount),
-                                botThreadCount,
-                                getPercentage(botThreadCount, cachedThreadCount),
-                                roundThreadCount,
-                                getPercentage(roundThreadCount, cachedThreadCount));
+            """.formatted(
+                        guild.getName(),
+                        memberCount,
+                        memberMax,
+                        getPercentage(memberCount, memberMax),
+                        boostCount,
+                        emojiCount,
+                        emojiMax,
+                        getPercentage(emojiCount, emojiMax),
+                        roleCount,
+                        getPercentage(roleCount, 250),
+                        roomForGames,
+                        channelCount,
+                        getPercentage(channelCount, 500),
+                        categoryChannelCount,
+                        getPercentage(categoryChannelCount, channelCount),
+                        pbdChannelCount,
+                        getPercentage(pbdChannelCount, channelCount),
+                        (!isFoWGuild ? "pbd" : "fow"),
+                        getThreadAgeInHoursString(activeThreadChannels.getFirst()),
+                        activeThreadCount,
+                        getPercentage(activeThreadCount, 1000),
+                        cachedThreadCount,
+                        threadArchivedCount,
+                        privateThreadCount,
+                        getPercentage(privateThreadCount, cachedThreadCount),
+                        cardsInfoThreadCount,
+                        getPercentage(cardsInfoThreadCount, cachedThreadCount),
+                        publicThreadCount,
+                        getPercentage(publicThreadCount, cachedThreadCount),
+                        botThreadCount,
+                        getPercentage(botThreadCount, cachedThreadCount),
+                        roundThreadCount,
+                        getPercentage(roundThreadCount, cachedThreadCount));
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 

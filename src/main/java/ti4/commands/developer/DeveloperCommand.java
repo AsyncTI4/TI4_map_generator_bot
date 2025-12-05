@@ -21,6 +21,7 @@ public class DeveloperCommand implements ParentCommand {
                     new RestoreGame(),
                     new RunCron(),
                     new RunAgainstAllGames(),
+                    new RunAgainstSpecificGame(),
                     new ProduceNucleusGenStats())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

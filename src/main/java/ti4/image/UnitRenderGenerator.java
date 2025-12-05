@@ -1,5 +1,7 @@
 package ti4.image;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -81,7 +83,7 @@ class UnitRenderGenerator {
 
     private SystemContext ctx;
 
-    public UnitRenderGenerator(
+    UnitRenderGenerator(
             Game game,
             DisplayType displayType,
             Tile tile,
@@ -104,7 +106,7 @@ class UnitRenderGenerator {
         this.frogPlayer = frogPlayer;
     }
 
-    public void render() {
+    void render() {
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
         boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
         if (isSpace && displayType == DisplayType.shipless) return;
@@ -162,7 +164,6 @@ class UnitRenderGenerator {
                 continue;
             }
             if (unitImage == null) continue;
-            if (bulkUnitCount != null && bulkUnitCount > 0) unitCount = 1;
 
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
@@ -534,6 +535,7 @@ class UnitRenderGenerator {
         // Handle special unit replacements
         return switch (unitKey.getUnitType()) {
             case Lady -> unitPath.replace("lady", "fs");
+            case Celagrom -> unitPath.replace("celagrom", "fs");
             case Cavalry -> {
                 boolean hasM2Tech = game.getPNOwner("cavalry") != null
                         && game.getPNOwner("cavalry").hasTech("m2");
@@ -546,7 +548,14 @@ class UnitRenderGenerator {
 
     private BufferedImage getUnitDecal(Player player, UnitKey unitKey) {
         if (player == null) return null;
-        return ImageHelper.read(resourceHelper.getDecalFile(player.getDecalFile(unitKey.asyncID())));
+
+        String decalFileName = player.getDecalFile(unitKey.asyncID());
+        if (isBlank(decalFileName)) {
+            return null;
+        }
+
+        String decalFilePath = resourceHelper.getDecalFile(decalFileName);
+        return ImageHelper.read(decalFilePath);
     }
 
     private BufferedImage getSpoopyImage(UnitKey unitKey, Player player) {
@@ -562,6 +571,11 @@ class UnitRenderGenerator {
         // Ghemina special units
         if (unitKey.getUnitType() == UnitType.Lady) {
             String name = "units_ds_ghemina_lady_wht.png";
+            String spoopyPath = resourceHelper.getDecalFile(name);
+            spoopy = ImageHelper.read(spoopyPath);
+        }
+        if (unitKey.getUnitType() == UnitType.Celagrom) {
+            String name = "units_ds_ghemina_celagrom_wht.png";
             String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
         }
@@ -590,7 +604,8 @@ class UnitRenderGenerator {
         // Space unit ordering
         typeOrder.addAll(List.of(
                 UnitType.Flagship, UnitType.Dreadnought, UnitType.Carrier, UnitType.Cruiser, UnitType.Destroyer));
-        typeOrder.addAll(List.of(UnitType.Warsun, UnitType.TyrantsLament, UnitType.Cavalry, UnitType.Lady));
+        typeOrder.addAll(List.of(
+                UnitType.Warsun, UnitType.TyrantsLament, UnitType.Cavalry, UnitType.Lady, UnitType.Celagrom)); // other
 
         List<String> playerOrder = unitHolder.getUnitColorsOnHolder();
         if (game.getActivePlayer() != null && !playerOrder.isEmpty()) {
@@ -733,7 +748,7 @@ class UnitRenderGenerator {
     private static Point getUnitTagLocation(String unitID) {
         return switch (unitID) {
             case "ws" -> new Point(-10, 45); // War Sun
-            case "fs", "lord", "lady", "tyrantslament", "cavalry" -> new Point(10, 55); // Flagship
+            case "fs", "lord", "lady", "tyrantslament", "cavalry", "celagrom" -> new Point(10, 55); // Flagship
             case "dn" -> new Point(10, 50); // Dreadnought
             case "ca" -> new Point(0, 40); // Cruiser
             case "cv" -> new Point(0, 40); // Carrier

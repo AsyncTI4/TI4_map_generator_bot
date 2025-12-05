@@ -468,7 +468,7 @@ public class TileGenerator {
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
                 }
-                if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula()) {
+                if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula(game)) {
                     BufferedImage nebulaBypass =
                             ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
                     if (isSpiral) {

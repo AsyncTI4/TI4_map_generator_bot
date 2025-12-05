@@ -300,7 +300,8 @@ public class WebTileUnitData {
                 "ocean3",
                 "ocean4",
                 "ocean5",
-                "triad");
+                "triad",
+                "grove");
 
         Map<String, Planet> planetsInfo = game.getPlanetsInfo();
 
@@ -366,6 +367,7 @@ public class WebTileUnitData {
             case PlenaryOrbital -> "plenaryorbital";
             case TyrantsLament -> "tyrantslament";
             case Lady -> "lady";
+            case Celagrom -> "celagrom";
             case Cavalry -> "cavalry";
             case StarfallPds -> "starfallpds";
             default -> null;

@@ -1635,6 +1635,19 @@ class PlayerAreaGenerator {
                         ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
 
                 int numInReinforcements = unitCap - count;
+                if (player.hasUnlockedBreakthrough("freesystemsbt")
+                        && model != null
+                        && model.getUnitType() == UnitType.Infantry) {
+                    for (String planet : player.getPlanetsAllianceMode()) {
+                        UnitHolder planetUh = game.getUnitHolderFromPlanet(planet);
+                        if (planetUh != null) {
+                            if (planetUh.getUnitCount(UnitType.Infantry, player) > 0) {
+                                numInReinforcements += 1;
+                                numInReinforcements = Math.min(numInReinforcements, unitCap);
+                            }
+                        }
+                    }
+                }
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
                 String decal = player.getDecalFile(unitID);
                 BufferedImage decalImage = null;
@@ -1682,6 +1695,10 @@ class PlayerAreaGenerator {
             }
             if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
                 positionCount = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
+            }
+            if (game.getPlayerFromColorOrFaction(playerColor) != null
+                    && game.getPlayerFromColorOrFaction(playerColor).hasRelic("endurance_steroids")) {
+                positionCount += 2;
             }
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
@@ -2210,6 +2227,7 @@ class PlayerAreaGenerator {
                 return deltaX;
             }
             planet.updateTriadStats(player);
+            planet.updateGroveStats(player);
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
             boolean coexist = false;

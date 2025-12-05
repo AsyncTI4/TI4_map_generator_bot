@@ -934,7 +934,8 @@ public class CombatRollService {
                 resultBuilder.append(unitRoll);
                 List<DiceHelper.Die> resultRolls2 = new ArrayList<>();
                 int numMisses = numRolls - hitRolls;
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                if ((game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                                || player.hasTech("tf-tacticalbrilliance"))
                         && rollType != CombatRollType.combatround
                         && numMisses > 0) {
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);

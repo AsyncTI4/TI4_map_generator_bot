@@ -69,8 +69,7 @@ class HowToMoveUnits extends Subcommand {
                 + "# "
                 + MiscEmojis.BLT + "\n";
 
-        String examples =
-                """
+        String examples = """
             # Examples of the `/move_units` command:
             > - `/move_units tile_name: meer unit_names: ws, 4 ff, 2 mech m tile_name_to: torkan unit_names_to: ws, 4 ff, 1 mech to, 1 mech te` will remove 1 War Sun, 4 Fighters, 2 Mechs on Meer from the Arinam/Meer system and then add 1 War Sun, 4 Fighters, land 1 Mech on Tequran, and land 1 Mech on Torkan in the Tequran/Torkan system
             > - `/move_units tile_name: argent unit_names: 2 mech avar, 2 inf ylir tile_name_to: argent unit_names_to: mech valk, mech ylir, 2 inf avar` will remove 2 Mechs from Avar, 2 Infantry from Ylir and then add 1 Mech to Valk, 1 Mech to Ylir, and 2 Infantry to Avar
