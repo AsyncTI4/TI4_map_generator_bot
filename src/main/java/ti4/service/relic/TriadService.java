@@ -15,6 +15,13 @@ public class TriadService {
             } else {
                 player.removePlanet("triad");
             }
+            if (player.hasUnlockedBreakthrough("khraskbt")) {
+                if (!player.hasPlanet("grove")) player.addPlanet("grove");
+                Planet grove = game.getPlanetsInfo().get("grove");
+                if (grove != null) grove.updateGroveStats(player);
+            } else {
+                player.removePlanet("grove");
+            }
         }
     }
 }

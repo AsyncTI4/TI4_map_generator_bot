@@ -565,6 +565,20 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isNebula(Game game) {
+        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
+            return true;
+        if (game != null) {
+            for (Player p : game.getPlayers().values()) {
+                if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
+                    return true;
+                }
+            }
+        }
+        return getTileModel().isNebula();
+    }
+
+    @JsonIgnore
     public boolean isGravityRift() {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
@@ -643,7 +657,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar()) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");

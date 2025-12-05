@@ -1,9 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -840,7 +837,7 @@ public class UnfiledButtonHandlers {
                     "assignedBombardment" + player.getFaction(),
                     game.getStoredValue("assignedBombardment" + player.getFaction()) + "plasma_99_" + planet + ";");
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
             game.setStoredValue(
                     "assignedBombardment" + player.getFaction(),
                     game.getStoredValue("assignedBombardment" + player.getFaction()) + "argentcommander_99_" + planet
@@ -910,7 +907,7 @@ public class UnfiledButtonHandlers {
                 }
             }
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
             if (assignedUnits.contains("argent")) {
                 for (String assignedUnit : assignedUnits.split(";")) {
                     if (assignedUnit.contains("argent")) {
@@ -1158,10 +1155,14 @@ public class UnfiledButtonHandlers {
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "ff", true));
 
         } else if ("xxcha".equalsIgnoreCase(type)) {
-            message +=
-                    "_Instinct Training_! The technology has been exhausted and a command token removed from strategy pool.";
+            message += "_Instinct Training_! A command token was removed from strategy pool.";
             if (player.hasTech(AliasHandler.resolveTech("Instinct Training"))) {
-                player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
+                if (game.isTwilightsFallMode()) {
+                    message += " (Twilights Fall mode: no tech exhaustion)";
+                } else {
+                    message += " The technology is now exhausted.";
+                    player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
+                }
                 if (player.getStrategicCC() > 0) {
                     player.setStrategicCC(player.getStrategicCC() - 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
@@ -2397,7 +2398,7 @@ public class UnfiledButtonHandlers {
                 }
 
                 if (game.isFowMode()) {
-                    LoreService.showSystemLore(player, game, game.getActiveSystem());
+                    LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
                 }
                 ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());

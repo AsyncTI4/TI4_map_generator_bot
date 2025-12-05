@@ -294,8 +294,7 @@ public class AgendaHelper {
 
     @ButtonHandler("explainQueue")
     public static void explainQueue(ButtonInteractionEvent event) {
-        String msg =
-                """
+        String msg = """
             "When"s are any action card or ability that has a timing window of "when an agenda is revealed" and \
             "after"s are any action card or ability that has a timing window of "after an agenda is revealed". All "when"s need to be played (or declined to be played) \
             before any "after"s, and all "after"s need to be played (or declined to be played) before any votes are cast. The bot attempts to facilitate this process \
@@ -429,6 +428,17 @@ public class AgendaHelper {
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
                 buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
+            }
+        }
+        if (player.hasPlanet("garbozia")) {
+            for (String acId :
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet()) {
+                ActionCardModel actionCard = Mapper.getActionCard(acId);
+                String actionCardWindow = actionCard.getWindow();
+                if (actionCardWindow.contains("After an agenda is revealed")
+                        || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
+                    buttons.add(Buttons.green("queueAfter_ac_" + acId, actionCard.getName()));
+                }
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {

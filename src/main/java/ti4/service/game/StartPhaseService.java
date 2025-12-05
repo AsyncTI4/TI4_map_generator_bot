@@ -810,8 +810,7 @@ public class StartPhaseService {
         Button passOnAbilities;
         if (custodiansTaken || game.isOmegaPhaseMode()) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
-            message2 +=
-                    """
+            message2 += """
                 This is the moment when you should resolve:\s
                 - _Political Stability_\s
                 - _Ancient Burial Sites_\s
@@ -822,8 +821,7 @@ public class StartPhaseService {
                 Please click the "Ready For Agenda" button once you are done resolving these or if you decline to do so.""";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 +=
-                    """
+            message2 += """
                 This is the moment when you should resolve:\s
                 - _Political Stability_\s
                 - _Summit_\s

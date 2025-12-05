@@ -443,7 +443,8 @@ public class AutoCompleteProvider {
                         "total_war",
                         "liberation",
                         "ordinian",
-                        "te");
+                        "te",
+                        "tf");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
@@ -1345,8 +1346,8 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getAllTileModels(), source);
             case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getAllPlanetModels(), source);
 
-                /* From others */
-                // none of them are populated from here
+            /* From others */
+            // none of them are populated from here
         }
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList()))
                 .queue();
