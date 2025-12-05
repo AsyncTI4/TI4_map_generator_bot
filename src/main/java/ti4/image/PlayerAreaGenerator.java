@@ -1696,6 +1696,10 @@ class PlayerAreaGenerator {
             if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
                 positionCount = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
             }
+            if (game.getPlayerFromColorOrFaction(playerColor) != null
+                    && game.getPlayerFromColorOrFaction(playerColor).hasRelic("endurance_steroids")) {
+                positionCount += 2;
+            }
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
                 for (int i = 0; i < remainingReinforcements && i < 16; i++) {

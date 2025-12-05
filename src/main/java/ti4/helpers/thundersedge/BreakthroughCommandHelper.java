@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.helpers.BreakthroughHelper;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -89,6 +90,25 @@ public class BreakthroughCommandHelper {
                 if (player.hasTech("cr2")) {
                     player.addOwnedUnitByID("mentak_cruiser3");
                     player.removeOwnedUnitByID("cruiser2");
+                }
+            }
+            if ("celdauribt".equalsIgnoreCase(bt.getID())) {
+                player.addOwnedUnitByID("celdauri_celagrom");
+                String output = player.getRepresentation() + " Use buttons to put the Celagrom with your ships.";
+                List<Button> buttons =
+                        Helper.getTileWithShipsPlaceUnitButtons(player, game, "celagrom", "placeOneNDone_skipbuild");
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), output, buttons);
+            }
+            if ("rohdhnabt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("dsrohdws")) {
+                    player.addOwnedUnitByID("rohdhna_warsun3");
+                    player.removeOwnedUnitByID("rohdhna_warsun2");
+                }
+            }
+            if ("kortalbt".equalsIgnoreCase(bt.getID())) {
+                if (player.hasTech("dn2")) {
+                    player.addOwnedUnitByID("tribune3");
+                    player.removeOwnedUnitByID("dreadnought2");
                 }
             }
 

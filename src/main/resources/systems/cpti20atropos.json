@@ -9,6 +9,9 @@
     "planets": [
         "atropos"
     ],
+    "wormholes": [
+        "ZETA"
+    ],
     "shipPositionsType": "TYPE05",
     "tileBack": "red",
     "isAsteroidField": true,

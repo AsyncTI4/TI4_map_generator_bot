@@ -908,8 +908,16 @@ public class Player extends PlayerProperties {
         int score = 0;
         if ("naaz_voltron".equals(unit.getAlias())) // Always, ALWAYS use voltron, if available
         score += 99;
-        if ("mentak_cruiser3".equals(unit.getAlias())) // Always, ALWAYS use corsair, if available
-        score += 99;
+        // if ("mentak_cruiser3".equals(unit.getAlias())) // Always, ALWAYS use corsair, if available
+        // score += 99;
+
+        if (unit.getAlias().contains("3")) {
+            score += 99;
+        }
+
+        if ("tf-swa".equals(unit.getAlias())) {
+            score += 99;
+        }
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
                 && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 4;
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
@@ -1361,6 +1369,9 @@ public class Player extends PlayerProperties {
                     bonus++;
                 }
             }
+        }
+        if (ownsUnit("rohdhna_warsun3")) {
+            bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(game, this, "warsun", false);
         }
         if (game.isFacilitiesMode()) {
             for (String planet : getPlanets()) {
@@ -2426,7 +2437,16 @@ public class Player extends PlayerProperties {
             }
         }
         if ("cr2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("mentakbt")) {
+            removeOwnedUnitByID("cruiser2");
             addOwnedUnitByID("mentak_cruiser3");
+        }
+        if ("dsrohdws".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("rohdhnabt")) {
+            removeOwnedUnitByID("rohdhna_warsun2");
+            addOwnedUnitByID("rohdhna_warsun3");
+        }
+        if ("dn2".equalsIgnoreCase(techID) && hasUnlockedBreakthrough("kortalibt")) {
+            addOwnedUnitByID("tribune3");
+            removeOwnedUnitByID("dreadnought2");
         }
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (techModel.getFaction().isEmpty()

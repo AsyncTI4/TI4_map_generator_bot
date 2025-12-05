@@ -2096,6 +2096,13 @@ public class Helper {
                             UnitEmojis.flagship);
                     unitButtons.add(wsButton);
                 }
+                if (player.ownsUnit("celdauri_celagrom") && resourcelimit > 4) {
+                    Button wsButton = Buttons.green(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_celagrom_" + tp,
+                            "Produce The Celagrom",
+                            UnitEmojis.flagship);
+                    unitButtons.add(wsButton);
+                }
                 Button fsButton = Buttons.green(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                         "Produce Flagship",
@@ -2562,6 +2569,10 @@ public class Helper {
         }
         if (!game.getStoredValue("ccLimit" + color).isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit" + color));
+        }
+        if (game.getPlayerFromColorOrFaction(color) != null
+                && game.getPlayerFromColorOrFaction(color).hasRelic("endurance_steroids")) {
+            limit += 2;
         }
         boolean ccCountIsOver = ccCount > limit;
         if (ccCountIsOver && game.isCcNPlasticLimit()) {

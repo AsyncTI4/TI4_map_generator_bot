@@ -343,5 +343,12 @@
         "asyncId": "lady",
         "name": "Fake Lady Flagship Basetype",
         "source": "ds"
+    },
+    {
+        "id": "celagrom",
+        "baseType": "celagrom",
+        "asyncId": "celagrom",
+        "name": "Fake Celagrom Flagship Basetype",
+        "source": "ds"
     }
 ]
