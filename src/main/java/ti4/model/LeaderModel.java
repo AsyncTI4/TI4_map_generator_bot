@@ -110,6 +110,22 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(tfAbilityText);
     }
 
+    private boolean isTFCard() {
+        return source == ComponentSource.twilights_fall
+                || tfName != null
+                || tfTitle != null
+                || tfAbilityWindow != null
+                || tfAbilityText != null;
+    }
+
+    public boolean isGenome() {
+        return Constants.AGENT.equalsIgnoreCase(type) && isTFCard();
+    }
+
+    public boolean isParadigm() {
+        return Constants.HERO.equalsIgnoreCase(type) && isTFCard();
+    }
+
     private Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
     }

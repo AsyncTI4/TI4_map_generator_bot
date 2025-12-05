@@ -432,6 +432,7 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("solBtBuild_")
     public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        player.addSpentThing(buttonID);
         String pos = buttonID.split("_")[1];
         List<Button> buttons;
         buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
