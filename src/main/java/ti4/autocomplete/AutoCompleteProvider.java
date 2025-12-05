@@ -801,7 +801,7 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(leaderIDs, enteredValue);
                 event.replyChoices(options).queue();
             }
-            case Constants.PARADIGM -> {
+            case Constants.TF_PARADIGM -> {
                 List<String> paradigms = Mapper.getDeck("tf_paradigm").getNewDeck();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = mapTo25ChoicesThatContain(paradigms, enteredValue);
