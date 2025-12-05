@@ -132,6 +132,9 @@ public class VeiledHeartService {
         List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
                 .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
                 .toList());
+        if (buttons.isEmpty()) {
+            return;
+        }
         buttons.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
