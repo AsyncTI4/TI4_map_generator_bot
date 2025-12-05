@@ -695,7 +695,12 @@ public class ListPlayerInfoService {
             case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
                 for (Tile tile : CheckUnitContainmentService.getTilesContainingPlayersUnits(
-                        game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
+                        game,
+                        player,
+                        Units.UnitType.Flagship,
+                        Units.UnitType.Warsun,
+                        Units.UnitType.Lady,
+                        Units.UnitType.Celagrom)) {
                     if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
                     }

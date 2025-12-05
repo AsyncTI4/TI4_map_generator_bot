@@ -3,11 +3,15 @@
     "name": "Fracxus",
     "aliases": [
         "fracxus",
-        "cpti20fracxus"
+        "cpti20fracxus",
+        "fracxusegress"
     ],
     "imagePath": "cpti20-fracxus.png",
     "shipPositionsType": "TYPE08",
     "planets": [],
+    "wormholes": [
+        "ZETA"
+    ],
     "tileBack": "fracture",
     "isGravityRift": true,
     "source": "other"
