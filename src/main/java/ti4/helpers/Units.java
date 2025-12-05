@@ -66,7 +66,7 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
+            if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
             if (unitType == UnitType.TyrantsLament) {
@@ -117,6 +117,7 @@ public class Units {
         PlenaryOrbital("plenaryorbital"),
         TyrantsLament("tyrantslament"),
         Lady("lady"),
+        Celagrom("celagrom"),
         Cavalry("cavalry"), // relics
         StarfallPds("starfallpds");
 
@@ -144,6 +145,7 @@ public class Units {
                 case TyrantsLament -> "Tyrant's Lament";
                 case Cavalry -> "The Cavalry";
                 case Lady -> "The Lady";
+                case Celagrom -> "The Celagrom";
                 case Monument -> "Monument";
             };
         }
@@ -165,6 +167,7 @@ public class Units {
                 case TyrantsLament -> "tyrantslament";
                 case Cavalry -> "cavalry";
                 case Lady -> "lady";
+                case Celagrom -> "celagrom";
                 case Monument -> "monument";
             };
         }
@@ -181,7 +184,7 @@ public class Units {
                 case Cruiser -> UnitEmojis.cruiser;
                 case Carrier -> UnitEmojis.carrier;
                 case Dreadnought -> UnitEmojis.dreadnought;
-                case Flagship, Cavalry, Lady -> UnitEmojis.flagship;
+                case Flagship, Cavalry, Lady, Celagrom -> UnitEmojis.flagship;
                 case TyrantsLament -> UnitEmojis.TyrantsLament;
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
@@ -293,6 +296,7 @@ public class Units {
             case "plenaryorbital" -> UnitType.PlenaryOrbital;
             case "tyrantslament" -> UnitType.TyrantsLament;
             case "lady" -> UnitType.Lady;
+            case "celagrom" -> UnitType.Celagrom;
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
             default -> null;

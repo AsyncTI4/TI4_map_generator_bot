@@ -367,6 +367,7 @@ public class WebTileUnitData {
             case PlenaryOrbital -> "plenaryorbital";
             case TyrantsLament -> "tyrantslament";
             case Lady -> "lady";
+            case Celagrom -> "celagrom";
             case Cavalry -> "cavalry";
             case StarfallPds -> "starfallpds";
             default -> null;

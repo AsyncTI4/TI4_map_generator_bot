@@ -10,5 +10,47 @@
         "name": "King Tis's Golden Tooth",
         "text": "Attach this card to a planet you control that is the farthest away from your home system. Gain 1 VP. If you lose control of the planet, lose 1 VP and give this card to the player who took the planet from you.",
         "source": "pbd100"
+    },
+    {
+        "alias": "gravitation_drivetrain",
+        "name": "Gravitation Drivetrain",
+        "text": "After you activate a system, apply +1 to the move value of one of your ships. You may spend command tokens from your strategy pool to resolve this card additional times.",
+        "source": "other"
+    },
+    {
+        "alias": "hyperaviary",
+        "name": "Hyperaviary",
+        "text": "When one of your units makes a roll for a unit ability or a combat roll, you may choose one of those units to roll 1 additional dice.",
+        "source": "other"
+    },
+    {
+        "alias": "the_brooch_of_mordai",
+        "name": "The Brooch of Mordai",
+        "text": "After you gain control of a planet from another player, you may place 1 infantry from that player's reinforcements into coexistence on that planet. Apply +1 to the resource and influence values of planets you control that contain coexisting units.",
+        "source": "other"
+    },
+    {
+        "alias": "metali_void_pods",
+        "name": "Metali Void Pods",
+        "text": "Apply +1 capacity to each of your non-fighter ships with a capacity value.",
+        "source": "other"
+    },
+    {
+        "alias": "the_incursion_gate",
+        "name": "The Incursion Gate",
+        "text": "Action: Exhaust this card and choose a non-home system that does not contain players' ships.  You may produce up to 3 neutral ships in that system. ",
+        "source": "other"
+    },
+    {
+        "alias": "endurance_steroids",
+        "name": "Endurance Steroids",
+        "text": "When you gain this card gain 2 neutral command tokens to your reinforcements. The neutral command tokens can be used and spent as your command tokens. Action: Exhaust this card to gain 1 command token.",
+        "source": "other"
+    },
+    {
+        "alias": "space_frog",
+        "name": "Space Frog",
+        "text": "When you draw a card from an planet trait exploration deck you may draw a card from any other exploration deck instead. You may allow neighbours to use this ability.  ",
+        "source": "other"
     }
 ]
