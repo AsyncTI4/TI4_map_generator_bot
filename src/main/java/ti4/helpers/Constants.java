@@ -976,6 +976,13 @@ public class Constants {
         leaderList.add(ENVOY);
     }
 
+    // Twilight's Fall
+    public static final String TF_ABILITY = "tf_ability";
+    public static final String TF_UNIT_UPGRADE = "tf_unit_upgrade";
+    public static final String GENOME = "genome";
+    public static final String PARADIGM = "paradigm";
+    public static final String EDICT = "edict";
+
     public static final String HS_TILE_POSITION = "hs_tile_position";
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
