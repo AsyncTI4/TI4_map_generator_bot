@@ -489,7 +489,6 @@ public class ComponentActionHelper {
                             "bentoragent",
                             "kolumeagent",
                             "crimsonagent",
-                            "bastionagent",
                             "redcreussagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);

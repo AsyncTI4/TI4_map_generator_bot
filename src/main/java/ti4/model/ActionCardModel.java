@@ -62,7 +62,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title);
 
         // DESCRIPTION
-        eb.setDescription(phase + " Phase\n***" + window + ":***\n" + text);
+        eb.setDescription("\n***" + window + ":***\n" + text);
 
         // FLAVOUR TEXT
         if (includeFlavourText && getFlavorText().isPresent())

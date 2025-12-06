@@ -1217,7 +1217,7 @@ public class Helper {
                     found = true;
                 }
                 case "sledfactories" -> {
-                    msg.append("> Used _Sled Factories_ " + TechEmojis.CyberneticTech + "\n");
+                    msg.append("> Used Sled Factories " + TechEmojis.CyberneticTech + "\n");
                     res += 2;
                     found = true;
                 }
@@ -1865,7 +1865,7 @@ public class Helper {
                 }
             }
         }
-        if (tile.isScar()) {
+        if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt")) {
             return 0;
         }
         if (game.isTwilightsFallMode()) {

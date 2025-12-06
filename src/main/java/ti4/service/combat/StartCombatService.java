@@ -708,7 +708,7 @@ public class StartCombatService {
             MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
-        if (tile.isScar()) {
+        if (tile.isScar(game)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
             return;
@@ -1347,6 +1347,15 @@ public class StartCombatService {
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                                 + "Sol Agent",
                         FactionEmojis.Sol));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)
+                    && agentHolder.hasUnexhaustedLeader("bastionagent")
+                    && isGroundCombat) {
+                buttons.add(Buttons.gray(
+                        finChecker + "getAgentSelection_bastionagent",
+                        "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Bastion Agent",
+                        FactionEmojis.Bastion));
             }
 
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("valiantagent")) {

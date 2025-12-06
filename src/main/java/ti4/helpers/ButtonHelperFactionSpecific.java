@@ -928,7 +928,8 @@ public class ButtonHelperFactionSpecific {
                 + Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.sendMessageToRightStratThread(player, game, msg, "construction");
         if (!player.getSCs().contains(Integer.parseInt("4"))
-                && !game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
+                && !game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")
+                && !game.getStrategyCardSet().getAlias().equalsIgnoreCase("te")) {
             CommandCounterHelper.addCC(event, player, tile);
             ButtonHelper.sendMessageToRightStratThread(
                     player,
