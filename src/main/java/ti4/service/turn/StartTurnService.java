@@ -153,7 +153,7 @@ public class StartTurnService {
             MessageHelper.sendPrivateMessageToPlayer(player, game, event, text, fail, success);
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
-                FowCommunicationThreadService.checkNewNeighbors(game, player);
+                FowCommunicationThreadService.checkNewCommPartners(game, player);
             }
             if (getMissedSCFollowsText(game, player) != null
                     && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {

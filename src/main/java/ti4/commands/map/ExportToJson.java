@@ -44,7 +44,8 @@ class ExportToJson extends GameStateSubcommand {
                 || event.getOption("include_lore").getAsBoolean();
         String json = MapJsonIOService.exportMapAsJson(event, game, includeTokens, includeAttachments, includeLore);
         if (json == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Failed to export map to JSON.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Failed to export map to JSON.\n-# Solax has been pinged");
             return;
         }
 

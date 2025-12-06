@@ -131,8 +131,10 @@ public class BlindSelectionService {
 
         boolean invalidTarget = false;
         // Check for position
-        if (type.equals(POSITION) && !PositionMapper.isTilePositionValid(target)) {
-            invalidTarget = true;
+        if (type.equals(POSITION)) {
+            if (!PositionMapper.isTilePositionValid(target)) {
+                invalidTarget = true;
+            }
         } else {
             // Check for planet
             String planetID = AliasHandler.resolvePlanet(target);
@@ -171,11 +173,11 @@ public class BlindSelectionService {
         String target = parts[3];
 
         Button actionButton = null;
-        String msg = "⛔ *" + target + "* was not valid for this action";
+        String msg = "⛔ **" + target + "** was not valid for this action";
         String validTargets = game.getStoredValue(VALIDATION_KEY);
         if (validTargets != null && validTargets.contains(VALID_SEPARATOR + target + VALID_SEPARATOR)) {
             originalButtonPrefix = insertFactionToButtonId(target, type, originalButtonPrefix, game);
-            msg = "✅ *" + target + "* is valid for this action";
+            msg = "✅ **" + target + "** is valid for this action";
             actionButton = Buttons.green(
                     originalButtonPrefix + "_" + target, event.getButton().getLabel());
         }
