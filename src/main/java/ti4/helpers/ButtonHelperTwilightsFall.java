@@ -1021,8 +1021,12 @@ public class ButtonHelperTwilightsFall {
         if (buttonID.contains("_")) {
             type = buttonID.split("_")[1];
         }
-        List<Button> buttons = new ArrayList<>();
 
+        if (game.isVeiledHeartMode()) {
+            VeiledHeartService.sendVeiledButtons(VeiledHeartService.VeiledCardAction.DISCARD, type, player);
+        }
+
+        List<Button> buttons = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
             for (String tech : player.getTechs()) {
                 if ("antimatter".equalsIgnoreCase(tech) || "wavelength".equalsIgnoreCase(tech)) {

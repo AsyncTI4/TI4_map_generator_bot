@@ -150,6 +150,10 @@ public class VeiledHeartService {
         }
     }
 
+    public static void sendVeiledButtons(VeiledCardAction action, String typeStr, Player player) {
+        VeiledCardType.fromString(typeStr).ifPresent(type -> sendVeiledButtons(action, type, player));
+    }
+
     private static void sendVeiledButtons(VeiledCardAction action, VeiledCardType type, Player player) {
         String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
         List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
