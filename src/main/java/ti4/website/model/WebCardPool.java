@@ -1,10 +1,16 @@
 package ti4.website.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Data;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Player;
+import ti4.model.DeckModel;
 
 @Data
 public class WebCardPool {
@@ -47,8 +53,19 @@ public class WebCardPool {
     public static WebCardPool fromGame(Game game) {
         WebCardPool cardPool = new WebCardPool();
 
-        // Secret Objectives
-        cardPool.setSecretObjectiveDeck(new ArrayList<>());
+        // Secret Objectives - send all unscored secrets (full deck minus scored)
+        DeckModel soDeckModel = Mapper.getDeck(game.getSoDeckID());
+        List<String> unscoredSecrets = new ArrayList<>();
+        if (soDeckModel != null) {
+            Set<String> scoredSecrets = new HashSet<>();
+            for (Player player : game.getRealPlayers()) {
+                scoredSecrets.addAll(player.getSecretsScored().keySet());
+            }
+            unscoredSecrets = soDeckModel.getNewDeck().stream()
+                    .filter(so -> !scoredSecrets.contains(so))
+                    .collect(Collectors.toList());
+        }
+        cardPool.setSecretObjectiveDeck(unscoredSecrets);
         cardPool.setSecretObjectiveFullDeckSize(game.getSecretObjectiveFullDeckSize());
 
         // Action Cards
