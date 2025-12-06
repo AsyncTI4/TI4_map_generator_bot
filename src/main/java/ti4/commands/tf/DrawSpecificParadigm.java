@@ -14,7 +14,7 @@ class DrawSpecificParadigm extends GameStateSubcommand {
 
     DrawSpecificParadigm() {
         super("draw_specific_paradigm", "Draw a specific Twilight's Fall Paradigm", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PARADIGM, "Name of the paradigm you wish to draw")
+        addOptions(new OptionData(OptionType.STRING, Constants.TF_PARADIGM, "Name of the paradigm you wish to draw")
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you draw")
@@ -26,7 +26,7 @@ class DrawSpecificParadigm extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
 
-        String paradigm = event.getOption(Constants.PARADIGM).getAsString();
+        String paradigm = event.getOption(Constants.TF_PARADIGM).getAsString();
         boolean success = ButtonHelperTwilightsFall.drawSpecificParadigm(game, player, paradigm, true, false);
 
         String msg = player.getRepresentationNoPing() + " ";
