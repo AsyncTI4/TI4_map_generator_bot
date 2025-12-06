@@ -2,8 +2,10 @@ package ti4.map.pojo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.Data;
@@ -78,11 +80,17 @@ public class PlayerProperties {
     // LANEFIR TECH "ATS Armaments"
     private int atsCount;
 
-    private String breakthroughID = "";
-    private boolean breakthroughUnlocked;
-    private boolean breakthroughExhausted;
-    private boolean breakthroughActive;
-    private int breakthroughTGs;
+    // Breakthrough Information
+    private List<String> breakthroughIDs = new ArrayList<>();
+    private Map<String, Boolean> breakthroughUnlocked = new LinkedHashMap<>();
+    private Map<String, Boolean> breakthroughExhausted = new LinkedHashMap<>();
+    private Map<String, Boolean> breakthroughActive = new LinkedHashMap<>();
+    private Map<String, Integer> breakthroughTGs = new LinkedHashMap<>();
+    // private String breakthroughID = "";
+    // private boolean breakthroughUnlocked;
+    // private boolean breakthroughExhausted;
+    // private boolean breakthroughActive;
+    // private int breakthroughTGs;
 
     // Stat tracking
     private int sarweenCounter;

@@ -467,7 +467,8 @@ public class AddPlanetService {
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasAbility("enslave")
-                && !setup) {
+                && !setup
+                && tile != null) {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             tile.getUnitHolders().get(planet).addUnit(infKey, 1);
             MessageHelper.sendMessageToChannel(
@@ -629,8 +630,8 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
 
-        if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
-            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+        if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer()) {
+            BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
         }
         ButtonHelperAbilities.oceanBoundCheck(game);
     }
