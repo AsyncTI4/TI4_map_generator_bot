@@ -31,19 +31,36 @@ public class VeiledHeartService {
 
         static Optional<VeiledCardType> fromCard(String card) {
             if (Mapper.getTech(card) != null) {
-                return Optional.of(VeiledCardType.ABILITY);
+                return Optional.of(ABILITY);
             }
             if (Mapper.getUnit(card) != null) {
-                return Optional.of(VeiledCardType.UNIT);
+                return Optional.of(UNIT);
             }
             LeaderModel leaderModel = Mapper.getLeader(card);
             if (leaderModel != null) {
                 if (Constants.AGENT.equalsIgnoreCase(leaderModel.getType())) {
-                    return Optional.of(VeiledCardType.GENOME);
+                    return Optional.of(GENOME);
                 }
                 if (Constants.HERO.equalsIgnoreCase(leaderModel.getType())) {
-                    return Optional.of(VeiledCardType.PARADIGM);
+                    return Optional.of(PARADIGM);
                 }
+            }
+            return Optional.empty();
+        }
+
+        static Optional<VeiledCardType> fromString(String str) {
+            str = str.toLowerCase();
+            if (str.contains("abil") || str.contains("tech")) {
+                return Optional.of(ABILITY);
+            }
+            if (str.contains("unit") || str.contains("upgr")) {
+                return Optional.of(UNIT);
+            }
+            if (str.contains("genome") || str.contains("agent")) {
+                return Optional.of(GENOME);
+            }
+            if (str.contains("para") || str.contains("hero")) {
+                return Optional.of(PARADIGM);
             }
             return Optional.empty();
         }
@@ -172,6 +189,10 @@ public class VeiledHeartService {
                             });
                 });
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void doAction(VeiledCardAction action, String typeStr, Player player, String card) {
+        VeiledCardType.fromString(typeStr).ifPresent(type -> doAction(action, type, player, card));
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {

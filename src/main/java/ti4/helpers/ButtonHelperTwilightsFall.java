@@ -1174,13 +1174,7 @@ public class ButtonHelperTwilightsFall {
                         Mapper.getUnit(cardID).getRepresentationEmbed());
             }
         } else {
-            game.setStoredValue(
-                    "veiledCards" + player.getFaction(),
-                    game.getStoredValue("veiledCards" + player.getFaction()) + cardID + "_");
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " has taken a secret card. They may put it into play with a button in their cards info.");
+            VeiledHeartService.doAction(VeiledHeartService.VeiledCardAction.DRAW, type, player, cardID);
         }
     }
 
