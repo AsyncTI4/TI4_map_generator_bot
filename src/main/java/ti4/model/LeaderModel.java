@@ -110,20 +110,12 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(tfAbilityText);
     }
 
-    private boolean isTFCard() {
-        return source == ComponentSource.twilights_fall
-                || tfName != null
-                || tfTitle != null
-                || tfAbilityWindow != null
-                || tfAbilityText != null;
-    }
-
     public boolean isGenome() {
-        return Constants.AGENT.equalsIgnoreCase(type) && isTFCard();
+        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(ID);
     }
 
     public boolean isParadigm() {
-        return Constants.HERO.equalsIgnoreCase(type) && isTFCard();
+        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(ID);
     }
 
     private Optional<String> getFlavourText() {
