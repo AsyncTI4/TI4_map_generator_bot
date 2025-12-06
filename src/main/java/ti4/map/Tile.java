@@ -599,9 +599,11 @@ public class Tile {
     @JsonIgnore
     public boolean isScar(Game game) {
         if (hasAnyToken("token_entropicscar_async.png")) return true;
-        for (Player p2 : game.getPlayers().values()) {
-            if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
-                return true;
+        if (game != null) {
+            for (Player p2 : game.getPlayers().values()) {
+                if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
+                    return true;
+                }
             }
         }
         return getTileModel().isScar();
