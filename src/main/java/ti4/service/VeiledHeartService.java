@@ -136,6 +136,16 @@ public class VeiledHeartService {
                 .toList();
     }
 
+    public static List<Button> getVeiledDiscardButtonsForGenophage(Player activePlayer, Player targetPlayer) {
+        List<Button> buttons = new ArrayList<>();
+        String buttonIdFormat = "veiled_discard_genome_%d_" + targetPlayer.getFaction();
+        long cardCount = getVeiledCards(VeiledCardType.GENOME, targetPlayer).count();
+        for (long i = 0; i < cardCount; i++) {
+            buttons.add(Buttons.gray(String.format(buttonIdFormat, i), "Veiled Genome " + (i + 1)));
+        }
+        return buttons;
+    }
+
     private static String getRepresentation(VeiledCardType type, String card) {
         return switch (type) {
             case ABILITY -> Mapper.getTech(card).getName();
@@ -177,6 +187,7 @@ public class VeiledHeartService {
         String actionString = splitID[1];
         String typeString = splitID[2];
         String card = splitID.length > 3 ? splitID[3] : "";
+        Player targetPlayer = splitID.length > 4 ? game.getPlayerFromColorOrFaction(splitID[4]) : null;
         Stream.of(VeiledCardAction.values())
                 .filter(action -> actionString.equalsIgnoreCase(action.toString()))
                 .findAny()
@@ -187,8 +198,10 @@ public class VeiledHeartService {
                             .ifPresent(type -> {
                                 if (card.isEmpty()) {
                                     sendVeiledButtons(action, type, player);
-                                } else {
+                                } else if (targetPlayer == null) {
                                     doAction(action, type, player, card);
+                                } else {
+                                    doAction(action, type, player, Integer.parseInt(card), targetPlayer);
                                 }
                             });
                 });
@@ -219,6 +232,20 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + ", but was unable to.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+    }
+
+    public static void doAction(
+            VeiledCardAction action, VeiledCardType type, Player activePlayer, int cardIndex, Player targetPlayer) {
+        List<String> cards = getVeiledCards(type, targetPlayer).toList();
+        if (cards.size() <= cardIndex) {
+            return;
+        }
+        doAction(action, type, targetPlayer, cards.get(cardIndex));
+        MessageHelper.sendMessageToChannel(
+                activePlayer.getCorrectChannel(),
+                activePlayer.getRepresentation() + " made " + targetPlayer.getRepresentation() + " "
+                        + action.toString().toLowerCase() + " a veiled "
+                        + type.toString().toLowerCase() + "!");
     }
 
     public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {

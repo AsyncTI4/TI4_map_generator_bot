@@ -26,6 +26,7 @@ import ti4.model.LeaderModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.map.FractureService;
 import ti4.service.unit.DestroyUnitService;
@@ -495,6 +496,9 @@ public class ButtonHelperTwilightsFallActionCards {
             }
             LeaderModel lead = Mapper.getLeader(agent);
             buttons.add(Buttons.gray("genophageStep3_" + p2.getFaction() + "_" + agent, lead.getAutoCompleteName()));
+        }
+        if (game.isVeiledHeartMode()) {
+            buttons.addAll(VeiledHeartService.getVeiledDiscardButtonsForGenophage(player, p2));
         }
         String msg = player.getRepresentation() + " choose the genome of your neighbor that you wish to remove.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
