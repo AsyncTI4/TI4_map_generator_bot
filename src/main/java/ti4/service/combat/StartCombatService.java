@@ -1348,9 +1348,7 @@ public class StartCombatService {
                                 + "Sol Agent",
                         FactionEmojis.Sol));
             }
-            if ((!game.isFowMode() || agentHolder == p1)
-                    && agentHolder.hasUnexhaustedLeader("bastionagent")
-                    && isGroundCombat) {
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("bastionagent")) {
                 buttons.add(Buttons.gray(
                         finChecker + "getAgentSelection_bastionagent",
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
