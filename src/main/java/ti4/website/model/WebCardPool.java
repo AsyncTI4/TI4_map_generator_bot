@@ -52,7 +52,7 @@ public class WebCardPool {
         cardPool.setSecretObjectiveFullDeckSize(game.getSecretObjectiveFullDeckSize());
 
         // Action Cards
-        cardPool.setActionCardDeck(new ArrayList<>(game.getActionCards()));
+        cardPool.setActionCardDeck(new ArrayList<>());
         cardPool.setActionCardDiscard(
                 new ArrayList<>(game.getDiscardActionCards().keySet()));
         cardPool.setActionCardFullDeckSize(game.getActionCardFullDeckSize());
