@@ -64,7 +64,7 @@ public class LoreService {
     private static final int LORE_TEXT_MAX_LENGTH = 1000;
     private static final int FOOTER_TEXT_MAX_LENGTH = 200;
 
-    private enum RECEIVER {
+    public enum RECEIVER {
         CURRENT("Current Player"),
         ADJACENT("Adjacent Players"),
         ALL("All Players"),
@@ -87,7 +87,7 @@ public class LoreService {
         }
     }
 
-    private enum PING {
+    public enum PING {
         NO("No"),
         YES("Yes");
         public final String name;
@@ -97,7 +97,7 @@ public class LoreService {
         }
     }
 
-    private enum PERSISTANCE {
+    public enum PERSISTANCE {
         ONCE("Once"),
         ALWAYS("Every time");
         public final String name;
@@ -125,10 +125,14 @@ public class LoreService {
             LoreEntry entry = new LoreEntry(clean(splitLore[1]));
             entry.target = splitLore[0].trim();
             entry.footerText = splitLore.length > 2 ? clean(splitLore[2]) : "";
-            entry.receiver = splitLore.length > 3 ? RECEIVER.valueOf(splitLore[3]) : RECEIVER.CURRENT;
-            entry.trigger = splitLore.length > 4 ? TRIGGER.valueOf(splitLore[4]) : TRIGGER.CONTROLLED;
-            entry.ping = splitLore.length > 5 ? PING.valueOf(splitLore[5]) : PING.NO;
-            entry.persistance = splitLore.length > 6 ? PERSISTANCE.valueOf(splitLore[6]) : PERSISTANCE.ONCE;
+            try {
+                entry.receiver = RECEIVER.valueOf(splitLore[3]);
+                entry.trigger = TRIGGER.valueOf(splitLore[4]);
+                entry.ping = PING.valueOf(splitLore[5]);
+                entry.persistance = PERSISTANCE.valueOf(splitLore[6]);
+            } catch (Exception e) {
+                // Ignore invalid entries and use defaults
+            }
             return entry;
         }
 
