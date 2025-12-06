@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -74,7 +75,8 @@ public class ButtonHelperModifyUnits {
         }
         if (game.getActiveSystem() != null
                 && game.getTileByPosition(game.getActiveSystem()) != null
-                && game.getTileByPosition(game.getActiveSystem()).isScar()) {
+                && game.getTileByPosition(game.getActiveSystem()).isScar(game)
+                && !player.hasUnlockedBreakthrough("nivynbt")) {
             return 0;
         }
         mentakFS = Helper.getPlayerFromUnit(game, "sigma_mentak_flagship_2");
@@ -1019,6 +1021,11 @@ public class ButtonHelperModifyUnits {
         Set<String> positions = FoWHelper.getAdjacentTiles(game, pos1, player, false);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander") && player.getHomeSystemTile() != null) {
             positions.addAll(FoWHelper.getAdjacentTiles(game, player.getHomeSystemPosition(), player, false));
+        }
+        if (player.hasUnlockedBreakthrough("ghotibt")) {
+            positions.addAll(FoWHelper.getEmptyTiles(game).stream()
+                    .map(Tile::getPosition)
+                    .collect(Collectors.toSet()));
         }
         for (String pos2 : positions) {
             Tile tile = game.getTileByPosition(pos2);

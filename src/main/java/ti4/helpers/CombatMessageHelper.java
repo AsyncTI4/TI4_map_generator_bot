@@ -162,7 +162,7 @@ public class CombatMessageHelper {
                     modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitScope));
                 }
             }
-            result += String.join("\n", modifierMessages) + "\n";
+            result += String.join("\n", modifierMessages).replace("Optional[", "") + "\n";
         }
         return result;
     }

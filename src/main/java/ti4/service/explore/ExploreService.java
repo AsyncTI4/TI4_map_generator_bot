@@ -510,7 +510,7 @@ public class ExploreService {
                 if (tokenFilename == null || tile == null) {
                     message = "Invalid token or tile";
                 } else {
-                    if (tile.isScar() && ("ionalpha".equalsIgnoreCase(token) || "gamma".equalsIgnoreCase(token))) {
+                    if (tile.isScar(game) && ("ionalpha".equalsIgnoreCase(token) || "gamma".equalsIgnoreCase(token))) {
                         message = "Token `" + token + "` was not added to tile " + tile.getAutoCompleteName()
                                 + " because it is an entropic scar and cannot have wormholes.";
                     } else {

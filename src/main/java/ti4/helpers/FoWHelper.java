@@ -319,9 +319,15 @@ public class FoWHelper {
         }
 
         if (game.isCosmicPhenomenaeMode()) {
-            if (tile.isScar()) {
+            if (tile.isScar(game)) {
                 adjToFeatures.add(Feature.scar);
             }
+        }
+
+        if (game.getActivePlayer() != null
+                && game.getActivePlayer().hasUnlockedBreakthrough("nivynbt")
+                && tile.isScar(game)) {
+            adjToFeatures.add(Feature.egress);
         }
 
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -340,7 +346,7 @@ public class FoWHelper {
                 continue;
             }
             if (game.isCosmicPhenomenaeMode()) {
-                if (adjToFeatures.contains(Feature.scar) && t.isScar()) {
+                if (adjToFeatures.contains(Feature.scar) && t.isScar(game)) {
                     adjacentPositions.add(t.getPosition());
                     continue;
                 }
@@ -361,7 +367,7 @@ public class FoWHelper {
         return adjacentPositions;
     }
 
-    private static Set<Tile> getEmptyTiles(Game game) {
+    public static Set<Tile> getEmptyTiles(Game game) {
         Set<Tile> emptyTiles = new HashSet<>();
         Collection<Tile> tileList = game.getTileMap().values();
         List<String> frontierTileList = Mapper.getFrontierTileIds();

@@ -339,5 +339,10 @@ public class CardsInfoService {
                         },
                         BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        if (game.isTwilightsFallMode() && game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## Reminder that Genomes can be shattered in Twilight's Fall mode! Use best judgement on whether that is likely to occur and whether you should wait on shatters, usually it will not.");
+        }
     }
 }

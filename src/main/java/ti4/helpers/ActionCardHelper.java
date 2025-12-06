@@ -663,31 +663,12 @@ public class ActionCardHelper {
                     + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
                     + " You may discard the action cards and manually resolve if you need to.";
         }
-        if ("agenda".equalsIgnoreCase(actionCard.getPhase())
-                && game.getPhaseOfGame() != null
-                && !game.isTwilightsFallMode()
-                && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            if (!"edyn".equalsIgnoreCase(player.getFaction())
-                    && !player.getFaction().contains("franken")) {
-                return player.getRepresentationUnfogged()
-                        + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
-            }
-        }
         if (game.isStellarAtomicsMode()
                 && "agenda".equalsIgnoreCase(actionCard.getPhase())
                 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
             if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
                 return player.getRepresentationUnfogged() + ", the bot thinks you have committed some light war crimes,"
                         + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
-            }
-        }
-        if ("action".equalsIgnoreCase(actionCard.getPhase())
-                && game.getPhaseOfGame() != null
-                && !game.isTwilightsFallMode()
-                && game.getPhaseOfGame().contains("agenda")) {
-            if (!actionCard.getName().toLowerCase().contains("war machine")) {
-                return player.getRepresentationUnfogged()
-                        + ", the bot thinks it is the Agenda Phase and this is an Action Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
 

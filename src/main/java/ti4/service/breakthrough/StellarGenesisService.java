@@ -20,6 +20,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.combat.StartCombatService;
 import ti4.service.map.TokenPlanetService;
 import ti4.service.planet.AddPlanetService;
 
@@ -72,6 +73,14 @@ public class StellarGenesisService {
             Tile tile = game.getTileByPosition(destination);
             TokenPlanetService.moveTokenPlanet(game, player, tile, Constants.AVERNUS);
             ButtonHelper.deleteTheOneButton(event);
+            List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
+            if (playersWithPds2.contains(player)) {
+                List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        "If avernus had PDS on it, you can fire the PDS with this button if this is the appropriate time to do so.",
+                        spaceCannonButtons);
+            }
         }
     }
 }

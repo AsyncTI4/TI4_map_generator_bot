@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -104,7 +105,9 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && tile2 != null
-                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
+                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2)
+                                    && (!player.hasUnit("mentak_cruiser3")
+                                            || tile2.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
