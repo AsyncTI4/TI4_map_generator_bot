@@ -49,6 +49,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
+import ti4.service.unit.GalvanizeService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -966,6 +967,22 @@ public class ButtonHelperAgents {
                     p2.getFactionEmojiOrColor() + " will receive " + ssruuClever + "Evelyn Delouis, the Sol"
                             + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("solagent", p2.getFaction());
+        }
+        if ("bastionagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + " the Bastion"
+                    + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            String faction = rest.split("_")[1];
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            MessageChannel channel2 = event.getMessageChannel();
+            if (game.isFowMode()) {
+                channel2 = p2.getPrivateChannel();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the chosen player");
+            }
+            List<Button> buttons = GalvanizeService.getToggleGalvanizeButtons(
+                    p2, game, game.getTileByPosition(game.getActiveSystem()));
+            MessageHelper.sendMessageToChannel(
+                    channel2, p2.getRepresentation() + " use these buttons to galvanize a unit.", buttons);
         }
         if ("valiantagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valiant genome.";

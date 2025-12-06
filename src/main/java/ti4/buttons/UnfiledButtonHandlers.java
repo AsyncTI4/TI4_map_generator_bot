@@ -111,6 +111,7 @@ import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.settings.users.UserSettingsManager;
 
@@ -1857,6 +1858,23 @@ public class UnfiledButtonHandlers {
                 event.getMessageChannel(),
                 message,
                 ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
+        Tile oldTile = game.getTileFromPlanet("avernus");
+        if (player.hasUnlockedBreakthrough("muaatbt")
+                && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Warsun)
+                        .contains(game.getTileByPosition(pos2))
+                && !game.getTileByPosition(pos2).isHomeSystem(game)
+                && game.getTileByPosition(pos1) == oldTile) {
+
+            List<Button> breakthroughButtons = new ArrayList<>();
+            breakthroughButtons.add(
+                    Buttons.blue(player.finChecker() + "moveAvernus_" + pos2, "Retreat Avernus", FactionEmojis.Muaat));
+            breakthroughButtons.add(Buttons.red("deleteButtons", "Decline"));
+            String breakthroughMessage = player.getRepresentationUnfogged() + ", you may move Avernus into "
+                    + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), breakthroughMessage, breakthroughButtons);
+        }
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2046,11 +2064,11 @@ public class UnfiledButtonHandlers {
                         }
                         if (player.hasTech("hm")) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
+                            reasons += (properGain == 3 ? "" : ", ") + "_Hyper Metabolism_";
                         }
                         if (player.hasTech("tf-inheritancesystems")) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Inheritance Systems_";
+                            reasons += (properGain == 3 ? "" : ", ") + "_Inheritance Systems_";
                         }
                         if (malevolency) {
                             properGain -= 1;
@@ -2058,7 +2076,7 @@ public class UnfiledButtonHandlers {
                         }
                         if (cyber) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
+                            reasons += (properGain == 3 ? "" : ", ") + "_Cybernetic Enhancements_";
                         }
                         if (netGain != properGain) {
                             MessageHelper.sendMessageToChannel(

@@ -1470,7 +1470,7 @@ public class ButtonHelper {
                             + ", this is a __friendly__ reminder that you do not own _Antimass Deflectors_.");
         }
         if (!game.isFowMode()
-                && activeSystem.isScar()
+                && activeSystem.isScar(game)
                 && !player.getRelics().contains("circletofthevoid")
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
