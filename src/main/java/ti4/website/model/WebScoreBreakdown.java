@@ -238,6 +238,11 @@ public class WebScoreBreakdown {
                     continue;
                 }
 
+                // Skip Firmament/Obsidian "(Plotted)" secrets - these are 0 VP plot card triggers, not real scores
+                if (key.startsWith("(Plotted)")) {
+                    continue;
+                }
+
                 // Check if this player actually scored this custom objective
                 List<String> scoringPlayers = scoredPublics.get(key);
                 if (scoringPlayers == null || !scoringPlayers.contains(player.getUserID())) {
