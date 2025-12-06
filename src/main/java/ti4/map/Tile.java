@@ -597,6 +597,19 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isScar(Game game) {
+        if (hasAnyToken("token_entropicscar_async.png")) return true;
+        if (game != null) {
+            for (Player p2 : game.getPlayers().values()) {
+                if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
+                    return true;
+                }
+            }
+        }
+        return getTileModel().isScar();
+    }
+
+    @JsonIgnore
     public List<WormholeModel.Wormhole> getWormholes(Game game) {
         Set<WormholeModel.Wormhole> whs = EnumSet.noneOf(WormholeModel.Wormhole.class);
         List<WormholeModel.Wormhole> whs2 = new ArrayList<>(whs);
@@ -657,7 +670,7 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar()) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar(game)) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
