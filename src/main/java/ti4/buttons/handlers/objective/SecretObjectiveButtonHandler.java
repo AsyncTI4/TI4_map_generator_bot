@@ -50,10 +50,19 @@ class SecretObjectiveButtonHandler {
                 }
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
+            String oldSO = player.getSecret(soIndex).getAlias();
             DiscardSecretService.discardSO(player, soIndex, game);
 
             if (drawReplacement) {
                 DrawSecretService.drawSO(event, game, player);
+
+                if (player.getSecrets().containsKey(oldSO)
+                        && event.getUser().getId().equals(player.getUserID())) {
+                    event.getHook()
+                            .setEphemeral(true)
+                            .sendMessage("OH NO!!! You drew the same secret you discarded! How unlucky 😭😭😭")
+                            .queue();
+                }
             }
             if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
