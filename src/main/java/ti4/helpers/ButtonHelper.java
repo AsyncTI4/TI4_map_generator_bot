@@ -4302,6 +4302,10 @@ public class ButtonHelper {
         if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
             endButtons.add(Buttons.red(player.finChecker() + "startQhetInfRevival", "Revive Up To 2 Infantry"));
         }
+        if (player.hasUnlockedBreakthrough("axisbt") && player.hasReadyBreakthrough("axisbt")) {
+            endButtons.add(
+                    Buttons.green(player.finChecker() + "useAxisBT", "Use Axis Breakthrough", FactionEmojis.axis));
+        }
         return endButtons;
     }
 
@@ -4344,6 +4348,7 @@ public class ButtonHelper {
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isEdgeOfBoard(game)
                     && tile.getPosition().length() > 2
+                    && !tile.getPosition().contains("frac")
                     && (game.isDiscordantStarsMode() || FoWHelper.playerHasShipsInSystem(player, tile))) {
                 if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;
@@ -5432,6 +5437,10 @@ public class ButtonHelper {
                         "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
                 buttons.add(Buttons.gray(buttonId, buttonMessage, ExploreEmojis.getTraitEmoji(trait)));
             }
+        }
+        if (player.hasUnlockedBreakthrough("augersbt")) {
+            buttons.add(Buttons.green(
+                    "draw_1_ACDelete", "Draw 1 Action Card Instead (Breakthrough)", FactionEmojis.augers));
         }
         return buttons;
     }

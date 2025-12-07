@@ -615,6 +615,9 @@ public class StartTurnService {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
+        if (player.hasReadyBreakthrough("lanefirbt")) {
+            startButtons.add(Buttons.gray("useLanefirBt", "Use Lanefir Breakthrough", FactionEmojis.lanefir));
+        }
         if (player.hasUnexhaustedLeader("hyperagent")) {
             startButtons.add(Buttons.gray(
                     "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));

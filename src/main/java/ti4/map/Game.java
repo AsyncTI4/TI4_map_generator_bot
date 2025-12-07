@@ -4986,10 +4986,10 @@ public class Game extends GameProperties {
                 if (tile.getPosition().equals(position)) {
                     String tileID =
                             AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
-                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) {
+                    if ("000".equalsIgnoreCase(position) && "112".equalsIgnoreCase(tileID)) {
                         // Mecatol Rex in Centre Position
-                        sb.append("{18}");
-                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) {
+                        sb.append("{112}");
+                    } else if ("000".equalsIgnoreCase(position) && !"112".equalsIgnoreCase(tileID)) {
                         // Something else is in the Centre Position
                         sb.append("{").append(tileID).append("}");
                     } else {

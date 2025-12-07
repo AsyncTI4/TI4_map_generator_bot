@@ -29,6 +29,10 @@ class CaptureUnitService {
 
         List<Player> capturing = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
+            if (player.hasUnlockedBreakthrough("mykomentoribt") && player != game.getActivePlayer()) {
+                capturing.add(player);
+                continue;
+            }
             if (!player.hasUnit("cabal_mech")) continue;
             if (planet.getUnitCount(UnitType.Mech, player) == 0) continue;
             capturing.add(player);

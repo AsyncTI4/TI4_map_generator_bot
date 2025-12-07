@@ -7,12 +7,15 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 
@@ -28,6 +31,131 @@ public class DSHelperBreakthroughs {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 p1.getCorrectChannel(), "Select a player to target with your breakthrough:", buttons);
+    }
+
+    public static void kolumeBTStep1(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
+        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Tech for 3i"));
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " is resolving the kolume breakthrough to either spend 3i to research 1 tech as the same color of one of their exhausted techs or gain 1 command token");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " choose whether you want to either spend 3i to research 1 tech as the same color of one of their exhausted techs or gain 1 command token",
+                buttons);
+    }
+
+    public static void bentorBTStep1(Game game, Player p1) {
+        for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("acceptBentorBT_" + p1.getFaction(), "Explore 1 Planet"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p2.getCorrectChannel(),
+                    p2.getRepresentationUnfogged() + ", " + p1.getFactionNameOrColor()
+                            + " has activated their Bentor breakthrough. Do you wish to explore one of your planets?",
+                    buttons);
+        }
+        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Sent buttons to every player to resolve.");
+    }
+
+    @ButtonHandler("acceptBentorBT")
+    public static void acceptBentorBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                p2.getCorrectChannel(),
+                p2.getRepresentation() + " " + p1.getFactionNameOrColor()
+                        + " has accepted your breakthrough offer to explore one of their planets and you have been given 1 commodity (if possible).");
+        p2.gainCommodities(1);
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
+    }
+
+    @ButtonHandler("useAxisBT")
+    public static void useAxisBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        p1.setBreakthroughExhausted(true);
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation()
+                        + " has used their Axis breakthrough to move any number of ships between two systems with their spacedocks.");
+        ButtonHelper.deleteTheOneButton(event);
+        String message = ", please choose the first system that you wish to swap a ship between (and transport).";
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock);
+        for (Tile tile : tiles) {
+            if (FoWHelper.otherPlayersHaveShipsInSystem(p1, tile, game)) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "axisBTStep2_" + tile.getPosition(),
+                    tile.getRepresentationForButtons()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                p1.getCorrectChannel(), p1.getRepresentationUnfogged() + message, buttons);
+    }
+
+    @ButtonHandler("useLanefirBt")
+    public static void useLanefirBt(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        p1.setBreakthroughExhausted(true);
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation() + " has used their Lanefir breakthrough to explore 1 planet they control.");
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
+    }
+
+    public static void doLanefirBtCheck(Game game, Player player) {
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (p2.hasUnlockedBreakthrough("lanefirbt")) {
+                List<Button> buttons = new ArrayList<>();
+                if (p2.isBreakthroughExhausted()) {
+                    buttons.add(Buttons.green("readyLanefirBt", "Ready Lanefir Breakthrough"));
+                }
+                buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(
+                        p2.getCorrectChannel(),
+                        p2.getRepresentation()
+                                + " is resolving the lanefir breakthrough to either ready the breakthrough or gain 1 command token after another player has purged a non-action card component.");
+                MessageHelper.sendMessageToChannel(
+                        p2.getCorrectChannel(),
+                        p2.getRepresentation()
+                                + " choose whether you want to either ready the breakthrough or gain 1 command token",
+                        buttons);
+            }
+        }
+    }
+
+    @ButtonHandler("axisBTStep2_")
+    public static void axisBTStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        String message =
+                ", please choose the second system that you wish to swap a ship between (and transport). The first system is position "
+                        + pos + ".";
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
+        for (Tile tile : tiles) {
+            if (tile.getPosition().equalsIgnoreCase(pos)) {
+                continue;
+            }
+            if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                continue;
+            }
+            buttons.add(Buttons.gray(
+                    player.getFinsFactionCheckerPrefix() + "redcreussAgentPart2_" + pos + "_" + tile.getPosition(),
+                    tile.getRepresentationForButtons()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + message, buttons);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("edynbtSelect_")
