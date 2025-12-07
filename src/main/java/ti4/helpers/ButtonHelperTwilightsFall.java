@@ -13,6 +13,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.twilightsfall.TfCardType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -850,10 +851,7 @@ public class ButtonHelperTwilightsFall {
                 Mapper.getLeader(paradigm).getRepresentationEmbed(false, true, false, false, true));
         if (game.isVeiledHeartMode()) {
             VeiledHeartService.doAction(
-                    VeiledHeartService.VeiledCardAction.DRAW,
-                    VeiledHeartService.VeiledCardType.PARADIGM,
-                    player,
-                    paradigm);
+                    VeiledHeartService.VeiledCardAction.DRAW, TfCardType.PARADIGM, player, paradigm);
         } else {
             player.addLeader(paradigm);
             player.getLeaderByID(paradigm).get().setLocked(false);

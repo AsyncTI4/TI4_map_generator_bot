@@ -16,6 +16,7 @@ import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.ButtonHelperTwilightsFallActionCards;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.twilightsfall.TfCardType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -123,7 +124,7 @@ public class EdictPhaseHandler {
                 if (game.isVeiledHeartMode()) {
                     VeiledHeartService.doAction(
                             VeiledHeartService.VeiledCardAction.DISCARD,
-                            VeiledHeartService.VeiledCardType.PARADIGM,
+                            TfCardType.PARADIGM,
                             player,
                             paradigmToLose);
                 }

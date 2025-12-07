@@ -10,74 +10,17 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.twilightsfall.TfCardType;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.*;
 import ti4.message.MessageHelper;
-import ti4.model.LeaderModel;
 
 @UtilityClass
 public class VeiledHeartService {
     private static final String VEILED_CARDS = "veiledCards";
-
-    public enum VeiledCardType {
-        ABILITY,
-        UNIT,
-        GENOME,
-        PARADIGM;
-
-        static Optional<VeiledCardType> fromCard(String card) {
-            if (Mapper.getTech(card) != null) {
-                return Optional.of(ABILITY);
-            }
-            if (Mapper.getUnit(card) != null) {
-                return Optional.of(UNIT);
-            }
-            LeaderModel leaderModel = Mapper.getLeader(card);
-            if (leaderModel != null) {
-                if (Constants.AGENT.equalsIgnoreCase(leaderModel.getType())) {
-                    return Optional.of(GENOME);
-                }
-                if (Constants.HERO.equalsIgnoreCase(leaderModel.getType())) {
-                    return Optional.of(PARADIGM);
-                }
-            }
-            return Optional.empty();
-        }
-
-        static Optional<VeiledCardType> fromString(String str) {
-            str = str.toLowerCase();
-            if (str.contains("abil") || str.contains("tech")) {
-                return Optional.of(ABILITY);
-            }
-            if (str.contains("unit") || str.contains("upgr")) {
-                return Optional.of(UNIT);
-            }
-            if (str.contains("genome") || str.contains("agent")) {
-                return Optional.of(GENOME);
-            }
-            if (str.contains("para") || str.contains("hero")) {
-                return Optional.of(PARADIGM);
-            }
-            return Optional.empty();
-        }
-
-        boolean matches(String card) {
-            return Optional.of(this).equals(fromCard(card));
-        }
-
-        Button toButton(String buttonId, String buttonLabel) {
-            return switch (this) {
-                case ABILITY -> Buttons.green(buttonId, buttonLabel);
-                case UNIT -> Buttons.gray(buttonId, buttonLabel);
-                case GENOME -> Buttons.blue(buttonId, buttonLabel);
-                case PARADIGM -> Buttons.red(buttonId, buttonLabel);
-            };
-        }
-    }
 
     public enum VeiledCardAction {
         DISCARD,
@@ -107,30 +50,27 @@ public class VeiledHeartService {
         return Arrays.stream(getStoredValue(player).split("_"));
     }
 
-    private static Stream<String> getVeiledCards(VeiledCardType type, Player player) {
+    private static Stream<String> getVeiledCards(TfCardType type, Player player) {
         return getVeiledCards(player).filter(type::matches);
     }
 
-    private static Map<VeiledCardType, List<String>> getVeiledCardsByType(Player player) {
-        Map<VeiledCardType, List<String>> veiledCardsByType = new HashMap<>();
-        for (VeiledCardType cardType : VeiledCardType.values()) {
+    private static Map<TfCardType, List<String>> getVeiledCardsByType(Player player) {
+        Map<TfCardType, List<String>> veiledCardsByType = new HashMap<>();
+        for (TfCardType cardType : TfCardType.values()) {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> {
-            VeiledCardType.fromCard(card).ifPresent(type -> {
-                veiledCardsByType.get(type).add(card);
-            });
-        });
+        getVeiledCards(player).forEach(card -> TfCardType.fromCard(card)
+                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 
-    private static boolean hasVeiledCard(VeiledCardType type, Player player) {
+    private static boolean hasVeiledCard(TfCardType type, Player player) {
         return getVeiledCards(player).anyMatch(type::matches);
     }
 
     public static List<Button> getVeiledDiscardButtonsForRedDeploy(Player player) {
-        return Stream.of(VeiledCardType.ABILITY, VeiledCardType.GENOME)
+        return Stream.of(TfCardType.ABILITY, TfCardType.GENOME)
                 .filter(type -> hasVeiledCard(type, player))
                 .map(type -> type.toButton("veiled_discard_" + type, "Veiled " + toTitleCase(type.toString())))
                 .toList();
@@ -139,14 +79,14 @@ public class VeiledHeartService {
     public static List<Button> getVeiledDiscardButtonsForGenophage(Player activePlayer, Player targetPlayer) {
         List<Button> buttons = new ArrayList<>();
         String buttonIdFormat = "veiled_discard_genome_%d_" + targetPlayer.getFaction();
-        long cardCount = getVeiledCards(VeiledCardType.GENOME, targetPlayer).count();
+        long cardCount = getVeiledCards(TfCardType.GENOME, targetPlayer).count();
         for (long i = 0; i < cardCount; i++) {
             buttons.add(Buttons.gray(String.format(buttonIdFormat, i), "Veiled Genome " + (i + 1)));
         }
         return buttons;
     }
 
-    private static String getRepresentation(VeiledCardType type, String card) {
+    private static String getRepresentation(TfCardType type, String card) {
         return switch (type) {
             case ABILITY -> Mapper.getTech(card).getName();
             case UNIT -> Mapper.getUnit(card).getName();
@@ -155,16 +95,16 @@ public class VeiledHeartService {
     }
 
     public static void sendVeiledButtons(VeiledCardAction action, Player player) {
-        for (VeiledCardType type : VeiledCardType.values()) {
+        for (TfCardType type : TfCardType.values()) {
             sendVeiledButtons(action, type, player);
         }
     }
 
     public static void sendVeiledButtons(VeiledCardAction action, String typeStr, Player player) {
-        VeiledCardType.fromString(typeStr).ifPresent(type -> sendVeiledButtons(action, type, player));
+        TfCardType.fromString(typeStr).ifPresent(type -> sendVeiledButtons(action, type, player));
     }
 
-    private static void sendVeiledButtons(VeiledCardAction action, VeiledCardType type, Player player) {
+    private static void sendVeiledButtons(VeiledCardAction action, TfCardType type, Player player) {
         String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
         List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
                 .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
@@ -191,28 +131,26 @@ public class VeiledHeartService {
         Stream.of(VeiledCardAction.values())
                 .filter(action -> actionString.equalsIgnoreCase(action.toString()))
                 .findAny()
-                .ifPresent(action -> {
-                    Stream.of(VeiledCardType.values())
-                            .filter(type -> typeString.equalsIgnoreCase(type.toString()))
-                            .findAny()
-                            .ifPresent(type -> {
-                                if (card.isEmpty()) {
-                                    sendVeiledButtons(action, type, player);
-                                } else if (targetPlayer == null) {
-                                    doAction(action, type, player, card);
-                                } else {
-                                    doAction(action, type, player, Integer.parseInt(card), targetPlayer);
-                                }
-                            });
-                });
+                .ifPresent(action -> Stream.of(TfCardType.values())
+                        .filter(type -> typeString.equalsIgnoreCase(type.toString()))
+                        .findAny()
+                        .ifPresent(type -> {
+                            if (card.isEmpty()) {
+                                sendVeiledButtons(action, type, player);
+                            } else if (targetPlayer == null) {
+                                doAction(action, type, player, card);
+                            } else {
+                                doAction(action, type, player, Integer.parseInt(card), targetPlayer);
+                            }
+                        }));
         ButtonHelper.deleteMessage(event);
     }
 
     public static void doAction(VeiledCardAction action, String typeStr, Player player, String card) {
-        VeiledCardType.fromString(typeStr).ifPresent(type -> doAction(action, type, player, card));
+        TfCardType.fromString(typeStr).ifPresent(type -> doAction(action, type, player, card));
     }
 
-    public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
+    public static void doAction(VeiledCardAction action, TfCardType type, Player player, String card) {
         String msg;
         switch (action) {
             case VeiledCardAction.DRAW -> {
@@ -235,7 +173,7 @@ public class VeiledHeartService {
     }
 
     public static void doAction(
-            VeiledCardAction action, VeiledCardType type, Player activePlayer, int cardIndex, Player targetPlayer) {
+            VeiledCardAction action, TfCardType type, Player activePlayer, int cardIndex, Player targetPlayer) {
         List<String> cards = getVeiledCards(type, targetPlayer).toList();
         if (cards.size() <= cardIndex) {
             return;
@@ -248,7 +186,9 @@ public class VeiledHeartService {
                         + type.toString().toLowerCase() + "!");
     }
 
-    public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {
+    public static void showVeiledAndRemaining(Game game, String typeStr, Player player, ButtonInteractionEvent event) {}
+
+    public static int veiledField(Graphics graphics, int x, int y, TfCardType type, int deltaX, Player player) {
         graphics.setColor(Color.LIGHT_GRAY);
         graphics.setFont(Storage.getFont18());
         String text = "VEILED\n" + type.toString();

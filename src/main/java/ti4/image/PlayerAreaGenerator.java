@@ -51,6 +51,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.twilightsfall.TfCardType;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.map.Game;
@@ -1276,8 +1277,7 @@ class PlayerAreaGenerator {
         for (Leader leader : allLeaders) {
             if (shouldDrawVeiledGenomes && !Constants.AGENT.equalsIgnoreCase(leader.getType())) {
                 // The last unveiled genome has been drawn, so now draw the veiled genomes.
-                deltaX = VeiledHeartService.veiledField(
-                        graphics, x, y, VeiledHeartService.VeiledCardType.GENOME, deltaX, player);
+                deltaX = VeiledHeartService.veiledField(graphics, x, y, TfCardType.GENOME, deltaX, player);
                 // The veiled genomes have been drawn, so don't draw them again.
                 shouldDrawVeiledGenomes = false;
             }
@@ -1352,12 +1352,10 @@ class PlayerAreaGenerator {
             if (shouldDrawVeiledGenomes) {
                 // The veiled genomes were not drawn earlier because there are no non-agent leaders.
                 // The veiled genomes should still be drawn, so do it now.
-                deltaX = VeiledHeartService.veiledField(
-                        graphics, x, y, VeiledHeartService.VeiledCardType.GENOME, deltaX, player);
+                deltaX = VeiledHeartService.veiledField(graphics, x, y, TfCardType.GENOME, deltaX, player);
             }
             // Draw the veiled paradigms after all other leaders (directly after the heroes, if any).
-            deltaX = VeiledHeartService.veiledField(
-                    graphics, x, y, VeiledHeartService.VeiledCardType.PARADIGM, deltaX, player);
+            deltaX = VeiledHeartService.veiledField(graphics, x, y, TfCardType.PARADIGM, deltaX, player);
         }
 
         if (player.hasAbility("imperia")) {
@@ -2491,16 +2489,14 @@ class PlayerAreaGenerator {
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
 
         if (game.isVeiledHeartMode()) {
-            deltaX = VeiledHeartService.veiledField(
-                    graphics, x, y, VeiledHeartService.VeiledCardType.ABILITY, deltaX, player);
+            deltaX = VeiledHeartService.veiledField(graphics, x, y, TfCardType.ABILITY, deltaX, player);
         }
 
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
         deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
 
         if (game.isVeiledHeartMode()) {
-            deltaX = VeiledHeartService.veiledField(
-                    graphics, x, y, VeiledHeartService.VeiledCardType.UNIT, deltaX, player);
+            deltaX = VeiledHeartService.veiledField(graphics, x, y, TfCardType.UNIT, deltaX, player);
         }
 
         deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
