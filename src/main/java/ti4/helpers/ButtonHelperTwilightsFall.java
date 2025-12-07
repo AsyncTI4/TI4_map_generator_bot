@@ -1240,7 +1240,7 @@ public class ButtonHelperTwilightsFall {
             for (String card : alreadyDrawn) {
                 // savedParadigms includes veiled paradigms, which should only be removed if includeVeiledCards is false
                 boolean shouldRemove = true;
-                if (game.isVeiledHeartMode() & includeVeiledCards) {
+                if (game.isVeiledHeartMode() && includeVeiledCards) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
                             shouldRemove = false;
