@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.service.combat.CombatRollType;
 
 @Data
@@ -75,6 +78,19 @@ public class CombatModifierModel implements ModelInterface {
             }
             if ("_ship_".equals(scope)) {
                 isInScope = unit.getIsShip();
+                if (game.getTileByPosition(game.getActiveSystem()) != null) {
+                    Tile tile = game.getTileByPosition(game.getActiveSystem());
+                    if (unit.getAlias().equalsIgnoreCase("purpletf_mech")) {
+                        if (FoWHelper.playerHasShipsInSystem(player, tile)
+                                && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                            isInScope = true;
+                        }
+                    }
+                    if (ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
+                            && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                        isInScope = true;
+                    }
+                }
             }
             if ("_ship_no_ff".equals(scope)) {
                 isInScope = unit.getIsShip() && !"fighter".equalsIgnoreCase(unit.getBaseType());

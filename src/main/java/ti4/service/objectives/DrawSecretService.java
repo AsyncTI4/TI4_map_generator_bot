@@ -156,7 +156,7 @@ public class DrawSecretService {
                     rex.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                     game.setTile(tile);
                     if (ingress) {
-                        rex.addToken(Constants.TOKEN_INGRESS);
+                        tile.getSpaceUnitHolder().addToken(Constants.TOKEN_INGRESS);
                     }
                 }
             }

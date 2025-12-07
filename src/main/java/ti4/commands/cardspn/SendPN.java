@@ -16,6 +16,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.transaction.SendDebtService;
 
 class SendPN extends GameStateSubcommand {
 
@@ -111,6 +113,14 @@ class SendPN extends GameStateSubcommand {
                 && !targetPlayer.equals(pnOwner)
                 && !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
             targetPlayer.addPromissoryNoteToPlayArea(id);
+            if (pnOwner.hasUnlockedBreakthrough("vadenbt")) {
+                SendDebtService.sendDebt(targetPlayer, pnOwner, 1);
+                CommanderUnlockCheckService.checkPlayer(pnOwner, "vaden");
+                MessageHelper.sendMessageToChannel(
+                        targetPlayer.getCorrectChannel(),
+                        targetPlayer.getRepresentationUnfogged() + " you sent 1 debt token to "
+                                + pnOwner.getFactionEmojiOrColor() + " due to their breakthrough ability.");
+            }
         }
 
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, targetPlayer, false);

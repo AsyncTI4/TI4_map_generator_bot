@@ -414,7 +414,7 @@ public class TeHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void beginPirates(Game game, Player player, String prefix, int cost, boolean allowRes) {
+    public static void beginPirates(Game game, Player player, String prefix, int cost, boolean allowRes) {
         String message = player.getRepresentation() + " choose a system to place the pirates! 🦜☠";
         if (allowRes) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -457,6 +457,28 @@ public class TeHelperActionCards {
             resolvePiratesGeneric(event, game, player, tile, "dd");
 
             String message = player.getRepresentation() + " paid a pirate to post up at "
+                    + tile.getRepresentationForButtons(game, player);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    @ButtonHandler("resolveNokarBt_")
+    private static void resolveNokarBt(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "resolveNokarBt_" + RegexHelper.posRegex();
+        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        if (neutral == null) {
+            List<String> unusedColors =
+                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
+            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+            game.setupNeutralPlayer(color);
+            neutral = game.getPlayerFromColorOrFaction("neutral");
+        }
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            Tile tile = game.getTileByPosition(matcher.group("pos"));
+            resolvePiratesGeneric(event, game, player, tile, "2 dd, cr");
+
+            String message = player.getRepresentation() + " hired 2 neutral destroyers and a cruiser to post up at "
                     + tile.getRepresentationForButtons(game, player);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);

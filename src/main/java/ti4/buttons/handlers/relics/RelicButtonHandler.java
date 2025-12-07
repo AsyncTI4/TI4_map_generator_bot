@@ -10,6 +10,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -86,6 +87,7 @@ class RelicButtonHandler {
     @ButtonHandler("drawRelicFromFrag")
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
@@ -101,6 +103,7 @@ class RelicButtonHandler {
         game.setDominusOrb(true);
         String relicId = "dominusorb";
         player.removeRelic(relicId);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
@@ -115,6 +118,7 @@ class RelicButtonHandler {
     static void eyeOfVogul(ButtonInteractionEvent event, Player player, Game game) {
         String relicId = "eye_of_vogul";
         player.removeRelic(relicId);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");

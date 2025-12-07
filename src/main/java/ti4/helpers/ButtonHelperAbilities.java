@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1674,6 +1673,9 @@ public class ButtonHelperAbilities {
 
     public static boolean canBePillaged(Player player, Game game, int tg) {
         if (player.getPromissoryNotesInPlayArea().contains("pop")) {
+            return false;
+        }
+        if (player.hasUnlockedBreakthrough("vadenbt")) {
             return false;
         }
         if (player.getPromissoryNotesInPlayArea().contains("sigma_promise_of_protection")) {

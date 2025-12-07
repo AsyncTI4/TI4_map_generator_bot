@@ -260,7 +260,6 @@ public class TeHelperTechs {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
             return;
         }
-        System.out.println("boop");
 
         String regex = "planesplitterStep1_" + RegexHelper.posRegex(game);
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);

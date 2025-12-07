@@ -669,9 +669,10 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveAtomize(Game game, Player player, ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (tile != null) {
-            UnitHolder uh = tile.getSpaceUnitHolder();
-            for (Player player_ : game.getPlayers().values()) {
-                DestroyUnitService.destroyAllPlayerNonStructureUnits(event, game, player_, tile, uh, true);
+            for (UnitHolder uh : tile.getUnitHolders().values()) {
+                for (Player player_ : game.getPlayers().values()) {
+                    DestroyUnitService.destroyAllPlayerUnits(event, game, player_, tile, uh, true);
+                }
             }
             String msg = player.getRepresentation() + " purged their flagship and destroyed all units in "
                     + tile.getRepresentationForButtons();

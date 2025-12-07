@@ -33,6 +33,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -285,6 +286,7 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player2.getCorrectChannel(), msg + "the second technology.", buttons);
                 player2.removeLeader("zealotshero");
+                DSHelperBreakthroughs.doLanefirBtCheck(game, player2);
                 ButtonHelperHeroes.checkForMykoHero(game, "zealotshero", player2);
                 game.setStoredValue("zealotsHeroTechs", "");
                 game.setStoredValue("zealotsHeroPurged", "true");
