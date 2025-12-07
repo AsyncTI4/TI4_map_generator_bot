@@ -22,6 +22,9 @@ public class TeHelperBreakthroughs {
             case "mahactbt" -> VaultsOfTheHeirService.postInitialButtons(event, game, player);
             case "bastionbt" -> TheIconService.iconStepOne(event, game, player);
             case "edynbt" -> DSHelperBreakthroughs.edynBTStep1(game, player);
+            case "bentorbt" -> DSHelperBreakthroughs.bentorBTStep1(game, player);
+            case "kolumebt" -> DSHelperBreakthroughs.kolumeBTStep1(game, player);
+            case "nokarbt" -> TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
             default -> {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),

@@ -261,7 +261,9 @@ public class TacticalActionService {
         List<Button> buttons = new ArrayList<>();
 
         int productionVal = Helper.getProductionValue(player, game, tile, false);
-        if (productionVal > 0 || ("18".equalsIgnoreCase(tile.getTileID()) && player.hasIIHQ())) {
+        if (productionVal > 0
+                || (("18".equalsIgnoreCase(tile.getTileID()) || "112".equalsIgnoreCase(tile.getTileID()))
+                        && player.hasIIHQ())) {
             buttons.add(createBuildButton(player, tile, productionVal));
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {

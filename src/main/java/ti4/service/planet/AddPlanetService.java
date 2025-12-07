@@ -371,6 +371,29 @@ public class AddPlanetService {
 
         if ((game.getPhaseOfGame().contains("agenda")
                         || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+                && player.hasUnlockedBreakthrough("zealotsbt")
+                && unitHolder != null
+                && tile != null
+                && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
+                && !doubleCheck
+                && !setup) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove CC"));
+            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Tech"));
+
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " is resolving the zealots breakthrough to either research a tech or remove the command token from the system.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " choose whether you want to research a tech (you need the pre-requistites) or remove the command token from the system",
+                    buttons);
+        }
+
+        if ((game.getPhaseOfGame().contains("agenda")
+                        || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
                 && player.hasAbility("veiled_ember_forge")
                 && !doubleCheck
                 && !setup

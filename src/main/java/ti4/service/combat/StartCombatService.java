@@ -1965,6 +1965,14 @@ public class StartCombatService {
                         String label = "Use Sol Commander on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
                     }
+                    if (p != game.getActivePlayer()
+                            && p.hasUnlockedBreakthrough("mykomentoribt")
+                            && p.getNombox().getUnitCount(UnitType.Infantry, p) > 0
+                            && isGroundCombat) {
+                        String id = p.finChecker() + "utilizeMykoBT_" + unitH.getName();
+                        String label = "Roll Myko Breakthrough on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.mykomentori));
+                    }
                     // atokera
                     if (p.hasUnit("atokera_mech")
                             && isGroundCombat

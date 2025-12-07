@@ -67,7 +67,7 @@ public class MapPresetService {
                 }
                 List<String> tiles = List.of(
                         "{" + s1[4] + "}", // ring 0
-                        "18",
+                        "112",
                         "84a1",
                         "84a1",
                         s1[1],

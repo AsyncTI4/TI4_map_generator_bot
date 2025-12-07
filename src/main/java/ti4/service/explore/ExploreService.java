@@ -36,6 +36,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -535,6 +536,7 @@ public class ExploreService {
                                         player.getRepresentation() + " has explored Mallice in " + game.getName()
                                                 + ", and discovered the _Gamma Wormhole_.");
                             }
+                            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                         }
                     }
 
@@ -557,6 +559,7 @@ public class ExploreService {
                                                 + game.getName() + ". Alas, alack, they have discovered Mirage!");
                             }
                         }
+                        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                     }
                     game.purgeExplore(ogID);
                 }

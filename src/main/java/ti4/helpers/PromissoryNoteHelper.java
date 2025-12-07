@@ -25,6 +25,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.transaction.SendDebtService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -222,6 +223,15 @@ public class PromissoryNoteHelper {
                 }
             }
             // PN Info is refreshed later
+        }
+
+        if (owner.hasUnlockedBreakthrough("vadenbt")) {
+            SendDebtService.sendDebt(player, owner, 1);
+            CommanderUnlockCheckService.checkPlayer(owner, "vaden");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " you sent 1 debt token to " + owner.getFactionEmojiOrColor()
+                            + " due to their breakthrough ability.");
         }
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
