@@ -17,6 +17,7 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -56,6 +57,7 @@ class OtherHeroButtonHandler {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), heroTitle + ", has been purged.");
+            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), heroTitle + ", was not purged - something went wrong.");

@@ -20,6 +20,7 @@ import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -1143,6 +1144,7 @@ public class ButtonHelperHeroes {
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), message + " - Titus Flavius, the Celdauri hero, has been purged.");
@@ -1198,6 +1200,7 @@ public class ButtonHelperHeroes {
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -2056,6 +2059,7 @@ public class ButtonHelperHeroes {
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -2084,6 +2088,7 @@ public class ButtonHelperHeroes {
                 .append(" played ")
                 .append(Helper.getLeaderFullRepresentation(playerLeader));
         boolean purged = player.removeLeader(playerLeader);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         if (purged) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), message2 + " - Speygh, the Kyro hero, has been purged. \n\n");

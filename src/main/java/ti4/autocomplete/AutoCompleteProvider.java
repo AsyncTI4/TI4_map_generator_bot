@@ -103,7 +103,7 @@ public class AutoCompleteProvider {
         if (subCommandName != null) {
             switch (commandName) {
                 case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
-                case Constants.SEARCH -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
+                case Constants.SEARCH, "search2" -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
                 case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName);
             }
             if (event.isAcknowledged()) return;

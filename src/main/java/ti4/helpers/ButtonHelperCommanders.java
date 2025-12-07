@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -870,6 +871,29 @@ public class ButtonHelperCommanders {
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game)
                         + " using Claire Gibson, the Sol Commander.");
+    }
+
+    @ButtonHandler("utilizeMykoBT_")
+    public static void resolveMykoBT(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        Die d1 = new Die(7);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getFactionEmoji() + " is attempting to place 1 captured infantry on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + " using the Mykomentori Breakthrough. Rolling a die... (need 7+ to succeed)");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getFactionEmoji() + " rolled a " + d1.getResult() + " for the Mykomentori Breakthrough.");
+        if (d1.isSuccess()) {
+            Tile tile = game.getTileFromPlanet(planet);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
+            RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), "infantry");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    player.getFactionEmoji() + " placed 1 captured infantry on "
+                            + Helper.getPlanetRepresentation(planet, game) + " using the Mykomentori Breakthrough.");
+        }
     }
 
     @ButtonHandler("utilizePharadnCommander_")

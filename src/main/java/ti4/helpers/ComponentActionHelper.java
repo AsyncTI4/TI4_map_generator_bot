@@ -12,6 +12,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.helpers.thundersedge.TeHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -649,6 +650,7 @@ public class ComponentActionHelper {
                     Button transact3 = Buttons.red(finChecker + "finishComponentAction", "Done Resolving Fabrication");
                     purgeFragButtons.add(transact3);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
+                    DSHelperBreakthroughs.doLanefirBtCheck(game, p1);
 
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
@@ -1010,6 +1012,9 @@ public class ComponentActionHelper {
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
+            if (!relicID.equals("nanoforge")) {
+                DSHelperBreakthroughs.doLanefirBtCheck(game, player);
+            }
         }
 
         RelicModel relicModel = Mapper.getRelic(relicID);

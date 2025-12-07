@@ -1591,10 +1591,10 @@ public class ButtonHelperAgents {
         Tile tile = game.getTileByPosition(pos);
         String pos2 = buttonID.split("_")[2];
         Tile tile2 = game.getTileByPosition(pos2);
-        String message = ", please choose the one ship you wish to move from " + tile.getRepresentation() + " to "
-                + tile2.getRepresentation() + " (along with any units it transports).";
-        String message2 = ", please choose the one ship you wish to move from " + tile2.getRepresentation() + " to "
-                + tile.getRepresentation() + " (along with any units it transports).";
+        String message = ", please choose the units you wish to move from " + tile.getRepresentation() + " to "
+                + tile2.getRepresentation();
+        String message2 = ", please choose the units you wish to move from " + tile2.getRepresentation() + " to "
+                + tile.getRepresentation();
         List<Button> buttons = ButtonHelperHeroes.getArgentHeroStep3Buttons(game, player, "spoof_" + pos2 + "_" + pos);
         List<Button> buttons2 = ButtonHelperHeroes.getArgentHeroStep3Buttons(game, player, "spoof_" + pos + "_" + pos2);
         MessageHelper.sendMessageToChannelWithButtons(
