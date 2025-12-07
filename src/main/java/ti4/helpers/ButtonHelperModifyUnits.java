@@ -41,6 +41,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
@@ -1122,6 +1123,7 @@ public class ButtonHelperModifyUnits {
         }
         TeHelperGeneral.addStationsToPlayArea(event, game, tile);
         for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
+            LoreService.showPlanetLore(player, game, unitHolder.getName(), LoreService.TRIGGER.MOVED);
             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
             Player player2 = player;
             for (Player p2 : players) {
@@ -1823,12 +1825,12 @@ public class ButtonHelperModifyUnits {
                 }
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
+                int solBtLimit = player.getUnitFromUnitKey(unitKey).getCapacityValue();
+                if (solBtLimit > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
-                            "solBtBuild_" + tile.getPosition(),
-                            "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
-                                    + " Ground Forces and Fighters"));
+                            "solBtBuild_" + tile.getPosition() + "_" + solBtLimit,
+                            "Build Up To " + solBtLimit + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
                             + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline.  [Note: Finish your normal build first for best results.]";

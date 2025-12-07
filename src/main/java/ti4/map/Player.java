@@ -2540,7 +2540,7 @@ public class Player extends PlayerProperties {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
-            LoreService.showPlanetLore(this, game, planet);
+            LoreService.showPlanetLore(this, game, planet, LoreService.TRIGGER.CONTROLLED);
         }
     }
 

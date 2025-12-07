@@ -25,6 +25,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -56,6 +57,8 @@ public class GMService {
             Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies/Briberies", CardEmojis.ActionCard),
             Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
             Buttons.gray("gmCheckPlayerHands_secret", "Unscored SOs", CardEmojis.SecretObjective),
+            Buttons.gray("gmCheckPlayerHands_acs", "All ACs", CardEmojis.ActionCard),
+            Buttons.gray("gmCheckPlayerHands_pns", "All PNs", CardEmojis.PN),
             Buttons.DONE_DELETE_BUTTONS);
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
@@ -238,6 +241,34 @@ public class GMService {
                             .append("\n");
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
+            }
+            case "acs" -> {
+                StringBuilder acs = new StringBuilder();
+                for (Player player : game.getRealPlayers()) {
+                    acs.append("__")
+                            .append(player.getRepresentationUnfoggedNoPing())
+                            .append("__\n");
+                    player.getActionCards().entrySet().stream().forEach(entry -> acs.append("> ")
+                            .append(Mapper.getActionCard(entry.getKey()).getNameRepresentation())
+                            .append(" (")
+                            .append(entry.getValue())
+                            .append(")\n"));
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), acs.toString());
+            }
+            case "pns" -> {
+                StringBuilder pns = new StringBuilder();
+                for (Player player : game.getRealPlayers()) {
+                    pns.append("__")
+                            .append(player.getRepresentationUnfoggedNoPing())
+                            .append("__\n");
+                    player.getPromissoryNotes().entrySet().stream().forEach(entry -> pns.append("> ")
+                            .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
+                            .append(" (")
+                            .append(entry.getValue())
+                            .append(")\n"));
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), pns.toString());
             }
             default ->
                 MessageHelper.sendMessageToChannelWithButtons(

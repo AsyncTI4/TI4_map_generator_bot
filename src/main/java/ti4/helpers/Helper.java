@@ -1517,14 +1517,42 @@ public class Helper {
                     .append(cost == 1 ? "" : "s")
                     .append(".");
         } else {
-            int productionLimit;
-            if (activeSystem != null && tile == activeSystem && getProductionValue(player, game, tile, false) > 0) {
+            int solBtLimit = 0;
+            if (player.hasUnlockedBreakthrough("solbt")) {
+                solBtLimit = player.getSpentThingsThisWindow().stream()
+                        .map(str -> str.split("_"))
+                        .filter(arr -> arr[0].equalsIgnoreCase("solBtBuild"))
+                        .map(arr -> arr[2])
+                        .map(Integer::parseInt)
+                        .findAny()
+                        .orElse(0);
+            }
+            if (solBtLimit > 0) {
+                msg.append("Producing a total of ")
+                        .append(unitCount)
+                        .append(" units (Bellum Gloriosum limit is ")
+                        .append(solBtLimit)
+                        .append(")")
+                        .append(" for a total cost of ")
+                        .append(cost)
+                        .append(" resource")
+                        .append(cost == 1 ? "" : "s")
+                        .append(".");
+                if (solBtLimit < unitCount) {
+                    msg.append("\n### Warning! Exceeding Bellum Gloriosum limit of ")
+                            .append(solBtLimit)
+                            .append("!");
+                }
+            } else if (activeSystem != null
+                    && tile == activeSystem
+                    && getProductionValue(player, game, tile, false) > 0) {
                 if (!player.hasUnit("arborec_mech")
                         && !player.hasUnit("arborec_infantry")
                         && !player.hasUnit("tf-lataniwarrior")
                         && !player.hasUnit("deepwrought_mech")
                         && !player.hasUnit("arborec_infantry2")) {
 
+                    int productionLimit;
                     productionLimit = getProductionValue(player, game, tile, false);
                     boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
                     if (warM) {

@@ -24,25 +24,15 @@ class SearchGenomesSubcommand extends SearchComponentModelSubcommand {
 
         if (Mapper.isValidLeader(searchString)) {
             LeaderModel leaderModel = Mapper.getLeader(searchString);
-            if (Constants.AGENT.equalsIgnoreCase(leaderModel.getType())
-                    && (leaderModel.getSource() == ComponentSource.twilights_fall
-                            || leaderModel.getTFName().isPresent()
-                            || leaderModel.getTFAbilityText().isPresent()
-                            || leaderModel.getTFAbilityWindow().isPresent()
-                            || leaderModel.getTFTitle().isPresent())) {
+            if (leaderModel.isGenome()) {
                 event.getChannel()
                         .sendMessageEmbeds(leaderModel.getRepresentationEmbed(true, true, false, true, true))
                         .queue();
                 return;
             }
         }
-        List<MessageEmbed> messageEmbeds = Mapper.getLeaders().values().stream()
-                .filter(model -> Constants.AGENT.equalsIgnoreCase(model.getType()))
-                .filter(model -> model.getSource() == ComponentSource.twilights_fall
-                        || model.getTFName().isPresent()
-                        || model.getTFAbilityText().isPresent()
-                        || model.getTFAbilityWindow().isPresent()
-                        || model.getTFTitle().isPresent())
+        List<MessageEmbed> messageEmbeds = Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
+                .map(Mapper::getLeader)
                 .filter(model -> model.search(searchString, source))
                 .sorted(Comparator.comparing(LeaderModel::getID))
                 .map(model -> model.getRepresentationEmbed(true, true, false, true, true))
