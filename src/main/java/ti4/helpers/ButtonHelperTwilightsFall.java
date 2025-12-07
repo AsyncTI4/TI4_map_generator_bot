@@ -930,7 +930,8 @@ public class ButtonHelperTwilightsFall {
                 embeds.add(Mapper.getUnit(card).getRepresentationEmbed());
             }
         }
-        MessageHelper.sendMessageEmbedsToThread(event.getChannel(), "Remaining cards of type: " + type, embeds);
+        String threadName = String.format("These %d cards are left in the %s deck:", cards.size(), type);
+        MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, embeds);
     }
 
     public static List<MessageEmbed> getSpliceEmbeds(Game game, String type, List<String> cards, Player player) {
