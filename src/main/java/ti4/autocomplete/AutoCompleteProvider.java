@@ -801,6 +801,12 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(leaderIDs, enteredValue);
                 event.replyChoices(options).queue();
             }
+            case Constants.TF_PARADIGM -> {
+                List<String> paradigms = Mapper.getDeck("tf_paradigm").getNewDeck();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options = mapTo25ChoicesThatContain(paradigms, enteredValue);
+                event.replyChoices(options).queue();
+            }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();

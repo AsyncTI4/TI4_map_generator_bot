@@ -2416,7 +2416,7 @@ public class UnfiledButtonHandlers {
                 }
 
                 if (game.isFowMode()) {
-                    LoreService.showSystemLore(player, game, game.getActiveSystem());
+                    LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
                 }
                 ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());

@@ -32,6 +32,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.VeiledHeartService;
 import ti4.service.button.ReactionService;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.draft.MantisMapBuildContext;
@@ -810,40 +811,52 @@ public class ButtonHelperTwilightsFall {
         for (String card : alreadyDrawn) {
             allCards.remove(card);
         }
-        String leader = allCards.removeFirst();
-        if (game.getStoredValue("savedParadigms").isEmpty()) {
-            game.setStoredValue("savedParadigms", leader);
-        } else {
-            game.setStoredValue("savedParadigms", game.getStoredValue("savedParadigms") + "_" + leader);
-        }
+        String paradigm = allCards.removeFirst();
+        drawSpecificParadigm(game, player, paradigm);
         if (!scPara && "agenda".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (game.getStoredValue("artificeParadigms").isEmpty()) {
-                game.setStoredValue("artificeParadigms", leader);
+                game.setStoredValue("artificeParadigms", paradigm);
             } else {
-                game.setStoredValue("artificeParadigms", game.getStoredValue("artificeParadigms") + "_" + leader);
+                game.setStoredValue("artificeParadigms", game.getStoredValue("artificeParadigms") + "_" + paradigm);
             }
         }
+    }
+
+    public static boolean drawSpecificParadigm(
+            Game game, Player player, String paradigm, boolean checkDeck, boolean checkDrawn) {
+        if (checkDeck && !Mapper.getDeck("tf_paradigm").getNewDeck().contains(paradigm)) {
+            return false;
+        }
+        if (checkDrawn
+                && List.of(game.getStoredValue("savedParadigms").split("_")).contains(paradigm)) {
+            return false;
+        }
+        drawSpecificParadigm(game, player, paradigm);
+        return true;
+    }
+
+    public static void drawSpecificParadigm(Game game, Player player, String paradigm) {
+        String valueToStore = game.getStoredValue("savedParadigms");
+        if (!valueToStore.isEmpty()) {
+            valueToStore += "_";
+        }
+        valueToStore += paradigm;
+        game.setStoredValue("savedParadigms", valueToStore);
+
+        MessageHelper.sendMessageToChannelWithEmbed(
+                game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
+                player.getRepresentation() + " has drawn a new paradigm: "
+                        + Mapper.getLeader(paradigm).getName(),
+                Mapper.getLeader(paradigm).getRepresentationEmbed(false, true, false, false, true));
         if (game.isVeiledHeartMode()) {
-            MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCardsInfoThread(),
-                    player.getRepresentation() + " has drawn a new paradigm: "
-                            + Mapper.getLeader(leader).getName(),
-                    Mapper.getLeader(leader).getRepresentationEmbed(false, true, false, false, true));
-            game.setStoredValue(
-                    "veiledCards" + player.getFaction(),
-                    game.getStoredValue("veiledCards" + player.getFaction()) + leader + "_");
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing()
-                            + " has taken a secret paradigm. They may put it into play with a button in their cards info.");
+            VeiledHeartService.doAction(
+                    VeiledHeartService.VeiledCardAction.DRAW,
+                    VeiledHeartService.VeiledCardType.PARADIGM,
+                    player,
+                    paradigm);
         } else {
-            MessageHelper.sendMessageToChannelWithEmbed(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has drawn a new paradigm: "
-                            + Mapper.getLeader(leader).getName(),
-                    Mapper.getLeader(leader).getRepresentationEmbed(false, true, false, false, true));
-            player.addLeader(leader);
-            player.getLeaderByID(leader).get().setLocked(false);
+            player.addLeader(paradigm);
+            player.getLeaderByID(paradigm).get().setLocked(false);
         }
     }
 

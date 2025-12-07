@@ -289,7 +289,7 @@ public class ActionCardHelper {
             List<String> factionEmojis = factions.stream()
                     .map(game::getPlayerFromColorOrFaction)
                     .filter(Objects::nonNull)
-                    .map(Player::getFactionEmoji)
+                    .map(Player::fogSafeEmoji)
                     .toList();
             sb.append("> ").append(String.join(", ", factionEmojis)).append("\n");
         }

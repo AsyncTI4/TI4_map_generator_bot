@@ -110,6 +110,14 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(tfAbilityText);
     }
 
+    public boolean isGenome() {
+        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(ID);
+    }
+
+    public boolean isParadigm() {
+        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(ID);
+    }
+
     private Optional<String> getFlavourText() {
         return Optional.ofNullable(flavourText);
     }

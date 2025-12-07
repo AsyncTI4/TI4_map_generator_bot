@@ -892,8 +892,8 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("uprisingStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                buttons.addAll(getUprisingTargetsFor(p2, game));
             } else {
                 Button button = Buttons.gray("uprisingStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -902,11 +902,14 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
+        String msg = ", please choose which player's planet you wish to _Uprise_ against their oppressors.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPlanetSelection(
+                    game, player, buttons, "uprisingStep2_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the planet you wish to exhaust.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which player's planet you wish to _Uprise_ against their oppressors.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveAssRepsStep1") // don't skip ass day
@@ -992,8 +995,8 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("plagueStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                buttons.addAll(getPlagueTargetsFor(p2, game));
             } else {
                 Button button = Buttons.gray("plagueStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -1002,10 +1005,15 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteTheOneButton(event);
+        String msg = ", please choose who controls the planet that you wish to target.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPlanetSelection(
+                    game, player, buttons, "plagueStep3_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the planet you wish to target.";
+        }
+
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose who controls the planet that you wish to target.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveEBSStep1_")
@@ -1044,8 +1052,8 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("micrometeoroidStormStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                buttons.addAll(getMicrometeoroidStormTargetsFor(p2, game));
             } else {
                 Button button = Buttons.gray("micrometeoroidStormStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -1054,11 +1062,14 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
+        String msg = ", please choose which player's fighters you wish to experience inclement space weather.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPositionSelection(
+                    game, player, buttons, "micrometeoroidStormStep3_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the system you wish to storm.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which player's fighters you wish to experience inclement space weather.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveGhostShipStep1")
@@ -1119,8 +1130,8 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("crippleStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                buttons.addAll(getCrippleTargetsFor(p2, game));
             } else {
                 Button button = Buttons.gray("crippleStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -1129,11 +1140,14 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
+        String msg = ", please choose which player controls the planet whose Defenses you wish to Cripple.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPlanetSelection(
+                    game, player, buttons, "crippleStep3_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the planet you wish to Cripple the Defenses of.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which player controls the planet whose Defenses you wish to Cripple.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveInfiltrateStep1")
@@ -1328,8 +1342,8 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFowMode()) {
-                buttons.add(Buttons.gray("unstableStep2_" + p2.getFaction(), p2.getColor()));
+            if (game.isFowMode()) { // skip choosing player
+                buttons.addAll(getUnstableTargetsFor(p2, game));
             } else {
                 Button button = Buttons.gray("unstableStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
@@ -1338,11 +1352,14 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
+        String msg = ", please choose which player owns the soon-to-be _Unstable Planet_.";
+        if (game.isFowMode()) {
+            BlindSelectionService.filterForBlindPlanetSelection(
+                    game, player, buttons, "unstableStep3_" + BlindSelectionService.TBD_FACTION);
+            msg = ", please choose the planet you wish to exhaust.";
+        }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which player owns the soon-to-be _Unstable Planet_.",
-                buttons);
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + msg, buttons);
     }
 
     @ButtonHandler("resolveABSStep1")
@@ -1619,6 +1636,15 @@ public class ButtonHelperActionCards {
             ButtonHelper.deleteMessage(event);
             return;
         }
+        List<Button> buttons = getUprisingTargetsFor(p2, game);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
+                buttons);
+    }
+
+    private static List<Button> getUprisingTargetsFor(Player p2, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getReadiedPlanets()) {
             if (game.getTileFromPlanet(planet) != null
@@ -1634,11 +1660,7 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.gray(
                     "uprisingStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
-                buttons);
+        return buttons;
     }
 
     @ButtonHandler("assRepsStep2_")
@@ -1821,11 +1843,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("plagueStep2_")
     public static void resolvePlagueStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : p2.getPlanets()) {
-            buttons.add(Buttons.gray(
-                    "plagueStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
-        }
+        List<Button> buttons = getPlagueTargetsFor(p2, game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -1833,10 +1851,28 @@ public class ButtonHelperActionCards {
                 buttons);
     }
 
+    private static List<Button> getPlagueTargetsFor(Player p2, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getPlanets()) {
+            buttons.add(Buttons.gray(
+                    "plagueStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        return buttons;
+    }
+
     @ButtonHandler("micrometeoroidStormStep2_")
     public static void resolveMicrometeoroidStormStep2(
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = getMicrometeoroidStormTargetsFor(p2, game);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", please choose the system you wish to storm.",
+                buttons);
+    }
+
+    private static List<Button> getMicrometeoroidStormTargetsFor(Player p2, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasFightersInSystem(p2, tile)) {
@@ -1845,11 +1881,7 @@ public class ButtonHelperActionCards {
                         tile.getRepresentationForButtons(game, p2)));
             }
         }
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the system you wish to storm.",
-                buttons);
+        return buttons;
     }
 
     @ButtonHandler("resolveRefitTroops")
@@ -1867,16 +1899,21 @@ public class ButtonHelperActionCards {
     @ButtonHandler("crippleStep2_")
     public static void resolveCrippleStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : p2.getPlanets()) {
-            buttons.add(Buttons.gray(
-                    "crippleStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
-        }
+        List<Button> buttons = getCrippleTargetsFor(p2, game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", please choose the planet you wish to Cripple the Defenses of.",
                 buttons);
+    }
+
+    private static List<Button> getCrippleTargetsFor(Player p2, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getPlanets()) {
+            buttons.add(Buttons.gray(
+                    "crippleStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        return buttons;
     }
 
     @ButtonHandler("infiltrateStep2_")
@@ -1887,6 +1924,8 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.gray(
                     "infiltrateStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
+        BlindSelectionService.filterForBlindPlanetSelection(
+                game, player, buttons, "infiltrateStep3_" + p2.getFaction());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -2230,6 +2269,15 @@ public class ButtonHelperActionCards {
     @ButtonHandler("unstableStep2_")
     public static void resolveUnstableStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = getUnstableTargetsFor(p2, game);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
+                buttons);
+    }
+
+    private static List<Button> getUnstableTargetsFor(Player p2, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
             if (ButtonHelper.getTypeOfPlanet(game, planet).contains("hazardous")) {
@@ -2238,11 +2286,7 @@ public class ButtonHelperActionCards {
                         Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust.",
-                buttons);
+        return buttons;
     }
 
     @ButtonHandler("unstableStep3_")

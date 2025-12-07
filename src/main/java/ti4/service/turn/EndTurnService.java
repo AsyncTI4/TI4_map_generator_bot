@@ -122,7 +122,7 @@ public class EndTurnService {
             }
         }
         if (game.isFowMode()) {
-            FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
+            FowCommunicationThreadService.checkNewCommPartners(game, mainPlayer);
             MessageHelper.sendMessageToChannel(
                     mainPlayer.getPrivateChannel(),
                     "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
