@@ -1194,7 +1194,8 @@ public class ButtonHelperTwilightsFall {
                                     player.getCorrectChannel(),
                                     player.getRepresentation() + " you automatically lost the unit known as "
                                             + u.getNameRepresentation()
-                                            + ". If you would like to keep it and lose the newly acquired unit, click the green button.");
+                                            + ". If you would like to keep it and lose the newly acquired unit, click the green button.",
+                                    buttons);
                         }
                         player.removeOwnedUnitByID(u.getId());
                     }
