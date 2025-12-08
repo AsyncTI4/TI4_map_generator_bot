@@ -1,4 +1,4 @@
-package ti4.listeners;
+package ti4.spring.service.messagecache;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
