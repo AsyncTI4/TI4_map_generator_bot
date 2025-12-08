@@ -1451,14 +1451,25 @@ public class ButtonHelperModifyUnits {
         if (damaged) {
             state = UnitState.dmg;
         }
+
         buttons.add(ButtonHelper.buildAssignHitButton(
-                player,
-                game.getTileFromPlanet(planet),
-                game.getUnitHolderFromPlanet(planet),
-                state,
-                key,
-                1,
-                !damaged && unitModel.getSustainDamage()));
+                        player,
+                        game.getTileFromPlanet(planet),
+                        game.getUnitHolderFromPlanet(planet),
+                        state,
+                        key,
+                        1,
+                        !damaged && unitModel.getSustainDamage())
+                .withCustomId(ButtonHelper.buildAssignHitButton(
+                                        player,
+                                        game.getTileFromPlanet(planet),
+                                        game.getUnitHolderFromPlanet(planet),
+                                        state,
+                                        key,
+                                        1,
+                                        !damaged && unitModel.getSustainDamage())
+                                .getCustomId()
+                        + "deleteThisMessage"));
 
         buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
@@ -1509,15 +1520,18 @@ public class ButtonHelperModifyUnits {
         String id;
         String label;
         if (damaged) {
-            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName + "_damaged";
+            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName + "_damaged"
+                    + "deleteThisMessage";
             label = "Remove " + x + " damaged " + unitModel.getBaseType();
         } else {
-            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName;
+            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName
+                    + "deleteThisMessage";
             label = "Remove " + x + " " + unitModel.getBaseType();
         }
         buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
         if (!damaged && unitModel.getSustainDamage()) {
-            id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + "_" + unitName;
+            id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + "_" + unitName
+                    + "deleteThisMessage";
             label = "Sustain 1 " + unitModel.getBaseType();
             buttons.add(Buttons.blue(id, label, unitModel.getUnitEmoji()));
         }
@@ -2291,6 +2305,8 @@ public class ButtonHelperModifyUnits {
             msg = opponent.getRepresentationUnfogged() + " " + player.getFactionEmoji()
                     + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), player.getRepresentation(false, false) + " used dimensional splicer.");
             buttons = getOpposingUnitsToHit(player, game, tile, false);
             msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         } else if (cause.contains("exo")) {
