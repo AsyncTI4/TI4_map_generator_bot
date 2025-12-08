@@ -1,4 +1,4 @@
-package ti4.listeners;
+package ti4.spring.service.messagecache;
 
 import java.time.Duration;
 import javax.annotation.Nullable;
@@ -17,19 +17,19 @@ public class BotMessageCacheService {
     private final BotMessageCacheRepository botMessageCacheRepository;
 
     public void cache(Message message) {
-        if (message == null || !message.getAuthor().equals(message.getJDA().getSelfUser())) {
-            return;
-        }
+        if (message == null || message.isEphemeral() || !message.getAuthor().isBot()) return;
 
         long createdAtEpochMillis = message.getTimeCreated().toInstant().toEpochMilli();
-        BotMessageRecord record =
-                new BotMessageRecord(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
+        var record = new BotMessageRecord(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
         botMessageCacheRepository.save(record);
     }
 
     @Nullable
     public String getContent(long messageId) {
-        return botMessageCacheRepository.findById(messageId).map(BotMessageRecord::getContent).orElse(null);
+        return botMessageCacheRepository
+                .findById(messageId)
+                .map(BotMessageRecord::getContent)
+                .orElse(null);
     }
 
     @Scheduled(cron = "0 */30 * * * *")
