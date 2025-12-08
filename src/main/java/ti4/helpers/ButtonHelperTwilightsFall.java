@@ -1118,6 +1118,29 @@ public class ButtonHelperTwilightsFall {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("keepUnit_")
+    public static void keepUnit(Game game, String buttonID, Player player, GenericInteractionCreateEvent event) {
+        String cardID = buttonID.split("_")[1];
+        UnitModel unitModel = Mapper.getUnit(cardID);
+        String asyncId = unitModel.getAsyncId();
+        if (!"fs".equalsIgnoreCase(asyncId) && !"mf".equalsIgnoreCase(asyncId)) {
+            List<UnitModel> unitsToRemove = player.getUnitsByAsyncID(asyncId).stream()
+                    .filter(unit -> unit.getFaction().isEmpty()
+                            || unit.getUpgradesFromUnitId().isEmpty())
+                    .toList();
+            for (UnitModel u : unitsToRemove) {
+                player.removeOwnedUnitByID(u.getId());
+            }
+        }
+        player.addOwnedUnitByID(cardID);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " has reacquired the unit: "
+                        + Mapper.getUnit(cardID).getName(),
+                Mapper.getUnit(cardID).getRepresentationEmbed());
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("drawSingularNewSpliceCard")
     public static void drawSingularNewSpliceCard(
             Game game, String buttonID, Player player, GenericInteractionCreateEvent event) {
@@ -1163,6 +1186,17 @@ public class ButtonHelperTwilightsFall {
                                     || unit.getUpgradesFromUnitId().isEmpty())
                             .toList();
                     for (UnitModel u : unitsToRemove) {
+                        if (u.getAlias().contains("tf-")) {
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Buttons.green("keepUnit_" + u.getAlias(), "Keep " + u.getName()));
+                            buttons.add(Buttons.red("deleteButtons", "Keep the New Unit"));
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCorrectChannel(),
+                                    player.getRepresentation() + " you automatically lost the unit known as "
+                                            + u.getNameRepresentation()
+                                            + ". If you would like to keep it and lose the newly acquired unit, click the green button.",
+                                    buttons);
+                        }
                         player.removeOwnedUnitByID(u.getId());
                     }
                 }

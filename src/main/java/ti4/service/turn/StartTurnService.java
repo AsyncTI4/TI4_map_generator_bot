@@ -331,7 +331,7 @@ public class StartTurnService {
             if (game.getStrategyCardModelByInitiative(sc)
                     .map(strat -> "te6warfare".equals(strat.getAlias()))
                     .orElse(false)) {
-                if (game.isWarfareAction() && !game.isComponentAction()) {
+                if (player != game.getActivePlayer()) {
                     // skip warning for warfare if we are presently resolving warfare
                     continue;
                 }
