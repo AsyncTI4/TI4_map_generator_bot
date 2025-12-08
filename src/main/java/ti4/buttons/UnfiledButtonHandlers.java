@@ -1834,8 +1834,8 @@ public class UnfiledButtonHandlers {
                     MiscEmojis.GravityRift);
             List<Button> buttons = new ArrayList<>();
             buttons.add(rift);
-            String message2 = player.getRepresentationUnfogged()
-                    + ", if applicable, use this button to rift retreating units BEFORE choosing where to retreat.";
+            String message2 = "## " + player.getRepresentationUnfogged()
+                    + ", if applicable, use this button to rift retreating units BEFORE choosing where to retreat. It needs to be before you actually select where to retreat.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
         }
     }
