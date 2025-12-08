@@ -46,6 +46,10 @@ public class VeiledHeartService {
         player.getGame().setStoredValue(getKey(player), value);
     }
 
+    public static boolean hasVeiledCard(String card, Player player) {
+        return getStoredValue(player).contains(card);
+    }
+
     private static Stream<String> getVeiledCards(Player player) {
         return Arrays.stream(getStoredValue(player).split("_"));
     }
