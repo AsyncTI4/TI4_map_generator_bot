@@ -745,7 +745,7 @@ public class ButtonHelper {
                 || "".equalsIgnoreCase(player.getFaction())) {
             game.removePlayer(player.getUserID());
         } else {
-            if (!player.getPlanetsAllianceMode().isEmpty() && !game.isConventionsOfWarAbandonedMode()) {
+            if (!player.getPlanetsForScoring(true).isEmpty() && !game.isConventionsOfWarAbandonedMode()) {
                 String msg =
                         "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -7096,6 +7096,11 @@ public class ButtonHelper {
             adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tilePos, p2, false, true));
         }
         List<Player> playersWithPds2 = new ArrayList<>();
+
+        if (game.getTileByPosition(tilePos) != null
+                && game.getTileByPosition(tilePos).isScar(game)) {
+            return playersWithPds2;
+        }
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos), game)
                 && player.hasAbility("starfall_gunnery")
                 && checkNumberNonFighterShipsWithoutSpaceCannon(player, game.getTileByPosition(tilePos)) > 0) {

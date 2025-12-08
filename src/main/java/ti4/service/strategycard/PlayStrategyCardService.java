@@ -764,7 +764,7 @@ public class PlayStrategyCardService {
     public static void handleSOQueueing(Game game, boolean winnuHero) {
         if (winnuHero) {
             String message =
-                    "# Since this is the result of playing Mathis Mathinus, the Winnu hero, secret objectives draws will not be queued or resolved in a particular order.";
+                    "### No queuing will occur if secrets are drawn off of this. Handle timing yourselves if relevant";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             return;
         }
