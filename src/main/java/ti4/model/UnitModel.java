@@ -577,4 +577,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         }
         return sb.toString();
     }
+
+    public boolean isTfCard() {
+        return source == ComponentSource.twilights_fall
+                && faction != null
+                && Mapper.getFaction(faction) != null
+                && Mapper.getFaction(faction).getSource() == ComponentSource.twilights_fall;
+    }
 }
