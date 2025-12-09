@@ -320,8 +320,9 @@ public class MapJsonIOService {
     private static void handleLore(String target, LoreIO lore, Game game) {
         if (lore != null && lore.getLoreText() != null && !lore.getLoreText().isEmpty()) {
             LoreService.addLoreFromString(
-                    target + ";" + lore.getLoreText() + ";" + lore.getFooterText() + ";" + lore.getReceiver() + ";"
-                            + lore.getTrigger() + ";" + lore.getPing() + ";" + lore.getPersistance(),
+                    target + ";" + LoreService.clean(lore.getLoreText()) + ";" + LoreService.clean(lore.getFooterText())
+                            + ";" + lore.getReceiver() + ";" + lore.getTrigger() + ";" + lore.getPing() + ";"
+                            + lore.getPersistance(),
                     game);
         }
     }
