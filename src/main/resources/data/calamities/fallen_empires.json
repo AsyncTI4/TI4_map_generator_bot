@@ -1,0 +1,28 @@
+[
+    {
+        "id": "id1",
+        "name": "Fallen Empire Calamity",
+        "type": "collapse",
+        "permanentEffect": "The fallen empire exerts its influence over the galaxy, causing widespread instability.",
+        "effects": [
+            "how unfortunate: bad luck!",
+            "galactic turmoil: chaos ensues"
+        ],
+        "flavourText": "*The galaxy trembles under the shadow of the fallen empire.*",
+        "source": "fallen_empires",
+        "version": "3"
+    },
+    {
+        "id": "id2",
+        "name": "Galactic Plague",
+        "type": "disaster",
+        "permanentEffect": "A deadly plague spreads across the galaxy, decimating populations and crippling economies.",
+        "effects": [
+            "population decline: tragic!",
+            "economic downturn: oh no!"
+        ],
+        "flavourText": "*A silent killer sweeps through the stars, leaving despair in its wake.*",
+        "source": "fallen_empires",
+        "version": "3"
+    }
+]
