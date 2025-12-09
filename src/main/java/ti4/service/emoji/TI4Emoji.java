@@ -11,7 +11,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.NotNull;
-import ti4.helpers.Constants;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
 
@@ -27,7 +26,7 @@ public interface TI4Emoji {
     default String emojiString() {
         CachedEmoji emoji = ApplicationEmojiService.getApplicationEmoji(name());
         if (emoji == null) {
-            BotLogger.warning(Constants.jazzPing() + " could not find requested emoji: " + name());
+            BotLogger.warning("Could not find requested emoji: " + name());
             return ApplicationEmojiService.fallbackEmoji;
         }
         return emoji.getFormatted();
