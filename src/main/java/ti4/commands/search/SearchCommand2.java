@@ -23,6 +23,7 @@ public class SearchCommand2 implements ParentCommand {
                     // no /search map_templates yet
                     new SearchSources(),
                     new SearchStrategyCardsSubcommand(),
+                    new SearchCalamitiesSubcommand(),
 
                     /* From \resources\ */
                     new SearchEmojis(),
