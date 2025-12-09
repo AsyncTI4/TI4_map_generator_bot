@@ -35,6 +35,7 @@ public class Source {
         uncharted_space,
         monuments,
         blue_reverie,
+        fallen_empires,
 
         // lil homebrew
         lazax,
@@ -147,6 +148,7 @@ public class Source {
                         case lazax -> FactionEmojis.Lazax;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
+                        case fallen_empires -> SourceEmojis.FallenEmpires;
                         default -> null;
                     };
             return emoji == null ? "" : emoji.toString();

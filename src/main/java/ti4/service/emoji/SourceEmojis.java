@@ -22,7 +22,8 @@ public enum SourceEmojis implements TI4Emoji {
     Eronous,
     IgnisAurora,
     MiltyMod,
-    StrategicAlliance;
+    StrategicAlliance,
+    FallenEmpires;
 
     @Override
     public String toString() {

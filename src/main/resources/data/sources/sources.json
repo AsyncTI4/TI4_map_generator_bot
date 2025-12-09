@@ -259,5 +259,15 @@
         "credits": "Solax",
         "description": "Make Fog of War more foggy",
         "data": []
+    },
+    {
+        "source": "fallen_empires",
+        "name": "Fallen Empires",
+        "canal": "community",
+        "subcanal": "big homebrew",
+        "credits": "cacoctopus",
+        "description": "new Calamities affecting the galaxy",
+        "data": [
+        ]
     }
 ]
