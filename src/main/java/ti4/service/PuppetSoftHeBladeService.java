@@ -58,7 +58,7 @@ public class PuppetSoftHeBladeService {
                 StringBuilder factions = new StringBuilder();
                 for (String faction : puppetedFactions) {
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null) factions.append(p2.getFactionEmoji()).append(" ");
+                    if (p2 != null) factions.append(p2.fogSafeEmoji()).append(" ");
                 }
                 plotInfo.append("\n> - Puppeted Factions for ")
                         .append(plot.getName())
@@ -91,8 +91,8 @@ public class PuppetSoftHeBladeService {
         String prefix = obsidian.finChecker() + "revealSeethe_";
         for (Player p : puppets) {
             if (p == null) continue;
-            String label = p.getFactionModel().getFactionName();
-            seetheButtons.add(Buttons.red(prefix + p.getFaction(), label, p.getFactionEmoji()));
+            String label = p.getFactionNameOrColor();
+            seetheButtons.add(Buttons.red(prefix + p.getFaction(), label, p.fogSafeEmoji()));
         }
         String message = obsidian.getRepresentation() + " Resolve the Seethe plot:";
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, seetheButtons);
@@ -103,8 +103,8 @@ public class PuppetSoftHeBladeService {
         String prefix = obsidian.finChecker() + "revealExtract_";
         for (Player p : puppets) {
             if (p == null) continue;
-            String label = p.getFactionModel().getFactionName();
-            extractButtons.add(Buttons.red(prefix + p.getFaction(), label, p.getFactionEmoji()));
+            String label = p.getFactionNameOrColor();
+            extractButtons.add(Buttons.red(prefix + p.getFaction(), label, p.fogSafeEmoji()));
         }
         String message = obsidian.getRepresentation() + " Resolve the Extract plot:";
         MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), message, extractButtons);
