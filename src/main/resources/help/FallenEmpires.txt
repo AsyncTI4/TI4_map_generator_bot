@@ -1,0 +1,19 @@
+# Fallen Empires
+
+## __**Information**__
+The Fallen Empires Expansion is a stand-alone mini-expansion of cards that aims to encourage a continuation of ‘presence’ in the galactic slice of a player who has to leave the game early. It avoids the sudden power void of a player leaving the game by providing a narrative and rules for NPC unit combat and a cost for taking the suddenly abandoned systems.
+
+## __**Important Links**__
+G-Drive link to print ready components (JUMBO size cards 89mm x 127mm):  https://drive.google.com/drive/folders/1ecCGWKsd3sX1JwfeIjitmTnRdB50l0qo?usp=share_link
+G-Sheet with raw text: https://docs.google.com/spreadsheets/d/1p5C0MNfikeqnQvUENvjJSnqTLFMQ6NnD/edit?usp=share_link&ouid=113888086752617086837&rtpof=true&sd=true
+
+## __**Additional Info**__
+As these cards are new assets entirely, they don't need to be printed professionally to be a useful tool to keep your game running after people have to leave early.
+
+## __**FAQ**__
+
+### Calamity
+Place the demissioned player’s control token on this card and on each planet controlled by that player. These are calamity tokens.
+
+### Disaster
+Place the demissioned player’s control token on this card and in each system that contains 1 or more units controlled by that player. These are calamity tokens.
