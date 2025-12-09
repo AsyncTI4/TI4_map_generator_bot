@@ -48,6 +48,7 @@ import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.AttachmentModel;
 import ti4.model.BreakthroughModel;
+import ti4.model.CalamityModel;
 import ti4.model.ColorModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.CombatModifierModel;
@@ -96,6 +97,7 @@ public class Mapper {
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
+    private static final Map<String, CalamityModel> calamities = new HashMap<>();
     private static final Map<String, ColorModel> colors = new HashMap<>();
     private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
     private static final Map<String, DeckModel> decks = new HashMap<>();
@@ -143,6 +145,7 @@ public class Mapper {
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
         importJsonObjectsFromFolder("breakthroughs", breakthroughs, BreakthroughModel.class);
+        importJsonObjectsFromFolder("calamities", calamities, CalamityModel.class);
         importJsonObjectsFromFolder("colors", colors, ColorModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
@@ -1467,5 +1470,17 @@ public class Mapper {
             }
             throw c.weirdStringException(n.toString(), Color.class, "Unsupported color format");
         }
+    }
+
+    public static boolean isValidCalamity(String searchString) {
+        return calamities.containsKey(searchString);
+    }
+
+    public static CalamityModel getCalamity(String searchString) {
+        return calamities.get(searchString);
+    }
+
+    public static Map<String, CalamityModel> getCalamities() {
+        return calamities;
     }
 }
