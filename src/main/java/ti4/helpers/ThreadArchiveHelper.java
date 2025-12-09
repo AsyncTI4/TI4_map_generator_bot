@@ -40,11 +40,11 @@ public class ThreadArchiveHelper {
         });
     }
 
-    public static List<ThreadChannel> archiveOldThreads(Guild guild, Integer threadCount) {
+    public static List<ThreadChannel> archiveOldThreads(Guild guild, int threadCount) {
         return archiveOldThreads(guild, threadCount, false);
     }
 
-    public static List<ThreadChannel> archiveOldThreads(Guild guild, Integer threadCount, boolean skipArchiveStep) {
+    public static List<ThreadChannel> archiveOldThreads(Guild guild, int threadCount, boolean skipArchiveStep) {
         List<ThreadChannel> activeThreadChannels = guild.retrieveActiveThreads().complete().stream()
                 .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
                 .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
@@ -52,21 +52,21 @@ public class ThreadArchiveHelper {
 
         // Try gathering all threads that are not bot-map-updates or cards-info threads
         List<ThreadChannel> threadChannels = activeThreadChannels.stream()
-                .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates")
-                        && !threadChannel.getName().contains("cards-info"))
+                .filter(threadChannel -> !threadChannel.getName().endsWith(Constants.BOT_CHANNEL_SUFFIX)
+                        && !threadChannel.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX))
                 .limit(threadCount)
                 .toList();
 
         // If there are fewer channels in the list than requested to close, include cards-info threads
-        if (threadChannels.size() < (threadCount - 1)) {
+        if (threadChannels.size() - threadCount < 0) {
             threadChannels = activeThreadChannels.stream()
-                    .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
+                    .filter(threadChannel -> !threadChannel.getName().endsWith(Constants.BOT_CHANNEL_SUFFIX))
                     .limit(threadCount)
                     .toList();
         }
 
         // If there are fewer channels in the list than requested to close, close them all
-        if (threadChannels.size() < (threadCount - 1)) {
+        if (threadChannels.size() - threadCount < 0) {
             threadChannels = activeThreadChannels.stream().limit(threadCount).toList();
         }
         if (skipArchiveStep) {
