@@ -49,11 +49,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         return getRepresentationEmbed(false, false);
     }
 
-    public String getAutomationID() {
-        if (automationID == null) return alias;
-        return automationID;
-    }
-
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -62,7 +57,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title);
 
         // DESCRIPTION
-        eb.setDescription(phase + " Phase\n***" + window + ":***\n" + text);
+        eb.setDescription("***" + window + ":***\n" + text);
 
         // FLAVOUR TEXT
         if (includeFlavourText && getFlavorText().isPresent())
@@ -76,6 +71,11 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
         eb.setColor(Color.orange);
         return eb.build();
+    }
+
+    public String getAutomationID() {
+        if (automationID == null) return alias;
+        return automationID;
     }
 
     public boolean search(String searchString) {
