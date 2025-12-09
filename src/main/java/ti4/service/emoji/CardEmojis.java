@@ -20,7 +20,11 @@ public enum CardEmojis implements TI4Emoji {
     IndustrialCard,
     FrontierCard,
     Event,
+
+    // Fallen Empires
     Calamity,
+    Disaster,
+    Collapse,
 
     // Normal Strategy Cards
     SC1,

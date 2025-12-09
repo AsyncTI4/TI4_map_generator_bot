@@ -44,7 +44,12 @@ public class ApplicationEmojiService {
         List<EmojiFileData> newEmojis = emojiFiles.values().stream()
                 .filter(data -> !emojis.containsKey(data.getName()))
                 .toList();
-        BotLogger.info("Uploading " + newEmojis.size() + " new emojis...");
+        int missingEmojis = newEmojis.size();
+        if (missingEmojis > 0) {
+            BotLogger.info("Uploading " + newEmojis.size() + " new emojis...");
+        } else {
+            BotLogger.info("No new emojis to upload.");
+        }
         boolean success = createAppEmojis(newEmojis);
         pushEmojiListToCache(success);
     }
@@ -56,7 +61,12 @@ public class ApplicationEmojiService {
                 .filter(data -> emojis.get(data.getName()).getTimeCreated()
                         < data.getFile().lastModified())
                 .toList();
-        BotLogger.info("Re-uploading " + staleEmojis.size() + " stale emojis...");
+        int staleCount = staleEmojis.size();
+        if (staleCount > 0) {
+            BotLogger.info("Re-uploading " + staleCount + " stale emojis...");
+        } else {
+            BotLogger.info("No stale emojis to re-upload.");
+        }
         boolean success = reuploadAppEmojis(staleEmojis);
         pushEmojiListToCache(success);
     }
@@ -66,7 +76,12 @@ public class ApplicationEmojiService {
         List<CachedEmoji> hangingEmojis = emojis.values().stream()
                 .filter(emoji -> !emojiFiles.containsKey(emoji.getName()))
                 .toList();
-        BotLogger.info("Deleting " + hangingEmojis.size() + " hanging emojis...");
+        int hangingCount = hangingEmojis.size();
+        if (hangingCount > 0) {
+            BotLogger.info("Deleting " + hangingCount + " hanging emojis...");
+        } else {
+            BotLogger.info("No hanging emojis to delete.");
+        }
         boolean success = deleteAppEmojis(hangingEmojis);
         pushEmojiListToCache(success);
     }
