@@ -1,0 +1,84 @@
+- rules commands
+  - controlled demission
+  - emerg demission
+  - elimination
+  - combat
+- source
+- emoji
+- calamities data
+- CalamityModel
+  - permanentEffect
+    - base resources of 0
+    - base influence of 0
+    - can't commit gf
+    - can't be explored
+    - cannot refresh planet
+    - cannot exhaust planet unless has 2 or more units
+    - structures have no abilities and do not count as structures
+    - remove all infantry from the board
+    - planets do not provide tech specialties and are unaffected by attachments
+    - each planet with calam token gains SPACE CANNON 6 (x2)
+  - effectWindow
+    - when a player passes
+    - after active player moves into system
+    - start of agenda phase
+    - start of strategy phase
+    - player moves into system
+      - non-creuss
+      - non-hacan
+    - end of tactical action in system
+    - at the beginning of the status phase
+    - during combat with demiss ships
+    - at the end of the first round of space combat in calam system
+    - moves THROUGH calam
+    - commits GF (POPULAR REVOLUTION)
+    - when gain control of planet
+    - after a player moves into system, with no other players ships
+    - when a player researches a tech
+  - effects (list) (effectWindow is text before :)
+    - spend 2res to remove calam
+    - spend 3res to remove calam
+    - spend 4res to remove calam
+    - spend 3inf to remove calam
+    - spend 2tg to remove calamity
+    - lose an inf
+    - vote on planet to remove token from
+    - if moved thru wormhole, take 3 hits
+    - return 2gf to remove token
+    - return 1 comm or tg to supply (to be gained by Pillage)
+    - remove 1 non-fighter ship, then damage all units
+    - has ships? remove token
+    - lose a ship in combat? demiss player gets that ship
+    - 1 hit in active system for each calam system moved through
+    - contains a dread? remove calam
+    - place 2 demiss inf
+    - remove token
+    - return gf to space, then resolve capacity
+    - place a demiss cruiser+destroyer if able, then resolve combat
+    - remove token if contains ships
+    - if has units in 3 calam systems, may remove 1 calam from 1 planet per those 3 systems AND return 1 non-faction/unit tech to tech deck. If they do, they may research 1 tech.
+    - spend 4res to place control token on calamity card
+    - spend 1 less resource (to research) for each green tech prerequisite that player has (how does this work with skips?)
+    - each player without a matching token on calam destroys all infantry in calam system
+    - spend 4res to place control token on calamity card (adds a faction to the disaster - it's like researching solar flare protection)
+    - if the active player does not have a control token on the calamity card, produce 2 hits against that player in the active system
+    - each player (in combat) rolls 1 die. on 4+, player may choose 1 of their ships that was destroyed and place 1 ship of that type in the system
+    - discard 1 action card, if able
+    - each player with 3 or more gf in system can remove calam
+    - return 1 non-fighter ship to reinforcements, if able
+  - type collapse/disaster
+  - version
+- search command
+- option for no aftermath
+- add tag
+- commands
+  - draw2
+  - apply
+- Game
+  - activeCalamities (faction:calamity map)
+- combat automation
+  - unit abilities must be activated when possible
+  - no production, produce, or deploy
+  - assign hits in ascending order of unit cost (active player breaks ties)
+  - sustain damage must be used
+- display the calamity on map image, agenda style
