@@ -366,6 +366,9 @@ class Stats extends GameStateSubcommand {
 
     @Override
     public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return event.getOptions().stream().anyMatch(option -> SUS_OPTIONS.contains(option.getName()));
+        // We're okay with reducing values
+        return event.getOptions().stream()
+                .anyMatch(option -> SUS_OPTIONS.contains(option.getName())
+                        && !option.getAsString().startsWith("-"));
     }
 }
