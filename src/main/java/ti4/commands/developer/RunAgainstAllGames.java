@@ -1,9 +1,13 @@
 package ti4.commands.developer;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
@@ -32,10 +36,18 @@ class RunAgainstAllGames extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        boolean removed = game.getTags().remove("ThundersEdgeDemo");
-        if (removed) {
-            game.getTags().add("Thunder's Edge Demo");
-        }
-        return removed;
+        int gameNameHash = game.getName().hashCode();
+        int hours = Math.floorMod(gameNameHash, 24);
+        int minutes = Math.floorMod(gameNameHash, 60);
+
+        int customNameHash = game.getCustomName().hashCode();
+        int seconds = Math.floorMod(customNameHash, 60);
+        int nanoseconds = Math.floorMod(gameNameHash, 1_000_000_000);
+
+        LocalDate creationDate = GameHelper.getCreationDateAsLocalDate(game);
+        LocalDateTime creationDateWithFakeTime = creationDate.atTime(hours, minutes, seconds, nanoseconds);
+        game.setCreationDateTime(
+                creationDateWithFakeTime.toInstant(ZoneOffset.UTC).toEpochMilli());
+        return true;
     }
 }
