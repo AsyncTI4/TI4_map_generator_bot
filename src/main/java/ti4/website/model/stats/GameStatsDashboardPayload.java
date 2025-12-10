@@ -5,6 +5,7 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -260,6 +261,38 @@ public class GameStatsDashboardPayload {
         int seconds = Math.abs(game.getCustomName().hashCode()) % 60;
         var localDateTime = localDate.atTime(hours, minutes, seconds);
         return localDateTime.atZone(ZoneId.of("UTC")).toInstant().getEpochSecond();
+    }
+
+    public long getCreationEpochMilliseconds() {
+        ZonedDateTime creationDateTime = game.getCreationDateTime();
+        if (creationDateTime != null) {
+            return creationDateTime.toInstant().toEpochMilli();
+        }
+        LocalDate localDate;
+        try {
+            localDate = GameHelper.getCreationDateAsLocalDate(game);
+        } catch (DateTimeParseException e) {
+            localDate = LocalDate.now();
+        }
+        int gameNameHash = Math.abs(game.getName().hashCode());
+        int hours = gameNameHash % 24;
+        int minutes = gameNameHash % 60;
+        int seconds = Math.abs(game.getCustomName().hashCode()) % 60;
+        int milliseconds = Math.abs(gameNameHash) % 1000;
+        var localDateTime = localDate.atTime(hours, minutes, seconds, milliseconds);
+        return localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
+    }
+
+    public Long getEndedEpochMilliseconds() {
+        if (!game.isHasEnded()) {
+            return null;
+        }
+
+        return game.getEndedDate();
+    }
+
+    public Long getLastUpdatedEpochMilliseconds() {
+        return game.getLastModifiedDate();
     }
 
     public String getSpeaker() {
