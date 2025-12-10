@@ -384,6 +384,12 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue();
             }
+            case Constants.SPLICE_TYPE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var values = List.of("ability", "units", "genome");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
+                event.replyChoices(options).queue();
+            }
             case Constants.EXPEDITION -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 var values = List.of("secret", "actionCards", "fiveInf", "fiveRes", "tradeGoods", "techSkip");

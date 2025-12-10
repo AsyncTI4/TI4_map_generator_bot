@@ -1152,7 +1152,7 @@ public class ButtonHelperTwilightsFall {
         if (cardsToDraw.isEmpty()) {
             String messageText = "There are no more cards in the " + type + " deck.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
-            ButtonHelper.deleteMessage(event);
+            ButtonHelper.deleteTheOneButton(event);
             return;
         }
         String cardID = cardsToDraw.getFirst();

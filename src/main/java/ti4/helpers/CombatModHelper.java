@@ -190,24 +190,6 @@ public class CombatModHelper {
                         relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
             }
         }
-        if (player.hasTech("tf-zealous")) {
-            Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
-                    .filter(modifier -> modifier.isRelevantTo(Constants.LEADER, "argentcommander"))
-                    .findFirst();
-
-            if (relevantMod.isPresent()
-                    && checkModPassesCondition(
-                            relevantMod.get(),
-                            tile,
-                            player,
-                            opponent,
-                            unitsByQuantity,
-                            opponentUnitsByQuantity,
-                            game)) {
-                modifiers.add(new NamedCombatModifierModel(
-                        relevantMod.get(), Mapper.getLeader("argentcommander").getName()));
-            }
-        }
 
         for (Leader leader : game.playerUnlockedLeadersOrAlliance(player)) {
             if (leader.isExhausted() || leader.isLocked()) {
