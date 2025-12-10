@@ -37,7 +37,7 @@ class StartNewSplice extends GameStateSubcommand {
         String spliceType = event.getOption(Constants.SPLICE_TYPE, OptionMapping::getAsString);
         List<Player> participants = new ArrayList<>();
         Player player = getPlayer();
-
+        participants.add(player);
         for (int x = 2; x < 9; x++) {
             String constant = "player" + x;
             if (event.getOption(constant) != null) {
