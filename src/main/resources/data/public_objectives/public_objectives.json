@@ -123,7 +123,7 @@
         "alias": "infrastructure",
         "name": "Improve Infrastructure",
         "phase": "Status",
-        "text": "Have structures on 3 planets outside of your home system.",
+        "text": "Have [your] structures on 3 planets outside of your home system.",
         "points": 1,
         "source": "pok"
     },
@@ -299,7 +299,7 @@
         "alias": "protect_border",
         "name": "Protect the Border",
         "phase": "Status",
-        "text": "Have structures on 5 planets outside of your home system.",
+        "text": "Have [your] structures on 5 planets outside of your home system.",
         "points": 2,
         "source": "pok"
     },

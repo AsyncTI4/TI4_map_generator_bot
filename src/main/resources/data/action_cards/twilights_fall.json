@@ -341,7 +341,7 @@
         "name": "Starflare",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system.",
+        "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system. [Note: cannot be played if there is no supernova on the board. In such a case, consider getting table permission to purge this AC and draw a new one.]",
         "source": "twilights_fall"
     },
     {

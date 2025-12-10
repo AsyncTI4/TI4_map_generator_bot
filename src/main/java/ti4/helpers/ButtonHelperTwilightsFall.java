@@ -623,34 +623,39 @@ public class ButtonHelperTwilightsFall {
                             player.getRepresentationNoPing()
                                     + " has taken a secret card. They may put it into play with a button in their cards info.");
                 }
-                triggerYellowUnits(game, player);
-            }
-        }
-        List<Player> participants = getParticipantsList(game);
-        participants.remove(player);
-        game.removeStoredValue("savedParticipants");
-        if (!participants.isEmpty()) {
-            sendPlayerSpliceOptions(game, participants.getFirst());
-            for (Player p : participants) {
-                if (game.getStoredValue("savedParticipants").isEmpty()) {
-                    game.setStoredValue("savedParticipants", p.getFaction());
-                } else {
-                    game.setStoredValue(
-                            "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
+                if (!buttonID.contains("spoof_")) {
+                    triggerYellowUnits(game, player);
                 }
             }
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), game.getPing() + " The splice is complete.");
-            if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
-                Player p2 = game.getActivePlayer();
-                if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
-                    EndTurnService.endTurnAndUpdateMap(event, game, p2);
-                }
-                game.setStoredValue("endTurnWhenSpliceEnds", "");
-            }
-            game.removeStoredValue("willParticipateInSplice");
         }
-        ButtonHelper.deleteMessage(event);
+        if (!buttonID.contains("spoof_")) {
+            List<Player> participants = getParticipantsList(game);
+            participants.remove(player);
+            game.removeStoredValue("savedParticipants");
+            if (!participants.isEmpty()) {
+                sendPlayerSpliceOptions(game, participants.getFirst());
+                for (Player p : participants) {
+                    if (game.getStoredValue("savedParticipants").isEmpty()) {
+                        game.setStoredValue("savedParticipants", p.getFaction());
+                    } else {
+                        game.setStoredValue(
+                                "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
+                    }
+                }
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), game.getPing() + " The splice is complete.");
+                if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
+                    Player p2 = game.getActivePlayer();
+                    if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
+                        EndTurnService.endTurnAndUpdateMap(event, game, p2);
+                    }
+                    game.setStoredValue("endTurnWhenSpliceEnds", "");
+                }
+                game.removeStoredValue("willParticipateInSplice");
+            }
+            ButtonHelper.deleteMessage(event);
+        }
     }
 
     @ButtonHandler("revealVeiledCards")
@@ -1152,7 +1157,7 @@ public class ButtonHelperTwilightsFall {
         if (cardsToDraw.isEmpty()) {
             String messageText = "There are no more cards in the " + type + " deck.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
-            ButtonHelper.deleteMessage(event);
+            ButtonHelper.deleteTheOneButton(event);
             return;
         }
         String cardID = cardsToDraw.getFirst();
