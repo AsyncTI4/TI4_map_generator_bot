@@ -24,6 +24,7 @@ public class GameProperties {
     // need to migrate old creationDate only games to creationDateTime (at midnight)
     @Deprecated
     private @ExportableField String creationDate;
+
     private @ExportableField ZonedDateTime creationDateTime;
 
     private @ExportableField String name; // pbdXXXX

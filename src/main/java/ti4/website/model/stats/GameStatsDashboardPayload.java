@@ -274,12 +274,17 @@ public class GameStatsDashboardPayload {
         } catch (DateTimeParseException e) {
             localDate = LocalDate.now();
         }
-        int gameNameHash = Math.abs(game.getName().hashCode());
-        int hours = gameNameHash % 24;
-        int minutes = gameNameHash % 60;
-        int seconds = Math.abs(game.getCustomName().hashCode()) % 60;
-        int milliseconds = Math.abs(gameNameHash) % 1000;
-        var localDateTime = localDate.atTime(hours, minutes, seconds, milliseconds);
+
+        int gameNameHash = game.getName().hashCode();
+        int hours = Math.floorMod(gameNameHash, 24);
+        int minutes = Math.floorMod(gameNameHash, 60);
+
+        int customNameHash = game.getCustomName().hashCode();
+        int seconds = Math.floorMod(customNameHash, 60);
+
+        int nanoseconds = Math.floorMod(gameNameHash, 1_000_000_000);
+
+        var localDateTime = localDate.atTime(hours, minutes, seconds, nanoseconds);
         return localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
     }
 
