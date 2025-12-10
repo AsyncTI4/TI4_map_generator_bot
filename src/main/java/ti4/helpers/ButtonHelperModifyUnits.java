@@ -2206,7 +2206,8 @@ public class ButtonHelperModifyUnits {
                 if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
-                            "solBtBuild_" + tile.getPosition(),
+                            "solBtBuild_" + tile.getPosition() + "_"
+                                    + player.getUnitFromUnitKey(unitKey).getCapacityValue(),
                             "Build Up To " + player.getUnitFromUnitKey(unitKey).getCapacityValue()
                                     + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));

@@ -50,7 +50,7 @@
         "name": "Brilliance of the Hylar",
         "title": "Jol Nar Paradigm",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gain 1 genome, 1 unit upgrade, and 1 technology. Then purge this card.",
+        "abilityText": "Gain 1 genome, 1 unit upgrade, and 1 ability. Then purge this card.",
         "unlockCondition": "Always Unlocked",
         "source": "twilights_fall"
     },

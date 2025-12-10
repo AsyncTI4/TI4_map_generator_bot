@@ -16,6 +16,7 @@ public class TwilightFallCommand implements ParentCommand {
                     new DrawSpecificParadigm(),
                     new RadicalAdvancement(),
                     new FixColors(),
+                    new StartNewSplice(),
                     new DoEdictPhase(),
                     new DiscardVeiledCard())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
