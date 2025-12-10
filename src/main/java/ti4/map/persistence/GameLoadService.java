@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -767,8 +765,7 @@ class GameLoadService {
                 case Constants.SHOW_FULL_COMPONENT_TEXT ->
                     game.setShowFullComponentTextEmbeds(loadBooleanOrDefault(info, false));
                 case Constants.GAME_HAS_ENDED -> game.setHasEnded(loadBooleanOrDefault(info, false));
-                case Constants.CREATION_DATE_TIME ->
-                    game.setCreationDateTime(ZonedDateTime.parse(info, DateTimeFormatter.ISO_ZONED_DATE_TIME));
+                case Constants.CREATION_DATE_TIME -> game.setCreationDateTime(Long.parseLong(info));
                 case Constants.CREATION_DATE -> game.setCreationDate(info);
                 case Constants.ROUND -> {
                     try {

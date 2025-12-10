@@ -12,8 +12,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Point;
 import java.lang.reflect.Field;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -241,7 +239,7 @@ public class Game extends GameProperties {
 
     public Game() {
         setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
-        setCreationDateTime(ZonedDateTime.now(ZoneOffset.UTC));
+        setCreationDateTime(System.currentTimeMillis());
         setLastModifiedDate(System.currentTimeMillis());
     }
 

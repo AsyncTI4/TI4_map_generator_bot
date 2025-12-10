@@ -1,6 +1,5 @@
 package ti4.map;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,7 +24,7 @@ public class GameProperties {
     @Deprecated
     private @ExportableField String creationDate;
 
-    private @ExportableField ZonedDateTime creationDateTime;
+    private @ExportableField long creationDateTime;
 
     private @ExportableField String name; // pbdXXXX
     private @ExportableField String customName = "";

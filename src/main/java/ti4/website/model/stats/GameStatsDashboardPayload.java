@@ -5,7 +5,6 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -268,28 +267,7 @@ public class GameStatsDashboardPayload {
     }
 
     public long getCreationEpochMilliseconds() {
-        ZonedDateTime creationDateTime = game.getCreationDateTime();
-        if (creationDateTime != null) {
-            return creationDateTime.toInstant().toEpochMilli();
-        }
-        LocalDate localDate;
-        try {
-            localDate = GameHelper.getCreationDateAsLocalDate(game);
-        } catch (DateTimeParseException e) {
-            localDate = LocalDate.now();
-        }
-
-        int gameNameHash = game.getName().hashCode();
-        int hours = Math.floorMod(gameNameHash, 24);
-        int minutes = Math.floorMod(gameNameHash, 60);
-
-        int customNameHash = game.getCustomName().hashCode();
-        int seconds = Math.floorMod(customNameHash, 60);
-
-        int nanoseconds = Math.floorMod(gameNameHash, 1_000_000_000);
-
-        var localDateTime = localDate.atTime(hours, minutes, seconds, nanoseconds);
-        return localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli();
+        return game.getCreationDateTime();
     }
 
     public Long getEndedEpochMilliseconds() {

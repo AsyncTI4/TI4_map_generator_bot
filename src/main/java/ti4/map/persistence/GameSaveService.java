@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -410,11 +409,8 @@ class GameSaveService {
 
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
         writer.write(System.lineSeparator());
-        if (game.getCreationDateTime() != null) {
-            String creationDateTime = game.getCreationDateTime().format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
-            writer.write(Constants.CREATION_DATE_TIME + " " + creationDateTime);
-            writer.write(System.lineSeparator());
-        }
+        writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
+        writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
         writer.write(System.lineSeparator());
         long time = System.currentTimeMillis();
