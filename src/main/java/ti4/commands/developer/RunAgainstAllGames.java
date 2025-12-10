@@ -27,7 +27,7 @@ class RunAgainstAllGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         List<String> changedGames = new ArrayList<>();
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
+        GamesPage.consumeAllGames(game -> {
             boolean changed = makeChanges(game);
             if (changed) {
                 changedGames.add(game.getName());
@@ -35,8 +35,9 @@ class RunAgainstAllGames extends Subcommand {
             }
         });
 
-        BotLogger.info("Changes made to " + changedGames.size() + " games:" + String.join(", ", changedGames));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
+        BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()
+                + " games: " + String.join(", ", changedGames));
     }
 
     private static boolean makeChanges(Game game) {
