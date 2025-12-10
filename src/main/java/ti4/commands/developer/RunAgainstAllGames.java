@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
-import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
@@ -19,7 +18,6 @@ class RunAgainstAllGames extends Subcommand {
 
     RunAgainstAllGames() {
         super("run_against_all_games", "Runs this custom code against all games.");
-        addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
     @Override
@@ -27,7 +25,7 @@ class RunAgainstAllGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         List<String> changedGames = new ArrayList<>();
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
+        GamesPage.consumeAllGames(game -> {
             boolean changed = makeChanges(game);
             if (changed) {
                 changedGames.add(game.getName());
