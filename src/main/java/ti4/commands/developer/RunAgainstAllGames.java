@@ -3,6 +3,8 @@ package ti4.commands.developer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.commands.statistics.GameStatisticsFilterer;
@@ -24,14 +26,16 @@ class RunAgainstAllGames extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
+        List<String> changedGames = new ArrayList<>();
         GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
             boolean changed = makeChanges(game);
             if (changed) {
-                BotLogger.info("Changes made to " + game.getName() + ".");
+                changedGames.add(game.getName());
                 GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
             }
         });
 
+        BotLogger.info("Changes made to " + changedGames.size() + " games:" + String.join(", ", changedGames));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
     }
 
