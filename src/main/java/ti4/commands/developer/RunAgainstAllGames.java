@@ -27,7 +27,7 @@ class RunAgainstAllGames extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         List<String> changedGames = new ArrayList<>();
-        GamesPage.consumeAllGames(game -> {
+        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
             boolean changed = makeChanges(game);
             if (changed) {
                 changedGames.add(game.getName());

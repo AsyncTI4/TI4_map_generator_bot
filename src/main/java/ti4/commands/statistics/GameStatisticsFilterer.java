@@ -72,6 +72,9 @@ public class GameStatisticsFilterer {
     }
 
     public static Predicate<Game> getGamesFilter(SlashCommandInteractionEvent event) {
+        if (event.getOptions().isEmpty()) {
+            return game -> true;
+        }
         return getGamesFilter(event, null);
     }
 
