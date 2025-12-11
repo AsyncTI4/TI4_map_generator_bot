@@ -42,10 +42,7 @@ class RunAgainstSpecificGame extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        if (!game.isThundersEdge()) {
-            return false;
-        }
-        game.setThundersEdge(false);
+        game.setCreationDateTime(1765323420000L);
         return true;
     }
 }
