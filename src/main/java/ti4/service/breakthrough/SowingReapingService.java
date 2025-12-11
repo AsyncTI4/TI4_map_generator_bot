@@ -49,7 +49,7 @@ public class SowingReapingService {
                         + FactionEmojis.Firmament + " **The Sowing**.";
         int btTG = firmament.getBreakthroughTGs("firmamentbt");
         int tg = firmament.getTg();
-        message += "\n -# There are " + btTG + " trade goods on **The Sowing**, and you currently have "
+        message += "\n-# There are " + btTG + " trade goods on **The Sowing**, and you currently have "
                 + MiscEmojis.tg(tg) + " " + tg + " trade goods.";
         MessageHelper.sendMessageToChannelWithButtons(firmament.getCorrectChannel(), message, buttons);
     }
