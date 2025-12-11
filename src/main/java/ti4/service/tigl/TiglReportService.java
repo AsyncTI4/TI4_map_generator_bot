@@ -2,10 +2,7 @@ package ti4.service.tigl;
 
 import static ti4.helpers.Constants.TIGL_FRACTURED_TAG;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -116,26 +113,11 @@ public class TiglReportService {
     }
 
     private static long determineStartTimestamp(Game game) {
-        if (game.getStartedDate() > 0) {
-            return game.getStartedDate();
-        }
-        return parseCreationDate(game.getCreationDate());
+        return game.getCreationDateTime();
     }
 
     private static long determineEndTimestamp(Game game) {
         return game.getEndedDate();
-    }
-
-    private static long parseCreationDate(String creationDate) {
-        if (StringUtils.isBlank(creationDate)) {
-            return 0L;
-        }
-        try {
-            LocalDate date = LocalDate.parse(creationDate, CREATION_DATE_FORMATTER);
-            return date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
-        } catch (DateTimeParseException ignored) {
-            return 0L;
-        }
     }
 
     private static Long parseDiscordId(String userId) {
