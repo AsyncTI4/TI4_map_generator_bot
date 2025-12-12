@@ -1656,11 +1656,11 @@ public class TransactionHelper {
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
+        sb.append("## " + player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
         if (!canTheseTwoTransact(game, player, player2)) {
-            sb.append("you are not neighbors with ")
+            sb.append("you cannot transact with ")
                     .append(player2.getRepresentation(false, false))
-                    .append(".");
+                    .append(". (probably due to no neighborship)");
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
         if (player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {

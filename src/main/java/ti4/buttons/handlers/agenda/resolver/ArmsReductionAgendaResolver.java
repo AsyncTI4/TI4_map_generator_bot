@@ -24,7 +24,8 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
 
             int excessCruisers = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) - 4;
             if (excessCruisers > 0) {
-                removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser"));
+                removeButtons.addAll(
+                        ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "cruiser", true));
                 message = player.getRepresentation() + ", please remove " + excessCruisers + " excess cruiser"
                         + (excessCruisers == 1 ? "" : "s");
             }
@@ -32,7 +33,7 @@ public class ArmsReductionAgendaResolver implements ForAgainstAgendaResolver {
             int excessDreadnoughts = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) - 2;
             if (excessDreadnoughts > 0) {
                 removeButtons.addAll(
-                        ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "dreadnought"));
+                        ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "dreadnought", true));
                 if (message.isEmpty()) {
                     message = player.getRepresentation() + ", please remove " + excessDreadnoughts
                             + " excess dreadnought" + (excessDreadnoughts == 1 ? "" : "s");

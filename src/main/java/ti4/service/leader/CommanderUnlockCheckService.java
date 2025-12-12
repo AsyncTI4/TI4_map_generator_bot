@@ -216,7 +216,10 @@ public class CommanderUnlockCheckService {
                 int count = 0;
                 for (String p : player.getPlanets()) {
                     Tile tile = game.getTileFromPlanet(p);
-                    if (tile != null && !tile.isHomeSystem(game)) {
+                    if (tile != null
+                            && !tile.isHomeSystem(game)
+                            && game.getUnitHolderFromPlanet(p) != null
+                            && !game.getUnitHolderFromPlanet(p).isSpaceStation()) {
                         count++;
                     }
                 }

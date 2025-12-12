@@ -14,7 +14,6 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -141,15 +140,6 @@ public class RiftUnitsHelper {
                     .editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
                     .queue();
-        } else {
-            boolean deletedMessage = JdaComponentHelper.removeComponentFromMessageAndDeleteIfEmpty(event);
-            if (!deletedMessage) {
-                String exhaustedMessage = event.getMessage().getContentRaw();
-                if ("".equalsIgnoreCase(exhaustedMessage)) {
-                    exhaustedMessage = "Rift";
-                }
-                event.getMessage().editMessage(exhaustedMessage).queue();
-            }
         }
     }
 

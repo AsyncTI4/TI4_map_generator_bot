@@ -490,7 +490,10 @@ public class StartCombatService {
                 List<Player> playersWithGF = new ArrayList<>();
                 for (Player player : game.getRealPlayersNDummies()) {
                     if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(uH, player)) {
-                        playersWithGF.add(player);
+                        if (playersWithGF.isEmpty()
+                                || !playersWithGF.get(0).getAllianceMembers().contains(player.getFaction())) {
+                            playersWithGF.add(player);
+                        }
                     }
                 }
                 if (playersWithGF.size() > 1) {
@@ -1466,7 +1469,7 @@ public class StartCombatService {
         }
         if (p1.hasUnit("pinktf_mech") && isGroundCombat) {
             buttons.add(Buttons.gray(
-                    p1.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units",
+                    p1.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units_pink",
                     "Draw 1 Unit Upgrade (Upon Win)",
                     FactionEmojis.pinktf));
         }

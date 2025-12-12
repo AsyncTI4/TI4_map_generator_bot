@@ -85,7 +85,7 @@
         "name": "Rescue",
         "phase": "Action",
         "window": "After a player moves ships into a system that contains your ships",
-        "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens.",
+        "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens. [Note: you can transport with this]",
         "flavorText": "\"Hold on...\" Tuck pleaded. \"We are coming. Hold on, please...\"",
         "source": "thunders_edge"
     },

@@ -72,8 +72,6 @@ public class StatusCleanupService {
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
-
-        returnEndStatusPNs(game); // return any PNs with "end of status phase" return timing
         closeRoundThreads(game);
 
         Map<String, Player> players = game.getPlayers();
@@ -94,29 +92,6 @@ public class StatusCleanupService {
             RefreshCardsService.refreshPlayerCards(game, player, true);
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");
-
-            String shareKnowledgeConst = "ShareKnowledge_" + player.getFaction();
-            String sharedKnowledge = game.getStoredValue(shareKnowledgeConst);
-            if (player.isRealPlayer() && sharedKnowledge != null && !sharedKnowledge.isEmpty()) {
-                game.removeStoredValue(shareKnowledgeConst);
-                if (player.getPromissoryNotesInPlayArea().contains("shareknowledge")) {
-                    player.removeTech(sharedKnowledge);
-                    TechnologyModel tech = Mapper.getTech(sharedKnowledge);
-                    String msg = player.getRepresentation() + " technology " + tech.getRepresentation(false)
-                            + " has been removed, and Share Knowledge has been returned to the owner.";
-                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg);
-
-                    player.removePromissoryNote("shareknowledge");
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (p2.ownsPromissoryNote("shareknowledge")) {
-                            p2.setPromissoryNote("shareknowledge");
-                            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
-                            break;
-                        }
-                    }
-                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
-                }
-            }
 
             if (player.isRealPlayer()
                     && game.getStoredValue("Pre Pass " + player.getFaction()) != null
@@ -175,7 +150,7 @@ public class StatusCleanupService {
         game.clearAllEmptyStoredValues();
     }
 
-    private void returnEndStatusPNs(Game game) {
+    public static void returnEndStatusPNs(Game game) {
         Map<String, Player> players = game.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
@@ -186,7 +161,7 @@ public class StatusCleanupService {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if ((pnModel.getText().contains("eturn this card")
+                if ((pnModel.getText().contains("return this card")
                         && pnModel.getText().contains("end of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
@@ -196,6 +171,25 @@ public class StatusCleanupService {
                             player.getCorrectChannel(),
                             "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
                                     + ".");
+                }
+                if (pn.equalsIgnoreCase("shareknowledge")) {
+                    String shareKnowledgeConst = "ShareKnowledge_" + player.getFaction();
+                    String sharedKnowledge = game.getStoredValue(shareKnowledgeConst);
+                    player.removePromissoryNote(pn);
+                    pnOwner.setPromissoryNote(pn);
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
+                    TechnologyModel tech = Mapper.getTech(sharedKnowledge);
+                    if (player.isRealPlayer()
+                            && sharedKnowledge != null
+                            && !sharedKnowledge.isEmpty()
+                            && tech != null) {
+                        game.removeStoredValue(shareKnowledgeConst);
+                        player.removeTech(sharedKnowledge);
+                        String msg = player.getRepresentation() + " technology " + tech.getRepresentation(false)
+                                + " has been removed, and Share Knowledge has been returned to the owner.";
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    }
                 }
             }
         }

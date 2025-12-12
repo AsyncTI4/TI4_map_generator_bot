@@ -1,0 +1,74 @@
+[
+    {
+        "alias": "belkoseabt",
+        "name": "Trinity Stockpile",
+        "displayName": "Trinity\nStockpile",
+        "faction": "belkosea",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "At any time, you may exhaust this card and purge 1 command token from your strategy pool; destroy all units on a planet that contains a superweapon or is adjacent to your home system. Then, exhaust that planet, if able.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "uydaibt",
+        "name": "Prescient Warriors",
+        "displayName": "Prescient\nWarriors",
+        "faction": "uydai",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "If you have the Infantry II technology, flip this card and place it on top of Infantry II.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "pharadnbt",
+        "name": "Hidden Vaults",
+        "displayName": "Hidden\nVaults",
+        "faction": "pharadn",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "text": "When you explore a planet, you may produce 1 infantry on that planet. At any time, you may exhaust this card to destroy any number of your units on the game board.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "qhetbt",
+        "name": "Duranium Outfitting",
+        "displayName": "Duranium\nOutfitting",
+        "faction": "qhet",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "At the start of ground combat, choose 1 of your plastic-piece infantry participating in that combat; that plastic-piece unit gains SUSTAIN DAMAGE until the end of that combat.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "atokerabt",
+        "name": "Panoply Animus",
+        "displayName": "Panoply\nAnimus",
+        "faction": "atokera",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "Your structures gain SUSTAIN DAMAGE and participate in ground combat as if they were ground forces with a combat value of 7",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "toldarbt",
+        "name": "Dyrun's War-Bell",
+        "displayName": "Dyrun's\nWar-Bell",
+        "faction": "toldar",
+        "synergy": [
+            "CYBERNETIC",
+            "WARFARE"
+        ],
+        "text": "If you have more Dishonor than Honor, flip this card. During each round of combat, up to 1 hit you cancel is instead produced against your opponent’s units. \nIf you have more Honor than Dishonor, flip this card. Once per round of combat, you may produce 1 hit against your units to produce 1 hit against your opponent’s units.",
+        "source": "blue_reverie"
+    }
+]
