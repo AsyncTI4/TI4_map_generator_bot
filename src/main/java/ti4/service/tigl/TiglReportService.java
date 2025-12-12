@@ -2,10 +2,7 @@ package ti4.service.tigl;
 
 import static ti4.helpers.Constants.TIGL_FRACTURED_TAG;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,11 +46,10 @@ public class TiglReportService {
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑")
                 .append(game.getWinner().get().getPing())
-                .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-        sb.append("```\nMatch Start Date: ")
+                .append(" is the winner!\n");
+        sb.append("```\nMatch End Date: ")
                 .append(Helper.getDateRepresentationTIGL(game.getEndedDate()))
-                .append(" (TIGL wants Game End Date for Async)\n");
-        sb.append("Match Start Time: 00:00\n\n");
+                .append("\n");
         sb.append("Players:").append("\n");
         int index = 1;
         for (Player player : game.getRealPlayers()) {
@@ -117,26 +113,11 @@ public class TiglReportService {
     }
 
     private static long determineStartTimestamp(Game game) {
-        if (game.getStartedDate() > 0) {
-            return game.getStartedDate();
-        }
-        return parseCreationDate(game.getCreationDate());
+        return game.getCreationDateTime();
     }
 
     private static long determineEndTimestamp(Game game) {
         return game.getEndedDate();
-    }
-
-    private static long parseCreationDate(String creationDate) {
-        if (StringUtils.isBlank(creationDate)) {
-            return 0L;
-        }
-        try {
-            LocalDate date = LocalDate.parse(creationDate, CREATION_DATE_FORMATTER);
-            return date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
-        } catch (DateTimeParseException ignored) {
-            return 0L;
-        }
     }
 
     private static Long parseDiscordId(String userId) {

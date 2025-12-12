@@ -122,9 +122,9 @@ public class LoreService {
 
         public static LoreEntry fromString(String loreString) {
             String[] splitLore = loreString.split(";");
-            LoreEntry entry = new LoreEntry(clean(splitLore[1]));
+            LoreEntry entry = new LoreEntry(splitLore[1]);
             entry.target = splitLore[0].trim();
-            entry.footerText = splitLore.length > 2 ? clean(splitLore[2]) : "";
+            entry.footerText = splitLore.length > 2 ? splitLore[2] : "";
             try {
                 entry.receiver = RECEIVER.valueOf(splitLore[3]);
                 entry.trigger = TRIGGER.valueOf(splitLore[4]);
@@ -430,8 +430,9 @@ public class LoreService {
         String[] selectedOptions = event.getModalId().replace("gmLoreSave_", "").split("_");
         Map<String, LoreEntry> loreMap = getGameLore(game);
 
-        LoreEntry newEntry = new LoreEntry(event.getValue(Constants.MESSAGE).getAsString());
-        newEntry.footerText = event.getValue("footer").getAsString();
+        LoreEntry newEntry =
+                new LoreEntry(clean(event.getValue(Constants.MESSAGE).getAsString()));
+        newEntry.footerText = clean(event.getValue("footer").getAsString());
         newEntry.receiver = RECEIVER.valueOf(selectedOptions[0]);
         newEntry.trigger = TRIGGER.valueOf(selectedOptions[1]);
         newEntry.ping = PING.valueOf(selectedOptions[2]);
@@ -507,7 +508,7 @@ public class LoreService {
         }
     }
 
-    private static String clean(String input) {
+    public static String clean(String input) {
         return input == null ? "" : input.trim().replace(";", "").replace("|", "");
     }
 

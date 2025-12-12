@@ -16,9 +16,4 @@ class TechExhaust extends TechAddRemove {
         PlayerTechService.exhaustTechAndResolve(event, getGame(), player, techID);
         PlayerTechService.checkAndApplyCombatMods(event, player, techID);
     }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
-    }
 }
