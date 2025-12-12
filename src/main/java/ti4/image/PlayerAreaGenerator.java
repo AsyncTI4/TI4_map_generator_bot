@@ -533,7 +533,7 @@ class PlayerAreaGenerator {
         if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
             xDelta = pnInfo(player, xDelta, yPlayArea, game);
         }
-        xDelta = breakthroughInfo(player, xDelta, yPlayArea, game);
+        xDelta = allBreakthroughInfo(player, xDelta, yPlayArea, game);
         xDelta = techInfo(player, xDelta, yPlayArea, game);
 
         if (!player.getNotResearchedFactionTechs().isEmpty()) {
@@ -2507,36 +2507,43 @@ class PlayerAreaGenerator {
         return x + deltaX + 20;
     }
 
-    private int breakthroughInfo(Player player, int x, int y, Game game) {
-        BreakthroughModel bt = player.getBreakthroughModel();
-        if (bt == null
+    private int allBreakthroughInfo(Player player, int x, int y, Game game) {
+        for (String bt : player.getBreakthroughIDs()) {
+            x = breakthroughInfo(player, bt, x, y, game);
+        }
+        return x + 20;
+    }
+
+    private int breakthroughInfo(Player player, String bt, int x, int y, Game game) {
+        BreakthroughModel model = player.getBreakthroughModel(bt);
+        if (model == null
                 || ((!game.isThundersEdge() || game.isTwilightsFallMode())
-                        && !player.hasUnlockedBreakthrough(bt.getID()))) return x;
-        String name = bt.getDisplayName() == null ? bt.getName() : bt.getDisplayName();
-        String faction = bt.getFaction().orElse(null);
-        boolean exh = player.isBreakthroughExhausted();
-        boolean unl = player.isBreakthroughUnlocked();
+                        && !player.hasUnlockedBreakthrough(model.getID()))) return x;
+        String name = model.getDisplayName() == null ? model.getName() : model.getDisplayName();
+        String faction = model.getFaction().orElse(null);
+        boolean exh = player.isBreakthroughExhausted(bt);
+        boolean unl = player.isBreakthroughUnlocked(bt);
 
         // Draw something
         try {
             Color boxColor = Color.white;
             if (!unl) boxColor = Color.red;
             else if (exh) boxColor = Color.gray;
-            if (unl && player.isBreakthroughActive()) boxColor = new Color(19, 249, 236);
+            if (unl && player.isBreakthroughActive(bt)) boxColor = new Color(19, 249, 236);
 
             Color textColor = Color.white;
             if (!unl || exh) textColor = Color.gray;
 
-            String resource = bt.getBackgroundResource();
+            String resource = model.getBackgroundResource();
 
             BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
-            drawRectWithOverlay(graphics, x, y - 3, 44, 154, bt);
+            drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
             graphics.drawImage(btBox, x, y - 3, null);
 
-            if (player.getBreakthroughTGs() > 0) {
+            if (player.getBreakthroughTGs(bt) > 0) {
                 BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);
                 graphics.drawImage(tg, x + 2, y - 40, null);
-                String tgs = Integer.toString(player.getBreakthroughTGs());
+                String tgs = Integer.toString(player.getBreakthroughTGs(bt));
                 graphics.setFont(Storage.getFont32());
                 DrawingUtil.superDrawString(
                         graphics,
@@ -2553,8 +2560,7 @@ class PlayerAreaGenerator {
             BotLogger.error("Error displaying breakthrough: " + name, e);
             return x;
         }
-
-        return x + 60;
+        return x + 44;
     }
 
     private BufferedImage createPABox(

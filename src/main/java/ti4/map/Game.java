@@ -1984,11 +1984,8 @@ public class Game extends GameProperties {
                 break;
             }
         }
-        if (!id.isEmpty()) {
-            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            return scoredPlayerList.remove(userID);
-        }
-        return false;
+
+        return unscorePublicObjective(userID, id);
     }
 
     public boolean unscorePublicObjective(String userID, String id) {
@@ -4085,11 +4082,21 @@ public class Game extends GameProperties {
     }
 
     public void removePlanet(UnitHolder planet) {
-        for (Player player_ : players.values()) {
-            String color = player_.getColor();
+        if ("styx".equals(planet.getName())) {
+            String marrow = "A Song Like Marrow";
+            for (Player p : players.values()) {
+                if (unscorePublicObjective(p.getUserID(), marrow)) {
+                    String msg = p.getRepresentation() + " lost 1 VP because Styx is gone.";
+                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg);
+                }
+            }
+        }
+
+        for (Player p : players.values()) {
+            String color = p.getColor();
             planet.removeAllUnits(color);
-            PlanetRemove.removePlayerControlToken(player_, planet);
-            player_.removePlanet(planet.getName());
+            PlanetRemove.removePlayerControlToken(p, planet);
+            p.removePlanet(planet.getName());
         }
     }
 
@@ -4704,6 +4711,18 @@ public class Game extends GameProperties {
             }
         }
         return player;
+    }
+
+    @Nullable
+    public Player getPlayerFromBreakthrough(String bt) {
+        if (bt != null) {
+            for (Player player : players.values()) {
+                if (player.hasBreakthrough(bt)) {
+                    return player;
+                }
+            }
+        }
+        return null;
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {

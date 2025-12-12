@@ -117,7 +117,7 @@ public class SilverFlameService {
         ButtonHelper.deleteAllButtons(event);
         if (!FractureService.isFractureInPlay(game)) {
             FractureService.spawnFracture(null, game);
-            FractureService.spawnIngressTokens(null, game, player, false);
+            FractureService.spawnIngressTokens(null, game, player, null);
         }
     }
 
@@ -177,7 +177,7 @@ public class SilverFlameService {
         game.removeTile(homeSystem.getPosition());
         if (!FractureService.isFractureInPlay(game)) {
             FractureService.spawnFracture(null, game);
-            FractureService.spawnIngressTokens(null, game, player, false);
+            FractureService.spawnIngressTokens(null, game, player, null);
         }
         ButtonHelper.deleteMessage(event);
     }

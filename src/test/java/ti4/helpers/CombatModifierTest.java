@@ -134,8 +134,8 @@ class CombatModifierTest extends BaseTi4Test {
         player.setFactionEmoji("<" + faction + ">");
         player.setColor(color.getName());
         player.setUnitsOwned(new HashSet<>(model.getUnits()));
-        player.setBreakthroughID(model.getBreakthrough());
-        player.setBreakthroughUnlocked(true);
+        player.addBreakthrough(model.getBreakthrough());
+        player.setBreakthroughUnlocked(model.getBreakthrough(), true);
         player.setCommoditiesBase(model.getCommodities());
         player.setPlanets(model.getHomePlanets());
         player.setFactionTechs(model.getFactionTech());

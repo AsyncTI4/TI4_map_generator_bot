@@ -531,9 +531,19 @@ public class TeHelperActionCards {
             }
         }
         for (Player p : game.getRealPlayers()) {
-            if (p.getBreakthroughID() != null && !p.isBreakthroughUnlocked()) {
+            int lockedCount = 0;
+            for (String btID : p.getBreakthroughIDs()) {
+                if (!p.isBreakthroughUnlocked(btID)) {
+                    lockedCount++;
+                }
+            }
+
+            if (lockedCount > 0) {
                 String id = "resolveBrillianceUnlock_" + p.getFaction();
                 String label = "Unlock " + p.getBreakthroughModel().getName();
+                if (lockedCount > 1) {
+                    label = "Unlock " + p.getFactionModel().getShortName() + "'s Breakthroughs";
+                }
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             }
         }
@@ -548,7 +558,7 @@ public class TeHelperActionCards {
         String regex = "resolveBrillianceUnlock_" + RegexHelper.factionRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Player p2 = game.getPlayerFromColorOrFaction(matcher.group("faction"));
-            BreakthroughCommandHelper.unlockBreakthrough(game, p2);
+            BreakthroughCommandHelper.unlockAllBreakthroughs(game, p2);
             ButtonHelper.deleteMessage(event);
         });
     }

@@ -846,8 +846,9 @@ public class ComponentActionHelper {
                 }
             }
             case "exhaustBT" -> {
-                BreakthroughModel btModel = Mapper.getBreakthrough(buttonID);
-                p1.setBreakthroughExhausted(true);
+                String btID = buttonID;
+                BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+                p1.getBreakthroughExhausted().put(btID, true);
                 String message = p1.getRepresentation() + " exhausted " + btModel.getName();
                 MessageHelper.sendMessageToChannelWithEmbed(
                         event.getMessageChannel(), message, btModel.getRepresentationEmbed());
