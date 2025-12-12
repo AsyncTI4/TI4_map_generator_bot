@@ -18,6 +18,7 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -517,7 +518,10 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray("startThundersParadox", label, FactionEmojis.Nomad));
             }
             if (player.hasTech("parasite-obs") || player.hasTech("tf-neuralparasite")) {
-                startButtons.add(Buttons.gray("startNeuralParasite", "Use Neural Parasite", FactionEmojis.Obsidian));
+                if (!TeHelperTechs.neuralParasiteButtons(game, player).isEmpty()) {
+                    startButtons.add(Buttons.gray(
+                            "startNeuralParasite", "Use Neural Parasite (Mandatory)", FactionEmojis.Obsidian));
+                }
             }
 
             if (player.hasTech("cm") || player.hasTech("tf-chaos")) {

@@ -20,6 +20,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.image.TileHelper;
@@ -71,6 +72,9 @@ public class ButtonHelperModifyUnits {
         if (mentakFS != null
                 && mentakFS != player
                 && unitHolder.getUnitCount(UnitType.Flagship, mentakFS.getColor()) > 0) {
+            return 0;
+        }
+        if (TeHelperUnits.affectedByQuietus(game, player, unitHolder)) {
             return 0;
         }
         if (game.getActiveSystem() != null
@@ -1137,6 +1141,8 @@ public class ButtonHelperModifyUnits {
             if (player != player2 && players.contains(player)) {
                 if (player2.hasUnlockedBreakthrough("titansbt")
                         || player.hasUnlockedBreakthrough("titansbt")
+                        || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
+                        || (player2.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
                         || player.hasAbility("researchteam")
                         || player.hasUnit("tf-ambassador")
                         || player2.hasAbility("researchteam")) {
@@ -1149,6 +1155,7 @@ public class ButtonHelperModifyUnits {
                             player.getFinsFactionCheckerPrefix() + "startCombatOn_" + unitHolder.getName(),
                             "Engage in Combat"));
                     if (player.hasUnlockedBreakthrough("titansbt")
+                            || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                             || player.hasAbility("researchteam")
                             || player.hasUnit("tf-ambassador")) {
                         buttons.add(Buttons.green(
@@ -1159,7 +1166,10 @@ public class ButtonHelperModifyUnits {
                                 Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Coexistence"));
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-                    if (player2.getPlanets().contains(unitHolder.getName()) && player2.hasAbility("researchteam")) {
+                    if (player2.getPlanets().contains(unitHolder.getName())
+                            && (player2.hasAbility("researchteam")
+                                    || (player2.hasUnit("firmament_mech")
+                                            && unitHolder.getUnitCount(UnitType.Mech, player2) > 0))) {
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 player2.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
@@ -2009,7 +2019,7 @@ public class ButtonHelperModifyUnits {
                     player.getRepresentationUnfogged() + " captured\\* 1 newly produced "
                             + UnitEmojis.getUnitEmoji(name)
                             + " in " + tile.getRepresentationForButtons(game, player)
-                            + " using \"A Tall Stranger\", the Red Creuss Hero ability."
+                            + " using the Crimson Hero ability."
                             + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
@@ -2169,7 +2179,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
+        MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);
         String message2 = player.getRepresentationUnfogged() + ", please choose the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         if (skipbuild.contains("freelancers")) {
@@ -2201,7 +2211,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(DoneExhausting);
         if (!willSkipBuild) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
                 if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
                     List<Button> buttons2 = new ArrayList<>();
@@ -2213,7 +2223,7 @@ public class ButtonHelperModifyUnits {
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
                             + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline. [Note: Finish your normal build first for best results.]";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons2);
                 }
             }
             if (player.hasUnlockedBreakthrough("ghostbt")

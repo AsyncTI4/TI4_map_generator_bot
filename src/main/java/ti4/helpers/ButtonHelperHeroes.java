@@ -143,7 +143,7 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null || unitModel.getIsStructure()) continue;
+                if (unitModel == null || (unitModel.getIsStructure() && unitHolder.getName() != "space")) continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = unitKey.unitName();
                 int totalUndamagedUnits = unitEntry.getValue();

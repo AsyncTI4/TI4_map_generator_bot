@@ -1221,6 +1221,12 @@ public class ButtonHelperTwilightsFall {
                     player.getRepresentationNoPing()
                             + " has taken a secret card. They may put it into play with a button in their cards info.");
         }
+        if (buttonID.contains("pinktfmech")) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " Remove the Mech",
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
+        }
     }
 
     public static List<String> getDeckForSplicing(Game game, String type, int size) {
