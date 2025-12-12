@@ -12,13 +12,13 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -113,19 +113,14 @@ public class PickStrategyCardButtonHandler {
             }
         }
         if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num) && !game.isTwilightsFallMode()) {
-            if (player.getStrategicCC() < 1) {
+            if (player.getEffectiveFleetCC() < 1) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your strategy pool to spend.");
+                                + ", you can't pick this strategy card because it has been targeted by _Deflection_, and you don't have a command token in your fleet pool to spend.");
                 return false;
             } else {
-                player.setStrategicCC(player.getStrategicCC() - 1);
-                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + " spent 1 command token from their strategy pool to pick this strategy card due to _Deflection_.");
+                MahactTokenService.removeFleetCC(game, player, "due to _Deflection_");
             }
         }
 

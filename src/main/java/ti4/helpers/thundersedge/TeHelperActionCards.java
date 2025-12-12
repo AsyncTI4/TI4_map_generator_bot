@@ -27,6 +27,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.ColorModel;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -253,13 +254,8 @@ public class TeHelperActionCards {
 
     @ButtonHandler("loseAFleetCultural")
     private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        player.setFleetCC(player.getFleetCC() - 1);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getRepresentation()
-                        + " has removed a command token from their fleet pool due to failing to reach an agreement on the cultural exchange.");
-        ButtonHelper.checkFleetInEveryTile(player, game);
-
+        String mahactReason = "due to failing to reach an agreement on _Exchange Program_.";
+        MahactTokenService.removeFleetCC(game, player, mahactReason);
         event.getMessage().delete().queue();
     }
 

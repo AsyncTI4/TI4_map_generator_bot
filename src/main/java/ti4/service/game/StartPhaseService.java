@@ -741,9 +741,17 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
-                String cyberMessage = "## " + player.getRepresentationUnfogged()
-                        + ", a reminder you should gain 1 less Command token here due to Malevolency";
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
+                boolean mahactMalev = player.getMahactCC().size() > 0;
+                if (mahactMalev) {
+                    String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
+                    malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
+                    malevMsg += " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
+                } else {
+                    String malevMsg = "## " + player.getRepresentationUnfogged() + ", a reminder";
+                    malevMsg += " you should gain 1 less Command token here due to _Malevolency";
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
+                }
             }
             if (!player.ownsPromissoryNote("sigma_machinations") && "sigma_machinations".equalsIgnoreCase(pn)) {
                 String cyberMessage = player.getRepresentationUnfogged() + ", a reminder to use _Machinations_.";

@@ -1,6 +1,9 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,6 +82,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.StatusCleanupService;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.AutoFactoriesService;
 import ti4.service.breakthrough.EidolonMaximumService;
@@ -2029,7 +2033,8 @@ public class UnfiledButtonHandlers {
         String editedMessage = event.getMessage().getContentRaw();
         if (("Done Gaining Command Tokens".equalsIgnoreCase(buttonLabel)
                         || "Done Redistributing Command Tokens".equalsIgnoreCase(buttonLabel)
-                        || "Done Losing Command Tokens".equalsIgnoreCase(buttonLabel))
+                        || "Done Losing Command Tokens".equalsIgnoreCase(buttonLabel)
+                        || "Done Losing Fleet Tokens".equalsIgnoreCase(buttonLabel))
                 && editedMessage.contains("command tokens have gone from")) {
 
             String playerRep = player.getRepresentation();
@@ -2051,6 +2056,10 @@ public class UnfiledButtonHandlers {
                     }
                 }
                 if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
+                    if (malevolency && player.getMahactCC().size() > 0) {
+                        malevolency = false;
+                        MahactTokenService.removeFleetCC(game, player, "due to _Malevolency_");
+                    }
                     if (player.hasAbility("versatile")
                             || player.hasTech("hm")
                             || cyber
@@ -3252,11 +3261,10 @@ public class UnfiledButtonHandlers {
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue();
-        if (ButtonHelper.isLawInPlay(game, "regulations") && player.getFleetCC() > 4) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentation()
-                            + " reminder that under the _Fleet Regulations_ law, fleet pools are limited to 4 command tokens.");
+        if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
+            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            msg += " law in play, which is limiting fleet pool to 4 tokens.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
     }
 
@@ -3405,14 +3413,7 @@ public class UnfiledButtonHandlers {
                 + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
 
-        String finChecker = player.finChecker();
-        Button loseTactic = Buttons.red(finChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
-        Button loseFleet = Buttons.red(finChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
-        Button loseStrat = Buttons.red(finChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
-        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons_spitItOut", "Done Losing 1 Command Token");
-        Button resetCC = Buttons.gray(finChecker + "resetCCs", "Reset Command Tokens");
-
-        List<Button> buttons = Arrays.asList(loseTactic, loseFleet, loseStrat, doneGainingCC, resetCC);
+        List<Button> buttons = ButtonHelper.getLoseCCButtons(player);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), player.getRepresentation() + " has chosen to lose 1 command token.");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -3459,6 +3460,7 @@ public class UnfiledButtonHandlers {
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             boolean cyber = false;
             boolean malevolency = false;
+            boolean mahactMalev = false;
             for (String pn : player.getPromissoryNotes().keySet()) {
                 if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                     cyber = true;
@@ -3466,6 +3468,10 @@ public class UnfiledButtonHandlers {
                 if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
                     malevolency = true;
                 }
+            }
+            if (malevolency && player.getMahactCC().size() > 0) {
+                malevolency = false;
+                mahactMalev = true;
             }
             if (player.hasAbility("versatile")
                     || player.hasTech("hm")
@@ -3499,6 +3505,12 @@ public class UnfiledButtonHandlers {
                         "## " + player.getRepresentationUnfogged()
                                 + ", heads up, the bot thinks you should gain " + properGain + " command token"
                                 + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
+                if (player.getMahactCC().size() > 0) {
+                    String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
+                    malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
+                    malevMsg += " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
+                }
             }
             if (game.isCcNPlasticLimit()) {
                 MessageHelper.sendMessageToChannel(
