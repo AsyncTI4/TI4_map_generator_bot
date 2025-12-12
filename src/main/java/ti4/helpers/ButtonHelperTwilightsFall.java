@@ -369,9 +369,9 @@ public class ButtonHelperTwilightsFall {
         List<String> cards = getSpliceCards(game);
         List<Button> buttons = getSpliceButtons(game, type, cards, player);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
-        String msg = player.getRepresentation() + " Select a card to splice into your faction:";
+        String msg = player.getRepresentationUnfogged() + " Select a card to splice into your faction:";
         if (game.getStoredValue("engineerACSplice").startsWith("remove")) {
-            msg = player.getRepresentation() + " select a card to remove from the splice:";
+            msg = player.getRepresentationUnfogged() + " select a card to remove from the splice:";
         }
         if (player.isNpc()) {
             selectASpliceCard(

@@ -16,7 +16,7 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).isEqualTo(1730248570L);
+        assertThat(setupTimestamp).isEqualTo(1730247890L);
     }
 
     @Test
@@ -26,7 +26,7 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(String.valueOf(setupTimestamp)).endsWith("70");
+        assertThat(String.valueOf(setupTimestamp)).endsWith("90");
     }
 
     @Test
