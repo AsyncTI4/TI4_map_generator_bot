@@ -72,7 +72,7 @@ public class LeaderInfoService {
                     if (otherPlayerAgent == null) {
                         continue;
                     }
-                    yssarilEmbeds.add(otherPlayerAgent.getLeaderEmbed());
+                    yssarilEmbeds.add(otherPlayerAgent.getLeaderEmbed(player.getGame()));
                 }
             }
         }
@@ -115,7 +115,7 @@ public class LeaderInfoService {
     private static List<MessageEmbed> getPlayersLeaderEmbeds(Player player) {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (Leader leader : player.getLeaders()) {
-            embeds.add(leader.getLeaderEmbed());
+            embeds.add(leader.getLeaderEmbed(player.getGame()));
         }
         return embeds;
     }

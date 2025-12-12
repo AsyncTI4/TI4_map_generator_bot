@@ -43,6 +43,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -1894,6 +1895,9 @@ public class Helper {
             }
         }
         if (tile.isScar(game) && !player.hasUnlockedBreakthrough("nivynbt")) {
+            return 0;
+        }
+        if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
             return 0;
         }
         if (game.isTwilightsFallMode()) {

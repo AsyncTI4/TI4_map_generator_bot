@@ -3,7 +3,7 @@ package ti4.map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.awt.*;
+import java.awt.Color;
 import java.util.Comparator;
 import java.util.Optional;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -108,6 +108,40 @@ public class Leader {
         }
         EmbedBuilder eb = new EmbedBuilder();
         MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, locked, false);
+        eb.copyFrom(modelEmbed);
+
+        if (tgCount > 0) {
+            String desc = modelEmbed.getDescription();
+            eb.setDescription(desc + "\n" + MiscEmojis.tg(tgCount));
+        }
+
+        if (exhausted) {
+            eb.setColor(Color.GRAY);
+        } else {
+            eb.setColor(Color.GREEN);
+        }
+
+        if (locked) {
+            eb.setColor(Color.RED);
+            eb.setAuthor("🔒 Locked");
+        }
+
+        if (active) {
+            eb.setColor(Color.BLUE);
+            eb.setAuthor("🔒 ACTIVE - Leader will be purged during Status Phase cleanup");
+        }
+
+        return eb.build();
+    }
+
+    @JsonIgnore
+    public MessageEmbed getLeaderEmbed(Game game) {
+        if (getLeaderModel().isEmpty()) {
+            return null;
+        }
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageEmbed modelEmbed =
+                getLeaderModel().get().getRepresentationEmbed(false, false, locked, false, game.isTwilightsFallMode());
         eb.copyFrom(modelEmbed);
 
         if (tgCount > 0) {

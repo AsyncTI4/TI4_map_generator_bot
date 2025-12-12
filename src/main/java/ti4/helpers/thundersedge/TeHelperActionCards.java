@@ -363,6 +363,12 @@ public class TeHelperActionCards {
             player.setTg(player.getTg() - 2);
             String message = player.getRepresentation() + " paid some mercenaries 2tg to post up at "
                     + Helper.getPlanetRepresentation(planet, game);
+            if (tile != null && tile.getPosition().contains("frac")) {
+                Planet uh = game.getUnitHolderFromPlanet(planet);
+                if (uh != null) {
+                    uh.addToken("token_relictoken.png");
+                }
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         });
