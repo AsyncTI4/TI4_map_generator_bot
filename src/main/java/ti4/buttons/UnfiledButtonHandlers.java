@@ -2625,6 +2625,8 @@ public class UnfiledButtonHandlers {
                 }
             }
             case "redistributeCCButtons" -> {
+                StatusCleanupService.returnEndStatusPNs(
+                        game); // return any PNs with "end of status phase" return timing
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     if (game.isTwilightsFallMode()) {
@@ -3456,14 +3458,19 @@ public class UnfiledButtonHandlers {
 
         if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             boolean cyber = false;
+            boolean malevolency = false;
             for (String pn : player.getPromissoryNotes().keySet()) {
                 if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
                     cyber = true;
+                }
+                if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
+                    malevolency = true;
                 }
             }
             if (player.hasAbility("versatile")
                     || player.hasTech("hm")
                     || cyber
+                    || malevolency
                     || player.hasTech("tf-inheritancesystems")) {
                 int properGain = 2;
                 String reasons = "";
@@ -3473,23 +3480,25 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasTech("hm")) {
                     properGain += 1;
-                    reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
+                    reasons += (properGain == 3 ? "" : ", ") + "_Hyper Metabolism_";
                 }
                 if (player.hasTech("tf-inheritancesystems")) {
                     properGain += 1;
-                    reasons += (properGain == 1 ? "" : ", ") + "_Inheritance Systems_";
+                    reasons += (properGain == 3 ? "" : ", ") + "_Inheritance Systems_";
                 }
                 if (cyber) {
                     properGain += 1;
-                    reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
+                    reasons += (properGain == 3 ? "" : ", ") + "_Cybernetic Enhancements_";
                 }
-                if (properGain > 2) {
-                    MessageHelper.sendMessageToChannel(
-                            player.getCardsInfoThread(),
-                            "## " + player.getRepresentationUnfogged()
-                                    + ", heads up, the bot thinks you should gain " + properGain + " command token"
-                                    + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
+                if (malevolency) {
+                    properGain -= 1;
+                    reasons += (properGain == 1 ? "" : ", ") + "_Malevolency_";
                 }
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        "## " + player.getRepresentationUnfogged()
+                                + ", heads up, the bot thinks you should gain " + properGain + " command token"
+                                + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
             }
             if (game.isCcNPlasticLimit()) {
                 MessageHelper.sendMessageToChannel(

@@ -1127,9 +1127,6 @@ public class ButtonHelperActionCards {
             Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player) {
-                continue;
-            }
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getCrippleTargetsFor(p2, game));
             } else {
@@ -2506,6 +2503,7 @@ public class ButtonHelperActionCards {
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.deleteMessage(event);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+
         int amount = uH.getUnitCount(UnitType.Pds, p2.getColor());
         if (amount > 0) {
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
@@ -2513,6 +2511,18 @@ public class ButtonHelperActionCards {
             RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
             if (p2.hasAbility("data_recovery")) {
                 ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
+        }
+        for (Player p3 : game.getRealPlayers()) {
+            int amount2 = uH.getUnitCount(UnitType.Pds, p3.getColor());
+            if (amount2 > 0) {
+                UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p3.getColor());
+                var unit = new ParsedUnit(key, amount2, planet);
+                RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
+                if (p3.hasAbility("data_recovery")) {
+                    ButtonHelperAbilities.dataRecovery(p3, game, event, "dataRecovery_" + player.getColor());
+                }
+                amount += amount2;
             }
         }
         if (game.isFowMode()) {
@@ -2527,9 +2537,10 @@ public class ButtonHelperActionCards {
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you crippled " + planetRep
+                    player.getRepresentationUnfogged() + ", you crippled " + planetRep + " owned by "
+                            + p2.getRepresentationUnfogged()
                             + (amount > 0
-                                    ? " and killed " + amount + " of " + p2.getRepresentationUnfogged() + " PDS."
+                                    ? " and killed " + amount + " PDS."
                                     : ". There were no " + p2.getRepresentationUnfogged() + " PDS to kill."));
         }
     }

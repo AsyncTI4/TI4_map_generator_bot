@@ -61,6 +61,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -1476,6 +1477,12 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work in an entropic scar.");
+        }
+
+        if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) are turned off for other players in systems with active breaches while Crimson flagship is in an active breach.");
         }
 
         if (!game.isFowMode()) {
@@ -5451,7 +5458,7 @@ public class ButtonHelper {
             if (p2 != player
                     && CommandCounterHelper.hasCC(event, p2.getColor(), tile)
                     && (game.playerHasLeaderUnlockedOrAlliance(p2, "empyreancommander")
-                            || player.hasTech("tf-overwatch"))) {
+                            || p2.hasTech("tf-overwatch"))) {
                 MessageChannel channel = game.getMainGameChannel();
                 if (game.isFowMode()) {
                     channel = p2.getPrivateChannel();
@@ -5469,6 +5476,17 @@ public class ButtonHelper {
         List<Tile> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             if (FoWHelper.playerHasActualShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                buttons.add(tile);
+            }
+        }
+        return buttons;
+    }
+
+    public static List<Tile> getTilesWithUnitsInTheSpaceArea(Player player, Game game) {
+        List<Tile> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
+            if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 buttons.add(tile);
             }

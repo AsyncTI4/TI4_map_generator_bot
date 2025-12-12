@@ -173,6 +173,18 @@ public class ButtonHelperAgents {
                     "cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2, UnitEmojis.destroyer);
             buttons.add(unitButton2);
         }
+        unit2 = "fighter";
+        if (maxComms > 0) {
+            unitButton2 = Buttons.red(
+                    "cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2, UnitEmojis.destroyer);
+            buttons.add(unitButton2);
+        }
+        unit2 = "infantry";
+        if (maxComms > 0) {
+            unitButton2 = Buttons.red(
+                    "cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2, UnitEmojis.destroyer);
+            buttons.add(unitButton2);
+        }
 
         unit2 = "mech";
         if (maxComms > 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 4) {
@@ -891,7 +903,7 @@ public class ButtonHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             message = ", please choose the first system that you wish to swap a ship between (and transport).";
             List<Button> buttons = new ArrayList<>();
-            List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(p2, game);
+            List<Tile> tiles = ButtonHelper.getTilesWithUnitsInTheSpaceArea(player, game);
             for (Tile tile : tiles) {
                 buttons.add(Buttons.gray(
                         p2.getFinsFactionCheckerPrefix() + "redcreussAgentPart1_" + tile.getPosition(),

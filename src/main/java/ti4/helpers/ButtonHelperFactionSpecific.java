@@ -3014,7 +3014,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void offerTerraformButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti", "thundersedge");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet planetReal = game.getPlanetsInfo().get(planet);
@@ -3032,7 +3032,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void offerAutomatonsButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti");
+        List<String> extraAllowedPlanets = List.of("custodiavigilia", "ghoti", "thundersedge");
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             boolean oneOfThree = game.getPlanetsInfo().get(planet) != null

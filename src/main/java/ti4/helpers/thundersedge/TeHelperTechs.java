@@ -136,10 +136,7 @@ public class TeHelperTechs {
         return new ArrayList<>(tilesAdjToInf);
     }
 
-    @ButtonHandler("startNeuralParasite")
-    private static void handleNeuralParasiteStep1(ButtonInteractionEvent event, Game game, Player player) {
-        // "At the start of your turn, destroy 1 of another player's infantry in or adjacent to a system that contains
-        // your infantry."
+    public static List<Button> neuralParasiteButtons(Game game, Player player) {
         Predicate<UnitKey> isInf = uk -> uk.getUnitType() == UnitType.Infantry;
         List<Tile> tilesAdjToObsInf = tilesAdjToPlayersInf(game, player);
         List<Player> playersWithInfAdj = game.getRealPlayersNNeutral().stream()
@@ -150,6 +147,14 @@ public class TeHelperTechs {
         List<Button> buttons = playersWithInfAdj.stream()
                 .map(p -> Buttons.gray(prefixID + p.getFaction(), null, p.fogSafeEmoji()))
                 .toList();
+        return buttons;
+    }
+
+    @ButtonHandler("startNeuralParasite")
+    private static void handleNeuralParasiteStep1(ButtonInteractionEvent event, Game game, Player player) {
+        // "At the start of your turn, destroy 1 of another player's infantry in or adjacent to a system that contains
+        // your infantry."
+        List<Button> buttons = neuralParasiteButtons(game, player);
         TechnologyModel biorganic = Mapper.getTech("parasite-obs");
         String message = player.getRepresentation() + " Choose a player to remove 1 of their infantry using "
                 + biorganic.getNameRepresentation() + ":";

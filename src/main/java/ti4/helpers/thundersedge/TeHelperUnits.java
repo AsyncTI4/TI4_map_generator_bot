@@ -78,6 +78,10 @@ public class TeHelperUnits {
         });
     }
 
+    public static boolean affectedByQuietus(Game game, Player player, Tile tile) {
+        return affectedByQuietus(game, player, tile.getSpaceUnitHolder());
+    }
+
     public static boolean affectedByQuietus(Game game, Player player, UnitHolder uh) {
         // Get the actual space unit holder if able
         if (!"space".equals(uh.getName())) {
