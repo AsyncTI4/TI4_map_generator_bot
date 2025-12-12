@@ -295,7 +295,7 @@ public class Expeditions {
                 MessageHelper.sendMessageToChannelWithButton(
                         channel, "Use the button to begin placing Thunder's Edge:", button);
             }
-            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+            BreakthroughCommandHelper.unlockBreakthroughs(game, player, player.getBreakthroughIDs());
         }
         event.getHook()
                 .editOriginal(exp.printExpeditionInfo(game, player))
