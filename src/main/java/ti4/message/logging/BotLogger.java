@@ -41,7 +41,11 @@ public class BotLogger {
      * Initialize the BotLogger system. Should be called once at bot startup.
      */
     public static void init() {
-        getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+        if (!logToConsole()) getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+    }
+
+    public static boolean logToConsole() {
+        return JdaService.testingMode;
     }
 
     /**
@@ -252,6 +256,14 @@ public class BotLogger {
         // Send off message
         String compiledMessage = msg.toString();
         int msgLength = compiledMessage.length();
+        if (logToConsole()) {
+            if (severity.isErrorOrHigher()) {
+                System.err.println(severity.name() + ": " + compiledMessage);
+            } else {
+                System.out.println(severity.name() + ": " + compiledMessage);
+            }
+            return;
+        }
 
         List<String> messageChunks = new ArrayList<>();
         // Handle message length overflow. Overflow length is derived from previous implementation
