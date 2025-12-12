@@ -40,6 +40,8 @@ public class WebPlayerArea {
         private final String breakthroughId;
         private final boolean unlocked;
         private final boolean exhausted;
+        // TODO: MemePhilosopher uncomment this
+        // private final boolean active;
         private final int tradeGoodsStored;
     }
 
@@ -178,6 +180,7 @@ public class WebPlayerArea {
     private Map<String, Integer> debtTokens;
 
     // Breakthrough (Thunder's Edge)
+    // TODO: MemePhilosopher make this a list
     private BreakthroughInfo breakthrough;
 
     // Plot cards (Firmament/Obsidian)
@@ -360,13 +363,22 @@ public class WebPlayerArea {
 
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
-            String breakthroughId = player.getBreakthroughID();
-            if (breakthroughId != null && !breakthroughId.isEmpty()) {
-                webPlayerArea.setBreakthrough(new BreakthroughInfo(
-                        breakthroughId,
-                        player.isBreakthroughUnlocked(),
-                        player.isBreakthroughExhausted(),
-                        player.getBreakthroughTGs()));
+            List<BreakthroughInfo> breakthroughs = new ArrayList<>();
+            for (String btID : player.getBreakthroughIDs()) {
+                boolean unl = player.isBreakthroughUnlocked(btID);
+                boolean exh = player.isBreakthroughExhausted(btID);
+                boolean act = player.isBreakthroughActive(btID);
+                int tgs = player.getBreakthroughTGs(btID);
+
+                // TODO: MemePhilosopher replace this ...
+                breakthroughs.add(new BreakthroughInfo(btID, unl, exh, tgs));
+                // ... with this
+                // breakthroughs.add(new BreakthroughInfo(btID, unl, exh, act, tgs));
+            }
+
+            // TODO: MemePhilosopher make this a list
+            if (breakthroughs.size() > 0) {
+                webPlayerArea.setBreakthrough(breakthroughs.getFirst());
             } else {
                 webPlayerArea.setBreakthrough(null);
             }

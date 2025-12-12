@@ -8,6 +8,8 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.collections4.CollectionUtils;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.emoji.FactionEmojis;
@@ -102,6 +104,16 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder(name);
         if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
         sb.append(" [").append(source).append("]");
+        return sb.toString();
+    }
+
+    public String getAutoCompleteName(Game game) {
+        StringBuilder sb = new StringBuilder(name);
+        if (getFaction().isPresent()) sb.append(" (").append(getFaction().get()).append(")");
+        Player p = game.getPlayerFromBreakthrough(alias);
+        if (p != null) {
+            sb.append(" ").append(p.isBreakthroughUnlocked(alias) ? "🔓" : "🔒");
+        }
         return sb.toString();
     }
 

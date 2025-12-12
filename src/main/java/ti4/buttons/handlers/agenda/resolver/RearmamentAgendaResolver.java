@@ -45,7 +45,7 @@ public class RearmamentAgendaResolver implements ForAgainstAgendaResolver {
                 }
             }
             if (player.hasActiveBreakthrough("naazbt")) {
-                BreakthroughCommandHelper.deactivateBreakthrough(player);
+                BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
             }
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Removed all mechs.");

@@ -315,11 +315,7 @@ public class MiltyService {
         String breakthrough = factionModel.getBreakthrough();
         // BREAKTHROUGH
         if (Mapper.getBreakthrough(breakthrough) != null) {
-            player.setBreakthroughID(breakthrough);
-            player.setBreakthroughUnlocked(false);
-            player.setBreakthroughExhausted(false);
-            player.setBreakthroughActive(false);
-            player.setBreakthroughTGs(0);
+            player.addBreakthrough(breakthrough);
             if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
                 List<MessageEmbed> embeds = new ArrayList<>();
                 embeds.add(player.getBreakthroughModel().getRepresentationEmbed());
@@ -712,7 +708,7 @@ public class MiltyService {
         }
 
         if (game.isThundersEdge() && "crimson".equalsIgnoreCase(player.getFaction())) {
-            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+            BreakthroughCommandHelper.unlockBreakthrough(game, player, "crimsonbt");
         }
 
         if (game.isRapidMobilizationMode()) {

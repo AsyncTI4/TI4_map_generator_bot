@@ -325,7 +325,7 @@ public class DestroyUnitService {
 
     private static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
         if (player.hasActiveBreakthrough("naazbt")) {
-            BreakthroughCommandHelper.deactivateBreakthrough(player);
+            BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
         }
         if (player.hasTech("sar")) {
             MessageHelper.sendMessageToChannel(

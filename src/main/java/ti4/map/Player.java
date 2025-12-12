@@ -336,34 +336,116 @@ public class Player extends PlayerProperties {
         getTransactionItems().remove(thing);
     }
 
+    public void addBreakthrough(String bt) {
+        getBreakthroughIDs().add(bt);
+        getBreakthroughUnlocked().put(bt, false);
+        getBreakthroughExhausted().put(bt, false);
+        getBreakthroughActive().put(bt, false);
+        getBreakthroughTGs().put(bt, 0);
+    }
+
+    public void removeBreakthrough(String bt) {
+        getBreakthroughIDs().remove(bt);
+        getBreakthroughUnlocked().remove(bt);
+        getBreakthroughExhausted().remove(bt);
+        getBreakthroughActive().remove(bt);
+        getBreakthroughTGs().remove(bt);
+    }
+
+    public boolean changeBreakthrough(String btOld, String btNew) {
+        if (!hasBreakthrough(btOld)) return false;
+
+        getBreakthroughIDs().add(btNew);
+        getBreakthroughUnlocked().put(btNew, isBreakthroughUnlocked(btOld));
+        getBreakthroughExhausted().put(btNew, isBreakthroughExhausted(btOld));
+        getBreakthroughActive().put(btNew, isBreakthroughActive(btOld));
+        getBreakthroughTGs().put(btNew, getBreakthroughTGs(btOld));
+        removeBreakthrough(btOld);
+        return true;
+    }
+
+    public String getBreakthroughID() {
+        if (getBreakthroughIDs().size() != 1) return null;
+        return getBreakthroughIDs().getFirst();
+    }
+
+    public boolean isBreakthroughUnlocked(String bt) {
+        return hasBreakthrough(bt) && getBreakthroughUnlocked().getOrDefault(bt, false);
+    }
+
+    public void setBreakthroughUnlocked(String bt, boolean unl) {
+        getBreakthroughUnlocked().put(bt, unl);
+    }
+
+    public boolean isBreakthroughExhausted(String bt) {
+        return hasBreakthrough(bt) && getBreakthroughExhausted().getOrDefault(bt, false);
+    }
+
+    public void setBreakthroughExhausted(String bt, boolean exh) {
+        getBreakthroughExhausted().put(bt, exh);
+    }
+
+    public boolean isBreakthroughActive(String bt) {
+        return hasBreakthrough(bt) && getBreakthroughActive().getOrDefault(bt, false);
+    }
+
+    public void setBreakthroughActive(String bt, boolean active) {
+        getBreakthroughActive().put(bt, active);
+    }
+
+    public int getBreakthroughTGs(String bt) {
+        return getBreakthroughTGs().getOrDefault(bt, 0);
+    }
+
+    public void setBreakthroughTGs(String bt, int amt) {
+        getBreakthroughTGs().put(bt, amt);
+    }
+
     public boolean hasBreakthrough(String bt) {
-        if (bt == null || getBreakthroughID() == null || getBreakthroughID().isEmpty()) return false;
-        return bt.equals(getBreakthroughID());
+        return getBreakthroughIDs().contains(bt);
     }
 
     public boolean hasUnlockedBreakthrough(String bt) {
-        return hasBreakthrough(bt) && isBreakthroughUnlocked();
+        return hasBreakthrough(bt) && isBreakthroughUnlocked(bt);
     }
 
     public boolean hasReadyBreakthrough(String bt) {
-        return hasUnlockedBreakthrough(bt) && !isBreakthroughExhausted();
+        return hasUnlockedBreakthrough(bt) && !isBreakthroughExhausted(bt);
     }
 
     public boolean hasActiveBreakthrough(String bt) {
-        return hasUnlockedBreakthrough(bt) && isBreakthroughActive();
+        return hasUnlockedBreakthrough(bt) && isBreakthroughActive(bt);
     }
 
     @JsonIgnore
+    @Nullable
     public BreakthroughModel getBreakthroughModel() {
         if (getBreakthroughID() == null || getBreakthroughID().isEmpty()) return null;
         return Mapper.getBreakthrough(getBreakthroughID());
     }
 
     @JsonIgnore
+    public List<BreakthroughModel> getBreakthroughModels() {
+        return getBreakthroughIDs().stream()
+                .map(Mapper::getBreakthrough)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    @JsonIgnore
+    @Nullable
+    public BreakthroughModel getBreakthroughModel(String bt) {
+        if (!hasBreakthrough(bt)) return null;
+        return Mapper.getBreakthrough(bt);
+    }
+
+    @JsonIgnore
     public Set<TechnologyType> getSynergies() {
         Set<TechnologyType> synergies = EnumSet.noneOf(TechnologyType.class);
-        if (isBreakthroughUnlocked()) {
-            synergies.addAll(getBreakthroughModel().getSynergy());
+        for (String bt : getBreakthroughIDs()) {
+            if (isBreakthroughUnlocked(bt)) {
+                synergies.addAll(getBreakthroughModel(bt).getSynergy());
+            }
         }
         if (hasRelic("quantumcore")) {
             synergies.addAll(List.of(
@@ -2412,7 +2494,7 @@ public class Player extends PlayerProperties {
         if ("planesplitter-firm".equalsIgnoreCase(techID) || "tf-planesplitter".equalsIgnoreCase(techID)) {
             if (!FractureService.isFractureInPlay(game)) {
                 FractureService.spawnFracture(null, game);
-                FractureService.spawnIngressTokens(null, game, this, false);
+                FractureService.spawnIngressTokens(null, game, this, null);
             }
         }
 
@@ -2487,6 +2569,7 @@ public class Player extends PlayerProperties {
 
             // Find another unit model to replace this lost model
             String replacementUnit = unitModel.getBaseType(); // default
+            if (unitModel.getAlias().equals("warsun")) replacementUnit = "nowarsun";
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
                 FactionModel factionSetup = getFactionSetupInfo();

@@ -654,7 +654,7 @@ public class ButtonHelperActionCards {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
                     uH.removeUnit(key, hitRolls);
                     if (hitRolls > 0 && key.getUnitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
-                        BreakthroughCommandHelper.deactivateBreakthrough(player_);
+                        BreakthroughCommandHelper.deactivateBreakthrough(player_, "naazbt");
                     }
                 }
             }

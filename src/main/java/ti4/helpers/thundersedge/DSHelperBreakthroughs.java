@@ -79,7 +79,7 @@ public class DSHelperBreakthroughs {
 
     @ButtonHandler("useAxisBT")
     public static void useAxisBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
-        p1.setBreakthroughExhausted(true);
+        p1.setBreakthroughExhausted("axisbt", true);
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
@@ -102,7 +102,7 @@ public class DSHelperBreakthroughs {
 
     @ButtonHandler("useLanefirBt")
     public static void useLanefirBt(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
-        p1.setBreakthroughExhausted(true);
+        p1.setBreakthroughExhausted("lanefirbt", true);
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation() + " has used their Lanefir breakthrough to explore 1 planet they control.");
@@ -116,7 +116,7 @@ public class DSHelperBreakthroughs {
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (p2.hasUnlockedBreakthrough("lanefirbt")) {
                 List<Button> buttons = new ArrayList<>();
-                if (p2.isBreakthroughExhausted()) {
+                if (p2.isBreakthroughExhausted("lanefirbt")) {
                     buttons.add(Buttons.green("readyLanefirBt", "Ready Lanefir Breakthrough"));
                 }
                 buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));

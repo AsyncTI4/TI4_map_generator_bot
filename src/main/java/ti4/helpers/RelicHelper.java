@@ -127,7 +127,8 @@ public class RelicHelper {
                         .append(" scored _Shard of the Throne_.");
             }
             case "quantumcore" -> {
-                if (player.getBreakthroughID() != null && !player.isBreakthroughUnlocked() && game.isThundersEdge()) {
+                String primaryBT = player.getBreakthroughID();
+                if (primaryBT != null && !player.isBreakthroughUnlocked(primaryBT) && game.isThundersEdge()) {
                     BreakthroughCommandHelper.unlockBreakthrough(game, player);
                 }
             }

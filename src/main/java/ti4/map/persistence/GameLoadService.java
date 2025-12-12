@@ -6,7 +6,6 @@ import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
 import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
 import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
 import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITDAMAGE;
 import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
 import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
 import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
@@ -17,7 +16,6 @@ import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
 import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
 import static ti4.map.persistence.GamePersistenceKeys.TILE;
 import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
@@ -250,10 +248,6 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
-                                if ("sig01".equals(tile.getTileID()) && "garbozia".equals(unitHolderName)) {
-                                    // DELETE ME
-                                    unitHolderName = "bozgarbia";
-                                }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
                                             new LogOrigin(game),
@@ -268,26 +262,8 @@ class GameLoadService {
                         readUnit(tile, data, unitHolderName);
                     }
 
-                    // DEPRECATED. Delete this after September 1st
-                    boolean skipNext = true;
-                    String nextCategory = gameFileLines.next();
-                    if (UNITDAMAGE.equals(nextCategory)) {
-                        while (gameFileLines.hasNext()) {
-                            String data = skipNext ? nextCategory : gameFileLines.next();
-                            if (UNITDAMAGE.equals(data)) {
-                                skipNext = false;
-                                continue;
-                            }
-                            if (ENDUNITDAMAGE.equals(data)) {
-                                break;
-                            }
-                            readUnitDamage(tile, data, unitHolderName);
-                        }
-                    }
-
                     while (gameFileLines.hasNext()) {
-                        String data = skipNext ? nextCategory : gameFileLines.next();
-                        skipNext = false;
+                        String data = gameFileLines.next();
                         if (PLANET_TOKENS.equals(data)) {
                             continue;
                         }
@@ -855,6 +831,32 @@ class GameLoadService {
         return cardList;
     }
 
+    private static List<String> getParsedStrList(String tokenizer) {
+        StringTokenizer data = new StringTokenizer(tokenizer, ",");
+        List<String> output = new ArrayList<>();
+        while (data.hasMoreTokens()) {
+            String value = StringHelper.unescape(data.nextToken());
+            output.add(value);
+        }
+        return output;
+    }
+
+    private static Map<String, Boolean> getParsedStrBoolMap(String tokenizer) {
+        StringTokenizer mapdata = new StringTokenizer(tokenizer, ";");
+        Map<String, Boolean> cards = new LinkedHashMap<>();
+        while (mapdata.hasMoreTokens()) {
+            StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
+            String id = entry.nextToken();
+            Boolean val = Boolean.parseBoolean(entry.nextToken());
+            cards.put(id, val);
+        }
+        return cards;
+    }
+
+    private static Map<String, Integer> getParsedStrIntMap(String tokenizer) {
+        return getParsedCards(tokenizer);
+    }
+
     private static Map<String, Integer> getParsedCards(String tokenizer) {
         StringTokenizer actionCardToken = new StringTokenizer(tokenizer, ";");
         Map<String, Integer> cards = new LinkedHashMap<>();
@@ -958,14 +960,44 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                case Constants.BREAKTHROUGH -> player.setBreakthroughID(readStringLine(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_EXH ->
-                    player.setBreakthroughExhausted(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_UNL ->
-                    player.setBreakthroughUnlocked(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_ACTV ->
-                    player.setBreakthroughActive(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_TGS -> player.setBreakthroughTGs(Integer.parseInt(tokenizer.nextToken()));
+                // OLD - DELETE THESE
+                case Constants.BREAKTHROUGH -> player.setBreakthroughIDs(getCardList(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH -> {
+                    String bt = player.getBreakthroughID();
+                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
+                    player.getBreakthroughExhausted().put(bt, stuff);
+                }
+                case Constants.BREAKTHROUGH_UNL -> {
+                    String bt = player.getBreakthroughID();
+                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
+                    player.getBreakthroughUnlocked().put(bt, stuff);
+                }
+                case Constants.BREAKTHROUGH_ACTV -> {
+                    String bt = player.getBreakthroughID();
+                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
+                    player.getBreakthroughActive().put(bt, stuff);
+                }
+                case Constants.BREAKTHROUGH_TGS -> {
+                    String bt = player.getBreakthroughID();
+                    Integer stuff = Integer.parseInt(tokenizer.nextToken());
+                    player.getBreakthroughTGs().put(bt, stuff);
+                }
+                // END DELETE
+                case Constants.BREAKTHROUGHS -> {
+                    player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
+                }
+                case Constants.BREAKTHROUGH_EXH_MAP -> {
+                    player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));
+                }
+                case Constants.BREAKTHROUGH_UNL_MAP -> {
+                    player.setBreakthroughUnlocked(getParsedStrBoolMap(tokenizer.nextToken()));
+                }
+                case Constants.BREAKTHROUGH_ACTV_MAP -> {
+                    player.setBreakthroughActive(getParsedStrBoolMap(tokenizer.nextToken()));
+                }
+                case Constants.BREAKTHROUGH_TGS_MAP -> {
+                    player.setBreakthroughTGs(getParsedStrIntMap(tokenizer.nextToken()));
+                }
                 case Constants.STRATEGY_CARD ->
                     player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream()
                             .map(Integer::valueOf)
