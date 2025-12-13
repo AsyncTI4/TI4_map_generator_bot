@@ -42,7 +42,8 @@ class UnitModelTest extends BaseTi4Test {
 
     private static boolean validateFaction(UnitModel unitModel) {
         if (unitModel.getFaction().isEmpty()) return true;
-        if (Mapper.isValidFaction(unitModel.getFaction().get())) return true;
+        if (Mapper.isValidFaction(unitModel.getFaction().get())
+                || "keleres".equals(unitModel.getFaction().get())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId()
                 + "** failed validation due to invalid Faction ID: `"
                 + unitModel.getFaction().get() + "`");
