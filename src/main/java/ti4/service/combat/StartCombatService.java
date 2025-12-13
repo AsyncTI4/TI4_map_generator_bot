@@ -1469,7 +1469,7 @@ public class StartCombatService {
         }
         if (p1.hasUnit("pinktf_mech") && isGroundCombat) {
             buttons.add(Buttons.gray(
-                    p1.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units_pink",
+                    p1.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units_pinktfmech",
                     "Draw 1 Unit Upgrade (Upon Win)",
                     FactionEmojis.pinktf));
         }
@@ -1482,7 +1482,7 @@ public class StartCombatService {
         }
         if (p2.hasUnit("pinktf_mech") && isGroundCombat && !game.isFowMode()) {
             buttons.add(Buttons.gray(
-                    p2.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units",
+                    p2.getFinsFactionCheckerPrefix() + "drawSingularNewSpliceCard_units_pinktfmech",
                     "Draw 1 Unit Upgrade (Upon Win)",
                     FactionEmojis.pinktf));
         }
