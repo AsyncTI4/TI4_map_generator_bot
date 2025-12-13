@@ -895,7 +895,7 @@ public class ButtonHelper {
             player.clearExhaustedPlanets(false);
         }
         if (game.isThundersEdge()) {
-            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+            BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
         }
 
         List<Button> buttons2 = new ArrayList<>();
