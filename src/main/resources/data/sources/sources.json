@@ -260,4 +260,15 @@
         "description": "Make Fog of War more foggy",
         "data": []
     }
+    {
+        "source": "spice_thyme",
+        "name": "Spice & Thyme's Spicy (and Thymey) Content",
+        "canal": "community",
+        "subcanal": "personal projs",
+        "credits": "Action Card Deck 2, Uncharted Space, Milty Mod, Sigma, Asteroid, Voice of the Council",
+        "description": "Smorgasbord of content created and curated by Spice & Thyme for fun.",
+        "data": [
+            "Official channel: https://discord.com/channels/743629929484386395/1422472031949029396"
+        ]
+    }
 ]
