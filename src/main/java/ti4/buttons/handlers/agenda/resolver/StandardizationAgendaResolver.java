@@ -14,15 +14,20 @@ public class StandardizationAgendaResolver implements AgendaResolver {
 
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
-        Player player2 = game.getPlayerFromColorOrFaction(winner);
-        if (player2 == null) return;
-        player2.setTacticalCC(3);
-        player2.setStrategicCC(2);
-        int amount = Math.clamp(3 - player2.getMahactCC().size(), 0, 3);
-        player2.setFleetCC(amount);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
-        ButtonHelper.checkFleetInEveryTile(player2, game);
+        Player p2 = game.getPlayerFromColorOrFaction(winner);
+        if (p2 == null) return;
+        p2.setTacticalCC(3);
+        p2.setStrategicCC(2);
+        int amountToGain = Math.clamp(3 - p2.getEffectiveFleetCC(), 0, 3);
+        p2.gainFleetCC(amountToGain);
+
+        String msg = "Set " + p2.getFactionEmojiOrColor() + " command sheet to 3/" + p2.getFleetCC() + "/2.";
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+        if (p2.getEffectiveFleetCC() > 3) {
+            msg = p2.getRepresentation() + " use the buttons to lose fleet tokens until you are at 3 total:";
+            var buttons = ButtonHelper.getLoseFleetCCButtons(p2);
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
+        }
+        ButtonHelper.checkFleetInEveryTile(p2, game);
     }
 }

@@ -11,6 +11,7 @@ import ti4.testUtils.BaseTi4Test;
 class UnitModelTest extends BaseTi4Test {
     @Test
     void testUnitModels() {
+        System.out.println("Validating `" + Mapper.getUnits().size() + "` Unit Models");
         for (UnitModel unitModel : Mapper.getUnits().values()) {
             assertTrue(
                     validateFaction(unitModel),

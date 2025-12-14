@@ -1972,6 +1972,18 @@ public class Player extends PlayerProperties {
         if (fleetCC >= 0) super.setFleetCC(fleetCC);
     }
 
+    public String gainFleetCC(int amt) {
+        int i = getFleetCC();
+        amt = Math.clamp(amt, -1 * i, 16 - i);
+        setFleetCC(i + amt);
+        return String.format("(%d->%d)", i, getFleetCC());
+    }
+
+    @JsonIgnore
+    public int getEffectiveFleetCC() {
+        return getFleetCC() + getMahactCC().size();
+    }
+
     @Override
     public void setStrategicCC(int strategicCC) {
         if (strategicCC >= 0) super.setStrategicCC(strategicCC);
@@ -2723,6 +2735,11 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
+    }
+
+    @JsonIgnore
+    public boolean isNeutral() {
+        return "neutral".equals(getFaction());
     }
 
     @JsonIgnore
