@@ -129,7 +129,7 @@ public class RelicHelper {
             case "quantumcore" -> {
                 String primaryBT = player.getBreakthroughID();
                 if (primaryBT != null && !player.isBreakthroughUnlocked(primaryBT) && game.isThundersEdge()) {
-                    BreakthroughCommandHelper.unlockBreakthrough(game, player);
+                    BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
                 }
             }
             case "thetriad" -> {

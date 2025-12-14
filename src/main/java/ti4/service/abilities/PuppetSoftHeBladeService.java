@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.abilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -21,6 +21,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
@@ -433,11 +434,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " acquired the War Sun technology.");
-            owner.setFleetCC(owner.getFleetCC() - 1);
-            String reducedMsg = owner.getRepresentationUnfogged()
-                    + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
-            ButtonHelper.checkFleetInEveryTile(owner, game);
-            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
+            MahactTokenService.removeFleetCC(game, owner, "due to _Fires of the Gashlai_ being played.");
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
