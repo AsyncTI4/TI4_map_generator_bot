@@ -422,6 +422,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
         adminRoles.add(jda.getRoleById("1218342096474341396")); // Megagame Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
+        adminRoles.add(jda.getRoleById("1443842222922530929")); // Spice & Thyme's Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
