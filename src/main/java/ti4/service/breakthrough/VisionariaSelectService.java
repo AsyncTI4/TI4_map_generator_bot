@@ -171,7 +171,7 @@ public class VisionariaSelectService {
             // DWS Copy Tech
             if (!deepwrought.hasTech(techID)) {
                 deepwrought.addTech(techID);
-                String dwsMsg = deepwrought.getRepresentation(false, false) + " also acquired the technology due to "
+                String dwsMsg = deepwrought.getRepresentationUnfogged() + " also acquired the technology due to "
                         + visionariaName() + ": " + techM.getRepresentation(false);
                 MessageHelper.sendMessageToChannel(deepwrought.getCorrectChannel(), dwsMsg);
             }
@@ -179,7 +179,7 @@ public class VisionariaSelectService {
             // Send PN to DWS
             List<Button> sendPNbuttons = ButtonHelper.getForcedPNSendButtons(game, deepwrought, player);
             String dwsPromMsg = player.getRepresentation() + " choose a promissory note to send to "
-                    + deepwrought.getRepresentation(false, false) + " as part of" + visionariaName() + ":";
+                    + deepwrought.getColorIfCanSeeStats(player) + " as part of" + visionariaName() + ":";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), dwsPromMsg, sendPNbuttons);
         }
     }
