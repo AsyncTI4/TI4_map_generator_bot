@@ -863,7 +863,7 @@ public class ListPlayerInfoService {
                 }
             }
             case "mrm" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false); // 4 hazardous
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false, true); // 4 hazardous
             }
             case "mlp" -> { // 4 techs of a color
                 int maxNum = 0;
@@ -882,7 +882,7 @@ public class ListPlayerInfoService {
                 return maxNum;
             }
             case "mp" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false); // 4 industrial
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false, true); // 4 industrial
             }
             case "lsc" -> {
                 int count = 0;
@@ -972,7 +972,7 @@ public class ListPlayerInfoService {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds"); // 4 PDS
             }
             case "faa" -> { // 4 cultural
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false);
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false, true);
             }
             case "fc" -> {
                 return player.getNeighbourCount(); // neighbors

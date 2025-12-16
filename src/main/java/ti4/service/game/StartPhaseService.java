@@ -95,7 +95,6 @@ public class StartPhaseService {
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
             case "finFixScrewedRelics" -> game.fixScrewedRelics();
-            case "clearResearchAgent" -> game.removeStoredValue("researchagentSplice");
             case "finTFSlice" -> ButtonHelperTwilightsFall.startSliceBuild(game, event);
             case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
             case "offerSetup" -> CreateGameService.presentSetupToPlayers(game);

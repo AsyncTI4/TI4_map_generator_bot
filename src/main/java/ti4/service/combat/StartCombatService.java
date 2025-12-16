@@ -31,6 +31,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -607,6 +608,19 @@ public class StartCombatService {
                     }
                 }
             }
+        }
+
+        if (TeHelperUnits.affectedByQuietus(game, player2, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel,
+                    player2.getRepresentation()
+                            + " you are affected by the crimson flagship and your units will have lost all unit abilities");
+        }
+        if (TeHelperUnits.affectedByQuietus(game, player1, tile)) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel,
+                    player1.getRepresentation()
+                            + " you are affected by the crimson flagship and your units will have lost all unit abilities");
         }
 
         if (tile.isHomeSystem(game)
