@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -111,10 +110,13 @@ public class TeHelperAbilities {
     public static void removeUnits(Game game, Player player, HashMap<String, List<String>> moveMap) {
         for (Entry<String, List<String>> system : moveMap.entrySet()) {
             Tile systemFrom = game.getTileByPosition(system.getKey());
-            
+
             for (String unit : system.getValue()) {
                 String[] data = unit.split(" ");
-                systemFrom.getUnitHolders().get(data[1]).removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+                systemFrom
+                        .getUnitHolders()
+                        .get(data[1])
+                        .removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
             }
         }
     }
