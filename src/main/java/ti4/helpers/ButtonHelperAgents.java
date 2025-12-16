@@ -621,7 +621,7 @@ public class ButtonHelperAgents {
         if ("researchagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " used their genome to add 3 cards to the draft.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            game.setStoredValue("researchagentSplice", "Yes");
+            game.setStoredValue("researchagentSplice" + player.getFaction(), "Yes");
         }
 
         if ("augersagent".equalsIgnoreCase(agent)) {

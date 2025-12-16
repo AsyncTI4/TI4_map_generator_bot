@@ -2672,11 +2672,16 @@ class PlayerAreaGenerator {
 
             // Draw Faction Tech Icon
             if (techModel.getFaction().isPresent()) {
+
                 if (game.isLiberationC4Mode()
                         && "ghost".equals(techModel.getFaction().get())) {
                     drawFactionIconImage(graphics, "redcreuss", x + deltaX - 1, y + 108, 42, 42);
                 } else {
-                    drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+                    String faction = techModel.getFaction().get();
+                    if (player.getSingularityTechs().contains(tech)) {
+                        faction = "nekro";
+                    }
+                    drawFactionIconImage(graphics, faction, x + deltaX - 1, y + 108, 42, 42);
                 }
             } else {
                 Color foreground =

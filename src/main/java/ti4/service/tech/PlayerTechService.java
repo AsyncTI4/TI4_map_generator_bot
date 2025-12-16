@@ -30,6 +30,7 @@ import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -80,7 +81,11 @@ public class PlayerTechService {
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
+    @ButtonHandler("resolveSingularity")
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
+        if (techID.contains("resolveSingularity")) {
+            techID = techID.split("_")[1];
+        }
         player.removeTech(techID);
 
         if (Mapper.getTech(techID) != null) {
@@ -91,6 +96,18 @@ public class PlayerTechService {
         } else {
             MessageHelper.sendMessageToEventChannel(
                     event, player.getRepresentation(false, false) + " removed technology: " + techID + ".");
+        }
+        if (player.getSingularityTechs().contains(techID)) {
+            String oldVal = player.getGame().getStoredValue(player.getFaction() + "singularityTechs");
+            if (oldVal.contains(techID + "_")) {
+                oldVal = oldVal.replace(techID + "_", "");
+            } else {
+                oldVal = oldVal.replace(techID, "");
+            }
+            player.getGame().setStoredValue(player.getFaction() + "singularityTechs", oldVal);
+            if (event instanceof ButtonInteractionEvent bevent) {
+                ButtonHelper.deleteMessage(bevent);
+            }
         }
     }
 
@@ -717,6 +734,27 @@ public class PlayerTechService {
                     game.setStoredValue("zealotsHeroTechs", techID);
                 } else {
                     game.setStoredValue("zealotsHeroTechs", game.getStoredValue("zealotsHeroTechs") + "-" + techID);
+                }
+            }
+            if (game.isTwilightsFallMode()
+                    && (player.hasTech("tf-singularityx")
+                            || player.hasTech("tf-singularityy")
+                            || player.hasTech("tf-singularityz"))) {
+                String prev = game.getStoredValue(player.getFaction() + "singularityTechs");
+                if (!prev.isEmpty()) {
+                    prev += "_";
+                }
+                game.setStoredValue(player.getFaction() + "singularityTechs", prev + techID);
+                if (player.getSingularityTechs().size() > player.getSingularities()) {
+                    String msg = player.getRepresentation()
+                            + " you have more copied techs than you have singularities, please remove a copied tech with the buttons";
+                    List<Button> buttons = new ArrayList<>();
+                    for (String tech : player.getSingularityTechs()) {
+                        buttons.add(Buttons.gray(
+                                "removeSingularity_" + tech,
+                                Mapper.getTech(tech).getName()));
+                    }
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }
             }
         }
