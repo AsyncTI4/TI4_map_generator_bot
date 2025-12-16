@@ -70,6 +70,7 @@ public class Source {
         luminous,
         holytispoon,
         salliance,
+        spice_thyme,
         nomadfalcon,
         unfulvio,
         andcat,
