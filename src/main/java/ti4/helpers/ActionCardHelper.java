@@ -1906,6 +1906,7 @@ public class ActionCardHelper {
 
         player.removeActionCard(handIndex);
         p2.setActionCard(acID);
+        ButtonHelper.checkACLimit(game, p2);
         sendActionCardInfo(game, player);
         sendActionCardInfo(game, p2);
     }

@@ -2327,12 +2327,19 @@ public class ButtonHelper {
     }
 
     public static int getNumberOfXTypePlanets(Player player, Game game, String type, boolean alliance) {
+
+        return getNumberOfXTypePlanets(player, game, type, alliance, false);
+    }
+
+    public static int getNumberOfXTypePlanets(Player player, Game game, String type, boolean alliance, boolean secret) {
         int count = 0;
         List<String> planets = player.getPlanetsAllianceMode();
         if (!alliance) {
             planets = new ArrayList<>();
-            planets.addAll(player.getPlanets());
-            planets.addAll(game.getPlanetsPlayerIsCoexistingOn(player));
+            Set<Planet> planetUh = player.getPlanetsForScoring(secret);
+            for (Planet plan : planetUh) {
+                planets.add(plan.getName());
+            }
         }
         for (String planet : planets) {
             Planet p = game.getPlanetsInfo().get(planet);
@@ -7786,7 +7793,7 @@ public class ButtonHelper {
                     .append(".");
             resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getTg();
             if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
-                youCanSpend.append("and ").append(player.getTg()).append(" commodities");
+                youCanSpend.append(" (and ").append(player.getCommodities()).append(" commodities)");
                 resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getCommodities();
             }
         }

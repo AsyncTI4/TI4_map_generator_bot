@@ -323,9 +323,16 @@ public class ButtonHelperTwilightsFall {
             game.removeStoredValue("paid6ForSplice");
         }
         int size = 1 + participants.size();
+        // left here for legacy, remove when Jan 2026 occurs
         if (!game.getStoredValue("researchagentSplice").isEmpty()) {
             size += 3;
             game.removeStoredValue("researchagentSplice");
+        }
+        for (Player p : game.getRealPlayers()) {
+            if (!game.getStoredValue("researchagentSplice" + p.getFaction()).isEmpty()) {
+                size += 3;
+                game.removeStoredValue("researchagentSplice" + p.getFaction());
+            }
         }
         game.removeStoredValue("savedParticipants");
         setNewSpliceCards(game, spliceType, size);
@@ -368,24 +375,31 @@ public class ButtonHelperTwilightsFall {
 
         List<String> cards = getSpliceCards(game);
         List<Button> buttons = getSpliceButtons(game, type, cards, player);
-        List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
-        String msg = player.getRepresentationUnfogged() + " Select a card to splice into your faction:";
-        if (game.getStoredValue("engineerACSplice").startsWith("remove")) {
-            msg = player.getRepresentationUnfogged() + " select a card to remove from the splice:";
-        }
-        if (player.isNpc()) {
-            selectASpliceCard(
-                    game,
-                    player,
-                    buttons.getFirst().getCustomId().replace(player.getFinsFactionCheckerPrefix(), ""),
-                    null);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " unfortunately, there are no more splice cards remaining. Please reimburse yourself any costs associated with the splice (/player cc). Same for anyone else after you in the splice.");
         } else {
-            if (game.isVeiledHeartMode()) {
-                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                        player.getCardsInfoThread(), msg, embeds, buttons);
+            List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
+            String msg = player.getRepresentationUnfogged() + " Select a card to splice into your faction:";
+            if (game.getStoredValue("engineerACSplice").startsWith("remove")) {
+                msg = player.getRepresentationUnfogged() + " select a card to remove from the splice:";
+            }
+            if (player.isNpc()) {
+                selectASpliceCard(
+                        game,
+                        player,
+                        buttons.getFirst().getCustomId().replace(player.getFinsFactionCheckerPrefix(), ""),
+                        null);
             } else {
-                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                        player.getCorrectChannel(), msg, embeds, buttons);
+                if (game.isVeiledHeartMode()) {
+                    MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                            player.getCardsInfoThread(), msg, embeds, buttons);
+                } else {
+                    MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+                            player.getCorrectChannel(), msg, embeds, buttons);
+                }
             }
         }
     }
@@ -543,15 +557,14 @@ public class ButtonHelperTwilightsFall {
     public static void selectASpliceCard(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String cardID = buttonID.split("_")[1];
         boolean remove;
-        {
-            String[] engineerACSplice = game.getStoredValue("engineerACSplice").split("_", 2);
-            if (engineerACSplice.length > 1) {
-                game.setStoredValue("engineerACSplice", engineerACSplice[1]);
-            } else {
-                game.removeStoredValue("engineerACSplice");
-            }
-            remove = "remove".equals(engineerACSplice[0]);
+        String[] engineerACSplice = game.getStoredValue("engineerACSplice").split("_", 2);
+        if (engineerACSplice.length > 1) {
+            game.setStoredValue("engineerACSplice", engineerACSplice[1]);
+        } else {
+            game.removeStoredValue("engineerACSplice");
         }
+        remove = "remove".equals(engineerACSplice[0]);
+
         String type = game.getStoredValue("spliceType");
         if ("antimatter".equalsIgnoreCase(cardID) || "wavelength".equalsIgnoreCase(cardID)) {
             player.addTech(cardID);
@@ -569,9 +582,15 @@ public class ButtonHelperTwilightsFall {
                         "savedSpliceCards",
                         game.getStoredValue("savedSpliceCards").replace(cardID + "_", ""));
             } else {
-                game.setStoredValue(
-                        "savedSpliceCards",
-                        game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+                if (game.getStoredValue("savedSpliceCards").contains("_" + cardID)) {
+                    game.setStoredValue(
+                            "savedSpliceCards",
+                            game.getStoredValue("savedSpliceCards").replace("_" + cardID, ""));
+                } else {
+                    game.setStoredValue(
+                            "savedSpliceCards",
+                            game.getStoredValue("savedSpliceCards").replace(cardID, ""));
+                }
             }
             if (remove) {
                 MessageHelper.sendMessageToChannel(

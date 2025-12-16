@@ -348,6 +348,9 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
+            if (p2.getSingularityTechs().contains(ability)) {
+                continue;
+            }
             buttons.add(Buttons.gray(
                     "transposeStep4_" + p2.getFaction() + "_" + ability1 + "_" + ability, tech.getAutoCompleteName()));
         }
@@ -384,6 +387,9 @@ public class ButtonHelperTwilightsFallActionCards {
         for (String ability : player.getTechs()) {
             TechnologyModel tech = Mapper.getTech(ability);
             if (tech.getFaction().isEmpty()) {
+                continue;
+            }
+            if (player.getSingularityTechs().contains(ability)) {
                 continue;
             }
             String faction = tech.getFaction().get();

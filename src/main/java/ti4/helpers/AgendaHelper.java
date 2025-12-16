@@ -247,7 +247,8 @@ public class AgendaHelper {
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
+            if (!player.ownsPromissoryNote(pnId)
+                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || pnId.equals("favor"))) {
                 names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
                         + Mapper.getPromissoryNote(pnId).getName());
             }
@@ -260,7 +261,13 @@ public class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
         }
-        for (String acId : player.getActionCards().keySet()) {
+        ArrayList<String> acIDs = new ArrayList<>();
+        acIDs.addAll(player.getActionCards().keySet());
+        if (player.hasPlanet("garbozia")) {
+            acIDs.addAll(
+                    ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet());
+        }
+        for (String acId : acIDs) {
             ActionCardModel actionCard = Mapper.getActionCard(acId);
             String actionCardWindow = actionCard.getWindow();
             if (actionCardWindow.contains("When an agenda is revealed")) {
@@ -268,7 +275,8 @@ public class AgendaHelper {
             }
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
-            if (!player.ownsPromissoryNote(pnId) && pnId.endsWith("_ps") && !pnId.contains("absol")) {
+            if (!player.ownsPromissoryNote(pnId)
+                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || pnId.equals("favor"))) {
                 buttons.add(Buttons.red(
                         "queueWhen_pn_" + pnId,
                         StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
