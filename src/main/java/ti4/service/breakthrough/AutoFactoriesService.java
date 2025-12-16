@@ -8,7 +8,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.model.BreakthroughModel;
 import ti4.model.UnitModel;
 
 @UtilityClass
@@ -37,12 +36,14 @@ public class AutoFactoriesService {
         if (!player.hasUnlockedBreakthrough("hacanbt")) return;
         if (getNumberOfProducedNonFighterShips(player, game) < 3) return;
 
-        int fleet = player.getFleetCC();
-        player.setFleetCC(player.getFleetCC() + 1);
-        BreakthroughModel model = player.getBreakthroughModel();
-        String autoFactoriesMsg =
-                player.getPing() + " gained a fleet token from their breakthrough " + model.getNameRepresentation();
-        autoFactoriesMsg += "\n-# > Fleet tokens increased from (" + fleet + " -> " + (fleet + 1) + ")";
-        ButtonHelper.sendMessageToRightStratThread(player, game, autoFactoriesMsg, buttonID);
+        String message = player.getPing() + " gained a fleet token from their breakthrough " + autoFactories();
+        message += "\n-# > Fleet tokens increased from " + player.gainFleetCC(1);
+
+        if (game.getLaws().containsKey("regulations") && player.getEffectiveFleetCC() > 4) {
+            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            msg += " law in play, which is limiting fleet pool to 4 tokens.";
+            ButtonHelper.sendMessageToRightStratThread(player, game, msg, buttonID);
+        }
+        ButtonHelper.sendMessageToRightStratThread(player, game, message, buttonID);
     }
 }

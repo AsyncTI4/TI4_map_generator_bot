@@ -1,5 +1,8 @@
 package ti4.commands.status;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -29,23 +32,44 @@ class ListTurnStats extends GameStateSubcommand {
         }
         message.append("__**");
 
-        for (Player player : game.getPlayers().values()) {
-            if (!player.isRealPlayer()) continue;
+        List<Player> players = game.getRealPlayers().stream()
+                .filter(p -> !p.isNeutral())
+                .filter(p -> p.getNumberOfTurns() > 0)
+                .toList();
+        Comparator<Player> byTurnTime = Comparator.comparing(p -> getAvgTurnTime(p));
+        Optional<Player> min = players.stream().sorted(byTurnTime).findFirst();
+        Optional<Player> max = players.stream().sorted(byTurnTime.reversed()).findFirst();
+        Long maxTime = max.map(p -> getAvgTurnTime(p)).orElse(null);
+
+        for (Player player : players) {
             String turnString = playerAverageTurnLength(player);
             message.append("\n").append(turnString);
+            if (min.map(player::is).orElse(false)) message.append(" 🐇");
+            else if (max.map(player::is).orElse(false)) message.append(" 🐢");
+            else if (maxTime != null && maxTime < 30 * 60000) message.append(" 🐢"); // 30 minutes
+        }
+        if (players.isEmpty()) {
+            message.append("\n> Nobody has taken a turn yet :)");
         }
 
         MessageHelper.replyToMessage(event, message.toString());
     }
 
-    private String playerAverageTurnLength(Player player) {
+    private static long getAvgTurnTime(Player player) {
         long totalMillis = player.getTotalTurnTime();
         int numTurns = player.getNumberOfTurns();
         if (numTurns == 0 || totalMillis == 0) {
+            return -1;
+        }
+        return totalMillis / numTurns;
+    }
+
+    private static String playerAverageTurnLength(Player player) {
+        int numTurns = player.getNumberOfTurns();
+        long total = getAvgTurnTime(player);
+        if (total == -1) {
             return "> " + player.getUserName() + " has not taken a turn yet.";
         }
-
-        long total = totalMillis / numTurns;
         long millis = total % 1000;
 
         total /= 1000; // total seconds (truncates)
@@ -55,9 +79,9 @@ class ListTurnStats extends GameStateSubcommand {
         long minutes = total % 60;
         long hours = total / 60; // total hours (truncates)
 
-        return "> " + player.getUserName() + ": `"
+        String emoji = player.getGame().isFowMode() ? "" : (player.fogSafeEmoji() + " ");
+        return "> " + emoji + player.getUserName() + ": `"
                 + String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, millis)
-                + "` ("
-                + numTurns + " turns)";
+                + "` (" + numTurns + " turns)";
     }
 }

@@ -6,83 +6,83 @@ public enum LeaderEmojis implements TI4Emoji {
     // Official Content
     ArborecAgent,
     ArborecCommander,
-    ArborecHero, //
+    ArborecHero,
     ArgentAgent,
     ArgentCommander,
-    ArgentHero, //
+    ArgentHero,
     CabalAgent,
     CabalCommander,
-    CabalHero, //
-    CreussAgent,
-    CreussCommander,
-    CreussHero, //
+    CabalHero,
+    GhostAgent,
+    GhostCommander,
+    GhostHero,
     EmpyreanAgent,
     EmpyreanCommander,
-    EmpyreanHero, //
+    EmpyreanHero,
     HacanAgent,
     HacanCommander,
-    HacanHero, //
+    HacanHero,
     JolNarAgent,
     JolNarCommander,
-    JolNarHero, //
+    JolNarHero,
     L1Z1XAgent,
     L1Z1XCommander,
-    L1Z1XHero, //
+    L1Z1XHero,
     LetnevAgent,
     LetnevCommander,
-    LetnevHero, //
+    LetnevHero,
     MahactAgent,
     MahactCommander,
-    MahactHero, //
+    MahactHero,
     MentakAgent,
     MentakCommander,
-    MentakHero, //
+    MentakHero,
     MuaatAgent,
     MuaatCommander,
-    MuaatHero, //
+    MuaatHero,
     NaaluAgent,
     NaaluCommander,
-    NaaluHero, //
+    NaaluHero,
     NaazAgent,
     NaazCommander,
-    NaazHero, //
+    NaazHero,
     NekroAgent,
     NekroCommander,
-    NekroHero, //
+    NekroHero,
     NomadAgentArtuno,
     NomadAgentMercer,
     NomadAgentThundarian,
     NomadCommander,
-    NomadHero, //
+    NomadHero,
     KeleresAgent,
     KeleresCommander,
     KeleresHeroKuuasi,
     KeleresHeroHarka,
-    KeleresHeroOdlynn, //
+    KeleresHeroOdlynn,
     SaarAgent,
     SaarCommander,
-    SaarHero, //
+    SaarHero,
     SardakkAgent,
     SardakkCommander,
-    SardakkHero, //
+    SardakkHero,
     SolAgent,
     SolCommander,
-    SolHero, //
+    SolHero,
     TitansAgent,
     TitansCommander,
-    TitansHero, //
+    TitansHero,
     WinnuAgent,
     WinnuCommander,
-    WinnuHero, //
+    WinnuHero,
     XxchaAgent,
     XxchaCommander,
-    XxchaHero, //
+    XxchaHero,
     YinAgent,
     YinCommander,
-    YinHero, //
+    YinHero,
     YssarilAgent,
     YssarilCommander,
-    YssarilHero, //
+    YssarilHero,
     RedCreussAgent,
     RedCreussCommander,
     RedCreussHero,
@@ -91,69 +91,137 @@ public enum LeaderEmojis implements TI4Emoji {
     // Discordant Stars
     AugersAgent,
     AugersCommander,
-    AugersHero, //
+    AugersHero,
     AxisAgent,
     AxisCommander,
-    AxisHero, //
+    AxisHero,
     BentorAgent,
     BentorCommander,
-    BentorHero, //
+    BentorHero,
     KyroAgent,
     KyroCommander,
-    KyroHero, //
+    KyroHero,
     CeldauriAgent,
     CeldauriCommander,
-    CeldauriHero, //
+    CeldauriHero,
     CheiranAgent,
     CheiranCommander,
-    CheiranHero, //
+    CheiranHero,
     GheminaAgent,
     GheminaCommander,
     GheminaHeroLady,
-    GheminaHeroLord, //
+    GheminaHeroLord,
     CymiaeAgent,
     CymiaeCommander,
-    CymiaeHero, //
+    CymiaeHero,
     DihmohnAgent,
     DihmohnCommander,
-    DihmohnHero, //
+    DihmohnHero,
     EdynAgent,
     EdynCommander,
-    EdynHero, //
+    EdynHero,
     FlorzenAgent,
     FlorzenCommander,
-    FlorzenHero, //
+    FlorzenHero,
     FreesystemsAgent,
-    FreesystemCommander,
-    FreesystemHero, //
+    FreesystemsCommander,
+    FreesystemsHero,
     GhotiAgent,
     GhotiCommander,
-    GhotiHero, //
+    GhotiHero,
     GledgeAgent,
     GledgeCommander,
-    GledgeHero, //
+    GledgeHero,
     KhraskAgent,
     KhraskCommander,
-    KhraskHero, //
+    KhraskHero,
     KjalengardAgent,
     KjalengardCommander,
-    KjalengardHero, //
-    /* KolleccAgent, */ KolleccCommander,
-    KolleccHero, //
+    KjalengardHero,
+    KolleccAgent,
+    KolleccCommander,
+    KolleccHero,
     KolumeAgent,
     KolumeCommander,
-    KolumeHero, //
+    KolumeHero,
     KortaliAgent,
     KortaliCommander,
-    KortaliHero, //
+    KortaliHero,
     LanefirAgent,
-    LanefirCommander, /* LanefirHero, */ //
-    UydaiAgent,
-    UydaiCommander,
-    UydaiHero,
+    LanefirCommander,
+    LanefirHero,
+    LiZhoAgent,
+    LiZhoCommander,
+    LiZhoHero,
+    MirvedaAgent,
+    MirvedaCommander,
+    MirvedaHero,
+    MortheusAgent,
+    MortheusCommander,
+    MortheusHero,
+    MykoMentoriAgent,
+    MykoMentoriCommander,
+    MykoMentoriHero,
+    NivynAgent,
+    NivynCommander,
+    NivynHero,
+    NokarAgent,
+    NokarCommander,
+    NokarHero,
+    OlradinAgent,
+    OlradinCommander,
+    OlradinHero,
+    RohDhnaAgent,
+    RohDhnaCommander,
+    RohDhnaHero,
+    TnelisAgent,
+    TnelisCommander,
+    TnelisHero,
+    VadenAgent,
+    VadenCommander,
+    VadenHero,
+    VaylerianAgent,
+    VaylerianCommander,
+    VaylerianHero,
+    VeldyrAgent,
+    VeldyrCommander,
+    VeldyrHero,
+    ZealotsAgent,
+    ZealotsCommander,
+    ZealotsHero,
+    ZelianAgent,
+    ZelianCommander,
+    ZelianHero,
+
+    // Blue Reverie
+    AtokeraAgent,
+    AtokeraCommander,
+    AtokeraHero,
+    BelkoseaAgent,
+    BelkoseaCommander,
+    BelkoseaHero,
+    KaltrimAgent,
+    KaltrimCommander,
+    KaltrimHero,
     PharadnAgent,
     PharadnCommander,
     PharadnHero,
+    QhetAgent,
+    QhetCommander,
+    QhetHero,
+    SarcosaAgent,
+    SarcosaCommander,
+    SarcosaHero,
+    ToldarAgent,
+    ToldarCommander,
+    ToldarHero,
+    UydaiAgent,
+    UydaiCommander,
+    UydaiHero,
+    XinAgent,
+    XinCommander,
+    XinHero,
+
     // Generic
     Agent,
     Commander,
@@ -177,163 +245,13 @@ public enum LeaderEmojis implements TI4Emoji {
 
     public static TI4Emoji getLeaderEmoji(String leader) {
         if (leader == null) return TI4Emoji.getRandomGoodDog();
+        for (LeaderEmojis e : values()) {
+            if (leader.equalsIgnoreCase(e.name())) return e;
+        }
+
         return switch (leader.toLowerCase()) {
-            // LEADERS - AGENTS
-            case "arborecagent" -> ArborecAgent;
-            case "argentagent" -> ArgentAgent;
-            case "cabalagent" -> CabalAgent;
-            case "ghostagent", "creussagent" -> CreussAgent;
-            case "empyreanagent" -> EmpyreanAgent;
-            case "hacanagent" -> HacanAgent;
-            case "jolnaragent" -> JolNarAgent;
-            case "keleresagent" -> KeleresAgent;
-            case "l1z1xagent" -> L1Z1XAgent;
-            case "letnevagent" -> LetnevAgent;
-            case "mahactagent" -> MahactAgent;
-            case "mentakagent", "kelerescommander" -> MentakAgent;
-            case "muaatagent" -> MuaatAgent;
-            case "naaluagent", "naaluagent-te" -> NaaluAgent;
-            case "naazagent" -> NaazAgent;
-            case "nekroagent" -> NekroAgent;
-            case "nomadagentartuno" -> NomadAgentArtuno;
-            case "nomadagentmercer" -> NomadAgentMercer;
-            case "nomadagentthundarian" -> NomadAgentThundarian;
-            case "sardakkagent" -> SardakkAgent;
-            case "saaragent" -> SaarAgent;
-            case "solagent" -> SolAgent;
-            case "titansagent" -> TitansAgent;
-            case "winnuagent" -> WinnuAgent;
-            case "xxchaagent" -> XxchaAgent;
-            case "yinagent" -> YinAgent;
-            case "yssarilagent" -> YssarilAgent;
-            case "redghostagent", "redcreussagent" -> RedCreussAgent;
-
-            // LEADERS - COMMANDERS
-            case "arboreccommander" -> ArborecCommander;
-            case "argentcommander" -> ArgentCommander;
-            case "cabalcommander" -> CabalCommander;
-            case "ghostcommander", "creusscommander" -> CreussCommander;
-            case "empyreancommander" -> EmpyreanCommander;
-            case "hacancommander" -> HacanCommander;
-            case "jolnarcommander" -> JolNarCommander;
-            case "l1z1xcommander" -> L1Z1XCommander;
-            case "letnevcommander" -> LetnevCommander;
-            case "mahactcommander" -> MahactCommander;
-            case "mentakcommander" -> MentakCommander;
-            case "muaatcommander" -> MuaatCommander;
-            case "naalucommander" -> NaaluCommander;
-            case "naazcommander" -> NaazCommander;
-            case "nekrocommander" -> NekroCommander;
-            case "nomadcommander" -> NomadCommander;
-            case "sardakkcommander" -> SardakkCommander;
-            case "saarcommander" -> SaarCommander;
-            case "solcommander" -> SolCommander;
-            case "titanscommander" -> TitansCommander;
-            case "winnucommander" -> WinnuCommander;
-            case "xxchacommander" -> XxchaCommander;
-            case "yincommander" -> YinCommander;
-            case "yssarilcommander" -> YssarilCommander;
-            case "redghostcommander", "redcreusscommander" -> RedCreussCommander;
-
-            // LEADERS - HEROES
-            case "arborechero" -> ArborecHero;
-            case "argenthero" -> ArgentHero;
-            case "cabalhero" -> CabalHero;
-            case "ghosthero", "creusshero" -> CreussHero;
-            case "empyreanhero" -> EmpyreanHero;
-            case "hacanhero" -> HacanHero;
-            case "jolnarhero" -> JolNarHero;
-            case "keleresherokuuasi", "keleresahero" -> KeleresHeroKuuasi;
-            case "keleresheroodlynn", "keleresxhero" -> KeleresHeroOdlynn;
-            case "keleresheroharka", "keleresmhero" -> KeleresHeroHarka;
-            case "l1z1xhero" -> L1Z1XHero;
-            case "letnevhero" -> LetnevHero;
-            case "mahacthero" -> MahactHero;
-            case "mentakhero" -> MentakHero;
-            case "muaathero" -> MuaatHero;
-            case "naaluhero" -> NaaluHero;
-            case "naazhero" -> NaazHero;
-            case "nekrohero" -> NekroHero;
-            case "nomadhero" -> NomadHero;
-            case "sardakkhero" -> SardakkHero;
-            case "saarhero" -> SaarHero;
-            case "solhero" -> SolHero;
-            case "titanshero" -> TitansHero;
-            case "winnuhero" -> WinnuHero;
-            case "xxchahero", "xxchahero-te" -> XxchaHero;
-            case "yinhero" -> YinHero;
-            case "yssarilhero" -> YssarilHero;
-            case "redghosthero", "redcreusshero" -> RedCreussHero;
-            case "orlandohero" -> OrlandoHero;
-
-            // DS LEADERS
-            case "augersagent" -> AugersAgent;
-            case "augerscommander" -> AugersCommander;
-            case "augershero" -> AugersHero;
-            case "axisagent" -> AxisAgent;
-            case "axiscommander" -> AxisCommander;
-            case "axishero" -> AxisHero;
-            case "bentoragent" -> BentorAgent;
-            case "bentorcommander" -> BentorCommander;
-            case "bentorhero" -> BentorHero;
-            case "kyroagent" -> KyroAgent;
-            case "kyrocommander" -> KyroCommander;
-            case "kyrohero" -> KyroHero;
-            case "celdauriagent" -> CeldauriAgent;
-            case "celdauricommander" -> CeldauriCommander;
-            case "celdaurihero" -> CeldauriHero;
-            case "cheiranagent" -> CheiranAgent;
-            case "cheirancommander" -> CheiranCommander;
-            case "cheiranhero" -> CheiranHero;
-            case "gheminaagent" -> GheminaAgent;
-            case "gheminacommander" -> GheminaCommander;
-            case "gheminaherolady" -> GheminaHeroLady;
-            case "gheminaherolord" -> GheminaHeroLord;
-            case "cymiaeagent" -> CymiaeAgent;
-            case "cymiaecommander" -> CymiaeCommander;
-            case "cymiaehero" -> CymiaeHero;
-            case "dihmohnagent" -> DihmohnAgent;
-            case "dihmohncommander" -> DihmohnCommander;
-            case "dihmohnhero" -> DihmohnHero;
-            case "edynagent" -> EdynAgent;
-            case "edyncommander" -> EdynCommander;
-            case "edynhero" -> EdynHero;
-            case "florzenagent" -> FlorzenAgent;
-            case "florzencommander" -> FlorzenCommander;
-            case "florzenhero" -> FlorzenHero;
-            case "freesystemcommander" -> FreesystemCommander;
-            case "freesystemhero" -> FreesystemHero;
-            case "freesystemsagent" -> FreesystemsAgent;
-            case "ghotiagent" -> GhotiAgent;
-            case "ghoticommander" -> GhotiCommander;
-            case "ghotihero" -> GhotiHero;
-            case "gledgeagent" -> GledgeAgent;
-            case "gledgecommander" -> GledgeCommander;
-            case "gledgehero" -> GledgeHero;
-            case "khraskagent" -> KhraskAgent;
-            case "khraskcommander" -> KhraskCommander;
-            case "khraskhero" -> KhraskHero;
-            case "kjalengardagent" -> KjalengardAgent;
-            case "kjalengardcommander" -> KjalengardCommander;
-            case "kjalengardhero" -> KjalengardHero;
-            // case "kollecagent" -> "";
-            case "kollecccommander" -> KolleccCommander;
-            case "kollecchero" -> KolleccHero;
-            case "kolumeagent" -> KolumeAgent;
-            case "kolumecommander" -> KolumeCommander;
-            case "kolumehero" -> KolumeHero;
-            case "kortaliagent" -> KortaliAgent;
-            case "kortalicommander" -> KortaliCommander;
-            case "kortalihero" -> KortaliHero;
-            case "lanefiragent" -> LanefirAgent;
-            case "lanefircommander" -> LanefirCommander;
-            case "uydaiagent" -> UydaiAgent;
-            case "uydaicommander" -> UydaiCommander;
-            case "uydaihero" -> UydaiHero;
-            case "pharadnagent" -> PharadnAgent;
-            case "pharadncommander" -> PharadnCommander;
-            case "pharadnhero" -> PharadnHero;
-            // case "lanefirhero" -> "";
+            case "xxchahero-te" -> XxchaHero;
+            case "naaluagent-te" -> NaaluAgent;
             default -> TI4Emoji.getRandomGoodDog(leader.toLowerCase());
         };
     }

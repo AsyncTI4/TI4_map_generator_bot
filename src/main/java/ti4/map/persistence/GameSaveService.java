@@ -968,11 +968,15 @@ class GameSaveService {
                                     .toList()));
             writer.write(System.lineSeparator());
 
-            writeStrLine(writer, Constants.BREAKTHROUGH, player.getBreakthroughID());
-            writeBoolLine(writer, Constants.BREAKTHROUGH_UNL, player.isBreakthroughUnlocked());
-            writeBoolLine(writer, Constants.BREAKTHROUGH_EXH, player.isBreakthroughExhausted());
-            writeBoolLine(writer, Constants.BREAKTHROUGH_ACTV, player.isBreakthroughActive());
-            writeIntLine(writer, Constants.BREAKTHROUGH_TGS, player.getBreakthroughTGs());
+            player.getBreakthroughUnlocked().remove(null);
+            player.getBreakthroughExhausted().remove(null);
+            player.getBreakthroughActive().remove(null);
+            player.getBreakthroughTGs().remove(null);
+            writeStrList(writer, Constants.BREAKTHROUGHS, player.getBreakthroughIDs());
+            writeStrBoolMap(writer, Constants.BREAKTHROUGH_UNL_MAP, player.getBreakthroughUnlocked());
+            writeStrBoolMap(writer, Constants.BREAKTHROUGH_EXH_MAP, player.getBreakthroughExhausted());
+            writeStrBoolMap(writer, Constants.BREAKTHROUGH_ACTV_MAP, player.getBreakthroughActive());
+            writeStrIntMap(writer, Constants.BREAKTHROUGH_TGS_MAP, player.getBreakthroughTGs());
 
             StringBuilder leaderInfo = new StringBuilder();
             if (player.getLeaders().isEmpty()) leaderInfo.append("none");
@@ -1070,15 +1074,53 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
+    private static void writeStrList(Writer writer, String field, List<String> vals) throws IOException {
+        List<String> escaped = vals.stream()
+                .map(v -> v == null ? "" : v)
+                .map(StringHelper::escape)
+                .toList();
+        writer.write(field + " " + String.join(",", escaped));
+        writer.write(System.lineSeparator());
+    }
+
     private static void writeStrLine(Writer writer, String field, String str) throws IOException {
         String output = StringHelper.escape(str != null ? str : "");
         writer.write(field + " " + output);
         writer.write(System.lineSeparator());
     }
 
+    private static void writeIntLine(Writer writer, String field, int val) throws IOException {
+        writer.write(field + " " + val);
+        writer.write(System.lineSeparator());
+    }
+
     private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
         String output = bool ? "true" : "false";
         writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrStrMap(Writer writer, String field, Map<String, String> map) throws IOException {
+        List<String> entries = map.entrySet().stream()
+                .map(e -> e.getKey() + "," + e.getValue())
+                .toList();
+        writer.write(field + " " + String.join(";", entries));
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrIntMap(Writer writer, String field, Map<String, Integer> map) throws IOException {
+        List<String> entries = map.entrySet().stream()
+                .map(e -> e.getKey() + "," + e.getValue().toString())
+                .toList();
+        writer.write(field + " " + String.join(";", entries));
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrBoolMap(Writer writer, String field, Map<String, Boolean> map) throws IOException {
+        List<String> entries = map.entrySet().stream()
+                .map(e -> e.getKey() + "," + (e.getValue() ? "true" : "false"))
+                .toList();
+        writer.write(field + " " + String.join(";", entries));
         writer.write(System.lineSeparator());
     }
 
@@ -1092,11 +1134,6 @@ class GameSaveService {
                     .append(";");
         }
         writer.write(saveID + " " + sb);
-        writer.write(System.lineSeparator());
-    }
-
-    private static void writeIntLine(Writer writer, String field, int val) throws IOException {
-        writer.write(field + " " + val);
         writer.write(System.lineSeparator());
     }
 

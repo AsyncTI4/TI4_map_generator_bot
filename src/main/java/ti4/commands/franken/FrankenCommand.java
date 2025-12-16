@@ -21,6 +21,10 @@ public class FrankenCommand implements ParentCommand {
                     new PNRemove(),
                     new UnitAdd(),
                     new UnitRemove(),
+                    new BreakthroughAdd(),
+                    new BreakthroughRemove(),
+                    // WARNING: Franken commands are at 25/25 capacity.
+                    //          Reorganization must happen in order to add more commands
                     new StartFrankenDraft(),
                     new SetFactionIcon(),
                     new SetFactionDisplayName(),
@@ -31,7 +35,6 @@ public class FrankenCommand implements ParentCommand {
                     new Ban(),
                     new DraftLimits(),
                     new BanFaction(),
-                    new SetBreakthrough(),
                     new ApplyDraftBags(),
                     new SetHomeSystemPosition(),
                     new BuildMap())

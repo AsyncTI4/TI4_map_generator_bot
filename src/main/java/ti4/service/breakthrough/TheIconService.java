@@ -80,7 +80,7 @@ public class TheIconService {
 
     @ButtonHandler("useTheIcon")
     private void doExhaustIcon(ButtonInteractionEvent event, Player player) {
-        BreakthroughCommandHelper.exhaustBreakthrough(event, player);
+        BreakthroughCommandHelper.exhaustBreakthrough(player, "bastionbt");
         iconStepOne(event, player.getGame(), player);
     }
 

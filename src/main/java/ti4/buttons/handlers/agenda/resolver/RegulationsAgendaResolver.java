@@ -14,17 +14,15 @@ public class RegulationsAgendaResolver implements ForAgainstAgendaResolver {
 
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
-        for (Player playerB : game.getRealPlayers()) {
-            if (playerB.getFleetCC() > 4) {
-                playerB.setFleetCC(4);
-                ButtonHelper.checkFleetInEveryTile(playerB, game);
+        for (Player p : game.getRealPlayers()) {
+            if (p.getFleetCC() > 4) {
+                p.setFleetCC(4);
+                ButtonHelper.checkFleetInEveryTile(p, game);
             }
-            if (playerB.hasAbility("imperia")) {
-                if (playerB.getFleetCC() + playerB.getMahactCC().size() > 4) {
-                    int min = Math.max(0, 4 - playerB.getMahactCC().size());
-                    playerB.setFleetCC(min);
-                    ButtonHelper.checkFleetInEveryTile(playerB, game);
-                }
+            if (p.getEffectiveFleetCC() > 4) {
+                String msg = p.getRepresentation() + " use the buttons to lose fleet tokens until you are at 4 total:";
+                var buttons = ButtonHelper.getLoseFleetCCButtons(p);
+                MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
             }
         }
 

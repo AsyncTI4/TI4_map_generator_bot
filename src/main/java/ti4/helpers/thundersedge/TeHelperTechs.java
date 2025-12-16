@@ -229,7 +229,7 @@ public class TeHelperTechs {
             }
 
             TechnologyModel biorganic = Mapper.getTech("parasite-obs");
-            String message = victim.getRepresentation() + " one of your infantry " + location
+            String message = victim.getRepresentationUnfogged() + " one of your infantry " + location
                     + " has been destroyed via " + biorganic.getNameRepresentation() + ".";
             if (game.isFowMode()) {
                 String privateMsg = "Successfully used " + biorganic.getNameRepresentation() + " to destroy 1 infantry "

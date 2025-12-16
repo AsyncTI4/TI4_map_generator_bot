@@ -40,6 +40,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorableModelInterface;
 import ti4.model.DeckModel;
 import ti4.model.EmbeddableModel;
@@ -831,6 +832,41 @@ public class AutoCompleteProvider {
                                         + value.getValue().getSource() + ")",
                                 value.getKey()))
                         .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.BREAKTHROUGH -> {
+                if (!GameManager.isValid(gameName)) return;
+
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Set<BreakthroughModel> btSet = game.getPlayers().values().stream()
+                        .flatMap(p -> p.getBreakthroughIDs().stream())
+                        .map(Mapper::getBreakthrough)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+
+                boolean addAllOpt = false;
+                for (Player p : game.getPlayers().values()) {
+                    if (p.getBreakthroughIDs().size() > 1) {
+                        addAllOpt = true;
+                    }
+                }
+                if (event.getName().equals(Constants.FRANKEN)) {
+                    btSet = Mapper.getBreakthroughs().values().stream().collect(Collectors.toSet());
+                    addAllOpt = false;
+                }
+                if (subcommandName.equalsIgnoreCase(Constants.BREAKTHROUGH_SET_TG)) {
+                    addAllOpt = false;
+                }
+
+                List<Command.Choice> options = btSet.stream()
+                        .filter(bt -> bt.getAutoCompleteName(game).toLowerCase().contains(enteredValue))
+                        .limit(addAllOpt ? 24 : 25)
+                        .map(bt -> new Command.Choice(bt.getAutoCompleteName(game), bt.getAlias()))
+                        .collect(Collectors.toList());
+                if (addAllOpt) {
+                    options.add(0, new Command.Choice("all", "all"));
+                }
                 event.replyChoices(options).queue();
             }
             case Constants.PLAYER_FACTION -> {

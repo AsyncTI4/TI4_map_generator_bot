@@ -56,7 +56,8 @@ public class DrawSecretService {
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SecretObjectiveHelper.sendSODiscardButtons(player);
         }
-        if (event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent
+                && bevent.getUser().getId().equals(player.getUserID())) {
             List<MessageEmbed> soEmbeds = idsDrawn.stream()
                     .map(Mapper::getSecretObjective)
                     .filter(Objects::nonNull)

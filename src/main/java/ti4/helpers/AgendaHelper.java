@@ -53,6 +53,7 @@ import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -1362,10 +1363,12 @@ public class AgendaHelper {
                 }
             }
 
+            if (!game.isFowMode()) {
+                Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
+                String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
+            }
             String message = " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
-            Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
-            String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
-            MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
             Player nextInLine = getNextInLine(player, getVotingOrder(game), game);
             String realIdentity2 = nextInLine.getRepresentationUnfogged();
 
@@ -2074,12 +2077,7 @@ public class AgendaHelper {
                     if (winningR != null && specificVote.contains("Sanction")) {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
                         for (Player p2 : loseFleetPlayers) {
-                            p2.setFleetCC(p2.getFleetCC() - 1);
-                            MessageHelper.sendMessageToChannel(
-                                    p2.getCorrectChannel(),
-                                    p2.getRepresentation()
-                                            + ", you lost 1 command token from your fleet pool due to voting the same way as a _Sanction_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game);
+                            MahactTokenService.removeFleetCC(game, p2, "due to voting the same way as a _Sanction_.");
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
