@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -33,7 +34,6 @@ import ti4.model.PlanetModel;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.RemoveUnitService;
 
 public class TeHelperAbilities {
 
@@ -105,6 +105,20 @@ public class TeHelperAbilities {
             }
         }
         return sb.toString();
+    }
+
+    public static void removeUnits(Game game, Player player, HashMap<String, List<String>> moveMap) {
+        for (Entry<String, List<String>> system : moveMap.entrySet()) {
+            Tile systemFrom = game.getTileByPosition(system.getKey());
+
+            for (String unit : system.getValue()) {
+                String[] data = unit.split(" ");
+                systemFrom
+                        .getUnitHolders()
+                        .get(data[1])
+                        .removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+            }
+        }
     }
 
     public static HashMap<String, List<String>> readMoveMap(String val) {
@@ -287,6 +301,7 @@ public class TeHelperAbilities {
         if (matcher.matches()) {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             HashMap<String, List<String>> survivalMap = readMoveMap(game.getStoredValue("survivalInstinctMap"));
+            removeUnits(game, player, survivalMap);
             for (List<String> strings : survivalMap.values()) {
                 List<String> units = strings.stream().collect(Collectors.groupingBy(s -> s)).entrySet().stream()
                         .map(e -> e.getValue().size() + " " + e.getKey())
@@ -300,7 +315,6 @@ public class TeHelperAbilities {
                         .toList();
                 String unitStrFrom = String.join(", ", units);
                 String unitStrTo = String.join(", ", unitsTo);
-                RemoveUnitService.removeUnits(event, tile, game, player.getColor(), unitStrFrom);
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitStrTo);
             }
             game.removeStoredValue("survivalInstinctMap");
