@@ -323,7 +323,7 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButtons(
                         playerWithPds.getCorrectChannel(),
                         title + playerWithPds.getRepresentationUnfogged() + ", you have SPACE CANNON coverage in "
-                                + tile.getRepresentation() + ", use buttons to resolve:",
+                                + tile.getRepresentation() + "(" + tile.getPosition() + "), use buttons to resolve:",
                         spaceCannonButtons);
             }
         } else {

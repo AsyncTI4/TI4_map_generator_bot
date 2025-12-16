@@ -1363,10 +1363,12 @@ public class AgendaHelper {
                 }
             }
 
+            if (!game.isFowMode()) {
+                Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
+                String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
+            }
             String message = " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
-            Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
-            String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
-            MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
             Player nextInLine = getNextInLine(player, getVotingOrder(game), game);
             String realIdentity2 = nextInLine.getRepresentationUnfogged();
 

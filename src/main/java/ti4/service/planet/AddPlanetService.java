@@ -203,6 +203,12 @@ public class AddPlanetService {
                                 + Mapper.getPlanet(planet).getName()
                                 + " (and could perhaps resolve some applicable ability).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                        if (game.isFowMode() && player_.isRealPlayer()) {
+                            MessageHelper.sendMessageToChannel(
+                                    player_.getPrivateChannel(),
+                                    player_.getRepresentationUnfogged() + ", you lost the planet of "
+                                            + Mapper.getPlanet(planet).getName());
+                        }
                         if (player_.isRealPlayer()
                                 && player_.getPlanetsAllianceMode().isEmpty()
                                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(
