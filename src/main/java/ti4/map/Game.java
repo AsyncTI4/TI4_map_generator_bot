@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -4622,7 +4622,7 @@ public class Game extends GameProperties {
     public List<String> getPlanetsPlayerIsCoexistingOn(Player player) {
         List<String> coexistPlanets = new ArrayList<>();
 
-        for (Player p2 : getRealPlayers()) {
+        for (Player p2 : getRealPlayersNNeutral()) {
             if (p2.getFaction().equalsIgnoreCase(player.getFaction())
                     || player.getAllianceMembers().contains(p2.getFaction())) {
                 continue;
