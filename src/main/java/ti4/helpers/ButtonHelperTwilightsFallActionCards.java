@@ -198,7 +198,7 @@ public class ButtonHelperTwilightsFallActionCards {
         if (p2 == player) {
             if (!FractureService.isFractureInPlay(game)) {
                 FractureService.spawnFracture(event, game);
-                FractureService.spawnIngressTokens(event, game, player, false);
+                FractureService.spawnIngressTokens(event, game, player, null);
             }
         } else {
             Integer poIndex =

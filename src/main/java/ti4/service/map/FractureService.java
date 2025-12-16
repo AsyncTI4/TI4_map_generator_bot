@@ -37,24 +37,26 @@ public class FractureService {
     }
 
     @ButtonHandler("rollFracture")
-    private static void resolveFractureRoll(ButtonInteractionEvent event, Game game, Player player) {
+    private static void resolveFractureRoll(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String bt = player.getBreakthroughID();
+        if (buttonID.contains("_")) bt = buttonID.split("_")[1];
+
         int result = new Die(0).getResult();
-        if (player.hasBreakthrough("cabalbt")) {
+        if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
                     + " has Cabal breakthrough so the Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             spawnFracture(event, game);
-            spawnIngressTokens(event, game, player, true);
+            spawnIngressTokens(event, game, player, bt);
             AlRaithService.serveBeginCabalBreakthroughButtons(event, game, player);
-
         } else {
             if (result == 1 || result == 10) { // success
                 String msg = player.getRepresentation(false, false) + " rolled a " + DiceEmojis.getGreenDieEmoji(result)
                         + "! The Fracture is now in play! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
-                spawnIngressTokens(event, game, player, true);
+                spawnIngressTokens(event, game, player, bt);
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";
@@ -99,7 +101,7 @@ public class FractureService {
     }
 
     public static void spawnIngressTokens(
-            GenericInteractionCreateEvent event, Game game, @NotNull Player player, boolean fromBreakthrough) {
+            GenericInteractionCreateEvent event, Game game, @NotNull Player player, String breakthrough) {
         List<Tile> automaticAdds = new ArrayList<>();
         List<String> errors = new ArrayList<>();
 
@@ -110,8 +112,8 @@ public class FractureService {
 
         List<TechnologyType> techTypesToAddIngress = new ArrayList<>();
         int numberOfIngressPerTechType = 3;
-        BreakthroughModel bt = player.getBreakthroughModel();
-        if (fromBreakthrough && bt != null && bt.hasSynergy()) {
+        BreakthroughModel bt = player.getBreakthroughModel(breakthrough);
+        if (bt != null && bt.hasSynergy()) {
             techTypesToAddIngress.addAll(bt.getSynergy());
         } else {
             techTypesToAddIngress.addAll(TechnologyType.mainFour);

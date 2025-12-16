@@ -41,10 +41,12 @@ public class EmelparService {
         }
 
         prefix = "emelparReady_breakthrough_" + player.getFaction() + "_";
-        BreakthroughModel btModel = player.getBreakthroughModel();
-        if (btModel != null && player.isBreakthroughExhausted()) {
-            buttons.add(Buttons.blue(
-                    prefix + btModel.getAlias(), "Ready breakthrough " + btModel.getName(), player.getFactionEmoji()));
+        for (String bt : player.getBreakthroughIDs()) {
+            if (player.isBreakthroughExhausted(bt) && player.isBreakthroughUnlocked(bt)) {
+                BreakthroughModel btModel = Mapper.getBreakthrough(bt);
+                String label = "Ready breakthrough " + btModel.getName();
+                buttons.add(Buttons.blue(prefix + bt, label, player.getFactionEmoji()));
+            }
         }
 
         prefix = "emelparReady_leader_" + player.getFaction() + "_";
@@ -131,7 +133,8 @@ public class EmelparService {
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         buttonID = buttonID.replace(player2.getFaction() + "_", "");
         RegexService.runMatcher(regex, buttonID, matcher -> {
-            player2.setBreakthroughExhausted(false);
+            String bt = matcher.group("breakthrough");
+            player2.setBreakthroughExhausted(bt, false);
             String readyItem = player2.getBreakthroughModel().getNameRepresentation();
             postSummary(event, player, readyItem);
         });

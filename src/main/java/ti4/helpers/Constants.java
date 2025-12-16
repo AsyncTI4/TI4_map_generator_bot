@@ -1337,6 +1337,8 @@ public class Constants {
     public static final String UNIT_ID_5 = "unit_id_5";
     public static final String UNIT_REMOVE = "unit_remove";
     public static final String UNIT_ADD = "unit_add";
+    public static final String BREAKTHROUGH_ADD = "breakthrough_add";
+    public static final String BREAKTHROUGH_REMOVE = "breakthrough_remove";
     public static final String UNIT_INFO = "unit_info";
     public static final String CLEAR_DEBT = "clear_debt";
     public static final String MECH_ID = "mech";
@@ -1387,6 +1389,12 @@ public class Constants {
     public static final String BREAKTHROUGH_ACTV = "breakthrough_actv";
     public static final String BREAKTHROUGH_TGS = "breakthrough_tgs";
 
+    public static final String BREAKTHROUGHS = "breakthroughs";
+    public static final String BREAKTHROUGH_EXH_MAP = "breakthrough_exh_map";
+    public static final String BREAKTHROUGH_UNL_MAP = "breakthrough_unl_map";
+    public static final String BREAKTHROUGH_ACTV_MAP = "breakthrough_actv_map";
+    public static final String BREAKTHROUGH_TGS_MAP = "breakthrough_tgs_map";
+
     public static final String AC_DECK_ID = "ac_deck_id";
     public static final String SO_DECK_ID = "so_deck_id";
     public static final String STAGE_1_PUBLIC_DECK_ID = "stage_1_public_deck_id";
@@ -1426,7 +1434,6 @@ public class Constants {
     public static final String FACTION_IMAGE_URL = "faction_image_url";
     public static final String SET_FACTION_ICON = "set_faction_icon";
     public static final String SET_FACTION_DISPLAY_NAME = "set_faction_display_name";
-    public static final String SET_BREAKTHROUGH = "set_breakthrough";
     public static final String SET_HOMESYSTEM_POS = "set_hs_position";
     public static final String FRANKEN_FACTION_NAME = "franken_faction_suffix";
     public static final String FORCE = "force";

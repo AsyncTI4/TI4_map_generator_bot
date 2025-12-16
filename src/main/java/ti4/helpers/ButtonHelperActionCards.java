@@ -421,11 +421,11 @@ public class ButtonHelperActionCards {
         player.setFleetCC(player.getFleetCC() + 2);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
-        if (game.getLaws().containsKey("regulations") && player.getFleetCC() > 4) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentation()
-                            + ", reminder that _Fleet Regulations_ is a law, which is limiting fleet pool to 4 tokens.");
+        if (game.getLaws().containsKey("regulations") && player.getEffectiveFleetCC() > 4) {
+            var buttons = ButtonHelper.getLoseFleetCCButtons(player);
+            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            msg += " law in play, which is limiting fleet pool to 4 tokens.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }
     }
 
@@ -654,7 +654,7 @@ public class ButtonHelperActionCards {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
                     uH.removeUnit(key, hitRolls);
                     if (hitRolls > 0 && key.getUnitType() == UnitType.Mech && player_.hasActiveBreakthrough("naazbt")) {
-                        BreakthroughCommandHelper.deactivateBreakthrough(player_);
+                        BreakthroughCommandHelper.deactivateBreakthrough(player_, "naazbt");
                     }
                 }
             }

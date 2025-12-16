@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public abstract class UnitHolder {
     private final String name;
     private final Point holderCenterPosition;
 
-    private final Map<UnitKey, List<Integer>> unitsByState = new HashMap<>();
+    private final Map<UnitKey, List<Integer>> unitsByState = new LinkedHashMap<>();
     private final Set<String> ccList = new LinkedHashSet<>();
     private final Set<String> controlList = new LinkedHashSet<>();
     protected final Set<String> tokenList = new LinkedHashSet<>();
@@ -243,7 +244,7 @@ public abstract class UnitHolder {
         return unitsByState.entrySet().stream()
                 .filter(e -> getTotalUnitCount(e.getValue()) > 0)
                 .map(Entry::getKey)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     @Deprecated

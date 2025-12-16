@@ -1,4 +1,4 @@
-package ti4.service;
+package ti4.service.abilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -117,7 +117,7 @@ public class PuppetSoftHeBladeService {
         List<String> outputStrings = new ArrayList<>();
         outputStrings.add(replaceHomeSystem(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceFactionSheet(game, player, newFactionModel));
-        outputStrings.add(replaceBreakthrough(player, newFactionModel));
+        outputStrings.add(replaceBreakthrough(player));
         outputStrings.add(replacePN(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceTechAndFactionTech(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceLaws(game, oldFactionModel, newFactionModel));
@@ -200,9 +200,10 @@ public class PuppetSoftHeBladeService {
         return "Successfully changed faction sheet.";
     }
 
-    private static String replaceBreakthrough(Player player, FactionModel newFaction) {
-        player.setBreakthroughID(newFaction.getAlias() + "bt");
+    private static String replaceBreakthrough(Player player) {
         // automate flipping sowing to reaping
+        if (!player.changeBreakthrough("firmamentbt", "obsidianbt"))
+            return "Failed to change breakthrough, player did not have The Sowing.";
         return "Successfully changed breakthrough.";
     }
 

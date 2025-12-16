@@ -1021,8 +1021,8 @@ public class FoWHelper {
         // get players adjacent
         for (Player player_ : game.getRealPlayers()) {
             if (getTilePositionsToShow(game, player_).contains(position)) {
-                String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons()
-                        + " has been pinged:\n>>> " + message;
+                String playerMessage = player_.getRepresentationUnfogged() + " - System "
+                        + tile.getRepresentationForButtons() + " has been pinged:\n>>> " + message;
                 List<Button> refreshButton = viewSystemButton
                         ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture")
                         : new ArrayList<>();

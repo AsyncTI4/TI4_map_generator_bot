@@ -95,6 +95,7 @@ import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.button.ReactionService;
@@ -894,7 +895,7 @@ public class ButtonHelper {
             player.clearExhaustedPlanets(false);
         }
         if (game.isThundersEdge()) {
-            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+            BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
         }
 
         List<Button> buttons2 = new ArrayList<>();
@@ -1655,25 +1656,18 @@ public class ButtonHelper {
                 }
             }
             // neuroglaive
-            if (nonActivePlayer.hasTech("ng") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            boolean hasNg = nonActivePlayer.hasTech("ng") || nonActivePlayer.hasTech("absol_ng");
+            if (hasNg && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _Neuroglaive_.");
                     }
                     numberOfAbilities++;
                 } else {
-                    int cTG = player.getFleetCC();
-                    player.setFleetCC(cTG - 1);
+                    MahactTokenService.removeFleetCC(game, player, "due to _Neuroglaive_");
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, ident + ", you triggered _Neuroglaive_.");
-                        channel = player.getPrivateChannel();
                     }
-                    MessageHelper.sendMessageToChannel(
-                            channel,
-                            activePlayerident
-                                    + " lost 1 command token from fleet pool due to _Neuroglaive_ (" + cTG + "->"
-                                    + player.getFleetCC() + ")");
-                    checkFleetInEveryTile(player, game);
                 }
             }
             if (FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
@@ -6696,31 +6690,44 @@ public class ButtonHelper {
     public static List<Button> getGainAndLoseCCButtons(Player player) {
         List<Button> buttons = getGainCCButtons(player);
         buttons.removeIf(b -> !b.getCustomId().startsWith("increase_")); // remove the wiring buttons
-        buttons.addAll(getLoseCCButtons(player)); // add the redistro buttons
+        buttons.addAll(getLoseCCButtons(player, "Done Gaining Command Tokens", false)); // add the redistro buttons
         return buttons;
     }
 
     public static List<Button> getGainCCButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc", "Gain 1 Tactic Token"));
-        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet Token"));
-        buttons.add(
-                Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy Token"));
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Done Gaining Command Tokens"));
-        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Tokens"));
+        buttons.add(Buttons.green(player.finChecker() + "increase_tactic_cc", "Gain 1 Tactic Token"));
+        buttons.add(Buttons.green(player.finChecker() + "increase_fleet_cc", "Gain 1 Fleet Token"));
+        buttons.add(Buttons.green(player.finChecker() + "increase_strategy_cc", "Gain 1 Strategy Token"));
+        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Gaining Command Tokens"));
+        buttons.add(Buttons.gray(player.finChecker() + "resetCCs", "Reset Tokens"));
         player.getGame().setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         return buttons;
     }
 
     public static List<Button> getLoseCCButtons(Player player) {
+        return getLoseCCButtons(player, "Done Losing Command Tokens", true);
+    }
+
+    private static List<Button> getLoseCCButtons(Player player, String doneText, boolean includeMahact) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "decrease_tactic_cc", "Lose 1 Tactic Token"));
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "decrease_fleet_cc", "Lose 1 Fleet Token"));
-        buttons.add(
-                Buttons.red(player.getFinsFactionCheckerPrefix() + "decrease_strategy_cc", "Lose 1 Strategy Token"));
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Done Gaining Command Token"));
-        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Tokens"));
+        buttons.add(Buttons.red(player.finChecker() + "decrease_tactic_cc", "Lose 1 Tactic Token"));
+        buttons.add(Buttons.red(player.finChecker() + "decrease_fleet_cc", "Lose 1 Fleet Token"));
+        if (includeMahact) {
+            buttons.addAll(MahactTokenService.removeFleetTokenOptions(player.getGame(), player, false, true));
+        }
+        buttons.add(Buttons.red(player.finChecker() + "decrease_strategy_cc", "Lose 1 Strategy Token"));
+        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", doneText));
+        buttons.add(Buttons.gray(player.finChecker() + "resetCCs", "Reset Tokens"));
         player.getGame().setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        return buttons;
+    }
+
+    public static List<Button> getLoseFleetCCButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(player.finChecker() + "decrease_fleet_cc", "Lose 1 Fleet Token"));
+        buttons.addAll(MahactTokenService.removeFleetTokenOptions(player.getGame(), player, false, true));
+        buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Done Losing Fleet Tokens"));
         return buttons;
     }
 

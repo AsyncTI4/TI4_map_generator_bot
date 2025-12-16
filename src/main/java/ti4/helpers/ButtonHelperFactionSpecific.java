@@ -51,6 +51,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.VeiledHeartService;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.CombatRollService;
 import ti4.service.combat.CombatRollType;
@@ -870,12 +871,11 @@ public class ButtonHelperFactionSpecific {
         }
         CommanderUnlockCheckService.checkPlayer(player, "mahact");
 
-        if (ButtonHelper.isLawInPlay(game, "regulations")
-                && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getRepresentation()
-                            + " reminder that under the _Fleet Regulations_ law, fleet pools are limited to 4 command tokens.");
+        if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
+            var buttons = ButtonHelper.getLoseFleetCCButtons(player);
+            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
+            msg += " law in play, which is limiting fleet pool to 4 tokens.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -2097,20 +2097,14 @@ public class ButtonHelperFactionSpecific {
                             + " to vote a particular way. The technology has been exhausted, the owner should elaborate on which way to vote.";
                     MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), msg);
                     if (voter.getFleetCC() > 0) {
-                        msg = voter.getRepresentation(false, true)
-                                + " has the option to remove 1 command token from their fleet pool to ignore the effect of _Genetic Recombination_.";
-                        List<Button> conclusionButtons = new ArrayList<>();
-                        String finChecker = "FFCC_" + voter.getFaction() + "_";
-                        Button accept = Buttons.blue(
-                                finChecker + "geneticRecombination_" + p2.getUserID() + "_" + "accept",
-                                "Vote For Chosen Outcome");
-                        conclusionButtons.add(accept);
-                        Button decline = Buttons.red(
-                                finChecker + "geneticRecombination_" + p2.getUserID() + "_" + "decline",
-                                "Remove Fleet Token");
-                        conclusionButtons.add(decline);
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                voter.getCorrectChannel(), msg, conclusionButtons);
+                        msg = voter.getRepresentation(false, true) + " has the option to remove 1 command token";
+                        msg += " from their fleet pool to ignore the effect of _Genetic Recombination_.";
+
+                        String prefix = voter.finChecker() + "geneticRecombination_" + p2.getUserID() + "_";
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.blue(prefix + "accept", "Vote For Chosen Outcome"));
+                        buttons.add(Buttons.red(prefix + "decline", "Remove Fleet Token"));
+                        MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg, buttons);
                     }
                 }
             }
@@ -2118,25 +2112,16 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("geneticRecombination")
-    public static void resolveGeneticRecombination(
-            String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void resolveGeneticRecomb(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String[] fields = buttonID.split("_");
         Player mahactPlayer = game.getPlayer(fields[1]);
         String choice = fields[2];
         if ("accept".equals(choice)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentation()
-                            + " has chosen to vote for the outcome indicated by "
-                            + mahactPlayer.getRepresentation()
-                            + ".");
+            String msg = player.getRepresentation() + " has chosen to vote for the outcome indicated by ";
+            msg += mahactPlayer.getRepresentation() + ".";
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg);
         } else {
-            player.setFleetCC(player.getFleetCC() - 1);
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentation()
-                            + " has removed a command token from their fleet pool and may vote in any manner that they wish.");
-            ButtonHelper.checkFleetInEveryTile(player, game);
+            MahactTokenService.removeFleetCC(game, player, "due to defying the will of _Genetic Recombination_.");
         }
         event.getMessage().delete().queue();
     }

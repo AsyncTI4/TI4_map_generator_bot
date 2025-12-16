@@ -105,12 +105,12 @@ public class EidolonMaximumService {
                     uh.removeUnit(mech, uh.getUnitCount(mech));
                 }
             }
-            BreakthroughCommandHelper.activateBreakthrough(event, player);
+            BreakthroughCommandHelper.activateBreakthrough(event, player, "naazbt");
         });
         ButtonHelper.deleteMessage(event);
     }
 
     public void unflipEidolonMaximum(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (playerHasActiveMax(player)) BreakthroughCommandHelper.deactivateBreakthrough(player);
+        if (playerHasActiveMax(player)) BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
     }
 }
