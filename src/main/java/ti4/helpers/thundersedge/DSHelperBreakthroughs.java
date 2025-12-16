@@ -104,7 +104,7 @@ public class DSHelperBreakthroughs {
 
     @ButtonHandler("useFlorzenBT")
     public static void useFlorzenBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
-        p1.setBreakthroughExhausted(true);
+        p1.setBreakthroughExhausted("florzenbt", true);
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
