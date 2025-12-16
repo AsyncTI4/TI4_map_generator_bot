@@ -3,12 +3,16 @@ package ti4.helpers.thundersedge;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -98,6 +102,87 @@ public class DSHelperBreakthroughs {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 p1.getCorrectChannel(), p1.getRepresentationUnfogged() + message, buttons);
+    }
+
+    @ButtonHandler("useFlorzenBT")
+    public static void useFlorzenBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        p1.setBreakthroughExhausted(true);
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation()
+                        + " has used their Florzen breakthrough to choose another player and each simultaenously spend 0/1/2tgs. If they spend the same, Florzen gets a random PN.");
+        ButtonHelper.deleteTheOneButton(event);
+        String message = ", please choose the target player.";
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "florzenBTStep2_" +p2.getFaction(),
+                    p2.getFactionNameOrColor(),p2.getFactionEmojiOrColor()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                p1.getCorrectChannel(), p1.getRepresentationUnfogged() + message, buttons);
+    }
+    @ButtonHandler("florzenBTStep2")
+    public static void florzenBTStep2(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation()
+                        + " has targeted "+p2.getRepresentation());
+        ButtonHelper.deleteMessage(event);
+        String message = ", please choose the amount of tg you want to spend.";
+        List<Button> buttons = new ArrayList<>();
+        for (int x = 0; x < 3 && x <= p1.getTg(); x++) {
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "florzenBTStep3_" +p2.getFaction()+"_"+x,
+                    x +" tg"));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + message, buttons);
+    }
+
+    @ButtonHandler("florzenBTStep3")
+    public static void florzenBTStep3(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String originalBid = buttonID.split("_")[2];
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation()
+                        + " has chosen and buttons have been sent to "+p2.getRepresentation()+" for them to choose an amount.");
+        ButtonHelper.deleteMessage(event);
+        String message = ", please choose the amount of tg you want to spend.";
+        List<Button> buttons = new ArrayList<>();
+        for (int x = 0; x < 3 && x <= p2.getTg(); x++) {
+            buttons.add(Buttons.gray(
+                    p1.getFinsFactionCheckerPrefix() + "florzenBTStep4_" +p1.getFaction()+"_"+originalBid+"_"+x,
+                    x +" tg"));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                p2.getCardsInfoThread(), p2.getRepresentationUnfogged() + message, buttons);
+    }
+
+    @ButtonHandler("florzenBTStep4")
+    public static void florzenBTStep4(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String originalBid = buttonID.split("_")[2];
+        String originalBid2 = buttonID.split("_")[3];
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation()
+                        + " has chosen to spend "+originalBid2+" tg and "+p2.getRepresentation()+" has chosen to spend "+originalBid+". The tg have been subtracted");
+        ButtonHelper.deleteMessage(event);
+        if(StringUtils.isNumeric(originalBid2) && Integer.parseInt(originalBid2) > 0){
+                p1.setTg(p1.getTg()-Integer.parseInt(originalBid2));
+        }
+        if(StringUtils.isNumeric(originalBid) && Integer.parseInt(originalBid) > 0){
+                p2.setTg(p2.getTg()-Integer.parseInt(originalBid));
+        }
+        if(originalBid.equalsIgnoreCase(originalBid2)){
+                MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(),
+                p1.getRepresentation() +" has sent a random PN to "+p2.getRepresentation());
+                PromissoryNoteHelper.sendRandom(event, game, p1, p2);
+        }
     }
 
     @ButtonHandler("useLanefirBt")

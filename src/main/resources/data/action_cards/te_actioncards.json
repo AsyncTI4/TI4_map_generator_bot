@@ -94,7 +94,7 @@
         "name": "Pirate Fleet",
         "phase": "Action",
         "window": "Action",
-        "text": "Spend 3 resources to place 1 neutral carrier, 1 neutral cruiser, 1 neutral destroyer, and 2 neutral fighters in a non-home system that contains no ships.",
+        "text": "Spend 3 resources to place 1 neutral carrier, 1 neutral cruiser, 1 neutral destroyer, and 2 neutral fighters in a non-home system that contains no non-neutral ships.",
         "flavorText": "Felix rubbed his temples as the pirates - well, the other pirates - blipped one by one on the ship's scanner. It was going to be a very long day.",
         "source": "thunders_edge"
     },

@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -88,7 +89,7 @@ public class ComponentActionHelper {
                     StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
             compButtons.add(Buttons.red(
                     finChecker + prefix + "mercenariesForHireAction_",
-                    "Spend 3tg on Mercenries For Hire to acquire " + commanderName));
+                    "Spend 3tg for " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
