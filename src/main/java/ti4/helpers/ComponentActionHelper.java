@@ -86,9 +86,8 @@ public class ComponentActionHelper {
             }
             String commanderName =
                     StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
-            compButtons.add(Buttons.red(
-                    finChecker + prefix + "mercenariesForHireAction_",
-                    "Spend 3tg on Mercenries For Hire to acquire " + commanderName));
+            compButtons.add(
+                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg for " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));

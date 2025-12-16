@@ -2748,7 +2748,7 @@ public class ButtonHelperActionCards {
                     if (p2 == player) {
                         continue;
                     }
-                    if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
+                    if (FoWHelper.playerHasActualShipsInSystem(p2, tile)) {
                         hasOtherShip = true;
                     }
                 }
