@@ -4320,6 +4320,10 @@ public class ButtonHelper {
             endButtons.add(
                     Buttons.green(player.finChecker() + "useAxisBT", "Use Axis Breakthrough", FactionEmojis.axis));
         }
+        if (player.hasUnlockedBreakthrough("florzenbt") && player.hasReadyBreakthrough("florzenbt")) {
+            endButtons.add(
+                    Buttons.green(player.finChecker() + "useFlorzenBT", "Exhaust Florzen Breakthrough", FactionEmojis.florzen));
+        }
         return endButtons;
     }
 
