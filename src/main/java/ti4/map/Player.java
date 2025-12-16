@@ -175,6 +175,34 @@ public class Player extends PlayerProperties {
         return false;
     }
 
+    public int getSingularities() {
+        int amount = 0;
+        if (hasTech("tf-singularityx")) {
+            amount++;
+        }
+        if (hasTech("tf-singularityy")) {
+            amount++;
+        }
+        if (hasTech("tf-singularityz")) {
+            amount++;
+        }
+
+        return amount;
+    }
+
+    public List<String> getSingularityTechs() {
+        List<String> singularities = new ArrayList<>();
+        String[] techIDs =
+                getGame().getStoredValue(getFaction() + "singularityTechs").split("_");
+        for (String tech : techIDs) {
+            if (!tech.isEmpty() && Mapper.getTech(tech) != null) {
+                singularities.add(tech);
+            }
+        }
+
+        return singularities;
+    }
+
     public int numberOfSpaceStations() {
         return (int) getPlanets().stream()
                 .map(planet -> game.getPlanetsInfo().get(planet))
@@ -2334,8 +2362,9 @@ public class Player extends PlayerProperties {
 
         // firmament commander allows you to use planets in systems that contain your ships for scoring SECRET
         // OBJECTIVES
-        if (secret && game.playerHasLeaderUnlockedOrAlliance(this, "firmamentcommander")
-                || hasTech("tf-theburningeye")) {
+        if (secret
+                && (game.playerHasLeaderUnlockedOrAlliance(this, "firmamentcommander")
+                        || hasTech("tf-theburningeye"))) {
             Set<Planet> planetsUnderShips = game.getPlanetsInfo().values().stream()
                     .filter(planet -> {
                         Tile t = game.getTileFromPlanet(planet.getName());

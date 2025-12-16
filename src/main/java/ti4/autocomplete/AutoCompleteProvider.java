@@ -357,7 +357,7 @@ public class AutoCompleteProvider {
             }
             case Constants.PRIMARY_TILE_DIRECTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var values = List.of("North", "Northeast", "Southeast", "South", "Southwest", "Northwest");
+                var values = List.of("north", "northeast", "southeast", "south", "southwest", "northwest");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue();
             }
