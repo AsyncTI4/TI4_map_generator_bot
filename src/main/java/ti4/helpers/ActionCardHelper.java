@@ -705,9 +705,9 @@ public class ActionCardHelper {
         boolean actionCardIsSabotageOrShatter = isSabotageOrShatter(acID);
         if (actionCardIsCancelable && !actionCardIsSabotageOrShatter) {
             Button sabotageButton = Buttons.red(
-                "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
-                "Cancel Action Card With Sabotage",
-                MiscEmojis.Sabotage);
+                    "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
+                    "Cancel Action Card With Sabotage",
+                    MiscEmojis.Sabotage);
             buttons.add(sabotageButton);
         }
 
@@ -798,10 +798,11 @@ public class ActionCardHelper {
                     }
                     buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
                     buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For " + cancelName));
+                            player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_"
+                                    + actionCardTitle,
+                            "Pause Timer While Waiting For " + cancelName));
                     MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
-                        mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
+                            mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
                 } else {
                     MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
                     StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
@@ -809,7 +810,8 @@ public class ActionCardHelper {
                     for (Player p : game.getRealPlayers()) {
                         if (p == player) continue;
                         if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                            noSabosMessage.append("\n> A player may have access to **Instinct Training**, so watch out.");
+                            noSabosMessage.append(
+                                    "\n> A player may have access to **Instinct Training**, so watch out.");
                             it = true;
                         }
                         if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
@@ -817,7 +819,8 @@ public class ActionCardHelper {
                             watcher = true;
                         }
                         if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
-                            noSabosMessage.append("\n> A player may have access to a Triune fighter cancel, so watch out.");
+                            noSabosMessage.append(
+                                    "\n> A player may have access to a Triune fighter cancel, so watch out.");
                             triune = true;
                         }
                     }
@@ -887,8 +890,8 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
-
-            String introMsg = player.getRepresentation() + ", after checking for Sabos, please use buttons to resolve _"
+            String cancelReminder = actionCardIsCancelable ? ", after checking for Sabos" : "";
+            String introMsg = player.getRepresentation() + cancelReminder + ", please use buttons to resolve _"
                     + actionCardTitle + "_.";
             String targetMsg =
                     " A reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
