@@ -849,6 +849,7 @@ public class AutoCompleteProvider {
                 for (Player p : game.getPlayers().values()) {
                     if (p.getBreakthroughIDs().size() > 1) {
                         addAllOpt = true;
+                        break;
                     }
                 }
                 if (event.getName().equals(Constants.FRANKEN)) {

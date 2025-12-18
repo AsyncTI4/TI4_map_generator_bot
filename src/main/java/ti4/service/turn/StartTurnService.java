@@ -250,7 +250,7 @@ public class StartTurnService {
                     ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End turn"));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was canceled)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation() + " use buttons to resolve the AC.",
@@ -265,7 +265,7 @@ public class StartTurnService {
                     ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(ButtonHelper.getEndTurnButton(game, player));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was cancelled)"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was canceled)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation() + " use buttons to resolve the AC.",

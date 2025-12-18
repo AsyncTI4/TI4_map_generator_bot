@@ -193,7 +193,7 @@ public class Player extends PlayerProperties {
     public List<String> getSingularityTechs() {
         List<String> singularities = new ArrayList<>();
         String[] techIDs =
-                getGame().getStoredValue(getFaction() + "singularityTechs").split("_");
+                game.getStoredValue(getFaction() + "singularityTechs").split("_");
         for (String tech : techIDs) {
             if (!tech.isEmpty() && Mapper.getTech(tech) != null) {
                 singularities.add(tech);
@@ -819,12 +819,12 @@ public class Player extends PlayerProperties {
             return true;
         }
         if ("scheming".equalsIgnoreCase(ability)) {
-            if (getGame().getStoredValue("schemingFactions").contains(getFaction())) {
+            if (game.getStoredValue("schemingFactions").contains(getFaction())) {
                 return true;
             }
         }
         if ("stall_tactics".equalsIgnoreCase(ability)) {
-            if (getGame().getStoredValue("stalltacticsFactions").contains(getFaction())) {
+            if (game.getStoredValue("stalltacticsFactions").contains(getFaction())) {
                 return true;
             }
         }
@@ -2610,7 +2610,7 @@ public class Player extends PlayerProperties {
 
             // Find another unit model to replace this lost model
             String replacementUnit = unitModel.getBaseType(); // default
-            if (unitModel.getAlias().equals("warsun")) replacementUnit = "nowarsun";
+            if ("warsun".equals(unitModel.getAlias())) replacementUnit = "nowarsun";
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
                 FactionModel factionSetup = getFactionSetupInfo();
