@@ -1522,7 +1522,7 @@ public class Helper {
             if (player.hasUnlockedBreakthrough("solbt")) {
                 solBtLimit = player.getSpentThingsThisWindow().stream()
                         .map(str -> str.split("_"))
-                        .filter(arr -> arr[0].equalsIgnoreCase("solBtBuild"))
+                        .filter(arr -> "solBtBuild".equalsIgnoreCase(arr[0]))
                         .map(arr -> arr[2])
                         .map(Integer::parseInt)
                         .findAny()

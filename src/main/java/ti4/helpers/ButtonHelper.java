@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3781,7 +3784,7 @@ public class ButtonHelper {
                         capacity += player.getSoScored() * entry.getValue();
                     }
                     if (player.hasRelic("metali_void_pods") && unit.getCapacityValue() > 0) {
-                        capacity += 1 * entry.getValue();
+                        capacity += entry.getValue();
                     }
                 }
                 // System.out.println(unit.getBaseType());

@@ -306,7 +306,7 @@ public class LoreService {
                 .sendMessage("Add new Lore - Option " + step
                         + parseCurrentSelections(
                                 StringUtils.substringAfter(menu.getCustomId(), "loreAdd" + step + "_")))
-                .addComponents(Arrays.asList(ActionRow.of(menu)))
+                .addComponents(List.of(ActionRow.of(menu)))
                 .queue();
         if (event instanceof ButtonInteractionEvent) {
             ((ButtonInteractionEvent) event).getMessage().delete().queue();

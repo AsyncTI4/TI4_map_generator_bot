@@ -248,7 +248,7 @@ public class AgendaHelper {
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
-                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || pnId.equals("favor"))) {
+                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
                 names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
                         + Mapper.getPromissoryNote(pnId).getName());
             }
@@ -276,7 +276,7 @@ public class AgendaHelper {
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
-                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || pnId.equals("favor"))) {
+                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
                 buttons.add(Buttons.red(
                         "queueWhen_pn_" + pnId,
                         StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
@@ -340,7 +340,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
         msg =
-                "By default, your queued \"after\" will be cancelled if someone before you plays an \"after\". If you wish it to play regardless of others actions, press this button.";
+                "By default, your queued \"after\" will be canceled if someone before you plays an \"after\". If you wish it to play regardless of others actions, press this button.";
         buttons = new ArrayList<>();
         buttons.add(Buttons.blue("lockAftersIn", "Play Regardless of Others"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -2695,7 +2695,7 @@ public class AgendaHelper {
                         player.getCardsInfoThread(),
                         player.getRepresentation()
                                 + ", this is a reminder that you don't currently hold your _Political Secret_."
-                                + " Any \"when\"s or \"after\"s that you queue will be automatically cancelled if it is played by another player.");
+                                + " Any \"when\"s or \"after\"s that you queue will be automatically canceled if it is played by another player.");
             }
             if (game.getCurrentAgendaInfo().contains("Player")
                     && IsPlayerElectedService.isPlayerElected(game, player, "committee")) {

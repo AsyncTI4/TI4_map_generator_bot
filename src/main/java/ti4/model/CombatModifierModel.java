@@ -80,7 +80,7 @@ public class CombatModifierModel implements ModelInterface {
                 isInScope = unit.getIsShip();
                 if (game.getTileByPosition(game.getActiveSystem()) != null) {
                     Tile tile = game.getTileByPosition(game.getActiveSystem());
-                    if (unit.getAlias().equalsIgnoreCase("purpletf_mech")) {
+                    if ("purpletf_mech".equalsIgnoreCase(unit.getAlias())) {
                         if (FoWHelper.playerHasShipsInSystem(player, tile)
                                 && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             isInScope = true;

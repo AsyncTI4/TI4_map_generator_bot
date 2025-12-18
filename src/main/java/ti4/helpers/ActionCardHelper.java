@@ -694,19 +694,26 @@ public class ActionCardHelper {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation());
+        boolean actionCardIsCancelable = isActionCardCancelable(actionCard);
+
+        String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
+        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using Garbozia." : ".";
 
         List<Button> buttons = new ArrayList<>();
-        Button sabotageButton = Buttons.red(
-                "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
-                "Cancel Action Card With Sabotage",
-                MiscEmojis.Sabotage);
-        buttons.add(sabotageButton);
 
-        if (!"blackmarketdealing".equals(acID)) {
+        boolean actionCardIsSabotageOrShatter = isSabotageOrShatter(acID);
+        if (actionCardIsCancelable && !actionCardIsSabotageOrShatter) {
+            Button sabotageButton = Buttons.red(
+                    "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
+                    "Cancel Action Card With Sabotage",
+                    MiscEmojis.Sabotage);
+            buttons.add(sabotageButton);
+        }
+
+        if (actionCardIsCancelable) {
             Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
             if (empy != null
                     && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
@@ -769,52 +776,60 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (acID.contains("sabo") || acID.contains("shatter")) {
+        if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " You can use this button to pick up the sabod card from the discard, per Wild Wild Galaxy",
+                                + " You can use this button to pick up the Sabo'd card from the discard, per Wild Wild Galaxy",
                         List.of(codex1));
             }
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
             String automationID = actionCard.getAutomationID();
 
-            if (SabotageService.isSaboAllowed(game, player)) {
-                String cancelName = "Sabotage";
-                if (game.isTwilightsFallMode()) {
-                    cancelName = "Shatter";
-                }
-                buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
-                buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For " + cancelName));
-                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
-                        mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
-            } else {
+            if (!actionCardIsCancelable) {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
-                StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
-                boolean it = false, watcher = false, triune = false;
-                for (Player p : game.getRealPlayers()) {
-                    if (p == player) continue;
-                    if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to **Instinct Training**, so watch out.");
-                        it = true;
+            } else {
+                if (SabotageService.isSaboAllowed(game, player)) {
+                    String cancelName = "Sabotage";
+                    if (game.isTwilightsFallMode()) {
+                        cancelName = "Shatter";
                     }
-                    if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
-                        noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
-                        watcher = true;
+                    buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
+                    buttons.add(Buttons.gray(
+                            player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_"
+                                    + actionCardTitle,
+                            "Pause Timer While Waiting For " + cancelName));
+                    MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
+                            mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
+                } else {
+                    MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+                    StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
+                    boolean it = false, watcher = false, triune = false;
+                    for (Player p : game.getRealPlayers()) {
+                        if (p == player) continue;
+                        if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
+                            noSabosMessage.append(
+                                    "\n> A player may have access to **Instinct Training**, so watch out.");
+                            it = true;
+                        }
+                        if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
+                            noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
+                            watcher = true;
+                        }
+                        if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
+                            noSabosMessage.append(
+                                    "\n> A player may have access to a Triune fighter cancel, so watch out.");
+                            triune = true;
+                        }
                     }
-                    if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
-                        noSabosMessage.append("\n> A player may have access to a Triune fighter cancel, so watch out.");
-                        triune = true;
-                    }
+                    MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
                 }
-                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
             }
+
             MessageChannel channel2 = player.getCorrectChannel();
             if ("investments".equals(automationID)) {
                 List<Button> scButtons = new ArrayList<>();
@@ -877,8 +892,8 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
-
-            String introMsg = player.getRepresentation() + ", after checking for Sabos, please use buttons to resolve _"
+            String cancelReminder = actionCardIsCancelable ? ", after checking for Sabos" : "";
+            String introMsg = player.getRepresentation() + cancelReminder + ", please use buttons to resolve _"
                     + actionCardTitle + "_.";
             String targetMsg =
                     " A reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
@@ -1716,6 +1731,14 @@ public class ActionCardHelper {
 
         sendActionCardInfo(game, player);
         return null;
+    }
+
+    private static boolean isSabotageOrShatter(String acID) {
+        return acID.contains("sabo") || acID.contains("shatter");
+    }
+
+    private static boolean isActionCardCancelable(ActionCardModel actionCard) {
+        return !actionCard.getText().contains("cannot be canceled");
     }
 
     public static void serveReverseEngineerButtons(Game game, Player discardingPlayer, List<String> actionCards) {

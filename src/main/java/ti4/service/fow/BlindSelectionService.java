@@ -62,7 +62,7 @@ public class BlindSelectionService {
     }
 
     private static void filterForBlindSelection(
-            Game game, Player player, List<Button> buttons, String buttonPrefix, final String TYPE) {
+            Game game, Player player, List<Button> buttons, String buttonPrefix, String TYPE) {
 
         Set<String> visibleTilePositions = FoWHelper.getTilePositionsToShow(game, player);
         StringBuilder validTargets = new StringBuilder(VALID_SEPARATOR);

@@ -172,7 +172,7 @@ public class StatusCleanupService {
                             "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
                                     + ".");
                 }
-                if (pn.equalsIgnoreCase("shareknowledge")) {
+                if ("shareknowledge".equalsIgnoreCase(pn)) {
                     String shareKnowledgeConst = "ShareKnowledge_" + player.getFaction();
                     String sharedKnowledge = game.getStoredValue(shareKnowledgeConst);
                     player.removePromissoryNote(pn);

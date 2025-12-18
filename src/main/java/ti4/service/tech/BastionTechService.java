@@ -1,6 +1,6 @@
 package ti4.service.tech;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -199,17 +199,17 @@ public class BastionTechService {
             hits = substringAfter(message, "Total hits ");
             hits = hits.split(" ")[0].replace("*", "");
             h = Integer.parseInt(hits);
-            if (message != null && message.endsWith(";\n")) {
+            if (message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }
             if (player.hasTech("tf-proxima") && h > 0) {
-                message += "\nProxima cancelled 1 hit automatically";
+                message += "\nProxima canceled 1 hit automatically";
                 h--;
             } else {
                 if (planet.getGalvanizedUnitCount(player.getColorID()) > 0 && h > 0) {
                     int oldH = h;
                     h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                    message += "\nProxima cancelled " + (oldH - h) + " hit(s) automatically";
+                    message += "\nProxima canceled " + (oldH - h) + " hit(s) automatically";
                 }
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

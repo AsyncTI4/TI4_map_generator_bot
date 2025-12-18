@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -296,7 +297,7 @@ public class CombatRollService {
                 && opponent.hasTech("proxima")
                 && h > 0) {
             if (opponent.hasTech("tf-proxima") && h > 0) {
-                message += "\nProxima cancelled 1 hit automatically";
+                message += "\nProxima canceled 1 hit automatically";
                 h--;
             } else {
                 if (!bombardPlanet.isEmpty()) {
@@ -304,7 +305,7 @@ public class CombatRollService {
                     if (planet != null && planet.getGalvanizedUnitCount(player.getColorID()) > 0) {
                         int oldH = h;
                         h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                        message += "\nProxima cancelled " + (oldH - h) + " hit(s) automatically";
+                        message += "\nProxima canceled " + (oldH - h) + " hit(s) automatically";
                     }
                 }
             }

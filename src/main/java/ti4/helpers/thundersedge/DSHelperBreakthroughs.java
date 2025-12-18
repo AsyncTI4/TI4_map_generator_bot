@@ -15,7 +15,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -292,7 +291,7 @@ public class DSHelperBreakthroughs {
     public static void edynbtFinal(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         String action = buttonID.split("_")[1];
-        if (action.equals("showSecret")) {
+        if ("showSecret".equals(action)) {
             List<String> unscoredSOs = new ArrayList<>(p1.getSecretsUnscored().keySet());
             Collections.shuffle(unscoredSOs);
             String randomSOID = unscoredSOs.get(0);
@@ -321,7 +320,7 @@ public class DSHelperBreakthroughs {
                 if (game.getUnitHolderFromPlanet(planet) != null
                         && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
                         && !ButtonHelper.getPlanetExplorationButtons(
-                                        game, (Planet) game.getUnitHolderFromPlanet(planet), player, false, true)
+                                        game, game.getUnitHolderFromPlanet(planet), player, false, true)
                                 .isEmpty()) {
                     buttons.add(Buttons.gray(
                             player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,

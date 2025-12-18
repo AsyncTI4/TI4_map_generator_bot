@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -930,7 +932,7 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.sendMessageToRightStratThread(player, game, msg, "construction");
         if (!player.getSCs().contains(Integer.parseInt("4"))
                 && !game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")
-                && !game.getStrategyCardSet().getAlias().equalsIgnoreCase("te")) {
+                && !"te".equalsIgnoreCase(game.getStrategyCardSet().getAlias())) {
             CommandCounterHelper.addCC(event, player, tile);
             ButtonHelper.sendMessageToRightStratThread(
                     player,
