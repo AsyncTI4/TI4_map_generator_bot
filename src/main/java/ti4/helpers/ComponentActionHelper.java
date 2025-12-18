@@ -1012,7 +1012,7 @@ public class ComponentActionHelper {
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
-            if (!relicID.equals("nanoforge")) {
+            if (!"nanoforge".equals(relicID)) {
                 DSHelperBreakthroughs.doLanefirBtCheck(game, player);
             }
         }

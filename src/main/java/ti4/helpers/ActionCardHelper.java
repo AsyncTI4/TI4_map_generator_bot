@@ -694,14 +694,16 @@ public class ActionCardHelper {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation());
+        boolean actionCardIsCancelable = isActionCardCancelable(actionCard);
+
+        String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
+        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
         message += fromGarbozia ? " using Garbozia." : ".";
 
         List<Button> buttons = new ArrayList<>();
 
-        boolean actionCardIsCancelable = isActionCardCancelable(actionCard);
         boolean actionCardIsSabotageOrShatter = isSabotageOrShatter(acID);
         if (actionCardIsCancelable && !actionCardIsSabotageOrShatter) {
             Button sabotageButton = Buttons.red(

@@ -768,13 +768,9 @@ public class Tile {
         }
         TileModel tileM = TileHelper.getTileById(tileID);
         if (tileM != null) {
-            if (tileM.getTileBack() == TileBack.GREEN
-                    && !tileID.equalsIgnoreCase("17")
-                    && !tileID.equalsIgnoreCase("94")) {
-                return true;
-            } else {
-                return false;
-            }
+            return tileM.getTileBack() == TileBack.GREEN
+                    && !"17".equalsIgnoreCase(tileID)
+                    && !"94".equalsIgnoreCase(tileID);
         }
 
         for (UnitHolder unitHolder : unitHolders.values()) {

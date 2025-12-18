@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -762,7 +762,7 @@ public class ButtonHelperCommanders {
             if (game.getUnitHolderFromPlanet(planet) != null
                     && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
                     && !ButtonHelper.getPlanetExplorationButtons(
-                                    game, (Planet) game.getUnitHolderFromPlanet(planet), player, false, true)
+                                    game, game.getUnitHolderFromPlanet(planet), player, false, true)
                             .isEmpty()) {
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
