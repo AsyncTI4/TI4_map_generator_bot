@@ -1994,6 +1994,9 @@ public class ActionCardHelper {
     public static void pickACardFromDiscardStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : game.getDiscardActionCards().keySet()) {
+            if (!isDiscardActionCardPickable(game, acStringID)) {
+                continue;
+            }
             buttons.add(Buttons.green(
                     "pickFromDiscard_" + acStringID,
                     Mapper.getActionCard(acStringID).getName()));
@@ -2017,6 +2020,11 @@ public class ActionCardHelper {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
         String acID = buttonID.replace("pickFromDiscard_", "");
+        if (!isDiscardActionCardPickable(game, acID)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "No such Action Card ID found, please retry");
+            return;
+        }
         boolean picked = game.pickActionCard(
                 player.getUserID(), game.getDiscardActionCards().get(acID));
         if (!picked) {
@@ -2057,6 +2065,10 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
             return;
         }
+        if (!isDiscardActionCardPickable(game, acId)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
+            return;
+        }
         boolean picked = game.pickActionCard(player.getUserID(), acIndex);
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
@@ -2069,6 +2081,11 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
 
         sendActionCardInfo(game, player);
+    }
+
+    private static boolean isDiscardActionCardPickable(Game game, String acId) {
+        ACStatus status = game.getDiscardACStatus().get(acId);
+        return status != ACStatus.purged && status != ACStatus.ralnelbt && status != ACStatus.garbozia;
     }
 
     @ButtonHandler("riseOfAMessiah")
