@@ -1136,7 +1136,7 @@ public class UnfiledButtonHandlers {
             target = p2.getRepresentationUnfogged();
         }
         String message = game.getPing() + ", the action card _" + acName + "_ played by " + target
-                + " has been cancelled by " + player.getRepresentationUnfogged() + " with ";
+                + " has been canceled by " + player.getRepresentationUnfogged() + " with ";
         Integer count = game.getAllActionCardsSabod().get(acName);
         if (count == null) {
             game.setSpecificActionCardSaboCount(acName, 1);
@@ -1208,7 +1208,7 @@ public class UnfiledButtonHandlers {
         if (sendReact) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), game.getPing() + ", an action card has been cancelled.");
+                        game.getActionsChannel(), game.getPing() + ", an action card has been canceled.");
             } else {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             }
@@ -1381,7 +1381,7 @@ public class UnfiledButtonHandlers {
     public static void cancelAFBHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability.";
+        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -1402,7 +1402,7 @@ public class UnfiledButtonHandlers {
     public static void cancelPDSOffenseHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability.";
+        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -1425,7 +1425,7 @@ public class UnfiledButtonHandlers {
     public static void cancelGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -1447,7 +1447,7 @@ public class UnfiledButtonHandlers {
     public static void cancelSpaceHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
-        String msg = "\n" + player.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
+        String msg = "\n" + player.getRepresentationUnfogged() + " canceled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + player.getFaction() + "_";

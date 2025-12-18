@@ -80,7 +80,7 @@ public class MiltyService {
         message += " You can change your decision later by clicking a different button.";
         if (warn)
             message +=
-                    "\n- 🛑 Some of these factions are in the draft! 🛑 If you preset them and they get chosen, then the preset will be cancelled.";
+                    "\n- 🛑 Some of these factions are in the draft! 🛑 If you preset them and they get chosen, then the preset will be canceled.";
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, keleresPresets);
     }
 

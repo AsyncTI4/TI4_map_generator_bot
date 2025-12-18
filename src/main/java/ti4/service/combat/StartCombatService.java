@@ -458,13 +458,13 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
                             player1.getRepresentation()
-                                    + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
+                                    + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be canceled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player1, tile)) {
                     MessageHelper.sendMessageToChannel(
                             threadChannel,
                             player2.getRepresentation()
-                                    + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
+                                    + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be canceled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player2, tile)) {
                     MessageHelper.sendMessageToChannel(
