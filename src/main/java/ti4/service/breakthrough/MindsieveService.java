@@ -49,7 +49,7 @@ public class MindsieveService {
 
         StringBuilder msg = new StringBuilder(naalu.getRepresentation()).append(" since you have ");
         msg.append(mindsieve()).append(" you are able to send a promissory note to ");
-        msg.append(primary.getRepresentationNoPing()).append(" instead of spending a command token.");
+        msg.append(primary.getColorIfCanSeeStats(naalu)).append(" instead of spending a command token.");
         msg.append(" If you would like to do so, choose which promissory note to send by clicking a button:");
 
         List<Button> buttons = new ArrayList<>();
@@ -58,8 +58,8 @@ public class MindsieveService {
             if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
             if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) {
                 String fmt = "\n-# > - Since they %s, you cannot send the _Alliance_ promissory note.";
-                msg.append(String.format(
-                        fmt, game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact"));
+                String reason = game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact";
+                msg.append(String.format(fmt, game.isFowMode() ? "[REDACTED]" : reason));
                 continue;
             }
             Player owner = game.getPNOwner(pn);

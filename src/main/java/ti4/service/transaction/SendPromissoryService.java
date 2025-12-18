@@ -103,7 +103,9 @@ public class SendPromissoryService {
         }
         MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), reportMsg);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(sender.getCorrectChannel(), reportMsg);
+            MessageHelper.sendMessageToChannel(
+                    sender.getCorrectChannel(),
+                    reportMsg.replace(receiver.getRepresentation(), receiver.getColorIfCanSeeStats(sender)));
             String extra = null;
             if (model.getAlias().endsWith("_sftt")) extra = "Scores changed.";
             String whatSent = model.isPlayedDirectlyToPlayArea() ? model.getName() : "face down promissory note";
