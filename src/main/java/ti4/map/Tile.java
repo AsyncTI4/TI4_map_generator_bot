@@ -79,6 +79,7 @@ public class Tile {
             tileSpace.addUnitsWithStates(unit, space.getUnitsByState().get(unit));
         space.getCcList().forEach(tileSpace::addCC);
         space.getControlList().forEach(tileSpace::addControl);
+        space.getTokenList().forEach(tileSpace::addToken);
     }
 
     private void initPlanetsAndSpace(String tileID) {
