@@ -746,7 +746,7 @@
         "tfTitle": "",
         "abilityName": "Singularity Reactor: Changing the Ways",
         "abilityWindow": "ACTION:",
-        "abilityText": "Swap the positions of any 2 systems that contain wormholes or your units, other than the Creuss system and the wormhole nexus. Then, purge this card.",
+        "abilityText": "Swap the positions of any 2 systems that contain wormholes or your units, other than the Creuss system and the wormhole nexus. Then, purge this card. [Note: Cannot be used on irregularly sized tiles like Creuxx or The Fracture.]",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok",
         "shortName": "Riftwlkr\nMeian"
