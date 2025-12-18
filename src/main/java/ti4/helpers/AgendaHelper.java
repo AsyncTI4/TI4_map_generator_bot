@@ -248,7 +248,7 @@ public class AgendaHelper {
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
-                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || pnId.equals("favor"))) {
+                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
                 names.add(StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")
                         + Mapper.getPromissoryNote(pnId).getName());
             }
@@ -276,7 +276,7 @@ public class AgendaHelper {
         }
         for (String pnId : player.getPromissoryNotes().keySet()) {
             if (!player.ownsPromissoryNote(pnId)
-                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || pnId.equals("favor"))) {
+                    && ((pnId.endsWith("_ps") && !pnId.contains("absol")) || "favor".equals(pnId))) {
                 buttons.add(Buttons.red(
                         "queueWhen_pn_" + pnId,
                         StringUtils.capitalize(Mapper.getPromissoryNote(pnId).getColor() + " ")

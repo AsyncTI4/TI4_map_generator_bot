@@ -291,7 +291,7 @@ public class VoteButtonHandler {
                         && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                     continue;
                 }
-                if (planet.equalsIgnoreCase("mrte") || planet.equalsIgnoreCase("mr")) {
+                if ("mrte".equalsIgnoreCase(planet) || "mr".equalsIgnoreCase(planet)) {
                     continue;
                 }
             }

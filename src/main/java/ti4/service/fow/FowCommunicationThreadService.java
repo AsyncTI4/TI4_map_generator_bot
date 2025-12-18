@@ -31,7 +31,7 @@ public class FowCommunicationThreadService {
     public static final Pattern THREAD_NAME_PATTERN =
             Pattern.compile("^(\\w+)\\s*(?:" + YES_CHAR + "|" + NO_CHAR + ")\\s*(\\w+)");
 
-    private static Map<String, Boolean> validationRunning = new HashMap<>();
+    private static final Map<String, Boolean> validationRunning = new HashMap<>();
 
     public static boolean isActive(Game game) {
         return game.isFowMode() && game.getFowOption(FOWOption.MANAGED_COMMS);

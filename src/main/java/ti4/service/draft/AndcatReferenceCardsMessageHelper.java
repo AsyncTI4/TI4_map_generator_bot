@@ -569,7 +569,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             ReferenceCardPackage refPackage =
-                    this.draftable.getPackageByChoiceKey(picks.get(0).getChoiceKey());
+                    draftable.getPackageByChoiceKey(picks.get(0).getChoiceKey());
 
             if (refPackage.speakerOrderFaction() == null) {
                 unorderedPlayers.add(playerUserId);

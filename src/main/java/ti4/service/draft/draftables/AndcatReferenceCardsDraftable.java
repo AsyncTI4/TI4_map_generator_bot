@@ -520,12 +520,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
 
             FactionModel newKeleresFaction = getKeleresHomeSystemFaction(draftManager);
             if (newKeleresFaction != null) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(game.getPlayer(playerUserId).getRepresentation());
-                sb.append(" had Keleres as their home system faction, and drew a random unused home system tile.");
-                sb.append(System.lineSeparator());
-                sb.append(TwilightsFallInfoHelper.getFactionSetupInfo(newKeleresFaction, false, true, false));
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
+                String sb = game.getPlayer(playerUserId).getRepresentation()
+                        + " had Keleres as their home system faction, and drew a random unused home system tile."
+                        + System.lineSeparator()
+                        + TwilightsFallInfoHelper.getFactionSetupInfo(newKeleresFaction, false, true, false);
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb);
 
                 updatedPackage = new ReferenceCardPackage(
                         refPackage.key(),

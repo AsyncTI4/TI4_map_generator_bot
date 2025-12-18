@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1818,7 +1819,7 @@ public class ButtonHelperAbilities {
         String type = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
-        if (type.equalsIgnoreCase("scheming")) {
+        if ("scheming".equalsIgnoreCase(type)) {
             if (game.getStoredValue("schemingFactions").contains(faction)) {
                 game.setStoredValue(
                         "schemingFactions",
@@ -1848,7 +1849,7 @@ public class ButtonHelperAbilities {
                 }
             }
         }
-        if (type.equalsIgnoreCase("stalltactics")) {
+        if ("stalltactics".equalsIgnoreCase(type)) {
             if (game.getStoredValue("stalltacticsFactions").contains(faction)) {
                 game.setStoredValue(
                         "stalltacticsFactions",
