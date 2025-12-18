@@ -992,7 +992,7 @@ public class UnfiledButtonHandlers {
         }
         for (String planet : getBombardablePlanets(player, game, tile)) {
             summary.append("### ")
-                    .append(player.getFactionEmoji())
+                    .append(player.fogSafeEmoji())
                     .append(" BOMBARDMENT of ")
                     .append(Helper.getPlanetRepresentationNoResInf(planet, game))
                     .append(":\n");
@@ -1002,7 +1002,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
                     summary.append("-# ")
-                            .append(p2.getFactionEmoji())
+                            .append(p2.fogSafeEmoji())
                             .append(" currently has ")
                             .append(ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(
                                     game, p2, planet))
