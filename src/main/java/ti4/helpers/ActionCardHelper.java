@@ -2021,8 +2021,7 @@ public class ActionCardHelper {
         ButtonHelper.deleteMessage(event);
         String acID = buttonID.replace("pickFromDiscard_", "");
         if (!isDiscardActionCardPickable(game, acID)) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
         boolean picked = game.pickActionCard(
@@ -2065,10 +2064,6 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        if (!isDiscardActionCardPickable(game, acId)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
-            return;
-        }
         boolean picked = game.pickActionCard(player.getUserID(), acIndex);
         if (!picked) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
@@ -2085,7 +2080,7 @@ public class ActionCardHelper {
 
     private static boolean isDiscardActionCardPickable(Game game, String acId) {
         ACStatus status = game.getDiscardACStatus().get(acId);
-        return status != ACStatus.purged && status != ACStatus.ralnelbt && status != ACStatus.garbozia;
+        return status == null;
     }
 
     @ButtonHandler("riseOfAMessiah")
