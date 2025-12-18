@@ -121,7 +121,9 @@ public class FrankenDraftBagService {
         }
 
         if (includeGameSetup) {
-            game.setShowMapSetup(true);
+            if (!game.isFowMode()) {
+                game.setShowMapSetup(true);
+            }
 
             MessageHelper.sendMessageToChannelWithButtons(
                     game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
