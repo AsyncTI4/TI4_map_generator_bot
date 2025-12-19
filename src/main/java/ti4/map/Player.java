@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -867,7 +868,7 @@ public class Player extends PlayerProperties {
         List<String> cards = new ArrayList<>(actionCards.keySet());
         if (hasPlanet("garbozia")) {
             game.getDiscardACStatus().entrySet().stream()
-                    .filter(entry -> "garbozia".equals(String.valueOf(entry.getValue())))
+                    .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
                     .map(Entry::getKey)
                     .forEach(cards::add);
         }
