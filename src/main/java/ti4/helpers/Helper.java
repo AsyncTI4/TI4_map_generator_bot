@@ -342,7 +342,7 @@ public class Helper {
                     || game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     int poIndex = Integer.parseInt(game.getStoredValue(player.getFaction() + "queuedPOScore"));
-                    ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, poIndex);
+                    ScorePublicObjectiveService.scorePO(event, game, player, poIndex);
                     game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                 }

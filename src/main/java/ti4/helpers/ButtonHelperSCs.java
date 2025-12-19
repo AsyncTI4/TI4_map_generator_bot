@@ -296,7 +296,7 @@ public class ButtonHelperSCs {
         boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player);
         if (used) return;
         ButtonHelperFactionSpecific.keleresIIHQCCGainCheck(player, game);
-        ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, 0);
+        ScorePublicObjectiveService.scorePO(event, game, player, 0);
     }
 
     @ButtonHandler("sc_trade_follow")
