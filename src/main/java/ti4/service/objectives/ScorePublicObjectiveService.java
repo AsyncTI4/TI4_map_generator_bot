@@ -318,7 +318,7 @@ public class ScorePublicObjectiveService {
         if (spentFromTactics > 0) {
             commandTokenMessage.append(String.format(
                     " %d command token%s %s deducted from your tactic pool.",
-                    spentFromTactics, spentFromTactics  == 1 ? "" : "s", spentFromTactics  == 1 ? "was" : "were"));
+                    spentFromTactics, spentFromTactics == 1 ? "" : "s", spentFromTactics == 1 ? "was" : "were"));
         }
 
         if (hasReadiedEmelpar) {
