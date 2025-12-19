@@ -306,23 +306,25 @@ public class ScorePublicObjectiveService {
         int spentFromTactics = requiredSpend - spentFromStrat;
         player.setTacticalCC(currentTact - spentFromTactics);
 
-        String commandTokenMessage = String.format(
-                "%s, %d command token%s %s automatically deducted from your strategy pool.",
-                player.getRepresentation(),
-                spentFromStrat,
-                spentFromStrat == 1 ? "" : "s",
-                spentFromStrat == 1 ? "was" : "were");
+        StringBuilder commandTokenMessage = new StringBuilder();
+        commandTokenMessage.append(player.getRepresentation());
+
+        if (spentFromStrat > 0) {
+            commandTokenMessage.append(String.format(
+                    " %d command token%s %s deducted from your strategy pool.",
+                    spentFromStrat, spentFromStrat == 1 ? "" : "s", spentFromStrat == 1 ? "was" : "were"));
+        }
 
         if (spentFromTactics > 0) {
-            commandTokenMessage += String.format(
-                    " Additionally, %d command token%s %s deducted from your tactic pool.",
-                    spentFromTactics, spentFromTactics == 1 ? "" : "s", spentFromTactics == 1 ? "was" : "were");
+            commandTokenMessage.append(String.format(
+                    " %d command token%s %s deducted from your tactic pool.",
+                    spentFromTactics, spentFromStrat == 1 ? "" : "s", spentFromStrat == 1 ? "was" : "were"));
         }
 
         if (hasReadiedEmelpar) {
-            commandTokenMessage += " Scepter of Emelpar was used.";
+            commandTokenMessage.append(" Scepter of Emelpar was used.");
         }
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), commandTokenMessage);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), commandTokenMessage.toString());
     }
 }
