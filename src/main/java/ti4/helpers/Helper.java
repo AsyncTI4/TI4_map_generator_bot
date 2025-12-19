@@ -342,7 +342,7 @@ public class Helper {
                     || game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     int poIndex = Integer.parseInt(game.getStoredValue(player.getFaction() + "queuedPOScore"));
-                    ScorePublicObjectiveService.scorePO(event, player.getCorrectChannel(), game, player, poIndex);
+                    ScorePublicObjectiveService.scorePO(event, game, player, poIndex);
                     game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                 }
@@ -2259,7 +2259,7 @@ public class Helper {
                     }
                 }
             }
-            if (playerHasWarMachine(player)) {
+            if (ActionCardHelper.playerHasWarMachine(player)) {
                 ActionCardHelper.sendActionCardInfo(game, player, event);
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
@@ -2412,19 +2412,6 @@ public class Helper {
         }
 
         return unitButtons;
-    }
-
-    private static boolean playerHasWarMachine(Player player) {
-        return player.getActionCards().containsKey("war_machine1")
-                || player.getActionCards().containsKey("war_machine2")
-                || player.getActionCards().containsKey("war_machine3")
-                || player.getActionCards().containsKey("war_machine4")
-                || player.getActionCards().containsKey("war_machine_ds")
-                // deprecated, but needs to sit here for a while til those games finish
-                || player.getActionCards().containsKey("war_machine1_acd2")
-                || player.getActionCards().containsKey("war_machine2_acd2")
-                || player.getActionCards().containsKey("war_machine3_acd2")
-                || player.getActionCards().containsKey("war_machine4_acd2");
     }
 
     public static List<Button> getPlanetSystemDiploButtons(Player player, Game game, boolean ac, Player mahact) {

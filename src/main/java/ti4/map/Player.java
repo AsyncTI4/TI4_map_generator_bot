@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.helpers.ActionCardHelper.ACStatus;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -866,12 +866,11 @@ public class Player extends PlayerProperties {
 
     public List<String> getPlayableActionCards() {
         List<String> cards = new ArrayList<>(actionCards.keySet());
-        Game game = this.game;
-        if (game != null) {
-            List<String> garboziaCards = game.getDiscardACStatus().keySet().stream()
-                    .filter(ac -> game.getDiscardACStatus().get(ac) == ACStatus.garbozia)
-                    .toList();
-            cards.addAll(garboziaCards);
+        if (hasPlanet("garbozia")) {
+            game.getDiscardACStatus().entrySet().stream()
+                    .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
+                    .map(Entry::getKey)
+                    .forEach(cards::add);
         }
         return cards;
     }

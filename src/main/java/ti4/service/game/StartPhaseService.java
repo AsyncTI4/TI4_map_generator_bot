@@ -199,7 +199,7 @@ public class StartPhaseService {
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("SpecialSession") != null
                     && game.getStoredValue("SpecialSession").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("special_session")) {
+                    && player2.getPlayableActionCards().contains("special_session")) {
                 ActionCardHelper.playAC(event, game, player2, "special session", game.getMainGameChannel());
                 return;
             }
@@ -243,29 +243,29 @@ public class StartPhaseService {
         for (Player player2 : game.getRealPlayers()) {
             if (game.getStoredValue("Summit") != null
                     && game.getStoredValue("Summit").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("summit")) {
+                    && player2.getPlayableActionCards().contains("summit")) {
                 ActionCardHelper.playAC(event, game, player2, "summit", game.getMainGameChannel());
             }
 
             if (game.getStoredValue("Investments") != null
                     && game.getStoredValue("Investments").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("investments")) {
+                    && player2.getPlayableActionCards().contains("investments")) {
                 ActionCardHelper.playAC(event, game, player2, "investments", game.getMainGameChannel());
             }
 
             if (game.getStoredValue("PreRevolution") != null
                     && game.getStoredValue("PreRevolution").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("revolution")) {
+                    && player2.getPlayableActionCards().contains("revolution")) {
                 ActionCardHelper.playAC(event, game, player2, "revolution", game.getMainGameChannel());
             }
             if (game.getStoredValue("Deflection") != null
                     && game.getStoredValue("Deflection").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("deflection")) {
+                    && player2.getPlayableActionCards().contains("deflection")) {
                 ActionCardHelper.playAC(event, game, player2, "deflection", game.getMainGameChannel());
             }
             if (game.getStoredValue("Tartarus") != null
                     && game.getStoredValue("Tartarus").contains(player2.getFaction())
-                    && player2.getActionCards().containsKey("tf-tartarus")) {
+                    && player2.getPlayableActionCards().contains("tf-tartarus")) {
                 ActionCardHelper.playAC(event, game, player2, "tf-tartarus", game.getMainGameChannel());
             }
             if (player2.hasLeader("zealotshero")
@@ -534,7 +534,8 @@ public class StartPhaseService {
             ButtonHelper.updateMap(game, event, "Start of the Strategy Phase for round #" + game.getRound() + ".");
         }
         for (Player player2 : game.getRealPlayers()) {
-            if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")) {
+            if (player2.getActionCards() != null
+                    && player2.getPlayableActionCards().contains("summit")) {
                 MessageHelper.sendMessageToChannel(
                         player2.getCardsInfoThread(),
                         player2.getRepresentationUnfogged() + ", reminder that this is the window to play _Summit_.");
@@ -599,12 +600,12 @@ public class StartPhaseService {
 
     private static void handleStartOfStrategyForAcd2Player(Game game) {
         for (Player player : game.getRealPlayers()) {
-            if (player.getActionCards().containsKey("deflection")) {
+            if (player.getPlayableActionCards().contains("deflection")) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + ", a reminder this is the window to play _Deflection_.");
             }
-            if (player.getActionCards().containsKey("revolution")) {
+            if (player.getPlayableActionCards().contains("revolution")) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + ", a reminder this is the window to play _Revolution_.");
@@ -717,7 +718,7 @@ public class StartPhaseService {
             }
         }
 
-        if (player.getActionCards() != null && player.getActionCards().containsKey("stability")) {
+        if (player.getActionCards() != null && player.getPlayableActionCards().contains("stability")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -725,7 +726,7 @@ public class StartPhaseService {
         }
 
         if (player.getActionCards() != null
-                && player.getActionCards().containsKey("abs")
+                && player.getPlayableActionCards().contains("abs")
                 && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),

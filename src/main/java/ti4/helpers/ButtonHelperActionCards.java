@@ -1947,7 +1947,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("coup")) {
+        if (player.getPlayableActionCards().contains("coup")) {
             game.setStoredValue("Coup", "");
             String msg = player.getRepresentation()
                     + ", you have the option to pre-assign which strategy card you wish to Coup."
@@ -1976,7 +1976,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("extremeduress")) {
+        if (player.getPlayableActionCards().contains("extremeduress")) {
             game.setStoredValue("ExtremeDuress", "");
             String msg = player.getRepresentation()
                     + ", you have the option to pre-assign which player you wish to experience extreme duress."
@@ -2001,7 +2001,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("crisis")) {
+        if (player.getPlayableActionCards().contains("crisis")) {
             game.setStoredValue("Crisis Target", "");
             String msg = player.getRepresentation()
                     + ", you have the option to pre-assign which player whose turn you wish to skip with crisis."
@@ -2023,7 +2023,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("tf-stasis")) {
+        if (player.getPlayableActionCards().contains("tf-stasis")) {
             game.setStoredValue("Stasis Target", "");
             String msg = player.getRepresentation()
                     + ", you have the option to pre-assign which player whose turn you wish to skip with _Stasis_."
@@ -2045,7 +2045,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("summit")) {
+        if (player.getPlayableActionCards().contains("summit")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Summit_."
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
@@ -2062,7 +2062,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("bounty_contracts")
+        if (player.getPlayableActionCards().contains("bounty_contracts")
                 && game.getStoredValue("BountyContracts").isEmpty()) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Bounty Contracts_."
@@ -2080,7 +2080,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("investments")) {
+        if (player.getPlayableActionCards().contains("investments")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Manipulate Investments_."
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
@@ -2090,7 +2090,7 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getActionCards().containsKey("special_session")) {
+        if (player.getPlayableActionCards().contains("special_session")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Special Session_."
                     + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
@@ -2100,7 +2100,7 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getActionCards().containsKey("revolution")) {
+        if (player.getPlayableActionCards().contains("revolution")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Revolution_."
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
@@ -2110,7 +2110,7 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getActionCards().containsKey("deflection")) {
+        if (player.getPlayableActionCards().contains("deflection")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Deflection_."
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
@@ -2120,7 +2120,7 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
-        if (player.getActionCards().containsKey("tf-tartarus")) {
+        if (player.getPlayableActionCards().contains("tf-tartarus")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-play _Tartarus_."
                     + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
@@ -2151,7 +2151,7 @@ public class ButtonHelperActionCards {
                 || IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
             return;
         }
-        if (player.getActionCards().containsKey("disgrace")) {
+        if (player.getPlayableActionCards().contains("disgrace")) {
             String msg = player.getRepresentation()
                     + ", you have the option to pre-assign which strategy card you will Publicly Disgrace."
                     + " _Public Disgrace_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
