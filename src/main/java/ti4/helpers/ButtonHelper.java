@@ -1271,7 +1271,7 @@ public class ButtonHelper {
         }
         String message = "";
         int amount = 1;
-        boolean hadPoliticalStability = player.getActionCards().containsKey("stability");
+        boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
         if (player.hasAbility("autonetic_memory")) {
             if (player.hasTech("nm")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 2);
@@ -1352,7 +1352,7 @@ public class ButtonHelper {
                         player.getRepresentation()
                                 + ", you drew _Political Stability_ off of _Minister of Policy_."
                                 + " However, as _Minister of Policy_ triggers __after__ strategy cards are returned, this means you can't play _Political Stability_ this round.");
-            } else if (!hadPoliticalStability && player.getActionCards().containsKey("stability")) {
+            } else if (!hadPoliticalStability && player.getPlayableActionCards().contains("stability")) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
@@ -1674,7 +1674,7 @@ public class ButtonHelper {
                 }
             }
             if (FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
-                if (nonActivePlayer.getActionCards().containsKey("fsb")) {
+                if (nonActivePlayer.getPlayableActionCards().contains("fsb")) {
                     MessageHelper.sendMessageToChannel(
                             nonActivePlayer.getCardsInfoThread(),
                             nonActivePlayer.getRepresentation()
@@ -1689,7 +1689,7 @@ public class ButtonHelper {
             }
 
             if (CommandCounterHelper.hasCC(nonActivePlayer, activeSystem)) {
-                if (nonActivePlayer.getActionCards().containsKey("counterstroke")
+                if (nonActivePlayer.getPlayableActionCards().contains("counterstroke")
                         && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
                         && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
                     List<Button> reverseButtons = new ArrayList<>();
@@ -7247,7 +7247,7 @@ public class ButtonHelper {
                     }
 
                     UnitModel model = owningPlayer.getUnitFromUnitKey(unitKey);
-                    if (owningPlayer.getActionCards().containsKey("experimental")
+                    if (owningPlayer.getPlayableActionCards().contains("experimental")
                             && model != null
                             && "spacedock".equalsIgnoreCase(model.getBaseType())) {
                         MessageHelper.sendMessageToChannel(

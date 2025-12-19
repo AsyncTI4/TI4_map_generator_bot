@@ -229,7 +229,8 @@ public class ScorePublicObjectiveService {
         if (poName.contains("Lead From the Front")) {
             int currentStrat = player.getStrategicCC();
             int requiredSpend = 3;
-            if (player.hasRelicReady("emelpar")) {
+            boolean hasEmelpar = player.hasRelicReady("emelpar");
+            if (hasEmelpar) {
                 requiredSpend--;
             }
             int currentTact = player.getTacticalCC();
@@ -240,11 +241,11 @@ public class ScorePublicObjectiveService {
                                 player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
                     player.setStrategicCC(currentStrat - requiredSpend);
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation()
-                                    + ", 3 command tokens have automatically been deducted from your strategy pool ("
-                                    + currentStrat + "->" + player.getStrategicCC() + ").");
+                    String commandTokenMessage = player.getRepresentation()
+                            + ", 3 command tokens have automatically been deducted from your strategy pool ("
+                            + currentStrat + "->" + player.getStrategicCC() + ").";
+                    commandTokenMessage += hasEmelpar ? " Scepter of Emelpar was used." : "";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), commandTokenMessage);
                 } else {
                     String currentCC = player.getCCRepresentation();
                     int subtract = requiredSpend - currentStrat;

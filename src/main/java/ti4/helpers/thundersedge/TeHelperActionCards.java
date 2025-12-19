@@ -177,7 +177,6 @@ public class TeHelperActionCards {
 
     @ButtonHandler("crashLandOn")
     private static void crashLandOn(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         UnitType type = UnitType.Mech;
@@ -196,7 +195,8 @@ public class TeHelperActionCards {
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), unit + " " + planet);
         game.removeStoredValue("coexistFlag");
 
-        String message = player.getRepresentation() + " crashed a " + unit + " onto the planet of "
+        String unitMessage = "infantry".equals(unit) ? "an infantry" : "a mech";
+        String message = player.getRepresentation() + " crashed " + unitMessage + " onto the planet of "
                 + Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
