@@ -50,6 +50,18 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ActionCardHelper {
+
+    private static final Set<String> WAR_MACHINE_IDS = Set.of(
+            "war_machine1",
+            "war_machine2",
+            "war_machine3",
+            "war_machine4",
+            "war_machine_ds",
+            "war_machine1_acd2",
+            "war_machine2_acd2",
+            "war_machine3_acd2",
+            "war_machine4_acd2");
+
     public enum ACStatus {
         ralnelbt,
         garbozia,
@@ -1748,7 +1760,7 @@ public class ActionCardHelper {
             if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
 
             String reverseEngineerID = "reverse_engineer";
-            if (player.getActionCards().containsKey(reverseEngineerID)) {
+            if (player.getPlayableActionCards().contains(reverseEngineerID)) {
                 StringBuilder msg =
                         new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
                 if (actionCards.size() > 1) msg.append("one of the following cards:");
@@ -1797,7 +1809,7 @@ public class ActionCardHelper {
             if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
 
             String reverseEngineerID = "tf-twinning";
-            if (player.getActionCards().containsKey(reverseEngineerID)) {
+            if (player.getPlayableActionCards().contains(reverseEngineerID)) {
                 StringBuilder msg =
                         new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
                 if (actionCards.size() > 1) msg.append("one of the following cards:");
@@ -2232,5 +2244,9 @@ public class ActionCardHelper {
         }
         msg = msgBuilder.toString();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+
+    static boolean playerHasWarMachine(Player player) {
+        return player.getPlayableActionCards().stream().anyMatch(WAR_MACHINE_IDS::contains);
     }
 }

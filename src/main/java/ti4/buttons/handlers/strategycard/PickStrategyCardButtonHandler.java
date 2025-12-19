@@ -94,7 +94,8 @@ public class PickStrategyCardButtonHandler {
                     || (pdOnly.equalsIgnoreCase(player.getFaction()) || pdOnly.equalsIgnoreCase(player.getColor()))) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) continue;
-                    if (pdValue.contains(p2.getFaction()) && p2.getActionCards().containsKey("disgrace")) {
+                    if (pdValue.contains(p2.getFaction())
+                            && p2.getPlayableActionCards().contains("disgrace")) {
                         ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                         game.setStoredValue("Public Disgrace", "");
                         String msg = player.getRepresentationUnfogged() + " picked "

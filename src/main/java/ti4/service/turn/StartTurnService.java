@@ -228,7 +228,7 @@ public class StartTurnService {
         }
         if (game.getStoredValue("ExtremeDuress").equalsIgnoreCase(player.getColor()) && player.hasUnplayedSCs()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.getActionCards().containsKey("extremeduress")) {
+                if (p2.getPlayableActionCards().contains("extremeduress")) {
                     game.removeStoredValue("ExtremeDuress");
                     ActionCardHelper.playAC(event, game, p2, "extremeduress", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
@@ -245,7 +245,7 @@ public class StartTurnService {
         }
         if (game.getStoredValue("Crisis Target").equalsIgnoreCase(player.getColor())) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.getActionCards().containsKey("crisis")) {
+                if (p2.getPlayableActionCards().contains("crisis")) {
                     game.removeStoredValue("Crisis Target");
                     ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
@@ -260,7 +260,7 @@ public class StartTurnService {
         }
         if (game.getStoredValue("Stasis Target").equalsIgnoreCase(player.getColor())) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2.getActionCards().containsKey("tf-stasis")) {
+                if (p2.getPlayableActionCards().contains("tf-stasis")) {
                     game.removeStoredValue("Stasis Target");
                     ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();

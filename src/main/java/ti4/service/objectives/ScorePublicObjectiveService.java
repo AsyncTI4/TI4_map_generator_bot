@@ -29,11 +29,10 @@ import ti4.service.leader.HeroUnlockCheckService;
 @UtilityClass
 public class ScorePublicObjectiveService {
 
-    public static void scorePO(
-            GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
+    public static void scorePO(GenericInteractionCreateEvent event, Game game, Player player, int poID) {
         String both = getNameNEMoji(game, poID);
         String poName = both.split("_")[0];
-        channel = player.getCorrectChannel();
+        MessageChannel channel = player.getCorrectChannel();
         String id = "";
         Map<String, Integer> revealedPublicObjectives = game.getRevealedPublicObjectives();
         for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -227,54 +226,7 @@ public class ScorePublicObjectiveService {
             }
         }
         if (poName.contains("Lead From the Front")) {
-            int currentStrat = player.getStrategicCC();
-            int requiredSpend = 3;
-            if (player.hasRelicReady("emelpar")) {
-                requiredSpend--;
-            }
-            int currentTact = player.getTacticalCC();
-            if (currentStrat + currentTact >= requiredSpend) {
-                if (currentStrat >= requiredSpend) {
-                    for (int x = 0; x < requiredSpend; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
-                    }
-                    player.setStrategicCC(currentStrat - requiredSpend);
-                    MessageHelper.sendMessageToChannel(
-                            player.getCorrectChannel(),
-                            player.getRepresentation()
-                                    + ", 3 command tokens have automatically been deducted from your strategy pool ("
-                                    + currentStrat + "->" + player.getStrategicCC() + ").");
-                } else {
-                    String currentCC = player.getCCRepresentation();
-                    int subtract = requiredSpend - currentStrat;
-                    for (int x = 0; x < currentStrat; x++) {
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                                player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
-                    }
-                    player.setStrategicCC(0);
-                    player.setTacticalCC(currentTact - subtract);
-                    if (currentStrat == 0) {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation()
-                                        + ", 3 command tokens have automatically been deducted from your tactic pool ("
-                                        + currentCC + "->" + player.getCCRepresentation() + ")");
-                    } else {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentation()
-                                        + ", " + subtract + " and " + currentStrat
-                                        + " command tokens (3 total) have automatically been deducted from your tactic and/or strategy pools respectively ("
-                                        + currentCC + "->" + player.getCCRepresentation() + ")");
-                    }
-                }
-            } else {
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentation()
-                                + ", you do not have 3 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
-            }
+            handleLeadFromTheFront(event, game, player);
         }
         if (poName.contains("Galvanize the People")) {
             int currentStrat = player.getStrategicCC();
@@ -326,5 +278,53 @@ public class ScorePublicObjectiveService {
                                 + ", you do not have 6 command tokens in your tactic and/or strategy pools. No command tokens have been removed.");
             }
         }
+    }
+
+    private static void handleLeadFromTheFront(GenericInteractionCreateEvent event, Game game, Player player) {
+        boolean hasReadiedEmelpar = player.hasRelicReady("emelpar");
+        int requiredSpend = hasReadiedEmelpar ? 2 : 3;
+
+        int currentStrat = player.getStrategicCC();
+        int currentTact = player.getTacticalCC();
+
+        if (currentStrat + currentTact < requiredSpend) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    String.format(
+                            "%s, you do not have %d command tokens in your tactic and/or strategy pools. No command tokens have been removed.",
+                            player.getRepresentation(), requiredSpend));
+            return;
+        }
+
+        int spentFromStrat = Math.min(currentStrat, requiredSpend);
+        for (int x = 0; x < spentFromStrat; x++) {
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                    player, game, event, "scored " + CardEmojis.Public1 + " _Lead from the Front_.");
+        }
+        player.setStrategicCC(currentStrat - spentFromStrat);
+
+        int spentFromTactics = requiredSpend - spentFromStrat;
+        player.setTacticalCC(currentTact - spentFromTactics);
+
+        StringBuilder commandTokenMessage = new StringBuilder();
+        commandTokenMessage.append(player.getRepresentation());
+
+        if (spentFromStrat > 0) {
+            commandTokenMessage.append(String.format(
+                    " %d command token%s %s deducted from your strategy pool.",
+                    spentFromStrat, spentFromStrat == 1 ? "" : "s", spentFromStrat == 1 ? "was" : "were"));
+        }
+
+        if (spentFromTactics > 0) {
+            commandTokenMessage.append(String.format(
+                    " %d command token%s %s deducted from your tactic pool.",
+                    spentFromTactics, spentFromTactics == 1 ? "" : "s", spentFromTactics == 1 ? "was" : "were"));
+        }
+
+        if (hasReadiedEmelpar) {
+            commandTokenMessage.append(" Scepter of Emelpar was used.");
+        }
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), commandTokenMessage.toString());
     }
 }

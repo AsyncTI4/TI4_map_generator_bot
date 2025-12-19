@@ -239,7 +239,7 @@ public class StatusHelper {
             String keyV = player.getFaction() + "Round" + game.getRound() + "PreScoredPO";
 
             if (game.getStoredValue("BountyContracts").contains(player.getFaction())
-                    && player.getActionCards().containsKey("bounty_contracts")) {
+                    && player.getPlayableActionCards().contains("bounty_contracts")) {
                 ActionCardHelper.playAC(event, game, player, "bounty_contracts", game.getMainGameChannel());
             }
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {

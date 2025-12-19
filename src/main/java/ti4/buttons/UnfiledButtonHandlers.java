@@ -1704,7 +1704,7 @@ public class UnfiledButtonHandlers {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
-                ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
+                ScorePublicObjectiveService.scorePO(event, game, player, poIndex);
                 ReactionService.addReaction(event, game, player);
                 if (!game.getStoredValue("newStatusScoringMode").isEmpty() && event != null) {
                     String msg = "Please score objectives.";
@@ -1735,7 +1735,7 @@ public class UnfiledButtonHandlers {
 
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 int poIndex = Integer.parseInt(poID);
-                ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
+                ScorePublicObjectiveService.scorePO(event, game, player, poIndex);
                 ReactionService.addReaction(event, game, player);
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
