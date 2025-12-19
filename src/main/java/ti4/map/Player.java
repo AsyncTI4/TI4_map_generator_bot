@@ -866,7 +866,10 @@ public class Player extends PlayerProperties {
     public List<String> getPlayableActionCards() {
         List<String> cards = new ArrayList<>(actionCards.keySet());
         if (hasPlanet("garbozia")) {
-            cards.addAll(game.getDiscardACStatus().keySet());
+            game.getDiscardACStatus().entrySet().stream()
+                    .filter(entry -> "garbozia".equals(String.valueOf(entry.getValue())))
+                    .map(Entry::getKey)
+                    .forEach(cards::add);
         }
         return cards;
     }
