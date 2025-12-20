@@ -10,6 +10,8 @@ import ti4.spring.jda.JdaService;
 
 public class ButtonListener extends ListenerAdapter {
 
+    private static final List<String> BUTTONS_TO_THINK_ABOUT = List.of("showGameAgain");
+
     private static ButtonListener instance;
 
     public static ButtonListener getInstance() {
@@ -39,8 +41,6 @@ public class ButtonListener extends ListenerAdapter {
         ButtonProcessor.queue(event);
     }
 
-    private static final List<String> buttonsToThinkAbout = List.of("showGameAgain");
-
     /**
      * @return whether a button should show the bot is thinking - need to add the following at end of execution:
      * `    if (event instanceof ButtonInteractionEvent buttonEvent) {
@@ -48,7 +48,7 @@ public class ButtonListener extends ListenerAdapter {
      * }`
      */
     private static boolean shouldShowBotIsThinking(ButtonInteractionEvent event) {
-        return buttonsToThinkAbout.contains(event.getButton().getCustomId());
+        return BUTTONS_TO_THINK_ABOUT.contains(event.getButton().getCustomId());
     }
 
     /**
