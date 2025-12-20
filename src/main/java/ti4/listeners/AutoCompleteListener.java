@@ -3,8 +3,10 @@ package ti4.listeners;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.autocomplete.AutoCompleteProvider;
 import ti4.executors.ExecutorServiceManager;
+import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 public class AutoCompleteListener extends ListenerAdapter {
