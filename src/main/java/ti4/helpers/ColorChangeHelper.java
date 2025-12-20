@@ -45,14 +45,8 @@ public class ColorChangeHelper {
 
             Map<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
             for (Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn.getKey());
-                if (!pnModel.isDupe() || game.getPNOwner(pn.getKey()) != player) {
-                    promissoryNotesChanged.put(pn.getKey(), pn.getValue());
-                    continue;
-                }
-                PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-                String newPNModelID = genericPNModel.getID().replace("<color>", newColorModel.getName());
-                promissoryNotesChanged.put(newPNModelID, pn.getValue());
+                String updatedPN = mapPromissoryNoteId(game, player, newColorModel, pn.getKey(), true);
+                promissoryNotesChanged.put(updatedPN, pn.getValue());
             }
             playerInfo.setPromissoryNotes(promissoryNotesChanged);
 
@@ -60,14 +54,8 @@ public class ColorChangeHelper {
             List<String> promissoryNotesInPlayArea = playerInfo.getPromissoryNotesInPlayArea();
             List<String> promissoryNotesInPlayAreaChanged = new ArrayList<>();
             for (String pn : promissoryNotesInPlayArea) {
-                PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
-                if (!pnModel.isDupe() || game.getPNOwner(pn) != player) {
-                    promissoryNotesInPlayAreaChanged.add(pn);
-                    continue;
-                }
-                PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-                String newPNModelID = genericPNModel.getID().replace("<color>", newColorModel.getName());
-                promissoryNotesInPlayAreaChanged.add(newPNModelID);
+                String updatedPN = mapPromissoryNoteId(game, player, newColorModel, pn, true);
+                promissoryNotesInPlayAreaChanged.add(updatedPN);
             }
             playerInfo.setPromissoryNotesInPlayArea(promissoryNotesInPlayAreaChanged);
 
@@ -97,14 +85,8 @@ public class ColorChangeHelper {
         Set<String> ownedPromissoryNotes = player.getPromissoryNotesOwned();
         Set<String> ownedPromissoryNotesChanged = new HashSet<>();
         for (String pn : ownedPromissoryNotes) {
-            PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
-            if (!pnModel.isDupe()) {
-                ownedPromissoryNotesChanged.add(pn);
-                continue;
-            }
-            PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-            String newPNModelID = genericPNModel.getID().replace("<color>", newColorModel.getName());
-            ownedPromissoryNotesChanged.add(newPNModelID);
+            String updatedPN = mapPromissoryNoteId(game, player, newColorModel, pn, false);
+            ownedPromissoryNotesChanged.add(updatedPN);
         }
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
@@ -116,6 +98,20 @@ public class ColorChangeHelper {
                 .map(Player::getNomboxTile)
                 .flatMap(t -> t.getUnitHolders().values().stream())
                 .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
+    }
+
+    private static String mapPromissoryNoteId(
+            Game game, Player owner, ColorModel newColorModel, String promissoryNoteId, boolean requireOwnerMatch) {
+        PromissoryNoteModel pnModel = Mapper.getPromissoryNote(promissoryNoteId);
+        if (!pnModel.isDupe()) {
+            return promissoryNoteId;
+        }
+        if (requireOwnerMatch && game.getPNOwner(promissoryNoteId) != owner) {
+            return promissoryNoteId;
+        }
+
+        PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
+        return genericPNModel.getID().replace("<color>", newColorModel.getName());
     }
 
     private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
