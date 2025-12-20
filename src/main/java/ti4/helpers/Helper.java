@@ -647,49 +647,12 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            String techType = "";
-            String techEmoji = "";
-            if (Mapper.getPlanet(planetID) != null
-                    && Mapper.getPlanet(planetID).getTechSpecialties() != null
-                    && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
-                if (Mapper.getPlanet(planetID).getTechSpecialties().size() > 1) {
-                    for (TechSpecialty type : Mapper.getPlanet(planetID).getTechSpecialties()) {
-                        techType += type.toString().toLowerCase();
-                    }
-                } else {
-                    techType = Mapper.getPlanet(planetID)
-                            .getTechSpecialties()
-                            .getFirst()
-                            .toString()
-                            .toLowerCase();
-                }
-            } else {
-                techType = ButtonHelper.getTechSkipAttachments(game, AliasHandler.resolvePlanet(planetID));
-            }
-            if (!"".equalsIgnoreCase(techType)) {
-                switch (techType) {
-                    case "propulsion" -> techEmoji = TechEmojis.PropulsionTech.toString();
-                    case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
-                    case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
-                    case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
-                    case "propulsionpropulsion" -> techEmoji = TechEmojis.PropulsionPropulsion.toString();
-                    case "warfarewarfare" -> techEmoji = TechEmojis.WarfareWarfare.toString();
-                    case "cyberneticcybernetic" -> techEmoji = TechEmojis.CyberneticCybernetic.toString();
-                    case "bioticbiotic" -> techEmoji = TechEmojis.BioticBiotic.toString();
-                    case "warfarepropulsion", "propulsionwarfare" ->
-                        techEmoji = TechEmojis.WarfarePropulsion.toString();
-                    case "cyberneticpropulsion", "propulsioncybernetic" ->
-                        techEmoji = TechEmojis.CyberneticPropulsion.toString();
-                    case "cyberneticwarfare", "warfarecybernetic" ->
-                        techEmoji = TechEmojis.CyberneticWarfare.toString();
-                    case "bioticwarfare", "warfarebiotic" -> techEmoji = TechEmojis.BioticWarfare.toString();
-                    case "bioticcybernetic", "cyberneticbiotic" -> techEmoji = TechEmojis.BioticCybernetic.toString();
-                    case "bioticpropulsion", "propulsionbiotic" -> techEmoji = TechEmojis.BioticPropulsion.toString();
-                }
-            }
+            String techType = getPlanetTechType(game, planetID);
+            TechEmojis techEmoji = getTechEmojiFromType(techType);
             return getPlanetRepresentationPlusEmoji(planetID) + " "
                     + MiscEmojis.getResourceEmoji(unitHolder.getResources())
-                    + MiscEmojis.getInfluenceEmoji(unitHolder.getInfluence()) + techEmoji;
+                    + MiscEmojis.getInfluenceEmoji(unitHolder.getInfluence())
+                    + (techEmoji == null ? "" : techEmoji.toString());
         }
     }
 
@@ -708,47 +671,11 @@ public class Helper {
         if (unitHolder == null) {
             return getPlanetRepresentationPlusEmoji(planetID);
         } else {
-            String techType = "";
-            String techEmoji = "";
-            if (Mapper.getPlanet(planetID).getTechSpecialties() != null
-                    && !Mapper.getPlanet(planetID).getTechSpecialties().isEmpty()) {
-                if (Mapper.getPlanet(planetID).getTechSpecialties().size() > 1) {
-                    for (TechSpecialty type : Mapper.getPlanet(planetID).getTechSpecialties()) {
-                        techType += type.toString().toLowerCase();
-                    }
-                } else {
-                    techType = Mapper.getPlanet(planetID)
-                            .getTechSpecialties()
-                            .getFirst()
-                            .toString()
-                            .toLowerCase();
-                }
-            } else {
-                techType = ButtonHelper.getTechSkipAttachments(game, planetID);
-            }
-            if (!"".equalsIgnoreCase(techType)) {
-                switch (techType) {
-                    case "propulsion" -> techEmoji = TechEmojis.PropulsionTech.toString();
-                    case "warfare" -> techEmoji = TechEmojis.WarfareTech.toString();
-                    case "cybernetic" -> techEmoji = TechEmojis.CyberneticTech.toString();
-                    case "biotic" -> techEmoji = TechEmojis.BioticTech.toString();
-                    case "propulsionpropulsion" -> techEmoji = TechEmojis.PropulsionPropulsion.toString();
-                    case "warfarewarfare" -> techEmoji = TechEmojis.WarfareWarfare.toString();
-                    case "cyberneticcybernetic" -> techEmoji = TechEmojis.CyberneticCybernetic.toString();
-                    case "bioticbiotic" -> techEmoji = TechEmojis.BioticBiotic.toString();
-                    case "warfarepropulsion", "propulsionwarfare" ->
-                        techEmoji = TechEmojis.WarfarePropulsion.toString();
-                    case "cyberneticpropulsion", "propulsioncybernetic" ->
-                        techEmoji = TechEmojis.CyberneticPropulsion.toString();
-                    case "cyberneticwarfare", "warfarecybernetic" ->
-                        techEmoji = TechEmojis.CyberneticWarfare.toString();
-                    case "bioticwarfare", "warfarebiotic" -> techEmoji = TechEmojis.BioticWarfare.toString();
-                    case "bioticcybernetic", "cyberneticbiotic" -> techEmoji = TechEmojis.BioticCybernetic.toString();
-                    case "bioticpropulsion", "propulsionbiotic" -> techEmoji = TechEmojis.BioticPropulsion.toString();
-                }
-            }
+            String techType = getPlanetTechType(game, planetID);
+            TechEmojis techEmoji = getTechEmojiFromType(techType);
             return getPlanetRepresentationPlusEmoji(planetID) + " "
-                    + MiscEmojis.getResourceEmoji(unitHolder.getResources()) + techEmoji;
+                    + MiscEmojis.getResourceEmoji(unitHolder.getResources())
+                    + (techEmoji == null ? "" : techEmoji.toString());
         }
     }
 
@@ -856,56 +783,59 @@ public class Helper {
                 planetButtons.add(button);
                 continue;
             }
-            String techType = "";
-            if (Mapper.getPlanet(planet).getTechSpecialties() != null
-                    && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty()) {
-                if (Mapper.getPlanet(planet).getTechSpecialties().size() > 1) {
-                    for (TechSpecialty type : Mapper.getPlanet(planet).getTechSpecialties()) {
-                        techType += type.toString().toLowerCase();
-                    }
-                } else {
-                    techType = Mapper.getPlanet(planet)
-                            .getTechSpecialties()
-                            .getFirst()
-                            .toString()
-                            .toLowerCase();
-                }
-            } else {
-                techType = ButtonHelper.getTechSkipAttachments(game, planet);
-            }
-            if ("none".equalsIgnoreCase(techType) || "".equalsIgnoreCase(techType)) {
+            String techType = getPlanetTechType(game, planet);
+            TechEmojis techEmoji = getTechEmojiFromType(techType);
+            if (techEmoji == null) {
                 Button button =
                         Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
                 planetButtons.add(button);
             } else {
                 Button techB =
                         Buttons.red("spend_" + planet + "_" + whatIsItFor, getPlanetRepresentation(planet, game));
-                switch (techType) {
-                    case "propulsion" -> techB = techB.withEmoji(TechEmojis.PropulsionTech.asEmoji());
-                    case "warfare" -> techB = techB.withEmoji(TechEmojis.WarfareTech.asEmoji());
-                    case "cybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticTech.asEmoji());
-                    case "biotic" -> techB = techB.withEmoji(TechEmojis.BioticTech.asEmoji());
-                    case "propulsionpropulsion" -> techB = techB.withEmoji(TechEmojis.PropulsionPropulsion.asEmoji());
-                    case "warfarewarfare" -> techB = techB.withEmoji(TechEmojis.WarfareWarfare.asEmoji());
-                    case "cyberneticcybernetic" -> techB = techB.withEmoji(TechEmojis.CyberneticCybernetic.asEmoji());
-                    case "bioticbiotic" -> techB = techB.withEmoji(TechEmojis.BioticBiotic.asEmoji());
-                    case "warfarepropulsion", "propulsionwarfare" ->
-                        techB = techB.withEmoji(TechEmojis.WarfarePropulsion.asEmoji());
-                    case "cyberneticpropulsion", "propulsioncybernetic" ->
-                        techB = techB.withEmoji(TechEmojis.CyberneticPropulsion.asEmoji());
-                    case "cyberneticwarfare", "warfarecybernetic" ->
-                        techB = techB.withEmoji(TechEmojis.CyberneticWarfare.asEmoji());
-                    case "bioticwarfare", "warfarebiotic" ->
-                        techB = techB.withEmoji(TechEmojis.BioticWarfare.asEmoji());
-                    case "bioticcybernetic", "cyberneticbiotic" ->
-                        techB = techB.withEmoji(TechEmojis.BioticCybernetic.asEmoji());
-                    case "bioticpropulsion", "propulsionbiotic" ->
-                        techB = techB.withEmoji(TechEmojis.BioticPropulsion.asEmoji());
-                }
-                planetButtons.add(techB);
+                planetButtons.add(techB.withEmoji(techEmoji.asEmoji()));
             }
         }
         return planetButtons;
+    }
+
+    private static String getPlanetTechType(Game game, String planetID) {
+        Planet planet = Mapper.getPlanet(planetID);
+        if (planet == null) {
+            planet = Mapper.getPlanet(AliasHandler.resolvePlanet(planetID));
+        }
+
+        if (planet != null && planet.getTechSpecialties() != null && !planet.getTechSpecialties().isEmpty()) {
+            return planet.getTechSpecialties().stream()
+                    .map(type -> type.toString().toLowerCase())
+                    .collect(Collectors.joining());
+        }
+
+        return ButtonHelper.getTechSkipAttachments(game, AliasHandler.resolvePlanet(planetID));
+    }
+
+    @Nullable
+    private static TechEmojis getTechEmojiFromType(String techType) {
+        if (techType == null || techType.isBlank() || "none".equalsIgnoreCase(techType)) {
+            return null;
+        }
+
+        return switch (techType.toLowerCase()) {
+            case "propulsion" -> TechEmojis.PropulsionTech;
+            case "warfare" -> TechEmojis.WarfareTech;
+            case "cybernetic" -> TechEmojis.CyberneticTech;
+            case "biotic" -> TechEmojis.BioticTech;
+            case "propulsionpropulsion" -> TechEmojis.PropulsionPropulsion;
+            case "warfarewarfare" -> TechEmojis.WarfareWarfare;
+            case "cyberneticcybernetic" -> TechEmojis.CyberneticCybernetic;
+            case "bioticbiotic" -> TechEmojis.BioticBiotic;
+            case "warfarepropulsion", "propulsionwarfare" -> TechEmojis.WarfarePropulsion;
+            case "cyberneticpropulsion", "propulsioncybernetic" -> TechEmojis.CyberneticPropulsion;
+            case "cyberneticwarfare", "warfarecybernetic" -> TechEmojis.CyberneticWarfare;
+            case "bioticwarfare", "warfarebiotic" -> TechEmojis.BioticWarfare;
+            case "bioticcybernetic", "cyberneticbiotic" -> TechEmojis.BioticCybernetic;
+            case "bioticpropulsion", "propulsionbiotic" -> TechEmojis.BioticPropulsion;
+            default -> null;
+        };
     }
 
     public static List<Button> getPlanetPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
