@@ -6,6 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -18,7 +19,7 @@ import ti4.spring.jda.JdaService;
 
 class JazzCommand extends Subcommand {
 
-    public JazzCommand() {
+    JazzCommand() {
         super("jazz_command", "jazzxhands");
     }
 
