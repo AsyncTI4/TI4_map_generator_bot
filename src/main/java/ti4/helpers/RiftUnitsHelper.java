@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -21,6 +22,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.unit.AddUnitService;
@@ -48,7 +50,7 @@ public class RiftUnitsHelper {
         event.getMessage()
                 .editMessage(message)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("wormholeUnit_")
@@ -70,7 +72,7 @@ public class RiftUnitsHelper {
         event.getMessage()
                 .editMessage(message)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("riftAllUnits_")
@@ -139,7 +141,7 @@ public class RiftUnitsHelper {
             event.getMessage()
                     .editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -191,7 +193,7 @@ public class RiftUnitsHelper {
         event.getMessage()
                 .editMessage(message)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static String riftUnit(
@@ -399,7 +401,7 @@ public class RiftUnitsHelper {
 
     @ButtonHandler("doneRifting")
     public static void doneRifting(Game game, Player player, ButtonInteractionEvent event) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         Tile tile = null;
         if (game.getActiveSystem() != null) {
             tile = game.getTileByPosition(game.getActiveSystem());

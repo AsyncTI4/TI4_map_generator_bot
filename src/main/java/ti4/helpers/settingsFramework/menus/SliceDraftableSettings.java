@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
@@ -27,6 +28,7 @@ import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -255,7 +257,7 @@ public class SliceDraftableSettings extends SettingsMenu {
                     .sendMessage("Here is a preview of the selected map template:")
                     .addFiles(preview)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         if (mapTemplate.getValue() != null && mapTemplate.getValue().bluePerPlayer() != bpp) {
             if (isNucleusMode()) {
                 nucleusSettings.setDefaultsForTemplate(event, mapTemplate.getValue());
@@ -292,7 +294,7 @@ public class SliceDraftableSettings extends SettingsMenu {
                 .addComponents(Label.of("TTS String", ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue();
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
             return null;
         }
         return "Unknown Event";

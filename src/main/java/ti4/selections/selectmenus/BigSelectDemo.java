@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.listeners.context.SelectionMenuContext;
+import ti4.message.logging.BotLogger;
 import ti4.selections.Selection;
 
 public class BigSelectDemo implements Selection {
@@ -46,7 +48,7 @@ public class BigSelectDemo implements Selection {
         if (!hasPageOption) {
             event.getChannel()
                     .sendMessage("You selected: " + String.join(", ", keepValues))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -91,12 +93,15 @@ public class BigSelectDemo implements Selection {
         menuBuilder.setMaxValues(4);
 
         if (event instanceof StringSelectInteractionEvent) {
-            ((StringSelectInteractionEvent) event).getMessage().delete().queue();
+            ((StringSelectInteractionEvent) event)
+                    .getMessage()
+                    .delete()
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         event.getMessageChannel()
                 .sendMessage("")
                 .addComponents(ActionRow.of(menuBuilder.build()))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

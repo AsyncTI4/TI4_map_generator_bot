@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
@@ -58,7 +59,7 @@ public class RematchService {
         }
 
         if (gameRole != null) {
-            gameRole.getManager().setName(newName).queue();
+            gameRole.getManager().setName(newName).queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             gameRole = guild.createRole().setName(newName).setMentionable(true).complete();
             for (Player player : game.getRealPlayers()) {
@@ -75,14 +76,17 @@ public class RematchService {
 
         // CLOSE THREADS IN CHANNELS
         for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
-            threadChannel.getManager().setArchived(true).queue();
+            threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         String newTableName = tableTalkChannel.getName().replace(name, newName);
-        game.getTableTalkChannel().getManager().setName(newTableName).queue();
+        game.getTableTalkChannel().getManager().setName(newTableName).queue(Consumers.nop(), BotLogger::catchRestError);
         for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-            threadChannel.getManager().setArchived(true).queue();
+            threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
         }
-        game.getActionsChannel().getManager().setName(newName + "-actions").queue();
+        game.getActionsChannel()
+                .getManager()
+                .setName(newName + "-actions")
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         Member gameOwner = guild.getMemberById(game.getOwnerID());
         if (gameOwner == null) {
             for (Player player : game.getPlayers().values()) {
@@ -121,7 +125,10 @@ public class RematchService {
         newGame.setMainChannelID(actionsChannel.getId());
         actionsChannel
                 .retrievePinnedMessages()
-                .queue(msgs -> msgs.forEach(msg -> msg.getMessage().unpin().queue()), BotLogger::catchRestError);
+                .queue(
+                        msgs -> msgs.forEach(
+                                msg -> msg.getMessage().unpin().queue(Consumers.nop(), BotLogger::catchRestError)),
+                        BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread =
@@ -150,7 +157,7 @@ public class RematchService {
         CreateGameService.presentSetupToPlayers(newGame);
         GameManager.save(newGame, "Rematch");
         if (event instanceof ButtonInteractionEvent event2) {
-            event2.getMessage().delete().queue();
+            event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

@@ -6,6 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -18,7 +19,7 @@ import ti4.spring.jda.JdaService;
 
 class JazzCommand extends Subcommand {
 
-    public JazzCommand() {
+    JazzCommand() {
         super("jazz_command", "jazzxhands");
     }
 
@@ -62,12 +63,12 @@ class JazzCommand extends Subcommand {
                 .getGuildById("847560709730730064")
                 .getTextChannelById("1352824638354231439")
                 .sendMessage("```fix\nBorgJedi used /search my_titles player: @Mentak\n```")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
 
         JdaService.jda
                 .getGuildById("847560709730730064")
                 .getTextChannelById("1352824638354231439")
                 .sendMessage("**__Mentak's Titles__**\n` 1.`**You Made Me Mad** x5 (g15, g15, g15, g15, g15)")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

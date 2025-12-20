@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
@@ -76,12 +77,12 @@ public class EndGameService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
-            gameRole.delete().queue();
+            gameRole.delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
             if (game.isFowMode()) {
                 List<Role> gmRoles = event.getGuild().getRolesByName(game.getName() + " GM", true);
                 if (!gmRoles.isEmpty()) {
-                    gmRoles.getFirst().delete().queue();
+                    gmRoles.getFirst().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }
@@ -143,12 +144,12 @@ public class EndGameService {
         // CLOSE THREADS IN CHANNELS
         if (tableTalkChannel != null) {
             for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
-                threadChannel.getManager().setArchived(true).queue();
+                threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
             if (!threadChannel.getName().contains("Cards Info")) {
-                threadChannel.getManager().setArchived(true).queue();
+                threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         gameEndStuff(game, event, publish);
@@ -222,7 +223,8 @@ public class EndGameService {
                             gameEndText,
                             summaryChannel,
                             m -> { // POST INITIAL MESSAGE
-                                m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
+                                m.editMessageAttachments(fileUpload)
+                                        .queue(Consumers.nop(), BotLogger::catchRestError); // ADD MAP FILE TO MESSAGE
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
@@ -389,6 +391,6 @@ public class EndGameService {
         inLimboCategory.getTextChannels().stream()
                 .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
                 .limit(channelCountToDelete)
-                .forEach(channel -> channel.delete().queue());
+                .forEach(channel -> channel.delete().queue(Consumers.nop(), BotLogger::catchRestError));
     }
 }

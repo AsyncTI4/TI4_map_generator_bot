@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
@@ -328,7 +329,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = "requestAllFollow_", save = false)
@@ -339,14 +340,14 @@ public class UnfiledButtonHandlers {
                             event.getUser().getAsMention()
                                     + " has requested that everyone resolve this strategy card before play continues."
                                     + " Please do so as soon as you can. The active player should not take an action until this is done.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             event.getMessage()
                     .reply(
                             game.getPing()
                                     + ", someone has requested that everyone resolve this strategy card before play continues."
                                     + " Please do so as soon as you can. The active player should not take an action until this is done.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -771,20 +772,20 @@ public class UnfiledButtonHandlers {
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
-                event.getMessage().editMessage(exhaustedMessage).queue();
+                event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "tf-sledfactories" -> { // Sarween Tools
                 player.addSpentThing("sledfactories");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
                 ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
 
-                event.getMessage().editMessage(exhaustedMessage).queue();
+                event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "absol_st" -> { // Absol's Sarween Tools
                 player.addSpentThing("absol_sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
                 ButtonHelper.deleteTheOneButton(event, event.getButton().getCustomId(), false);
-                event.getMessage().editMessage(exhaustedMessage).queue();
+                event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "absol_pa" -> { // Absol's Psychoarcheology
                 List<Button> absolPAButtons = new ArrayList<>();
@@ -952,7 +953,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(getBombardmentSummary(player, game))
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("assignBombardUnit_")
@@ -965,7 +966,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(getBombardmentSummary(player, game))
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<String> getBombardablePlanets(Player player, Game game, Tile tile) {
@@ -1098,7 +1099,7 @@ public class UnfiledButtonHandlers {
                     player.getRepresentation() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
         }
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("reduceTG_")
@@ -1121,7 +1122,7 @@ public class UnfiledButtonHandlers {
             ButtonHelper.deleteTheOneButton(event);
         }
         String editedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("sabotage_")
@@ -1273,7 +1274,7 @@ public class UnfiledButtonHandlers {
             }
         }
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
-        event.getMessage().editMessage(exhaustedMessage).queue();
+        event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1347,7 +1348,7 @@ public class UnfiledButtonHandlers {
             totalVotesSoFar = player.getFactionEmojiOrColor() + " Readied "
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         }
-        event.getMessage().editMessage(totalVotesSoFar).queue();
+        event.getMessage().editMessage(totalVotesSoFar).queue(Consumers.nop(), BotLogger::catchRestError);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1395,7 +1396,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("cancelPdsOffenseHits_")
@@ -1418,7 +1419,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("cancelGroundHits_")
@@ -1440,7 +1441,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("cancelSpaceHits_")
@@ -1464,7 +1465,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(msg2)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("autoAssignSpaceCannonOffenceHits_")
@@ -1709,14 +1710,14 @@ public class UnfiledButtonHandlers {
                 if (!game.getStoredValue("newStatusScoringMode").isEmpty() && event != null) {
                     String msg = "Please score objectives.";
                     msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-                    event.getMessage().editMessage(msg).queue();
+                    event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             } catch (Exception e) {
                 if (event != null) {
                     BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
                     event.getChannel()
                             .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
                     BotLogger.error("Hm", e);
                 }
@@ -1762,7 +1763,7 @@ public class UnfiledButtonHandlers {
                     BotLogger.error(new LogOrigin(event, player), "Could not parse PO ID: " + poID, e);
                     event.getChannel()
                             .sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
                 game.setStoredValue(key2, game.getStoredValue(key2) + player.getFaction() + "*");
                 ReactionService.addReaction(event, game, player, message);
@@ -1775,10 +1776,10 @@ public class UnfiledButtonHandlers {
                 && !game.isFowMode()) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-            event.getMessage().editMessage(msg).queue();
+            event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         if ("action".equalsIgnoreCase(game.getPhaseOfGame()) && event != null) {
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2011,7 +2012,7 @@ public class UnfiledButtonHandlers {
                     BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
                     event.getChannel()
                             .sendMessage("Could not parse secret objective ID: " + soID + ". Please score manually.")
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                     return;
                 }
             }
@@ -2019,7 +2020,7 @@ public class UnfiledButtonHandlers {
             if (event != null) {
                 event.getChannel()
                         .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         ButtonHelper.deleteMessage(event);
@@ -2154,7 +2155,7 @@ public class UnfiledButtonHandlers {
                 event.getChannel().getHistory().retrievePast(2).queue(messageHistory -> {
                     Message previousMessage = messageHistory.get(1);
                     if (previousMessage.getContentRaw().contains("You have available to you")) {
-                        previousMessage.delete().queue();
+                        previousMessage.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 });
                 AutoFactoriesService.resolveAutoFactories(game, player, buttonID);
@@ -2448,7 +2449,7 @@ public class UnfiledButtonHandlers {
 
     public static void clearAllReactions(@NotNull ButtonInteractionEvent event) {
         Message mainMessage = event.getInteraction().getMessage();
-        mainMessage.clearReactions().queue();
+        mainMessage.clearReactions().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void checkForAllReactions(@NotNull ButtonInteractionEvent event, Game game) {
@@ -2581,7 +2582,7 @@ public class UnfiledButtonHandlers {
             event.getInteraction()
                     .getMessage()
                     .reply("All players have reacted to \"" + buttonText + "\".")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         switch (buttonID) {
             case Constants.SC_FOLLOW,
@@ -3011,7 +3012,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(exhaustedMessage)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resetSpend")
@@ -3037,7 +3038,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(exhaustedMessage)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("setOrder")
@@ -3230,7 +3231,7 @@ public class UnfiledButtonHandlers {
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("decrease_tactic_cc")
@@ -3240,7 +3241,7 @@ public class UnfiledButtonHandlers {
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("decrease_strategy_cc")
@@ -3250,7 +3251,7 @@ public class UnfiledButtonHandlers {
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("increase_fleet_cc")
@@ -3260,7 +3261,7 @@ public class UnfiledButtonHandlers {
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() > 4) {
             String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
             msg += " law in play, which is limiting fleet pool to 4 tokens.";
@@ -3274,7 +3275,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.resetCCs(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: 0.";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("increase_tactic_cc")
@@ -3284,7 +3285,7 @@ public class UnfiledButtonHandlers {
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resetProducedThings")
@@ -3292,7 +3293,7 @@ public class UnfiledButtonHandlers {
         Helper.resetProducedUnits(player, game, event);
         event.getMessage()
                 .editMessage(Helper.buildProducedUnitsMessage(player, game))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("yssarilMinisterOfPolicy")
@@ -3333,7 +3334,7 @@ public class UnfiledButtonHandlers {
         int netGain = ButtonHelper.checkNetGain(player, originalCCs);
         String editedMessage = player.getRepresentation() + " command tokens have gone from " + originalCCs + " -> "
                 + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
-        event.getMessage().editMessage(editedMessage).queue();
+        event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("proceed_to_strategy")
@@ -3651,7 +3652,7 @@ public class UnfiledButtonHandlers {
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-            event.getMessage().editMessage(msg).queue();
+            event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ReactionService.addReaction(event, game, player);
         // checkForAllReactions(event, game);
@@ -3661,7 +3662,7 @@ public class UnfiledButtonHandlers {
     public static void refreshStatusSummary(ButtonInteractionEvent event, Game game) {
         String msg = "Please score objectives.";
         msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-        event.getMessage().editMessage(msg).queue();
+        event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH
@@ -3720,7 +3721,7 @@ public class UnfiledButtonHandlers {
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             String msg = "Please score objectives.";
             msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
-            event.getMessage().editMessage(msg).queue();
+            event.getMessage().editMessage(msg).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -3753,7 +3754,7 @@ public class UnfiledButtonHandlers {
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("useTA_")

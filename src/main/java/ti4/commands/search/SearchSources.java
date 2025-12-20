@@ -14,10 +14,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 
@@ -71,7 +73,7 @@ class SearchSources extends Subcommand {
             SourceModel model = Mapper.getSource(sourceString);
             event.getChannel()
                     .sendMessageEmbeds(model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
-                    .queue(); // change getRepEmbed function here as well
+                    .queue(Consumers.nop(), BotLogger::catchRestError); // change getRepEmbed function here as well
             return;
         }
 

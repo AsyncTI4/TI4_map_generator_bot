@@ -261,7 +261,8 @@ public class PublicDraftInfoService {
                             if (atch.getFileName().contains(uniqueKey)) {
                                 keyDone = uniqueKey;
                                 FileUpload draftableImage = entry.getValue();
-                                msg.editMessageAttachments(draftableImage).queue();
+                                msg.editMessageAttachments(draftableImage)
+                                        .queue(Consumers.nop(), BotLogger::catchRestError);
                                 break;
                             }
                         }
@@ -308,14 +309,14 @@ public class PublicDraftInfoService {
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings) msg.delete().queue();
+                if (removePings) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePings = true;
             }
 
             for (String header : removeHeaders) {
                 if (msgTxt.startsWith(header)) {
                     if (seenHeader.contains(header)) {
-                        msg.delete().queue();
+                        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                     } else {
                         seenHeader.add(header);
                     }
@@ -325,7 +326,7 @@ public class PublicDraftInfoService {
 
             if (msgTxt.contains(SUMMARY_START)) {
                 if (seenHeader.contains(SUMMARY_START)) {
-                    msg.delete().queue();
+                    msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
                     seenHeader.add(SUMMARY_START);
                 }
@@ -335,7 +336,7 @@ public class PublicDraftInfoService {
                 for (String attachName : removeAttachments) {
                     if (atch.getFileName().contains(attachName)) {
                         if (seenAttachment.contains(attachName)) {
-                            msg.delete().queue();
+                            msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                         } else {
                             seenAttachment.add(attachName);
                         }

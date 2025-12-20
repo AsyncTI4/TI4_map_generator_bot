@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.executors.ExecutorServiceManager;
@@ -35,12 +36,12 @@ public class SlashCommandListener extends ListenerAdapter {
             event.getInteraction()
                     .reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.")
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         if (!isModalCommand(event)) {
-            event.getInteraction().deferReply().queue();
+            event.getInteraction().deferReply().queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         queue(event);
@@ -70,12 +71,12 @@ public class SlashCommandListener extends ListenerAdapter {
                 command.execute(event);
                 command.postExecute(event);
                 if (!isModalCommand(event)) {
-                    event.getHook().deleteOriginal().queue();
+                    event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             } catch (Exception e) {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
-                event.getHook().editOriginal(errorMessage).queue();
+                event.getHook().editOriginal(errorMessage).queue(Consumers.nop(), BotLogger::catchRestError);
                 BotLogger.error(new LogOrigin(event), messageText, e);
             }
         }

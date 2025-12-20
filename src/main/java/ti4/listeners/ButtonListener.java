@@ -4,7 +4,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
+import ti4.message.logging.BotLogger;
 import ti4.processors.ButtonProcessor;
 import ti4.spring.jda.JdaService;
 
@@ -25,16 +27,16 @@ public class ButtonListener extends ListenerAdapter {
             event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton())
                             + "\nPlease try again in a few minutes. The bot is rebooting.")
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         // Only defer if button does not spawn a Modal
         if (!isModalSpawner(event)) {
             if (shouldShowBotIsThinking(event)) {
-                event.deferReply(true).queue();
+                event.deferReply(true).queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
-                event.deferEdit().queue();
+                event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
 
@@ -44,7 +46,7 @@ public class ButtonListener extends ListenerAdapter {
     /**
      * @return whether a button should show the bot is thinking - need to add the following at end of execution:
      * `    if (event instanceof ButtonInteractionEvent buttonEvent) {
-     * buttonEvent.getHook().deleteOriginal().queue();
+     * buttonEvent.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
      * }`
      */
     private static boolean shouldShowBotIsThinking(ButtonInteractionEvent event) {

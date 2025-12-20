@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftItem;
 import ti4.draft.DraftItem.Category;
@@ -296,7 +297,7 @@ public class MantisMapBuildService {
                         List<Attachment> attachments = msg.getAttachments();
                         for (Attachment att : attachments) {
                             if (att.getFileName().contains(IMAGE_UNIQUE_STRING)) {
-                                msg.delete().queue();
+                                msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                                 break;
                             }
                         }
@@ -451,10 +452,11 @@ public class MantisMapBuildService {
                             for (Attachment attachment : msg.getAttachments()) {
                                 if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
                                     if (replaced) {
-                                        msg.delete().queue();
+                                        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                                         continue;
                                     }
-                                    msg.editMessageAttachments(mapImage).queue();
+                                    msg.editMessageAttachments(mapImage)
+                                            .queue(Consumers.nop(), BotLogger::catchRestError);
                                     replaced = true;
                                 }
                             }
@@ -477,7 +479,7 @@ public class MantisMapBuildService {
                     }
                     for (Attachment attachment : msg.getAttachments()) {
                         if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
-                            msg.delete().queue();
+                            msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                         }
                     }
                 }

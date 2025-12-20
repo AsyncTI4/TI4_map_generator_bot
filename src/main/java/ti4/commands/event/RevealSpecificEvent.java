@@ -6,11 +6,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.EventModel;
 
 class RevealSpecificEvent extends GameStateSubcommand {
@@ -38,13 +40,14 @@ class RevealSpecificEvent extends GameStateSubcommand {
             return;
         }
 
-        revealEvent(event, game, event.getChannel(), eventID);
+        revealEvent(event, event.getChannel(), eventID);
     }
 
-    private void revealEvent(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String eventID) {
+    private void revealEvent(GenericInteractionCreateEvent event, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel != null) {
-            channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
+            channel.sendMessageEmbeds(eventModel.getRepresentationEmbed())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Something went wrong");
         }

@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -27,6 +28,7 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
@@ -632,9 +634,9 @@ public class StartTurnService {
             startButtons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
         }
 
-        GameMessageManager.remove(game.getName(), GameMessageType.TURN)
-                .ifPresent(messageId ->
-                        game.getMainGameChannel().deleteMessageById(messageId).queue());
+        GameMessageManager.remove(game.getName(), GameMessageType.TURN).ifPresent(messageId -> game.getMainGameChannel()
+                .deleteMessageById(messageId)
+                .queue(Consumers.nop(), BotLogger::catchRestError));
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
         } else {

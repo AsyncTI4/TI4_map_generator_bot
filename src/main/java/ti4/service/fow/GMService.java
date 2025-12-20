@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -32,6 +33,7 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.ShowGameService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
@@ -156,7 +158,7 @@ public class GMService {
     @ButtonHandler("gmRefresh")
     public static void refreshGMButtons(ButtonInteractionEvent event, Game game) {
         showGMButtons(game);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gmShowGameAs_")
@@ -285,7 +287,7 @@ public class GMService {
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
                 .addComponents(Label.of("Position", position))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmWhoCanSeeResolve")

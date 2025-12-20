@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -18,6 +19,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
@@ -129,6 +131,6 @@ public class GalvanizeService {
         if (systemButtons.size() > 25) systemButtons = systemButtons.subList(0, 25);
         event.getMessage()
                 .editMessageComponents(ActionRow.partitionOf(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

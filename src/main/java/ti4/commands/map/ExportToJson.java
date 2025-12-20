@@ -8,11 +8,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.map.MapJsonIOService;
 
 class ExportToJson extends GameStateSubcommand {
@@ -60,6 +62,6 @@ class ExportToJson extends GameStateSubcommand {
         event.getChannel()
                 .sendFiles(FileUpload.fromData(exportFile))
                 .setContent("### Export of " + game.getName() + " Map:\n-# note that this feature is still WIP")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

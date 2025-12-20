@@ -6,12 +6,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 class ListDeadGames extends Subcommand {
@@ -19,7 +21,7 @@ class ListDeadGames extends Subcommand {
     private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, "
             + "unless someone takes a turn. You can ignore this if you want it deleted. Ping Fin if this should not be done.";
 
-    public ListDeadGames() {
+    ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning")
                 .setRequired(true));
@@ -75,7 +77,7 @@ class ListDeadGames extends Subcommand {
                     }
                 }
                 if (r != null && delete) {
-                    r.delete().queue();
+                    r.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }
@@ -98,7 +100,7 @@ class ListDeadGames extends Subcommand {
             sb.append(actionsChannel.getJumpUrl()).append("\n");
             channelCount++;
             if (delete) {
-                actionsChannel.delete().queue();
+                actionsChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 warned = true;
                 // MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) +
@@ -115,7 +117,7 @@ class ListDeadGames extends Subcommand {
                 sb.append(tableTalkChannel.getJumpUrl()).append("\n");
                 channelCount++;
                 if (delete) {
-                    tableTalkChannel.delete().queue();
+                    tableTalkChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else if (!warned) {
                     // MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) +
                     // WARNING_MESSAGE);

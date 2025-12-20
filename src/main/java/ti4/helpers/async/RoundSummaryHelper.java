@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.textinput.TextInput;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -20,8 +22,10 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
+@UtilityClass
 public class RoundSummaryHelper {
 
     private static final Pattern OPTIONAL_TRAILING_PERIOD_AND_SPACE = Pattern.compile("\\.? ?$");
@@ -62,7 +66,7 @@ public class RoundSummaryHelper {
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary")
                 .addComponents(Label.of("Edit summary", summary))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
         // ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason
     }
 

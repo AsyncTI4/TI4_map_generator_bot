@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
@@ -78,7 +79,7 @@ public class BanCleanupService {
         Collection<UserSnowflake> banList = Collections.singleton(user);
         for (Guild guild : JdaService.guilds) {
             try {
-                guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue();
+                guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue(Consumers.nop(), BotLogger::catchRestError);
                 errors += cleanupBotQuestionChannel(guild, getUser(user));
             } catch (Exception e) {
                 String msg = "Error encountered trying to ban " + getIdent(user);
@@ -149,7 +150,7 @@ public class BanCleanupService {
     private void findAndDeleteSpamPosts(User user, MessageHistory hist) {
         for (Message m : hist.getRetrievedHistory()) {
             if (authorIsUser(m.getAuthor(), user)) {
-                m.delete().queue();
+                m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
     }

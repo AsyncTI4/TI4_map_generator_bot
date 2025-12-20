@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -15,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.player.PlayerStatsService;
@@ -168,7 +170,7 @@ class ListPlayerInfoButtonHandler {
         }
 
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = "showObjInfo_", save = false)
@@ -178,7 +180,7 @@ class ListPlayerInfoButtonHandler {
             ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
             ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), extent);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }
