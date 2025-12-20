@@ -2,11 +2,13 @@ package ti4.buttons.handlers.options;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.option.GameOptionService;
 
 class GameOptionButtonHandler {
@@ -49,13 +51,13 @@ class GameOptionButtonHandler {
     @ButtonHandler("showOwnedPNsInPlayerArea_turnON")
     public static void showOwnedPNsInPlayerArea_turnON(ButtonInteractionEvent event, Game game) {
         game.setShowOwnedPNsInPlayerArea(true);
-        event.editButton(GameOptionService.showOwnedPNs_ON).queue();
+        event.editButton(GameOptionService.showOwnedPNs_ON).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("showOwnedPNsInPlayerArea_turnOFF")
     public static void showOwnedPNsInPlayerArea_turnOFF(ButtonInteractionEvent event, Game game) {
         game.setShowOwnedPNsInPlayerArea(false);
-        event.editButton(GameOptionService.showOwnedPNs_OFF).queue();
+        event.editButton(GameOptionService.showOwnedPNs_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("anonDeclare_")

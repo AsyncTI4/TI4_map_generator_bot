@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
@@ -67,7 +68,7 @@ public class PlayHeroService {
             player.getCorrectChannel()
                     .sendMessageEmbeds(leaderModel.getRepresentationEmbed(
                             false, true, false, showFlavourText, game.isTwilightsFallMode()))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

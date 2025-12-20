@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -31,6 +32,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
@@ -856,7 +858,7 @@ public class TransactionHelper {
                 if (player == p1) {
                     other = p2.getFaction();
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 String modalId = "finishDealDetails_" + other;
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
@@ -868,7 +870,7 @@ public class TransactionHelper {
                         .addComponents(Label.of("Edit deal details", summary))
                         .build();
 
-                event.replyModal(modal).queue();
+                event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
             case "DetailsInvert" -> {
@@ -876,7 +878,7 @@ public class TransactionHelper {
                 if (player == p2) {
                     other = p1.getFaction();
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 String modalId = "finishDealDetailsInvert_" + other;
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
@@ -886,11 +888,11 @@ public class TransactionHelper {
                 Modal modal = Modal.create(modalId, "Deal Details")
                         .addComponents(Label.of("Edit deal details", summary))
                         .build();
-                event.replyModal(modal).queue();
+                event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
@@ -1053,7 +1055,7 @@ public class TransactionHelper {
                     + buildTransactionOffer(player, opposing, game, false)
                     + "### Click something else that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
@@ -1077,7 +1079,7 @@ public class TransactionHelper {
                     + buildTransactionOffer(player, opposing, game, false)
                     + "### Click something that you wish to __offer to__ " + p2.getRepresentation(false, false);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
@@ -1134,7 +1136,7 @@ public class TransactionHelper {
                         + ":\n" + buildTransactionOffer(player, p2, game, false),
                 buttons);
 
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
         int offerNumber = 1;
         String key = "offerFrom" + player.getFaction() + "To" + p2.getFaction();

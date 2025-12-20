@@ -139,12 +139,12 @@ public class MessageHelper {
             ButtonInteractionEvent event, String message, List<Button> buttons) {
         List<MessageCreateData> messageList = getMessageCreateDataObjects(message, buttons);
         for (MessageCreateData messageD : messageList) {
-            event.getHook().setEphemeral(true).sendMessage(messageD).queue();
+            event.getHook().setEphemeral(true).sendMessage(messageD).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
     public static void sendEphemeralMessageToEventChannel(ButtonInteractionEvent event, String message) {
-        event.getHook().setEphemeral(true).sendMessage(message).queue();
+        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void sendMessageToChannelWithButtons(
@@ -355,13 +355,13 @@ public class MessageHelper {
                     .sendMessage("Here is your requested image")
                     .addFiles(fileUpload)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         else if (event instanceof SlashCommandInteractionEvent slash)
             slash.getHook()
                     .sendMessage("Here is your requested image")
                     .addFiles(fileUpload)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void sendFileToChannelAndAddLinkToButtons(
@@ -423,7 +423,7 @@ public class MessageHelper {
                 .editOriginal(message)
                 .setComponents(rows)
                 .setFiles(files)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void replyToMessage(
@@ -472,7 +472,7 @@ public class MessageHelper {
         }
         MessageCreateData messageObject = message.addFiles(fileUpload).build();
         channel.sendMessage(messageObject).queue(msg -> {
-            if (pinMessage) msg.pin().queue();
+            if (pinMessage) msg.pin().queue(Consumers.nop(), BotLogger::catchRestError);
         });
     }
 
@@ -503,7 +503,7 @@ public class MessageHelper {
         }
         MessageCreateData messageObject = message.setFiles(filesUpload).build();
         channel.sendMessage(messageObject).queue(msg -> {
-            if (pinMessage) msg.pin().queue();
+            if (pinMessage) msg.pin().queue(Consumers.nop(), BotLogger::catchRestError);
         });
     }
 
@@ -872,7 +872,7 @@ public class MessageHelper {
      *          <pre>
      * {@code
      * for (MessageCreateData messageData : getMessageObject(message, embeds, buttons)) {
-     * channel.sendMessage(messageData).queue();
+     * channel.sendMessage(messageData).queue(Consumers.nop(), BotLogger::catchRestError);
      * }
      * }
      * </pre>

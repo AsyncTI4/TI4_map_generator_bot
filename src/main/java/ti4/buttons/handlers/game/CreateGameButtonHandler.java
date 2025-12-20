@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -81,7 +82,7 @@ class CreateGameButtonHandler {
                             + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         Game game = CreateGameService.createGameChannels(
                 members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {

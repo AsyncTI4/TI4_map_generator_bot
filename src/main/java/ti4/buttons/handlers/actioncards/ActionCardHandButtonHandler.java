@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -79,7 +80,7 @@ class ActionCardHandButtonHandler {
         if (channel == null) {
             event.getChannel()
                     .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -200,21 +201,21 @@ class ActionCardHandButtonHandler {
         if (channel == null) {
             event.getChannel()
                     .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         try {
             String error = ActionCardHelper.playAC(event, game, player, acID, channel);
             if (error != null) {
-                event.getChannel().sendMessage(error).queue();
+                event.getChannel().sendMessage(error).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
                     .asThreadChannel()
                     .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ButtonHelper.deleteMessage(event);
     }

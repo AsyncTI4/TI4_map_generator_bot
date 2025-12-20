@@ -11,6 +11,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.draft.DraftItem;
 import ti4.draft.DraftItem.Category;
 import ti4.draft.items.BlueTileDraftItem;
@@ -283,8 +284,10 @@ public class MantisTileDraftable extends Draftable {
                 .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
                 .findFirst()
                 .ifPresentOrElse(
-                        msg -> msg.editMessage(summary.toString()).queue(),
-                        () -> cardsInfoChannel.sendMessage(summary.toString()).queue()));
+                        msg -> msg.editMessage(summary.toString()).queue(Consumers.nop(), BotLogger::catchRestError),
+                        () -> cardsInfoChannel
+                                .sendMessage(summary.toString())
+                                .queue(Consumers.nop(), BotLogger::catchRestError)));
     }
 
     @Override

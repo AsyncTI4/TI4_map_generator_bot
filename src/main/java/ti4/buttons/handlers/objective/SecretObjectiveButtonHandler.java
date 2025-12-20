@@ -3,8 +3,10 @@ package ti4.buttons.handlers.objective;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -19,6 +21,7 @@ import ti4.service.objectives.DiscardSecretService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.settings.users.UserSettingsManager;
 
+@UtilityClass
 class SecretObjectiveButtonHandler {
 
     @ButtonHandler("SODISCARD_")
@@ -61,7 +64,7 @@ class SecretObjectiveButtonHandler {
                     event.getHook()
                             .setEphemeral(true)
                             .sendMessage("OH NO!!! You drew the same secret you discarded! How unlucky 😭😭😭")
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
             if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
@@ -79,7 +82,7 @@ class SecretObjectiveButtonHandler {
             BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
             event.getChannel()
                     .sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
         ButtonHelper.deleteMessage(event);

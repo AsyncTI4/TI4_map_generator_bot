@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorServiceManager;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -37,11 +38,11 @@ public class ModalListener extends ListenerAdapter {
         if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
-        event.deferEdit().queue();
+        event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(

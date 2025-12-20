@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.ButtonHelper;
@@ -33,6 +34,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.combat.StartCombatService;
@@ -144,7 +146,7 @@ public class FOWPlusService {
                 .addComponents(Label.of("Position to activate", position))
                 .build();
 
-        event.replyModal(blindActivationModal).queue();
+        event.replyModal(blindActivationModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindActivation_")
@@ -171,7 +173,7 @@ public class FOWPlusService {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // Remove ring buttons player has no tiles they can activate
@@ -407,6 +409,6 @@ public class FOWPlusService {
         }
 
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

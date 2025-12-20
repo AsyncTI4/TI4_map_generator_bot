@@ -8,6 +8,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -18,6 +19,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.GenericCardModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
@@ -375,7 +377,7 @@ public class DiscordantStarsHelper {
                 player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> "
                         + tileToPullFromUnshuffled);
 
-        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ids.size() == 1) {
             ButtonHelper.starChartStep1(game, player, ids.getFirst());
         }
@@ -412,7 +414,7 @@ public class DiscordantStarsHelper {
                 player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
-        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ids.size() == 1) {
             ButtonHelper.starChartStep1(game, player, ids.getFirst());
 

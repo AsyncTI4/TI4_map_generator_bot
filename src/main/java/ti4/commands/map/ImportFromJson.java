@@ -5,15 +5,17 @@ import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 class ImportFromJson extends GameStateSubcommand {
 
-    public ImportFromJson() {
+    ImportFromJson() {
         super(Constants.IMPORT_MAP_JSON, "Import map data from external JSON", true, false);
     }
 
@@ -32,6 +34,6 @@ class ImportFromJson extends GameStateSubcommand {
         Modal importMapModal = Modal.create("importMapFromJSON", "Import map (WIP)")
                 .addComponents(Label.of("URL", url.build()))
                 .build();
-        event.replyModal(importMapModal).queue();
+        event.replyModal(importMapModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

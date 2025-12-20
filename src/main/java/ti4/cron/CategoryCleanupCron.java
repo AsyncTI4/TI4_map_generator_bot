@@ -2,6 +2,7 @@ package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
@@ -20,7 +21,7 @@ public class CategoryCleanupCron {
                 .forEach(category -> {
                     BotLogger.info("**CategoryCleanupCron** Deleted empty category: " + category.getName()
                             + " on guild: " + guild.getName());
-                    category.delete().queue();
+                    category.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 }));
     }
 }

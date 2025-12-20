@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.helpers.twilightsfall.TwilightsFallInfoHelper;
@@ -228,7 +229,7 @@ public class AndcatReferenceCardsMessageHelper {
             // Try to update existing message if possible
             for (var message : history) {
                 if (message.getAuthor().isBot() && message.getContentRaw().startsWith(USER_SUMMARY_PREFIX)) {
-                    message.editMessage(messageBuilder.toString()).queue();
+                    message.editMessage(messageBuilder.toString()).queue(Consumers.nop(), BotLogger::catchRestError);
                     return;
                 }
             }
@@ -241,7 +242,7 @@ public class AndcatReferenceCardsMessageHelper {
                     .getActionsChannel()
                     .sendMessage(messageBuilder.toString())
                     .setComponents(ActionRow.of(refreshButton))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         });
     }
 

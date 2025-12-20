@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
@@ -23,6 +24,7 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
@@ -205,7 +207,7 @@ public class GameSettings extends SettingsMenu {
                     .sendMessage("Here is a preview of the selected map template:")
                     .addFiles(preview)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         if (mapTemplate.getValue().bluePerPlayer() != bpp && parent instanceof MiltySettings m) {
             SliceGenerationSettings slice = m.getSliceSettings();
             bpp = mapTemplate.getValue().bluePerPlayer();

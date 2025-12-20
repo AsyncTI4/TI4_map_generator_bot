@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.apache.commons.lang3.function.Consumers;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
 import ti4.commands.CommandManager;
@@ -355,7 +356,7 @@ public class JdaService {
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.register(commands));
-            commands.queue();
+            commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
@@ -378,7 +379,7 @@ public class JdaService {
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
-            commands.queue();
+            commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {

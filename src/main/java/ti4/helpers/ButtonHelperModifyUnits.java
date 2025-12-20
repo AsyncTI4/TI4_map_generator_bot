@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -189,7 +190,7 @@ public class ButtonHelperModifyUnits {
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg.toString());
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void automateGroundCombat(
@@ -434,7 +435,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
         }
         event.getMessage();
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         return sardakkMechHits;
     }
 
@@ -828,7 +829,7 @@ public class ButtonHelperModifyUnits {
             }
         }
         if (!justSummarizing && event instanceof ButtonInteractionEvent bevent) {
-            bevent.getMessage().delete().queue();
+            bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return msg.toString();
     }
@@ -1225,7 +1226,7 @@ public class ButtonHelperModifyUnits {
         List<Button> systemButtons = TacticalActionService.getBuildButtons(event, game, player, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         CommanderUnlockCheckService.checkPlayer(player, "cheiran");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static List<Button> getUnitsToDevote(
@@ -1298,7 +1299,7 @@ public class ButtonHelperModifyUnits {
         String msg2 = player.getRepresentation() + "used **Devotion** to destroy one of their " + unitKey.unitEmoji()
                 + " in tile " + tile.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String devoteOrNo = buttonID.split("_")[3];
         if ("devote".equalsIgnoreCase(devoteOrNo)) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -1483,7 +1484,7 @@ public class ButtonHelperModifyUnits {
 
         buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("hitOpponent_")
@@ -1522,7 +1523,7 @@ public class ButtonHelperModifyUnits {
             var parsedUnit = new ParsedUnit(key, 1, Constants.SPACE);
             DestroyUnitService.destroyUnit(event, tile, game, parsedUnit, true, damaged);
             MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -1548,7 +1549,7 @@ public class ButtonHelperModifyUnits {
 
         buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("retreatGroundUnits_")
@@ -1579,7 +1580,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void retreatSpaceUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
@@ -1942,7 +1943,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             if ("sd".equalsIgnoreCase(unitID)
                     || "pds".equalsIgnoreCase(unitLong)
@@ -1960,7 +1961,7 @@ public class ButtonHelperModifyUnits {
             if (editedMessage.contains("place 2 infantry")) {
                 successMessage = "Placed 2 infantry on " + Helper.getPlanetRepresentation(planetName, game) + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 event.getMessage()
                         .editMessage(Helper.buildProducedUnitsMessage(player, game))
@@ -2023,7 +2024,7 @@ public class ButtonHelperModifyUnits {
                             + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("kolleccMechCapture_")
@@ -2368,7 +2369,7 @@ public class ButtonHelperModifyUnits {
 
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the unit you wish to move.", buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("domnaStepTwo_")
@@ -2389,7 +2390,7 @@ public class ButtonHelperModifyUnits {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the system you wish to move to.", buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("domnaStepThree_")
@@ -2406,7 +2407,7 @@ public class ButtonHelperModifyUnits {
                 player.getFactionEmoji() + " moved 1 " + unit + " from "
                         + tile1.getRepresentationForButtons(game, player) + " to "
                         + tile2.getRepresentationForButtons(game, player) + " with an ability.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("combatDrones")
@@ -2470,7 +2471,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("combatDroneConvert_")
@@ -2487,7 +2488,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean isNomadMechApplicable(Player player, boolean noMechPowers, UnitKey unitKey) {
@@ -2537,6 +2538,6 @@ public class ButtonHelperModifyUnits {
                     "Used _Contractual Obligations_ to force " + targetPlayer.getRepresentationNoPing()
                             + " to produce 1 ship.");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

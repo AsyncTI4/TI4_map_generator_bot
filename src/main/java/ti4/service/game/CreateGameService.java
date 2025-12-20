@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
@@ -192,8 +193,8 @@ public class CreateGameService {
             actionsChannelManager =
                     actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
         }
-        chatChannelManager.queue();
-        actionsChannelManager.queue();
+        chatChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
+        actionsChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel
@@ -235,7 +236,7 @@ public class CreateGameService {
             if (missingMembers.isEmpty()) {
                 manager = manager.setArchived(true);
             }
-            manager.queue();
+            manager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         return newGame;

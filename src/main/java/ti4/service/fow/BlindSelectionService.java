@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.FoWHelper;
@@ -25,6 +26,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 /*
  * Flow of Blind Selection:
@@ -103,8 +105,7 @@ public class BlindSelectionService {
     }
 
     @ButtonHandler("blindSelection~MDL")
-    public static void offerBlindPositionSelection(
-            ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void offerBlindPositionSelection(ButtonInteractionEvent event, String buttonID) {
         String[] splitButton = buttonID.replace("blindSelection~MDL_", "").split("_");
         String encodedButtonPrefix = splitButton[0];
         String type = splitButton[1];
@@ -118,11 +119,11 @@ public class BlindSelectionService {
                 .addComponents(Label.of("Target", target))
                 .build();
 
-        event.replyModal(blindSelectionModal).queue();
+        event.replyModal(blindSelectionModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindSelection_")
-    public static void doBlindSelection(ModalInteractionEvent event, Player player, Game game) {
+    public static void doBlindSelection(ModalInteractionEvent event, Player player) {
         String[] buttonData = event.getModalId().split("_");
         String origMessageId = buttonData[1];
         String encodedButtonPrefix = buttonData[2];
@@ -162,11 +163,11 @@ public class BlindSelectionService {
                 player.getRepresentation() + ", Please select the target:",
                 chooseTargetButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("blindValidation_")
-    public static void doBlindValidation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void doBlindValidation(ButtonInteractionEvent event, String buttonID, Game game) {
         String[] parts = buttonID.split("_");
         String originalButtonPrefix = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
         String type = parts[2];
@@ -184,7 +185,7 @@ public class BlindSelectionService {
         game.removeStoredValue(VALIDATION_KEY);
 
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, actionButton);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // if the original button id contains TBDF, replace it with the faction of the owner of the target

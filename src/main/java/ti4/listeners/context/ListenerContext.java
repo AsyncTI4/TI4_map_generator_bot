@@ -6,12 +6,14 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
@@ -59,7 +61,7 @@ public abstract class ListenerContext {
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
                 event.getMessageChannel()
                         .sendMessage(event.getUser().getAsMention() + " is not a player of the game")
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 contextIsValid = false;
                 return;
             }

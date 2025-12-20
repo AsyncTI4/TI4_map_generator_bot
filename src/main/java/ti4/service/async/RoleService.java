@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -89,7 +90,7 @@ public class RoleService {
             for (Guild guild : JdaService.guilds) {
                 Role role = getAsyncPlayerRole(guild);
                 if (guild.getMember(user) != null) {
-                    guild.addRoleToMember(user, role).queue();
+                    guild.addRoleToMember(user, role).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }

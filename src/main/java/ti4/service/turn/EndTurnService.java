@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -24,6 +25,7 @@ import ti4.map.Tile;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -180,7 +182,7 @@ public class EndTurnService {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()
                             .deleteMessageById(messageId)
-                            .queue());
+                            .queue(Consumers.nop(), BotLogger::catchRestError));
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {

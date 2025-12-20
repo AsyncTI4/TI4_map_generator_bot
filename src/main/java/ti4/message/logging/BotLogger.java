@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.CronManager;
 import ti4.executors.CircuitBreaker;
 import ti4.helpers.DateTimeHelper;
@@ -285,7 +286,9 @@ public class BotLogger {
 
             if (err == null || !isLastChunk) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
-                else channel.sendMessage(msgChunk).queue(); // Send message on channel
+                else
+                    channel.sendMessage(msgChunk)
+                            .queue(Consumers.nop(), BotLogger::catchRestError); // Send message on channel
             } else { // Handle error on last send
                 ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
 
@@ -312,7 +315,7 @@ public class BotLogger {
             @Nullable Throwable err) {
         ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
         ThreadGetter.getThreadInChannel(channel, threadName, thread -> {
-            messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue());
+            messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue(Consumers.nop(), BotLogger::catchRestError));
             if (err != null) {
                 MessageHelper.sendMessageToChannel(thread, ExceptionUtils.getStackTrace(err));
             }

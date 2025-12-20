@@ -12,18 +12,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.option.FOWOptionService.FOWOption;
 
+@UtilityClass
 public class FowCommunicationThreadService {
 
     private static final String YES_CHAR = "↔";
@@ -164,7 +168,7 @@ public class FowCommunicationThreadService {
                     threadChannel.getManager().setArchived(false).queue(success -> threadChannel
                             .sendMessage(
                                     "⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
-                            .queue());
+                            .queue(Consumers.nop(), BotLogger::catchRestError));
                 } else if (areAbleToCommunicate && threadLocked) {
                     // Allow talking
                     threadChannel.getManager().setArchived(false).queue(success -> threadChannel
@@ -175,7 +179,7 @@ public class FowCommunicationThreadService {
                                             + (areAllowedToTalkInAgenda
                                                     ? " __may__ communicate in Agenda Phase."
                                                     : " have regained comms and __may__ communicate."))
-                                    .queue()));
+                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
 
                 } else if (!areAbleToCommunicate && !threadLocked) {
                     // Deny talking
@@ -184,7 +188,7 @@ public class FowCommunicationThreadService {
                             .setName(threadName.replace(YES_CHAR, NO_CHAR))
                             .queue(nameUpdated -> threadChannel
                                     .sendMessage(notice + " have lost comms and __may not__ communicate.")
-                                    .queue()));
+                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
                 }
             }
         } finally {
@@ -238,7 +242,7 @@ public class FowCommunicationThreadService {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + "(You) accepted communications invitation from "
                         + inviteePlayer.getRepresentationNoPing());
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("fowCommsSuggest_")

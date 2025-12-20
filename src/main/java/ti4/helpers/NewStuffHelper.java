@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.image.Mapper;
@@ -19,6 +20,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 
@@ -113,7 +115,9 @@ public class NewStuffHelper {
             // replace the buttons in the previous message
             List<List<ActionRow>> actionRows = MessageHelper.getPartitionedButtonLists(buttons);
             if (!actionRows.isEmpty()) {
-                bEvent.getHook().editOriginalComponents(actionRows.getFirst()).queue();
+                bEvent.getHook()
+                        .editOriginalComponents(actionRows.getFirst())
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else {
             // make a new message

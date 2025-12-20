@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
@@ -25,6 +26,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
@@ -67,7 +69,7 @@ public class DrawSecretService {
                     .setEphemeral(true)
                     .sendMessage("Drew the following secret objective(s):")
                     .addEmbeds(soEmbeds)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

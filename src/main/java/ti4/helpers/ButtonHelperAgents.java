@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -31,6 +32,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
@@ -158,7 +160,7 @@ public class ButtonHelperAgents {
         String msg = cabal.getRepresentationUnfogged() + ", please choose which ship you wish to capture.";
         MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
         if (event instanceof ButtonInteractionEvent event2) {
-            event2.getMessage().delete().queue();
+            event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -804,7 +806,10 @@ public class ButtonHelperAgents {
             player.addSpentThing("winnuagent");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             if (event instanceof ButtonInteractionEvent buttonEvent) {
-                buttonEvent.getMessage().editMessage(exhaustedMessage).queue();
+                buttonEvent
+                        .getMessage()
+                        .editMessage(exhaustedMessage)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 ButtonHelper.deleteTheOneButton(buttonEvent);
             }
             return;
@@ -1532,13 +1537,13 @@ public class ButtonHelperAgents {
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
-                    buttonEvent.getMessage().delete().queue();
+                    buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
                     ButtonHelper.deleteTheOneButton(buttonEvent);
                 }
 
             } else {
-                buttonEvent.getMessage().delete().queue();
+                buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -1940,7 +1945,7 @@ public class ButtonHelperAgents {
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "Baggil Wildpaw, the Olradin"
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void resolveOlradinAgentStep2(Game game, Player player) {
@@ -2286,7 +2291,7 @@ public class ButtonHelperAgents {
                 event2.getMessage()
                         .editMessage(event2.getMessage().getContentRaw())
                         .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
     }
@@ -2360,7 +2365,7 @@ public class ButtonHelperAgents {
                 player.getRepresentationUnfogged() + ", please choose the planet you wish to place 1 space dock on.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         if (event instanceof ButtonInteractionEvent event2) {
-            event2.getMessage().delete().queue();
+            event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2388,7 +2393,7 @@ public class ButtonHelperAgents {
         }
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
         if (event instanceof ButtonInteractionEvent event2) {
-            event2.getMessage().delete().queue();
+            event2.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2796,7 +2801,7 @@ public class ButtonHelperAgents {
         if (exhaustedMessage.isEmpty()) {
             exhaustedMessage = "Combat";
         }
-        event.getMessage().editMessage(exhaustedMessage).queue();
+        event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         ButtonHelper.deleteTheOneButton(event);
     }
 

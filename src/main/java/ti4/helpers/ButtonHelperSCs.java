@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -27,6 +28,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.StrategyCardModel;
@@ -264,7 +266,7 @@ public class ButtonHelperSCs {
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("getPreDeclineSCButtons_")
@@ -281,7 +283,7 @@ public class ButtonHelperSCs {
         event.getMessage()
                 .editMessage(msg)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("score_imperial")
@@ -573,7 +575,7 @@ public class ButtonHelperSCs {
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "anarchy7Build", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("lumi7Build_")
@@ -584,7 +586,7 @@ public class ButtonHelperSCs {
         buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "lumi7Build", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static List<Button> getAnarchy7Buttons(Game game, Player player) {
@@ -671,7 +673,7 @@ public class ButtonHelperSCs {
                             p2.getRepresentationUnfogged() + " the Preparation ability was used by " + player.getColor()
                                     + " to ready your " + agent + ".");
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
             if (agent.contains("absol")) {
                 p2.removeExhaustedRelic("absol_jr");
@@ -685,7 +687,7 @@ public class ButtonHelperSCs {
                             p2.getRepresentationUnfogged() + " the Preparation ability was used by " + player.getColor()
                                     + " to ready your " + agent + ".");
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
             return;
         }
@@ -702,7 +704,7 @@ public class ButtonHelperSCs {
                     p2.getRepresentationUnfogged() + " the Preparation ability was used by " + player.getColor()
                             + " to ready your " + agent + ".");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static List<Button> getAnarchy2ReadyComponentButtons(Game game, Player player) {
@@ -972,7 +974,8 @@ public class ButtonHelperSCs {
         }
         // List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
         // for (MessageCreateData messageD : messageList) {
-        //     event.getHook().setEphemeral(true).sendMessage(messageD).queue();
+        //     event.getHook().setEphemeral(true).sendMessage(messageD).queue(Consumers.nop(),
+        // BotLogger::catchRestError);
         // }
     }
 
@@ -994,7 +997,7 @@ public class ButtonHelperSCs {
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), "Use Buttons to Pay For The Monument", buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<String> findUsedFacilities(Game game, Player player) {
@@ -1172,7 +1175,7 @@ public class ButtonHelperSCs {
         message += ".";
 
         if (event instanceof ButtonInteractionEvent bEvent) {
-            bEvent.getMessage().delete().queue();
+            bEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             if (!buttonID.contains("_dont")) {
                 ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
             } else {
@@ -1209,13 +1212,13 @@ public class ButtonHelperSCs {
     public static void anarchy10PeekAt(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String objID = buttonID.replace("anarchy10PeekAt_", "");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), player.getFactionEmoji() + " peeked at a public objective.");
         PublicObjectiveModel po = Mapper.getPublicObjective(objID);
         player.getCardsInfoThread()
                 .sendMessageEmbeds(po.getRepresentationEmbed())
-                .queue(m -> m.pin().queue());
+                .queue(m -> m.pin().queue(Consumers.nop(), BotLogger::catchRestError));
         buttons.add(Buttons.green("cutTape_" + objID, "Reveal Objective"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToChannelWithButtons(
@@ -1373,7 +1376,7 @@ public class ButtonHelperSCs {
         if (channel instanceof ThreadChannel) {
             game.getActionsChannel()
                     .addReactionById(channel.getId(), emojiToUse)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToChannel(
                     channel,

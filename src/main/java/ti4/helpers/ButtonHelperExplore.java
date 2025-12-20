@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.listeners.annotations.ButtonHandler;
@@ -22,11 +21,6 @@ class ButtonHelperExplore {
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
         ButtonHelper.resolveFullFrontierExplore(game, player, game.getTileByPosition(pos), event);
-        Message message = event.getMessage();
-        String exhaustedMessage = message.getContentRaw();
-        if ("".equalsIgnoreCase(exhaustedMessage)) {
-            exhaustedMessage = "Explore";
-        }
         ButtonHelper.deleteTheOneButton(event);
     }
 

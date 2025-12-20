@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -29,6 +30,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.persistence.GameManager;
+import ti4.message.logging.BotLogger;
 import ti4.service.game.GameNameService;
 
 @UtilityClass
@@ -51,19 +53,19 @@ public class CommandHelper {
                             "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName
                                     + "' is not valid. "
                                     + "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
         if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
             event.getHook()
                     .editOriginal("'" + event.getFullCommandName() + "' can only be executed in a game channel.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
         if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
             event.getHook()
                     .editOriginal("Command must be ran by a player in the game, please use `/game join gameName`.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
         return true;
@@ -186,7 +188,7 @@ public class CommandHelper {
         event.getHook()
                 .editOriginal("You are not authorized to use this command. You must have one of the following roles: "
                         + acceptRolesStr)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         return false;
     }
 

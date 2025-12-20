@@ -45,7 +45,7 @@ public class ReactionService {
             if (event.getMessageChannel() instanceof ThreadChannel) {
                 game.getActionsChannel()
                         .addReactionById(event.getChannel().getId(), emojiToUse)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             event.getChannel().addReactionById(messageId, emojiToUse).queue(Consumers.nop(), BotLogger::catchRestError);
             GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
@@ -117,7 +117,7 @@ public class ReactionService {
 
                             game.getMainGameChannel()
                                     .addReactionById(messageId, emojiToUse)
-                                    .queue();
+                                    .queue(Consumers.nop(), BotLogger::catchRestError);
                             GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
                             progressGameIfAllPlayersHaveReacted(messageId, game);
 

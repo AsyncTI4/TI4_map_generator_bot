@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -152,10 +153,10 @@ public class CreateFoWGameService {
                 .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
-        guild.addRoleToMember(gameOwner, roleGM).queue();
+        guild.addRoleToMember(gameOwner, roleGM).queue(Consumers.nop(), BotLogger::catchRestError);
         // ADD PLAYERS TO ROLE
         for (Member member : members) {
-            guild.addRoleToMember(member, role).queue();
+            guild.addRoleToMember(member, role).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         // CREATE GAME
@@ -236,7 +237,7 @@ public class CreateFoWGameService {
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            manager.queue();
+            manager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
