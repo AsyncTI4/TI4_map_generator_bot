@@ -44,76 +44,38 @@ public class ResourceHelper {
 
     @Nullable
     public String getFactionFile(String name) {
-        String unitPath = factionCache.get(name);
-        if (unitPath != null) {
-            return unitPath;
-        }
-        String tile = getResourceFromFolder("factions/", name);
-        factionCache.put(name, tile);
-        return tile;
+        return getCachedResource(factionCache, "factions/", name);
     }
 
     @Nullable
     public String getGeneralFile(String name) {
-        String unitPath = generalCache.get(name);
-        if (unitPath != null) {
-            return unitPath;
-        }
-        String tile = getResourceFromFolder("general/", name);
-        generalCache.put(name, tile);
-        return tile;
+        return getCachedResource(generalCache, "general/", name);
     }
 
     // @Deprecated
     @Nullable
     public String getUnitFile(String name) {
-        if (name.endsWith(Constants.UNIT_DD)) {
-            if (RandomHelper.isOneInX(Constants.EYE_CHANCE)) {
-                return getResourceFromFolder("units/", PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE));
-            }
+        if (name.endsWith(Constants.UNIT_DD) && RandomHelper.isOneInX(Constants.EYE_CHANCE)) {
+            name = PATTERN.matcher(name).replaceFirst(Constants.UNIT_DD_EYE);
         }
-        String unitPath = unitCache.get(name);
-        if (unitPath != null) {
-            return unitPath;
-        }
-        String unit = getResourceFromFolder("units/", name);
-        unitCache.put(name, unit);
-        return unit;
+        return getCachedResource(unitCache, "units/", name);
     }
 
     @Nullable
     public String getUnitFile(UnitKey unit) {
         String name = unit.getFileName();
-        String unitPath = unitCache.get(name);
-        if (unitPath != null) {
-            return unitPath;
-        }
-        String filePath = getResourceFromFolder("units/", name);
-        unitCache.put(name, filePath);
-        return filePath;
+        return getCachedResource(unitCache, "units/", name);
     }
 
     @Nullable
     public String getUnitFile(UnitKey unit, boolean eyes) {
         String name = unit.getFileName(eyes);
-        String unitPath = unitCache.get(name);
-        if (unitPath != null) {
-            return unitPath;
-        }
-        String filePath = getResourceFromFolder("units/", name);
-        unitCache.put(name, filePath);
-        return filePath;
+        return getCachedResource(unitCache, "units/", name);
     }
 
     @Nullable
     public String getDecalFile(String name) {
-        String decalPath = decalCache.get(name);
-        if (decalPath != null) {
-            return decalPath;
-        }
-        String unit = getResourceFromFolder("decals/", name);
-        decalCache.put(name, unit);
-        return unit;
+        return getCachedResource(decalCache, "decals/", name);
     }
 
     @Nullable
@@ -121,35 +83,17 @@ public class ResourceHelper {
         // overlay_jackolantern_1
         int face = ThreadLocalRandom.current().nextInt(1, 4);
         String name = "overlay_jackolantern_" + face + ".png";
-        String spoopyPath = spoopyCache.get(name);
-        if (spoopyPath != null) {
-            return spoopyPath;
-        }
-        String unit = getResourceFromFolder("decals/", name);
-        spoopyCache.put(name, unit);
-        return unit;
+        return getCachedResource(spoopyCache, "decals/", name);
     }
 
     @Nullable
     public String getCCFile(String name) {
-        String ccPath = ccCache.get(name);
-        if (ccPath != null) {
-            return ccPath;
-        }
-        String cc = getResourceFromFolder("command_token/", name);
-        ccCache.put(name, cc);
-        return cc;
+        return getCachedResource(ccCache, "command_token/", name);
     }
 
     @Nullable
     public String getPeekMarkerFile(String name) {
-        String markerPath = peekMarkerCache.get(name);
-        if (markerPath != null) {
-            return markerPath;
-        }
-        String marker = getResourceFromFolder("peek_marker/", name);
-        peekMarkerCache.put(name, marker);
-        return marker;
+        return getCachedResource(peekMarkerCache, "peek_marker/", name);
     }
 
     @Nullable
@@ -163,13 +107,7 @@ public class ResourceHelper {
 
     @Nullable
     public String getPlanetResource(String name) {
-        String planetInfoPath = planetCache.get(name);
-        if (planetInfoPath != null) {
-            return planetInfoPath;
-        }
-        String token = getResourceFromFolder("planet_cards/", name);
-        planetCache.put(name, token);
-        return token;
+        return getCachedResource(planetCache, "planet_cards/", name);
     }
 
     @Nullable
@@ -185,6 +123,15 @@ public class ResourceHelper {
     @Nullable
     public String getExtraFile(String name) {
         return getResourceFromFolder("extra/", name);
+    }
+
+    private String getCachedResource(Map<String, String> cache, String folder, String name) {
+        if (cache.containsKey(name)) {
+            return cache.get(name);
+        }
+        String resourcePath = getResourceFromFolder(folder, name);
+        cache.put(name, resourcePath);
+        return resourcePath;
     }
 
     @Nullable
