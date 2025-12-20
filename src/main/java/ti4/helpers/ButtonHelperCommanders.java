@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -48,10 +49,11 @@ import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
 
+@UtilityClass
 public class ButtonHelperCommanders {
 
     @ButtonHandler("cheiranCommanderBlock_")
-    public static void cheiranCommanderBlock(Player player, Game game, ButtonInteractionEvent event) {
+    public static void cheiranCommanderBlock(Player player, ButtonInteractionEvent event) {
         String msg2;
         int oldThing;
         int newThing;
@@ -77,7 +79,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("kortaliCommanderBlock_")
-    public static void kortaliCommanderBlock(Player player, Game game, ButtonInteractionEvent event) {
+    public static void kortaliCommanderBlock(Player player, ButtonInteractionEvent event) {
         String msg = player.getFactionEmojiOrColor()
                 + " used Queen Lorena, the Kortali commander, to cancel 1 hit in the first round of combat.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);

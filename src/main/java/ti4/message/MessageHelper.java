@@ -1,5 +1,7 @@
 package ti4.message;
 
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+
 import java.io.File;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -40,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
+import ti4.executors.CircuitBreaker;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -57,6 +61,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
 import ti4.spring.jda.JdaService;
 
+@UtilityClass
 public class MessageHelper {
 
     private static MessageFunction pin(MessageChannel channel) {
@@ -200,6 +205,9 @@ public class MessageHelper {
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
+        if (isDiscordServerError(error)) {
+            CircuitBreaker.incrementThresholdCount();
+        }
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
         String msg = "Failed to add reaction [" + reactionEmoji.getFormatted() + "] to message.";
         String restFailMsg = getRestActionFailureMessage(message.getChannel(), msg, null, error);
@@ -640,6 +648,9 @@ public class MessageHelper {
                             }
                         },
                         error -> {
+                            if (isDiscordServerError(error)) {
+                                CircuitBreaker.incrementThresholdCount();
+                            }
                             boolean shouldRetry = error instanceof ErrorResponseException
                                     && error.getCause() instanceof SocketTimeoutException
                                     && remainingAttempts > 0;

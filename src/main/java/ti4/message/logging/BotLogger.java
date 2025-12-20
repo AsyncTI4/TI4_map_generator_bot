@@ -1,5 +1,7 @@
 package ti4.message.logging;
 
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.cron.CronManager;
+import ti4.executors.CircuitBreaker;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
@@ -399,6 +402,9 @@ public class BotLogger {
     }
 
     public static void catchRestError(Throwable e) {
+        if (isDiscordServerError(e)) {
+            CircuitBreaker.incrementThresholdCount();
+        }
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =
                 GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
