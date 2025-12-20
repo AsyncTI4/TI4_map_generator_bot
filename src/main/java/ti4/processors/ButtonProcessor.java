@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -28,6 +29,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
 
+@UtilityClass
 public class ButtonProcessor {
 
     private static final Map<String, Consumer<ButtonContext>> knownButtons =

@@ -4,11 +4,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.cron.CronManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 
+@UtilityClass
 public class CircuitBreaker {
 
     private static final int CIRCUIT_BREAK_THRESHOLD = 10;
@@ -22,7 +24,7 @@ public class CircuitBreaker {
 
     private static LocalDateTime closeDateTime;
 
-    static synchronized boolean incrementThresholdCount() {
+    public static synchronized boolean incrementThresholdCount() {
         if (open) {
             return false;
         }

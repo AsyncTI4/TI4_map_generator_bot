@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
@@ -32,6 +33,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -40,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
+import ti4.executors.CircuitBreaker;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -57,6 +60,7 @@ import ti4.service.game.GameNameService;
 import ti4.service.game.GameUndoNameService;
 import ti4.spring.jda.JdaService;
 
+@UtilityClass
 public class MessageHelper {
 
     private static MessageFunction pin(MessageChannel channel) {
@@ -200,6 +204,9 @@ public class MessageHelper {
     }
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
+        if (isDiscordServerError(error)) {
+            CircuitBreaker.incrementThresholdCount();
+        }
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
         String msg = "Failed to add reaction [" + reactionEmoji.getFormatted() + "] to message.";
         String restFailMsg = getRestActionFailureMessage(message.getChannel(), msg, null, error);
@@ -640,6 +647,9 @@ public class MessageHelper {
                             }
                         },
                         error -> {
+                            if (isDiscordServerError(error)) {
+                                CircuitBreaker.incrementThresholdCount();
+                            }
                             boolean shouldRetry = error instanceof ErrorResponseException
                                     && error.getCause() instanceof SocketTimeoutException
                                     && remainingAttempts > 0;
@@ -1162,5 +1172,13 @@ public class MessageHelper {
             BotLogger.error("Issue injecting Rules into message: " + message, e);
             return message;
         }
+    }
+
+    private static boolean isDiscordServerError(Throwable error) {
+        if (error instanceof ErrorResponseException restError) {
+            Response response = restError.getResponse();
+            return response.code >= 500 && response.code < 600;
+        }
+        return false;
     }
 }
