@@ -3479,7 +3479,6 @@ public class ButtonHelper {
         if (event == null) return;
 
         boolean hasRealButton = false;
-        List<Button> remainingButtons = new ArrayList<>();
         List<ActionRow> remainingRows = new ArrayList<>();
         for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
             List<Button> newActionRow = new ArrayList<>();
@@ -3487,7 +3486,6 @@ public class ButtonHelper {
                 if (!(item instanceof Button b)) continue;
                 if (b.getCustomId() == null || b.getCustomId().equals(buttonID)) continue;
 
-                remainingButtons.add(b);
                 newActionRow.add(b);
                 if (!"deleteButtons".equalsIgnoreCase(b.getCustomId())
                         && !b.getCustomId().contains("ultimateUndo")) {
