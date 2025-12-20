@@ -113,7 +113,9 @@ public class NewStuffHelper {
             // replace the buttons in the previous message
             List<List<ActionRow>> actionRows = MessageHelper.getPartitionedButtonLists(buttons);
             if (!actionRows.isEmpty()) {
-                bEvent.getHook().editOriginalComponents(actionRows.getFirst()).queue();
+                bEvent.getHook()
+                        .editOriginalComponents(actionRows.getFirst())
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else {
             // make a new message

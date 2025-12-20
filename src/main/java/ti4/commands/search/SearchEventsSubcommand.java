@@ -23,7 +23,7 @@ class SearchEventsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidEvent(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getEvent(searchString).getRepresentationEmbed(true, null))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

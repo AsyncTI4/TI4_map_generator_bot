@@ -168,9 +168,12 @@ public class FOWOptionService {
             GMService.getGMChannel(game)
                     .sendMessage(sb.toString())
                     .addComponents(rows)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginal(sb.toString()).setComponents(rows).queue();
+            event.getHook()
+                    .editOriginal(sb.toString())
+                    .setComponents(rows)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

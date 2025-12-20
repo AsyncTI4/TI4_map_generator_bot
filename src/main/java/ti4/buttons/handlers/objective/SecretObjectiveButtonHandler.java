@@ -61,7 +61,7 @@ class SecretObjectiveButtonHandler {
                     event.getHook()
                             .setEphemeral(true)
                             .sendMessage("OH NO!!! You drew the same secret you discarded! How unlucky 😭😭😭")
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
             if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
@@ -79,7 +79,7 @@ class SecretObjectiveButtonHandler {
             BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
             event.getChannel()
                     .sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
         ButtonHelper.deleteMessage(event);

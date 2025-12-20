@@ -277,7 +277,7 @@ public class SliceGenerationSettings extends SettingsMenu {
                 .addComponents(Label.of("TTS String", ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue();
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
             return null;
         }
         return "Unknown Event";

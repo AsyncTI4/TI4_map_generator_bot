@@ -33,7 +33,7 @@ class SearchPlanetsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidPlanet(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getPlanet(searchString).getRepresentationEmbed(includeAliases))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

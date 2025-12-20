@@ -22,7 +22,7 @@ public class StatisticsPipeline {
         event.getHook()
                 .sendMessage("Your statistics are being processed, please hold...")
                 .setEphemeral(true)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         var timedRunnable = new TimedRunnable(eventToString(event), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, runnable);
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }

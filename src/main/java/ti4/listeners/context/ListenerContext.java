@@ -59,7 +59,7 @@ public abstract class ListenerContext {
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
                 event.getMessageChannel()
                         .sendMessage(event.getUser().getAsMention() + " is not a player of the game")
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 contextIsValid = false;
                 return;
             }

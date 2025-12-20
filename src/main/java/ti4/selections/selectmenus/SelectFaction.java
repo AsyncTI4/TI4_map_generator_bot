@@ -71,7 +71,7 @@ public class SelectFaction implements Selection {
             event.getMessageChannel()
                     .sendMessage("")
                     .addComponents(ActionRow.of(menu))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

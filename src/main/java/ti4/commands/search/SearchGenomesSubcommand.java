@@ -27,7 +27,7 @@ class SearchGenomesSubcommand extends SearchComponentModelSubcommand {
             if (leaderModel.isGenome()) {
                 event.getChannel()
                         .sendMessageEmbeds(leaderModel.getRepresentationEmbed(true, true, false, true, true))
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
         }

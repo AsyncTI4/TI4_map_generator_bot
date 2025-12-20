@@ -173,7 +173,7 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
                     .sendMessage(content)
                     .addComponents(components)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return null;
     }
@@ -183,7 +183,7 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
         // Delete the extra message
         if (event instanceof ButtonInteractionEvent buttonEvent
                 && buttonEvent.getMessage().isEphemeral()) {
-            buttonEvent.getMessage().delete().queue();
+            buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         if (!(parent instanceof DraftSystemSettings dss)) {
@@ -243,7 +243,7 @@ public class PublicSnakeDraftSettings extends SettingsMenu {
                         .sendMessage(content)
                         .addComponents(components)
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         return null;

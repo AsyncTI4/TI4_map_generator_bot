@@ -210,11 +210,23 @@ public abstract class SettingsMenu {
             userMsg += "\n> *Jazz has been pinged to take a look.*";
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)
-            buttonEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
+            buttonEvent
+                    .getHook()
+                    .sendMessage(userMsg)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         else if (event instanceof ModalInteractionEvent modalEvent)
-            modalEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
+            modalEvent
+                    .getHook()
+                    .sendMessage(userMsg)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         else if (event instanceof StringSelectInteractionEvent stringEvent)
-            stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
+            stringEvent
+                    .getHook()
+                    .sendMessage(userMsg)
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     void setMessageId(String messageId) {
@@ -342,7 +354,7 @@ public abstract class SettingsMenu {
                         .getHook()
                         .editOriginal(newSummary)
                         .setComponents(actionRows)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
 
         } else if (event instanceof ModalInteractionEvent modalEvent) {
@@ -351,7 +363,7 @@ public abstract class SettingsMenu {
                         .getMessage()
                         .editMessage(newSummary)
                         .setComponents(actionRows)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
             if (messageId == null) {

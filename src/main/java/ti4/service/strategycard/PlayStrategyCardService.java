@@ -436,7 +436,7 @@ public class PlayStrategyCardService {
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
         String stratCardName = Helper.getSCName(scToPlay, game);
         if (reactionEmoji != null) {
-            message.addReaction(reactionEmoji).queue();
+            message.addReaction(reactionEmoji).queue(Consumers.nop(), BotLogger::catchRestError);
             player.addFollowedSC(scToPlay, event);
         }
         if (!game.isFowMode()
@@ -450,7 +450,7 @@ public class PlayStrategyCardService {
                 if (p2.isNpc()) {
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
-                        message.addReaction(reactionEmoji2).queue();
+                        message.addReaction(reactionEmoji2).queue(Consumers.nop(), BotLogger::catchRestError);
                         p2.addFollowedSC(scToPlay, event);
                         if (scToPlay == 8) {
                             String key3 = "potentialBlockers";
@@ -480,7 +480,7 @@ public class PlayStrategyCardService {
                         && scToPlay != 1) {
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
-                        message.addReaction(reactionEmoji2).queue();
+                        message.addReaction(reactionEmoji2).queue(Consumers.nop(), BotLogger::catchRestError);
                         p2.addFollowedSC(scToPlay, event);
                         if (scToPlay == 8) {
                             String key3 = "potentialBlockers";
@@ -506,7 +506,7 @@ public class PlayStrategyCardService {
                                     .contains(p2.getHomeSystemTile())) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
-                            message.addReaction(reactionEmoji2).queue();
+                            message.addReaction(reactionEmoji2).queue(Consumers.nop(), BotLogger::catchRestError);
                             p2.addFollowedSC(6, event);
                             MessageHelper.sendMessageToChannel(
                                     p2.getCardsInfoThread(),
@@ -522,7 +522,7 @@ public class PlayStrategyCardService {
                     game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
-                        message.addReaction(reactionEmoji2).queue();
+                        message.addReaction(reactionEmoji2).queue(Consumers.nop(), BotLogger::catchRestError);
                         p2.addFollowedSC(scToPlay, event);
                         if (scToPlay == 8) {
                             String key3 = "potentialBlockers";
@@ -544,7 +544,7 @@ public class PlayStrategyCardService {
                     if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount() && !game.isTwilightsFallMode()) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
-                            message.addReaction(reactionEmoji2).queue();
+                            message.addReaction(reactionEmoji2).queue(Consumers.nop(), BotLogger::catchRestError);
                             p2.addFollowedSC(8, event);
                             String key3 = "potentialBlockers";
                             if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {

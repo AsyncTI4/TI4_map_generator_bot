@@ -23,7 +23,7 @@ class SearchBreakthroughs extends SearchComponentModelSubcommand {
         if (Mapper.isValidBreakthrough(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getBreakthrough(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

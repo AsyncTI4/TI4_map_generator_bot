@@ -32,7 +32,7 @@ class PrismButtonHandler {
                 player.getRepresentation() + ", please choose a technology to gain that also has "
                         + techM1.getRequirements().orElse("").length() + " prerequisites.",
                 Buttons.GET_A_FREE_TECH);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);

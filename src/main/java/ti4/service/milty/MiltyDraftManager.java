@@ -315,7 +315,9 @@ public class MiltyDraftManager {
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
-                event.getMessageChannel().sendMessage("Something went wrong").queue();
+                event.getMessageChannel()
+                        .sendMessage("Something went wrong")
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             return;
         }
@@ -343,7 +345,7 @@ public class MiltyDraftManager {
                         .setEphemeral(true)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
-                event.getMessageChannel().sendMessage(errorMessage).queue();
+                event.getMessageChannel().sendMessage(errorMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             return;
         }

@@ -632,9 +632,9 @@ public class StartTurnService {
             startButtons.add(Buttons.green("revealVeiledCards", "Reveal Veiled Cards"));
         }
 
-        GameMessageManager.remove(game.getName(), GameMessageType.TURN)
-                .ifPresent(messageId ->
-                        game.getMainGameChannel().deleteMessageById(messageId).queue());
+        GameMessageManager.remove(game.getName(), GameMessageType.TURN).ifPresent(messageId -> game.getMainGameChannel()
+                .deleteMessageById(messageId)
+                .queue(Consumers.nop(), BotLogger::catchRestError));
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
         } else {

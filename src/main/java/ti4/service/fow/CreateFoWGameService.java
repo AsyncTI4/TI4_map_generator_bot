@@ -152,10 +152,10 @@ public class CreateFoWGameService {
                 .complete(); // Must `complete` if we're using this channel as part of an interaction that saves the
         // game
 
-        guild.addRoleToMember(gameOwner, roleGM).queue();
+        guild.addRoleToMember(gameOwner, roleGM).queue(Consumers.nop(), BotLogger::catchRestError);
         // ADD PLAYERS TO ROLE
         for (Member member : members) {
-            guild.addRoleToMember(member, role).queue();
+            guild.addRoleToMember(member, role).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         // CREATE GAME
@@ -236,7 +236,7 @@ public class CreateFoWGameService {
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
                     .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            manager.queue();
+            manager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

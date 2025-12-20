@@ -19,7 +19,7 @@ class IgnisStrategyCardButtonHandler {
             MessageHelper.sendMessageToEventChannel(event, "You don't have the Antiquities strategy card.");
             return;
         }
-        event.editButton(event.getButton().asDisabled()).queue();
+        event.editButton(event.getButton().asDisabled()).queue(Consumers.nop(), BotLogger::catchRestError);
         RelicHelper.drawRelicAndNotify(player, event, game);
         EventHelper.revealEvent(event, game, game.getMainGameChannel());
     }

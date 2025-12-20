@@ -250,7 +250,9 @@ public class TIGLHelper {
     private static void promoteUser(User user, TIGLRank toRank) {
         TIGLRank currentRank = getUsersHighestTIGLRank(user);
         if (toRank.getIndex() - currentRank.getIndex() == 1) {
-            JdaService.guildPrimary.addRoleToMember(user, toRank.getRole()).queue();
+            JdaService.guildPrimary
+                    .addRoleToMember(user, toRank.getRole())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             // JdaService.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
             // TimeUnit.SECONDS);
         }
@@ -280,7 +282,9 @@ public class TIGLHelper {
                     .removeRoleFromMember(member, heroRank.getRole())
                     .queueAfter(10, TimeUnit.SECONDS);
         }
-        JdaService.guildPrimary.addRoleToMember(user, heroRank.getRole()).queue();
+        JdaService.guildPrimary
+                .addRoleToMember(user, heroRank.getRole())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
         MessageHelper.sendMessageToChannel(getTIGLChannel(), sb.toString());

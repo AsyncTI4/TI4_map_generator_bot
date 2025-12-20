@@ -35,7 +35,7 @@ class ChecksAndBalancesButtonHandler {
                     player.getCorrectChannel(),
                     p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scPicked, game) + ".");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> buttons = PickStrategyCardButtonHandler.getPlayerOptionsForChecksNBalances(player, game, scPicked);
         if (buttons.isEmpty()) {
             StartPhaseService.startActionPhase(event, game);

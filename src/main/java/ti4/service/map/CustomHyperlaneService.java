@@ -79,12 +79,12 @@ public class CustomHyperlaneService {
             event.getMessageChannel()
                     .sendMessage(sb.toString())
                     .setComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             ((ButtonInteractionEvent) event)
                     .getHook()
                     .editOriginalComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -112,7 +112,7 @@ public class CustomHyperlaneService {
     @ButtonHandler("customHyperlaneRefresh")
     public static void refreshHyperlaneButtons(ButtonInteractionEvent event, Game game) {
         offerManageHyperlaneButtons(game, event, null);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("customHyperlaneMore")
@@ -140,7 +140,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Hyperlane Data", data.build()))
                 .build();
 
-        event.replyModal(importDataModal).queue();
+        event.replyModal(importDataModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneImportSave")
@@ -198,7 +198,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Hyperlane Matrix (clear to delete)", data.build()))
                 .build();
 
-        event.replyModal(customHyperlaneModal).queue();
+        event.replyModal(customHyperlaneModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneSave_")
@@ -241,7 +241,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Static -> Custom", data1.build()), Label.of("Custom -> Static", data2.build()))
                 .build();
 
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneTransformExecute")

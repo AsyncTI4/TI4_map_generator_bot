@@ -36,7 +36,7 @@ public class VoteButtonHandler {
         game.setStoredValue("preVoting" + player.getFaction(), "");
         player.resetSpentThings();
         if (event instanceof ButtonInteractionEvent bEvent) {
-            bEvent.getMessage().delete().queue();
+            bEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("preVote", "Pre-Vote"));

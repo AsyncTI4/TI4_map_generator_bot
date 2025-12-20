@@ -27,9 +27,9 @@ class SetThreadName extends Subcommand {
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
             if (GameManager.isValid(gameName)) {
-                manager.setName(gameName + "-" + name).queue();
+                manager.setName(gameName + "-" + name).queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
-                manager.setName(name).queue();
+                manager.setName(name).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Run this command in the thread you are changing");

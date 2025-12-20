@@ -49,7 +49,7 @@ class PingIntervalButtonHandler {
             MessageHelper.sendMessageToEventChannel(event, message);
             return;
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         PingIntervalService.set(event, pingInterval);
     }
 }

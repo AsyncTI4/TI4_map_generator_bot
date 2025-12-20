@@ -23,7 +23,7 @@ class SearchPromissoryNotesSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidPromissoryNote(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getPromissoryNote(searchString).getRepresentationEmbed(false, true, true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

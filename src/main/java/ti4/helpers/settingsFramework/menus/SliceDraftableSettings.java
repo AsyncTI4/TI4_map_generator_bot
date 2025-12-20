@@ -255,7 +255,7 @@ public class SliceDraftableSettings extends SettingsMenu {
                     .sendMessage("Here is a preview of the selected map template:")
                     .addFiles(preview)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         if (mapTemplate.getValue() != null && mapTemplate.getValue().bluePerPlayer() != bpp) {
             if (isNucleusMode()) {
                 nucleusSettings.setDefaultsForTemplate(event, mapTemplate.getValue());
@@ -292,7 +292,7 @@ public class SliceDraftableSettings extends SettingsMenu {
                 .addComponents(Label.of("TTS String", ttsString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue();
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
             return null;
         }
         return "Unknown Event";

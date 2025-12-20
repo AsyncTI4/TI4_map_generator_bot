@@ -25,7 +25,7 @@ class SearchRelicsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidRelic(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getRelic(searchString).getRepresentationEmbed(true, true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

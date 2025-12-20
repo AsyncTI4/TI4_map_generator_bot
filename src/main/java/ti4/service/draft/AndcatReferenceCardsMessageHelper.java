@@ -228,7 +228,7 @@ public class AndcatReferenceCardsMessageHelper {
             // Try to update existing message if possible
             for (var message : history) {
                 if (message.getAuthor().isBot() && message.getContentRaw().startsWith(USER_SUMMARY_PREFIX)) {
-                    message.editMessage(messageBuilder.toString()).queue();
+                    message.editMessage(messageBuilder.toString()).queue(Consumers.nop(), BotLogger::catchRestError);
                     return;
                 }
             }
@@ -241,7 +241,7 @@ public class AndcatReferenceCardsMessageHelper {
                     .getActionsChannel()
                     .sendMessage(messageBuilder.toString())
                     .setComponents(ActionRow.of(refreshButton))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         });
     }
 

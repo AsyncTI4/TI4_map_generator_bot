@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -45,6 +46,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
 import ti4.model.PromissoryNoteModel;
@@ -213,7 +215,7 @@ public class ButtonHelperFactionSpecific {
                         + " is using their **War Stories** ability to explore the frontier deck in the active system.");
         Tile tile = game.getTileByPosition(pos);
         ExploreService.expFront(event, tile, game, player, true);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("warStoriesPlanetExplore")
@@ -227,7 +229,7 @@ public class ButtonHelperFactionSpecific {
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", please use buttons to explore a planet you control.",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resolveVadenMech_")
@@ -551,7 +553,7 @@ public class ButtonHelperFactionSpecific {
                 player.getCorrectChannel(), player.getRepresentation() + ", exploration #1", buttons);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentation() + ", exploration #2", buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void resolveEdynAgendaStuffStep1(Player player, Game game, List<Tile> tiles) {
@@ -585,7 +587,7 @@ public class ButtonHelperFactionSpecific {
                 buttons.add(button);
             }
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
@@ -600,7 +602,7 @@ public class ButtonHelperFactionSpecific {
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
         CommandCounterHelper.addCC(event, p2, tile);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you placed " + p2.getFactionEmojiOrColor()
@@ -736,7 +738,7 @@ public class ButtonHelperFactionSpecific {
         } else if (game.getPNOwner("cavalry").hasUnit("sigma_nomad_flagship_3")) {
             cav = "sigma_cavalry_3";
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         Tile tile = game.getTileByPosition(game.getActiveSystem());
 
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
@@ -814,7 +816,7 @@ public class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 "Use buttons to decide on whom to use Clever Clever JR-XS455-O, the Relic/Yssaril agent.",
                 buttons2);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -941,7 +943,7 @@ public class ButtonHelperFactionSpecific {
                             + Helper.getPlanetRepresentation(planet, game) + " system.",
                     "construction");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void checkForStymie(Game game, Player activePlayer, Tile tile) {
@@ -974,7 +976,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         if (!game.isTwilightsFallMode()) {
             PromissoryNoteHelper.resolvePNPlay("stymie", player, game, event);
         }
@@ -987,7 +989,7 @@ public class ButtonHelperFactionSpecific {
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
         CommandCounterHelper.addCC(event, p2, tile);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -1044,7 +1046,7 @@ public class ButtonHelperFactionSpecific {
             buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons2);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static boolean somebodyHasThisRelic(Game game, String relic) {
@@ -1066,7 +1068,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     private static void delete(ButtonInteractionEvent event) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("saarMechRes_")
@@ -1099,7 +1101,7 @@ public class ButtonHelperFactionSpecific {
                         Mapper.getTech(tech).getName()));
             }
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> techs2 = new ArrayList<>(techs);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
@@ -1185,7 +1187,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you an action card.");
         TransactionHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("spyNetPlayerChooses")
@@ -1195,7 +1197,7 @@ public class ButtonHelperFactionSpecific {
                 player.getCardsInfoThread(),
                 "Use buttons to take 1 action card.",
                 ActionCardHelper.getToBeStolenActionCardButtons(yssaril));
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("returnFFToSpace_")
@@ -1215,7 +1217,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " put all fighters in tile " + pos + " back into space");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<Button> getTradePlanetsWithHacanMechButtons(Player hacan, Player receiver, Game game) {
@@ -1428,7 +1430,7 @@ public class ButtonHelperFactionSpecific {
                     player.getFactionEmoji() + " deployed 1 mech in the space area of " + tile.getRepresentation()
                             + ".");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("raghsCallStepOne_")
@@ -1484,7 +1486,7 @@ public class ButtonHelperFactionSpecific {
                 hacan.getCorrectChannel(),
                 hacan.getRepresentationUnfogged() + "Please choose which planet to relocate your units to.",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("productionBiomes_")
@@ -1506,7 +1508,7 @@ public class ButtonHelperFactionSpecific {
         }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 2);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void resolveProductionBiomesStep1(Player hacan, Game game, GenericInteractionCreateEvent event) {
@@ -1573,7 +1575,7 @@ public class ButtonHelperFactionSpecific {
                 hacan.getCorrectChannel(),
                 hacan.getRepresentationUnfogged() + ", please choose who you wish to swap strategy cards with.",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<Button> getSwapSCButtons(Game game, String type, Player hacan) {
@@ -1668,7 +1670,7 @@ public class ButtonHelperFactionSpecific {
                 + player1.getRepresentationNoPing() + CardEmojis.getSCFrontFromInteger(player1SC) + " :arrow_right: "
                 + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         StartPhaseService.startActionPhase(event, game, false);
     }
 
@@ -1711,7 +1713,7 @@ public class ButtonHelperFactionSpecific {
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message2);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("hacanMechTradeStepTwo_")
@@ -1765,7 +1767,7 @@ public class ButtonHelperFactionSpecific {
                         goAgainButtons);
             }
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("cabalRelease_")
@@ -2125,7 +2127,7 @@ public class ButtonHelperFactionSpecific {
         } else {
             MahactTokenService.removeFleetCC(game, player, "due to defying the will of _Genetic Recombination_.");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("dihmohnfs_")
@@ -2140,7 +2142,7 @@ public class ButtonHelperFactionSpecific {
         buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "muaatagent", "place");
         String message = player.getRepresentation() + ", please use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void resolveImpressmentPrograms(
@@ -2155,7 +2157,7 @@ public class ButtonHelperFactionSpecific {
         String message = player.getRepresentation() + ", please use the buttons to produce 1 ship. \n> "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void resolveVadenSCDebt(Player player, int sc, Game game, GenericInteractionCreateEvent event) {
@@ -2280,7 +2282,7 @@ public class ButtonHelperFactionSpecific {
                     event.getChannel(),
                     player.getFactionEmoji() + " deployed 1 space dock on " + planet + " by removing " + requiredNum
                             + " infantry.");
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
@@ -2690,7 +2692,7 @@ public class ButtonHelperFactionSpecific {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "flagship");
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColor());
         tile.removeUnit(planet, unitKey, 1);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("startChaosMapping")
@@ -2997,7 +2999,7 @@ public class ButtonHelperFactionSpecific {
                 p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", a " + unit + " of yours has been consumed by _Vortex_.");
         cabalEatsUnit(p2, game, player, 1, unit, event);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void offerTerraformButtons(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -3120,7 +3122,7 @@ public class ButtonHelperFactionSpecific {
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard an action card.",
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
@@ -3150,7 +3152,7 @@ public class ButtonHelperFactionSpecific {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread();
             for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
+                cardsInfoThreadChannel.sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         return takeACs;
@@ -3199,7 +3201,7 @@ public class ButtonHelperFactionSpecific {
         ActionCardHelper.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, player);
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("terraformPlanet_")
@@ -3210,7 +3212,7 @@ public class ButtonHelperFactionSpecific {
                 event.getChannel(), "Attached _Terraform_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
         game.setStoredValue("terraformedPlanet", planet);
         CommanderUnlockCheckService.checkPlayer(player, "sol");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("automatonsPlanet_")
@@ -3219,7 +3221,7 @@ public class ButtonHelperFactionSpecific {
         game.getPlanetsInfo().get(planet).addToken("attachment_automatons.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Attached _Automatons_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("bentorPNPlanet_")
@@ -3230,7 +3232,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 "Attached _Encryption Key_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gledgeBasePlanet_")
@@ -3240,7 +3242,7 @@ public class ButtonHelperFactionSpecific {
         unitHolder.addToken("attachment_gledgebase.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Attached _Gledge Base_ to " + Helper.getPlanetRepresentation(planet, game) + ".");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("veldyrAttach_")
@@ -3261,7 +3263,7 @@ public class ButtonHelperFactionSpecific {
                 && !game.getPNOwner(pnID).hasLeaderUnlocked("veldyrcommander")) {
             CommanderUnlockCheckService.checkPlayer(game.getPNOwner(pnID), "veldyr");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<Player> getPlayersWithBranchOffices(Game game, Player player) {
@@ -3328,7 +3330,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("creussTFCruiserStep3_")
@@ -3348,7 +3350,7 @@ public class ButtonHelperFactionSpecific {
         }
         msg += ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("nivynMechStep2_")
@@ -3387,7 +3389,7 @@ public class ButtonHelperFactionSpecific {
         String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "nivyn");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("becomeDamaged_")
@@ -3433,7 +3435,7 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to place in "
                         + tilePos + ".",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("creussMechStep2_")
@@ -3448,7 +3450,7 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to place in "
                         + tilePos + ".",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("creussMechStep1_")
@@ -3542,7 +3544,7 @@ public class ButtonHelperFactionSpecific {
                     player.getRepresentationNoPing() + " replaced 1 of " + opponent + " infantry with 1 " + unit
                             + " on " + Helper.getPlanetRepresentation(planet, game) + " using _Greyfire Mutagen_.");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("creussIFFStart_")
@@ -3555,7 +3557,7 @@ public class ButtonHelperFactionSpecific {
                 player.getFactionEmojiOrColor() + ", please choose the system you wish to place the " + type
                         + " wormhole in.",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("creussIFFResolve_")
@@ -3603,7 +3605,7 @@ public class ButtonHelperFactionSpecific {
         for (Player p2 : game.getRealPlayers()) {
             CommanderUnlockCheckService.checkPlayer(p2, "ghost");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("severResolve_")
@@ -3616,7 +3618,7 @@ public class ButtonHelperFactionSpecific {
         sb.append(" added the sever token to ").append(tile.getRepresentationForButtons(game, player));
         msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
@@ -3661,7 +3663,7 @@ public class ButtonHelperFactionSpecific {
                         "blindIFFSelection_" + type + "_" + event.getMessageId(), "Select position")
                 .addComponents(Label.of("Position for " + type, position))
                 .build();
-        event.replyModal(blindSelectionModal).queue();
+        event.replyModal(blindSelectionModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindIFFSelection_")
@@ -3690,7 +3692,7 @@ public class ButtonHelperFactionSpecific {
                 player.getFactionEmojiOrColor() + ", please choose the system you wish to place the " + type
                         + " wormhole in.",
                 chooseTileButtons);
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
@@ -3749,7 +3751,7 @@ public class ButtonHelperFactionSpecific {
                             p2.getRepresentationUnfogged() + " _ Temporal Command Suite_ was exhausted by "
                                     + player.getColor() + " to ready your " + agent + ".");
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
             if (agent.contains("absol")) {
                 p2.removeExhaustedRelic("absol_jr");
@@ -3763,7 +3765,7 @@ public class ButtonHelperFactionSpecific {
                             p2.getRepresentationUnfogged() + " _Temporal Command Suite_ was exhausted by "
                                     + player.getColor() + " to ready your " + agent + ".");
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
             return;
         }
@@ -3780,7 +3782,7 @@ public class ButtonHelperFactionSpecific {
                     p2.getRepresentationUnfogged() + " _Temporal Command Suite_ was exhausted by " + player.getColor()
                             + " to ready your " + agent + ".");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("useTCS_")
@@ -3814,7 +3816,7 @@ public class ButtonHelperFactionSpecific {
                             p2.getRepresentationUnfogged() + " 1 Command Token was spent by " + player.getColor()
                                     + " to ready your " + agent + ".");
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
             if (agent.contains("absol")) {
                 p2.removeExhaustedRelic("absol_jr");
@@ -3828,7 +3830,7 @@ public class ButtonHelperFactionSpecific {
                             p2.getRepresentationUnfogged() + " 1 Command Token was spent by " + player.getColor()
                                     + " to ready your " + agent + ".");
                 }
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             }
             return;
         }
@@ -3845,7 +3847,7 @@ public class ButtonHelperFactionSpecific {
                     p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
                             + " to ready your " + agent + ".");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static boolean isNextToEmpyMechs(Game game, Player ACPlayer, Player EmpyPlayer) {
@@ -3971,7 +3973,7 @@ public class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 "Please choose the planets you wish to exhaust to pay the " + MiscEmojis.Resources_6 + ".",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<Button> getRohDhnaRecycleButtons(Game game, Tile tile, Player player) {
@@ -4045,7 +4047,7 @@ public class ButtonHelperFactionSpecific {
                     buttons);
         }
 
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("edynCommanderSODraw")

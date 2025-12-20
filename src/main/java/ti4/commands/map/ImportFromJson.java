@@ -32,6 +32,6 @@ class ImportFromJson extends GameStateSubcommand {
         Modal importMapModal = Modal.create("importMapFromJSON", "Import map (WIP)")
                 .addComponents(Label.of("URL", url.build()))
                 .build();
-        event.replyModal(importMapModal).queue();
+        event.replyModal(importMapModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

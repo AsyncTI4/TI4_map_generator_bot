@@ -192,8 +192,8 @@ public class CreateGameService {
             actionsChannelManager =
                     actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
         }
-        chatChannelManager.queue();
-        actionsChannelManager.queue();
+        chatChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
+        actionsChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel
@@ -235,7 +235,7 @@ public class CreateGameService {
             if (missingMembers.isEmpty()) {
                 manager = manager.setArchived(true);
             }
-            manager.queue();
+            manager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         return newGame;

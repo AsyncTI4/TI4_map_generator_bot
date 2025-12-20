@@ -168,7 +168,7 @@ class ListPlayerInfoButtonHandler {
         }
 
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = "showObjInfo_", save = false)
@@ -178,7 +178,7 @@ class ListPlayerInfoButtonHandler {
             ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
             ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), extent);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

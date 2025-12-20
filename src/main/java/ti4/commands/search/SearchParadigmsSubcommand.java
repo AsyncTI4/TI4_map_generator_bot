@@ -27,7 +27,7 @@ class SearchParadigmsSubcommand extends SearchComponentModelSubcommand {
             if (leaderModel.isParadigm()) {
                 event.getChannel()
                         .sendMessageEmbeds(leaderModel.getRepresentationEmbed(true, true, false, true, true))
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
                 return;
             }
         }

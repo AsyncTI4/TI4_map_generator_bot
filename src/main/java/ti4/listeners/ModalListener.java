@@ -37,11 +37,11 @@ public class ModalListener extends ListenerAdapter {
         if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
-        event.deferEdit().queue();
+        event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(

@@ -62,12 +62,12 @@ class JazzCommand extends Subcommand {
                 .getGuildById("847560709730730064")
                 .getTextChannelById("1352824638354231439")
                 .sendMessage("```fix\nBorgJedi used /search my_titles player: @Mentak\n```")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
 
         JdaService.jda
                 .getGuildById("847560709730730064")
                 .getTextChannelById("1352824638354231439")
                 .sendMessage("**__Mentak's Titles__**\n` 1.`**You Made Me Mad** x5 (g15, g15, g15, g15, g15)")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

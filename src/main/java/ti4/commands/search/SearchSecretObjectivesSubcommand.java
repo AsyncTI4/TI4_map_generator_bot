@@ -24,7 +24,7 @@ class SearchSecretObjectivesSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidSecretObjective(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getSecretObjective(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

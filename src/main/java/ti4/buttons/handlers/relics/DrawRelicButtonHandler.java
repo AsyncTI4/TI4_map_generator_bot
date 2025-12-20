@@ -19,6 +19,6 @@ class DrawRelicButtonHandler {
             PromissoryNoteHelper.resolvePNPlay("dspnflorChecked", player, game, event);
         }
         RelicHelper.drawRelicAndNotify(player, event, game, position, true);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

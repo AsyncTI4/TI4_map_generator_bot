@@ -156,7 +156,7 @@ public class GMService {
     @ButtonHandler("gmRefresh")
     public static void refreshGMButtons(ButtonInteractionEvent event, Game game) {
         showGMButtons(game);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gmShowGameAs_")
@@ -285,7 +285,7 @@ public class GMService {
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
                 .addComponents(Label.of("Position", position))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmWhoCanSeeResolve")

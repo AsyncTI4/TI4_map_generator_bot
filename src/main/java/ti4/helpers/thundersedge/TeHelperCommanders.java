@@ -43,7 +43,7 @@ public class TeHelperCommanders {
         player.addSpentThing("dwsDiscount_" + commanderFaction);
         ButtonHelper.deleteTheOneButton(event, buttonID, false);
         String editedMsg = Helper.buildSpentThingsMessage(player, game, "res");
-        event.editMessage(editedMsg).queue();
+        event.editMessage(editedMsg).queue(Consumers.nop(), BotLogger::catchRestError);
 
         // Notify the DWS commander holder that their discount was used
         String message = dws.getRepresentation(true, true) + " ";

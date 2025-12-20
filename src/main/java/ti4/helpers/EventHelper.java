@@ -24,7 +24,8 @@ public class EventHelper {
     public static void revealEvent(GenericInteractionCreateEvent event, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel != null) {
-            channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
+            channel.sendMessageEmbeds(eventModel.getRepresentationEmbed())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToEventChannel(
                     event, "Something went wrong revealing an event; eventID: " + eventID);

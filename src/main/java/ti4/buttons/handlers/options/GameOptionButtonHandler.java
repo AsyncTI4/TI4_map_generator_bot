@@ -49,13 +49,13 @@ class GameOptionButtonHandler {
     @ButtonHandler("showOwnedPNsInPlayerArea_turnON")
     public static void showOwnedPNsInPlayerArea_turnON(ButtonInteractionEvent event, Game game) {
         game.setShowOwnedPNsInPlayerArea(true);
-        event.editButton(GameOptionService.showOwnedPNs_ON).queue();
+        event.editButton(GameOptionService.showOwnedPNs_ON).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("showOwnedPNsInPlayerArea_turnOFF")
     public static void showOwnedPNsInPlayerArea_turnOFF(ButtonInteractionEvent event, Game game) {
         game.setShowOwnedPNsInPlayerArea(false);
-        event.editButton(GameOptionService.showOwnedPNs_OFF).queue();
+        event.editButton(GameOptionService.showOwnedPNs_OFF).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("anonDeclare_")

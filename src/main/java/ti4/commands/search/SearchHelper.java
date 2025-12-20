@@ -13,9 +13,9 @@ class SearchHelper {
             String threadName = event.getCommandString();
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
         } else if (!messageEmbeds.isEmpty()) {
-            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
+            event.getChannel().sendMessageEmbeds(messageEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getChannel().sendMessage("> No results found").queue();
+            event.getChannel().sendMessage("> No results found").queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

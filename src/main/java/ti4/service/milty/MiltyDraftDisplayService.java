@@ -119,7 +119,7 @@ public class MiltyDraftDisplayService {
                 if (!sliceImgDone && messageIsSliceImg(msg)) {
                     sliceImgDone = true;
                     FileUpload newImg = MiltyDraftHelper.generateImage(game);
-                    msg.editMessageAttachments(newImg).queue();
+                    msg.editMessageAttachments(newImg).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         };
@@ -162,28 +162,28 @@ public class MiltyDraftDisplayService {
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings) msg.delete().queue();
+                if (removePings) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePings = true;
             }
 
             if (clearOldDraftInfo && msgTxt.startsWith(SUMMARY_START)) {
-                if (removeSummary) msg.delete().queue();
+                if (removeSummary) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeSummary = true;
             }
             if (clearOldDraftInfo && msgTxt.equals(SLICES)) {
-                if (removeSliceMsgs) msg.delete().queue();
+                if (removeSliceMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeSliceMsgs = true;
             }
             if (clearOldDraftInfo && msgTxt.equals(FACTIONS)) {
-                if (removeFactionMsgs) msg.delete().queue();
+                if (removeFactionMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeFactionMsgs = true;
             }
             if (clearOldDraftInfo && msgTxt.equals(POSITION)) {
-                if (removePositionMsgs) msg.delete().queue();
+                if (removePositionMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePositionMsgs = true;
             }
             if (clearOldDraftInfo && messageIsSliceImg(msg)) {
-                if (removeImages) msg.delete().queue();
+                if (removeImages) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeImages = true;
             }
         }

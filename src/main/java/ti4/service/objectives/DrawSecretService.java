@@ -67,7 +67,7 @@ public class DrawSecretService {
                     .setEphemeral(true)
                     .sendMessage("Drew the following secret objective(s):")
                     .addEmbeds(soEmbeds)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

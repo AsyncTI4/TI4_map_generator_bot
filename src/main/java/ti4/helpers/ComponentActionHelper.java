@@ -774,7 +774,10 @@ public class ComponentActionHelper {
                 List<MessageCreateData> messageList =
                         MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
                 for (MessageCreateData message : messageList) {
-                    event.getHook().setEphemeral(true).sendMessage(message).queue();
+                    event.getHook()
+                            .setEphemeral(true)
+                            .sendMessage(message)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
             case "doStarCharts" -> {

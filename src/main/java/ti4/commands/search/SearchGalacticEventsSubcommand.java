@@ -23,7 +23,7 @@ class SearchGalacticEventsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidGalacticEvent(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getGalacticEvent(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

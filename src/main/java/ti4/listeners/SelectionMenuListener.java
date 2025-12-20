@@ -13,11 +13,11 @@ public class SelectionMenuListener extends ListenerAdapter {
         if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to receive selections.")
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
-        event.deferEdit().queue();
+        event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         SelectionMenuProcessor.queue(event);
     }

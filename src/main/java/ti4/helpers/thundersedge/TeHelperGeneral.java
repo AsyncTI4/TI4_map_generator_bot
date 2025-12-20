@@ -157,7 +157,7 @@ public class TeHelperGeneral {
             event.getMessage()
                     .editMessage(newMessage)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

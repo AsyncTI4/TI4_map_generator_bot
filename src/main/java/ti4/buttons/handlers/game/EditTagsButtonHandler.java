@@ -33,7 +33,7 @@ class EditTagsButtonHandler {
         Modal modal = Modal.create(modalId, "Tags for Game " + game.getName())
                 .addComponents(Label.of("Edit Tags", tags))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("editTags")

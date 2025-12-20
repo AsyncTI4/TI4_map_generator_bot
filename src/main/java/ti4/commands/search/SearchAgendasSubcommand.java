@@ -23,7 +23,7 @@ class SearchAgendasSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidAgenda(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getAgenda(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

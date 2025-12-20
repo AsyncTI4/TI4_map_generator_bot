@@ -23,7 +23,10 @@ class CardsInfoButtonHandler {
             ThreadChannel channel = player.getCardsInfoThread();
             channel.getManager()
                     .setArchived(true)
-                    .queue(); // archiving it to combat a common bug that is solved via archiving
+                    .queue(
+                            Consumers.nop(),
+                            BotLogger::catchRestError); // archiving it to combat a common bug that is solved via
+            // archiving
         }
         List<String> techs = Mapper.getDeck("techs_tf").getNewShuffledDeck();
         for (String tech : techs) {

@@ -51,7 +51,7 @@ public class MessageListener extends ListenerAdapter {
 
         Message message = event.getMessage();
         if (message.getContentRaw().startsWith("[DELETE]")) {
-            message.delete().queue();
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -106,7 +106,7 @@ public class MessageListener extends ListenerAdapter {
                         .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
         boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
         if (shouldRespondToBotHelperPing) {
-            message.reply(BOTHELPER_MENTION_REMINDER_TEXT).queue();
+            message.reply(BOTHELPER_MENTION_REMINDER_TEXT).queue(Consumers.nop(), BotLogger::catchRestError);
         }
         return shouldRespondToBotHelperPing;
     }
@@ -134,7 +134,7 @@ public class MessageListener extends ListenerAdapter {
         }
         message.reply(
                         "to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         return true;
     }
 
@@ -176,7 +176,7 @@ public class MessageListener extends ListenerAdapter {
 
     private static boolean handleWhispers(MessageReceivedEvent event, Message message, String gameName) {
         if (message.getContentRaw().contains("used /fow whisper")) {
-            message.delete().queue();
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         String messageText = message.getContentRaw();
@@ -227,7 +227,7 @@ public class MessageListener extends ListenerAdapter {
 
         String messageContent = StringUtils.substringAfter(messageText, " ");
         if (messageContent.isEmpty()) {
-            message.reply("No message content?").queue();
+            message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
 
@@ -250,7 +250,7 @@ public class MessageListener extends ListenerAdapter {
         } else {
             WhisperService.sendWhisper(
                     game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
-            message.delete().queue();
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         GameManager.save(game, "Whisper"); // TODO: We should be locking since we're saving
         return true;
@@ -265,7 +265,7 @@ public class MessageListener extends ListenerAdapter {
         MessageHelper.sendMessageToPlayerCardsInfoThread(
                 sender,
                 "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void whisperToFutureMe(MessageReceivedEvent event, Game game, Player player) {
@@ -280,7 +280,7 @@ public class MessageListener extends ListenerAdapter {
                 event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
         MessageHelper.sendMessageToPlayerCardsInfoThread(
                 player, "You sent yourself a future message:\n>>> " + messageContent);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
@@ -297,7 +297,7 @@ public class MessageListener extends ListenerAdapter {
             if (!player.isSpeaker()) {
                 event.getChannel().getHistory().retrievePast(1).queue(messages -> {
                     var emoji = Emoji.fromFormatted("🤫");
-                    messages.getFirst().addReaction(emoji).queue();
+                    messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
                 });
             }
         }
@@ -319,11 +319,11 @@ public class MessageListener extends ListenerAdapter {
                                 .equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
                     if (managedGame.isFactionReactMode()) {
                         var emoji = Emoji.fromFormatted(player.getFactionEmoji());
-                        messages.getFirst().addReaction(emoji).queue();
+                        messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (managedGame.isColorReactMode()) {
                         var emoji = ColorEmojis.getColorEmoji(player.getColor()).asEmoji();
-                        messages.getFirst().addReaction(emoji).queue();
+                        messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (managedGame.isStratReactMode()) {
                         if (game.getPhaseOfGame().contains("action")
@@ -337,7 +337,9 @@ public class MessageListener extends ListenerAdapter {
                                 }
                                 if (emoji2 != null && emoji2.asEmoji() != null) {
                                     var demoji2 = emoji2.asEmoji();
-                                    messages.getFirst().addReaction(demoji2).queue();
+                                    messages.getFirst()
+                                            .addReaction(demoji2)
+                                            .queue(Consumers.nop(), BotLogger::catchRestError);
                                 }
                             }
                         }

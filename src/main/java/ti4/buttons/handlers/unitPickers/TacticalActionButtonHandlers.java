@@ -205,7 +205,7 @@ class TacticalActionButtonHandlers {
                     event.getMessage()
                             .editMessage(event.getMessage().getContentRaw())
                             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 },
                 fail -> {
                     // Regen buttons
@@ -270,7 +270,7 @@ class TacticalActionButtonHandlers {
                     event.getMessage()
                             .editMessage(event.getMessage().getContentRaw())
                             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 },
                 fail -> {
                     // Regen buttons

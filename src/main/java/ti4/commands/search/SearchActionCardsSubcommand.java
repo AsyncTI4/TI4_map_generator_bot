@@ -23,7 +23,7 @@ class SearchActionCardsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidActionCard(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getActionCard(searchString).getRepresentationEmbed(true, true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

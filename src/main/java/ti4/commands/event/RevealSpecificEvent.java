@@ -44,7 +44,8 @@ class RevealSpecificEvent extends GameStateSubcommand {
     private void revealEvent(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String eventID) {
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel != null) {
-            channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
+            channel.sendMessageEmbeds(eventModel.getRepresentationEmbed())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Something went wrong");
         }

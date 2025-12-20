@@ -24,7 +24,7 @@ class SearchDecksSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidDeck(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getDeck(searchString).getRepresentationEmbed())
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

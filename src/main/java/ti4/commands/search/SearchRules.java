@@ -25,7 +25,7 @@ class SearchRules extends SearchComponentModelSubcommand {
         if (Mapper.isValidRule(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getRule(searchString).getRepresentationEmbed())
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

@@ -24,7 +24,7 @@ class SearchTechsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidTech(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getTech(searchString).getRepresentationEmbed(true, true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

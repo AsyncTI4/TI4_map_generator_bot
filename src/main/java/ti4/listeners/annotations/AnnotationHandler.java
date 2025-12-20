@@ -180,7 +180,7 @@ public class AnnotationHandler {
                                 .getMessage()
                                 .reply(
                                         "The button failed. An exception has been logged for the developers. Please report this to the bot questions and feedback channel. It will probably require a code change.")
-                                .queue();
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
                         origin = selectInteractionEvent;
@@ -189,7 +189,7 @@ public class AnnotationHandler {
                                 .getMessage()
                                 .reply(
                                         "The selection failed. An exception has been logged for the developers. Please report this to the bot questions and feedback channel. It will probably require a code change.")
-                                .queue();
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
                 BotLogger.error(

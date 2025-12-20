@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -2788,7 +2789,7 @@ public class Helper {
                 ((TextChannel) channel)
                         .getManager()
                         .putMemberPermissionOverride(player.getMember().getIdLong(), permission, 0)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
     }
@@ -2858,7 +2859,7 @@ public class Helper {
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
                 textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
-            textChannelManager.queue();
+            textChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2869,7 +2870,7 @@ public class Helper {
             Member member = guild.getMemberById(playerID);
             long deny = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), 0, deny);
-            textChannelManager.queue();
+            textChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2879,7 +2880,7 @@ public class Helper {
             TextChannelManager textChannelManager = textChannel.getManager();
             long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             textChannelManager.putRolePermissionOverride(role, allow, 0);
-            textChannelManager.queue();
+            textChannelManager.queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2890,7 +2891,7 @@ public class Helper {
             }
             Member member = guild.getMemberById(playerId);
             if (member != null && !member.getRoles().contains(role))
-                guild.addRoleToMember(member, role).queue();
+                guild.addRoleToMember(member, role).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

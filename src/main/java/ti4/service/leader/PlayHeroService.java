@@ -67,7 +67,7 @@ public class PlayHeroService {
             player.getCorrectChannel()
                     .sendMessageEmbeds(leaderModel.getRepresentationEmbed(
                             false, true, false, showFlavourText, game.isTwilightsFallMode()))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

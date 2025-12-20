@@ -51,19 +51,19 @@ public class CommandHelper {
                             "'" + event.getFullCommandName() + "' command canceled. Game name '" + gameName
                                     + "' is not valid. "
                                     + "Execute command in correctly named channel that starts with the game name. For example, for game `pbd123`, the channel name should start with `pbd123-`")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
         if (checkChannel && !event.getChannel().getName().startsWith(managedGame.getName() + "-")) {
             event.getHook()
                     .editOriginal("'" + event.getFullCommandName() + "' can only be executed in a game channel.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
         if (checkPlayer && getPlayerFromEvent(managedGame.getGame(), event) == null) {
             event.getHook()
                     .editOriginal("Command must be ran by a player in the game, please use `/game join gameName`.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return false;
         }
         return true;
@@ -186,7 +186,7 @@ public class CommandHelper {
         event.getHook()
                 .editOriginal("You are not authorized to use this command. You must have one of the following roles: "
                         + acceptRolesStr)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         return false;
     }
 

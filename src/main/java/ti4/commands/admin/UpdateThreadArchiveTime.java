@@ -74,7 +74,7 @@ class UpdateThreadArchiveTime extends Subcommand {
             threadChannel
                     .getManager()
                     .setAutoArchiveDuration(autoArchiveDuration)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             sb.append("> ").append(threadChannel.getAsMention()).append("\n");
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

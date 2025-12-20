@@ -37,6 +37,6 @@ class EditTrackRecord extends Subcommand {
         Modal modal = Modal.create(modalId, "Track Record")
                 .addComponents(Label.of("Edit user's track record", summary))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

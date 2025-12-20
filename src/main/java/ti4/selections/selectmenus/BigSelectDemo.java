@@ -46,7 +46,7 @@ public class BigSelectDemo implements Selection {
         if (!hasPageOption) {
             event.getChannel()
                     .sendMessage("You selected: " + String.join(", ", keepValues))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -91,12 +91,15 @@ public class BigSelectDemo implements Selection {
         menuBuilder.setMaxValues(4);
 
         if (event instanceof StringSelectInteractionEvent) {
-            ((StringSelectInteractionEvent) event).getMessage().delete().queue();
+            ((StringSelectInteractionEvent) event)
+                    .getMessage()
+                    .delete()
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         event.getMessageChannel()
                 .sendMessage("")
                 .addComponents(ActionRow.of(menuBuilder.build()))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

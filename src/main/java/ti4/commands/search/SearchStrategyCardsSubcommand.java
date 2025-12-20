@@ -25,7 +25,7 @@ class SearchStrategyCardsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidStrategyCard(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getStrategyCard(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

@@ -56,7 +56,7 @@ public class FOWCombatThreadMirroring {
         if (messageMirrored) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

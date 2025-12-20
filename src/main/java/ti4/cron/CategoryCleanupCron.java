@@ -20,7 +20,7 @@ public class CategoryCleanupCron {
                 .forEach(category -> {
                     BotLogger.info("**CategoryCleanupCron** Deleted empty category: " + category.getName()
                             + " on guild: " + guild.getName());
-                    category.delete().queue();
+                    category.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 }));
     }
 }

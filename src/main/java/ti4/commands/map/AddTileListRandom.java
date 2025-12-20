@@ -54,7 +54,7 @@ class AddTileListRandom extends GameStateSubcommand {
                 .build();
         modal = newModalBuilder.build();
 
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("addMapStringRandom")

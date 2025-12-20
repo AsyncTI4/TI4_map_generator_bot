@@ -81,7 +81,7 @@ class CreateGameButtonHandler {
                             + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
             return;
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         Game game = CreateGameService.createGameChannels(
                 members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {

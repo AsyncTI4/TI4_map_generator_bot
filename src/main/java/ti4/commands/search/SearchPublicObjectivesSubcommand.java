@@ -24,7 +24,7 @@ class SearchPublicObjectivesSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidPublicObjective(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getPublicObjective(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

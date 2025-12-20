@@ -31,7 +31,7 @@ class RelicButtonHandler {
         if ("boon".equals(relic)) { // Sarween Tools
             player.addSpentThing("boon");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-            event.getMessage().editMessage(exhaustedMessage).queue();
+            event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

@@ -129,6 +129,6 @@ public class GalvanizeService {
         if (systemButtons.size() > 25) systemButtons = systemButtons.subList(0, 25);
         event.getMessage()
                 .editMessageComponents(ActionRow.partitionOf(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

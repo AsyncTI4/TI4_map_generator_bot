@@ -312,7 +312,10 @@ public class PlayerTechService {
                         inf = "res";
                     }
                     String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, inf);
-                    buttonEvent.getMessage().editMessage(exhaustedMessage).queue();
+                    buttonEvent
+                            .getMessage()
+                            .editMessage(exhaustedMessage)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
             case "pi", "absol_pi" -> { // Predictive Intelligence
@@ -521,7 +524,7 @@ public class PlayerTechService {
 
     private static void deleteIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ((ButtonInteractionEvent) event).getMessage().delete().queue();
+            ((ButtonInteractionEvent) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -681,7 +684,7 @@ public class PlayerTechService {
                 GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                         .ifPresent(messageId -> game.getMainGameChannel()
                                 .deleteMessageById(messageId)
-                                .queue());
+                                .queue(Consumers.nop(), BotLogger::catchRestError));
             }
             String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";

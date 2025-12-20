@@ -118,7 +118,7 @@ public class BlindSelectionService {
                 .addComponents(Label.of("Target", target))
                 .build();
 
-        event.replyModal(blindSelectionModal).queue();
+        event.replyModal(blindSelectionModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindSelection_")
@@ -162,7 +162,7 @@ public class BlindSelectionService {
                 player.getRepresentation() + ", Please select the target:",
                 chooseTargetButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("blindValidation_")
@@ -184,7 +184,7 @@ public class BlindSelectionService {
         game.removeStoredValue(VALIDATION_KEY);
 
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, actionButton);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // if the original button id contains TBDF, replace it with the faction of the owner of the target

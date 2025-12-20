@@ -25,7 +25,7 @@ public class SearchTokensSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidToken(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getToken(searchString).getRepresentationEmbed())
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

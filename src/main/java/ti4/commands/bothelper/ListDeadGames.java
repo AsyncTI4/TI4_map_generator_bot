@@ -75,7 +75,7 @@ class ListDeadGames extends Subcommand {
                     }
                 }
                 if (r != null && delete) {
-                    r.delete().queue();
+                    r.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }
@@ -98,7 +98,7 @@ class ListDeadGames extends Subcommand {
             sb.append(actionsChannel.getJumpUrl()).append("\n");
             channelCount++;
             if (delete) {
-                actionsChannel.delete().queue();
+                actionsChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 warned = true;
                 // MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) +
@@ -115,7 +115,7 @@ class ListDeadGames extends Subcommand {
                 sb.append(tableTalkChannel.getJumpUrl()).append("\n");
                 channelCount++;
                 if (delete) {
-                    tableTalkChannel.delete().queue();
+                    tableTalkChannel.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else if (!warned) {
                     // MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) +
                     // WARNING_MESSAGE);

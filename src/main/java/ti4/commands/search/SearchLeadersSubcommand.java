@@ -25,7 +25,7 @@ class SearchLeadersSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidLeader(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getLeader(searchString).getRepresentationEmbed(true, true, true, true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

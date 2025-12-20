@@ -15,6 +15,6 @@ class AddTileList extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Modal modal = AddTileListService.buildMapStringModal(getGame(), "addMapString");
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

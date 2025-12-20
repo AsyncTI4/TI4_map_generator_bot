@@ -375,7 +375,7 @@ public class DiscordantStarsHelper {
                 player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> "
                         + tileToPullFromUnshuffled);
 
-        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ids.size() == 1) {
             ButtonHelper.starChartStep1(game, player, ids.getFirst());
         }
@@ -412,7 +412,7 @@ public class DiscordantStarsHelper {
                 player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
-        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ids.size() == 1) {
             ButtonHelper.starChartStep1(game, player, ids.getFirst());
 

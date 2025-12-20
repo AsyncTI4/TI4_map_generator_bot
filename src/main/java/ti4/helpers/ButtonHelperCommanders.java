@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.helpers.DiceHelper.Die;
@@ -27,6 +28,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.ActionCardModel;
 import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
@@ -172,7 +174,7 @@ public class ButtonHelperCommanders {
                 + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain "
                 + count + " trade good" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("cymiaeCommanderRes_")
@@ -186,7 +188,7 @@ public class ButtonHelperCommanders {
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard.",
                 ActionCardHelper.getDiscardActionCardButtons(player, false));
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void yinCommanderSummary(Player player, Game game) {
@@ -289,7 +291,7 @@ public class ButtonHelperCommanders {
                         + ButtonHelper.getUnitHolderRep(unitHolder, tile, game)
                         + " using Brother Omar, the Yin Commander.");
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + unitHName);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resolveMykoCommander")
@@ -430,7 +432,7 @@ public class ButtonHelperCommanders {
                     .getMessage()
                     .editMessage(newMessage)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -497,7 +499,7 @@ public class ButtonHelperCommanders {
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static List<Button> resolveFlorzenCommander(Player player, Game game) {
@@ -587,7 +589,7 @@ public class ButtonHelperCommanders {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is choosing to look at the top of the "
                         + event.getButton().getLabel() + " deck.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         switch (target) {
             case "industrial", "hazardous", "frontier", "cultural" ->
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, target);
@@ -639,7 +641,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + " is choosing to bottom the card they saw.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         switch (target) {
             case "industrial", "hazardous", "frontier", "cultural" ->
                 game.putExploreBottom(game.getExploreDeck(target).getFirst());
@@ -944,7 +946,7 @@ public class ButtonHelperCommanders {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(enemy.getPrivateChannel(), message);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("pay1tgforKeleres")
@@ -954,7 +956,7 @@ public class ButtonHelperCommanders {
                 player.getCorrectChannel(),
                 player.getFactionEmojiOrColor() + " paid 1 trade good to unleash Suffi An, the Keleres commander "
                         + player.gainTG(-1) + ".");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("sardakkcommander_")

@@ -337,7 +337,7 @@ public class CardsInfoService {
                 .queue(
                         msg -> {
                             if (msg != null && message.equals(msg.getContentRaw())) {
-                                msg.delete().queue();
+                                msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                             }
                         },
                         BotLogger::catchRestError);

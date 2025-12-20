@@ -180,19 +180,19 @@ public class SourceSettings extends SettingsMenu {
                         .sendMessage(
                                 "This setting doesn't fully change the decks, please resolve manually after starting the draft if you actually want to play base game mode. You can ping Bothelper for assistance.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Codexes" ->
                 event.getHook()
                         .sendMessage("This setting doesn't really do much. It only disables Keleres.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             case "DiscoStars" ->
                 event.getHook()
                         .sendMessage(
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             case "ThundersEdge" -> {
                 game.setThundersEdge(true);
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
@@ -221,7 +221,7 @@ public class SourceSettings extends SettingsMenu {
                 event.getHook()
                         .sendMessage((ignis) ? absolDS : pokStr)
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "UnchartSpace", "Absol", "ActionCardDeck2" -> {
                 boolean abs = absol.isVal();
@@ -254,7 +254,10 @@ public class SourceSettings extends SettingsMenu {
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."
                         : "Reset your decks to include all of the " + String.join(" and ", inclusions) + " cards.";
-                event.getHook().sendMessage(message).setEphemeral(true).queue();
+                event.getHook()
+                        .sendMessage(message)
+                        .setEphemeral(true)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Eronous" -> {}
         }

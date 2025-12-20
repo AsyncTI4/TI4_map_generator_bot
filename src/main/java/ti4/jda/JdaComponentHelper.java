@@ -14,13 +14,13 @@ public class JdaComponentHelper {
         event.editComponents(event.getMessage()
                         .getComponentTree()
                         .replace(ComponentReplacer.byUniqueId(event.getUniqueId(), (Component) null)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static boolean removeComponentFromMessageAndDeleteIfEmpty(ComponentInteraction event) {
         boolean isSingleComponent = event.getMessage().getComponents().size() == 1;
         if (isSingleComponent) {
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
         ButtonHelper.deleteTheOneButton((GenericInteractionCreateEvent) event);

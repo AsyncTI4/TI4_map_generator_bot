@@ -296,7 +296,7 @@ public class MantisMapBuildService {
                         List<Attachment> attachments = msg.getAttachments();
                         for (Attachment att : attachments) {
                             if (att.getFileName().contains(IMAGE_UNIQUE_STRING)) {
-                                msg.delete().queue();
+                                msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                                 break;
                             }
                         }
@@ -451,10 +451,11 @@ public class MantisMapBuildService {
                             for (Attachment attachment : msg.getAttachments()) {
                                 if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
                                     if (replaced) {
-                                        msg.delete().queue();
+                                        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                                         continue;
                                     }
-                                    msg.editMessageAttachments(mapImage).queue();
+                                    msg.editMessageAttachments(mapImage)
+                                            .queue(Consumers.nop(), BotLogger::catchRestError);
                                     replaced = true;
                                 }
                             }
@@ -477,7 +478,7 @@ public class MantisMapBuildService {
                     }
                     for (Attachment attachment : msg.getAttachments()) {
                         if (attachment.getFileName().startsWith(IMAGE_UNIQUE_STRING) && attachment.isImage()) {
-                            msg.delete().queue();
+                            msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                         }
                     }
                 }

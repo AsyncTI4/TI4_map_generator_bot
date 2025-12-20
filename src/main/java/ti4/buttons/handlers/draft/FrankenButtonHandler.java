@@ -40,7 +40,7 @@ class FrankenButtonHandler {
         DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
 
         applyFrankenItemToPlayer(event, draftItem, player);
-        event.editButton(draftItem.getRemoveButton()).queue();
+        event.editButton(draftItem.getRemoveButton()).queue(Consumers.nop(), BotLogger::catchRestError);
 
         // Handle Errata
         if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
@@ -69,7 +69,7 @@ class FrankenButtonHandler {
         DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
 
         removeFrankenItemFromPlayer(event, draftItem, player);
-        event.editButton(draftItem.getAddButton()).queue();
+        event.editButton(draftItem.getAddButton()).queue(Consumers.nop(), BotLogger::catchRestError);
 
         // Handle Errata
         if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
@@ -243,7 +243,7 @@ class FrankenButtonHandler {
                                 if (!m.isEmpty()) {
                                     draft.findExistingBagChannel(player)
                                             .deleteMessages(m)
-                                            .queue();
+                                            .queue(Consumers.nop(), BotLogger::catchRestError);
                                 }
                             });
                     MessageHelper.sendMessageToChannel(
@@ -318,6 +318,6 @@ class FrankenButtonHandler {
         }
 
         FrankenDraftBagService.showPlayerBag(game, player);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

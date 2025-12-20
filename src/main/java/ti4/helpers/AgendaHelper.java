@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
@@ -176,7 +177,7 @@ public class AgendaHelper {
 
     @ButtonHandler("passOnEverythingWhensNAfters")
     public static void passOnEverythingWhensNAfters(Game game, ButtonInteractionEvent event, Player player) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
         MessageHelper.sendMessageToChannelWithButtons(
@@ -215,7 +216,7 @@ public class AgendaHelper {
 
     @ButtonHandler("undoPassOnAllWhensNAfters")
     public static void undoPassOnEverythingWhensNAfters(Game game, ButtonInteractionEvent event, Player player) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
@@ -288,7 +289,7 @@ public class AgendaHelper {
 
     @ButtonHandler("queueWhen_")
     public static void queueWhen(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String when = buttonID.replace("queueWhen_", "");
         game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens") + player.getFaction() + "_");
         game.setStoredValue("queuedWhensFor" + player.getFaction(), when);
@@ -328,7 +329,7 @@ public class AgendaHelper {
 
     @ButtonHandler("queueAfter_")
     public static void queueAfter(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String after = buttonID.replace("queueAfter_", "");
         game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters") + player.getFaction() + "_");
         game.setStoredValue("queuedAftersFor" + player.getFaction(), after);
@@ -350,7 +351,7 @@ public class AgendaHelper {
     @ButtonHandler("lockAftersIn")
     public static void lockAftersIn(Game game, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "Yes");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 "Your \"after\" will now play regardless if another player also plays an \"after\" before you.");
@@ -828,7 +829,7 @@ public class AgendaHelper {
         GMService.addForcePassWhenButtonForFowGM(game, player, buttons);
         game.setStoredValue(
                 "declinedWhens", game.getStoredValue("declinedWhens").replace(player.getFaction() + "_", ""));
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), "You can use these buttons to queue a \"when\".", buttons);
     }
@@ -844,7 +845,7 @@ public class AgendaHelper {
                 player.getCardsInfoThread(),
                 "You have declined to queue a \"when\". You can change your mind with this button.",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<String> afters = getPossibleAfterNames(player);
         StringBuilder msg = new StringBuilder(player.getRepresentation()
                 + " now is the time to decide whether or not you will play an \"after\". If you do,"
@@ -883,7 +884,7 @@ public class AgendaHelper {
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
         game.setStoredValue(
                 "declinedAfters", game.getStoredValue("declinedAfters").replace(player.getFaction() + "_", ""));
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), "You can use these buttons to queue an \"after\".", buttons);
     }
@@ -891,7 +892,7 @@ public class AgendaHelper {
     @ButtonHandler("unlockQueuedAfters")
     public static void unlockQueuedAfters(Game game, ButtonInteractionEvent event, Player player) {
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 "You will now be asked to decide again if someone else plays an \"after\".");
@@ -917,7 +918,7 @@ public class AgendaHelper {
                             + " and be asked to decide on \"after\"s again when someone else plays an \"after\" by pressing this button.",
                     buttons);
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         offerPreVote(player);
         resolveAfterQueue(event, game);
         String msg = player.getRepresentation() + " you have the option to pre-pass on agenda shenanigans here."
@@ -1091,7 +1092,7 @@ public class AgendaHelper {
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (p2.getDebtTokenCount(player.getColor()) < 1) {
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -1178,7 +1179,7 @@ public class AgendaHelper {
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'))
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
-            event.getMessage().editMessage(totalVotesSoFar).queue();
+            event.getMessage().editMessage(totalVotesSoFar).queue(Consumers.nop(), BotLogger::catchRestError);
             ButtonHelper.deleteTheOneButton(event);
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
@@ -1192,7 +1193,7 @@ public class AgendaHelper {
                         + totalVotes
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'));
             }
-            event.getMessage().editMessage(totalVotesSoFar).queue();
+            event.getMessage().editMessage(totalVotesSoFar).queue(Consumers.nop(), BotLogger::catchRestError);
             ButtonHelper.deleteTheOneButton(event);
             String message;
             if (buttonID.contains("everything")) {
@@ -1458,7 +1459,7 @@ public class AgendaHelper {
                                 nextInLine.getPrivateChannel(), "\n " + realIdentity + message, buttons);
                         player.getCorrectChannel()
                                 .sendMessage("Notified next in line")
-                                .queue();
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 } else {
                     message = getSummaryOfVotes(game, true) + "\n \n " + realIdentity + message;
@@ -1643,7 +1644,7 @@ public class AgendaHelper {
                 game.setCurrentAgendaVote(outcome, total);
             }
         }
-        player.getCorrectChannel().sendMessage(voteMessage).queue();
+        player.getCorrectChannel().sendMessage(voteMessage).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("eraseMyRiders")
@@ -1973,7 +1974,7 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
                     game.getMainGameChannel()
                             .sendMessage("Voting started. Notified first in line")
-                            .queue();
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(nextInLine.getCorrectChannel(), message, buttons);
@@ -1983,7 +1984,7 @@ public class AgendaHelper {
         } else {
             game.getMainGameChannel()
                     .sendMessage("Cannot find voting info, sorry. Please resolve automatically.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -2813,7 +2814,7 @@ public class AgendaHelper {
         if (!finalRes) {
             String editedMessage = Helper.buildSpentThingsMessageForVoting(player, game, false);
             editedMessage = getSummaryOfVotes(game, true) + "\n\n" + editedMessage;
-            event.getMessage().editMessage(editedMessage).queue();
+            event.getMessage().editMessage(editedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 

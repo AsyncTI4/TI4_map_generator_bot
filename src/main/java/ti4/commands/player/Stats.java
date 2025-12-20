@@ -338,7 +338,8 @@ class Stats extends GameStateSubcommand {
                 Member removedMember = guild.getMemberById(player.getUserID());
                 List<Role> roles = guild.getRolesByName(game.getName(), true);
                 if (removedMember != null && roles.size() == 1) {
-                    guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
+                    guild.removeRoleFromMember(removedMember, roles.getFirst())
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(

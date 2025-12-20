@@ -355,7 +355,7 @@ public class JdaService {
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.register(commands));
-            commands.queue();
+            commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
@@ -378,7 +378,7 @@ public class JdaService {
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
-            commands.queue();
+            commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {

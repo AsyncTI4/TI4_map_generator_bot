@@ -70,7 +70,10 @@ class UndoButtonHandler {
 
         Game undo = GameManager.undo(game);
         if (undo == null) {
-            event.getHook().sendMessage("Failed to undo.").setEphemeral(true).queue();
+            event.getHook()
+                    .sendMessage("Failed to undo.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -83,6 +86,6 @@ class UndoButtonHandler {
                 break;
             }
         }
-        event.getHook().sendMessage(msg + ".").setEphemeral(true).queue();
+        event.getHook().sendMessage(msg + ".").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

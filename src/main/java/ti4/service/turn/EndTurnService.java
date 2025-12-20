@@ -180,7 +180,7 @@ public class EndTurnService {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()
                             .deleteMessageById(messageId)
-                            .queue());
+                            .queue(Consumers.nop(), BotLogger::catchRestError));
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {

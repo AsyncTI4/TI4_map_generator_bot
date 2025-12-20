@@ -22,7 +22,7 @@ public class ObjectiveHelper {
                     player.getCardsInfoThread(), "Stage 1 public objective at location " + loc1 + ".");
             player.getCardsInfoThread()
                     .sendMessageEmbeds(po.getRepresentationEmbed())
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             String sb = player.getRepresentationUnfogged() + ", stage 1 public objective at location "
                     + loc1 + ":\n" + po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID))

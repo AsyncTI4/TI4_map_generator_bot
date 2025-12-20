@@ -70,7 +70,7 @@ class PlayEvent extends GameStateSubcommand {
 
         game.getActionsChannel()
                 .sendMessageEmbeds(eventModel.getRepresentationEmbed())
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
 
         Integer discardedEventNumericalID = game.getDiscardedEvents().get(eventModel.getAlias());
 

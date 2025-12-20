@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
@@ -24,6 +25,7 @@ import ti4.map.Player;
 import ti4.map.Space;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
@@ -217,7 +219,7 @@ public class CryypterHelper {
                     event.getChannel(),
                     player.getRepresentation() + " has given 2 trade goods and may vote in any manner that they wish.");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void checkForAssigningYssarilEnvoy(
@@ -270,7 +272,7 @@ public class CryypterHelper {
         conclusionButtons.add(decline);
 
         MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg, conclusionButtons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("resolveYssarilEnvoy_")
@@ -289,7 +291,7 @@ public class CryypterHelper {
                     event, game, player, buttonID.replace("resolveYssarilEnvoy_" + choice + "_", ""), -1, null);
         }
 
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void envoyExhaustCheck(Game game, Player player, String envoyID) {
@@ -657,7 +659,7 @@ public class CryypterHelper {
         buttons.add(Buttons.blue("handleCreussEnvoy_" + tilePos + "_gamma", "Gamma", MiscEmojis.CreussGamma));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), player.getRepresentationUnfogged() + message, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("handleCreussEnvoy_")
@@ -677,7 +679,7 @@ public class CryypterHelper {
         }
         msg += ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static String handleCovert(String target) {

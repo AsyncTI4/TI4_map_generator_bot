@@ -25,7 +25,7 @@ class SearchFactionsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidFaction(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, false))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

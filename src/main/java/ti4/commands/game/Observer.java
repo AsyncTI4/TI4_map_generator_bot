@@ -103,7 +103,7 @@ class Observer extends Subcommand {
         channel.getPermissionContainer()
                 .upsertPermissionOverride(user)
                 .grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(
                     event,
@@ -123,7 +123,7 @@ class Observer extends Subcommand {
         channel.getPermissionContainer()
                 .upsertPermissionOverride(user)
                 .clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(
                     event,

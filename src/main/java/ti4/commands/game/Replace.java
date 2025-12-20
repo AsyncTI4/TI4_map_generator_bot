@@ -89,7 +89,7 @@ class Replace extends GameStateSubcommand {
         Member oldMember = guild.getMemberById(replacedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (oldMember != null && roles.size() == 1) {
-            guild.removeRoleFromMember(oldMember, roles.getFirst()).queue();
+            guild.removeRoleFromMember(oldMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         var userSettings = UserSettingsManager.get(replacedPlayer.getUserID());
@@ -98,7 +98,7 @@ class Replace extends GameStateSubcommand {
 
         // ADD ROLE
         if (roles.size() == 1) {
-            guild.addRoleToMember(newMember, roles.getFirst()).queue();
+            guild.addRoleToMember(newMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
@@ -145,13 +145,16 @@ class Replace extends GameStateSubcommand {
             privateChannel.getMemberPermissionOverrides().stream()
                     .filter(override -> Objects.equals(override.getMember(), oldMember))
                     .findFirst()
-                    .ifPresent(oldOverride -> oldOverride.delete().queue());
+                    .ifPresent(oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
 
             // Update private channel
             if (oldMember != null) {
                 String newPrivateChannelName =
                         privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
-                privateChannel.getManager().setName(newPrivateChannelName).queue();
+                privateChannel
+                        .getManager()
+                        .setName(newPrivateChannelName)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             privateChannel
                     .getManager()
@@ -165,9 +168,9 @@ class Replace extends GameStateSubcommand {
                     .replace(
                             oldPlayerUserName.replace("/", ""),
                             replacedPlayer.getUserName().replace("/", ""));
-            cardsInfo.getManager().setName(newCardsInfoName).queue();
+            cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
             if (oldMember != null) {
-                cardsInfo.removeThreadMember(oldMember).queue();
+                cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
 

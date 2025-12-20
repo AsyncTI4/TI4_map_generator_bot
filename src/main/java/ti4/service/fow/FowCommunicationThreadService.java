@@ -164,7 +164,7 @@ public class FowCommunicationThreadService {
                     threadChannel.getManager().setArchived(false).queue(success -> threadChannel
                             .sendMessage(
                                     "⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
-                            .queue());
+                            .queue(Consumers.nop(), BotLogger::catchRestError));
                 } else if (areAbleToCommunicate && threadLocked) {
                     // Allow talking
                     threadChannel.getManager().setArchived(false).queue(success -> threadChannel
@@ -175,7 +175,7 @@ public class FowCommunicationThreadService {
                                             + (areAllowedToTalkInAgenda
                                                     ? " __may__ communicate in Agenda Phase."
                                                     : " have regained comms and __may__ communicate."))
-                                    .queue()));
+                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
 
                 } else if (!areAbleToCommunicate && !threadLocked) {
                     // Deny talking
@@ -184,7 +184,7 @@ public class FowCommunicationThreadService {
                             .setName(threadName.replace(YES_CHAR, NO_CHAR))
                             .queue(nameUpdated -> threadChannel
                                     .sendMessage(notice + " have lost comms and __may not__ communicate.")
-                                    .queue()));
+                                    .queue(Consumers.nop(), BotLogger::catchRestError)));
                 }
             }
         } finally {
@@ -238,7 +238,7 @@ public class FowCommunicationThreadService {
                 player.getCorrectChannel(),
                 player.getRepresentationNoPing() + "(You) accepted communications invitation from "
                         + inviteePlayer.getRepresentationNoPing());
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("fowCommsSuggest_")

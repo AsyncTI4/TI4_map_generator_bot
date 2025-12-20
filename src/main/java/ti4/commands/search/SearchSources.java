@@ -71,7 +71,7 @@ class SearchSources extends Subcommand {
             SourceModel model = Mapper.getSource(sourceString);
             event.getChannel()
                     .sendMessageEmbeds(model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
-                    .queue(); // change getRepEmbed function here as well
+                    .queue(Consumers.nop(), BotLogger::catchRestError); // change getRepEmbed function here as well
             return;
         }
 

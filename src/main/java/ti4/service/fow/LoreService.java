@@ -146,7 +146,7 @@ public class LoreService {
     @ButtonHandler("gmLoreRefresh")
     private static void refreshLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
         showLoreButtons(event, buttonID, game);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gmLoreExportImportButtons")
@@ -167,7 +167,7 @@ public class LoreService {
         event.getChannel()
                 .sendFiles(FileUpload.fromData(exportFile))
                 .setContent("### Export of " + game.getName() + " Lore:")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gmLoreImport~MDL")
@@ -179,7 +179,7 @@ public class LoreService {
         Modal importLoreModal = Modal.create("gmLoreImportFromURL", "Import Lore from URL")
                 .addComponents(Label.of("URL", url.build()))
                 .build();
-        event.replyModal(importLoreModal).queue();
+        event.replyModal(importLoreModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmLoreImportFromURL")
@@ -216,9 +216,9 @@ public class LoreService {
             event.getChannel()
                     .sendMessage("### Lore Management")
                     .setComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginalComponents(buttons).queue();
+            event.getHook().editOriginalComponents(buttons).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -307,11 +307,14 @@ public class LoreService {
                         + parseCurrentSelections(
                                 StringUtils.substringAfter(menu.getCustomId(), "loreAdd" + step + "_")))
                 .addComponents(List.of(ActionRow.of(menu)))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         if (event instanceof ButtonInteractionEvent) {
-            ((ButtonInteractionEvent) event).getMessage().delete().queue();
+            ((ButtonInteractionEvent) event).getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         } else if (event instanceof StringSelectInteractionEvent) {
-            ((StringSelectInteractionEvent) event).getMessage().delete().queue();
+            ((StringSelectInteractionEvent) event)
+                    .getMessage()
+                    .delete()
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -369,7 +372,7 @@ public class LoreService {
         String selected =
                 menuId.replace("loreAdd4_", "") + "_" + event.getValues().get(0);
         confirmAddLoreSettings(event.getChannel(), selected);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gmLoreAdd")
@@ -421,7 +424,7 @@ public class LoreService {
                         Label.of("Lore (clear to delete)", lore.build()),
                         Label.of("Other info", footer.build()))
                 .build();
-        event.replyModal(editLoreModal).queue();
+        event.replyModal(editLoreModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmLoreSave_")

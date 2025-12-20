@@ -30,7 +30,7 @@ public class PickStrategyCardButtonHandler {
 
     @ButtonHandler("queueScPick_")
     public static void queueScPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         if (game.getActivePlayer() == player) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
@@ -65,7 +65,7 @@ public class PickStrategyCardButtonHandler {
 
     @ButtonHandler("restartSCQueue")
     public static void restartSCQueue(ButtonInteractionEvent event, Game game, Player player) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         game.setStoredValue(player.getFaction() + "scpickqueue", "");
         List<Button> buttons = StartPhaseService.getQueueSCPickButtons(game, player);
         String msg = StartPhaseService.getQueueSCMessage(game, player);
@@ -157,7 +157,7 @@ public class PickStrategyCardButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
         if (buttons.isEmpty()) {
             StartPhaseService.startActionPhase(event, game);
@@ -276,6 +276,6 @@ public class PickStrategyCardButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " chose which player to give this strategy card to.",
                 buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

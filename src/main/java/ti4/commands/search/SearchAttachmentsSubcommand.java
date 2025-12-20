@@ -25,7 +25,7 @@ public class SearchAttachmentsSubcommand extends SearchComponentModelSubcommand 
         if (Mapper.isValidAttachment(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getAttachmentInfo(searchString).getRepresentationEmbed())
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

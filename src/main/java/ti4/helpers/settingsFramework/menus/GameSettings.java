@@ -205,7 +205,7 @@ public class GameSettings extends SettingsMenu {
                     .sendMessage("Here is a preview of the selected map template:")
                     .addFiles(preview)
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         if (mapTemplate.getValue().bluePerPlayer() != bpp && parent instanceof MiltySettings m) {
             SliceGenerationSettings slice = m.getSliceSettings();
             bpp = mapTemplate.getValue().bluePerPlayer();

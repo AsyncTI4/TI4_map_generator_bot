@@ -458,8 +458,8 @@ public class FrankenDraftBagService {
                 .ifPresentOrElse(
                         gameMessage -> game.getActionsChannel()
                                 .retrieveMessageById(gameMessage.messageId())
-                                .queue(message ->
-                                        message.editMessage(statusMessage).queue()),
+                                .queue(message -> message.editMessage(statusMessage)
+                                        .queue(Consumers.nop(), BotLogger::catchRestError)),
                         () -> {
                             String newMessageId = game.getActionsChannel()
                                     .sendMessage(statusMessage)

@@ -144,7 +144,7 @@ public class FOWPlusService {
                 .addComponents(Label.of("Position to activate", position))
                 .build();
 
-        event.replyModal(blindActivationModal).queue();
+        event.replyModal(blindActivationModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindActivation_")
@@ -171,7 +171,7 @@ public class FOWPlusService {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // Remove ring buttons player has no tiles they can activate
@@ -407,6 +407,6 @@ public class FOWPlusService {
         }
 
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

@@ -16,7 +16,7 @@ public class AutoCompleteListener extends ListenerAdapter {
         if (!JdaService.isReadyToReceiveCommands()
                 && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
             event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

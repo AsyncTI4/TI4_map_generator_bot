@@ -89,7 +89,7 @@ public class RoleService {
             for (Guild guild : JdaService.guilds) {
                 Role role = getAsyncPlayerRole(guild);
                 if (guild.getMember(user) != null) {
-                    guild.addRoleToMember(user, role).queue();
+                    guild.addRoleToMember(user, role).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }

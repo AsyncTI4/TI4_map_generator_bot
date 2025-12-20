@@ -60,6 +60,6 @@ class ExportToJson extends GameStateSubcommand {
         event.getChannel()
                 .sendFiles(FileUpload.fromData(exportFile))
                 .setContent("### Export of " + game.getName() + " Map:\n-# note that this feature is still WIP")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

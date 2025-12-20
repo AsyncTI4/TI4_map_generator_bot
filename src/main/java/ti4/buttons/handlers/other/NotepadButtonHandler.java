@@ -44,7 +44,7 @@ class NotepadButtonHandler {
         Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
                 .addComponents(Label.of("Edit summary", textInputBuilder.build()))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("notepadModal")

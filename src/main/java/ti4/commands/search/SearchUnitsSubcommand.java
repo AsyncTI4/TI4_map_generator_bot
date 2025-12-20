@@ -32,7 +32,7 @@ class SearchUnitsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidUnit(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getUnit(searchString).getRepresentationEmbed(includeAliases))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

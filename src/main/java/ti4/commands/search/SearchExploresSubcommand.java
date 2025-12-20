@@ -25,7 +25,7 @@ class SearchExploresSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidExplore(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getExplore(searchString).getRepresentationEmbed(true, true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

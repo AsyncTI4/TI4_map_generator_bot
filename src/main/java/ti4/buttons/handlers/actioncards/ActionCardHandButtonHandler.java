@@ -79,7 +79,7 @@ class ActionCardHandButtonHandler {
         if (channel == null) {
             event.getChannel()
                     .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -200,21 +200,21 @@ class ActionCardHandButtonHandler {
         if (channel == null) {
             event.getChannel()
                     .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         try {
             String error = ActionCardHelper.playAC(event, game, player, acID, channel);
             if (error != null) {
-                event.getChannel().sendMessage(error).queue();
+                event.getChannel().sendMessage(error).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
                     .asThreadChannel()
                     .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ButtonHelper.deleteMessage(event);
     }

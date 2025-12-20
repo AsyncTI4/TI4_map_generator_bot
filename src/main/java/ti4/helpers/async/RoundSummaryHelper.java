@@ -62,7 +62,7 @@ public class RoundSummaryHelper {
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary")
                 .addComponents(Label.of("Edit summary", summary))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
         // ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason
     }
 

@@ -40,7 +40,7 @@ public class ShowGameService {
                 MessageHelper.sendFileUploadToChannel(channel, fileUpload);
             }
             if (event instanceof ButtonInteractionEvent buttonEvent) {
-                buttonEvent.getHook().deleteOriginal().queue();
+                buttonEvent.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
             }
         });
     }

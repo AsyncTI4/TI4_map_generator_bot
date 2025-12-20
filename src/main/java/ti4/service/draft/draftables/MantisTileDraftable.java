@@ -283,8 +283,10 @@ public class MantisTileDraftable extends Draftable {
                 .filter(msg -> msg.getContentRaw().startsWith("You picked the tiles: "))
                 .findFirst()
                 .ifPresentOrElse(
-                        msg -> msg.editMessage(summary.toString()).queue(),
-                        () -> cardsInfoChannel.sendMessage(summary.toString()).queue()));
+                        msg -> msg.editMessage(summary.toString()).queue(Consumers.nop(), BotLogger::catchRestError),
+                        () -> cardsInfoChannel
+                                .sendMessage(summary.toString())
+                                .queue(Consumers.nop(), BotLogger::catchRestError)));
     }
 
     @Override
