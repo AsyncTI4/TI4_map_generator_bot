@@ -15,9 +15,8 @@ public class SortHelper {
     public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
         List<Map.Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
 
-        Comparator<Map.Entry<String, Integer>> comparator = Comparator
-                .comparing(Map.Entry<String, Integer>::getValue)
-                .thenComparing(Map.Entry::getKey);
+        Comparator<Map.Entry<String, Integer>> comparator =
+                Comparator.comparing(Map.Entry<String, Integer>::getValue).thenComparing(Map.Entry::getKey);
 
         list.sort(order ? comparator : comparator.reversed());
 
