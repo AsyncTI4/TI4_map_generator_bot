@@ -1,5 +1,7 @@
 package ti4.message.logging;
 
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -400,7 +402,9 @@ public class BotLogger {
     }
 
     public static void catchRestError(Throwable e) {
-        incrementCircuitBreakerIfServerError(e);
+        if (isDiscordServerError(e)) {
+            CircuitBreaker.incrementThresholdCount();
+        }
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =
                 GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
@@ -408,15 +412,6 @@ public class BotLogger {
             // if it's ignored, it's not actionable.
             if (ignoredError(e)) return;
             error("Encountered REST error", e);
-        }
-    }
-
-    private static void incrementCircuitBreakerIfServerError(Throwable error) {
-        if (!(error instanceof ErrorResponseException restError)) return;
-
-        int responseCode = restError.getErrorCode();
-        if (responseCode >= 500 && responseCode < 600) {
-            CircuitBreaker.incrementThresholdCount();
         }
     }
 

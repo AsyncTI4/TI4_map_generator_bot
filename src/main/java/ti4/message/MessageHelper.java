@@ -1,5 +1,7 @@
 package ti4.message;
 
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+
 import java.io.File;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -33,7 +35,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -1172,13 +1173,5 @@ public class MessageHelper {
             BotLogger.error("Issue injecting Rules into message: " + message, e);
             return message;
         }
-    }
-
-    private static boolean isDiscordServerError(Throwable error) {
-        if (error instanceof ErrorResponseException restError) {
-            Response response = restError.getResponse();
-            return response.code >= 500 && response.code < 600;
-        }
-        return false;
     }
 }
