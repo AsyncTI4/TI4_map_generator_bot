@@ -28,7 +28,7 @@ public class ButtonListener extends ListenerAdapter {
                     .queue();
             return;
         }
-        //event.editMessage()
+        // event.editMessage()
         // Only defer if button does not spawn a Modal
         if (!isModalSpawner(event)) {
             if (shouldShowBotIsThinking(event)) {
