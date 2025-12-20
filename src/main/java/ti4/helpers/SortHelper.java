@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,19 +15,17 @@ public class SortHelper {
     public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
         List<Map.Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
 
-        // Sorting the list based on values
-        list.sort((o1, o2) -> order
-                ? o1.getValue().compareTo(o2.getValue()) == 0
-                        ? o1.getKey().compareTo(o2.getKey())
-                        : o1.getValue().compareTo(o2.getValue())
-                : o2.getValue().compareTo(o1.getValue()) == 0
-                        ? o2.getKey().compareTo(o1.getKey())
-                        : o2.getValue().compareTo(o1.getValue()));
+        Comparator<Map.Entry<String, Integer>> comparator = Comparator
+                .comparing(Map.Entry<String, Integer>::getValue)
+                .thenComparing(Map.Entry::getKey);
+
+        list.sort(order ? comparator : comparator.reversed());
+
         return list.stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
     }
 
     public static void sortButtonsByTitle(List<Button> buttons) {
-        buttons.sort((b1, b2) -> b1.getLabel().compareToIgnoreCase(b2.getLabel()));
+        buttons.sort(Comparator.comparing(Button::getLabel, String.CASE_INSENSITIVE_ORDER));
     }
 }
