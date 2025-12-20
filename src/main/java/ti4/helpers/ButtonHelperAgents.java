@@ -903,7 +903,7 @@ public class ButtonHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             message = ", please choose the first system that you wish to swap a ship between (and transport).";
             List<Button> buttons = new ArrayList<>();
-            List<Tile> tiles = ButtonHelper.getTilesWithUnitsInTheSpaceArea(player, game);
+            List<Tile> tiles = ButtonHelper.getTilesWithUnitsInTheSpaceArea(p2, game);
             for (Tile tile : tiles) {
                 buttons.add(Buttons.gray(
                         p2.getFinsFactionCheckerPrefix() + "redcreussAgentPart1_" + tile.getPosition(),
