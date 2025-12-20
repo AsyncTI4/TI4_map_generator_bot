@@ -49,7 +49,9 @@ public final class StringHelper {
         return Integer.toString(i);
     }
 
-    private static Map<String, String> escapables() {
+    private static final Map<String, String> ESCAPABLES = createEscapables();
+
+    private static Map<String, String> createEscapables() {
         Map<String, String> escape = new LinkedHashMap<>();
         // Do not simply change these values.
         // If you need to change any value, add a line in escape to handle the old value
@@ -62,7 +64,7 @@ public final class StringHelper {
         escape.put(",", "{cma}");
         escape.put("\n", "{nl}");
         escape.put(" ", "{sp}");
-        return escape;
+        return Collections.unmodifiableMap(escape);
     }
 
     // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by
@@ -70,7 +72,7 @@ public final class StringHelper {
     public static String escape(String input) {
         if (input == null) return null;
         String output = input;
-        for (Entry<String, String> entry : escapables().entrySet())
+        for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getKey(), entry.getValue());
         return output.replace("\r", "");
     }
@@ -78,7 +80,7 @@ public final class StringHelper {
     public static String unescape(String input) {
         if (input == null) return null;
         String output = input;
-        for (Entry<String, String> entry : escapables().entrySet())
+        for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getValue(), entry.getKey());
         output = output.replace("666fin", ":");
         output = output.replace("667fin", ",");
