@@ -3452,32 +3452,32 @@ public class ButtonHelper {
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-      if (!(event instanceof ButtonInteractionEvent bevent)) return;
+        if (!(event instanceof ButtonInteractionEvent bevent)) return;
 
-      boolean containsRealButton = false;
-      List<Button> buttons = new ArrayList<>();
-      for (ActionRow row : bevent.getMessage().getComponentTree().findAll(ActionRow.class)) {
-          for (ActionRowChildComponent item : row.getComponents()) {
-              if (!(item instanceof Button b)) continue;
-              if (b.getCustomId() == null) continue;
-              buttons.add(b);
-          }
-      }
-      List<Button> newButtons = new ArrayList<>();
-      for (Button button : buttons) {
-          if (!button.getCustomId().contains(partialID)) {
-              if (!button.getCustomId().contains("deleteButtons")
-                      && !button.getCustomId().contains("ultimateUndo")) {
-                  containsRealButton = true;
-              }
-              newButtons.add(button);
-          }
-      }
-      if (containsRealButton) {
-          MessageHelper.editMessageButtons(bevent, newButtons);
-      } else {
-          deleteMessage(bevent);
-      }
+        boolean containsRealButton = false;
+        List<Button> buttons = new ArrayList<>();
+        for (ActionRow row : bevent.getMessage().getComponentTree().findAll(ActionRow.class)) {
+            for (ActionRowChildComponent item : row.getComponents()) {
+                if (!(item instanceof Button b)) continue;
+                if (b.getCustomId() == null) continue;
+                buttons.add(b);
+            }
+        }
+        List<Button> newButtons = new ArrayList<>();
+        for (Button button : buttons) {
+            if (!button.getCustomId().contains(partialID)) {
+                if (!button.getCustomId().contains("deleteButtons")
+                        && !button.getCustomId().contains("ultimateUndo")) {
+                    containsRealButton = true;
+                }
+                newButtons.add(button);
+            }
+        }
+        if (containsRealButton) {
+            MessageHelper.editMessageButtons(bevent, newButtons);
+        } else {
+            deleteMessage(bevent);
+        }
     }
 
     public static void deleteButtonAndDeleteMessageIfEmpty(ButtonInteractionEvent event, boolean deleteMessage) {
