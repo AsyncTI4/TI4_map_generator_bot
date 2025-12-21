@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
@@ -38,7 +39,8 @@ public class MapRenderPipeline {
 
         String gameName = renderEvent.game.getName();
         Long lastRenderEpochMilli = LAST_RENDERED_AT.get(gameName);
-        if (lastRenderEpochMilli != null
+        if (renderEvent.event instanceof ButtonInteractionEvent
+                && lastRenderEpochMilli != null
                 && System.currentTimeMillis() - lastRenderEpochMilli < MIN_RENDER_INTERVAL_MS) {
             MessageHelper.sendMessageToChannel(
                     renderEvent.event.getMessageChannel(),

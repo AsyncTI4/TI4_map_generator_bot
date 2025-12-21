@@ -3509,10 +3509,14 @@ public class ButtonHelper {
                 .filter(Objects::nonNull)
                 .anyMatch(id -> !"deleteButtons".equalsIgnoreCase(id) && !id.contains("ultimateUndo"));
 
+        List<ActionRow> nonEmptyRows = updatedTree.findAll(ActionRow.class).stream()
+                .filter(row -> !row.getComponents().isEmpty())
+                .toList();
+
         if (deleteMessage && !hasRealButton) {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginalComponents(updatedTree).queue(Consumers.nop(), BotLogger::catchRestError);
+            event.getHook().editOriginalComponents(nonEmptyRows).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
