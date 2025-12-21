@@ -65,7 +65,6 @@ import ti4.model.MapTemplateModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
-import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
@@ -804,7 +803,9 @@ public class Helper {
             planet = Mapper.getPlanet(AliasHandler.resolvePlanet(planetID));
         }
 
-        if (planet != null && planet.getTechSpecialties() != null && !planet.getTechSpecialties().isEmpty()) {
+        if (planet != null
+                && planet.getTechSpecialties() != null
+                && !planet.getTechSpecialties().isEmpty()) {
             return planet.getTechSpecialties().stream()
                     .map(type -> type.toString().toLowerCase())
                     .collect(Collectors.joining());
