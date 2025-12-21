@@ -96,8 +96,7 @@ public class PlayerTechService {
                             + Mapper.getTech(componentID).getRepresentation(false) + ".");
         } else {
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.getRepresentation(false, false) + " removed technology: " + componentID + ".");
+                    event, player.getRepresentation(false, false) + " removed technology: " + componentID + ".");
         }
         if (player.getSingularityTechs().contains(componentID)) {
             String oldVal = player.getGame().getStoredValue(player.getFaction() + "singularityTechs");
