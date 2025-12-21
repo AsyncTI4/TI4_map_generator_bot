@@ -693,27 +693,6 @@ public class MessageHelper {
 
     /**
      * Send a private message to the player.
-     *
-     * @param player Player to send a message to
-     * @param game Active map
-     * @param event Event that caused the message
-     * @param messageText Message to send
-     * @param failText Feedback if the message failed to send
-     * @param successText Feedback if the message successfully sent
-     * @return True if the message was send successfully, false otherwise
-     */
-    public static boolean sendPrivateMessageToPlayer(
-            Player player,
-            Game game,
-            GenericInteractionCreateEvent event,
-            String messageText,
-            String failText,
-            String successText) {
-        return sendPrivateMessageToPlayer(player, game, event.getMessageChannel(), messageText, failText, successText);
-    }
-
-    /**
-     * Send a private message to the player.
      * <p>
      * This implementation does not provide feedback
      *

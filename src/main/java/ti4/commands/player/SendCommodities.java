@@ -86,9 +86,7 @@ class SendCommodities extends GameStateSubcommand {
         }
 
         if (game.isFowMode()) {
-            String fail = "Could not notify receiving player.";
-            String success = "The other player has been notified.";
-            MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event.getChannel(), message, fail, success);
+            MessageHelper.sendMessageToChannel(targetPlayer.getPrivateChannel(), message);
 
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, commString, null);

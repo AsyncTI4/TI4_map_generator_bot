@@ -151,9 +151,7 @@ public class StartTurnService {
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
 
-            String fail = "User for next faction not found. Report to ADMIN";
-            String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(player, game, event, text, fail, success);
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), text);
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
                 FowCommunicationThreadService.checkNewCommPartners(game, player);

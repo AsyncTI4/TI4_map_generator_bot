@@ -75,7 +75,7 @@ public class BastionTechService {
 
     public static void addProximaCombatButton(
             Game game, Player p1, Player p2, Tile tile, UnitHolder holder, List<Button> combatButtons) {
-        if (p1.hasTech("proxima") || (p2.hasTech("proxima") && !game.isFowMode())) {
+        if ((p1.hasTech("proxima") || (p2.hasTech("proxima")) && !game.isFowMode())) {
             String id = "resolveProxima_" + tile.getPosition() + "_" + holder.getName();
             String label = "Use Proxima Targeting on " + holder.getRepresentation(game);
             combatButtons.add(Buttons.red(id, label, FactionEmojis.Bastion));
