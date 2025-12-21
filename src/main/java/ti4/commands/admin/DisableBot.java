@@ -5,9 +5,9 @@ import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 import ti4.settings.GlobalSettings;
 
-class DisableBot extends Subcommand {
+public class DisableBot extends Subcommand {
 
-    DisableBot() {
+    public DisableBot() {
         super("disable_bot", "Quickly run /developer settings READY_TO_RECEIVE_COMMANDS = false");
     }
 

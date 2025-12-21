@@ -47,7 +47,7 @@ public class DraftButtonService {
             return;
         }
         if (outcome.equals(DELETE_BUTTON)) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         } else if (outcome.equals(DELETE_MESSAGE)) {
             ButtonHelper.deleteMessage(event);
         } else if (outcome.startsWith(USER_MISTAKE_PREFIX)) {

@@ -11,8 +11,7 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 
-public final class ResourceHelper {
-
+public class ResourceHelper {
     private static final Pattern PATTERN = Pattern.compile(Constants.UNIT_DD);
     private static ResourceHelper resourceHelper;
     private final Map<String, String> unitCache = new HashMap<>();

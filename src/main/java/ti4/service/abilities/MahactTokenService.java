@@ -97,6 +97,6 @@ public class MahactTokenService {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.checkFleetInEveryTile(player, game);
         if (delAll) ButtonHelper.deleteAllButtons(event);
-        else if (delOne) ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        else if (delOne) ButtonHelper.deleteTheOneButton(event);
     }
 }

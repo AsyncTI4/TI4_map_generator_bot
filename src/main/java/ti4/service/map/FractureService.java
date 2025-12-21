@@ -63,7 +63,7 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void spawnFracture(GenericInteractionCreateEvent event, Game game) {
@@ -176,7 +176,7 @@ public class FractureService {
             FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into the Fracture.", false);
         }
 
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     private static List<Tile> getTilesWithSkipAndNoIngressAndNotAdding(

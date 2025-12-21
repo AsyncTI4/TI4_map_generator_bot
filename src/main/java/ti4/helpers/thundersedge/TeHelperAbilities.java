@@ -81,7 +81,7 @@ public class TeHelperAbilities {
             String msg = player.getRepresentation(false, false) + " removed active breach from "
                     + tile.getRepresentationForButtons(game, player);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         });
     }
 

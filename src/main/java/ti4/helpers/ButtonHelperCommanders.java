@@ -85,7 +85,7 @@ public class ButtonHelperCommanders {
         String msg = player.getFactionEmojiOrColor()
                 + " used Queen Lorena, the Kortali commander, to cancel 1 hit in the first round of combat.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void olradinCommanderStep1(Player player, Game game) {
@@ -117,7 +117,7 @@ public class ButtonHelperCommanders {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Sent " + color + " the buttons for resolving S'ula Mentarion, the Mentak commander.");
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 
@@ -270,7 +270,7 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + " use buttons to remove 1 infantry",
@@ -331,7 +331,7 @@ public class ButtonHelperCommanders {
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(context.getEvent());
+            ButtonHelper.deleteTheOneButton(context.getEvent());
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
@@ -862,13 +862,13 @@ public class ButtonHelperCommanders {
         int amountToKill = 2;
         DestroyUnitService.destroyUnits(
                 event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet, false);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("utilizeSolCommander_")
     public static void resolveSolCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
         MessageHelper.sendMessageToChannel(
@@ -982,7 +982,7 @@ public class ButtonHelperCommanders {
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getSardakkCommanderButtons(

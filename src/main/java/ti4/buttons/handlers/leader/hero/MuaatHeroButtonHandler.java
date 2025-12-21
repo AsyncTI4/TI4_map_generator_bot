@@ -14,6 +14,6 @@ class MuaatHeroButtonHandler {
     @ButtonHandler("novaSeed_")
     public static void novaSeed(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         MuaatHeroService.secondHalfOfNovaSeed(player, event, game.getTileByPosition(buttonID.split("_")[1]), game);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 }

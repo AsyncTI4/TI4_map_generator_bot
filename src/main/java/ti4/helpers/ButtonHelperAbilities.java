@@ -65,7 +65,7 @@ public class ButtonHelperAbilities {
                 p2.getCorrectChannel(),
                 player.getRepresentation() + " placed 1 of " + p2.getRepresentation()
                         + " control tokens on their sheet via their **Data Recovery** ability.");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("mirvedaFS_")
@@ -159,7 +159,7 @@ public class ButtonHelperAbilities {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("facsimileStep2_")
@@ -311,7 +311,7 @@ public class ButtonHelperAbilities {
             }
         }
         String msg = player.getRepresentation() + ", please choose the system you wish to pull fighters from.";
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
@@ -907,7 +907,7 @@ public class ButtonHelperAbilities {
     @ButtonHandler("getDiplomatsButtons")
     public static void resolveGetDiplomatButtons(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         String message = player.getRepresentation() + ", please choose the planet you wish to exhaust.";
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), message, getDiplomatButtons(game, player));
@@ -1152,7 +1152,7 @@ public class ButtonHelperAbilities {
         String superweapon = "superweapon" + buttonID.split("_")[1];
         player.addExhaustedRelic(superweapon);
         Tile tile = getLocationOfSuperweapon(game, name);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         List<Button> buttons = new ArrayList<>();
         switch (name) {
             case "grom" -> {
@@ -1400,7 +1400,7 @@ public class ButtonHelperAbilities {
             techName = "dd2";
         }
         message = player.getRepresentationUnfogged() + " " + message;
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         player.addExhaustedRelic(order);
         for (Player p2 : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(p2, "axiscommander") && !p2.hasTech(techName)) {
@@ -1539,7 +1539,7 @@ public class ButtonHelperAbilities {
                         + "->" + player.getCommodities()
                         + ").");
         CommanderUnlockCheckService.checkPlayer(player, "axis");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("returnAxisOrder_")
@@ -1617,7 +1617,7 @@ public class ButtonHelperAbilities {
         if (!buttonID.contains("prof")) {
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
 
         CommanderUnlockCheckService.checkPlayer(player, "kollecc");
@@ -1735,7 +1735,7 @@ public class ButtonHelperAbilities {
     @ButtonHandler("startHiredGuns")
     public static void startHiredGuns(Player player, Game game, ButtonInteractionEvent event) {
         CommanderUnlockCheckService.checkPlayer(player, "nokar");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue(
                 "hiredGunsInPlay",
                 player.getFaction() + "_" + game.getActivePlayer().getFaction());
@@ -1753,7 +1753,7 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("startSimultaneousTacticalAction")
     public static void startSimultaneousTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         if (game.getActivePlayer() == null
                 || game.getActivePlayer() == player
                 || !player.getAllianceMembers().contains(game.getActivePlayer().getFaction())) {
@@ -1941,7 +1941,7 @@ public class ButtonHelperAbilities {
                     player.getRepresentationUnfogged()
                             + " will NOT get pinged about pillage on their own trade transactions in future pillage opportunities.");
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("mantleCrack_")
@@ -2416,7 +2416,7 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("moult_")
     public static void resolveMoult(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         String pos = buttonID.split("_")[1];
         String generalMsg = player.getFactionEmoji()
                 + " is resolving **Moult** (after winning the space combat) to build 1 ship, reducing the cost by 1 for each of their non-fighter ships destroyed in the combat.";
@@ -2427,7 +2427,7 @@ public class ButtonHelperAbilities {
         String message = player.getRepresentation() + " Use the buttons to produce a ship. "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("munitionsReserves")
@@ -2660,7 +2660,7 @@ public class ButtonHelperAbilities {
         } else {
             ObjectiveHelper.secondHalfOfPeakStage2(game, player, Integer.parseInt(buttonID.split("_")[2]));
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("initialPeak")
@@ -2689,7 +2689,7 @@ public class ButtonHelperAbilities {
         }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         String msg = player.getRepresentation() + ", please choose the system you wish to pull fighters from.";
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 

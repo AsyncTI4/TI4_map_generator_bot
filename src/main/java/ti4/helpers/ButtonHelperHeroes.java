@@ -464,7 +464,7 @@ public class ButtonHelperHeroes {
     @ButtonHandler("relicSwapStep1")
     public static void resolveRelicSwapStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String fanctionNRelic = buttonID.replace("relicSwapStep1_", "");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         String relic = fanctionNRelic.split(";")[1];
         List<String> revealedRelics = getAllRevealedRelics(game);
         String revealMsg = player.getRepresentation() + " you chose to swap the relic "
@@ -540,7 +540,7 @@ public class ButtonHelperHeroes {
                 buttons.add(button);
             }
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -1094,7 +1094,7 @@ public class ButtonHelperHeroes {
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "arboHeroBuild", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getNekroHeroButtons(Player player, Game game) {
@@ -1219,7 +1219,7 @@ public class ButtonHelperHeroes {
 
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         game.setStoredValue("mentakHero", player.getFaction());
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("refreshBelkoseaHero")
@@ -1235,7 +1235,7 @@ public class ButtonHelperHeroes {
         playerLeader.setExhausted(false);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("exhaustBelkoseaHero")
@@ -1254,7 +1254,7 @@ public class ButtonHelperHeroes {
                 event.getChannel(),
                 message
                         + "\nYou will have to use the \"Assign Hits\" button when ANTI-FIGHTER BARRAGE is rolled, since the bot will not know how to auto-assign the produced hits.");
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("purgeTech_")
@@ -1852,7 +1852,7 @@ public class ButtonHelperHeroes {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getEmpyHeroButtons(Player player, Game game) {
@@ -1957,7 +1957,7 @@ public class ButtonHelperHeroes {
     }
 
     public static void offerStealRelicButtons(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         String faction = buttonID.split("_")[1];
         Player victim = game.getPlayerFromColorOrFaction(faction);
         List<Button> buttons = new ArrayList<>();
@@ -2232,7 +2232,7 @@ public class ButtonHelperHeroes {
                 buttons.add(button);
             }
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
                 player.getRepresentationUnfogged() + ", please choose who you wish to give "
@@ -2373,7 +2373,7 @@ public class ButtonHelperHeroes {
             ButtonHelper.deleteMessage(event);
             message += " It must contain exactly 1 more pre-requisite than the technology you are swapping out.";
         } else {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
@@ -2538,7 +2538,7 @@ public class ButtonHelperHeroes {
                         + " returning one of your tokens (\"your kneecaps\" are not an option).",
                 buttons);
         if (vaden.getDebtTokenCount(target.getColor()) == 0) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 

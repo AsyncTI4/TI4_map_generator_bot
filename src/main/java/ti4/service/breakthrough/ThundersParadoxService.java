@@ -57,7 +57,7 @@ public class ThundersParadoxService {
             String message = player.getRepresentation() + " is using their breakthrough, " + paradoxRep()
                     + ". Use the buttons to choose one of your agents to exhaust:";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
 
         } else {
             Player nomad = Helper.getPlayerFromUnlockedBreakthrough(game, "nomadbt");

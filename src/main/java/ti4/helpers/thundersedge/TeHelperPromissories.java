@@ -101,7 +101,7 @@ public class TeHelperPromissories {
                     "%s moved %s from %s to %s using %s.",
                     player.getRepresentation(), unit.humanReadableName(), srcStr, destStr, name);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         });
     }
 

@@ -62,7 +62,7 @@ class OtherHeroButtonHandler {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), heroTitle + ", was not purged - something went wrong.");
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("purgeHacanHero")
@@ -237,7 +237,7 @@ class OtherHeroButtonHandler {
                 player.getCorrectChannel(),
                 msg,
                 ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("purgeBastionHero_")
@@ -253,7 +253,7 @@ class OtherHeroButtonHandler {
                 player.getCorrectChannel(),
                 msg,
                 ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("purgeRedCreussHero_")
@@ -298,7 +298,7 @@ class OtherHeroButtonHandler {
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to duplicate.",
                 buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("ghotiHeroIn_")
@@ -309,6 +309,6 @@ class OtherHeroButtonHandler {
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.",
                 buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 }

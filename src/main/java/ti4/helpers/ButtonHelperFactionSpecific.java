@@ -142,7 +142,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("utilizeAtokeraMech_")
     public static void utilizeAtokeraMech(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
         player.exhaustPlanet(planet);
         unitHolder.removeAllUnitDamage(player.getColor());
@@ -166,7 +166,7 @@ public class ButtonHelperFactionSpecific {
         String message = player.getRepresentationUnfogged() + " Use buttons to get a unit upgrade technology.";
         MessageHelper.sendMessageToChannel(channel, message0);
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveVadenTgForSpeed(Player player, GenericInteractionCreateEvent event) {
@@ -379,7 +379,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("sardakkbtRes")
     public static void sardakkbtRes(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
 
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
         buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Unit Upgrade"));
@@ -482,7 +482,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
 
             List<Button> buttons = new ArrayList<>();
@@ -881,7 +881,7 @@ public class ButtonHelperFactionSpecific {
             msg += " law in play, which is limiting fleet pool to 4 tokens.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("nekroStealTech_")
@@ -919,7 +919,7 @@ public class ButtonHelperFactionSpecific {
                     player.getCorrectChannel(),
                     trueIdentity + ", there are no technologies left for you to copy <sad Nekro noises>.");
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("titansConstructionMechDeployStep2_")
@@ -1311,7 +1311,7 @@ public class ButtonHelperFactionSpecific {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         if (totalHits > 0 && !game.isFowMode()) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
@@ -1459,7 +1459,7 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentationUnfogged()
                         + ", please choose which planet to relocate the Saar ground forces to.",
                 buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         if (event.getButton().getLabel().toLowerCase().contains("please choose which planet to")) {
             ButtonHelper.deleteMessage(event);
         }
@@ -1805,7 +1805,7 @@ public class ButtonHelperFactionSpecific {
                 .get("space")
                 .getUnits()
                 .containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
         if (cabal.hasAbility("amalgamation")) {
             double existingDiscount = 0;
@@ -1840,7 +1840,7 @@ public class ButtonHelperFactionSpecific {
                 .get("space")
                 .getUnits()
                 .containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 
@@ -2041,7 +2041,7 @@ public class ButtonHelperFactionSpecific {
         }
         // AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
         if (amount == 0) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 
@@ -2074,7 +2074,7 @@ public class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please use the buttons to release an infantry onto a planet.",
                 buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("startVortexerRevive")
@@ -2084,7 +2084,7 @@ public class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please use the buttons to release infantry and fighters.",
                 buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void checkForGeneticRecombination(Player voter, Game game) {
@@ -2231,7 +2231,7 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("startQhetInfRevival")
     public static void startQhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         List<Button> infButtons = new ArrayList<>();
         for (String planet : ButtonHelper.getPlanetsWithUnits(player, game)) {
             infButtons.add(Buttons.green("qhetInfRevival_" + planet, Helper.getPlanetRepresentation(planet, game)));
@@ -2310,7 +2310,7 @@ public class ButtonHelperFactionSpecific {
         String message = player.getRepresentationUnfogged() + ", please resolve **Necrophage** ability using buttons. ";
         List<Button> buttons = gainOrConvertCommButtons(player, true);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("pharadnPNUse")
@@ -2321,7 +2321,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons =
                 new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter) {
@@ -2611,7 +2611,7 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentation() + " discarded the top card of the " + deckType
                         + " deck. The discarded card was _" + top.getName() + "_.");
         game.discardExplore(topCard);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveKolleccAbilities(Player player, Game game) {
@@ -2899,7 +2899,7 @@ public class ButtonHelperFactionSpecific {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please pay two resources for your mech.",
                 options);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveDarkPactCheck(Game game, Player sender, Player receiver, int numOfComms) {
@@ -3420,7 +3420,7 @@ public class ButtonHelperFactionSpecific {
         }
         sb.append(".");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("creussTFCruiserStep2_")
@@ -3910,7 +3910,7 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("salvageOps_")
     public static void resolveSalvageOps(Player player, ButtonInteractionEvent event, String buttonID, Game game) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         player.setTg(player.getTg() + 1);

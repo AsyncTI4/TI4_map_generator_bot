@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -26,14 +25,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponentUnion;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.replacer.ComponentReplacer;
-import net.dv8tion.jda.api.components.tree.MessageComponentTree;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -1114,7 +1110,7 @@ public class ButtonHelper {
                     + player.getRepresentationNoPing() + " using **Trade**.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         }
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
         if (!p2.getFollowedSCs().contains(5)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(p2, 5, game, event);
         }
@@ -2114,7 +2110,7 @@ public class ButtonHelper {
                         + " and gained 1 trade good (" + oldTg + "->" + player.getTg() + ") using _Psychoarcheology_.");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     @ButtonHandler("biostimsReady_")
@@ -3143,7 +3139,7 @@ public class ButtonHelper {
                         + " the _Minister of Peace_ law. 1 command token has been placed from your tactic pool in the system and your turn has been ended."
                         + " Use the buttons to resolve \"end of turn\" abilities and then end turn.",
                 conclusionButtons);
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     public static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
@@ -3373,14 +3369,14 @@ public class ButtonHelper {
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent bevent) {
-            bevent.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
+            bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
     public static void deleteMessageDelay(GenericInteractionCreateEvent event, int delaySeconds) {
         if (event instanceof ButtonInteractionEvent bevent) {
             if (delaySeconds > 20) delaySeconds = 20;
-            bevent.getHook().deleteOriginal().queueAfter(delaySeconds, TimeUnit.SECONDS);
+            bevent.getMessage().delete().queueAfter(delaySeconds, TimeUnit.SECONDS);
         }
     }
 
@@ -3400,9 +3396,10 @@ public class ButtonHelper {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static void deleteButtonAndDeleteMessageIfEmpty(GenericInteractionCreateEvent event) {
+    public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent bevent) {
-            deleteButtonAndDeleteMessageIfEmpty(bevent, true);
+            bevent.getMessage();
+            deleteTheOneButton(bevent, bevent.getButton().getCustomId(), true);
         }
     }
 
@@ -3481,38 +3478,32 @@ public class ButtonHelper {
         }
     }
 
-    public static void deleteButtonAndDeleteMessageIfEmpty(ButtonInteractionEvent event, boolean deleteMessage) {
-        MessageComponentTree updatedTree = event.getMessage()
-                .getComponentTree()
-                .replace(ComponentReplacer.byUniqueId(event.getButton().getUniqueId(), (Component) null));
+    public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
+        if (event == null) return;
 
-        deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
-    }
+        boolean hasRealButton = false;
+        List<ActionRow> remainingRows = new ArrayList<>();
+        for (ActionRow row : event.getMessage().getComponentTree().findAll(ActionRow.class)) {
+            List<Button> newActionRow = new ArrayList<>();
+            for (ActionRowChildComponent item : row.getComponents()) {
+                if (!(item instanceof Button b)) continue;
+                if (b.getCustomId() == null || b.getCustomId().equals(buttonID)) continue;
 
-    public static void deleteButtonAndDeleteMessageIfEmpty(
-            ButtonInteractionEvent event, String customButtonId, boolean deleteMessage) {
-        MessageComponentTree updatedTree = event.getMessage()
-                .getComponentTree()
-                .replace(ComponentReplacer.of(
-                        Button.class,
-                        b -> customButtonId.equals(b.getCustomId()),
-                        b -> null // returning null removes the component
-                        ));
+                newActionRow.add(b);
+                if (!"deleteButtons".equalsIgnoreCase(b.getCustomId())
+                        && !b.getCustomId().contains("ultimateUndo")) {
+                    hasRealButton = true;
+                }
+            }
+            if (!newActionRow.isEmpty()) {
+                remainingRows.add(ActionRow.of(newActionRow));
+            }
+        }
 
-        deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
-    }
-
-    private static void deleteButtonAndDeleteMessageIfEmpty(
-            ButtonInteractionEvent event, MessageComponentTree updatedTree, boolean deleteMessage) {
-        boolean hasRealButton = updatedTree.findAll(Button.class).stream()
-                .map(Button::getCustomId)
-                .filter(Objects::nonNull)
-                .anyMatch(id -> !"deleteButtons".equalsIgnoreCase(id) && !id.contains("ultimateUndo"));
-
-        if (deleteMessage && !hasRealButton) {
-            event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
+        if (deleteMsg && !hasRealButton) {
+            deleteMessage(event);
         } else {
-            event.getHook().editOriginalComponents(updatedTree).queue(Consumers.nop(), BotLogger::catchRestError);
+            event.getMessage().editMessageComponents(remainingRows).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -4193,7 +4184,7 @@ public class ButtonHelper {
                         + " is using their breakthrough to explore the frontier deck in their home system.");
         Tile tile = game.getTileByPosition(pos);
         ExploreService.expFront(event, tile, game, player, true);
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     public static Button getEndTurnButton(Game game, Player player) {
@@ -4639,7 +4630,7 @@ public class ButtonHelper {
 
     @ButtonHandler("healCoatl")
     public static void healCoatl(ButtonInteractionEvent event, Game game, Player player) {
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), "# " + player.getRepresentation() + " healed the Coatl!");
         String message2 = player.getRepresentationUnfogged()
@@ -4676,7 +4667,7 @@ public class ButtonHelper {
             if (!buttonID.endsWith("_stay")) {
                 deleteMessage(event);
             } else {
-                deleteButtonAndDeleteMessageIfEmpty(event);
+                deleteTheOneButton(event);
             }
         }
     }
@@ -5755,7 +5746,7 @@ public class ButtonHelper {
     public static void resolveTransitDiodesStep2(
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = getButtonsForMovingGroundForcesToAPlanet(game, buttonID.split("_")[1], player);
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation() + ", use buttons to choose the troops you wish to move to "
@@ -5979,7 +5970,7 @@ public class ButtonHelper {
             tile.addToken(tokenFilenameAlpha, "space");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), "Flipped ionstorm in " + tile.getRepresentation());
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     public static List<Tile> getAllWormholeTiles(Game game) {
@@ -6209,7 +6200,7 @@ public class ButtonHelper {
         }
         buttons.add(Buttons.blue("rollThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Now"));
         buttons.add(Buttons.red("deleteButtons", "Don't Roll Anything"));
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
         String message = player.getRepresentation()
                 + ", please choose the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -7473,7 +7464,7 @@ public class ButtonHelper {
 
     @ButtonHandler("cashInPathTokens")
     public static void cashInPathTokens(ButtonInteractionEvent event, Game game, Player player) {
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
         player.setPathTokenCounter(player.getPathTokenCounter() - 6);
         String msg1 = player.getRepresentation()
                 + " chose to turn in 6 **Path** tokens in order to resolve the secondary ability of any strategy card.";
@@ -7486,7 +7477,7 @@ public class ButtonHelper {
 
     @ButtonHandler("startPath")
     public static void startPath(ButtonInteractionEvent event, Game game, Player player) {
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 "Use buttons to choose your next turn's **Path**.",
@@ -7535,8 +7526,8 @@ public class ButtonHelper {
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("endTurnWhenSCFinished", sc + player.getFaction());
-        deleteButtonAndDeleteMessageIfEmpty(event);
-        deleteButtonAndDeleteMessageIfEmpty(event, "fleetLogWhenAllReactedTo_" + sc, true);
+        deleteTheOneButton(event);
+        deleteTheOneButton(event, "fleetLogWhenAllReactedTo_" + sc, true);
         for (Player p2 : game.getRealPlayers()) {
             if (!p2.hasFollowedSC(Integer.parseInt(sc))) {
                 return;
@@ -7556,7 +7547,7 @@ public class ButtonHelper {
                         + ", the active player has elected to move the game along after this splice finishes. Please respond as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("endTurnWhenSpliceEnds", player.getFaction());
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     @ButtonHandler("fleetLogWhenAllReactedTo_")
@@ -7580,8 +7571,8 @@ public class ButtonHelper {
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("fleetLogWhenSCFinished", sc + player.getFaction());
-        deleteButtonAndDeleteMessageIfEmpty(event);
-        deleteButtonAndDeleteMessageIfEmpty(event, "endTurnWhenAllReactedTo_" + sc, true);
+        deleteTheOneButton(event);
+        deleteTheOneButton(event, "endTurnWhenAllReactedTo_" + sc, true);
     }
 
     @ButtonHandler("moveAlongAfterAllHaveReactedToAC_")
@@ -7593,7 +7584,7 @@ public class ButtonHelper {
                         + " the active player has elected to move the game along after everyone has said \"No Sabo\" to _"
                         + ac + "_. Please respond as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     @ButtonHandler("resolveTwilightMirror")
@@ -8038,7 +8029,7 @@ public class ButtonHelper {
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose which planet you wish to drop 1 mech on.",
                 buttons);
-        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteTheOneButton(event);
     }
 
     @ButtonHandler("sarMechStep2_")

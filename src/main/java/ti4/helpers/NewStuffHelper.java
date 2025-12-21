@@ -109,7 +109,8 @@ public class NewStuffHelper {
 
     public static void sendOrEditButtons(
             GenericInteractionCreateEvent event, MessageChannel channel, String message, List<Button> buttons) {
-        if (event instanceof ButtonInteractionEvent bEvent
+        if (event != null
+                && event instanceof ButtonInteractionEvent bEvent
                 && bEvent.getMessage().getContentRaw().equals(message)) {
             // replace the buttons in the previous message
             List<List<ActionRow>> actionRows = MessageHelper.getPartitionedButtonLists(buttons);

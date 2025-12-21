@@ -494,16 +494,16 @@ public class ButtonHelperAgents {
         AddUnitService.addUnits(event, tileDestination, game, player.getColor(), unit + " " + planetDestination);
         if ("mech".equalsIgnoreCase(unit)) {
             if (uH.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
-                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+                ButtonHelper.deleteTheOneButton(event);
             }
             CommanderUnlockCheckService.checkPlayer(player, "naaz");
         } else {
             if ("pds".equalsIgnoreCase(unit)) {
                 if (uH.getUnitCount(UnitType.Pds, player.getColor()) < 1) {
-                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+                    ButtonHelper.deleteTheOneButton(event);
                 }
             } else if (uH.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
-                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+                ButtonHelper.deleteTheOneButton(event);
             }
         }
         if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
@@ -810,7 +810,7 @@ public class ButtonHelperAgents {
                         .getMessage()
                         .editMessage(exhaustedMessage)
                         .queue(Consumers.nop(), BotLogger::catchRestError);
-                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
+                ButtonHelper.deleteTheOneButton(buttonEvent);
             }
             return;
         }
@@ -1539,7 +1539,7 @@ public class ButtonHelperAgents {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
                     buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
-                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
+                    ButtonHelper.deleteTheOneButton(buttonEvent);
                 }
 
             } else {
@@ -2492,7 +2492,7 @@ public class ButtonHelperAgents {
                     tile.getRepresentationForButtons(game, player)));
         }
         if (buttonID.contains("hero")) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         } else {
             ButtonHelper.deleteMessage(event);
         }
@@ -2802,7 +2802,7 @@ public class ButtonHelperAgents {
             exhaustedMessage = "Combat";
         }
         event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     private static List<Button> getJolNarAgentButtons(Player player, Game game) {
@@ -2840,7 +2840,7 @@ public class ButtonHelperAgents {
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + unitHName);
         ButtonHelper.resolveInfantryRemoval(player, 1);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 }

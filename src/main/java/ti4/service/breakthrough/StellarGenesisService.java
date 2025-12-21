@@ -72,7 +72,7 @@ public class StellarGenesisService {
             String destination = matcher.group("destination");
             Tile tile = game.getTileByPosition(destination);
             TokenPlanetService.moveTokenPlanet(game, player, tile, Constants.AVERNUS);
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
             List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
             if (playersWithPds2.contains(player)) {
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);

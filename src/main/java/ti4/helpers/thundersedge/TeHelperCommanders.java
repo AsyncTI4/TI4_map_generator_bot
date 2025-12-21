@@ -46,7 +46,7 @@ public class TeHelperCommanders {
 
         // Add the discount to spent things for the player using the discount
         player.addSpentThing("dwsDiscount_" + commanderFaction);
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+        ButtonHelper.deleteTheOneButton(event, buttonID, false);
         String editedMsg = Helper.buildSpentThingsMessage(player, game, "res");
         event.editMessage(editedMsg).queue(Consumers.nop(), BotLogger::catchRestError);
 

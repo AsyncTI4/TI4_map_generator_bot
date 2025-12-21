@@ -124,7 +124,7 @@ class ActionCardHandButtonHandler {
             if (!retainButtons) {
                 ButtonHelper.deleteMessage(event);
             } else {
-                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
+                ButtonHelper.deleteTheOneButton(event, buttonID, false);
             }
             if (player.hasUnexhaustedLeader("cymiaeagent")) {
                 List<Button> buttons2 = new ArrayList<>();
@@ -302,7 +302,7 @@ class ActionCardHandButtonHandler {
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         if (!game.isTwilightsFallMode()) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 
@@ -311,7 +311,7 @@ class ActionCardHandButtonHandler {
         try {
             int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
             ActionCardHelper.drawActionCards(game, player, count, true);
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            ButtonHelper.deleteTheOneButton(event);
         } catch (Exception ignored) {
         }
     }

@@ -257,7 +257,7 @@ public class PlayerPreferenceHelper {
         userSetting.addAfkHour(time);
         UserSettingsManager.save(userSetting);
 
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
