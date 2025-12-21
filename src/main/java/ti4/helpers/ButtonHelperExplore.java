@@ -21,7 +21,7 @@ class ButtonHelperExplore {
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
         ButtonHelper.resolveFullFrontierExplore(game, player, game.getTileByPosition(pos), event);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("freelancersBuild_")
@@ -53,7 +53,7 @@ class ButtonHelperExplore {
             }
         }
         if (fragmentsToPurge.size() == count) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
         while (fragmentsToPurge.size() > count) {
             fragmentsToPurge.removeFirst();

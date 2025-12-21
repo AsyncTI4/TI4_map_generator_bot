@@ -1004,7 +1004,7 @@ public class ButtonHelperActionCards {
                 buttons.add(button);
             }
         }
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String msg = ", please choose who controls the planet that you wish to target.";
         if (game.isFowMode()) {
             BlindSelectionService.filterForBlindPlanetSelection(
@@ -1302,7 +1302,7 @@ public class ButtonHelperActionCards {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you retained " + Helper.getSCName(scNum, game) + ".");
         if (game.getRealPlayers().size() < 5) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
             ButtonHelper.deleteMessage(event);
         }

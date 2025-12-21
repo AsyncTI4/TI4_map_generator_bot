@@ -778,7 +778,7 @@ public class ButtonHelperTwilightsFall {
         game.setStoredValue(
                 "veiledCards" + player.getFaction(),
                 game.getStoredValue("veiledCards" + player.getFaction()).replace(cardID + "_", ""));
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("drawParadigm")
@@ -1176,7 +1176,7 @@ public class ButtonHelperTwilightsFall {
         if (cardsToDraw.isEmpty()) {
             String messageText = "There are no more cards in the " + type + " deck.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), messageText);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             return;
         }
         String cardID = cardsToDraw.getFirst();

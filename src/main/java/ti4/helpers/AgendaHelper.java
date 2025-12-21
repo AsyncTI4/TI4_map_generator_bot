@@ -1180,7 +1180,7 @@ public class AgendaHelper {
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
             event.getMessage().editMessage(totalVotesSoFar).queue(Consumers.nop(), BotLogger::catchRestError);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
             if ("Exhaust stuff".equalsIgnoreCase(totalVotesSoFar)) {
                 totalVotesSoFar =
@@ -1194,7 +1194,7 @@ public class AgendaHelper {
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf('\n'));
             }
             event.getMessage().editMessage(totalVotesSoFar).queue(Consumers.nop(), BotLogger::catchRestError);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             String message;
             if (buttonID.contains("everything")) {
                 message = "Exhausted all planets for " + votes + " vote" + ("1".equals(votes) ? "" : "s");
@@ -2758,7 +2758,7 @@ public class AgendaHelper {
                 game.setStoredValue("riskedPredictive", game.getStoredValue("riskedPredictive") + player.getFaction());
             }
             if (!finalRes) {
-                ButtonHelper.deleteTheOneButton(event);
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
         } else {
             if (thing.contains("hacan")) {
@@ -2769,7 +2769,7 @@ public class AgendaHelper {
                     player.increaseTgsSpentThisWindow(1);
                 }
                 if (player.getTg() < 1) {
-                    ButtonHelper.deleteTheOneButton(event);
+                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
                 }
             }
             if (thing.contains("kyro")) {
@@ -2807,7 +2807,7 @@ public class AgendaHelper {
                     }
                 }
                 if (!finalRes) {
-                    ButtonHelper.deleteTheOneButton(event);
+                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
                 }
             }
         }
@@ -3316,7 +3316,7 @@ public class AgendaHelper {
 
     @ButtonHandler("ministerOfWar")
     public static void resolveMinisterOfWar(Game game, Player player, ButtonInteractionEvent event) {
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         boolean success = game.removeLaw(game.getLaws().get("minister_war"));
         if (success) {
             String msg = "The _Minister of War_ law has been discarded.";
@@ -4397,7 +4397,7 @@ public class AgendaHelper {
     public static void retrieveAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String agendaID = buttonID.substring(buttonID.indexOf('_') + 1);
         drawSpecificAgenda(agendaID, game, player);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("discardAgenda_")

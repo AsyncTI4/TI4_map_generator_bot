@@ -128,7 +128,7 @@ public class DataSkimmerService {
     }
 
     @ButtonHandler(value = "peekDataSkimmer", save = false)
-    public static void peekDataSkimmer(ButtonInteractionEvent event, Game game, Player ralnel) {
+    public static void peekDataSkimmer(ButtonInteractionEvent event, Game game) {
         String dataSkimmerText = ShowActionCardsService.getDataSkimmerDiscardText(game, true);
         List<String> splits = MessageHelper.splitLargeText(dataSkimmerText, 2000);
         for (String split : splits) {

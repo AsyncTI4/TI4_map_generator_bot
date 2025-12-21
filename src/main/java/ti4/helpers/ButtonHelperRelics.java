@@ -66,7 +66,7 @@ public class ButtonHelperRelics {
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.checkACLimit(game, player);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
             String msg = " exhausted _The Prophet's Tears_.";
             String exhaustedMessage = event.getMessage().getContentRaw();
@@ -76,7 +76,7 @@ public class ButtonHelperRelics {
                 exhaustedMessage = player.getRepresentation() + msg;
             }
             event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 

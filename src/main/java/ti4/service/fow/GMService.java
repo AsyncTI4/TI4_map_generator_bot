@@ -388,6 +388,6 @@ public class GMService {
                 event.getChannel(),
                 "Created private channel for " + player.getUserName() + ": "
                         + player.getPrivateChannel().getAsMention());
-        ButtonHelper.deleteTheOneButton(event, buttonID, false);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
     }
 }

@@ -888,7 +888,7 @@ public class ButtonHelperModifyUnits {
                                 .getUnitType(),
                         color)
                 < 1) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -942,7 +942,7 @@ public class ButtonHelperModifyUnits {
                                 .getUnitType(),
                         player.getColor())
                 < 1) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -1274,13 +1274,13 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
         if (uh.getUnitCount(UnitType.Fighter, player) < 1) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 
     @ButtonHandler("startDevotion_")
     public static void startDevotion(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         String msg = player.getRepresentation() + ", please choose which unit of yours to destroy.";
         List<Button> buttons = getUnitsToDevote(player, game, event, tile, "devote");
@@ -1364,7 +1364,7 @@ public class ButtonHelperModifyUnits {
 
     @ButtonHandler("magenHit_")
     public static void magenHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String planet = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving _Magen Defense Grid_.");
@@ -1376,7 +1376,7 @@ public class ButtonHelperModifyUnits {
 
     @ButtonHandler("ruthlessHit_")
     public static void ruthlessHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String planet = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving **Ruthless**.");
@@ -2043,11 +2043,11 @@ public class ButtonHelperModifyUnits {
         UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if ("mech".equalsIgnoreCase(unit)) {
             if (uh.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
-                ButtonHelper.deleteTheOneButton(event);
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
         } else {
             if (uh.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
-                ButtonHelper.deleteTheOneButton(event);
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
         }
     }
@@ -2430,7 +2430,7 @@ public class ButtonHelperModifyUnits {
                 player.getRepresentationUnfogged()
                         + ", please choose how many fighters you wish to convert to infantry.",
                 buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("offerMirvedaCommander")
@@ -2453,7 +2453,7 @@ public class ButtonHelperModifyUnits {
                 player.getRepresentationUnfogged()
                         + ", please choose how many infantry you wish to convert to fighters.",
                 buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("resolveMirvedaCommander_")

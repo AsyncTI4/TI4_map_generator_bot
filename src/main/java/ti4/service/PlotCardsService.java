@@ -50,7 +50,7 @@ public class PlotCardsService {
                 String msg = player.getRepresentation() + " added a " + player2 + " token to plot "
                         + player.getPlotCards().get(plotID);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                ButtonHelper.deleteTheOneButton(event);
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
             CommanderUnlockCheckService.checkPlayer(player, "firmament");
         }
@@ -78,7 +78,7 @@ public class PlotCardsService {
                 String msg = player.getRepresentation() + " removed a " + player2 + " token from plot "
                         + player.getPlotCards().get(plotID);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                ButtonHelper.deleteTheOneButton(event);
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
             CommanderUnlockCheckService.checkPlayer(player, "firmament");
         }
@@ -108,7 +108,7 @@ public class PlotCardsService {
             String message = player.getRepresentation() + " Choose a non-home planet controlled by "
                     + puppet.getRepresentation(false, false) + " to eradicate:";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
     }
 
@@ -132,7 +132,7 @@ public class PlotCardsService {
             String message = player.getRepresentation() + " Choose a technology to gain from "
                     + puppet.getRepresentation(false, false) + ":";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
     }
 

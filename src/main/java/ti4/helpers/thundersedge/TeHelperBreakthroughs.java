@@ -1,5 +1,6 @@
 package ti4.helpers.thundersedge;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -11,6 +12,7 @@ import ti4.service.breakthrough.TheIconService;
 import ti4.service.breakthrough.VaultsOfTheHeirService;
 import ti4.service.breakthrough.VisionariaSelectService;
 
+@UtilityClass
 public class TeHelperBreakthroughs {
     public static boolean handleBreakthroughExhaust(
             GenericInteractionCreateEvent event, Game game, Player player, String breakthroughID) {
