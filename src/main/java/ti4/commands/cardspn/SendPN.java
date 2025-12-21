@@ -131,9 +131,7 @@ class SendPN extends GameStateSubcommand {
         String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition
                 + targetPlayer.getRepresentation() + ".";
         if (game.isFowMode()) {
-            String fail = "User for faction not found. Report to ADMIN.";
-            String success = message + "\nThe other player has been notified.";
-            MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event, message, fail, success);
+            MessageHelper.sendMessageToChannel(targetPlayer.getPrivateChannel(), message);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Promissory note sent.");
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
