@@ -303,7 +303,7 @@ public class PlayerTechService {
             case "aida", "sar", "htp", "absol_aida" -> {
                 if (event instanceof ButtonInteractionEvent buttonEvent) {
                     tech = tech.replace("absol_", "");
-                    ButtonHelper.deleteTheOneButton(buttonEvent);
+                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
                     if (buttonEvent.getButton().getLabel().contains("(")) {
                         player.addSpentThing(tech + "_");
                     } else {
@@ -538,7 +538,7 @@ public class PlayerTechService {
 
     public static void deleteTheOneButtonIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 

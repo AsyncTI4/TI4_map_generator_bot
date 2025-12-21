@@ -35,7 +35,7 @@ public class ButtonContext extends ListenerContext {
 
         if (componentID.contains("deleteThisButton")) {
             componentID = componentID.replace("deleteThisButton", "");
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
 
         if (componentID.contains("deleteThisMessage")) {

@@ -85,7 +85,7 @@ public class DSHelperBreakthroughs {
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
                         + " has used their Axis breakthrough to move any number of ships between two systems with their spacedocks.");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the first system that you wish to swap a ship between (and transport).";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock);
@@ -108,7 +108,7 @@ public class DSHelperBreakthroughs {
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
                         + " has used their Florzen breakthrough to choose another player and each simultaenously spend 0/1/2tgs. If they spend the same, Florzen gets a random PN.");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the target player.";
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
@@ -188,7 +188,7 @@ public class DSHelperBreakthroughs {
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation() + " has used their Lanefir breakthrough to explore 1 planet they control.");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);

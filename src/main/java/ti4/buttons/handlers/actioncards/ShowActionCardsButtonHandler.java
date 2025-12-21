@@ -18,13 +18,13 @@ class ShowActionCardsButtonHandler {
 
     @ButtonHandler(value = "ACShowDiscardFullText", save = false)
     public static void showDiscardFullText(ButtonInteractionEvent event, Game game) {
-        ButtonHelper.deleteTheOneButton(event, "ACShowDiscardFullText", false);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
         ShowActionCardsService.showDiscard(game, event, true);
     }
 
     @ButtonHandler(value = "ACShowUnplayedFullText", save = false)
     public static void showUnplayedFullText(ButtonInteractionEvent event, Game game) {
-        ButtonHelper.deleteTheOneButton(event, "ACShowUnplayedFullText", false);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
         ShowActionCardsService.showUnplayedACs(game, event, true);
     }
 }

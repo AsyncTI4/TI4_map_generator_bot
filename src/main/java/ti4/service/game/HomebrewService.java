@@ -102,7 +102,7 @@ public class HomebrewService {
 
     @ButtonHandler("setupHomebrew_")
     public static void setUpHomebrew(Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         game.setHomebrew(true);
 
         Homebrew type = Homebrew.valueOf(buttonID.split("_")[1]);

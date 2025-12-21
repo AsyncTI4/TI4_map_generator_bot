@@ -181,7 +181,7 @@ public class EdictPhaseHandler {
                     buttons);
         }
 
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("conveneStep2_")

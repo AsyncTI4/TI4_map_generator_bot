@@ -77,8 +77,8 @@ public class VisionariaSelectService {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         game.setTemporaryPingDisable(true);
         game.setStoredValue(buttonID, player.getFaction());
-        ButtonHelper.deleteTheOneButton(event, "endTurnAfterVisionaria", true);
-        ButtonHelper.deleteTheOneButton(event, "fleetLogAfterVisionaria", true);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, true);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, true);
     }
 
     @ButtonHandler("declineVisionaria")
