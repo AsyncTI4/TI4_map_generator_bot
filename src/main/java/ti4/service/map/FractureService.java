@@ -25,6 +25,7 @@ import ti4.model.ColorModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.rules.ThundersEdgeRulesService;
 import ti4.service.unit.AddUnitService;
 
@@ -154,10 +155,19 @@ public class FractureService {
                     })
                     .toList());
 
-            String msg =
-                    player.getRepresentation() + " choose tiles with a " + type.emoji() + " to place an Ingress token:";
+            String msg = game.isFowMode()
+                    ? GMService.gmPing(game)
+                    : player.getRepresentation() + " choose tiles with a " + type.emoji()
+                            + " to place an Ingress token:";
             buttons.add(Buttons.gray("deleteButtons", "Done resolving"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(), msg, buttons);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getPrivateChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", buttons to resolve Ingress tokens for the Fracture have been sent to the GM.");
+            }
         }
 
         ThundersEdgeRulesService.alertTabletalkWithFractureRules(game);

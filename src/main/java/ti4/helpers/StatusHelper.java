@@ -671,7 +671,7 @@ public class StatusHelper {
                 techs++;
                 buttons.add(Buttons.blue("redistributeCCButtons", "Gain 2 Command Tokens (And Spend 1 Strat)"));
             }
-            String scarMessage = player.getRepresentation()
+            String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
             scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";
             if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
