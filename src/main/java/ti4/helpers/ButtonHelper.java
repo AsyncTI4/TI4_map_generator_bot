@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.Component;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.actionrow.ActionRowChildComponent;
@@ -3453,53 +3452,63 @@ public class ButtonHelper {
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-        if (event instanceof ButtonInteractionEvent bevent) {
-            boolean containsRealButton = false;
-            List<Button> buttons = new ArrayList<>();
-            for (ActionRow row : bevent.getMessage().getComponentTree().findAll(ActionRow.class)) {
-                for (ActionRowChildComponent item : row.getComponents()) {
-                    if (!(item instanceof Button b)) continue;
-                    if (b.getCustomId() == null) continue;
-                    buttons.add(b);
+        if (!(event instanceof ButtonInteractionEvent bevent)) return;
+
+        boolean containsRealButton = false;
+        List<Button> buttons = new ArrayList<>();
+        for (ActionRow row : bevent.getMessage().getComponentTree().findAll(ActionRow.class)) {
+            for (ActionRowChildComponent item : row.getComponents()) {
+                if (!(item instanceof Button b)) continue;
+                if (b.getCustomId() == null) continue;
+                buttons.add(b);
+            }
+        }
+        List<Button> newButtons = new ArrayList<>();
+        for (Button button : buttons) {
+            if (!button.getCustomId().contains(partialID)) {
+                if (!button.getCustomId().contains("deleteButtons")
+                        && !button.getCustomId().contains("ultimateUndo")) {
+                    containsRealButton = true;
                 }
+                newButtons.add(button);
             }
-            List<Button> newButtons = new ArrayList<>();
-            for (Button button : buttons) {
-                if (!button.getCustomId().contains(partialID)) {
-                    if (!button.getCustomId().contains("deleteButtons")
-                            && !button.getCustomId().contains("ultimateUndo")) {
-                        containsRealButton = true;
-                    }
-                    newButtons.add(button);
-                }
-            }
-            if (containsRealButton) {
-                MessageHelper.editMessageButtons(bevent, newButtons);
-            } else {
-                deleteMessage(bevent);
-            }
+        }
+        if (containsRealButton) {
+            MessageHelper.editMessageButtons(bevent, newButtons);
+        } else {
+            deleteMessage(bevent);
         }
     }
 
     public static void deleteButtonAndDeleteMessageIfEmpty(ButtonInteractionEvent event, boolean deleteMessage) {
-        MessageComponentTree updatedTree = event.getMessage()
-                .getComponentTree()
-                .replace(ComponentReplacer.byUniqueId(event.getButton().getUniqueId(), (Component) null));
+        int uniqueId = event.getButton().getUniqueId();
+
+        MessageComponentTree updatedTree =
+                removeButtonsSafely(event.getMessage().getComponentTree(), b -> b.getUniqueId() == uniqueId);
 
         deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
     }
 
     public static void deleteButtonAndDeleteMessageIfEmpty(
             ButtonInteractionEvent event, String customButtonId, boolean deleteMessage) {
-        MessageComponentTree updatedTree = event.getMessage()
-                .getComponentTree()
-                .replace(ComponentReplacer.of(
-                        Button.class,
-                        b -> customButtonId.equals(b.getCustomId()),
-                        b -> null // returning null removes the component
-                        ));
+        MessageComponentTree updatedTree =
+                removeButtonsSafely(event.getMessage().getComponentTree(), b -> customButtonId.equals(b.getCustomId()));
 
         deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
+    }
+
+    private static MessageComponentTree removeButtonsSafely(MessageComponentTree tree, Predicate<Button> shouldRemove) {
+        return tree.replace(ComponentReplacer.of(
+                ActionRow.class,
+                row -> row.getComponents().stream().anyMatch(c -> c instanceof Button b && shouldRemove.test(b)),
+                row -> {
+                    List<ActionRowChildComponentUnion> kept = row.getComponents().stream()
+                            .filter(c -> !(c instanceof Button b && shouldRemove.test(b)))
+                            .toList();
+
+                    // If we'd end up with an empty row, remove the row entirely (null = remove)
+                    return kept.isEmpty() ? null : ActionRow.of(kept);
+                }));
     }
 
     private static void deleteButtonAndDeleteMessageIfEmpty(
@@ -3509,14 +3518,10 @@ public class ButtonHelper {
                 .filter(Objects::nonNull)
                 .anyMatch(id -> !"deleteButtons".equalsIgnoreCase(id) && !id.contains("ultimateUndo"));
 
-        List<ActionRow> nonEmptyRows = updatedTree.findAll(ActionRow.class).stream()
-                .filter(row -> !row.getComponents().isEmpty())
-                .toList();
-
         if (deleteMessage && !hasRealButton) {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginalComponents(nonEmptyRows).queue(Consumers.nop(), BotLogger::catchRestError);
+            event.getHook().editOriginalComponents(updatedTree).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
