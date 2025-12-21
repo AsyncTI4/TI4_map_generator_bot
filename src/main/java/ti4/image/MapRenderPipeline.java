@@ -27,7 +27,7 @@ public class MapRenderPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
-    private static final long MIN_RENDER_INTERVAL_MS = Duration.ofSeconds(15).toMillis();
+    private static final long MIN_RENDER_INTERVAL_MS = Duration.ofSeconds(5).toMillis();
     private static final ConcurrentHashMap<String, Long> LAST_RENDERED_AT = new ConcurrentHashMap<>();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
