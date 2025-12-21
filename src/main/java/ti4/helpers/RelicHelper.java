@@ -283,9 +283,7 @@ public class RelicHelper {
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc", "bentor");
 
         if (game.isFowMode()) {
-            String fail = "User for faction not found. Report to ADMIN";
-            String success = "The other player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(receiver, game, event, message, fail, success);
+            MessageHelper.sendMessageToChannel(receiver.getPrivateChannel(), message);
 
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);

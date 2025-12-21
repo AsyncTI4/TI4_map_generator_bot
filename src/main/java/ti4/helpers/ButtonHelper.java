@@ -7330,9 +7330,7 @@ public class ButtonHelper {
             }
             String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
-            String fail = "User for next faction not found. Report to ADMIN";
-            String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(player, game, event, msgExtra, fail, success);
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), msgExtra);
             game.updateActivePlayer(player);
 
             StartTurnService.reviveInfantryII(player);
