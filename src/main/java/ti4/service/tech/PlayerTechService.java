@@ -83,27 +83,27 @@ public class PlayerTechService {
     }
 
     @ButtonHandler("resolveSingularity")
-    public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
-        if (techID.contains("resolveSingularity")) {
-            techID = techID.split("_")[1];
+    public static void removeTech(GenericInteractionCreateEvent event, Player player, String componentID) {
+        if (componentID.contains("resolveSingularity")) {
+            componentID = componentID.split("_")[1];
         }
-        player.removeTech(techID);
+        player.removeTech(componentID);
 
-        if (Mapper.getTech(techID) != null) {
+        if (Mapper.getTech(componentID) != null) {
             MessageHelper.sendMessageToEventChannel(
                     event,
                     player.getRepresentation(false, false) + " removed technology: "
-                            + Mapper.getTech(techID).getRepresentation(false) + ".");
+                            + Mapper.getTech(componentID).getRepresentation(false) + ".");
         } else {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentation(false, false) + " removed technology: " + techID + ".");
+                    event, player.getRepresentation(false, false) + " removed technology: " + componentID + ".");
         }
-        if (player.getSingularityTechs().contains(techID)) {
+        if (player.getSingularityTechs().contains(componentID)) {
             String oldVal = player.getGame().getStoredValue(player.getFaction() + "singularityTechs");
-            if (oldVal.contains(techID + "_")) {
-                oldVal = oldVal.replace(techID + "_", "");
+            if (oldVal.contains(componentID + "_")) {
+                oldVal = oldVal.replace(componentID + "_", "");
             } else {
-                oldVal = oldVal.replace(techID, "");
+                oldVal = oldVal.replace(componentID, "");
             }
             player.getGame().setStoredValue(player.getFaction() + "singularityTechs", oldVal);
             if (event instanceof ButtonInteractionEvent bevent) {
