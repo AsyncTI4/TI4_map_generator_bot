@@ -29,7 +29,7 @@ class RelicButtonHandler {
     @ButtonHandler("useRelic_")
     static void useRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String relic = buttonID.replace("useRelic_", "");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         if ("boon".equals(relic)) { // Sarween Tools
             player.addSpentThing("boon");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
@@ -50,7 +50,7 @@ class RelicButtonHandler {
                 player.getCorrectChannel(),
                 player.getFactionEmoji() + " exhausted "
                         + Mapper.getRelic(relic).getName());
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         if ("absol_luxarchtreatise".equalsIgnoreCase(relic)) {
             game.setStoredValue("absolLux", "true");
         }
@@ -124,7 +124,7 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("exhauste6g0network")
@@ -154,7 +154,7 @@ class RelicButtonHandler {
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.checkACLimit(game, player);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("crownofemphidiaexplore")

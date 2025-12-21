@@ -73,7 +73,7 @@ public class TeHelperGeneral {
         String info = game.getExpeditions().printExpeditionInfo(game, player);
         List<Button> butts = game.getExpeditions().getRemainingExpeditionButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), info, butts);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static void addStationsToPlayArea(GenericInteractionCreateEvent event, Game game, Tile tile) {
