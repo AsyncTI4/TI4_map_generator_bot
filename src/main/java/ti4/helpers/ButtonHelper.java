@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3498,6 +3501,14 @@ public class ButtonHelper {
                     // If we'd end up with an empty row, remove the row entirely (null = remove)
                     return kept.isEmpty() ? null : ActionRow.of(kept);
                 }));
+    }
+
+    public static void deleteButtonAndDeleteMessageIfEmpty(
+        ButtonInteractionEvent event, String customButtonId, boolean deleteMessage) {
+        MessageComponentTree updatedTree =
+            removeButtonsSafely(event.getMessage().getComponentTree(), b -> customButtonId.equals(b.getCustomId()));
+
+        deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
     }
 
     private static void deleteButtonAndDeleteMessageIfEmpty(
@@ -7533,7 +7544,8 @@ public class ButtonHelper {
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("endTurnWhenSCFinished", sc + player.getFaction());
-        deleteMessage(event);
+        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteButtonAndDeleteMessageIfEmpty(event, "fleetLogWhenAllReactedTo_" + sc, true);
         for (Player p2 : game.getRealPlayers()) {
             if (!p2.hasFollowedSC(Integer.parseInt(sc))) {
                 return;
@@ -7577,7 +7589,8 @@ public class ButtonHelper {
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("fleetLogWhenSCFinished", sc + player.getFaction());
-        deleteMessage(event);
+        deleteButtonAndDeleteMessageIfEmpty(event);
+        deleteButtonAndDeleteMessageIfEmpty(event, "endTurnWhenAllReactedTo_" + sc, true);
     }
 
     @ButtonHandler("moveAlongAfterAllHaveReactedToAC_")
