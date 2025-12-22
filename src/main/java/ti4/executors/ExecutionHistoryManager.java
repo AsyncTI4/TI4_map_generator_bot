@@ -45,8 +45,7 @@ public final class ExecutionHistoryManager {
                 BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds
                         + " seconds: " + execution.name);
             } else if (elapsedMinutes == 1
-                    && CircuitBreaker.incrementThresholdCount(
-                            "Task running longer than 1 minute: " + execution.name)) {
+                    && CircuitBreaker.incrementThresholdCount("Task running longer than 1 minute: " + execution.name)) {
                 BotLogger.warning("Incremented circuit breaker threshold. Task name: " + execution.name);
             }
         }

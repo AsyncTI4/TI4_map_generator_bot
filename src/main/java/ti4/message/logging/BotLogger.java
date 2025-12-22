@@ -406,8 +406,7 @@ public class BotLogger {
 
     public static void catchRestError(Throwable e) {
         if (isDiscordServerError(e)) {
-            CircuitBreaker.incrementThresholdCount(
-                    "Discord server error during REST call: " + e.getMessage());
+            CircuitBreaker.incrementThresholdCount("Discord server error during REST call: " + e.getMessage());
         }
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =

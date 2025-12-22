@@ -651,8 +651,7 @@ public class MessageHelper {
                         error -> {
                             if (isDiscordServerError(error)) {
                                 CircuitBreaker.incrementThresholdCount(
-                                        "Discord server error while sending message in channel "
-                                                + channel.getId());
+                                        "Discord server error while sending message in channel " + channel.getId());
                             }
                             boolean shouldRetry = error instanceof ErrorResponseException
                                     && error.getCause() instanceof SocketTimeoutException

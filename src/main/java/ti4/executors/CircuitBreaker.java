@@ -99,6 +99,6 @@ public class CircuitBreaker {
             return "";
         }
         String formattedReasons = String.join("\n - ", openReasons);
-        return "\nCircuit breaker reasons:\n - " + formattedReasons;
+        return "\nCircuit breaker reasons:" + formattedReasons;
     }
 }
