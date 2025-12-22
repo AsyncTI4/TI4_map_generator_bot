@@ -155,10 +155,9 @@ public class BanCleanupService {
 
     private boolean authorIsUser(User author, User user) {
         String authorNameLower = author.getName().toLowerCase();
-        List<String> names =
-                Stream.of(user.getName(), user.getEffectiveName(), user.getGlobalName())
-                        .filter(Objects::nonNull)
-                        .toList();
+        List<String> names = Stream.of(user.getName(), user.getEffectiveName(), user.getGlobalName())
+                .filter(Objects::nonNull)
+                .toList();
         for (String n : names) {
             if (authorNameLower.startsWith(n.toLowerCase())) return true;
         }
