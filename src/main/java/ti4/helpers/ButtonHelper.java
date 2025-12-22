@@ -3486,14 +3486,6 @@ public class ButtonHelper {
         deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
     }
 
-    public static void deleteButtonAndDeleteMessageIfEmpty(
-            ButtonInteractionEvent event, String customButtonId, boolean deleteMessage) {
-        MessageComponentTree updatedTree =
-                removeButtonsSafely(event.getMessage().getComponentTree(), b -> customButtonId.equals(b.getCustomId()));
-
-        deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
-    }
-
     private static MessageComponentTree removeButtonsSafely(MessageComponentTree tree, Predicate<Button> shouldRemove) {
         return tree.replace(ComponentReplacer.of(
                 ActionRow.class,
@@ -3518,7 +3510,9 @@ public class ButtonHelper {
         if (deleteMessage && !hasRealButton) {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginalComponents(updatedTree).queue(Consumers.nop(), BotLogger::catchRestError);
+            event.getMessage()
+                .editMessageComponents(updatedTree)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -7539,8 +7533,7 @@ public class ButtonHelper {
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("endTurnWhenSCFinished", sc + player.getFaction());
-        deleteButtonAndDeleteMessageIfEmpty(event);
-        deleteButtonAndDeleteMessageIfEmpty(event, "fleetLogWhenAllReactedTo_" + sc, true);
+        deleteMessage(event);
         for (Player p2 : game.getRealPlayers()) {
             if (!p2.hasFollowedSC(Integer.parseInt(sc))) {
                 return;
@@ -7584,8 +7577,7 @@ public class ButtonHelper {
                         + "**. Please resolve it as soon as possible so that the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("fleetLogWhenSCFinished", sc + player.getFaction());
-        deleteButtonAndDeleteMessageIfEmpty(event);
-        deleteButtonAndDeleteMessageIfEmpty(event, "endTurnWhenAllReactedTo_" + sc, true);
+        deleteMessage(event);
     }
 
     @ButtonHandler("moveAlongAfterAllHaveReactedToAC_")
