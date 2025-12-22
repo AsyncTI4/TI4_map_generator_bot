@@ -3504,9 +3504,9 @@ public class ButtonHelper {
     }
 
     public static void deleteButtonAndDeleteMessageIfEmpty(
-        ButtonInteractionEvent event, String customButtonId, boolean deleteMessage) {
+            ButtonInteractionEvent event, String customButtonId, boolean deleteMessage) {
         MessageComponentTree updatedTree =
-            removeButtonsSafely(event.getMessage().getComponentTree(), b -> customButtonId.equals(b.getCustomId()));
+                removeButtonsSafely(event.getMessage().getComponentTree(), b -> customButtonId.equals(b.getCustomId()));
 
         deleteButtonAndDeleteMessageIfEmpty(event, updatedTree, deleteMessage);
     }
@@ -3521,9 +3521,7 @@ public class ButtonHelper {
         if (deleteMessage && !hasRealButton) {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getMessage()
-                .editMessageComponents(updatedTree)
-                .queue(Consumers.nop(), BotLogger::catchRestError);
+            event.getMessage().editMessageComponents(updatedTree).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
