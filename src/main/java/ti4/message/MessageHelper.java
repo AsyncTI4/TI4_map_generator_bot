@@ -206,7 +206,8 @@ public class MessageHelper {
 
     private static void handleFailedReaction(Game game, Player player, Message message, Throwable error) {
         if (isDiscordServerError(error)) {
-            CircuitBreaker.incrementThresholdCount();
+            CircuitBreaker.incrementThresholdCount(
+                    "Discord server error while adding reaction to message " + message.getId());
         }
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
         String msg = "Failed to add reaction [" + reactionEmoji.getFormatted() + "] to message.";
@@ -649,7 +650,9 @@ public class MessageHelper {
                         },
                         error -> {
                             if (isDiscordServerError(error)) {
-                                CircuitBreaker.incrementThresholdCount();
+                                CircuitBreaker.incrementThresholdCount(
+                                        "Discord server error while sending message in channel "
+                                                + channel.getId());
                             }
                             boolean shouldRetry = error instanceof ErrorResponseException
                                     && error.getCause() instanceof SocketTimeoutException
