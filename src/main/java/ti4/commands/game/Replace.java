@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -17,7 +20,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -80,6 +82,9 @@ class Replace extends GameStateSubcommand {
         }
 
         Guild guild = game.getGuild();
+        if (guild == null) {
+            guild = event.getGuild();
+        }
         Member newMember = guild.getMemberById(replacementUser.getId());
         if (newMember == null) {
             MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
@@ -142,11 +147,11 @@ class Replace extends GameStateSubcommand {
         if (game.isFowMode()) {
             long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
-
-            privateChannel.getMemberPermissionOverrides().stream()
-                    .filter(override -> Objects.equals(override.getMember(), oldMember))
-                    .findFirst()
-                    .ifPresent(oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
+            if (privateChannel != null) {
+                privateChannel.getMemberPermissionOverrides().stream()
+                        .filter(override -> Objects.equals(override.getMember(), oldMember))
+                        .findFirst()
+                        .ifPresent(oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
 
             // Update private channel
             if (oldMember != null) {
@@ -175,16 +180,17 @@ class Replace extends GameStateSubcommand {
             }
             cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
 
-            // Update private threads
-            if (oldMember != null) {
-                game.getMainGameChannel()
-                        .getThreadChannels()
-                        .forEach(thread -> updateThread(thread, oldMember, newMember));
+                // Update private threads
+                if (oldMember != null) {
+                    game.getMainGameChannel()
+                            .getThreadChannels()
+                            .forEach(thread -> updateThread(thread, oldMember, newMember));
 
-                game.getMainGameChannel()
-                        .retrieveArchivedPrivateThreadChannels()
-                        .queue(archivedThreads ->
-                                archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
+                    game.getMainGameChannel()
+                            .retrieveArchivedPrivateThreadChannels()
+                            .queue(archivedThreads ->
+                                    archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
+                }
             }
         }
 
@@ -211,7 +217,7 @@ class Replace extends GameStateSubcommand {
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
                 + replacementUser.getName();
-        if (FoWHelper.isPrivateGame(game)) {
+        if (FoWHelper.isPrivateGame(game) || game.getActionsChannel() == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);

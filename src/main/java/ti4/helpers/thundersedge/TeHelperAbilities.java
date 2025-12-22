@@ -116,7 +116,7 @@ public class TeHelperAbilities {
                 systemFrom
                         .getUnitHolders()
                         .get(data[1])
-                        .removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+                        .removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(data[0]), player.getColorID()), 1);
             }
         }
     }
