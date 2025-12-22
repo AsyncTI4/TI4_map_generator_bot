@@ -3,7 +3,9 @@ package ti4.service.async;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -23,6 +25,12 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class BanCleanupService {
 
+    private static final List<String> BOT_QUESTION_CHANNEL_NAMES = List.of(
+            "bot-questions-and-support-and-feedback",
+            "bot-questions-and-feedback",
+            "bot-questions-and-discussion",
+            "bot-questions-and-discussions");
+
     private User getUser(UserSnowflake id) {
         return JdaService.jda.getUserById(id.getId());
     }
@@ -34,7 +42,7 @@ public class BanCleanupService {
         if (user != null) {
             return "user `" + user.getEffectiveName() + "` with ID `" + id.getId() + "`";
         } else {
-            return "user `unkownUser` with ID `" + id.getId() + "`";
+            return "user `unknownUser` with ID `" + id.getId() + "`";
         }
     }
 
@@ -82,9 +90,7 @@ public class BanCleanupService {
                 guild.ban(banList, 24, TimeUnit.HOURS).reason(reason).queue(Consumers.nop(), BotLogger::catchRestError);
                 errors += cleanupBotQuestionChannel(guild, getUser(user));
             } catch (Exception e) {
-                String msg = "Error encountered trying to ban " + getIdent(user);
-                msg += " from guild `" + guild.getName() + "`";
-                BotLogger.error(msg, e);
+                BotLogger.error(formatGuildActionError("trying to ban", user, guild), e);
                 errors++;
             }
         }
@@ -115,9 +121,7 @@ public class BanCleanupService {
             try {
                 cleanupBotQuestionChannel(guild, user);
             } catch (Exception e) {
-                String msg = "Error encountered trying to ban " + getIdent(user);
-                msg += " from guild `" + guild.getName() + "`";
-                BotLogger.error(msg, e);
+                BotLogger.error(formatGuildActionError("cleaning bot question channels for", user, guild), e);
             }
         }
     }
@@ -125,13 +129,8 @@ public class BanCleanupService {
     public int cleanupBotQuestionChannel(Guild guild, User user) {
         if (user == null) return 0;
         int errors = 0;
-        List<String> channelNames = List.of(
-                "bot-questions-and-support-and-feedback",
-                "bot-questions-and-feedback",
-                "bot-questions-and-discussion",
-                "bot-questions-and-discussions");
         try {
-            for (String channelName : channelNames) {
+            for (String channelName : BOT_QUESTION_CHANNEL_NAMES) {
                 List<TextChannel> channels = guild.getTextChannelsByName(channelName, true);
                 if (!channels.isEmpty()) {
                     TextChannel channel = channels.getFirst();
@@ -140,8 +139,7 @@ public class BanCleanupService {
                 }
             }
         } catch (Exception e) {
-            String msg = "Error cleaning up messages from synced channel while banning " + getIdent(user);
-            BotLogger.error(msg, e);
+            BotLogger.error(formatGuildActionError("cleaning bot question messages for", user, guild), e);
             errors++;
         }
         return errors;
@@ -156,10 +154,18 @@ public class BanCleanupService {
     }
 
     private boolean authorIsUser(User author, User user) {
-        List<String> names = List.of(user.getName(), user.getEffectiveName(), user.getGlobalName());
+        String authorNameLower = author.getName().toLowerCase();
+        List<String> names =
+                Stream.of(user.getName(), user.getEffectiveName(), user.getGlobalName())
+                        .filter(Objects::nonNull)
+                        .toList();
         for (String n : names) {
-            if (author.getName().toLowerCase().startsWith(n.toLowerCase())) return true;
+            if (authorNameLower.startsWith(n.toLowerCase())) return true;
         }
         return author.getId().equals(user.getId());
+    }
+
+    private String formatGuildActionError(String action, UserSnowflake user, Guild guild) {
+        return "Error encountered while " + action + " " + getIdent(user) + " in guild `" + guild.getName() + "`";
     }
 }
