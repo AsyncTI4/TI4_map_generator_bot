@@ -1496,6 +1496,7 @@ public class AgendaHelper {
                                 speaker.getRepresentationUnfogged()
                                         + ", there are tied outcomes. As Speaker, please decide a winner.",
                                 tiedWinners);
+                        game.updateActivePlayer(speaker);
                     }
                 }
             }

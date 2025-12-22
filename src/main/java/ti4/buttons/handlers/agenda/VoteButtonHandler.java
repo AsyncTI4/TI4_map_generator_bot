@@ -129,6 +129,7 @@ public class VoteButtonHandler {
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Choosing to break tie for one of " + factionOrColor
                 + "'s planets. As Speaker, please decide a winner.";
+
         List<Button> outcomeActionRow;
         outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "resolveAgendaVote_outcomeTie*", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
@@ -315,6 +316,9 @@ public class VoteButtonHandler {
     public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
         List<Player> players = game.getRealPlayers();
+        if (prefix.contains("solagent") || prefix.contains("letnevagent")) {
+            players = game.getRealPlayersNNeutral();
+        }
         if (prefix.contains("yinHero")) {
             players = game.getRealPlayersNNeutral();
         }
