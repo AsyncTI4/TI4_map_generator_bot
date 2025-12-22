@@ -913,7 +913,7 @@ public class ButtonHelperTwilightsFall {
             for (String card : cards) {
                 String name = Mapper.getUnit(card).getName();
                 buttons.add(Buttons.green(
-                        "selectASpliceCard_" + card,
+                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_" + card,
                         "Select " + name,
                         Mapper.getUnit(card).getUnitEmoji()));
             }

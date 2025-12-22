@@ -82,9 +82,9 @@ public class PlayerTechService {
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 
-    @ButtonHandler("resolveSingularity")
+    @ButtonHandler("removeSingularity")
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String componentID) {
-        if (componentID.contains("resolveSingularity")) {
+        if (componentID.contains("removeSingularity")) {
             componentID = componentID.split("_")[1];
         }
         player.removeTech(componentID);
