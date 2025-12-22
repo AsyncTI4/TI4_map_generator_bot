@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -151,34 +149,36 @@ class Replace extends GameStateSubcommand {
                 privateChannel.getMemberPermissionOverrides().stream()
                         .filter(override -> Objects.equals(override.getMember(), oldMember))
                         .findFirst()
-                        .ifPresent(oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
+                        .ifPresent(
+                                oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
 
-            // Update private channel
-            if (oldMember != null) {
-                String newPrivateChannelName =
-                        privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                // Update private channel
+                if (oldMember != null) {
+                    String newPrivateChannelName = privateChannel
+                            .getName()
+                            .replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                    privateChannel
+                            .getManager()
+                            .setName(newPrivateChannelName)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                }
                 privateChannel
                         .getManager()
-                        .setName(newPrivateChannelName)
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            privateChannel
-                    .getManager()
-                    .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
-                    .queue(success -> accessMessage(privateChannel, newMember));
+                        .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
+                        .queue(success -> accessMessage(privateChannel, newMember));
 
-            // Update Cards Info
-            ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
-            String newCardsInfoName = cardsInfo
-                    .getName()
-                    .replace(
-                            oldPlayerUserName.replace("/", ""),
-                            replacedPlayer.getUserName().replace("/", ""));
-            cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
-            if (oldMember != null) {
-                cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
-            }
-            cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
+                // Update Cards Info
+                ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
+                String newCardsInfoName = cardsInfo
+                        .getName()
+                        .replace(
+                                oldPlayerUserName.replace("/", ""),
+                                replacedPlayer.getUserName().replace("/", ""));
+                cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
+                if (oldMember != null) {
+                    cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
 
                 // Update private threads
                 if (oldMember != null) {
