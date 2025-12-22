@@ -2,6 +2,8 @@ package ti4.executors;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -18,17 +20,21 @@ public class CircuitBreaker {
     private static final int MINUTES_TO_WAIT_BEFORE_RESETTING_THRESHOLD = 1;
 
     private static int thresholdCount;
+    private static final List<String> openReasons = new ArrayList<>();
 
     @Getter
     private static boolean open;
 
     private static LocalDateTime closeDateTime;
 
-    public static synchronized boolean incrementThresholdCount() {
+    public static synchronized boolean incrementThresholdCount(String reason) {
         if (open) {
             return false;
         }
         thresholdCount++;
+        if (reason != null && !reason.isBlank()) {
+            openReasons.add(reason);
+        }
         if (thresholdCount == 1) {
             CronManager.scheduleOnce(
                     CircuitBreaker.class,
@@ -43,7 +49,9 @@ public class CircuitBreaker {
             closeDateTime = LocalDateTime.now().plusMinutes(MINUTES_TO_WAIT_BEFORE_CLOSING);
             BotLogger.error(
                     "Excess errors or timeouts have caused the circuit breaker to open. The bot will not accept commands for "
-                            + MINUTES_TO_WAIT_BEFORE_CLOSING + " minutes.");
+                            + MINUTES_TO_WAIT_BEFORE_CLOSING + " minutes."
+                            + formatOpenReasons());
+            openReasons.clear();
         }
         return true;
     }
@@ -51,6 +59,7 @@ public class CircuitBreaker {
     public static synchronized void openForSeconds(long seconds) {
         open = true;
         thresholdCount = 0;
+        openReasons.clear();
         closeDateTime = LocalDateTime.now().plusSeconds(seconds);
         CronManager.scheduleOnce(CircuitBreaker.class, CircuitBreaker::reset, seconds, TimeUnit.SECONDS);
         BotLogger.info("Circuit breaker manually opened for " + seconds + " seconds.");
@@ -59,10 +68,12 @@ public class CircuitBreaker {
     private static synchronized void reset() {
         thresholdCount = 0;
         open = false;
+        openReasons.clear();
     }
 
     private static synchronized void resetThreshold() {
         thresholdCount = 0;
+        openReasons.clear();
     }
 
     public static boolean checkIsOpenAndPostWarningIfTrue(MessageChannel messageChannel) {
@@ -81,5 +92,13 @@ public class CircuitBreaker {
         return Duration.between(LocalDateTime.now(), closeDateTime).isNegative()
                 ? Duration.ZERO
                 : Duration.between(LocalDateTime.now(), closeDateTime);
+    }
+
+    private static String formatOpenReasons() {
+        if (openReasons.isEmpty()) {
+            return "";
+        }
+        String formattedReasons = String.join("\n - ", openReasons);
+        return "\nCircuit breaker reasons:\n - " + formattedReasons;
     }
 }
