@@ -175,7 +175,7 @@
         "name": "Overrule",
         "phase": "Action",
         "window": "Action",
-        "text": "Perform the primary ability of a readied or unchosen strategy card.",
+        "text": "Perform the primary ability of a readied or unchosen strategy card. [Note: cannot allow others to refresh off of trade, as that would be them resolving the secondary, which is not enabled by this card]",
         "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luch, he'd be dead or demoted within a day or two.",
         "source": "thunders_edge"
     }
