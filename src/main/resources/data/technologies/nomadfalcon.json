@@ -104,5 +104,72 @@
         "requirements": "BY",
         "source": "nomadfalcon",
         "text": "At the start of your turn during the action phase you may exhaust this card to remove up to 4 of your fighters from the game board and place them in up to 4 systems with any of your ships."
+    },
+    {
+        "alias": "nferocsd",
+        "name": "Productive complex ll",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "erock",
+        "baseUpgrade": "sd",
+        "source": "nomadfalcon",
+        "text": "This units PRODUCTION value is equal to the combined rescource and influence value of planets in this system. this unit is placed in the space area instead of a planet. This unit may move and retreat as ifit where a ship. If it is blockaded it is destroyed. "
+    },
+    {
+        "alias": "nferocy",
+        "name": "Mobility Systems",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "erock",
+        "source": "nomadfalcon",
+        "text": "After you activeate a system when you move ships you may remove any number of fighter from systems with your space docks and place them in the active system."
+    },
+    {
+        "alias": "nfcounr",
+        "name": "Correction Systems",
+        "types": [
+            "WARFARE "
+        ],
+        "requirements": "RR",
+        "faction": "councilors",
+        "source": "nomadfalcon",
+        "text": "At the start of a combat round you may exausht this card to apply +x to each of our units comabt dice. X is equal to the number of laws in play."
+    },
+    {
+        "alias": "nfcouny",
+        "name": "Data Bank Manipulator",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "RR",
+        "faction": "councilors",
+        "source": "nomadfalcon",
+        "text": "When you spend trade goods, you may exaust 1 planet you control to place spent trade goods equla to the influence value of the planet on  this card. After an agend is revealed you may spend trade goods off this card to ready an equal numbver of planets you or a neigbor control"
+    },
+    {
+        "alias": "nfexplg",
+        "name": "Tech Fields",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "explanetary",
+        "source": "nomadfalcon",
+        "text": "When you exusht a planet with a technology specialty to reserch a technology you my ignore 1 additional prerequiste of the planets technology specilty type."
+    },
+    {
+        "alias": "nfexply",
+        "name": "Data Center",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "explanetary",
+        "source": "nomadfalcon",
+        "text": "When another player reserches a technology you may place 1 of there control tokens on this card. When reserching a technology owned by a player whose control token is on this card you may ignore 1 prerquiste then return that players control token"
     }
 ]

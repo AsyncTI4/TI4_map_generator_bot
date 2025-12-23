@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "nf1",
+    "name": "Arel -- Councilors",
+    "aliases": [
+        "arel",
+        "nf1",
+        "councilors"
+    ],
+    "imagePath": "NF1_Councilors.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "arel"
+    ],
+    "source": "nomadfalcon"
+}

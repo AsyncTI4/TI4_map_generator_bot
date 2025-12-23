@@ -1,0 +1,16 @@
+{
+    "tileBack": "green",
+    "id": "nf2",
+    "name": "Erock -- Erock",
+    "aliases": [
+        "erock",
+        "nf2"
+    ],
+    "imagePath": "NF2_Erock.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "erock"
+    ],
+    "source": "nomadfalcon"
+}

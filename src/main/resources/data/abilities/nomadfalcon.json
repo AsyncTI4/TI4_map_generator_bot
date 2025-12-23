@@ -1,0 +1,58 @@
+[
+    {
+        "id": "political_agenda",
+        "name": "Political Agenda",
+        "faction": "councilors",
+        "permanentEffect": "During setup take the 4 league Agendas and place them facedown in yoiur play area. You may look at these cards at any time. Then choose 1 of your 3 heros and place it in your hero slot. Purge the rest",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "Ballots",
+        "name": "ballots",
+        "faction": "councilors",
+        "permanentEffect": "Action: Spend 1 token from your strategy pool to either choose and place 1 legue agenda on your faction sheet or repair 1 unit you control or gain 2 trade goods. you may look at agenda cards on your factino sheet at any time. ",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "political_importance",
+        "name": "Political Importance",
+        "faction": "councilors",
+        "permanentEffect": "When the speaker would reavel to the top card of the agenda deck you may instead have the speaker reavel 1 agenda on your faction sheet. Player vote on that agenda instead as if it where drawn from the agenda deck. Cast 3 additional votes when voting for a law.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "technical_exploration",
+        "name": "Technical Exploration",
+        "faction": "explanetary",
+        "permanentEffect": "Action: Spend 1 token from your strategy pool to exhuast 1 planet you control and attach 1 Technology attachment to that planet or move 1 technology attachment  from 1 planet you control to the exauhsted planet.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "defense_protocols",
+        "name": "Defense Protocols",
+        "faction": "explanetary",
+        "permanentEffect": "At the start of the round place 1 infantry from you reinforcments on 1 plsanet you control in your home system. You must have at least 3 ground forces in your home system at all times.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "probe_drones",
+        "name": "Probe Drones",
+        "faction": "explanetary",
+        "permanentEffect": "During setup take the 4 technology arttachment cards and tokens and place them in your reinforcments.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "factorial_complexes",
+        "name": "Factorial Complexes",
+        "faction": "erock",
+        "permanentEffect": "Each planet that contains 1 or more of your mechs gains the production 1 ability as if it where a unit you control.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "rocket_technologies",
+        "name": "Rocket Technologies",
+        "faction": "erock",
+        "permanentEffect": "When you move ships into a system with any planerts you may remove PDS units from adjacent systems on planets you control and place them on your faction sheet. those units are captured. At the end of a tactical action if control 1 or more planets in the active systme you place up to 2 of your captured units on those planets.",
+        "source": "nomadfalcon"
+    }
+]
