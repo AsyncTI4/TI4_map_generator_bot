@@ -3521,7 +3521,6 @@ public class ButtonHelper {
         if (deleteMessage && !hasRealButton) {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            // event.getHook().editOriginalComponents(updatedTree)
             event.getMessage().editMessageComponents(updatedTree).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
