@@ -113,7 +113,7 @@
         ],
         "requirements": "YY",
         "faction": "erock",
-        "baseUpgrade": "sd",
+        "baseUpgrade": "sd2",
         "source": "nomadfalcon",
         "text": "This units PRODUCTION value is equal to the combined rescource and influence value of planets in this system. this unit is placed in the space area instead of a planet. This unit may move and retreat as ifit where a ship. If it is blockaded it is destroyed. "
     },
