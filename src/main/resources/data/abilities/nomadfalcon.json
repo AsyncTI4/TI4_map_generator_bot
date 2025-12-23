@@ -7,8 +7,8 @@
         "source": "nomadfalcon"
     },
     {
-        "id": "Ballots",
-        "name": "ballots",
+        "id": "ballots",
+        "name": "Ballots",
         "faction": "councilors",
         "permanentEffect": "Action: Spend 1 token from your strategy pool to either choose and place 1 legue agenda on your faction sheet or repair 1 unit you control or gain 2 trade goods. you may look at agenda cards on your factino sheet at any time. ",
         "source": "nomadfalcon"
