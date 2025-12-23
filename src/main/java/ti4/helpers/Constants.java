@@ -65,6 +65,11 @@ public class Constants {
     public static final String ADD_TEAMMATE = "add_teammate";
     public static final String REMOVE_TEAMMATE = "remove_teammate";
     public static final String SPIN_TILES_IN_RINGS = "spin_tiles_in_rings";
+    public static final String SPIN = "spin";
+    public static final String SPIN_LIST = "list";
+    public static final String SPIN_ADD = "add";
+    public static final String SPIN_REMOVE = "remove";
+    public static final String SPIN_EXECUTE = "execute";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
     public static final String SURVEY = "survey";

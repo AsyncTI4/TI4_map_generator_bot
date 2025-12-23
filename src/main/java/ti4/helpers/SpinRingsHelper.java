@@ -3,137 +3,163 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
+import ti4.service.map.SpinService;
+import ti4.service.map.SpinService.Direction;
+import ti4.service.map.SpinService.SpinSetting;
 
 @UtilityClass
 public class SpinRingsHelper {
     private static final String DEFAULT_MSG = "Spun the rings";
     private static final List<String> STATUS_MSGS = Arrays.asList(
-            "Shifted the cosmic rings",
-            "Aligned the stellar orbits",
-            "Twisted the galactic core",
-            "Rearranged the celestial dance",
-            "Tilted the astral axis",
-            "Rotated the planetary rings",
+            "Cosmic rings were shifted",
+            "Stellar orbits were re-aligned",
+            "Galactic core is twisting",
+            "Celestial dance has spun",
+            "Astral axis is tilting",
+            "Planetary rings have rotated",
             "Adjusted the star-bound gyroscope",
-            "Spiraled the galactic arms",
+            "Galactic arms are spiraling",
             "Warped the orbital paths");
 
-    private static final String CW = "cw";
-    private static final String CCW = "ccw";
-    private static final String RND = "rnd";
+    private static Map<String, Hex> indexToHex = new HashMap<>();
+    private static Map<Hex, String> hexToIndex = new HashMap<>();
 
-    public static boolean validateSpinSettings(String customSpinSptring) {
-        String[] customSpins = customSpinSptring.toLowerCase().split(" ");
-        for (String spinString : customSpins) {
+    static final int[][] RING_DIRS = {
+        {1, 0}, // SE
+        {0, 1}, // S
+        {-1, 1}, // SW
+        {-1, 0}, // NW
+        {0, -1}, // N
+        {1, -1} // NE
+    };
 
-            // Needs to have Ring:Direction:Steps
-            String[] spinSettings = spinString.toLowerCase().split(":");
-            if (spinSettings.length != 3) {
-                return false;
-            }
+    private static class Hex {
+        final int q;
+        final int r;
 
-            int smallestRing = 99;
-            for (String ringString : spinSettings[0].split(",")) {
-                int ring = parseInt(ringString);
-                if (ring <= 0) {
-                    return false;
-                }
-                smallestRing = Math.min(ring, smallestRing);
-            }
-
-            String direction = spinSettings[1];
-            if (!Arrays.asList(CW, CCW, RND).contains(direction)) {
-                return false;
-            }
-
-            // Step counts must be less than tiles in smallest ring
-            for (String stepsString : spinSettings[2].split(",")) {
-                int steps = parseInt(stepsString);
-                if (steps < 0 || steps > smallestRing * 6 - 1) {
-                    return false;
-                }
-            }
+        Hex(int q, int r) {
+            this.q = q;
+            this.r = r;
         }
-        return true;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Hex)) return false;
+            Hex h = (Hex) o;
+            return q == h.q && r == h.r;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * q + r;
+        }
     }
 
-    /*
-     * Custom rotation with random support
-     *
-     * Ring:Direction:Steps
-     * 1:cw:1 2:ccw:2
-     *
-     * Or with random options
-     * 1,2:rnd:2,3
-     * to spin ring 1 OR 2 to random direction for 2 OR 3 steps
-     *
-     */
-    public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
-        String[] customSpins = customSpinString.toLowerCase().split(" ");
-        StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## ⚙️ " + randomStatusMessage());
+    private static void generateBoard(int maxRing) {
+        Hex center = new Hex(0, 0);
+        indexToHex.put("000", center);
+        hexToIndex.put(center, "000");
+
+        for (int ring = 1; ring <= maxRing; ring++) {
+            generateRing(ring);
+        }
+    }
+
+    private static void generateRing(int ring) {
+        int q = 0;
+        int r = -ring; // north start
+
+        int pos = 1;
+
+        for (int d = 0; d < 6; d++) {
+            for (int i = 0; i < ring; i++) {
+                Hex h = new Hex(q, r);
+
+                // Guard: never overwrite 000
+                if (!(h.q == 0 && h.r == 0)) {
+                    String index = ring + (pos < 10 ? "0" : "") + pos;
+
+                    indexToHex.put(index, h);
+                    hexToIndex.put(h, index);
+                }
+
+                q += RING_DIRS[d][0];
+                r += RING_DIRS[d][1];
+                pos++;
+            }
+        }
+    }
+
+    public static void spinRingsCustom(Game game, List<SpinSetting> spinSettings) {
+        // init board hex positions
+        if (indexToHex.isEmpty()) {
+            generateBoard(SpinService.MAX_RING_TO_SPIN);
+        }
+
+        StringBuilder sb = new StringBuilder("# " + randomStatusMessage());
 
         List<Tile> tilesToSet = new ArrayList<>();
-        List<String[]> customHyperlanesToMove = new ArrayList<>();
+        List<Map<String, String>> customHyperlanesToMove = new ArrayList<>();
+        Map<Player, Set<String>> systemsPlayersSee = new HashMap<>();
+        Map<Player, Set<String>> systemsPlayersSawMoving = new HashMap<>();
+        if (game.isFowMode()) {
+            for (Player p : game.getRealPlayers()) {
+                systemsPlayersSee.put(p, FoWHelper.getTilePositionsToShow(game, p));
+                systemsPlayersSawMoving.put(p, new HashSet<>());
+            }
+        }
 
-        for (String spinString : customSpins) {
-            Random random = new Random();
-            String[] spinSettings = spinString.toLowerCase().split(":");
+        for (SpinSetting spin : spinSettings) {
+            int ring = spin.ring();
+            Direction dir = spin.direction();
+            int steps = spin.steps();
+            String center = spin.center();
+            Hex centerHex = indexToHex.get(spin.center());
 
-            String[] ringOptions = spinSettings[0].split(",");
-            int ring = parseInt(ringOptions[random.nextInt(ringOptions.length)]);
+            if (steps == 0) continue;
 
-            String direction = spinSettings[1];
-            if (RND.equals(direction)) {
-                if (random.nextBoolean()) {
-                    direction = CW;
-                } else {
-                    direction = CCW;
+            List<Hex> ringHexes = buildRing(centerHex, ring);
+            int size = ringHexes.size();
+
+            for (int i = 0; i < size; i++) {
+                Hex fromHex = ringHexes.get(i);
+                String fromPosition = hexToIndex.get(fromHex);
+
+                Tile tile = game.getTileByPosition(fromPosition);
+                if (tile == null) continue;
+
+                int newIndex = dir == Direction.CW ? (i + steps) % size : (i - steps + size) % size;
+                Hex toHex = ringHexes.get(newIndex);
+                String toPosition = hexToIndex.get(toHex);
+
+                tile.setPosition(toPosition);
+                if (game.getCustomHyperlaneData().get(fromPosition) != null) {
+                    customHyperlanesToMove.add(Map.of(fromPosition, toPosition));
+                }
+                tilesToSet.add(tile);
+                updateHomeSystem(game, tile);
+                if (game.isFowMode()) {
+                    updateSystemsPlayerSawMoving(fromPosition, toPosition, systemsPlayersSawMoving, systemsPlayersSee);
                 }
             }
-
-            String[] stepsOptions = spinSettings[2].split(",");
-            int steps = parseInt(stepsOptions[random.nextInt(stepsOptions.length)]);
-
-            if (steps > 0) {
-                for (int x = 1; x < (ring * 6 + 1); x++) {
-                    Tile tile = game.getTileByPosition(ring + (x < 10 ? "0" : "") + x);
-                    if (tile == null) {
-                        continue;
-                    }
-
-                    int pos;
-                    if (CW.equals(direction)) {
-                        if ((x + steps) > (ring * 6)) {
-                            pos = (x + steps) % (ring * 6);
-                        } else {
-                            pos = x + steps;
-                        }
-                    } else {
-                        if ((x - steps) < 1) {
-                            pos = (x - steps) + (ring * 6);
-                        } else {
-                            pos = x - steps;
-                        }
-                    }
-                    String fromPosition = tile.getPosition();
-                    tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
-                    if (game.getCustomHyperlaneData().get(fromPosition) != null) {
-                        customHyperlanesToMove.add(new String[] {fromPosition, tile.getPosition()});
-                    }
-                    tilesToSet.add(tile);
-                    updateHomeSystem(game, tile);
-                }
+            sb.append("\n-# ").append(spunMessage(ring, dir, steps, center, game.isFowMode()));
+            if (game.isFowMode()) {
+                GMService.logActivity(game, spunMessage(ring, dir, steps, center, false), false);
             }
-            spunMessage(sb, ring, direction, steps, game);
         }
 
         for (Tile tile : tilesToSet) {
@@ -142,9 +168,10 @@ public class SpinRingsHelper {
         if (!customHyperlanesToMove.isEmpty()) {
             Map<String, String> currentData = new HashMap<>(game.getCustomHyperlaneData());
             Map<String, String> newData = new HashMap<>();
-            for (String[] pair : customHyperlanesToMove) {
-                String from = pair[0];
-                String to = pair[1];
+            for (Map<String, String> pair : customHyperlanesToMove) {
+                Entry<String, String> entry = pair.entrySet().iterator().next();
+                String from = entry.getKey();
+                String to = entry.getValue();
                 String previousValue = currentData.remove(from);
                 if (previousValue != null) {
                     newData.put(to, previousValue);
@@ -155,14 +182,52 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
-        FowCommunicationThreadService.checkAllCommThreads(game);
+
+        if (game.isFowMode()) {
+            FowCommunicationThreadService.checkAllCommThreads(game);
+            for (Map.Entry<Player, Set<String>> entry : systemsPlayersSawMoving.entrySet()) {
+                if (!entry.getValue().isEmpty()) {
+                    Player p = entry.getKey();
+                    MessageHelper.sendMessageToChannel(
+                            p.getPrivateChannel(),
+                            p.getRepresentationUnfogged() + ", ⚙️ system"
+                                    + (entry.getValue().size() > 1 ? "s " : " ") + String.join(", ", entry.getValue())
+                                    + (entry.getValue().size() > 1 ? " have " : " has ") + "moved.");
+                }
+            }
+        }
     }
 
-    private static int parseInt(String number) {
-        try {
-            return Integer.parseInt(number);
-        } catch (NumberFormatException e) {
-            return -1;
+    private static List<Hex> buildRing(Hex center, int ring) {
+        List<Hex> result = new ArrayList<>(ring * 6);
+
+        // 1. start at north
+        int q = center.q;
+        int r = center.r - ring;
+
+        // 2. walk the 6 sides
+        for (int d = 0; d < 6; d++) {
+            for (int i = 0; i < ring; i++) {
+                result.add(new Hex(q, r));
+                q += RING_DIRS[d][0];
+                r += RING_DIRS[d][1];
+            }
+        }
+        return result;
+    }
+
+    private static void updateSystemsPlayerSawMoving(
+            String from,
+            String to,
+            Map<Player, Set<String>> systemsPlayersSawMoving,
+            Map<Player, Set<String>> systemsPlayersSee) {
+        for (Map.Entry<Player, Set<String>> entry : systemsPlayersSee.entrySet()) {
+            if (entry.getValue().contains(from)) {
+                systemsPlayersSawMoving.get(entry.getKey()).add(from);
+            }
+            if (entry.getValue().contains(to)) {
+                systemsPlayersSawMoving.get(entry.getKey()).add(to);
+            }
         }
     }
 
@@ -217,18 +282,27 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
 
-        StringBuffer sb = new StringBuffer("## ⚙️ " + randomStatusMessage());
-        spunMessage(sb, 1, CW, 1, game);
-        spunMessage(sb, 2, CCW, 2, game);
-        spunMessage(sb, 3, CW, 3, game);
+        StringBuilder sb = new StringBuilder("# " + randomStatusMessage());
+        sb.append("\n-# ").append(spunMessage(1, Direction.CW, 1, null, game.isFowMode()));
+        sb.append("\n-# ").append(spunMessage(2, Direction.CCW, 2, null, game.isFowMode()));
+        sb.append("\n-# ").append(spunMessage(3, Direction.CW, 3, null, game.isFowMode()));
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
     }
 
-    private static void spunMessage(StringBuffer sb, int ring, String direction, int steps, Game game) {
-        sb.append("\n-# Ring ");
-        sb.append(game.isFowMode() ? "?" : ring).append(" ");
-        sb.append(game.isFowMode() ? "?" : direction.toUpperCase()).append(" for ");
-        sb.append(game.isFowMode() ? "?" : steps).append(" steps.");
+    private static String spunMessage(int ring, Direction direction, int steps, String position, boolean fow) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("⚙️ Ring **");
+        sb.append(fow ? "?" : ring);
+        sb.append("** to **");
+        sb.append(fow ? "?" : direction.displayName);
+        sb.append("** direction by **");
+        sb.append(fow ? "?" : steps);
+        if (position != null) {
+            sb.append("** steps around **");
+            sb.append(fow ? "?" : position);
+        }
+        sb.append("**.");
+        return sb.toString();
     }
 
     private static void updateHomeSystem(Game game, Tile tile) {
@@ -243,10 +317,9 @@ public class SpinRingsHelper {
     }
 
     private static String randomStatusMessage() {
-        Random random = new Random();
-        if (random.nextBoolean()) {
+        if (new Random().nextBoolean()) {
             return DEFAULT_MSG;
         }
-        return STATUS_MSGS.get(random.nextInt(STATUS_MSGS.size()));
+        return RandomHelper.pickRandomFromList(STATUS_MSGS);
     }
 }
