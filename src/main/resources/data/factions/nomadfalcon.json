@@ -1,0 +1,137 @@
+[
+    {
+        "alias": "erock",
+        "factionName": "The Erock Industrialest",
+        "homeSystem": "nf2",
+        "startingFleet": "1 dn, 1 cv, 4 ff, 2 inf e, 1 dd, sd, pds e",
+        "commodities": 5,
+        "factionTech": [
+            "nferocy",
+            "nferocsd"
+        ],
+        "startingTech": [
+            "amd",
+            "pa"
+        ],
+        "homePlanets": [
+            "erock"
+        ],
+        "abilities": [
+            "factorial_complexes",
+            "rocket_technologies"
+        ],
+        "leaders": [
+            "erockagent",
+            "erockcommander",
+            "erockhero"
+        ],
+        "promissoryNotes": [
+            "nfpneroc"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "erock_flagship",
+            "infantry",
+            "erock_mech",
+            "pds",
+            "erock_spacedock"
+        ],
+        "complexity": "Low",
+        "source": "nomadfalcon"
+    },
+    {
+        "alias": "explanetary",
+        "factionName": "The Explanetary Alliance",
+        "homeSystem": "nf3",
+        "startingFleet": "1 dn, 2 cv, 6 ff, 2 inf n, sd n, pds g, 2 inf z, 2 inf a, mech n",
+        "commodities": 3,
+        "factionTech": [
+            "nfexplg",
+            "nfexply"
+        ],
+        "startingTech": [
+            "sdn"
+        ],
+        "homePlanets": [
+            "nerot",
+            "zardell",
+            "garer",
+            "aldim"
+        ],
+        "abilities": [
+            "probe_drones",
+            "technical_exploration",
+            "defense_protocols"
+        ],
+        "leaders": [
+            "explanetaryagent",
+            "explanetarycommander",
+            "explanetaryhero"
+        ],
+        "promissoryNotes": [
+            "nfpnexpl"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "explanetary_flagship",
+            "infantry",
+            "explanetary_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "nomadfalcon"
+    },
+    {
+        "alias": "councilors",
+        "factionName": "League of Councilors",
+        "homeSystem": "nf1",
+        "startingFleet": "1 cr, 2 cv, 2 ff, 4 inf a, sd a",
+        "commodities": 5,
+        "factionTech": [
+            "nfcounr",
+            "nfcouny"
+        ],
+        "startingTech": [
+            "pi"
+        ],
+        "homePlanets": [
+            "arel"
+        ],
+        "abilities": [
+            "political_agenda",
+            "ballots",
+            "political_importance"
+        ],
+        "leaders": [
+            "councilorsagent",
+            "councilorscommander",
+            "councilorsherolean"
+        ],
+        "promissoryNotes": [
+            "nfpncoun"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "councilors_flagship",
+            "infantry",
+            "councilors_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "nomadfalcon"
+    }
+]

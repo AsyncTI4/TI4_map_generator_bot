@@ -109,6 +109,11 @@ public enum FactionEmojis implements TI4Emoji {
     zephyrion,
     arachian,
 
+    // nomadfalcon
+    erock,
+    explanetary,
+    councilors,
+
     // Franken
     Franken1,
     Franken2,
@@ -333,6 +338,10 @@ public enum FactionEmojis implements TI4Emoji {
             case "raven" -> raven;
             case "syndicate" -> syndicate;
             case "terminator" -> terminator;
+
+            case "councilors" -> councilors;
+            case "erock" -> erock;
+            case "explanetary" -> explanetary;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;
