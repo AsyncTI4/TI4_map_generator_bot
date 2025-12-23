@@ -63,6 +63,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.map.SpinService;
 import ti4.service.planet.PlanetService;
 import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.StartTurnService;
@@ -496,6 +497,7 @@ public class StartPhaseService {
         game.setPhaseOfGame("strategy");
         GMService.logActivity(game, "**Strategy** Phase for Round " + game.getRound() + " started.", true);
         FowCommunicationThreadService.checkAllCommThreads(game);
+        SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STRATEGY);
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";

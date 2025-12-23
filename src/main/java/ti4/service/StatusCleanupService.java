@@ -24,6 +24,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.map.SpinService;
 import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
@@ -139,7 +140,7 @@ public class StatusCleanupService {
             if ("ON".equalsIgnoreCase(game.getSpinMode())) {
                 SpinRingsHelper.spinRings(game);
             } else {
-                SpinRingsHelper.spinRingsCustom(game, game.getSpinMode(), null);
+                SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STATUS);
             }
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {

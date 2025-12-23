@@ -9,10 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.MessageHelper;
+import ti4.service.map.SpinService;
 
 class CustomizationOptions extends GameStateSubcommand {
 
@@ -61,7 +60,7 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.STRING,
                 Constants.SPIN_MODE,
-                "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
+                "Spins rings at status cleanup. ON for Fin logic, OFF to turn off. /spin for advanced settings"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
@@ -148,16 +147,12 @@ class CustomizationOptions extends GameStateSubcommand {
                 game.setBotStratReacts(false);
             }
         }
-        OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
-        if (shushing != null) {
-            String ccNP = shushing.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)
-                    || "OFF".equalsIgnoreCase(ccNP)
-                    || SpinRingsHelper.validateSpinSettings(ccNP)) {
+        OptionMapping spin = event.getOption(Constants.SPIN_MODE);
+        if (spin != null) {
+            String ccNP = spin.getAsString();
+            if ("ON".equalsIgnoreCase(ccNP) || "OFF".equalsIgnoreCase(ccNP)) {
                 game.setSpinMode(ccNP.toUpperCase());
-                MessageHelper.replyToMessage(event, "Spin mode set to `" + ccNP + "`");
-            } else {
-                MessageHelper.replyToMessage(event, "Invalid spin settings: " + ccNP);
+                SpinService.listSpinSettings(event, game);
             }
         }
 
