@@ -1,8 +1,6 @@
 package ti4.image;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -11,14 +9,12 @@ import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
-import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.settings.GlobalSettings;
@@ -28,8 +24,6 @@ public class MapRenderPipeline {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
-    private static final long MIN_RENDER_INTERVAL_MS = Duration.ofSeconds(10).toMillis();
-    private static final ConcurrentHashMap<String, Long> LAST_RENDERED_AT = new ConcurrentHashMap<>();
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
     private static void render(RenderEvent renderEvent) {
@@ -38,18 +32,6 @@ public class MapRenderPipeline {
         }
 
         String gameName = renderEvent.game.getName();
-        Long lastRenderEpochMilli = LAST_RENDERED_AT.get(gameName);
-        if (renderEvent.event instanceof ButtonInteractionEvent
-                && lastRenderEpochMilli != null
-                && System.currentTimeMillis() - lastRenderEpochMilli < MIN_RENDER_INTERVAL_MS) {
-            MessageHelper.sendMessageToChannel(
-                    renderEvent.event.getMessageChannel(),
-                    "**Map renders are limited to once every " + MIN_RENDER_INTERVAL_MS / 1000
-                            + " seconds. Retry in a bit!**");
-            return;
-        }
-        LAST_RENDERED_AT.put(gameName, System.currentTimeMillis());
-
         var timedRunnable =
                 new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
                     try (var mapGenerator =
