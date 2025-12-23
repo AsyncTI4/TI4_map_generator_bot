@@ -1,0 +1,128 @@
+[
+    {
+        "id": "erockagent",
+        "faction": "erock",
+        "type": "agent",
+        "name": "Ener'ock",
+        "title": "Titles Are Silly",
+        "abilityWindow": "When a player uses PRODUCTION:",
+        "abilityText": "You may exhaust this card to allow that player to choose 1 produced unit in that system matching a unit in that system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "erockcommander",
+        "faction": "erock",
+        "type": "commander",
+        "name": "Are'Ock",
+        "title": "Titles Are Silly",
+        "abilityWindow": "When you use 1 or more of your units PRODUCTION abilites:",
+        "abilityText": "Reduce the combined cost of the produced unit by 1 after applying other modifiers.",
+        "unlockCondition": "Have a combined production value total of 10 in 1 system",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "erockhero",
+        "faction": "erock",
+        "type": "hero",
+        "name": "Kaelen",
+        "title": "Titles Are Silly",
+        "abilityName": "Titles Are Silly",
+        "abilityWindow": "At the start of a space combat you may place this card near that game board:",
+        "abilityText": "During each round of combat, you may produce units up to the number of your space docks adjacent to the active system, reducing the cost of each produced unit by 1. At the end of the combat, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "explanetaryagent",
+        "faction": "explanetary",
+        "type": "agent",
+        "name": "Ro-ed",
+        "title": "Exploration Leader",
+        "abilityWindow": "After a player explores a planet ",
+        "abilityText": "You may exhaust this card to allow that player to gain 1 command token or 2 trade goods",
+        "unlockCondition": "Always Unlocked",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "explanetarycommander",
+        "faction": "explanetary",
+        "type": "commander",
+        "name": "General Gerod",
+        "title": "Titles Are Silly",
+        "abilityWindow": "At all times:",
+        "abilityText": "Reduce the cost of each unit that you have the unit upgrade for by 1",
+        "unlockCondition": "Win a combat in a system with a technology specialty planet",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "explanetaryhero",
+        "faction": "explanetary",
+        "type": "hero",
+        "name": "Daren",
+        "title": "Aggressive Exploration",
+        "abilityName": "Titles Are Silly",
+        "abilityWindow": "Action",
+        "abilityText": "Choose 1 planet with a technology specilty in the system that contains your flagship and Destroy each unit on that planet removing structures to that player reinforcments. Then place 4 infatry from your reinforcments on that planet. You gain control of that planet and ready it. Then gain trade goods equal to the combined rescource and influence value of that planet and purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "councilorsagent",
+        "faction": "councilors",
+        "type": "agent",
+        "name": "Councilor Arian",
+        "title": "Titles Are Silly",
+        "abilityWindow": "After a player plays an action card",
+        "abilityText": "You may exhaust this card to allow that player to ready 1 planet they control.",
+        "unlockCondition": "Always Unlocked",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "councilorscommander",
+        "faction": "councilors",
+        "type": "commander",
+        "name": "Councilor Esren",
+        "title": "Titles Are Silly",
+        "abilityWindow": "Action:",
+        "abilityText": "Spend one token from your strategy pool to swap one law from the councilor's players faction sheet with a law in play. \n\n (Unrelated to the action) When an agenda is resolved you may spend 1 token from your strategy pool to ignore the outcome. ",
+        "unlockCondition": "Have 4 agendas on your faction sheet",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "councilorsheroterk",
+        "faction": "councilors",
+        "type": "hero",
+        "name": "Councilor Terk",
+        "title": "Titles Are Silly",
+        "abilityName": "Titles Are Silly",
+        "abilityWindow": "Action",
+        "abilityText": "Search the agenda deck and discard pile for up to four laws. Place those laws face down on your factino sheet. Shuffle the agenda deck afterwards. Then purge this card",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "councilorsheroeric",
+        "faction": "councilors",
+        "type": "hero",
+        "name": "Councilor Eric",
+        "title": "Titles Are Silly",
+        "abilityName": "Titles Are Silly",
+        "abilityWindow": "Action",
+        "abilityText": "Choose 2 agendas on your faction sheet and resolve 1 outcome on each agenda as if you casted 1 vote for 1 outcome. Then gain trade goods equal to the number of laws in play and purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "nomadfalcon"
+    },
+    {
+        "id": "councilorsherolean",
+        "faction": "councilors",
+        "type": "hero",
+        "name": "Councilor Le'an",
+        "title": "Titles Are Silly",
+        "abilityName": "Titles Are Silly",
+        "abilityWindow": "When you would use your political importance faction ability you may instead use this card.",
+        "abilityText": "Law: Elect planet: Attach this card to the elected planet. Remove all units on this planet. Place the removed ground forces on a planet the controling player controls and return all structures to their reinforcments. This planets influence and rescource value is increased by 2. This planet may be exchanged as part of a transactoin. If the legue player does not control this planet at the start of their turn they may ready 1 planet they control or gain 2 trade goods.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "nomadfalcon"
+    }
+]
