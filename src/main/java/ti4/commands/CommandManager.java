@@ -37,6 +37,7 @@ import ti4.commands.search.SearchCommand;
 import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
 import ti4.commands.special.SpecialCommand;
+import ti4.commands.spin.SpinCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
@@ -127,7 +128,8 @@ public class CommandManager {
                     new TiglCommand(),
                     new AsyncCommand(),
                     new OmegaPhaseCommand(),
-                    new DraftCommand())
+                    new DraftCommand(),
+                    new SpinCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {
