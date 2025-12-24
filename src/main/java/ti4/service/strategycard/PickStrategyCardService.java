@@ -60,20 +60,22 @@ public class PickStrategyCardService {
         }
 
         // SEND EXTRA MESSAGE
-        if (isFowPrivateGame && privatePlayer != null) {
-            MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
-            game.updateActivePlayer(privatePlayer);
-            if (!allPicked) {
-                game.setPhaseOfGame("strategy");
+        if (isFowPrivateGame) {
+            if (privatePlayer != null) {
+                MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
                 game.updateActivePlayer(privatePlayer);
-                boolean queuedPick = false;
-                if (event instanceof ButtonInteractionEvent bevent) {
-                    queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
-                }
-                if (!queuedPick) {
-                    checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
-                } else {
-                    return;
+                if (!allPicked) {
+                    game.setPhaseOfGame("strategy");
+                    game.updateActivePlayer(privatePlayer);
+                    boolean queuedPick = false;
+                    if (event instanceof ButtonInteractionEvent bevent) {
+                        queuedPick = checkForQueuedSCPick(bevent, privatePlayer, game, msgExtra);
+                    }
+                    if (!queuedPick) {
+                        checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
+                    } else {
+                        return;
+                    }
                 }
             }
         } else {
