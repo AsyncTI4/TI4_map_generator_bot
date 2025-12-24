@@ -60,7 +60,7 @@ public class PickStrategyCardService {
         }
 
         // SEND EXTRA MESSAGE
-        if (isFowPrivateGame) {
+        if (isFowPrivateGame && privatePlayer != null) {
             MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
             game.updateActivePlayer(privatePlayer);
             if (!allPicked) {
