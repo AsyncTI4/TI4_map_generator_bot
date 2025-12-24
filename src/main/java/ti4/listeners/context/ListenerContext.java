@@ -63,19 +63,19 @@ public abstract class ListenerContext {
                 String message = event.getUser().getAsMention() + " is not a player of the game";
                 if (event instanceof IReplyCallback replyCallback) {
                     if (replyCallback.isAcknowledged()) {
-                        replyCallback.getHook()
+                        replyCallback
+                                .getHook()
                                 .sendMessage(message)
                                 .setEphemeral(true)
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     } else {
-                        replyCallback.reply(message)
+                        replyCallback
+                                .reply(message)
                                 .setEphemeral(true)
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 } else {
-                    event.getMessageChannel()
-                            .sendMessage(message)
-                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                    event.getMessageChannel().sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
                 contextIsValid = false;
                 return;
