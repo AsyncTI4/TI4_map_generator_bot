@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.CommandHelper;
@@ -59,9 +60,23 @@ public abstract class ListenerContext {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
 
             if (player == null && !"showGameAgain".equalsIgnoreCase(componentID)) {
-                event.getMessageChannel()
-                        .sendMessage(event.getUser().getAsMention() + " is not a player of the game")
-                        .queue(Consumers.nop(), BotLogger::catchRestError);
+                String message = event.getUser().getAsMention() + " is not a player of the game";
+                if (event instanceof IReplyCallback replyCallback) {
+                    if (replyCallback.isAcknowledged()) {
+                        replyCallback
+                                .getHook()
+                                .sendMessage(message)
+                                .setEphemeral(true)
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
+                    } else {
+                        replyCallback
+                                .reply(message)
+                                .setEphemeral(true)
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
+                    }
+                } else {
+                    event.getMessageChannel().sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+                }
                 contextIsValid = false;
                 return;
             }
