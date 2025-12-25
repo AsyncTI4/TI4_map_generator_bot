@@ -148,10 +148,7 @@ public abstract class ListenerContext {
                             .setEphemeral(true)
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
-                    replyCallback
-                            .reply(message)
-                            .setEphemeral(true)
-                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                    replyCallback.reply(message).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
