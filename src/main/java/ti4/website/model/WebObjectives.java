@@ -20,6 +20,7 @@ public class WebObjectives {
         private int pointValue;
         private boolean revealed;
         private boolean isMultiScoring;
+        private boolean hasRedTape;
         private List<String> scoredFactions;
         private List<String> peekingFactions;
         private Map<String, Integer> factionProgress;
@@ -31,6 +32,7 @@ public class WebObjectives {
                 int pointValue,
                 boolean revealed,
                 boolean isMultiScoring,
+                boolean hasRedTape,
                 List<String> scoredFactions,
                 List<String> peekingFactions,
                 Map<String, Integer> factionProgress,
@@ -40,6 +42,7 @@ public class WebObjectives {
             this.pointValue = pointValue;
             this.revealed = revealed;
             this.isMultiScoring = isMultiScoring;
+            this.hasRedTape = hasRedTape;
             this.scoredFactions = scoredFactions != null ? scoredFactions : new ArrayList<>();
             this.peekingFactions = peekingFactions != null ? peekingFactions : new ArrayList<>();
             this.factionProgress = factionProgress != null ? factionProgress : new HashMap<>();
@@ -81,12 +84,14 @@ public class WebObjectives {
     private static void processStage1Objectives(Game game, WebObjectives webObjectives) {
         Map<String, Integer> revealedObjectives = game.getRevealedPublicObjectives();
         Map<String, String> stage1Objectives = Mapper.getPublicObjectivesStage1();
+        boolean isRedTapeMode = game.isRedTapeMode();
+        boolean isCivilizedSocietyMode = game.isCivilizedSocietyMode();
 
         // Process revealed Stage 1 objectives
         for (Map.Entry<String, Integer> entry : revealedObjectives.entrySet()) {
             String key = entry.getKey();
             if (stage1Objectives.containsKey(key)) {
-                ObjectiveInfo objInfo = createObjectiveInfo(game, key, true, 1);
+                ObjectiveInfo objInfo = createObjectiveInfo(game, key, true, false, 1);
                 if (objInfo != null) {
                     webObjectives.stage1Objectives.add(objInfo);
                 }
@@ -95,8 +100,10 @@ public class WebObjectives {
 
         // Process unrevealed Stage 1 objectives
         List<String> unrevealed1 = game.getPublicObjectives1Peakable();
+        boolean isRevealed = isRedTapeMode || isCivilizedSocietyMode;
+        boolean hasRedTape = isRedTapeMode;
         for (String key : unrevealed1) {
-            ObjectiveInfo objInfo = createObjectiveInfo(game, key, false, 1);
+            ObjectiveInfo objInfo = createObjectiveInfo(game, key, isRevealed, hasRedTape, 1);
             if (objInfo != null) {
                 webObjectives.stage1Objectives.add(objInfo);
             }
@@ -106,12 +113,14 @@ public class WebObjectives {
     private static void processStage2Objectives(Game game, WebObjectives webObjectives) {
         Map<String, Integer> revealedObjectives = game.getRevealedPublicObjectives();
         Map<String, String> stage2Objectives = Mapper.getPublicObjectivesStage2();
+        boolean isRedTapeMode = game.isRedTapeMode();
+        boolean isCivilizedSocietyMode = game.isCivilizedSocietyMode();
 
         // Process revealed Stage 2 objectives
         for (Map.Entry<String, Integer> entry : revealedObjectives.entrySet()) {
             String key = entry.getKey();
             if (stage2Objectives.containsKey(key)) {
-                ObjectiveInfo objInfo = createObjectiveInfo(game, key, true, 2);
+                ObjectiveInfo objInfo = createObjectiveInfo(game, key, true, false, 2);
                 if (objInfo != null) {
                     webObjectives.stage2Objectives.add(objInfo);
                 }
@@ -120,8 +129,10 @@ public class WebObjectives {
 
         // Process unrevealed Stage 2 objectives
         List<String> unrevealed2 = game.getPublicObjectives2Peakable();
+        boolean isRevealed = isRedTapeMode || isCivilizedSocietyMode;
+        boolean hasRedTape = isRedTapeMode;
         for (String key : unrevealed2) {
-            ObjectiveInfo objInfo = createObjectiveInfo(game, key, false, 2);
+            ObjectiveInfo objInfo = createObjectiveInfo(game, key, isRevealed, hasRedTape, 2);
             if (objInfo != null) {
                 webObjectives.stage2Objectives.add(objInfo);
             }
@@ -142,7 +153,8 @@ public class WebObjectives {
         }
     }
 
-    private static ObjectiveInfo createObjectiveInfo(Game game, String key, boolean revealed, int defaultPointValue) {
+    private static ObjectiveInfo createObjectiveInfo(
+            Game game, String key, boolean revealed, boolean hasRedTape, int defaultPointValue) {
         PublicObjectiveModel po = Mapper.getPublicObjective(key);
         if (po == null) {
             return null;
@@ -166,6 +178,7 @@ public class WebObjectives {
                 pointValue,
                 revealed,
                 isMultiScoring,
+                hasRedTape,
                 scoredFactions,
                 peekingFactions,
                 factionProgress,
@@ -187,6 +200,7 @@ public class WebObjectives {
                 pointValue,
                 true,
                 isMultiScoring,
+                false,
                 scoredFactions,
                 peekingFactions,
                 factionProgress,
