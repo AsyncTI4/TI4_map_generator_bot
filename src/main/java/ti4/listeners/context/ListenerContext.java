@@ -140,7 +140,22 @@ public abstract class ListenerContext {
                 && !componentID.startsWith(factionWhoPressedButton + "_")
                 && (!componentID.contains("firmament_") || !factionWhoPressedButton.contains("obsidian"))) {
             String message = "To " + player.fogSafeEmoji() + ": these buttons are for someone else";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            if (event instanceof IReplyCallback replyCallback) {
+                if (replyCallback.isAcknowledged()) {
+                    replyCallback
+                            .getHook()
+                            .sendMessage(message)
+                            .setEphemeral(true)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                } else {
+                    replyCallback
+                            .reply(message)
+                            .setEphemeral(true)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            }
             return false;
         }
         if (componentID.contains("firmament_") && factionWhoPressedButton.contains("obsidian")) {
