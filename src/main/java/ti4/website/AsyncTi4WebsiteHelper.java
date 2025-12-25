@@ -127,7 +127,7 @@ public class AsyncTi4WebsiteHelper {
             }
 
             Map<String, Object> webData = new HashMap<>();
-            webData.put("versionSchema", 5);
+            webData.put("versionSchema", 6);
             webData.put("objectives", webObjectives);
             webData.put("playerData", playerDataList);
             webData.put("lawsInPlay", lawsInPlay);
