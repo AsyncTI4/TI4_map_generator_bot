@@ -42,7 +42,8 @@ class ObjectiveBox {
 
         graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
         graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
-        if ((objective.revealed() || game.isRedTapeMode() || game.isCivilizedSocietyMode()) && Mapper.getPublicObjective(objective.key()) != null) {
+        if ((objective.revealed() || game.isRedTapeMode() || game.isCivilizedSocietyMode())
+                && Mapper.getPublicObjective(objective.key()) != null) {
             generator.addWebsiteOverlay(
                     Mapper.getPublicObjective(objective.key()),
                     x - horizontalBoxOffset,

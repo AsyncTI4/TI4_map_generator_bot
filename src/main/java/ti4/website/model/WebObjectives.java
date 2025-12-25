@@ -153,7 +153,8 @@ public class WebObjectives {
         }
     }
 
-    private static ObjectiveInfo createObjectiveInfo(Game game, String key, boolean revealed, boolean hasRedTape, int defaultPointValue) {
+    private static ObjectiveInfo createObjectiveInfo(
+            Game game, String key, boolean revealed, boolean hasRedTape, int defaultPointValue) {
         PublicObjectiveModel po = Mapper.getPublicObjective(key);
         if (po == null) {
             return null;
