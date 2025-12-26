@@ -1183,15 +1183,11 @@ public class Player extends PlayerProperties {
 
     private Set<Integer> getReservedActionCardIdentifiers() {
         Set<Integer> values = new HashSet<>(actionCards.values());
-        if (game == null) {
-            return values;
-        }
         Map<String, Integer> discardCards = game.getDiscardActionCards();
         Map<String, ActionCardHelper.ACStatus> discardStatuses = game.getDiscardACStatus();
         for (Entry<String, Integer> entry : discardCards.entrySet()) {
             ActionCardHelper.ACStatus status = discardStatuses.get(entry.getKey());
-            if (status == ActionCardHelper.ACStatus.garbozia
-                    || status == ActionCardHelper.ACStatus.ralnelbt) {
+            if (status == ActionCardHelper.ACStatus.garbozia) {
                 values.add(entry.getValue());
             }
         }
