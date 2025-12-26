@@ -1693,9 +1693,7 @@ public class ButtonHelper {
             }
 
             if (CommandCounterHelper.hasCC(nonActivePlayer, activeSystem)
-                    && nonActivePlayer.getPlayableActionCards().contains("counterstroke")
-                    && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                    && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
+                    && nonActivePlayer.getPlayableActionCards().contains("counterstroke")) {
                 List<Button> reverseButtons = new ArrayList<>();
                 String key = "counterstroke";
                 Integer counterstrokeValue = nonActivePlayer.getActionCards().get(key);

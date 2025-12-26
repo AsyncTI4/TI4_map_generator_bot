@@ -1788,7 +1788,7 @@ public class ActionCardHelper {
                 if (twinningValue == null) {
                     twinningValue = game.getDiscardActionCards().get(twinningId);
                 }
-                String reversePrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
+                String twinningPrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
 
                 for (String acID : actionCards) {
                     ActionCardModel model = Mapper.getActionCard(acID);
@@ -1801,7 +1801,7 @@ public class ActionCardHelper {
                         continue;
                     }
 
-                    String id = reversePrefix + model.getName();
+                    String id = twinningPrefix + model.getName();
                     String label = "Twin " + model.getName();
                     twinningButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
                     if (actionCards.size() == 1) msg.append(model.getName()).append(".");
