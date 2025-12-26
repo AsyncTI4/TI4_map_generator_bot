@@ -1,19 +1,20 @@
 package ti4.listeners.context;
 
+import java.util.Collections;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
-import java.util.Collections;
-import java.util.List;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
 import ti4.commands.CommandHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -23,8 +24,8 @@ import ti4.message.logging.BotLogger;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
-import ti4.spring.jda.JdaService;
 import ti4.settings.users.UserSettingsManager;
+import ti4.spring.jda.JdaService;
 
 @Getter
 public abstract class ListenerContext {
@@ -145,39 +146,7 @@ public abstract class ListenerContext {
         if (player != null
                 && !componentID.startsWith(factionWhoPressedButton + "_")
                 && (!componentID.contains("firmament_") || !factionWhoPressedButton.contains("obsidian"))) {
-            var userSettings = UserSettingsManager.get(player.getUserID());
-            Boolean prefersEphemeral = userSettings.getPrefersWrongButtonEphemeral();
-            boolean shouldAskPreference = prefersEphemeral == null;
-            boolean sendEphemeral = prefersEphemeral == null || prefersEphemeral;
-            String message = "To " + player.fogSafeEmoji() + ": these buttons are for someone else";
-            List<Button> buttons = Collections.emptyList();
-            if (shouldAskPreference) {
-                message += "\nWould you like this warning to be ephemeral in the future?";
-                buttons = List.of(
-                        Buttons.green("wrongButtonEphemeral_true", "Yes"),
-                        Buttons.red("wrongButtonEphemeral_false", "No"));
-            }
-            if (event instanceof IReplyCallback replyCallback) {
-                if (replyCallback.isAcknowledged()) {
-                    var messageAction = replyCallback.getHook().sendMessage(message).setEphemeral(sendEphemeral);
-                    if (shouldAskPreference) {
-                        messageAction.setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons));
-                    }
-                    messageAction.queue(Consumers.nop(), BotLogger::catchRestError);
-                } else {
-                    var replyAction = replyCallback.reply(message).setEphemeral(sendEphemeral);
-                    if (shouldAskPreference) {
-                        replyAction.setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons));
-                    }
-                    replyAction.queue(Consumers.nop(), BotLogger::catchRestError);
-                }
-            } else {
-                if (shouldAskPreference) {
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                }
-            }
+            handlePlayerHittingButtonTheyDoNotOwn(event);
             return false;
         }
         if (componentID.contains("firmament_") && factionWhoPressedButton.contains("obsidian")) {
@@ -186,6 +155,38 @@ public abstract class ListenerContext {
         componentID = componentID.replaceFirst(factionWhoPressedButton + "_", "");
         factionChecked = true;
         return true;
+    }
+
+    private void handlePlayerHittingButtonTheyDoNotOwn(Interaction event) {
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        Boolean prefersEphemeral = userSettings.getPrefersWrongButtonEphemeral();
+        boolean shouldAskPreference = prefersEphemeral == null;
+        boolean sendEphemeral = prefersEphemeral == null || prefersEphemeral;
+        String message = "To " + player.fogSafeEmoji() + ": these buttons are for someone else";
+        List<Button> buttons = Collections.emptyList();
+        if (shouldAskPreference) {
+            message += "\nWould you like this warning to be ephemeral in the future?";
+            buttons = List.of(
+                Buttons.green("wrongButtonEphemeral_true", "Yes"),
+                Buttons.red("wrongButtonEphemeral_false", "No"));
+        }
+        if (event instanceof IReplyCallback replyCallback) {
+            if (replyCallback.isAcknowledged()) {
+                var messageAction = replyCallback.getHook().sendMessage(message).setEphemeral(sendEphemeral);
+                if (shouldAskPreference) {
+                    messageAction.setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons));
+                }
+                messageAction.queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                var replyAction = replyCallback.reply(message).setEphemeral(sendEphemeral);
+                if (shouldAskPreference) {
+                    replyAction.setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons));
+                }
+                replyAction.queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        }
     }
 
     public void save() {
