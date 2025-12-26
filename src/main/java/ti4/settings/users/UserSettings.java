@@ -32,6 +32,7 @@ public class UserSettings {
     private boolean prefersAutoDebtClearance = true;
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
+    private Boolean prefersWrongButtonEphemeral;
     private int autoNoSaboInterval;
     private String whisperPref = "No Preference";
     private String supportPref = "No Preference";

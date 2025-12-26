@@ -30,6 +30,10 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN,
                 "auto_respond_no_secrets",
                 "True to auto decline scoring status phase secrets if you can't score any"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "ephemeral_wrong_button_warning",
+                "True to keep the \"wrong button\" warning ephemeral"));
     }
 
     @Override
@@ -58,6 +62,11 @@ class SetPreferredSettings extends Subcommand {
             } else {
                 userSettings.setSandbagPref("manual");
             }
+        }
+
+        Boolean wrongButtonWarning = event.getOption("ephemeral_wrong_button_warning", null, OptionMapping::getAsBoolean);
+        if (wrongButtonWarning != null) {
+            userSettings.setPrefersWrongButtonEphemeral(wrongButtonWarning);
         }
 
         Integer sabo = event.getOption("sabo_decline_median", null, OptionMapping::getAsInt);
