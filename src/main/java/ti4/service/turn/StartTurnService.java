@@ -25,6 +25,9 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.map.Planet;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -45,6 +48,7 @@ import ti4.service.fow.WhisperService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.unit.AddUnitService;
 import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
@@ -292,7 +296,27 @@ public class StartTurnService {
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
         if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf") && !player.hasUnit("tf-yinclone")) {
-            if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
+            Tile tile = player.getHomeSystemTile();
+            List<String> controlledHomePlanets = new ArrayList<>();
+            if (tile != null) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder instanceof Planet
+                            && !((Planet) unitHolder).isSpaceStation()
+                            && player.getPlanets().contains(unitHolder.getName())) {
+                        controlledHomePlanets.add(unitHolder.getName());
+                    }
+                }
+            }
+            if (controlledHomePlanets.size() == 1) {
+                String planet = controlledHomePlanets.getFirst();
+                int infantryToPlace = player.getStasisInfantry();
+                AddUnitService.addUnits(null, tile, game, player.getColor(), infantryToPlace + " inf " + planet);
+                player.setStasisInfantry(0);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getFactionEmoji() + " automatically placed " + infantryToPlace + " infantry on "
+                                + Helper.getPlanetRepresentation(planet, game) + ".");
+            } else if (controlledHomePlanets.size() > 1) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
                         + " infantry left to revive.";
