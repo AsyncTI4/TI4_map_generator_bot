@@ -1731,7 +1731,7 @@ public class ActionCardHelper {
                     new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
             if (actionCards.size() > 1) msg.append("one of the following cards:");
 
-            List<String> ralnel = new ArrayList<>();
+            List<String> notInDiscard = new ArrayList<>();
             List<Button> reverseButtons = new ArrayList<>();
 
             Integer reverseEngineerValue = player.getActionCards().get(reverseEngineerID);
@@ -1746,8 +1746,9 @@ public class ActionCardHelper {
                 if (!model.getWindow().toLowerCase().startsWith("action")) {
                     continue;
                 }
-                if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) {
-                    ralnel.add(acID);
+                ACStatus discardStatus = game.getDiscardACStatus().get(acID);
+                if (discardStatus != null) {
+                    notInDiscard.add(acID);
                     continue;
                 }
                 cardNames.add(model.getName());
@@ -1764,8 +1765,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), msg.toString(), reverseButtons);
             }
-            if (!ralnel.isEmpty()) {
-                String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
+            if (!notInDiscard.isEmpty()) {
+                String error =
+                        "The action cards were not placed in the discard pile: " + String.join(", ", notInDiscard);
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
             }
         }
@@ -1793,11 +1795,6 @@ public class ActionCardHelper {
                 for (String acID : actionCards) {
                     ActionCardModel model = Mapper.getActionCard(acID);
                     if (!model.getWindow().toLowerCase().startsWith("action")) {
-                        continue;
-                    }
-
-                    if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) {
-                        ralnel.add(acID);
                         continue;
                     }
 
