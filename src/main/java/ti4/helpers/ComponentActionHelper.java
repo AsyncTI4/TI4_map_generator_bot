@@ -548,7 +548,8 @@ public class ComponentActionHelper {
                                 p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
                     } else {
                         p1.addExhaustedRelic("emelpar");
-                        successMessage = p1.getFactionEmoji() + " used Scepter of Emelpar to Orbital Drop";
+                        successMessage = p1.getFactionEmoji() + " used the _" + RelicHelper.sillySpelling()
+                                + "_ to **Orbital Drop**.";
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Please choose the planet you wish to place 2 infantry on.";

@@ -2383,12 +2383,12 @@ public class ButtonHelper {
     public static void addMinorFactionsInfantry(Game game, ButtonInteractionEvent event) {
 
         if (!game.isMinorFactionsMode()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode.");
             return;
         }
         if (game.getRealPlayers().size() < 3 && game.getPlayers().size() > 3) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Set up all real players before pressing this button");
+                    event.getChannel(), "Set up all real players before pressing this button.");
             return;
         }
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
@@ -2420,7 +2420,7 @@ public class ButtonHelper {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to home systems");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to home systems.");
 
         deleteMessage(event);
     }
@@ -4615,7 +4615,7 @@ public class ButtonHelper {
                 }
                 if (added) {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets");
+                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets.");
                 }
             }
         }
@@ -5126,8 +5126,7 @@ public class ButtonHelper {
                             "resolvePhantomEnergy_" + asyncID,
                             StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID))));
                 }
-                String msg =
-                        player.getRepresentation() + " choose the ship type to use your phantom energy ability on.";
+                String msg = player.getRepresentation() + " choose the ship type to use **Phantom Energy** on.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             }
         }
@@ -5139,7 +5138,7 @@ public class ButtonHelper {
         game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " has used the phantom energy ability on the "
+                player.getRepresentation() + " has used **Phantom Energy** on the "
                         + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
         deleteMessage(event);
     }
@@ -8158,6 +8157,6 @@ public class ButtonHelper {
     public static void autoProveEndurance(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
         deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response.");
     }
 }

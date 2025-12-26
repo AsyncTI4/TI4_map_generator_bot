@@ -214,7 +214,7 @@ class ActionCardHandButtonHandler {
             BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
                     .asThreadChannel()
-                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
+                    .sendMessage("Could not parse action card ID: `" + acID + "`. Please play manually.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ButtonHelper.deleteMessage(event);

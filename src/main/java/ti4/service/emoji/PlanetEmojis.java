@@ -48,6 +48,7 @@ public enum PlanetEmojis implements TI4Emoji {
     Retillion,
     Shalloq, // Yssaril
     SpaceStation, // Space Station
+    Lightning, // TE and Fracture
     // Base/PoK non-home
     Ang,
     ArchonVail,

@@ -8,6 +8,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.collections4.CollectionUtils;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
@@ -20,10 +21,12 @@ import ti4.service.emoji.TechEmojis;
 public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
-    private String displayName;
+    private String shortName;
+    private Boolean shrinkName;
     private List<TechnologyType> synergy;
     private String faction;
     private String text;
+    private String homebrewReplacesID;
     private ComponentSource source;
 
     public boolean isValid() {
@@ -92,6 +95,26 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
             case UNITUPGRADE -> Color.black;
             default -> Color.white;
         };
+    }
+
+    public Optional<String> getHomebrewReplacesID() {
+        return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public String getShortName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shortName).orElse(name);
+        }
+        return Optional.ofNullable(shortName)
+                .orElse(Mapper.getBreakthrough(getHomebrewReplacesID().get()).getShortName());
+    }
+
+    public boolean getShrinkName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName)
+                .orElse(Mapper.getBreakthrough(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public boolean search(String searchString) {

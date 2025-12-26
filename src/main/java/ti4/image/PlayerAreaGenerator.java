@@ -2145,6 +2145,11 @@ class PlayerAreaGenerator {
                 if (creussGate != null) {
                     homeTile = creussGate;
                 }
+            } else if ("118".equals(homeTile.getTileID())) {
+                Tile creussGate = game.getTile("94");
+                if (creussGate != null) {
+                    homeTile = creussGate;
+                }
             }
             Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
             Comparator<String> planetComparator = (planet1, planet2) -> {
@@ -2154,11 +2159,17 @@ class PlayerAreaGenerator {
                 if (tile1 != null && "51".equals(tile1.getTileID())) {
                     Tile creussGate = game.getTile("17");
                     if (creussGate != null) tile1 = creussGate;
+                } else if (tile1 != null && "118".equals(tile1.getTileID())) {
+                    Tile creussGate = game.getTile("94");
+                    if (creussGate != null) tile1 = creussGate;
                 }
 
                 Tile tile2 = game.getTileFromPlanet(planet2);
                 if (tile2 != null && "51".equals(tile2.getTileID())) {
                     Tile creussGate = game.getTile("17");
+                    if (creussGate != null) tile2 = creussGate;
+                } else if (tile2 != null && "118".equals(tile2.getTileID())) {
+                    Tile creussGate = game.getTile("94");
                     if (creussGate != null) tile2 = creussGate;
                 }
 
@@ -2519,7 +2530,7 @@ class PlayerAreaGenerator {
         if (model == null
                 || ((!game.isThundersEdge() || game.isTwilightsFallMode())
                         && !player.hasUnlockedBreakthrough(model.getID()))) return x;
-        String name = model.getDisplayName() == null ? model.getName() : model.getDisplayName();
+        String name = model.getShortName();
         String faction = model.getFaction().orElse(null);
         boolean exh = player.isBreakthroughExhausted(bt);
         boolean unl = player.isBreakthroughUnlocked(bt);
@@ -2536,7 +2547,7 @@ class PlayerAreaGenerator {
 
             String resource = model.getBackgroundResource();
 
-            BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor);
+            BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor, model.getShrinkName());
             drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
             graphics.drawImage(btBox, x, y - 3, null);
 
@@ -2565,6 +2576,11 @@ class PlayerAreaGenerator {
 
     private BufferedImage createPABox(
             String displayText, String resource, String faction, Color boxOutline, Color textColor) {
+        return createPABox(displayText, resource, faction, boxOutline, textColor, false);
+    }
+
+    private BufferedImage createPABox(
+            String displayText, String resource, String faction, Color boxOutline, Color textColor, boolean shrink) {
         BufferedImage output = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
         BufferedImage textAndBox = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
         Graphics g = output.getGraphics();
@@ -2574,51 +2590,17 @@ class PlayerAreaGenerator {
         Graphics2D g2 = textAndBox.createGraphics();
         AffineTransform orig = g2.getTransform();
         g2.setStroke(stroke2);
-        g2.setFont(Storage.getFont18());
-        g2.rotate(NEGATIVE_NINETY_DEGREES_RADIANS);
-
         g2.setColor(textColor);
-        String firstRow = StringUtils.left(StringUtils.substringBefore(displayText, "\n"), 20)
-                .toUpperCase();
-        String secondRow = StringUtils.left(StringUtils.substringAfter(displayText, "\n"), 20)
-                .toUpperCase();
-        int xAlign = resource == null ? -4 : -35;
-        if (StringUtils.isNotBlank(secondRow)) {
-            DrawingUtil.superDrawString(
-                    g2,
-                    firstRow,
-                    xAlign,
-                    12,
-                    textColor,
-                    HorizontalAlign.Right,
-                    VerticalAlign.Center,
-                    stroke3,
-                    Color.black);
-            DrawingUtil.superDrawString(
-                    g2,
-                    secondRow,
-                    xAlign,
-                    32,
-                    textColor,
-                    HorizontalAlign.Right,
-                    VerticalAlign.Center,
-                    stroke3,
-                    Color.black);
+
+        if (shrink) {
+            g2.setFont(Storage.getFont16());
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 11, 30, 120, true);
         } else {
-            DrawingUtil.superDrawString(
-                    g2,
-                    firstRow,
-                    xAlign,
-                    21,
-                    textColor,
-                    HorizontalAlign.Right,
-                    VerticalAlign.Center,
-                    stroke3,
-                    Color.black);
+            g2.setFont(Storage.getFont18());
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 9, 30, 120, true);
         }
 
         g2.setColor(boxOutline);
-        g2.setTransform(orig);
         g2.drawRect(1, 1, 42, 152);
 
         g.drawImage(textAndBox, 0, 0, null);

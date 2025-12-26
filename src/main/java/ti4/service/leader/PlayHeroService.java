@@ -201,7 +201,8 @@ public class PlayHeroService {
                 buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " use buttons to resolve the hero ability",
+                        player.getRepresentation()
+                                + ", please use buttons to resolve your _Titles Are Silly_ hero ability.",
                         buttons);
             }
             case "xanhero" -> {
@@ -216,19 +217,16 @@ public class PlayHeroService {
                 game.getTileMap().values().stream()
                         .flatMap(t -> t.getUnitHolders().values().stream())
                         .forEach(uh -> uh.removeAllUnitDamage(player.getColorID()));
-                String message = player.getRepresentation() + " repaired all of their units.";
+                String gainedTg = player.gainTG(amount, true);
+                String message = player.getRepresentation() + " repaired all " + amount
+                        + " of their damaged units, and consequently gained " + amount + " trade good"
+                        + (amount == 1 ? "" : "s") + " " + gainedTg + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (amount > 0) {
-                    String gainedTg = player.gainTG(amount, true);
-                    ButtonHelperAgents.resolveArtunoCheck(player, amount);
-                    message = player.getRepresentation() + " gained " + amount + " tg " + gainedTg
-                            + ", equal to the amount of damaged units.";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                }
+                ButtonHelperAgents.resolveArtunoCheck(player, amount);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " can now repair opponent units near their space docks (not automated, use /remove_all_sustain_damage)");
+                                + " can now repair other players' units near their space docks (not automated, use `/remove_all_sustain_damage`).");
             }
             case "mirvedahero" -> {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "pds", "placeOneNDone_skipbuild");

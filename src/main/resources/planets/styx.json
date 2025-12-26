@@ -11,7 +11,7 @@
     "resources": 4,
     "influence": 0,
     "planetTypes": [
-        "NONE"
+        "LIGHTNING"
     ],
     "legendaryAbilityName": "A Song Like Marrow",
     "legendaryAbilityText": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point.",

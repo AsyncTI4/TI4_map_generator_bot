@@ -2,7 +2,7 @@
     {
         "alias": "axisbt",
         "name": "Arms Brokerage",
-        "displayName": "Arms\nBrokerage",
+        "shortName": "Arms\nBrokerage",
         "faction": "axis",
         "synergy": [
             "PROPULSION",
@@ -14,7 +14,7 @@
     {
         "alias": "bentorbt",
         "name": "Historian Conclave",
-        "displayName": "Historian\nConclave",
+        "shortName": "Historian\nConclave",
         "faction": "bentor",
         "synergy": [
             "PROPULSION",
@@ -26,7 +26,7 @@
     {
         "alias": "celdauribt",
         "name": "Trade Protectorate",
-        "displayName": "Trade\nProtectorate",
+        "shortName": "Trade\nProtectorate",
         "faction": "celdauri",
         "synergy": [
             "CYBERNETIC",
@@ -38,7 +38,7 @@
     {
         "alias": "cheiranbt",
         "name": "Matriphagy",
-        "displayName": "Matriphagy",
+        "shortName": "Matriphagy",
         "faction": "cheiran",
         "synergy": [
             "PROPULSION",
@@ -50,7 +50,7 @@
     {
         "alias": "cymiaebt",
         "name": "Cybernetic Armoring",
-        "displayName": "Cybernetic\nArmoring",
+        "shortName": "Cybernetic\nArmoring",
         "faction": "cymiae",
         "synergy": [
             "CYBERNETIC",
@@ -62,7 +62,7 @@
     {
         "alias": "dihmohnbt",
         "name": "Exodus Engineering",
-        "displayName": "Exodus\nEngineering",
+        "shortName": "Exodus\nEngineering",
         "faction": "dihmohn",
         "synergy": [
             "PROPULSION",
@@ -74,7 +74,7 @@
     {
         "alias": "edynbt",
         "name": "Celestial Ambassadors",
-        "displayName": "Celestial\nAmbassadors",
+        "shortName": "Celestial\nAmbassadors",
         "faction": "edyn",
         "synergy": [
             "CYBERNETIC",
@@ -86,7 +86,7 @@
     {
         "alias": "freesystemsbt",
         "name": "Galactic Movement",
-        "displayName": "Galactic\nMovement",
+        "shortName": "Galactic\nMovement",
         "faction": "freesystems",
         "synergy": [
             "BIOTIC",
@@ -98,7 +98,7 @@
     {
         "alias": "gheminabt",
         "name": "Raiding Parties",
-        "displayName": "Raiding\nParties",
+        "shortName": "Raiding\nParties",
         "faction": "ghemina",
         "synergy": [
             "BIOTIC",
@@ -110,7 +110,7 @@
     {
         "alias": "ghotibt",
         "name": "Cult of the All-Mother",
-        "displayName": "Cult of\nthe All-Mother",
+        "shortName": "Cult of\nthe All-Mother",
         "faction": "ghoti",
         "synergy": [
             "BIOTIC",
@@ -122,7 +122,7 @@
     {
         "alias": "gledgebt",
         "name": "Dhonraz Installations",
-        "displayName": "Dhonraz\nInstallations",
+        "shortName": "Dhonraz\nInstallations",
         "faction": "gledge",
         "synergy": [
             "CYBERNETIC",
@@ -134,7 +134,7 @@
     {
         "alias": "augersbt",
         "name": "Cryptic Insights",
-        "displayName": "Cryptic\nInsights",
+        "shortName": "Cryptic\nInsights",
         "faction": "augers",
         "synergy": [
             "CYBERNETIC",
@@ -146,7 +146,7 @@
     {
         "alias": "kjalengardbt",
         "name": "Bannerhalls",
-        "displayName": "Bannerhalls",
+        "shortName": "Bannerhalls",
         "faction": "kjalengard",
         "synergy": [
             "WARFARE",
@@ -158,7 +158,7 @@
     {
         "alias": "kolleccbt",
         "name": "The Collector's Museum",
-        "displayName": "The Collector's\nMuseum",
+        "shortName": "The Collector's\nMuseum",
         "faction": "kollecc",
         "synergy": [
             "PROPULSION",
@@ -170,7 +170,7 @@
     {
         "alias": "kolumebt",
         "name": "Synchronicity VI",
-        "displayName": "Synchronicity VI",
+        "shortName": "Synchronicity VI",
         "faction": "kolume",
         "synergy": [
             "PROPULSION",
@@ -182,7 +182,7 @@
     {
         "alias": "florzenbt",
         "name": "Reverie Implants",
-        "displayName": "Reverie\nImplants",
+        "shortName": "Reverie\nImplants",
         "faction": "florzen",
         "synergy": [
             "PROPULSION",
@@ -194,7 +194,7 @@
     {
         "alias": "kortalibt",
         "name": "The Queens’ Wrath",
-        "displayName": "The Queens’ \nrath",
+        "shortName": "The Queens’ \nrath",
         "faction": "kortali",
         "synergy": [
             "PROPULSION",
@@ -206,7 +206,7 @@
     {
         "alias": "kyrobt",
         "name": "Strain Dispersal",
-        "displayName": "Strain\nDispersal",
+        "shortName": "Strain\nDispersal",
         "faction": "kyro",
         "synergy": [
             "CYBERNETIC",
@@ -218,7 +218,7 @@
     {
         "alias": "lanefirbt",
         "name": "Erasure Corps",
-        "displayName": "Erasure Corps",
+        "shortName": "Erasure Corps",
         "faction": "lanefir",
         "synergy": [
             "BIOTIC",
@@ -230,7 +230,7 @@
     {
         "alias": "lizhobt",
         "name": "Professional Intrigue",
-        "displayName": "Professional\nIntrigue",
+        "shortName": "Professional\nIntrigue",
         "faction": "lizho",
         "synergy": [
             "BIOTIC",
@@ -242,7 +242,7 @@
     {
         "alias": "khraskbt",
         "name": "Mended Grove",
-        "displayName": "Mended Grove",
+        "shortName": "Mended Grove",
         "faction": "khrask",
         "synergy": [
             "BIOTIC",
@@ -254,7 +254,7 @@
     {
         "alias": "mirvedabt",
         "name": "Stabilization Arrays",
-        "displayName": "Stabilization\nArrays",
+        "shortName": "Stabilization\nArrays",
         "faction": "mirveda",
         "synergy": [
             "PROPULSION",
@@ -266,7 +266,7 @@
     {
         "alias": "mortheusbt",
         "name": "Mirage Craft",
-        "displayName": "Mirage \nCraft",
+        "shortName": "Mirage \nCraft",
         "faction": "mortheus",
         "synergy": [
             "WARFARE",
@@ -278,7 +278,7 @@
     {
         "alias": "mykomentoribt",
         "name": "Dreamwalkers",
-        "displayName": "Dreamwalkers",
+        "shortName": "Dreamwalkers",
         "faction": "mykomentori",
         "synergy": [
             "BIOTIC",
@@ -290,7 +290,7 @@
     {
         "alias": "nivynbt",
         "name": "Anomaly Stabilization",
-        "displayName": "Anomaly\nStabilization",
+        "shortName": "Anomaly\nStabilization",
         "faction": "nivyn",
         "synergy": [
             "PROPULSION",
@@ -302,7 +302,7 @@
     {
         "alias": "nokarbt",
         "name": "Mercenary Captains",
-        "displayName": "Mercenary\nCaptains",
+        "shortName": "Mercenary\nCaptains",
         "faction": "nokar",
         "synergy": [
             "CYBERNETIC",
@@ -314,7 +314,7 @@
     {
         "alias": "olradinbt",
         "name": "Insurrectionist Networking",
-        "displayName": "Insurrectionist\nNetworking",
+        "shortName": "Insurrectionist\nNetworking",
         "faction": "olradin",
         "synergy": [
             "BIOTIC",
@@ -326,7 +326,7 @@
     {
         "alias": "zealotsbt",
         "name": "Rhodun's Reliquary",
-        "displayName": "Rhodun's\nReliquary",
+        "shortName": "Rhodun's\nReliquary",
         "faction": "zealots",
         "synergy": [
             "CYBERNETIC",
@@ -338,7 +338,7 @@
     {
         "alias": "rohdhnabt",
         "name": "The Prodigy’s Triumph",
-        "displayName": "The Prodigy’s\nTriumph",
+        "shortName": "The Prodigy’s\nTriumph",
         "faction": "rohdhna",
         "synergy": [
             "CYBERNETIC",
@@ -350,7 +350,7 @@
     {
         "alias": "tnelisbt",
         "name": "Hidden Hardpoints",
-        "displayName": "Hidden\nHardpoints",
+        "shortName": "Hidden\nHardpoints",
         "faction": "tnelis",
         "synergy": [
             "WARFARE",
@@ -362,7 +362,7 @@
     {
         "alias": "vadenbt",
         "name": "Strongarm Banking",
-        "displayName": "Strongarm\nBanking",
+        "shortName": "Strongarm\nBanking",
         "faction": "vaden",
         "synergy": [
             "WARFARE",
@@ -374,7 +374,7 @@
     {
         "alias": "vaylerianbt",
         "name": "Gravitic Disruption",
-        "displayName": "Gravitic\nDisruption",
+        "shortName": "Gravitic\nDisruption",
         "faction": "vaylerian",
         "synergy": [
             "WARFARE",
@@ -386,7 +386,7 @@
     {
         "alias": "veldyrbt",
         "name": "Aurora Research Base",
-        "displayName": "Aurora\nResearch Base",
+        "shortName": "Aurora\nResearch Base",
         "faction": "veldyr",
         "synergy": [
             "CYBERNETIC",
@@ -398,7 +398,7 @@
     {
         "alias": "zelianbt",
         "name": "Awakened Planetoids",
-        "displayName": "Awakened\nPlanetoids",
+        "shortName": "Awakened\nPlanetoids",
         "faction": "zelian",
         "synergy": [
             "BIOTIC",

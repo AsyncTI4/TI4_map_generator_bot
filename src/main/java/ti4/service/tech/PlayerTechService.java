@@ -368,7 +368,7 @@ public class PlayerTechService {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "Purging a frag or spending a CC (and exhausting tech) is not automated at this time");
+                        "Purging a relic fragment or spending a command token (and exhausting technology) is not automated at this time.");
                 ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
             case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
