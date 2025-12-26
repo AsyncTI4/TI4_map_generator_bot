@@ -1738,8 +1738,7 @@ public class ActionCardHelper {
             if (reverseEngineerValue == null) {
                 reverseEngineerValue = game.getDiscardActionCards().get(reverseEngineerID);
             }
-            String reversePrefix =
-                    Constants.AC_PLAY_FROM_HAND + reverseEngineerValue + "_reverse_";
+            String reversePrefix = Constants.AC_PLAY_FROM_HAND + reverseEngineerValue + "_reverse_";
 
             Set<String> cardNames = new HashSet<>();
             for (String acID : actionCards) {
@@ -1789,8 +1788,7 @@ public class ActionCardHelper {
                 if (twinningValue == null) {
                     twinningValue = game.getDiscardActionCards().get(twinningId);
                 }
-                String reversePrefix =
-                        Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
+                String reversePrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
 
                 for (String acID : actionCards) {
                     ActionCardModel model = Mapper.getActionCard(acID);
