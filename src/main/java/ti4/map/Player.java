@@ -1082,15 +1082,6 @@ public class Player extends PlayerProperties {
         actionCards.put(id, identifier);
     }
 
-    public void setActionCard(String id, int oldID) {
-        Set<Integer> values = getReservedActionCardIdentifiers();
-        int identifier = oldID;
-        while (values.contains(identifier)) {
-            identifier = ThreadLocalRandom.current().nextInt(1000);
-        }
-        actionCards.put(id, identifier);
-    }
-
     public void setEvent(String id) {
         Collection<Integer> values = events.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
