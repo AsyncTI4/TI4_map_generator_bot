@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -96,6 +97,21 @@ public class PlayerPreferenceHelper {
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("wrongButtonEphemeral_")
+    public static void resolveWrongButtonEphemeralPreference(
+            Player player, ButtonInteractionEvent event, String buttonID) {
+        boolean prefersEphemeral = Boolean.parseBoolean(buttonID.split("_")[1]);
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        userSettings.setPrefersWrongButtonEphemeral(prefersEphemeral);
+        UserSettingsManager.save(userSettings);
+        String confirmation = "Preference saved. Future warnings will be "
+                + (prefersEphemeral ? "ephemeral." : "sent to the channel.");
+        event.getMessage()
+                .editMessage(confirmation)
+                .setComponents(Collections.emptyList())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void offerSetAutoPassOnSaboButtons(Game game, Player player2) {
