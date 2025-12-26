@@ -94,13 +94,11 @@ public class SabotageService {
 
         boolean bigAcDeckGame =
                 (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180;
-        return (bigAcDeckGame || playerHasSabotage(player))
-                && !IsPlayerElectedService.isPlayerElected(game, player, "censure")
-                && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure");
+        return bigAcDeckGame || playerHasSabotage(player);
     }
 
     private static boolean playerHasSabotage(Player player) {
-        return player.getActionCards().keySet().stream().anyMatch(ALL_SABOTAGE_CARD_ALIASES::contains);
+        return player.getPlayableActionCards().stream().anyMatch(ALL_SABOTAGE_CARD_ALIASES::contains);
     }
 
     public static boolean isSaboAllowed(Game game, Player player) {

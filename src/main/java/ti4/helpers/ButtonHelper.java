@@ -1698,14 +1698,15 @@ public class ButtonHelper {
                         && !IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) {
                     List<Button> reverseButtons = new ArrayList<>();
                     String key = "counterstroke";
-                    String ac_name = Mapper.getActionCard(key).getName();
-                    if (ac_name != null) {
-                        reverseButtons.add(Buttons.green(
-                                Constants.AC_PLAY_FROM_HAND
-                                        + nonActivePlayer.getActionCards().get(key) + "_counterstroke_"
-                                        + activeSystem.getPosition(),
-                                "Counterstroke in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
+                    Integer counterstrokeValue = nonActivePlayer.getActionCards().get(key);
+                    if (counterstrokeValue == null) {
+                        counterstrokeValue = game.getDiscardActionCards().get(key);
                     }
+                    reverseButtons.add(Buttons.green(
+                        Constants.AC_PLAY_FROM_HAND
+                            + counterstrokeValue + "_counterstroke_"
+                            + activeSystem.getPosition(),
+                        "Counterstroke in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
                     reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
                     String cyberMessage = nonActivePlayer.getRepresentationUnfogged()
                             + ", a reminder that you may use _Counterstroke_ in "
