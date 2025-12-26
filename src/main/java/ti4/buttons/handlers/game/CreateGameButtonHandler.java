@@ -49,6 +49,21 @@ class CreateGameButtonHandler {
         String gameName = CreateGameService.getNextGameName();
         String lastGameName = CreateGameService.getLastGameName();
 
+        if (!GameManager.isValid(lastGameName)) {
+            BotLogger.error(
+                    new LogOrigin(event),
+                    "**Unable to create new games because the last game `" + lastGameName + "` cannot be found."
+                            + " Was it deleted but the roles still exist?**");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "@Bothelper check if the supposed latest PBD game `" + lastGameName
+                            + "` exists using `/game info game_name:pbd#`."
+                            + " If not, you will need to create this game with"
+                            + " `/bothelper create_game_channels game_fun_name:<whatever-name> game_name:<missing"
+                            + " pbd# + 1> player1:.......`");
+            return;
+        }
+
         if (isLikelyDoublePressedButton(gameName, gameSillyName, lastGameName, event)) return;
 
         List<Member> members = new ArrayList<>();
@@ -94,14 +109,6 @@ class CreateGameButtonHandler {
     private static boolean isLikelyDoublePressedButton(
             String gameName, String gameSillyName, String lastGameName, ButtonInteractionEvent event) {
         if ("pbd1".equalsIgnoreCase(gameName)) return false;
-
-        if (!GameManager.isValid(lastGameName)) {
-            BotLogger.error(
-                    new LogOrigin(event),
-                    "**Unable to create new games because the last game `" + lastGameName + "` cannot be found." +
-                        " Was it deleted but the roles still exist?**");
-            return true;
-        }
 
         Game lastGame = GameManager.getManagedGame(lastGameName).getGame();
         boolean lastGameHasSameSillyName = gameSillyName.equalsIgnoreCase(lastGame.getCustomName());
