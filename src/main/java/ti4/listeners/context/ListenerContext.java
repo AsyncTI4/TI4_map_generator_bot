@@ -167,8 +167,7 @@ public abstract class ListenerContext {
         if (shouldAskPreference) {
             message += "\nWould you like this warning to be ephemeral in the future?";
             buttons = List.of(
-                Buttons.green("wrongButtonEphemeral_true", "Yes"),
-                Buttons.red("wrongButtonEphemeral_false", "No"));
+                    Buttons.green("wrongButtonEphemeral_true", "Yes"), Buttons.red("wrongButtonEphemeral_false", "No"));
         }
         if (event instanceof IReplyCallback replyCallback) {
             if (replyCallback.isAcknowledged()) {
