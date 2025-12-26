@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
@@ -41,13 +40,12 @@ import ti4.service.unit.RemoveUnitService;
 
 public class TeHelperAgents {
 
-    public static boolean handleTeAgentExhaust(
-            GenericInteractionCreateEvent event, Game game, Player player, String leaderID, String targetPlayer) {
+    public static boolean handleTeAgentExhaust(Game game, Player player, String leaderID, String targetPlayer) {
         Player target = game.getPlayerFromColorOrFaction(targetPlayer);
         if (target == null) target = player;
         switch (leaderID) {
             case "crimsonagent" -> postCrimsonAgentStep1(game, target);
-            case "ralnelagent" -> postRalNelAgentStep1(event, game, target);
+            case "ralnelagent" -> postRalNelAgentStep1(game, target);
             default -> {
                 return false;
             }
@@ -55,7 +53,7 @@ public class TeHelperAgents {
         return true;
     }
 
-    public static void postRalNelAgentStep1(GenericInteractionCreateEvent event, Game game, Player player) {
+    public static void postRalNelAgentStep1(Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
         ActionCardHelper.drawActionCards(game, player, 2, true);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());

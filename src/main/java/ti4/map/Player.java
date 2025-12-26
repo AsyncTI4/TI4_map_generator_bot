@@ -76,6 +76,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -864,7 +865,12 @@ public class Player extends PlayerProperties {
         return actionCards;
     }
 
+    @NotNull
     public List<String> getPlayableActionCards() {
+        if (IsPlayerElectedService.isPlayerElected(game, this, "censure")
+                || IsPlayerElectedService.isPlayerElected(game, this, "absol_censure")) {
+            return Collections.emptyList();
+        }
         List<String> cards = new ArrayList<>(actionCards.keySet());
         if (hasPlanet("garbozia")) {
             game.getDiscardACStatus().entrySet().stream()

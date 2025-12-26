@@ -250,7 +250,7 @@ public class GMService {
                     acs.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getActionCards().entrySet().stream().forEach(entry -> acs.append("> ")
+                    player.getActionCards().entrySet().forEach(entry -> acs.append("> ")
                             .append(Mapper.getActionCard(entry.getKey()).getNameRepresentation())
                             .append(" (")
                             .append(entry.getValue())

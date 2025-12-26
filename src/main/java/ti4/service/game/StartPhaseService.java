@@ -720,16 +720,14 @@ public class StartPhaseService {
             }
         }
 
-        if (player.getActionCards() != null && player.getPlayableActionCards().contains("stability")) {
+        if (player.getPlayableActionCards().contains("stability")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", a reminder that this is the window to play _Political Stability_.");
         }
 
-        if (player.getActionCards() != null
-                && player.getPlayableActionCards().contains("abs")
-                && game.isCustodiansScored()) {
+        if (player.getPlayableActionCards().contains("abs") && game.isCustodiansScored()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
@@ -743,7 +741,7 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
             }
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
-                boolean mahactMalev = player.getMahactCC().size() > 0;
+                boolean mahactMalev = !player.getMahactCC().isEmpty();
                 if (mahactMalev) {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
                     malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";

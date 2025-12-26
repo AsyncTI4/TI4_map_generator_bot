@@ -1512,7 +1512,7 @@ public class ButtonHelperAgents {
             }
         }
         if ("ralnelagent".equalsIgnoreCase(agent)) {
-            TeHelperAgents.postRalNelAgentStep1(event, game, player);
+            TeHelperAgents.postRalNelAgentStep1(game, player);
         }
 
         if (event instanceof ButtonInteractionEvent buttonEvent) {
