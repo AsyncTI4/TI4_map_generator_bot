@@ -98,7 +98,8 @@ class CreateGameButtonHandler {
         if (!GameManager.isValid(lastGameName)) {
             BotLogger.error(
                     new LogOrigin(event),
-                    "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
+                    "**Unable to create new games because the last game `" + lastGameName + "` cannot be found." +
+                        " Was it deleted but the roles still exist?**");
             return true;
         }
 
