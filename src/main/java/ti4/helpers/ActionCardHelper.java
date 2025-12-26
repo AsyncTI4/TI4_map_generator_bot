@@ -1723,9 +1723,7 @@ public class ActionCardHelper {
             if (player == discardingPlayer) continue;
 
             String reverseEngineerID = "reverse_engineer";
-            if (!player.getPlayableActionCards().contains(reverseEngineerID)) {
-                continue;
-            }
+            if (!player.getPlayableActionCards().contains(reverseEngineerID)) continue;
 
             StringBuilder msg =
                     new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
@@ -1778,41 +1776,35 @@ public class ActionCardHelper {
             if (player == discardingPlayer) continue;
 
             String twinningId = "tf-twinning";
-            if (player.getPlayableActionCards().contains(twinningId)) {
-                StringBuilder msg =
-                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
-                if (actionCards.size() > 1) msg.append("one of the following cards:");
+            if (!player.getPlayableActionCards().contains(twinningId)) continue;
 
-                List<String> ralnel = new ArrayList<>();
-                List<Button> twinningButtons = new ArrayList<>();
+            StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
+            if (actionCards.size() > 1) msg.append("one of the following cards:");
 
-                Integer twinningValue = player.getActionCards().get(twinningId);
-                if (twinningValue == null) {
-                    twinningValue = game.getDiscardActionCards().get(twinningId);
-                }
-                String twinningPrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
+            List<Button> twinningButtons = new ArrayList<>();
 
-                for (String acID : actionCards) {
-                    ActionCardModel model = Mapper.getActionCard(acID);
-                    if (!model.getWindow().toLowerCase().startsWith("action")) {
-                        continue;
-                    }
+            Integer twinningValue = player.getActionCards().get(twinningId);
+            if (twinningValue == null) {
+                twinningValue = game.getDiscardActionCards().get(twinningId);
+            }
+            String twinningPrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
 
-                    String id = twinningPrefix + model.getName();
-                    String label = "Twin " + model.getName();
-                    twinningButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
-                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+            for (String acID : actionCards) {
+                ActionCardModel model = Mapper.getActionCard(acID);
+                if (!model.getWindow().toLowerCase().startsWith("action")) {
+                    continue;
                 }
 
-                if (!twinningButtons.isEmpty()) {
-                    twinningButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), msg.toString(), twinningButtons);
-                }
-                if (!ralnel.isEmpty()) {
-                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
-                }
+                String id = twinningPrefix + model.getName();
+                String label = "Twin " + model.getName();
+                twinningButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+            }
+
+            if (!twinningButtons.isEmpty()) {
+                twinningButtons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(), msg.toString(), twinningButtons);
             }
         }
     }
