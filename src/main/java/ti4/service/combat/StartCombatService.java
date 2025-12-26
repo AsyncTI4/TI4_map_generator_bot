@@ -873,6 +873,17 @@ public class StartCombatService {
                                 + otherPlayer.getColor() + ") command token to your fleet pool.",
                         buttons);
             }
+            if (player.hasUnlockedBreakthrough("sardakkbt")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "sardakkbtRes",
+                        "Resolve Sardakk Breakthrough (Upon Win)",
+                        FactionEmojis.Sardakk));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        msg + ", a reminder that if you win this combat, you may resolve your breakthrough.",
+                        buttons);
+            }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
