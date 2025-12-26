@@ -64,7 +64,8 @@ class SetPreferredSettings extends Subcommand {
             }
         }
 
-        Boolean wrongButtonWarning = event.getOption("ephemeral_wrong_button_warning", null, OptionMapping::getAsBoolean);
+        Boolean wrongButtonWarning =
+                event.getOption("ephemeral_wrong_button_warning", null, OptionMapping::getAsBoolean);
         if (wrongButtonWarning != null) {
             userSettings.setPrefersWrongButtonEphemeral(wrongButtonWarning);
         }
