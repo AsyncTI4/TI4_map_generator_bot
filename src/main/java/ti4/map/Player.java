@@ -1074,7 +1074,7 @@ public class Player extends PlayerProperties {
     }
 
     public void setActionCard(String id) {
-        Collection<Integer> values = actionCards.values();
+        Set<Integer> values = getReservedActionCardIdentifiers();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -1083,7 +1083,7 @@ public class Player extends PlayerProperties {
     }
 
     public void setActionCard(String id, int oldID) {
-        Collection<Integer> values = actionCards.values();
+        Set<Integer> values = getReservedActionCardIdentifiers();
         int identifier = oldID;
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -1173,12 +1173,29 @@ public class Player extends PlayerProperties {
     }
 
     public void setActionCard(String id, Integer identifier) {
-        Collection<Integer> values = actionCards.values();
+        Set<Integer> values = getReservedActionCardIdentifiers();
         int identifier2 = identifier;
         while (values.contains(identifier2)) {
             identifier2 = ThreadLocalRandom.current().nextInt(1000);
         }
         actionCards.put(id, identifier2);
+    }
+
+    private Set<Integer> getReservedActionCardIdentifiers() {
+        Set<Integer> values = new HashSet<>(actionCards.values());
+        if (game == null) {
+            return values;
+        }
+        Map<String, Integer> discardCards = game.getDiscardActionCards();
+        Map<String, ActionCardHelper.ACStatus> discardStatuses = game.getDiscardACStatus();
+        for (Entry<String, Integer> entry : discardCards.entrySet()) {
+            ActionCardHelper.ACStatus status = discardStatuses.get(entry.getKey());
+            if (status == ActionCardHelper.ACStatus.garbozia
+                    || status == ActionCardHelper.ACStatus.ralnelbt) {
+                values.add(entry.getValue());
+            }
+        }
+        return values;
     }
 
     public void setEvent(String id, Integer identifier) {
