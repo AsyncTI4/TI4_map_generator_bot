@@ -175,7 +175,9 @@ public class EndTurnService {
                 buttons.add(Buttons.red("startScoring", "Start Scoring"));
                 buttons.add(Buttons.gray("deleteButtons", "Was not sabod"));
                 MessageHelper.sendMessageToChannel(
-                        puppeteer.getCorrectChannel(), "Use these buttons to start scoring if puppets is sabod");
+                        puppeteer.getCorrectChannel(),
+                        "Use these buttons to start scoring if puppets is sabod",
+                        buttons);
             }
             return;
         }
