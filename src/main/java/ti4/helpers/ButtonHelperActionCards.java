@@ -552,7 +552,7 @@ public class ButtonHelperActionCards {
                     MessageHelper.sendMessageToChannel(
                             p3.getCardsInfoThread(),
                             p3.getRepresentation()
-                                    + " this is a reminder that you have lie in wait and two of your neighbors just resolved a transaction. The two neighbors are "
+                                    + " this is a reminder that you have the action card \"Lie In Wait\" and two of your neighbors just resolved a transaction. The two neighbors are "
                                     + p1.getRepresentationNoPing() + " and " + p2.getRepresentationNoPing());
                 }
             }
