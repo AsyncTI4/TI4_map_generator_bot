@@ -82,6 +82,10 @@ public class ExploreService {
                     event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
         }
+        boolean kolleccbt = drawColor.endsWith("kolleccbt");
+        if (kolleccbt) {
+            drawColor = drawColor.replace("kolleccbt", "");
+        }
         game.setStoredValue(
                 player.getFaction() + "planetsExplored",
                 game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
@@ -229,6 +233,15 @@ public class ExploreService {
             }
         }
 
+        if (kolleccbt) {
+            player.setBreakthroughExhausted("kolleccbt", kolleccbt);
+            MessageHelper.sendMessageToChannel(
+                    (MessageChannel) event.getChannel(),
+                    player.getRepresentation() + " has exhausted Kollecct Breakthrough to explore the discard pile of "
+                            + drawColor + " on " + planetName
+                            + ". Not yet implemented fully. Use /explore shuffle_back_into_deck and then /explore use to resolve. (and then maybe shuffle back into deck again).");
+            return;
+        }
         String cardID = game.drawExplore(drawColor);
         if (cardID == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored");

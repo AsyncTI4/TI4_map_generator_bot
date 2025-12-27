@@ -1,1 +1,26 @@
-{"id":"luthieniv","tileId":"110","name":"Luthien IV","aliases":["luthien4","luthien","luthieniv"],"resources":3,"influence":1,"planetTypes":["HAZARDOUS"],"planetLayout":{"unitHolderName":"luthieniv","resourcesLocation":"TopLeft","centerPosition":{"x":223,"y":225}},"source":"thunders_edge"}
+{
+    "id": "luthieniv",
+    "tileId": "110",
+    "name": "Luthien VI",
+    "aliases": [
+        "luthien4",
+        "luthien",
+        "luthieniv",
+        "luthienvi",
+        "luthien6"
+    ],
+    "resources": 3,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "luthieniv",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 223,
+            "y": 225
+        }
+    },
+    "source": "thunders_edge"
+}

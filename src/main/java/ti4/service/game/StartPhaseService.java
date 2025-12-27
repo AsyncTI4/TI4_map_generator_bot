@@ -820,7 +820,11 @@ public class StartPhaseService {
         boolean custodiansTaken = game.isCustodiansScored();
         Button passOnAbilities;
         if (custodiansTaken || game.isOmegaPhaseMode()) {
-            passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
+            String agenda = "Agenda";
+            if (game.isTwilightsFallMode()) {
+                agenda = "Benediction Phase";
+            }
+            passOnAbilities = Buttons.red("pass_on_abilities", "Ready For " + agenda);
             message2 += """
                 This is the moment when you should resolve:\s
                 - _Political Stability_\s
@@ -829,7 +833,7 @@ public class StartPhaseService {
                 - The Oracle, the Naalu hero
                 - Neuraloop purging to redraw an objective
                 - _The Crown of Emphidia_
-                Please click the "Ready For Agenda" button once you are done resolving these or if you decline to do so.""";
+                Please click the "Ready For """ + agenda + "\" button once you are done resolving these or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
             message2 += """
