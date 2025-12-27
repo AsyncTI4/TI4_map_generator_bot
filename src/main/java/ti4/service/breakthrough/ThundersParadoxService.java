@@ -53,7 +53,7 @@ public class ThundersParadoxService {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
                     null,
-                    player.getBreakthroughModel().getRepresentationEmbed());
+                    player.getBreakthroughModel("nomadbt").getRepresentationEmbed());
             String message = player.getRepresentation() + " is using their breakthrough, " + paradoxRep()
                     + ". Use the buttons to choose one of your agents to exhaust:";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);

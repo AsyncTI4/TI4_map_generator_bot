@@ -64,7 +64,7 @@ public class TeHelperActionCards {
             case "mercenarycontract" -> buttons.add(Buttons.green(ffcc + "teMercenaryContract_page0", resolve));
             case "piratecontract" -> buttons.add(Buttons.green(ffcc + "pirateContract", resolve));
             case "piratefleet" -> buttons.add(Buttons.green(ffcc + "pirateFleet", resolve));
-            case "puppetsonastring" -> nop(); // preset
+            case "puppetsonastring" -> buttons.add(Buttons.green(ffcc + "startAction", "Start Your Action")); // preset
             case "rescue" -> buttons.add(Buttons.green(ffcc + "startRescue", "Start Rescue"));
             case "overrule" -> buttons.add(Buttons.green(ffcc + "overruleStart", "Start Overrule"));
             case "strategize" -> buttons.add(Buttons.green(ffcc + "strategize", resolve));

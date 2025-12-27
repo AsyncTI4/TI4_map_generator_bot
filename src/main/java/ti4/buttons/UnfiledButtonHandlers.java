@@ -1,9 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -332,23 +329,15 @@ public class UnfiledButtonHandlers {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler(value = "requestAllFollow_", save = false)
+    @ButtonHandler(value = "requestAllFollow_", save = true)
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
-        if ("fow273".equalsIgnoreCase(game.getName())) {
-            event.getMessage()
-                    .reply(
-                            event.getUser().getAsMention()
-                                    + " has requested that everyone resolve this strategy card before play continues."
-                                    + " Please do so as soon as you can. The active player should not take an action until this is done.")
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-        } else {
-            event.getMessage()
-                    .reply(
-                            game.getPing()
-                                    + ", someone has requested that everyone resolve this strategy card before play continues."
-                                    + " Please do so as soon as you can. The active player should not take an action until this is done.")
-                    .queue(Consumers.nop(), BotLogger::catchRestError);
-        }
+        game.setTemporaryPingDisable(true);
+        event.getMessage()
+                .reply(
+                        game.getPing()
+                                + ", someone has requested that everyone resolve this strategy card before play continues."
+                                + " Please do so as soon as you can. The active player should not take an action until this is done.")
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("starChartsStep1_")
@@ -1189,6 +1178,18 @@ public class UnfiledButtonHandlers {
                     hasSabo = true;
                     saboID = "" + player.getActionCards().get(AC);
                     break;
+                }
+            }
+            if (player.hasPlanet("garbozia")) {
+                for (String AC : ActionCardHelper.getGarboziaActionCards(player.getGame())
+                        .keySet()) {
+                    if (AC.contains("sabo") || AC.contains("shatter")) {
+                        hasSabo = true;
+                        saboID = ""
+                                + ActionCardHelper.getGarboziaActionCards(player.getGame())
+                                        .get(AC);
+                        break;
+                    }
                 }
             }
             if (hasSabo) {

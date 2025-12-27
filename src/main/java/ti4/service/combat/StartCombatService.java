@@ -341,6 +341,9 @@ public class StartCombatService {
 
         // PDS2 Context
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
+        if (threadChannel.getName().toLowerCase().contains("benediction")) {
+            context = 0;
+        }
         if (file == null) {
             file = new TileGenerator(game, event, null, context, tile.getPosition(), player1).createFileUpload();
         }
@@ -359,7 +362,7 @@ public class StartCombatService {
         }
 
         // Space Cannon Offense
-        if (isSpaceCombat) {
+        if (isSpaceCombat && !threadChannel.getName().toLowerCase().contains("benediction")) {
             sendSpaceCannonButtonsToThread(threadChannel, game, player1, tile);
         }
 

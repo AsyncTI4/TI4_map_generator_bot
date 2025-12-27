@@ -54,7 +54,7 @@ public class ThundersEdgeRulesService {
     public static void alertTabletalkWithRulesAtStartOfDraft(Game game) {
         String msg = "Hello " + game.getPing() + "!\n";
         msg +=
-                "It looks like you are playing with Thunder's Edge. Since it's brand new, you might like some of the rules posted here for your convenience:";
+                "It looks like you are playing with Thunder's Edge. Since it's new, you might like some of the rules posted here for your convenience:";
         if (game.getTableTalkChannel() != null) {
             List<MessageEmbed> embeds = startOfDraftRules(game);
             MessageHelper.sendMessageToChannelWithEmbeds(game.getTableTalkChannel(), msg, embeds);
