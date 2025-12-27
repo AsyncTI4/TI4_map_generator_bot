@@ -62,8 +62,8 @@ public class DeorbitBarrageService {
 
             buttons.add(Buttons.red("deorbitBarrageTarget_" + p2.getFaction(), null, p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " Choose a player whose planet you want to target with "
-                + deorbitRep(true);
+        String msg = player.getRepresentation() + ", please choose the player whose planet you want to target with "
+                + deorbitRep(true) + ".";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -92,10 +92,11 @@ public class DeorbitBarrageService {
         for (int x = 0; x < Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + 1; x++) {
             buttons.add(Buttons.gray("deorbitBarrageResource_" + planet + "_" + x, "" + x));
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                "Choose how many resources you would like to spend (can spend tgs)",
-                buttons);
+        String message = "Choose how many resources you wish to spend.";
+        if (player.getTg() > 0) {
+            message = "Choose how many resources you wish to spend (you may spend trade goods as resources).";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -108,8 +109,9 @@ public class DeorbitBarrageService {
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " will target " + planetRep + " and spend " + resources
-                        + " resources to roll " + resources + " dice hitting on a 4+");
+                player.getRepresentationNoPing() + " is targeting " + planetRep + ". They spent " + resources
+                        + " resource" + (resources == 1 ? "" : "s") + " to roll " + resources
+                        + " dice, hitting on a 4+");
         ButtonHelper.deleteMessage(event);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amount = resources;
@@ -123,7 +125,8 @@ public class DeorbitBarrageService {
                     hits++;
                 }
             }
-            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+            msg = new StringBuilder(msg.substring(0, msg.length() - 2) + ", producing "
+                    + (hits == 0 ? "no" : "a total of " + hit) + " hit" + (hits == 1 ? "" : "s") + ".");
             // bombard msg
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0) {

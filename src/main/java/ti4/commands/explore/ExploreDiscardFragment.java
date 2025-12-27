@@ -24,10 +24,10 @@ class ExploreDiscardFragment extends GameStateSubcommand {
 
     ExploreDiscardFragment() {
         super("discard_fragment", "Discard a relic fragment.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Type of fragment.")
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Type of fragment")
                 .setAutoComplete(true)
                 .setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to discard (default 1).")
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to discard (default 1)")
                 .setMinValue(1));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (default you)")
                 .setAutoComplete(true));
@@ -50,7 +50,7 @@ class ExploreDiscardFragment extends GameStateSubcommand {
 
         if (fragmentsToDiscard.size() < count) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "Could not find " + count + " fragments to discard from " + player.getFaction());
+                    event, "Could not find " + count + " fragments to discard from " + player.getFaction() + ".");
             return;
         }
 
@@ -60,7 +60,7 @@ class ExploreDiscardFragment extends GameStateSubcommand {
         }
 
         ExploreModel fragmentModel = Mapper.getExplore(fragmentsToDiscard.getFirst());
-        String message = player.getRepresentation() + " discarded " + count + " " + fragmentModel.getName();
+        String message = player.getRepresentation() + " discarded " + count + " " + fragmentModel.getName() + ".";
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

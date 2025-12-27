@@ -16,7 +16,6 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.regex.RegexService;
 
@@ -40,17 +39,19 @@ public class SowingReapingService {
         List<Button> buttons = new ArrayList<>();
         for (int i = 1; i <= Math.min(3, firmament.getTg()); i++) {
             buttons.add(Buttons.green(
-                    firmament.finChecker() + "theSowingAddTg_" + i, i + " tg", MiscEmojis.getTGorNomadCoinEmoji(game)));
+                    firmament.finChecker() + "theSowingAddTg_" + i,
+                    i + " Trade Good" + (i == 1 ? "" : "s"),
+                    MiscEmojis.getTGorNomadCoinEmoji(game)));
         }
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
 
         String message =
-                firmament.getRepresentation() + " you may place up to 3 of your trade goods on your breakthrough "
-                        + FactionEmojis.Firmament + " **The Sowing**.";
+                firmament.getRepresentation() + " you may place up to 3 of your trade goods on " + sowingRep() + ".";
         int btTG = firmament.getBreakthroughTGs("firmamentbt");
         int tg = firmament.getTg();
-        message += "\n-# There are " + btTG + " trade goods on **The Sowing**, and you currently have "
-                + MiscEmojis.tg(tg) + " " + tg + " trade goods.";
+        message += "\n-# There are " + btTG + " trade good" + (btTG == 1 ? "" : "s")
+                + " on _The Sowing_, and you currently have " + MiscEmojis.tg(tg) + " " + tg + " trade good"
+                + (tg == 1 ? "" : "s") + ".";
         MessageHelper.sendMessageToChannelWithButtons(firmament.getCorrectChannel(), message, buttons);
     }
 
@@ -62,10 +63,11 @@ public class SowingReapingService {
             player.setBreakthroughTGs("firmamentbt", player.getBreakthroughTGs("firmamentbt") + amt);
             player.setTg(player.getTg() - amt);
 
-            String message = player.getRepresentation(false, false) + " added " + amt
-                    + " trade goods to their breakthrough, " + sowingRep() + ".";
-            message += "\n-# **The Sowing** now has " + player.getBreakthroughTGs() + " trade goods.";
-            message += "\n-# You now have " + player.getTg() + " trade goods.";
+            String message = player.getRepresentation(false, false) + " added " + amt + " trade good"
+                    + (amt == 1 ? "" : "s") + " to " + sowingRep() + ".";
+            message += "\n-# _The Sowing_ now has " + player.getBreakthroughTGs("firmamentbt") + " trade good"
+                    + (player.getBreakthroughTGs("firmamentbt") == 1 ? "" : "s") + ".";
+            message += "\n-# You now have " + player.getTg() + " trade good" + (player.getTg() == 1 ? "" : "s") + ".";
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
@@ -86,9 +88,10 @@ public class SowingReapingService {
         int tgs = obsidian.getBreakthroughTGs("obsidianbt");
         obsidian.setBreakthroughTGs("obsidianbt", 0);
 
-        String message = obsidian.getRepresentation() + " gained the " + tgs + " on their breakthrough "
-                + FactionEmojis.Obsidian + " **The Reaping** as well as " + tgs + " more from the supply.";
-        message += "\n-# " + MiscEmojis.getTGorNomadCoinEmoji(game) + " TGs went from " + obsidian.gainTG(tgs * 2);
+        String message = obsidian.getRepresentation() + " gained the " + tgs + " trade good" + (tgs == 1 ? "" : "s")
+                + " on " + reapingRep() + " as well as " + tgs + " more from the supply.";
+        message += "\n-# " + MiscEmojis.getTGorNomadCoinEmoji(game) + " trade goods went from "
+                + obsidian.gainTG(tgs * 2) + ".";
         MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), message);
 
         ButtonHelperAgents.resolveArtunoCheck(obsidian, tgs);
@@ -99,10 +102,10 @@ public class SowingReapingService {
     @ButtonHandler("theReapingAddTg")
     private void addTgToTheReaping(ButtonInteractionEvent event, Game game, Player player) {
         String message = player.getRepresentation(false, false)
-                + " won combat against a puppeted player and added 1 trade good to their breakthrough, " + reapingRep()
-                + ".";
+                + " won combat against a puppeted player and added 1 trade good to " + reapingRep() + ".";
         player.setBreakthroughTGs("obsidianbt", player.getBreakthroughTGs("obsidianbt") + 1);
-        message += "\n-# **The Reaping** now has " + player.getBreakthroughTGs() + " trade goods.";
+        message += "\n-# _The Reaping_ now has " + player.getBreakthroughTGs("obsidianbt") + " trade good"
+                + (player.getBreakthroughTGs("obsidianbt") == 1 ? "" : "s") + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }

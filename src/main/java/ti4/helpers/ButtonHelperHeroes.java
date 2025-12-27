@@ -115,7 +115,7 @@ public class ButtonHelperHeroes {
     public static void xxchaHeroTEStart(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
 
-        String msg = player.getRepresentation() + ", please choose whether you want to place a mech or a pds.";
+        String msg = player.getRepresentation() + ", please choose whether you want to place a mech or a PDS.";
         buttons.add(Buttons.gray("xxchaHeroTEStep2_mech", "Place Mech", UnitEmojis.mech));
         buttons.add(Buttons.gray("xxchaHeroTEStep2_pds", "Place PDS", UnitEmojis.pds));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);

@@ -297,15 +297,13 @@ public class ExploreService {
         if (player.hasAbility("ultimate_authority")) {
             Planet plan = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (plan != null) {
-                if (plan.getUnitCount(player.getColorID()) > 2) {
+                if (plan.getUnitCount(player.getColorID()) >= 3) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
                     MessageHelper.sendMessageToChannel(
                             (MessageChannel) event.getChannel(),
-                            player.getRepresentation() + " can draw 1 AC via their ultimate authority ability");
-                    MessageHelper.sendMessageToChannel(
-                            (MessageChannel) event.getChannel(),
-                            player.getRepresentation() + " use button to resolve",
+                            player.getRepresentation()
+                                    + ", please draw an action card because of **Ultimate Authority**.",
                             buttons);
                 }
             }

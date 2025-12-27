@@ -236,7 +236,7 @@ public class PlayHeroService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "You will unfortunately need to use dicecord to roll the PDS and bombardment of all your units against one system/planet. /roll");
+                        "You will unfortunately need to use dicecord's `/roll` command for the SPACE CANNON and BOMBARDMENT of all your units against one system and planet respectively.");
             }
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {

@@ -127,7 +127,7 @@ public class Expeditions {
     public String getTopLevelExpeditionButtonText() {
         int count = getRemainingExpeditionCount();
         if (count > 0) {
-            return "Do an Expedition (" + count + " remaining)";
+            return "Do an Expedition (" + count + " Remaining)";
         } else {
             return null;
         }
@@ -159,7 +159,7 @@ public class Expeditions {
     @JsonIgnore
     private String getExpeditionMessage(String expeditionID) {
         return switch (expeditionID) {
-            case "techSkip" -> "Exhaust 1 tech skip planet";
+            case "techSkip" -> "Exhaust 1 technology specialty planet";
             case "tradeGoods" -> "Spend 3 trade goods";
             case "fiveRes" -> "Spend 5 resources";
             case "fiveInf" -> "Spend 5 influence";
@@ -189,7 +189,7 @@ public class Expeditions {
             String msg = getExpeditionMessage(exp.getKey());
             buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey())));
         }
-        buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return buttons;
     }
 
@@ -206,29 +206,32 @@ public class Expeditions {
         MessageChannel channel = player.getCorrectChannel();
         String output;
         boolean success = false;
-        String whichExp = "### __" + player.getRepresentation() + " completed the **%s** expedition!!__";
+        String whichExp = "### " + player.getRepresentation() + " completed the **%s** expedition!";
         switch (expeditionType) {
             case "techSkip" -> {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "skips");
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(whichExp, "TECH SKIP"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), String.format(whichExp, "technology specialty"));
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(), "Use the buttons to exhaust 1 tech skip:", buttons);
+                        player.getCorrectChannel(),
+                        "Please choose the planet with a technology specialty that you wish to exhaust.",
+                        buttons);
             }
             case "tradeGoods" -> {
                 success = true;
                 int oldTg = player.getTg();
-                MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "3 TRADE GOODS"));
+                MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "3 trade goods"));
                 List<Button> buttons = null;
                 if (oldTg < 3) {
                     output =
-                            "You do not have enough trade goods to do this automatically. Use the buttons to spend TGs:";
+                            "You do not have enough trade goods to do this automatically. Use the buttons to spend trade goods:";
                     buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "tgsonly");
-                    buttons.add(Buttons.red("deleteButtons_spitItOut", "Done spending TGs"));
+                    buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Spending Trade Goods"));
                 } else {
                     player.setTg(player.getTg() - 3);
-                    output = player.getRepresentation() + " Automatically deducted 3tg (" + oldTg + "->"
+                    output = player.getRepresentation() + " Automatically deducted 3 trade goods (" + oldTg + "->"
                             + player.getTg() + ")";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(channel, output, buttons);
@@ -237,7 +240,7 @@ public class Expeditions {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
-                MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 RESOURCES"));
+                MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 resources"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel, "Use the buttons to spend 5 resources:", buttons);
             }
@@ -245,28 +248,28 @@ public class Expeditions {
                 success = true;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
-                MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 INFLUENCE"));
+                MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 influence"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel, "Use the buttons to spend 5 influence:", buttons);
             }
             case "secret" -> {
                 success = true;
-                output = String.format(whichExp, "SECRET OBJECTIVE");
+                output = String.format(whichExp, "secret objective");
                 List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
                 if (!soButtons.isEmpty()) {
-                    output += "\n-# Use the buttons in your private channel to discard an unscored secret.";
+                    output += "\n-# Use the buttons in your private channel to discard an unscored secret objective.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), "Use the buttons to discard a secret objective:", soButtons);
                 } else {
                     output +=
-                            "\n-# you may not have an unscored secret to discard... use game undo if this was a mistake";
+                            "\n-# you may not have an unscored secret to discard... use `/game undo` if this was a mistake";
                     MessageHelper.sendMessageToChannel(channel, output);
                 }
             }
             case "actionCards" -> {
                 success = true;
-                output = String.format(whichExp, "2 ACTION CARDS");
+                output = String.format(whichExp, "2 action cards");
                 List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(player, false);
                 if (acButtons.size() >= 2) {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
@@ -274,7 +277,7 @@ public class Expeditions {
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), "Use the buttons to discard action cards:", acButtons);
                 } else {
-                    output += "\n-# you may not have enough action cards... use game undo if this was a mistake";
+                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake";
                     MessageHelper.sendMessageToChannel(channel, output);
                 }
             }
@@ -286,9 +289,9 @@ public class Expeditions {
             if (exp.getRemainingExpeditionCount() == 0) {
                 String message = !game.isFowMode() ? "# ATTENTION " + game.getPing() + "\n" : "";
                 message += player.getRepresentation()
-                        + " has completed the last expedition! They can now place the __**Thunder's Edge**__ planet on the board:";
+                        + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
                 message +=
-                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes.";
+                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova.";
                 Button button = Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "placeThundersEdge", "Place Thunder's Edge");
                 MessageHelper.sendMessageToChannel(channel, message);

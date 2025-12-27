@@ -81,7 +81,7 @@ public class StatusHelper {
             if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation()
-                        + " you can use these buttons to queue a public objective to score, to speed up the status phase";
+                        + ", you may use these buttons to queue a public objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
 
@@ -100,7 +100,7 @@ public class StatusHelper {
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation()
-                        + " you can use these buttons to queue a secret objective to score, to speed up the status phase";
+                        + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
         }
@@ -663,20 +663,21 @@ public class StatusHelper {
                                 model.getCondensedReqsEmojis(true));
                     })
                     .toList());
-            buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
 
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
             if (game.isTwilightsFallMode() && techs == 0) {
                 techs++;
-                buttons.add(Buttons.blue("redistributeCCButtons", "Gain 2 Command Tokens (And Spend 1 Strat)"));
+                buttons.add(Buttons.blue("redistributeCCButtons", "Gain 2 Command Tokens (And Spend 1 From Strategy)"));
             }
             String scarMessage = player.getRepresentationUnfogged()
-                    + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
-            scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";
+                    + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
+            scarMessage +=
+                    "You currently have " + ccs + " command token" + (ccs == 1 ? "" : "s") + " in your strategy pool.";
             if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
-                scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
-                        + " available to exhaust (This will be spent first)";
+                scarMessage += "You also have the _" + RelicHelper.sillySpelling()
+                        + "_ available to exhaust (this will be spent first).";
             for (int i = 0; i < techs && i < entry.getValue(); i++) {
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);

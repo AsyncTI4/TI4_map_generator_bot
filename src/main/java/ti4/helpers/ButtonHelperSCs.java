@@ -465,7 +465,7 @@ public class ButtonHelperSCs {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + " since you have the **Trade** strategy card, and the primary is done automatically when you play trade, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+                            + " since you have the **Trade** strategy card, and the primary is done automatically when you play **Trade**, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong.");
             return;
         }
 

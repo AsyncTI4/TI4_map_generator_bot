@@ -57,7 +57,7 @@ public class MindsieveService {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
             if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
             if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) {
-                String fmt = "\n-# > - Since they %s, you cannot send the _Alliance_ promissory note.";
+                String fmt = "\n-# > - Since they %s, you cannot send them your _Alliance_ promissory note.";
                 String reason = game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact";
                 msg.append(String.format(fmt, game.isFowMode() ? "[REDACTED]" : reason));
                 continue;
@@ -93,14 +93,15 @@ public class MindsieveService {
                     ReactionService.addReaction(naalu, false, null, null, messageID, game);
 
                     MessageChannel scChannel = ButtonHelper.getSCFollowChannel(game, naalu, sc);
-                    String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to the "
-                            + scModel.getName() + " holder ";
-                    msg += "to follow the strategy card without spending a command token.";
+                    String msg = naalu.getRepresentationUnfogged() + " sent a promissory note to "
+                            + primary.getRepresentationUnfogged() + " via " + mindsieve()
+                            + " to perform the secondary ability of **" + scModel.getName()
+                            + "** without spending a command token.";
                     MessageHelper.sendMessageToChannel(scChannel, msg);
                     ButtonHelper.deleteMessage(event);
                 },
                 e -> {
-                    String message = "Failed to send promissory note using Mindsieve. ";
+                    String message = "Failed to send promissory note using _Mindsieve_. ";
                     message += "Are you sure you still have that promissory note in your hand?";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 });

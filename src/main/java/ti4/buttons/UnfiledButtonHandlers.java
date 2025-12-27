@@ -1910,7 +1910,7 @@ public class UnfiledButtonHandlers {
             game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, num);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+                    "Successfully queued an objective to score (it won't be scored if you later stop meeting the requirements).");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray("reverse" + buttonID, "Unqueue it"));
             MessageHelper.sendMessageToChannel(

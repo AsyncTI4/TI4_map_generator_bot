@@ -74,7 +74,7 @@ public class BreakthroughCommandHelper {
             BreakthroughModel model = Mapper.getBreakthrough(btID);
             String message = "Player does not have a breakthrough.";
             if (model == null) {
-                message = "Breakthrough " + btID + " does not exist.";
+                message = "Breakthrough `" + btID + "` does not exist.";
             } else if (!player.getBreakthroughIDs().isEmpty()) {
                 message = player.getRepresentationNoPing() + " does not have _" + model.getName() + "_.";
             }

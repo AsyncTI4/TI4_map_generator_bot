@@ -41,7 +41,7 @@ public class StellarGenesisService {
         Predicate<Tile> nonHomeAndAdj = nonHome.and(adjToPlanetTiles::contains);
         List<Button> avernusLocations =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeAvernus", nonHomeAndAdj, false);
-        String message = "Choose a tile to place Avernus:";
+        String message = "Please choose which system you wish to place Avernus in.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, avernusLocations);
     }
 
@@ -78,7 +78,7 @@ public class StellarGenesisService {
                 List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        "If avernus had PDS on it, you can fire the PDS with this button if this is the appropriate time to do so.",
+                        "If Avernus had PDS on it, you may fire the PDS with this button if this is the appropriate time to do so.",
                         spaceCannonButtons);
             }
         }

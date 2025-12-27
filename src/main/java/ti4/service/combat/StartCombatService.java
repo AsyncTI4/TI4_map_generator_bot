@@ -877,11 +877,12 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "sardakkbtRes",
-                        "Resolve Sardakk Breakthrough (Upon Win)",
+                        "Resolve N'orr Supremacy (Upon Win)",
                         FactionEmojis.Sardakk));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        msg + ", a reminder that if you win this combat, you may resolve your breakthrough.",
+                        msg
+                                + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade or command token.",
                         buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
@@ -1417,7 +1418,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(
                         finChecker + "getAgentSelection_xanagent",
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Xan Agent",
+                                + "Noro Weba",
                         FactionEmojis.xan));
             }
 

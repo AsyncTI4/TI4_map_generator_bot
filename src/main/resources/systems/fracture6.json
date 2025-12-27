@@ -1,1 +1,14 @@
-{"id":"fracture6","name":"Fracture Egress Right","aliases":["fracture6","egressright"],"imagePath":"fracture6.png","shipPositionsType":"TYPE08","tileBack":"fracture","source":"thunders_edge"}
+{
+    "id": "fracture6",
+    "name": "Fracture Egress Right",
+    "aliases": [
+        "fracture6",
+        "egressright",
+        "frac6",
+        "fracrightegr"
+    ],
+    "imagePath": "fracture6.png",
+    "shipPositionsType": "TYPE08",
+    "tileBack": "fracture",
+    "source": "thunders_edge"
+}

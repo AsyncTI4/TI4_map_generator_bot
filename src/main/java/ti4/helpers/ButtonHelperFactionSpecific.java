@@ -381,17 +381,18 @@ public class ButtonHelperFactionSpecific {
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
-        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Unit Upgrade"));
+        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
+        buttons.add(Buttons.blue("acquireATech_deleteThisMessage", "Research a Unit Upgrade"));
+        buttons.add(Buttons.red("deleteButtons", "Neither"));
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " is resolving the sardakk breakthrough to either research 1 unit upgrade or gain 1 command token");
+                        + " is resolving _N'orr Supremacy_ to either research 1 unit upgrade or gain 1 command token.");
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation()
-                        + " choose whether you want to research a unit upgrade (you need the pre-requistites) or gain a command token",
+                        + ", please choose whether you wish to __research__ a unit upgrade or gain a command token.",
                 buttons);
     }
 
@@ -421,9 +422,9 @@ public class ButtonHelperFactionSpecific {
         SecretObjectiveModel soM = Mapper.getSecretObjective(so);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " used their plots ability to score the secret "
+                player.getRepresentation() + " used their **Plots Within Plots** ability to score the _"
                         + soM.getName()
-                        + " for 0 VP (but they get to put a plot card into play)");
+                        + "_ secret objective for 0 VP (but they get to put a Plot card into play).");
         int poIndex = game.addCustomPO("(Plotted) " + soM.getName(), 0);
         game.scorePublicObjective(player.getUserID(), poIndex);
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
@@ -432,7 +433,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + " use the buttons to put a plot card into play with the faction whose secret you just scored.");
+                        + ", please use these buttons to put a Plot card into play with a control token from the faction whose secret you just scored.");
     }
 
     @ButtonHandler("solBtBuild_")
@@ -441,11 +442,11 @@ public class ButtonHelperFactionSpecific {
         String pos = buttonID.split("_")[1];
         List<Button> buttons;
         buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        String message = player.getRepresentation() + ", use these buttons to produce units. ";
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " is resolving sol's breakthrough ability in "
-                        + game.getTileByPosition(pos).getRepresentationForButtons());
+                player.getRepresentation() + " is resolving _Bellum Gloriosum_ in "
+                        + game.getTileByPosition(pos).getRepresentationForButtons() + ".");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -461,7 +462,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " has gained an Honor by beating someonewith equal victory points than them in combat. They can do this max once per turn."
+                            + " has gained an Honor by beating someone with equal victory points than them in combat. They can do this max once per turn."
                             + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter()
                             + " Dishonor.");
         }
@@ -491,7 +492,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", you can gain 1 honor or 1 dishonor once per turn when beating someone with equal VPs. Use buttons to choose.",
+                            + ", you can gain 1 Honor or 1 Dishonor once per turn by winning a combat against a player with equal victory points. Use buttons to choose.",
                     buttons);
         }
         if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {

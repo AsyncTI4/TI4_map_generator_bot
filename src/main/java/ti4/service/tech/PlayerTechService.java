@@ -357,10 +357,10 @@ public class PlayerTechService {
                 buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard",
+                        player.getRepresentationUnfogged() + ", use buttons to discard.",
                         ActionCardHelper.getDiscardActionCardButtons(player, false));
-                String message =
-                        player.getRepresentationUnfogged() + ", after discarding an AC, use this button to draw an AC.";
+                String message = player.getRepresentationUnfogged()
+                        + ", after discarding an action card, use this button to draw an action card.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }

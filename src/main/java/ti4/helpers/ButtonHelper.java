@@ -4752,6 +4752,7 @@ public class ButtonHelper {
         if (tile == null || tile.getRepresentationForButtons(game, player).contains("Hyperlane")) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
+        if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
                 if ((p2.hasTech("cm") || p2.hasTech("tf-nomadic"))
@@ -7350,11 +7351,15 @@ public class ButtonHelper {
                         ? nextPlayer.getRepresentationUnfogged()
                         : nextPlayer.getRepresentationNoPing();
                 int numUnpassed = -2;
+                boolean anyPassed = false;
                 for (Player p2 : game.getPlayers().values()) {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                    anyPassed |= p2.isPassed() || p2.isEliminated();
                 }
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0) {
+                if (!anyPassed) {
+                    msgExtra += "All players are yet to pass.";
+                } else if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
                 } else {
                     msgExtra +=

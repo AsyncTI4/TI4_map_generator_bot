@@ -17,6 +17,19 @@ public class UnlockLeaderService {
 
     public static void unlockLeader(String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
+        LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
+        String message;
+        if (leaderModel != null) {
+            message = player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".";
+        } else {
+            message =
+                    player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
+        }
+        unlockLeader(leaderID, game, player, message);
+    }
+
+    public static void unlockLeader(String leaderID, Game game, Player player, String message) {
+        Leader playerLeader = player.unsafeGetLeader(leaderID);
         MessageChannel channel = game.getMainGameChannel();
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
@@ -34,13 +47,11 @@ public class UnlockLeaderService {
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     channel,
-                    player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
+                    message,
                     leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
-            String message =
-                    player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(channel, message);
         }
 

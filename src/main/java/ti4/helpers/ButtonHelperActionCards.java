@@ -2637,10 +2637,10 @@ public class ButtonHelperActionCards {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " repealed " + Mapper.getAgendaTitle(name) + ".");
+                player.getFactionEmoji() + " repealed " + Mapper.getAgendaTitleNoCap(name) + ".");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), Mapper.getAgendaTitle(name) + " was repealed.");
+                    game.getMainGameChannel(), Mapper.getAgendaTitleNoCap(name) + " was repealed.");
         }
         game.removeLaw(name);
         ButtonHelper.deleteMessage(event);
