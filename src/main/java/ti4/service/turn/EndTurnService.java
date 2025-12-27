@@ -150,7 +150,7 @@ public class EndTurnService {
 
         // First, check for the ralnel hero and play it if it has been preset
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)
-                && game.getStoredValue("ralnelHero") != null) {
+                && !game.getStoredValue("ralnelHero").isEmpty()) {
             String value = game.getStoredValue("ralnelHero");
             Matcher matcher = Pattern.compile(RegexHelper.factionRegex(game)).matcher(value);
             if (matcher.find()) {
@@ -165,10 +165,10 @@ public class EndTurnService {
 
         // Next, check if puppets on a string has been pre-played
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)
-                && game.getStoredValue("Puppets On A String") != null) {
+                && !game.getStoredValue("Puppets On A String").isEmpty()) {
             String value = game.getStoredValue("Puppets On A String");
             Player puppeteer = game.getPlayerFromColorOrFaction(value);
-            if (puppeteer.getPlayableActionCards().contains("puppetsonastring")) {
+            if (puppeteer != null && puppeteer.getPlayableActionCards().contains("puppetsonastring")) {
                 game.removeStoredValue("Puppets On A String");
                 ActionCardHelper.playAC(event, game, puppeteer, "puppetsonastring", game.getMainGameChannel());
                 List<Button> buttons = new ArrayList<>();
@@ -178,8 +178,8 @@ public class EndTurnService {
                         puppeteer.getCorrectChannel(),
                         "Use these buttons to start scoring if puppets is sabod",
                         buttons);
+                return;
             }
-            return;
         }
 
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
