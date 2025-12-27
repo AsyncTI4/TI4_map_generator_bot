@@ -3204,7 +3204,7 @@ public class Player extends PlayerProperties {
         }
         if (getHomeSystemPosition() != null) {
             Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
-            if (frankenHs != null && frankenHs.isHomeSystem()) {
+            if (frankenHs != null) {
                 return frankenHs;
             }
         }

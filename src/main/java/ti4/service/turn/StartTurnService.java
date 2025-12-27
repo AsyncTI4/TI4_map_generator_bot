@@ -480,6 +480,17 @@ public class StartTurnService {
                         player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
             }
 
+            if (player.getPlayableActionCards().contains("puppetsonastring")) {
+                String msg =
+                        "You have the action card puppets on a string! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
+                msg +=
+                        "to automatically use it when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green("resolvePreassignment_Puppets On A String", "Pre-Play Puppets On A String"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+            }
+
             startButtons.add(ButtonHelper.getPassButton(game, player));
             if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {

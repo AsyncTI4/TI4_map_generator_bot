@@ -34,6 +34,7 @@ public class StatusCleanupService {
         game.removeStoredValue("deflectedSC");
         game.removeStoredValue("pharadnPNUsed");
         game.removeStoredValue("willParticipateInSplice");
+        game.removeStoredValue("Puppets On A String");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (Player toldar : game.getRealPlayers()) {
@@ -162,8 +163,8 @@ public class StatusCleanupService {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if ((pnModel.getText().contains("return this card")
-                        && pnModel.getText().contains("end of the status phase"))) {
+                if ((pnModel.getText().toLowerCase().contains("return this card")
+                        && pnModel.getText().toLowerCase().contains("end of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);

@@ -108,6 +108,14 @@ public abstract class BagDraft {
         for (Player p : owner.getRealPlayers()) {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
                 setPlayerReadyToPass(p, true);
+                MessageHelper.sendMessageToChannel(
+                        this.findExistingBagChannel(p),
+                        "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+                MessageHelper.sendMessageToChannel(
+                        p.getCardsInfoThread(),
+                        "You are passing the following cards to your right:\n"
+                                + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
+                FrankenDraftBagService.displayPlayerHand(owner, p);
             }
         }
         return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
