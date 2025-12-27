@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -5472,6 +5469,13 @@ public class ButtonHelper {
                 String buttonMessage =
                         "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
                 buttons.add(Buttons.gray(buttonId, buttonMessage, ExploreEmojis.getTraitEmoji(trait)));
+                if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
+                    String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId
+                            + "_" + trait + "kolleccbt";
+                    String buttonMessage2 = "Exhaust Kollect BT and explore discard on " + planetRepresentation
+                            + (explorationTraits.size() > 1 ? " as " + trait : "");
+                    buttons.add(Buttons.gray(buttonId2, buttonMessage2, ExploreEmojis.getTraitEmoji(trait)));
+                }
             }
         }
         if (player.hasUnlockedBreakthrough("augersbt")) {
@@ -7302,6 +7306,21 @@ public class ButtonHelper {
         for (Player player : game.getRealPlayers()) {
             player.setAllianceMembers("");
         }
+    }
+
+    @ButtonHandler("startAction")
+    public static void startAction(Game game, Player player, ButtonInteractionEvent event) {
+        StartTurnService.turnStart(event, game, player);
+        deleteMessage(event);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "The bot will probably not know who's turn it should be after you complete this action. Use /player turn_start if necessary to fix this.");
+    }
+
+    @ButtonHandler("startScoring")
+    public static void startScoring(Game game, Player player, ButtonInteractionEvent event) {
+        EndTurnService.pingNextPlayer(event, game, player, true);
+        deleteMessage(event);
     }
 
     public static void startMyTurn(GenericInteractionCreateEvent event, Game game, Player player) {

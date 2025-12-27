@@ -1,6 +1,6 @@
 package ti4.service.tech;
 
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +108,7 @@ public class BastionTechService {
             }
 
             Player p2 = null;
-            for (Player p : game.getRealPlayers()) {
+            for (Player p : game.getRealPlayersExcludingThis(p1)) {
                 if (p1.isPlayerMemberOfAlliance(p)) continue;
                 if (FoWHelper.playerHasUnitsOnPlanet(p, planet)) {
                     p2 = p;
@@ -181,7 +181,8 @@ public class BastionTechService {
             if (message != null && message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing());
             if (h > 0) {
                 String msg = p2.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
                         + ".";
@@ -212,7 +213,8 @@ public class BastionTechService {
                     message += "\nProxima canceled " + (oldH - h) + " hit(s) automatically";
                 }
             }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), message + "\nRolled against " + p1.getRepresentationNoPing());
             if (h > 0) {
                 String msg = p1.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
                         + ".";
