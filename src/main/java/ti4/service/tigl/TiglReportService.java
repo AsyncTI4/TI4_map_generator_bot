@@ -88,10 +88,10 @@ public class TiglReportService {
         report.setEvents(getEnabledGalacticEvents(game));
 
         List<Player> winners = Optional.ofNullable(game.getWinners()).orElse(List.of());
-        var tiglPlayerResults = game.getRealPlayers().stream()
+        var tiglPlayerResults = game.getRealAndEliminatedPlayers().stream()
                 .map(player -> {
                     var tiglPlayerResult = new TiglPlayerResult();
-                    tiglPlayerResult.setScore(player.getTotalVictoryPoints());
+                    tiglPlayerResult.setScore(player.isEliminated() ? 0 : player.getTotalVictoryPoints());
                     if (player.getFactionModel() != null) {
                         tiglPlayerResult.setFaction(player.getFactionModel().getFactionName());
                     } else {
