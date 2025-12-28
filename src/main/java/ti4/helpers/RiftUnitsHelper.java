@@ -65,7 +65,7 @@ public class RiftUnitsHelper {
         String unit = rest;
         for (int x = 0; x < amount; x++) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), ident + " " + wormholeUnit(unit, tile, game, event, player));
+                    player.getCorrectChannel(), ident + " " + wormholeUnit(unit, tile, game, event, player) + ".");
         }
         String message = event.getMessage().getContentRaw();
         List<Button> systemButtons = getButtonsForWormholingUnitsInSystem(player, game, tile);
@@ -394,7 +394,7 @@ public class RiftUnitsHelper {
         buttons.add(Buttons.gray(finChecker + "wormholeAllShips_" + tile.getPosition(), "Wormhole All Ships"));
         buttons.add(
                 Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove", "Remove Excess Transported Units"));
-        buttons.add(Buttons.red("doneRifting", "Done Wormholing ships Units"));
+        buttons.add(Buttons.red("doneRifting", "Done Wormholing Ships"));
 
         return buttons;
     }
@@ -445,7 +445,7 @@ public class RiftUnitsHelper {
             MessageHelper.sendMessageToChannelWithButtons(
                     channel,
                     player.getRepresentationNoPing()
-                            + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.",
+                            + " is rifting some units. Please use these buttons to choose the units you wish to risk in the gravity rift.",
                     getButtonsForRiftingUnitsInSystem(player, game, tile));
         }
     }
@@ -458,7 +458,7 @@ public class RiftUnitsHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
                 player.getRepresentationNoPing()
-                        + " is rolling for weird wormhole units. Please use the the buttons to choose the units that went through a wormhole.",
+                        + " is rolling for ships navigating the _Weird Wormholes_. Please use these buttons to choose the units that went through a wormhole.",
                 getButtonsForWormholingUnitsInSystem(player, game, tile));
     }
 }

@@ -70,12 +70,12 @@ public class PlayerTechService {
         }
         if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("mentakbt")) {
-                message += "\nAutomatically added Mentak's cruiser 3.";
+                message += "\nAutomatically flipped _The Table's Grace_ and applied Corsair cruisers.";
             }
         }
         if ("dn2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("kortalibt")) {
-                message += "\nAutomatically added Kortal's dread 2.";
+                message += "\nAutomatically flipped _The Queens’ Wrath_ and applied Tribune dreadnoughts.";
             }
         }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
@@ -472,7 +472,7 @@ public class PlayerTechService {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged() + " please choose the planet you wish to annihilate.",
+                        player.getRepresentationUnfogged() + ", please choose the planet you wish to annihilate.",
                         ButtonHelper.getButtonsForConventions(player, game));
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }

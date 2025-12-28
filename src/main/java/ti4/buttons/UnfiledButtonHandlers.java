@@ -1022,14 +1022,28 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("bombardConfirm_")
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game) {
-        if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
-                .isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentation() + " there are no planets in this system that you can legally bombard. "
-                            + "You cannot bombard planets you own, and you cannot bombard cultural planets if conventions of war law is in play");
+        if (game.getActiveSystem() == null) {
             return;
         }
+        if (game.getTileByPosition(game.getActiveSystem()).isScar()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentation()
+                            + ", you cannot use BOMBARDMENT (or any other unit abilities) in an entropic scar.");
+            return;
+        }
+        if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
+                .isEmpty()) {
+            String message = player.getRepresentation()
+                    + ", there are no planets in this system that you can legally use BOMBARDMENT against. "
+                    + "You cannot use BOMBARDMENT against planets you own";
+            message += ButtonHelper.isLawInPlay(game, "conventions")
+                    ? ", and you cannot bombard cultural planets while the _Conventions of War_ law is in play."
+                    : ".";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            return;
+        }
+
         autoAssignAllBombardmentToAPlanet(player, game);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),

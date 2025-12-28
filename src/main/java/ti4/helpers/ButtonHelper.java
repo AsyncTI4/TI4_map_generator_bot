@@ -910,7 +910,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + ", use the button to place 1 spacedock on a planet you control. Your flagship and 3 fighters will also be placed in the system.",
+                        + ", please choose a planet you control. A space dock will be placed on this planet, and your flagship and 3 fighters will be placed in its system.",
                 buttons2);
 
         if (player.hasAbility("propagation")) {
@@ -918,12 +918,11 @@ public class ButtonHelper {
             String message = player.getRepresentation()
                     + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation()
-                    + ". Use buttons to gain command tokens.";
+                    + ". Use these buttons to gain command tokens.";
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " resolve research (with **Propagation**) by using the button to gain 3 command tokens.");
+                    player.getRepresentation() + " resolve research (with **Propagation**) to gain 3 command tokens.");
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannelWithButton(
@@ -939,7 +938,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Finished rapid mobilization setup for " + player.getRepresentation() + ".");
+                "Finished _Rapid Mobilization_ setup for " + player.getRepresentation() + ".");
     }
 
     @ButtonHandler("rapidMobilizationSD_")
@@ -5654,11 +5653,39 @@ public class ButtonHelper {
                 resolveCombatRoll(nokar, game, event, buttonID, false);
             }
         }
+
         String[] idInfo = buttonID.split("_");
         String pos = idInfo[1];
         String unitHolderName = idInfo[2];
+        String rollTypeString = "";
+        if (idInfo.length > 3) {
+            rollTypeString = idInfo[3];
+        }
+        Tile tile = game.getTileByPosition(pos);
+
+        if (tile.isScar()) {
+            String message = "";
+            switch (rollTypeString) {
+                case "afb" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use ANTI-FIGHTER BARRAGE (or any other unit abilities) in an entropic scar.";
+                case "bombardment" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use BOMBARDMENT (or any other unit abilities) in an entropic scar.";
+                case "spacecannonoffence" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use SPACE CANNON (or any other unit abilities) in or against an entropic scar.";
+                case "spacecannondefence" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use SPACE CANNON (or any other unit abilities) in an entropic scar.";
+                default -> {}
+            }
+            if (!message.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                return;
+            }
+        }
         if (!player.getAllianceMembers().isEmpty() && first) {
-            Tile tile = game.getTileByPosition(pos);
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != player && player.getAllianceMembers().contains(p2.getFaction())) {
                     if ("space".equalsIgnoreCase(unitHolderName)) {
@@ -5673,16 +5700,14 @@ public class ButtonHelper {
                 }
             }
         }
+
         CombatRollType rollType = CombatRollType.combatround;
-        if (idInfo.length > 3) {
-            String rollTypeString = idInfo[3];
-            switch (rollTypeString) {
-                case "afb" -> rollType = CombatRollType.AFB;
-                case "bombardment" -> rollType = CombatRollType.bombardment;
-                case "spacecannonoffence" -> rollType = CombatRollType.SpaceCannonOffence;
-                case "spacecannondefence" -> rollType = CombatRollType.SpaceCannonDefence;
-                default -> {}
-            }
+        switch (rollTypeString) {
+            case "afb" -> rollType = CombatRollType.AFB;
+            case "bombardment" -> rollType = CombatRollType.bombardment;
+            case "spacecannonoffence" -> rollType = CombatRollType.SpaceCannonOffence;
+            case "spacecannondefence" -> rollType = CombatRollType.SpaceCannonDefence;
+            default -> {}
         }
         if (buttonID.contains("deleteTheseButtons") && event instanceof ButtonInteractionEvent bevent) {
             deleteAllButtons(bevent);

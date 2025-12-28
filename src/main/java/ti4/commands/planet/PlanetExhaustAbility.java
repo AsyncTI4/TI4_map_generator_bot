@@ -111,24 +111,24 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                         player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
             }
             case "faunus" -> {
-                output = player.getRepresentationUnfogged() + " Select a planet to gain control of:";
-                output += "\n> Non-home, non-legendary planet, with no units, and no attachments";
-                if (game.isFowMode()) output += "\n> Additionally, in Fog of War, you need vision of the planet";
+                output = player.getRepresentationUnfogged()
+                        + ", please choose a planet to gain control of, that is non-home, non-legendary planet, with no units, and has no attachments.";
+                if (game.isFowMode()) output += " Additionally, in Fog of War, you need vision of the planet.";
                 buttons = FaunusService.getFaunusButtons(game, player);
             }
             case "emelpar" -> {
-                output = player.getRepresentationUnfogged() + " select a component to ready:";
+                output = player.getRepresentationUnfogged() + " please choose a component to ready.";
                 buttons = EmelparService.getReadyComponentButtons(game, player);
             }
 
             case "industrex" -> {
-                output = "Choose a unit type to place:";
+                output = player.getRepresentationUnfogged() + " please choose a ship type to place.";
                 buttons.addAll(IndustrexService.getIndustrexButtonsPart1(game, player));
             }
             case "tempesta" -> {
                 PlanetModel tempesta = Mapper.getPlanet("tempesta");
                 output = player.getFactionEmojiOrColor() + " is using _" + tempesta.getLegendaryAbilityName()
-                        + "_ to apply +1 movement to a single ship.";
+                        + "_ to apply +1 movement to one ship.";
                 game.setStoredValue("tempestaUsed", player.getFaction());
             }
 

@@ -2303,6 +2303,8 @@ class PlayerAreaGenerator {
 
                 if (Mapper.isValidFaction(planetDisplayIcon) || "redcreuss".equals(planetDisplayIcon)) {
                     drawFactionIconImage(graphics, planetDisplayIcon, x + deltaX - 2, y - 2, 52, 52);
+                } else if ("triad".equals(planetName)) {
+                    drawPAImage(x + deltaX + 3, y - 2, "pa_relics_icon.png");
                 } else {
                     String planetTypeName = "pc_attribute_" + planetDisplayIcon + ".png";
                     drawPlanetCardDetail(x + deltaX + 1, y + 2, planetTypeName);

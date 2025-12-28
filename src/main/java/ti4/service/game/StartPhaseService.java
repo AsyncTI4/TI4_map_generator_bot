@@ -831,7 +831,7 @@ public class StartPhaseService {
                 - _Ancient Burial Sites_\s
                 - _Maw of Worlds_\s
                 - The Oracle, the Naalu hero
-                - Neuraloop purging to redraw an objective
+                - _Neuraloop_
                 - _The Crown of Emphidia_
                 Please click the "Ready For """ + agenda + "\" button once you are done resolving these or if you decline to do so.";
         } else {
@@ -1076,7 +1076,7 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             "# " + p2.getRepresentationUnfogged()
-                                    + ", you have the opportunity to use _Quantum Datahub Node_. (Noone should take a turn until this is decided)",
+                                    + ", you have the opportunity to use _Quantum Datahub Node_ (nobody should take a turn until this is decided).",
                             buttons);
                 }
                 if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
@@ -1086,7 +1086,7 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             "# " + p2.getRepresentationUnfogged()
-                                    + ", you have the opportunity to use _Imperial Arbiter_. (Noone should take a turn until this is decided)",
+                                    + ", you have the opportunity to use _Imperial Arbiter_ (nobody should take a turn until this is decided).",
                             buttons);
                 }
             }

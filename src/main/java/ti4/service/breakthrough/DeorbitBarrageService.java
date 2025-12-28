@@ -104,19 +104,18 @@ public class DeorbitBarrageService {
     private static void deorbitBarrageStep3(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String planet = buttonID.split("_")[1];
-        int resources = Integer.parseInt(buttonID.split("_")[2]);
+        int amount = Integer.parseInt(buttonID.split("_")[2]);
         Player p2 = game.getPlanetOwner(planet);
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationNoPing() + " is targeting " + planetRep + ". They spent " + resources
-                        + " resource" + (resources == 1 ? "" : "s") + " to roll " + resources
-                        + " dice, hitting on a 4+");
+                player.getRepresentationNoPing() + " is targeting " + planetRep + ". They spent " + amount
+                        + " resource" + (amount == 1 ? "" : "s") + " to roll " + amount
+                        + " dice, hitting on a 4+.");
         ButtonHelper.deleteMessage(event);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        int amount = resources;
-        int hits = 0;
         if (amount > 0) {
+            int hits = 0;
             StringBuilder msg = new StringBuilder(FactionEmojis.Saar + " rolled ");
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(4);
@@ -145,7 +144,9 @@ public class DeorbitBarrageService {
             Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), "Use Buttons to Pay For The Rolled Dice", buttons);
+                    player.getCorrectChannel(),
+                    "Please pay " + amount + " resource" + (amount == 1 ? "" : "s") + " for the rolled dice.",
+                    buttons);
         }
     }
 }
