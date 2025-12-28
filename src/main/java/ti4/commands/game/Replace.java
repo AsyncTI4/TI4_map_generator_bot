@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.buttons.Buttons;
+import ti4.buttons.handlers.tigl.TiglButtonHandler;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -118,6 +120,7 @@ class Replace extends GameStateSubcommand {
         String oldPlayerUserName = replacedPlayer.getUserName();
         replacedPlayer.setUserID(replacementUser.getId());
         replacedPlayer.setUserName(replacementUser.getName());
+        replacedPlayer.setStatsTrackedUserID(replacementUser.getId());
         replacedPlayer.setTotalTurnTime(0);
         replacedPlayer.setNumberOfTurns(0);
         replacedPlayer.setNpc(false);
@@ -214,6 +217,21 @@ class Replace extends GameStateSubcommand {
         }
 
         game.setReplacementMade(true);
+
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                "Should this game's stats be tracked for you, or the player you replaced?",
+                List.of(
+                        Buttons.green(
+                                TiglButtonHandler.statsTrackingButtonId(
+                                        TiglButtonHandler.Choice.ME, replacementUser.getId(), oldPlayerUserId),
+                                "Me"),
+                        Buttons.gray(
+                                TiglButtonHandler.statsTrackingButtonId(
+                                        TiglButtonHandler.Choice.REPLACED_PLAYER,
+                                        replacementUser.getId(),
+                                        oldPlayerUserId),
+                                "Replaced Player")));
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
                 + replacementUser.getName();

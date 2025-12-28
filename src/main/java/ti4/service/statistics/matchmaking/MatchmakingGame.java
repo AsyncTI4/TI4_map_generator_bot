@@ -14,7 +14,7 @@ record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> play
     private static List<MatchmakingPlayer> getPlayers(Game game) {
         return game.getRealAndEliminatedPlayers().stream()
                 .map(player -> {
-                    String userId = player.getUserID();
+                    String userId = player.getStatsTrackedUserID();
                     String username = GameManager.getManagedPlayer(userId).getName();
                     int rank =
                             calculatePlayerRank(isWinner(game, player), game.getVp(), player.getTotalVictoryPoints());
