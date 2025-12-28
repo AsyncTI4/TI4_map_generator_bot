@@ -1,8 +1,466 @@
 [
+    /* The Crimson Rebellion */
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "crimson",
+        "Undraftable": "True",
+        "AdditionalComponents": [
+            "ABILITY:sorrow"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "sundered",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "incursion",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "sorrow",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "crimsoncommander",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "exile2",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "crimson_mech",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "crimsonbt",
+        "AdditionalComponents": [
+            "ABILITY:sundered",
+            "ABILITY:incursion"
+        ],
+        "OptionalSwaps": [
+            "HOMESYSTEM:crimson",
+            "FLAGSHIP:crimson_flagship",
+            "COMMANDER:crimsoncommander",
+            "MECH:crimson_mech",
+            "TECH:exile2"
+        ],
+        "source": "TE"
+    },
+
+    
+    /* The Deepwrought Scholarate */
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "researchteam",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "oceanbound",
+        "AdditionalComponents": [
+            "ABILITY:researchteam"
+        ],
+        "OptionalSwaps": [
+            "TECH:hydrothermal",
+            "FLAGSHIP:deepwrought_flagship",
+            "AGENT:deepwroughtagent",
+            "COMMANDER:deepwroughtcommander"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "hydrothermal",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "deepwrought_flagship",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "deepwroughtagent",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "deepwroughtcommander",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "deepwrought_mech",
+        "AdditionalComponents": [
+            "ABILITY:researchteam"
+        ],
+        "source": "TE"
+    },
+
+    
+    /* Last Bastion */
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "galvanize",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "phoenixstandard",
+        "AdditionalComponents": [
+            "ABILITY:galvanize",
+        ],
+        "OptionalSwaps": [
+            "MECH:bastion_mech",
+            "AGENT:bastionagent",
+            "COMMANDER:bastioncommander",
+            "HERO:bastionhero"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "raisethestandard",
+        "AdditionalComponents": [
+            "ABILITY:galvanize"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "bastionagent",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "bastioncommander",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "bastionhero",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMODITIES",
+        "ItemId": "bastion",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "bastion_mech",
+        "Undraftable": true,
+        "source": "TE"
+    },
+
+    
+    /* The Firmamanent / The Obsidian */
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "firmament",
+        "AdditionalComponents": [
+            "PN:blackops",
+            "generic_card:mutated_enervate",
+            "ABILITY:plotsplots",
+            "ABILITY:puppetsoftheblade"        
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "obsidian",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "enervate",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "syphon",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "seethe",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "asail",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "extract",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "mutated_enervate",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "mutated_siphon",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "mutated_seethe",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "mutated_asail",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "generic_card",
+        "ItemId": "mutated_extract",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "plotsplots",
+        "AdditionalComponents": [
+            "generic_card:enervate",
+            "generic_card:syphon",
+            "generic_card:seethe",
+            "generic_card:asail",
+            "generic_card:extract",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "OptionalSwaps": [
+            "AGENT:firmamentagent",
+            "COMMANDER:firmamentcommander",
+            "HERO:firmamenthero",
+            "FLAGSHIP:firmament_flagship"
+        ],
+        "source": "TE"
+    }, 
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "puppetsoftheblade",
+        "Undraftable": true,
+        "source": "TE"
+    },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "nocturne",
         "Undraftable": true,
-        "source": "thunders_edge"
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "bladesorchestra",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "marionettes",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "blackops",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "malevolency",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "planesplitter-firm",
+        "AdditionalComponents": [
+            "generic_card:enervate",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "planesplitter-obs",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "parasite-firm",
+        "AdditionalComponents": [
+            "generic_card:enervate",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "parasite-obs",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "firmament_flagship",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "obsidian_flagship",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "firmamentagent",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "obsidianagent",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "firmamentcommander",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "obsidiancommander",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "firmamenthero",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "obsidianhero",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "COMMODITIES",
+        "ItemId": "obsidian",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "firmament_mech",
+        "AdditionalComponents": [
+            "generic_card:syphon",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "obsidian_mech",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "firmamentbt",
+        "AdditionalComponents": [
+            "generic_card:asail",
+            "generic_card:mutated_enervate",
+            "generic_card:mutated_siphon",
+            "generic_card:mutated_seethe",
+            "generic_card:mutated_extract",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "obsidianbt",
+        "Undraftable": true,
+        "source": "TE"
+    },
+
+    
+    /* The Ral Nel Consortium */
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "miniaturization",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "linkship2",
+        "AdditionalComponents": [
+            "ABILITY:miniaturization"
+        ],
+        "source": "TE"
+    },
+
+
+    /* The Council Keleres - Changed to BT and New Faction tech replaced this one	*/
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "iihq",
+        "Undraftable": true,
+        "source": "pok"
     }
+    
 ]
+
