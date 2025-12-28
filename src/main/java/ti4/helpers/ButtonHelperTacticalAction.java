@@ -122,7 +122,7 @@ public class ButtonHelperTacticalAction {
             Button redistro = Buttons.blue(
                     player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
             String warfareDone = player.getRepresentationUnfogged()
-                    + " your Warfare action is finished, you can redistribute your command tokens again.";
+                    + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
         }
 

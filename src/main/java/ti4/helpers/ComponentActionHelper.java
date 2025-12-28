@@ -88,8 +88,8 @@ public class ComponentActionHelper {
             }
             String commanderName =
                     StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
-            compButtons.add(
-                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg for " + commanderName));
+            compButtons.add(Buttons.red(
+                    finChecker + prefix + "mercenariesForHireAction_", "Spend 3 Trade Goods For " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
@@ -817,13 +817,14 @@ public class ComponentActionHelper {
             case "mercenariesForHireAction" -> {
                 if (p1.getTg() < 2) {
                     MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(), "You don't have enough TG (3) to hire mercenaries.");
+                            event.getMessageChannel(),
+                            "You don't have three trade goods to pay your mercenaries. And Bad Things™ happen when you shortchange mercenaries.");
                     return;
                 }
                 p1.setTg(p1.getTg() - 3);
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(),
-                        p1.getRepresentationUnfogged() + " has spent 3 TG to hire mercenaries.");
+                        p1.getRepresentationUnfogged() + " has spent 3 trade goods to hire mercenaries.");
                 String leaderID = game.getStoredValue("mercCommander");
                 if (leaderID != null) {
                     p1.addLeader(leaderID);

@@ -126,7 +126,7 @@ public class DeorbitBarrageService {
                 }
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + ", producing "
-                    + (hits == 0 ? "no" : "a total of " + hit) + " hit" + (hits == 1 ? "" : "s") + ".");
+                    + (hits == 0 ? "no" : "a total of " + hits) + " hit" + (hits == 1 ? "" : "s") + ".");
             // bombard msg
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0) {

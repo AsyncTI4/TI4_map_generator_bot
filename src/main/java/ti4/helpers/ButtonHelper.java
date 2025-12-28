@@ -94,6 +94,7 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
@@ -5876,14 +5877,14 @@ public class ButtonHelper {
     public static void addNewSCs(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useNewSCs", "Yes");
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "This game will use the new Construction and Warfare SCs");
+                event.getChannel(), "This game will use the new **Construction** and **Warfare** strategy cards.");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("addNewRelics")
     public static void addNewRelics(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useNewRelics", "Yes");
-        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new TE Relics");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the Thunder's Edge relics");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -6578,6 +6579,8 @@ public class ButtonHelper {
                     name = "The Council Keleres";
                 }
                 if (factionsComplete.contains(factionId)) continue;
+                if (!game.isTwilightsFallMode() && faction.getSource() == ComponentSource.twilights_fall) continue;
+                if (game.isTwilightsFallMode() && faction.getSource() != ComponentSource.twilights_fall) continue;
                 buttons.add(Buttons.green(
                         "setupStep2_" + userId + "_" + factionId, name, FactionEmojis.getFactionIcon(factionId)));
             }

@@ -2421,7 +2421,7 @@ public class UnfiledButtonHandlers {
                             "Redistribute Command Tokens"));
                     redistro.add(Buttons.DONE_DELETE_BUTTONS);
                     String warfareDone = player.getRepresentationUnfogged()
-                            + " your Warfare action is finished, you can redistribute your command tokens again.";
+                            + " your **Warfare** action is finished, you may redistribute your command tokens again.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warfareDone, redistro);
                 }
 
@@ -3792,7 +3792,7 @@ public class UnfiledButtonHandlers {
                 player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens"));
         buttons.add(Buttons.red(player.finChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
         String message =
-                "Use the buttons to resolve the primary of Warfare. Redistributing your Command Tokens is optional.";
+                "Use the buttons to resolve the primary of **Warfare**. Redistributing your command tokens is optional.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

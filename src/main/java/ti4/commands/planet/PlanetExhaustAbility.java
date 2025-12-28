@@ -153,7 +153,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
             // }
             case "avernus" -> {
-                output = "Select the tile you would like to starforge in:";
+                output = "Please choose the system where you wish to resolve **Star Forge** in.";
                 List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);
                 for (Tile tile : tiles) {
                     buttons.add(Buttons.green(

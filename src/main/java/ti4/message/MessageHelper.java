@@ -55,6 +55,7 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
+import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
@@ -305,9 +306,17 @@ public class MessageHelper {
                             }
                             yield new StringTokenizer(game.getPlayersWhoHitPersistentNoAfter(), "_");
                         }
-                        case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT ->
-                            new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
-                        case AGENDA_DEADLY_PLOT -> new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
+                        case AGENDA_CONFOUNDING_CONFUSING_LEGAL_TEXT, AGENDA_DEADLY_PLOT -> {
+                            StringBuilder noShenanigans = new StringBuilder(game.getStoredValue("Pass On Shenanigans"));
+                            for (Player p2 : game.getRealPlayers()) {
+                                if (p2.getAcCount() == 0
+                                        || IsPlayerElectedService.isPlayerElected(game, p2, "censure")
+                                        || IsPlayerElectedService.isPlayerElected(game, p2, "absol_censure")) {
+                                    noShenanigans.append("_").append(p2.getFaction());
+                                }
+                            }
+                            yield new StringTokenizer(noShenanigans.toString(), "_");
+                        }
                         default -> {
                             BotLogger.warning(new LogOrigin(game), "Unable to handle message type: " + messageType);
                             yield null;
