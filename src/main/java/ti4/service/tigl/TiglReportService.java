@@ -2,7 +2,6 @@ package ti4.service.tigl;
 
 import static ti4.helpers.Constants.TIGL_FRACTURED_TAG;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,8 +20,6 @@ import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
 public class TiglReportService {
-
-    private static final DateTimeFormatter CREATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     public static void handleTiglReporting(Game game, GenericInteractionCreateEvent event) {
         if (!game.isCompetitiveTIGLGame() || game.getWinner().isEmpty()) {
@@ -52,8 +49,8 @@ public class TiglReportService {
                 .append("\n");
         sb.append("Players:").append("\n");
         int index = 1;
-        for (Player player : game.getRealPlayers()) {
-            int playerVP = player.getTotalVictoryPoints();
+        for (Player player : game.getRealAndEliminatedPlayers()) {
+            int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPoints();
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
