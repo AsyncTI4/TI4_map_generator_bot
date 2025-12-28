@@ -77,8 +77,8 @@
         "shortName": "Celestial\nAmbassadors",
         "faction": "edyn",
         "synergy": [
-            "CYBERNETIC",
-            "WARFARE"
+            "BIOTIC",
+            "PROPULSION"
         ],
         "text": "ACTION: Exhaust this card and show another player 1 of your unscored secret objectives; that player must show you 1 of their unscored secret objectives, at random, or allow you to place 1 ground force from your reinforcements into coexistence on a planet they control.",
         "source": "ds"

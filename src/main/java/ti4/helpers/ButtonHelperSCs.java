@@ -35,6 +35,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
@@ -90,6 +91,16 @@ public class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Produce Units", buttons);
+
+        if (player.hasUnit("tf-productionbiomes")
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(tile)) {
+            String msg = player.getRepresentation()
+                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+        }
     }
 
     @ButtonHandler("warfareTeBuild")
@@ -143,6 +154,15 @@ public class ButtonHelperSCs {
         } else {
             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message);
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+        }
+        if (player.hasUnit("tf-productionbiomes")
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(tile)) {
+            String msg = player.getRepresentation()
+                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
         }
     }
 
@@ -578,6 +598,16 @@ public class ButtonHelperSCs {
                 Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "anarchy7Build", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+
+        if (player.hasUnit("tf-productionbiomes")
+                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                        .contains(game.getTileByPosition(pos))) {
+            String msg = player.getRepresentation()
+                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+        }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 

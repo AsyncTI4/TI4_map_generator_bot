@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -149,7 +150,7 @@ public class EndTurnService {
 
         // First, check for the ralnel hero and play it if it has been preset
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)
-                && game.getStoredValue("ralnelHero") != null) {
+                && !game.getStoredValue("ralnelHero").isEmpty()) {
             String value = game.getStoredValue("ralnelHero");
             Matcher matcher = Pattern.compile(RegexHelper.factionRegex(game)).matcher(value);
             if (matcher.find()) {
@@ -159,6 +160,25 @@ public class EndTurnService {
                 Leader hero =
                         ralnel == null ? null : ralnel.getLeader("ralnelhero").orElse(null);
                 if (hero != null) PlayHeroService.playHero(event, game, ralnel, hero);
+            }
+        }
+
+        // Next, check if puppets on a string has been pre-played
+        if (game.getPlayers().values().stream().allMatch(Player::isPassed)
+                && !game.getStoredValue("Puppets On A String").isEmpty()) {
+            String value = game.getStoredValue("Puppets On A String");
+            Player puppeteer = game.getPlayerFromColorOrFaction(value);
+            if (puppeteer != null && puppeteer.getPlayableActionCards().contains("puppetsonastring")) {
+                game.removeStoredValue("Puppets On A String");
+                ActionCardHelper.playAC(event, game, puppeteer, "puppetsonastring", game.getMainGameChannel());
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("startScoring", "Start Scoring"));
+                buttons.add(Buttons.gray("deleteButtons", "Was not sabod"));
+                MessageHelper.sendMessageToChannel(
+                        puppeteer.getCorrectChannel(),
+                        "Use these buttons to start scoring if puppets is sabod",
+                        buttons);
+                return;
             }
         }
 

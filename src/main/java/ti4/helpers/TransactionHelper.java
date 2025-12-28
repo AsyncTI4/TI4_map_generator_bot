@@ -183,6 +183,7 @@ public class TransactionHelper {
                                     .isEmpty())) {
 
             } else {
+                ButtonHelperActionCards.lieInWaitCheck(p1, p2, game);
                 ButtonHelperAbilities.pillageCheck(p1, game);
                 ButtonHelperAbilities.pillageCheck(p2, game);
             }
