@@ -29,7 +29,8 @@
         "ItemCategory": "ABILITY",
         "ItemId": "star_forge",
         "OptionalSwaps": [
-            "MECH:muaat_mech"
+            "MECH:muaat_mech",
+            "BREAKTHROUGH:muaatbt"
         ],
         "source": "pok"
     },
@@ -180,6 +181,20 @@
         "source": "pok"
     },
     {
+        "ItemCategory": "HERO",
+        "ItemId": "naaluhero",
+        "AdditionalComponents": [
+            "BREAKTHROUGH:naalubt"
+        ],
+        "source": "pok"
+    },,
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "naalubt",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "telepathic",
         "OptionalSwaps": [
@@ -196,10 +211,19 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "galactic_threat",
+        "AdditionalComponents": [
+            "BREAKTHROUGH:nekrobt"
+        ],
         "OptionalSwaps": [
             "TECH:vay"
         ],
         "source": "pok"
+    },,
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "nekrobt",
+        "Undraftable": true,
+        "source": "TE"
     },
     {
         "ItemCategory": "ABILITY",
@@ -247,9 +271,16 @@
             "AGENT:nomadagentthundarian"
         ],
         "OptionalSwaps": [
-            "AGENT:nomadagentmercer"
+            "AGENT:nomadagentmercer",
+            "BREAKTHROUGH:nomadbt"
         ],
         "source": "pok"
+    },
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "nomadbt",
+        "Undraftable": true,
+        "source": "TE"
     },
     {
         "ItemCategory": "AGENT",
@@ -276,11 +307,20 @@
         "source": "pok"
     },
     {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "titansbt",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "terragenesis",
         "AdditionalComponents": [
             "ABILITY:awaken",
             "ABILITY:coalescence"
+        ],
+        "OptionalSwaps": [
+            "BREAKTHROUGH:titansbt"
         ],
         "source": "pok"
     },
@@ -387,10 +427,37 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "scheming",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "crafty",
+        "AdditionalComponents": [
+            "ABILITY:scheming",
+            "BREAKTHROUGH:yssarilbt"
+        ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "BREAKTHROUGH",
+        "ItemId": "yssarilbt",
+        "Undraftable": true,
+        "source": "TE"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "stall_tactics",
         "OptionalSwaps": [
             "MECH:yssaril_mech"
         ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "yssaril_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
@@ -404,12 +471,6 @@
     {
         "ItemCategory": "TECH",
         "ItemId": "m2",
-        "Undraftable": true,
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "MECH",
-        "ItemId": "yssaril_mech",
         "Undraftable": true,
         "source": "pok"
     }
