@@ -20,8 +20,8 @@ public class TiglButtonHandler {
         String payload = buttonID.substring(STATS_TRACKING_BUTTON_PREFIX.length());
         String[] parts = payload.split("_", 2);
 
-        String selection = parts[1];
-        String replacementUserId = parts[2];
+        String selection = parts[0];
+        String replacementUserId = parts[1];
 
         if (!event.getUser().getId().equals(replacementUserId)) {
             event.getHook()
@@ -34,15 +34,14 @@ public class TiglButtonHandler {
         Player replacementPlayer = game.getPlayer(replacementUserId);
 
         boolean changeStatsTracking = "me".equalsIgnoreCase(selection);
-        if (!changeStatsTracking) {
+        if (changeStatsTracking) {
+            replacementPlayer.setStatsTrackedUserID(replacementUserId);
+            replacementPlayer.setStatsTrackedUserName(replacementPlayer.getUserName());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Stats will be tracked for you.");
+        } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Stats will be tracked for the replaced player.");
-            return;
         }
-
-        replacementPlayer.setStatsTrackedUserID(replacementUserId);
-        replacementPlayer.setStatsTrackedUserName(replacementPlayer.getUserName());
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Stats will be tracked for you.");
         ButtonHelper.deleteMessage(event);
     }
 
