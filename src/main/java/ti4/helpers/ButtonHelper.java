@@ -7442,6 +7442,15 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
+    @ButtonHandler("declineArbiter")
+    public static void declineImperialArbiter(ButtonInteractionEvent event, Game game, Player player) {
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), game.getPing() + ", usage of _Imperial Arbiter_ has been declined.");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("declinePath")
     public static void declinePath(ButtonInteractionEvent event, Player player) {
         deleteMessage(event);
