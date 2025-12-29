@@ -29,7 +29,9 @@ class CaptureUnitService {
 
         List<Player> capturing = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
-            if (player.hasUnlockedBreakthrough("mykomentoribt") && player != game.getActivePlayer()) {
+            if (player.hasUnlockedBreakthrough("mykomentoribt")
+                    && player != game.getActivePlayer()
+                    && !removedUnitType.uh().getPlayersUnitListOnHolder(player).isEmpty()) {
                 capturing.add(player);
                 continue;
             }

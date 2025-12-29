@@ -510,6 +510,7 @@ public class ButtonHelperTwilightsFall {
             if (player2 == startPlayer || game.isFowMode()) {
                 continue;
             }
+            game.setStoredValue(player2.getFaction() + "splicequeue", "");
             String msg = player2.getRepresentationUnfogged()
                     + " in order to speed up the splice, you can now offer the bot a ranked list of your desired"
                     + " splice cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";

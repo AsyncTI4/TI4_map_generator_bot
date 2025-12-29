@@ -291,7 +291,7 @@ public class Expeditions {
                 message += player.getRepresentation()
                         + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
                 message +=
-                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova.";
+                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or the fracture.";
                 Button button = Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "placeThundersEdge", "Place Thunder's Edge");
                 MessageHelper.sendMessageToChannel(channel, message);
