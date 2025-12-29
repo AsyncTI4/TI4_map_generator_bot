@@ -54,11 +54,12 @@ public class ButtonHelperTwilightsFall {
     public static List<Button> getQueueSplicePickButtons(Game game, Player player) {
         String type = game.getStoredValue("spliceType");
         List<String> cards = getSpliceCards(game);
+        List<String> nCards = new ArrayList<>(cards);
         String alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
         for (String cardID : alreadyQueued.split("_")) {
-            cards.remove(cardID);
+            nCards.remove(cardID);
         }
-        return getSpliceButtons(game, type, cards, player, "queueSplicePick_");
+        return getSpliceButtons(game, type, nCards, player, "queueSplicePick_");
     }
 
     public static String getQueueSpliceMessage(Game game, Player player) {
@@ -469,7 +470,7 @@ public class ButtonHelperTwilightsFall {
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
-            if (player2 == startPlayer) {
+            if (player2 == startPlayer || game.isFowMode()) {
                 continue;
             }
             String msg = player2.getRepresentationUnfogged()
