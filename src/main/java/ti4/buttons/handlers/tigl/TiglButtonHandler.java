@@ -36,7 +36,6 @@ public class TiglButtonHandler {
         boolean changeStatsTracking = "me".equalsIgnoreCase(selection);
         if (changeStatsTracking) {
             replacementPlayer.setStatsTrackedUserID(replacementUserId);
-            replacementPlayer.setStatsTrackedUserName(replacementPlayer.getUserName());
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Stats will be tracked for you.");
         } else {
             MessageHelper.sendMessageToChannel(
