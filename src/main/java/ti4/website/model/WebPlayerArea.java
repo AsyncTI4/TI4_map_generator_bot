@@ -350,7 +350,7 @@ public class WebPlayerArea {
         webPlayerArea.setPnCount(player.getPnCount());
 
         // victory points
-        webPlayerArea.setTotalVps(player.getTotalVictoryPoints());
+        webPlayerArea.setTotalVps(player.getTotalVictoryPointsCapped());
 
         // secret objectives
         webPlayerArea.setNumScoreableSecrets(player.getMaxSOCount());

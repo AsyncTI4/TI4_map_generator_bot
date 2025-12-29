@@ -677,7 +677,7 @@ public class MapGenerator implements AutoCloseable {
                     int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
                     int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) / 2);
 
-                    int vpCount = player.getTotalVictoryPoints();
+                    int vpCount = Math.min(player.getTotalVictoryPoints(), game.getScoreTrackMax());
                     int tokenX = vpCount * boxWidth
                             + Math.min(
                                     boxBuffer + (availableSpacePerColumn * col) + centreHorizontally,
@@ -1191,7 +1191,7 @@ public class MapGenerator implements AutoCloseable {
 
         { // PAINT VICTORY POINTS
             graphics.setFont(Storage.getFont32());
-            String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
+            String vpCount = "VP: " + player.getTotalVictoryPointsCapped() + " / " + game.getVp();
             point = PositionMapper.getPlayerStats("newvp");
             point.translate(statTileMid.x, statTileMid.y);
             DrawingUtil.superDrawString(
@@ -1930,7 +1930,7 @@ public class MapGenerator implements AutoCloseable {
         graphics.drawString(player.getColor(), point.x + deltaX, point.y + deltaY);
 
         // PAIN VICTORY POINTS
-        int vpCount = player.getTotalVictoryPoints();
+        int vpCount = player.getTotalVictoryPointsCapped();
         point = PositionMapper.getPlayerStats(Constants.STATS_VP);
         graphics.drawString("VP: " + vpCount, point.x + deltaX, point.y + deltaY);
 

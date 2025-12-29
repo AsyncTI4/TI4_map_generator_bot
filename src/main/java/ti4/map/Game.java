@@ -723,6 +723,18 @@ public class Game extends GameProperties {
         setButtonPressCount(getButtonPressCount() + 1);
     }
 
+    @JsonIgnore
+    public int getScoreTrackMax() {
+        int max = getVp();
+        if (isLiberationC4Mode()) {
+            max = Math.max(max, 12);
+        }
+        if (isAllianceMode()) {
+            max = Math.max(max, 14);
+        }
+        return max;
+    }
+
     public int getSlashCommandsRunCount() {
         return slashCommandsUsed.values().stream().mapToInt(Integer::intValue).sum();
     }

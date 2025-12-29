@@ -275,7 +275,7 @@ public class PlayerStatsDashboardPayload {
     }
 
     public int getScore() {
-        return player.getTotalVictoryPoints();
+        return player.getTotalVictoryPointsCapped();
     }
 
     public List<String> getStrategyCards() {

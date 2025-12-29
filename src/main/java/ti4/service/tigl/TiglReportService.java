@@ -50,7 +50,7 @@ public class TiglReportService {
         sb.append("Players:").append("\n");
         int index = 1;
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPoints();
+            int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPointsCapped();
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
@@ -88,7 +88,7 @@ public class TiglReportService {
         var tiglPlayerResults = game.getRealAndEliminatedPlayers().stream()
                 .map(player -> {
                     var tiglPlayerResult = new TiglPlayerResult();
-                    tiglPlayerResult.setScore(player.isEliminated() ? 0 : player.getTotalVictoryPoints());
+                    tiglPlayerResult.setScore(player.isEliminated() ? 0 : player.getTotalVictoryPointsCapped());
                     if (player.getFactionModel() != null) {
                         tiglPlayerResult.setFaction(player.getFactionModel().getFactionName());
                     } else {
