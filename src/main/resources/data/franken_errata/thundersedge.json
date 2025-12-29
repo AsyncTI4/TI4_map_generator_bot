@@ -1,5 +1,5 @@
 [
-    /* The Crimson Rebellion */
+
     {
         "ItemCategory": "HOMESYSTEM",
         "ItemId": "crimson",
@@ -63,7 +63,7 @@
     },
 
     
-    /* The Deepwrought Scholarate */
+
     {
         "ItemCategory": "ABILITY",
         "ItemId": "researchteam",
@@ -118,7 +118,7 @@
     },
 
     
-    /* Last Bastion */
+
     {
         "ItemCategory": "ABILITY",
         "ItemId": "galvanize",
@@ -179,7 +179,7 @@
     },
 
     
-    /* The Firmamanent / The Obsidian */
+
     {
         "ItemCategory": "HOMESYSTEM",
         "ItemId": "firmament",
@@ -437,7 +437,7 @@
     },
 
     
-    /* The Ral Nel Consortium */
+
     {
         "ItemCategory": "ABILITY",
         "ItemId": "miniaturization",
@@ -454,7 +454,7 @@
     },
 
 
-    /* The Council Keleres - Changed to BT and New Faction tech replaced this one	*/
+
     {
         "ItemCategory": "TECH",
         "ItemId": "iihq",
