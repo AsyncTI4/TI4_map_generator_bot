@@ -1555,6 +1555,7 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
+    @Override
     public String getStatsTrackedUserName() {
         User statsTrackedUser = getUser(getStatsTrackedUserID());
         if (statsTrackedUser == null) return super.getStatsTrackedUserName();
