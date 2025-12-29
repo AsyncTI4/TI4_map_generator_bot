@@ -1219,7 +1219,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, true)
-                                + " you may use this button to return Naalu fighters to space after combat concludes. This only needs to be done once. Reminder you can't take over a planet with only fighters.",
+                                + " you may use this button to return fighters to space after combat concludes. This only needs to be done once.",
                         b2s);
             }
         }
