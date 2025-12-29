@@ -752,6 +752,9 @@ class GameSaveService {
             writer.write(Constants.STATS_TRACKED_USER_ID + " " + player.getStatsTrackedUserID());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.STATS_TRACKED_USER_NAME + " " + player.getStatsTrackedUserName());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HS_TILE_POSITION + " " + player.getHomeSystemPosition());
             writer.write(System.lineSeparator());
 
