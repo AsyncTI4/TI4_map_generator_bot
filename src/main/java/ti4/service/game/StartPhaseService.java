@@ -1082,12 +1082,15 @@ public class StartPhaseService {
                 if (IsPlayerElectedService.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    buttons.add(Buttons.red("declineArbiter", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             p2.getCorrectChannel(),
                             "# " + p2.getRepresentationUnfogged()
                                     + ", you have the opportunity to use _Imperial Arbiter_ (nobody should take a turn until this is decided).",
                             buttons);
+                    MessageHelper.sendMessageToChannel(
+                            game.getMainGameChannel(),
+                            game.getPing() + ", please wait while the use of _Imperial Arbiter_ is decided.");
                 }
             }
             StartTurnService.turnStart(event, game, nextPlayer);
