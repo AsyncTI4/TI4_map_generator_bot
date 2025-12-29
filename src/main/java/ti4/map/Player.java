@@ -136,6 +136,7 @@ public class Player extends PlayerProperties {
         setUserID(userID);
         setUserName(userName);
         setStatsTrackedUserID(userID);
+        setStatsTrackedUserName(userName);
         this.game = game;
     }
 
@@ -1545,37 +1546,26 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public User getUser() {
-        // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
-        return JdaService.jda == null ? null : JdaService.jda.getUserById(getUserID());
+        return getUser(getUserID());
     }
 
-    @Override
-    public String getStatsTrackedUserID() {
-        String trackedUserId = super.getStatsTrackedUserID();
-        if (trackedUserId == null) {
-            return getUserID();
-        }
-        return trackedUserId;
+    private User getUser(String userId) {
+        // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
+        return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
     }
 
     @JsonIgnore
     public String getStatsTrackedUserName() {
-        String statsUserId = getStatsTrackedUserID();
-        if (statsUserId == null || statsUserId.equals(getUserID())) {
-            return getUserName();
-        }
-        if (JdaService.jda == null) {
-            return getUserName();
-        }
-        User userById = JdaService.jda.getUserById(statsUserId);
-        if (userById == null) {
-            return getUserName();
-        }
-        Member member = JdaService.guildPrimary.getMemberById(statsUserId);
+        User statsTrackedUser = getUser(getStatsTrackedUserID());
+        if (statsTrackedUser == null) return super.getStatsTrackedUserName();
+
+        Member member = JdaService.guildPrimary.getMemberById(getStatsTrackedUserID());
         if (member == null) {
-            return userById.getName();
+            setStatsTrackedUserID(statsTrackedUser.getName());
+        } else {
+            setStatsTrackedUserID(member.getEffectiveName());
         }
-        return member.getEffectiveName();
+        return super.getStatsTrackedUserName();
     }
 
     @Override

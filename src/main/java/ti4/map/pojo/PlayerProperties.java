@@ -70,7 +70,8 @@ public class PlayerProperties {
     // Statistics
     private int numberOfTurns;
     private long totalTurnTime;
-    private @Nullable String statsTrackedUserID;
+    private String statsTrackedUserID;
+    private String statsTrackedUserName;
 
     // BENTOR CONGLOMERATE ABILITY "Ancient Blueprints"
     private boolean hasFoundCulFrag;

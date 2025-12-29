@@ -223,14 +223,11 @@ class Replace extends GameStateSubcommand {
                 "Should this game's stats be tracked for you, or the player you replaced?",
                 List.of(
                         Buttons.green(
-                                TiglButtonHandler.statsTrackingButtonId(
-                                        TiglButtonHandler.Choice.ME, replacementUser.getId(), oldPlayerUserId),
+                                TiglButtonHandler.statsTrackingButtonId("me", replacementUser.getId(), oldPlayerUserId),
                                 "Me"),
                         Buttons.gray(
                                 TiglButtonHandler.statsTrackingButtonId(
-                                        TiglButtonHandler.Choice.REPLACED_PLAYER,
-                                        replacementUser.getId(),
-                                        oldPlayerUserId),
+                                        "replaced", replacementUser.getId(), oldPlayerUserId),
                                 "Replaced Player")));
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "

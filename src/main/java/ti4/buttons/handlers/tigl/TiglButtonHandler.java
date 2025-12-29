@@ -13,31 +13,12 @@ import ti4.message.logging.BotLogger;
 @UtilityClass
 public class TiglButtonHandler {
 
-    public enum Choice {
-        ME,
-        REPLACED_PLAYER
-    }
-
     private static final String STATS_TRACKING_BUTTON_PREFIX = "tiglStatsTracking_";
 
-    public static String statsTrackingButtonId(Choice choice, String replacementUserId, String replacedUserId) {
-        return STATS_TRACKING_BUTTON_PREFIX
-                + choice.name().toLowerCase()
-                + "_"
-                + replacementUserId
-                + "_"
-                + replacedUserId;
-    }
-
     @ButtonHandler(STATS_TRACKING_BUTTON_PREFIX)
-    public static void handleStatsTrackingChoice(
-            ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void handleStatsTrackingChoice(ButtonInteractionEvent event, Game game, String buttonID) {
         String payload = buttonID.substring(STATS_TRACKING_BUTTON_PREFIX.length());
         String[] parts = payload.split("_", 3);
-        if (parts.length < 3) {
-            MessageHelper.replyToMessage(event, "Invalid stats tracking selection.");
-            return;
-        }
 
         String selection = parts[0];
         String replacementUserId = parts[1];
@@ -51,15 +32,10 @@ public class TiglButtonHandler {
             return;
         }
 
-        Player trackedPlayer = game.getPlayer(replacementUserId);
-        if (trackedPlayer == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Could not find the replacement player to update stats tracking.");
-            return;
-        }
+        Player replacementPlayer = game.getPlayer(replacementUserId);
 
-        String statsTrackedUserId = selection.equalsIgnoreCase("me") ? replacementUserId : replacedUserId;
-        trackedPlayer.setStatsTrackedUserID(statsTrackedUserId);
+        String statsTrackedUserId = "me".equalsIgnoreCase(selection) ? replacementUserId : replacedUserId;
+        replacementPlayer.setStatsTrackedUserID(statsTrackedUserId);
 
         if (statsTrackedUserId.equals(replacementUserId)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Stats will be tracked for you.");
@@ -68,5 +44,9 @@ public class TiglButtonHandler {
                     event.getMessageChannel(), "Stats will be tracked for the replaced player.");
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static String statsTrackingButtonId(String choice, String replacementUserId, String replacedUserId) {
+        return STATS_TRACKING_BUTTON_PREFIX + choice + "_" + replacementUserId + "_" + replacedUserId;
     }
 }
