@@ -1408,6 +1408,8 @@ public class Constants {
     public static final String AGENDA_DECK_ID = "agenda_deck_id";
     public static final String EXPLORATION_DECK_ID = "exploration_deck_id";
     public static final String STATS_ANCHOR_LOCATION = "stats_anchor_location";
+    public static final String STATS_TRACKED_USER_ID = "stats_tracked_user_id";
+    public static final String STATS_TRACKED_USER_NAME = "stats_tracked_user_name";
     public static final String SET_STATS_ANCHOR = "set_stats_anchor";
     public static final String IGNORE_ENDED_GAMES = "ignore_ended_games";
     public static final String MEDIAN_TURN_TIME = "median_turn_time";

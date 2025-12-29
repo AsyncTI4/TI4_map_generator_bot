@@ -94,8 +94,8 @@ public class TiglReportService {
                     } else {
                         tiglPlayerResult.setFaction(player.getFaction());
                     }
-                    tiglPlayerResult.setDiscordId(parseDiscordId(player.getUserID()));
-                    tiglPlayerResult.setDiscordTag(resolveDiscordTag(player));
+                    tiglPlayerResult.setDiscordId(parseDiscordId(player.getStatsTrackedUserID()));
+                    tiglPlayerResult.setDiscordTag(player.getStatsTrackedUserName());
                     tiglPlayerResult.setWinner(winners.contains(player));
                     return tiglPlayerResult;
                 })
@@ -126,14 +126,6 @@ public class TiglReportService {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    private static String resolveDiscordTag(Player player) {
-        User user = player.getUser();
-        if (user != null) {
-            return user.getEffectiveName();
-        }
-        return player.getUserName();
     }
 
     private static String determineLeague(Game game) {
