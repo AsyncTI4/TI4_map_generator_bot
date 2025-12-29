@@ -2718,11 +2718,11 @@ public class ButtonHelperFactionSpecific {
                 new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(p1, game, "fs", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                p1.getFactionEmoji() + " has chosen to discard an ability or genome to deploy their flagship.");
+                p1.getFactionEmoji() + " has chosen to discard an ability or genome to DEPLOY their flagship.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose which system you wish to place the flagship in.", buttons);
         if (p1.hasUnit("redtf_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
-            String message3 = "Use buttons to deploy a mech with the flagship or decline";
+            String message3 = "Use buttons to DEPLOY a mech with the flagship, or decline.";
             List<Button> buttons2 = new ArrayList<>(
                     Helper.getTileWithShipsPlaceUnitButtons(p1, game, "mech", "placeOneNDone_skipbuild"));
             buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));

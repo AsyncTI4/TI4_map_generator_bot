@@ -1627,7 +1627,7 @@ public class UnfiledButtonHandlers {
                 if (player_.getFaction().equals(faction)) {
                     game.setSpeakerUserID(player_.getUserID());
                     String message =
-                            MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                            MiscEmojis.SpeakerToken + " Speaker has been assigned to " + player_.getRepresentation(false, true) + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     if (!game.isFowMode()) {
                         ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
@@ -1648,7 +1648,7 @@ public class UnfiledButtonHandlers {
             if (player_.getFaction().equals(faction)) {
                 game.setSpeakerUserID(player_.getUserID());
                 String message =
-                        MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                        MiscEmojis.SpeakerToken + " Speaker has been assigned to " + player_.getRepresentation(false, true) + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
@@ -1676,7 +1676,7 @@ public class UnfiledButtonHandlers {
             if (player_.getFaction().equals(faction)) {
                 game.setTyrantUserID(player_.getUserID());
                 String message =
-                        MiscEmojis.SpeakerToken + " Tyrant assigned to: " + player_.getRepresentation(false, true);
+                        MiscEmojis.BenedictionToken + " Tyrant has been assigned to " + player_.getRepresentation(false, true) + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
@@ -2631,7 +2631,7 @@ public class UnfiledButtonHandlers {
                         Button flipAgenda = Buttons.blue("edictPhase", "Do Edict Phase");
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
-                                event.getChannel(), "Please proceed to edict phase now.", buttons);
+                                event.getChannel(), "Please proceed to the Edict Phase now.", buttons);
                     } else {
                         Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                         List<Button> buttons = List.of(flipAgenda);
@@ -2659,7 +2659,7 @@ public class UnfiledButtonHandlers {
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "Please proceed to edict phase after the last person finishing doing CCs.",
+                                "Please proceed to Edict Phase after the last person finishing doing gaining and redistributing command tokens.",
                                 buttons);
                     } else {
                         Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");

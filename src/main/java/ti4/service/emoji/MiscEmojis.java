@@ -22,6 +22,7 @@ public enum MiscEmojis implements TI4Emoji {
     CreussGamma, //
     LegendaryPlanet,
     SpeakerToken,
+    BenedictionToken,
     DoubleBoom,
     Ingress,
 
