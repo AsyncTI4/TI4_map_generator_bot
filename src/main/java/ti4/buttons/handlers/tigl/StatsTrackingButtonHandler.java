@@ -11,9 +11,9 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 
 @UtilityClass
-public class TiglButtonHandler {
+public class StatsTrackingButtonHandler {
 
-    private static final String STATS_TRACKING_BUTTON_PREFIX = "tiglStatsTracking_";
+    private static final String STATS_TRACKING_BUTTON_PREFIX = "statsTracking_";
 
     @ButtonHandler(STATS_TRACKING_BUTTON_PREFIX)
     public static void handleStatsTrackingChoice(ButtonInteractionEvent event, Game game, String buttonID) {

@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.buttons.handlers.tigl.TiglButtonHandler;
+import ti4.buttons.handlers.tigl.StatsTrackingButtonHandler;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -222,9 +222,12 @@ class Replace extends GameStateSubcommand {
                     event.getChannel(),
                     "Should this game's stats be tracked for you, or the player you replaced?",
                     List.of(
-                            Buttons.green(TiglButtonHandler.statsTrackingButtonId("me", replacementUser.getId()), "Me"),
+                            Buttons.green(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId("me", replacementUser.getId()),
+                                    "Me"),
                             Buttons.gray(
-                                    TiglButtonHandler.statsTrackingButtonId("replaced", replacementUser.getId()),
+                                    StatsTrackingButtonHandler.statsTrackingButtonId(
+                                            "replaced", replacementUser.getId()),
                                     "Replaced Player")));
         }
 
