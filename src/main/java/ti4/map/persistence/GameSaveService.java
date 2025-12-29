@@ -749,7 +749,8 @@ class GameSaveService {
             writer.write(Constants.STATS_ANCHOR_LOCATION + " " + player.getPlayerStatsAnchorPosition());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.STATS_TRACKED_USER_ID + " " + player.getStatsTrackedUserID());
+            writer.write(Constants.STATS_TRACKED_USER_ID + " "
+                    + player.getStatsTrackedUserID().replace(" ", "----"));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.STATS_TRACKED_USER_NAME + " " + player.getStatsTrackedUserName());
