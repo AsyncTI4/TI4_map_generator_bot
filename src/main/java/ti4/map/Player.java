@@ -136,7 +136,6 @@ public class Player extends PlayerProperties {
         setUserID(userID);
         setUserName(userName);
         setStatsTrackedUserID(userID);
-        setStatsTrackedUserName(userName);
         this.game = game;
     }
 
@@ -1555,18 +1554,15 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
-    @Override
     public String getStatsTrackedUserName() {
         User statsTrackedUser = getUser(getStatsTrackedUserID());
-        if (statsTrackedUser == null) return super.getStatsTrackedUserName();
+        if (statsTrackedUser == null) return "unknown username";
 
         Member member = JdaService.guildPrimary.getMemberById(getStatsTrackedUserID());
         if (member == null) {
-            setStatsTrackedUserName(statsTrackedUser.getName());
-        } else {
-            setStatsTrackedUserName(member.getEffectiveName());
+            return statsTrackedUser.getName();
         }
-        return super.getStatsTrackedUserName();
+        return member.getEffectiveName();
     }
 
     @Override

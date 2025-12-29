@@ -934,7 +934,6 @@ class GameLoadService {
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
                 case Constants.STATS_TRACKED_USER_ID -> player.setStatsTrackedUserID(tokenizer.nextToken());
-                case Constants.STATS_TRACKED_USER_NAME -> player.setStatsTrackedUserName(tokenizer.nextToken());
                 case Constants.HS_TILE_POSITION -> player.setHomeSystemPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
