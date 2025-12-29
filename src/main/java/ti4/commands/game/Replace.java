@@ -120,7 +120,6 @@ class Replace extends GameStateSubcommand {
         String oldPlayerUserName = replacedPlayer.getUserName();
         replacedPlayer.setUserID(replacementUser.getId());
         replacedPlayer.setUserName(replacementUser.getName());
-        replacedPlayer.setStatsTrackedUserID(replacementUser.getId());
         replacedPlayer.setTotalTurnTime(0);
         replacedPlayer.setNumberOfTurns(0);
         replacedPlayer.setNpc(false);
@@ -218,17 +217,16 @@ class Replace extends GameStateSubcommand {
 
         game.setReplacementMade(true);
 
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(),
-                "Should this game's stats be tracked for you, or the player you replaced?",
-                List.of(
-                        Buttons.green(
-                                TiglButtonHandler.statsTrackingButtonId("me", replacementUser.getId(), oldPlayerUserId),
-                                "Me"),
-                        Buttons.gray(
-                                TiglButtonHandler.statsTrackingButtonId(
-                                        "replaced", replacementUser.getId(), oldPlayerUserId),
-                                "Replaced Player")));
+        if (!replacementUser.isBot()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    "Should this game's stats be tracked for you, or the player you replaced?",
+                    List.of(
+                            Buttons.green(TiglButtonHandler.statsTrackingButtonId("me", replacementUser.getId()), "Me"),
+                            Buttons.gray(
+                                    TiglButtonHandler.statsTrackingButtonId("replaced", replacementUser.getId()),
+                                    "Replaced Player")));
+        }
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
                 + replacementUser.getName();
