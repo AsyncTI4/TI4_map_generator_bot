@@ -23,7 +23,7 @@ class GalacticEventsSetup extends GameStateSubcommand {
                 Constants.AGE_OF_EXPLORATION_MODE,
                 "True to enable the Age of Exploration, per Codex 4."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Codex 4.."));
+                OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Codex 4."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.HIDDEN_AGENDA_MODE, "True to enable Hidden Agenda, per Dane Leek."));
         addOptions(new OptionData(
@@ -76,7 +76,7 @@ class GalacticEventsSetup extends GameStateSubcommand {
                 mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "After setting up the map, use this button to auto populate the neutral infantry",
+                        "After setting up the map, use this button to auto-populate the neutral infantry.",
                         mfButtons);
             }
         }

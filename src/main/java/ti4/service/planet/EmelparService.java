@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
 import ti4.image.Mapper;
@@ -44,7 +45,7 @@ public class EmelparService {
         for (String bt : player.getBreakthroughIDs()) {
             if (player.isBreakthroughExhausted(bt) && player.isBreakthroughUnlocked(bt)) {
                 BreakthroughModel btModel = Mapper.getBreakthrough(bt);
-                String label = "Ready breakthrough " + btModel.getName();
+                String label = "Ready " + btModel.getName() + " Breakthrough";
                 buttons.add(Buttons.blue(prefix + bt, label, player.getFactionEmoji()));
             }
         }
@@ -56,7 +57,7 @@ public class EmelparService {
                         leader.getLeaderModel().map(LeaderModel::getName).orElse(leader.getId());
                 buttons.add(Buttons.gray(
                         prefix + leader.getId(),
-                        "Ready leader " + leaderName,
+                        "Ready " + leaderName + (Constants.AGENT.equals(leader.getType()) ? " Agent" : " Leader"),
                         LeaderEmojis.getLeaderTypeEmoji(leader.getType())));
             }
         }
@@ -64,20 +65,21 @@ public class EmelparService {
         prefix = "emelparReady_relic_" + player.getFaction() + "_";
         for (String relic : player.getExhaustedRelics()) {
             RelicModel model = Mapper.getRelic(relic);
-            buttons.add(Buttons.red(prefix + relic, "Ready relic " + model.getName(), ExploreEmojis.Relic));
+            buttons.add(Buttons.red(prefix + relic, "Ready " + model.getName() + " Relic", ExploreEmojis.Relic));
         }
 
         prefix = "emelparReady_tech_" + player.getFaction() + "_";
         for (String tech : player.getExhaustedTechs()) {
             TechnologyModel model = Mapper.getTech(tech);
-            buttons.add(
-                    Buttons.green(prefix + tech, "Ready tech " + model.getName(), model.getCondensedReqsEmojis(true)));
+            buttons.add(Buttons.green(
+                    prefix + tech, "Ready " + model.getName() + "Technology", model.getCondensedReqsEmojis(true)));
         }
 
         prefix = "emelparReady_legendary_" + player.getFaction() + "_";
         for (String planet : player.getExhaustedPlanetsAbilities()) {
             PlanetModel model = Mapper.getPlanet(planet);
-            buttons.add(Buttons.blue(prefix + planet, "Ready ability " + model.getName(), MiscEmojis.LegendaryPlanet));
+            buttons.add(
+                    Buttons.blue(prefix + planet, "Ready " + model.getName() + " Ability", MiscEmojis.LegendaryPlanet));
         }
         if (!game.isFowMode()) {
             buttons.add(Buttons.gray("getOtherFactionsEmelpar", "Ready Another Player's Components"));
@@ -92,14 +94,14 @@ public class EmelparService {
         for (Player player2 : game.getRealPlayers()) {
             buttons.add(Buttons.gray("getEmelparButtons_" + player2.getFaction(), " ", player2.getFactionEmoji()));
         }
-        String msg = "Choose the faction you wish to ready a component of.";
+        String msg = "Choose the faction you wish to ready a component for.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("getEmelparButtons_")
     private static void getEmelparButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String msg = player.getRepresentationUnfogged() + " select a component to ready:";
+        String msg = player.getRepresentationUnfogged() + ", please choose a component to ready.";
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = getReadyComponentButtons(game, player2);
 
@@ -109,7 +111,7 @@ public class EmelparService {
 
     private static void postSummary(ButtonInteractionEvent event, Player player, String whatReadied) {
         String summary = player.getRepresentationUnfogged() + " readied " + whatReadied + " using "
-                + emelpar().getLegendaryNameRepresentation();
+                + emelpar().getLegendaryNameRepresentation() + ".";
         MessageHelper.sendMessageToEventChannel(event, summary);
         ButtonHelper.deleteMessage(event);
     }

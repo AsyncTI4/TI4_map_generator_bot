@@ -91,6 +91,7 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
@@ -909,7 +910,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + ", use the button to place 1 spacedock on a planet you control. Your flagship and 3 fighters will also be placed in the system.",
+                        + ", please choose a planet you control. A space dock will be placed on this planet, and your flagship and 3 fighters will be placed in its system.",
                 buttons2);
 
         if (player.hasAbility("propagation")) {
@@ -917,12 +918,11 @@ public class ButtonHelper {
             String message = player.getRepresentation()
                     + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
                     + " Your current command tokens are " + player.getCCRepresentation()
-                    + ". Use buttons to gain command tokens.";
+                    + ". Use these buttons to gain command tokens.";
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " resolve research (with **Propagation**) by using the button to gain 3 command tokens.");
+                    player.getRepresentation() + " resolve research (with **Propagation**) to gain 3 command tokens.");
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannelWithButton(
@@ -938,7 +938,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "Finished rapid mobilization setup for " + player.getRepresentation() + ".");
+                "Finished _Rapid Mobilization_ setup for " + player.getRepresentation() + ".");
     }
 
     @ButtonHandler("rapidMobilizationSD_")
@@ -1333,8 +1333,8 @@ public class ButtonHelper {
                     }
                 }
                 if (slumberBonus > 0) {
-                    message += " Drew `" + slumberBonus + "` additional cards for " + FactionEmojis.Titans
-                            + " Slumberstate Computing.";
+                    message += " Drew " + slumberBonus + " additional card" + (slumberBonus == 1 ? "" : "s") + " for "
+                            + FactionEmojis.Titans + " _Slumberstate Computing_.";
                     amount += slumberBonus;
                 }
             }
@@ -2380,12 +2380,12 @@ public class ButtonHelper {
     public static void addMinorFactionsInfantry(Game game, ButtonInteractionEvent event) {
 
         if (!game.isMinorFactionsMode()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not minor factions mode.");
             return;
         }
         if (game.getRealPlayers().size() < 3 && game.getPlayers().size() > 3) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Set up all real players before pressing this button");
+                    event.getChannel(), "Set up all real players before pressing this button.");
             return;
         }
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
@@ -2417,7 +2417,7 @@ public class ButtonHelper {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to home systems");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Added neutral infantry to home systems.");
 
         deleteMessage(event);
     }
@@ -4612,7 +4612,7 @@ public class ButtonHelper {
                 }
                 if (added) {
                     MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets");
+                            game.getMainGameChannel(), "Added neutral infantry to hazardous planets.");
                 }
             }
         }
@@ -4749,6 +4749,7 @@ public class ButtonHelper {
         if (tile == null || tile.getRepresentationForButtons(game, player).contains("Hyperlane")) return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game)) return false;
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game)) return false;
+        if ("silver_flame".equalsIgnoreCase(tile.getTileID())) return false;
         if (tile.isAsteroidField()) {
             for (Player p2 : game.getRealPlayers()) {
                 if ((p2.hasTech("cm") || p2.hasTech("tf-nomadic"))
@@ -5123,8 +5124,7 @@ public class ButtonHelper {
                             "resolvePhantomEnergy_" + asyncID,
                             StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(asyncID))));
                 }
-                String msg =
-                        player.getRepresentation() + " choose the ship type to use your phantom energy ability on.";
+                String msg = player.getRepresentation() + " choose the ship type to use **Phantom Energy** on.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             }
         }
@@ -5136,7 +5136,7 @@ public class ButtonHelper {
         game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " has used the phantom energy ability on the "
+                player.getRepresentation() + " has used **Phantom Energy** on the "
                         + Mapper.getUnitBaseTypeFromAsyncID(asyncID) + " ship type.");
         deleteMessage(event);
     }
@@ -5478,7 +5478,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (player.hasUnlockedBreakthrough("augersbt")) {
+        if (player.hasUnlockedBreakthrough("augersbt") && buttons.size() > 0) {
             buttons.add(Buttons.green(
                     "draw_1_ACDelete", "Draw 1 Action Card Instead (Breakthrough)", FactionEmojis.augers));
         }
@@ -5653,11 +5653,39 @@ public class ButtonHelper {
                 resolveCombatRoll(nokar, game, event, buttonID, false);
             }
         }
+
         String[] idInfo = buttonID.split("_");
         String pos = idInfo[1];
         String unitHolderName = idInfo[2];
+        String rollTypeString = "";
+        if (idInfo.length > 3) {
+            rollTypeString = idInfo[3];
+        }
+        Tile tile = game.getTileByPosition(pos);
+
+        if (tile.isScar()) {
+            String message = "";
+            switch (rollTypeString) {
+                case "afb" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use ANTI-FIGHTER BARRAGE (or any other unit abilities) in an entropic scar.";
+                case "bombardment" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use BOMBARDMENT (or any other unit abilities) in an entropic scar.";
+                case "spacecannonoffence" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use SPACE CANNON (or any other unit abilities) in or against an entropic scar.";
+                case "spacecannondefence" ->
+                    message = player.getRepresentation()
+                            + ", you cannot use SPACE CANNON (or any other unit abilities) in an entropic scar.";
+                default -> {}
+            }
+            if (!message.isEmpty()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                return;
+            }
+        }
         if (!player.getAllianceMembers().isEmpty() && first) {
-            Tile tile = game.getTileByPosition(pos);
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != player && player.getAllianceMembers().contains(p2.getFaction())) {
                     if ("space".equalsIgnoreCase(unitHolderName)) {
@@ -5672,16 +5700,14 @@ public class ButtonHelper {
                 }
             }
         }
+
         CombatRollType rollType = CombatRollType.combatround;
-        if (idInfo.length > 3) {
-            String rollTypeString = idInfo[3];
-            switch (rollTypeString) {
-                case "afb" -> rollType = CombatRollType.AFB;
-                case "bombardment" -> rollType = CombatRollType.bombardment;
-                case "spacecannonoffence" -> rollType = CombatRollType.SpaceCannonOffence;
-                case "spacecannondefence" -> rollType = CombatRollType.SpaceCannonDefence;
-                default -> {}
-            }
+        switch (rollTypeString) {
+            case "afb" -> rollType = CombatRollType.AFB;
+            case "bombardment" -> rollType = CombatRollType.bombardment;
+            case "spacecannonoffence" -> rollType = CombatRollType.SpaceCannonOffence;
+            case "spacecannondefence" -> rollType = CombatRollType.SpaceCannonDefence;
+            default -> {}
         }
         if (buttonID.contains("deleteTheseButtons") && event instanceof ButtonInteractionEvent bevent) {
             deleteAllButtons(bevent);
@@ -5880,14 +5906,14 @@ public class ButtonHelper {
     public static void addNewSCs(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useNewSCs", "Yes");
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "This game will use the new Construction and Warfare SCs");
+                event.getChannel(), "This game will use the new **Construction** and **Warfare** strategy cards.");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("addNewRelics")
     public static void addNewRelics(Game game, ButtonInteractionEvent event) {
         game.setStoredValue("useNewRelics", "Yes");
-        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the new TE Relics");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game will use the Thunder's Edge relics");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -6582,6 +6608,8 @@ public class ButtonHelper {
                     name = "The Council Keleres";
                 }
                 if (factionsComplete.contains(factionId)) continue;
+                if (!game.isTwilightsFallMode() && faction.getSource() == ComponentSource.twilights_fall) continue;
+                if (game.isTwilightsFallMode() && faction.getSource() != ComponentSource.twilights_fall) continue;
                 buttons.add(Buttons.green(
                         "setupStep2_" + userId + "_" + factionId, name, FactionEmojis.getFactionIcon(factionId)));
             }
@@ -7370,11 +7398,15 @@ public class ButtonHelper {
                         ? nextPlayer.getRepresentationUnfogged()
                         : nextPlayer.getRepresentationNoPing();
                 int numUnpassed = -2;
+                boolean anyPassed = false;
                 for (Player p2 : game.getPlayers().values()) {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                    anyPassed |= p2.isPassed() || p2.isEliminated();
                 }
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0) {
+                if (!anyPassed) {
+                    msgExtra += "All players are yet to pass.";
+                } else if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
                 } else {
                     msgExtra +=
@@ -8177,6 +8209,6 @@ public class ButtonHelper {
     public static void autoProveEndurance(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
         deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Successfully logged response.");
     }
 }

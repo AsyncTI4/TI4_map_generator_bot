@@ -201,7 +201,7 @@ public class TeHelperActionCards {
 
         String unitMessage = "infantry".equals(unit) ? "an infantry" : "a mech";
         String message = player.getRepresentation() + " crashed " + unitMessage + " onto the planet of "
-                + Helper.getPlanetRepresentation(planet, game);
+                + Helper.getPlanetRepresentation(planet, game) + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
         ButtonHelperAbilities.oceanBoundCheck(game);
@@ -220,9 +220,9 @@ public class TeHelperActionCards {
                         Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "loseAFleetCultural", "Lose a fleet token"));
-        String message =
-                player.getRepresentation() + " After reaching agreement, choose the planet that you will coexist on.";
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "loseAFleetCultural", "Lose A Fleet Token"));
+        String message = player.getRepresentation()
+                + ", after reaching an agreement, please choose the planet that you will coexist on.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
 
         buttons = new ArrayList<>();
@@ -235,7 +235,8 @@ public class TeHelperActionCards {
             }
         }
         buttons.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "loseAFleetCultural", "Lose a fleet token"));
-        message = p2.getRepresentation() + " After reaching agreement, choose the planet that you will coexist on.";
+        message = p2.getRepresentation()
+                + ", after reaching and agreement, please choose the planet that you will coexist on.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
 
         ButtonHelper.deleteMessage(event);
@@ -250,7 +251,7 @@ public class TeHelperActionCards {
         game.removeStoredValue("coexistFlag");
 
         String message = player.getRepresentation() + " placed an infantry into coexistence on the planet of "
-                + Helper.getPlanetRepresentation(planet, game);
+                + Helper.getPlanetRepresentation(planet, game) + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
         ButtonHelperAbilities.oceanBoundCheck(game);
@@ -266,7 +267,7 @@ public class TeHelperActionCards {
     @ButtonHandler("overruleStart")
     private static void resolveOverrule(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = getOverruleButtons(game);
-        String message = "Choose the SC you wish to do the primary of.";
+        String message = "Choose the strategy card you wish to perform the primary of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -276,20 +277,20 @@ public class TeHelperActionCards {
         List<Button> buttons = new ArrayList<>();
 
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
-            buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain CCs", CardEmojis.SC1));
+            buttons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens", CardEmojis.SC1));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            buttons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
-            buttons.add(Buttons.green("construction_spacedock", "Place A SD", UnitEmojis.spacedock));
-            buttons.add(Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds));
+            buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
+            buttons.add(Buttons.green("construction_pds", "Place A PDS", UnitEmojis.pds));
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
-            buttons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+            buttons.add(Buttons.green("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
         if (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6)) {
             buttons.add(Buttons.green("warfareBuild", "Build At Home", CardEmojis.SC6));
@@ -298,16 +299,13 @@ public class TeHelperActionCards {
             buttons.add(Buttons.GET_A_TECH.withEmoji(CardEmojis.SC7.asEmoji()));
         }
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
-            buttons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+            buttons.add(Buttons.green("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
 
-        String message = "Resolve strategize using the buttons. ";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("spendAStratCC", "Spend a Strategy CC"));
-        buttons.add(Buttons.red("deleteButtons", "Done resolving"));
-        message = "## Unless you are resolving leadership, please spend a strategy command token. ";
+        String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons."
+                + " You __must__ spend a token from your strategy pool, unless you are resolving **Leadership**.";
+        buttons.add(Buttons.blue("spendAStratCC", "Spend a Strategy Token"));
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -338,7 +336,7 @@ public class TeHelperActionCards {
                 .toList();
 
         String prefix = player.finChecker() + "teMercenaryContract_";
-        String message = player.getRepresentation() + " choose a planet to place 2 neutral infantry on:";
+        String message = player.getRepresentation() + ", please choose a planet to place 2 neutral infantry on.";
         Player neutral = game.getPlayerFromColorOrFaction("neutral");
         if (neutral == null) {
             List<String> unusedColors =
@@ -361,8 +359,8 @@ public class TeHelperActionCards {
             Tile tile = game.getTileFromPlanet(planet);
             resolvePiratesGeneric(event, game, player, tile, "2 inf " + planet);
             player.setTg(player.getTg() - 2);
-            String message = player.getRepresentation() + " paid some mercenaries 2tg to post up at "
-                    + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getRepresentation() + " paid some mercenaries 2 trade goods to post up at "
+                    + Helper.getPlanetRepresentation(planet, game) + ".";
             if (tile != null && tile.getPosition().contains("frac")) {
                 Planet uh = game.getUnitHolderFromPlanet(planet);
                 if (uh != null) {
@@ -427,12 +425,12 @@ public class TeHelperActionCards {
             Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), "Use buttons to pay the kind pirates", buttons);
+                    player.getCorrectChannel(), "Please pay the kind pirates.", buttons);
         } else {
             if (cost == 0) {
                 message += "\n-# This one is free :)";
             } else if (player.getTg() < cost) {
-                message += "\n-# Could not automatically deduct TGs, please resolve that manually or undo.";
+                message += "\n-# Could not automatically deduct trade goods, please resolve that manually or undo.";
             } else {
                 message += "\n-# Automatically deducted " + cost + " trade good" + (cost > 1 ? "s " : " ");
                 message += "(" + player.getTg() + "->" + (player.getTg() - cost) + ")";
@@ -464,7 +462,7 @@ public class TeHelperActionCards {
             resolvePiratesGeneric(event, game, player, tile, "dd");
 
             String message = player.getRepresentation() + " paid a pirate to post up at "
-                    + tile.getRepresentationForButtons(game, player);
+                    + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         });
@@ -486,7 +484,7 @@ public class TeHelperActionCards {
             resolvePiratesGeneric(event, game, player, tile, "2 dd, cr");
 
             String message = player.getRepresentation() + " hired 2 neutral destroyers and a cruiser to post up at "
-                    + tile.getRepresentationForButtons(game, player);
+                    + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         });
@@ -508,7 +506,7 @@ public class TeHelperActionCards {
             resolvePiratesGeneric(event, game, player, tile, "cv, ca, dd, 2 ff");
 
             String message = player.getRepresentation() + " paid a fleet of pirates to post up at "
-                    + tile.getRepresentationForButtons(game, player);
+                    + tile.getRepresentationForButtons(game, player) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         });
@@ -543,7 +541,7 @@ public class TeHelperActionCards {
                 String id = "resolveBrillianceUnlock_" + p.getFaction();
                 String label = "Unlock " + p.getBreakthroughModel().getName();
                 if (lockedCount > 1) {
-                    label = "Unlock " + p.getFactionModel().getShortName() + "'s Breakthroughs";
+                    label = "Unlock Breakthrough Of " + p.getFactionModel().getShortName();
                 }
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             }

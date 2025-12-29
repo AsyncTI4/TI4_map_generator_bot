@@ -2,7 +2,7 @@
     {
         "alias": "belkoseabt",
         "name": "Trinity Stockpile",
-        "displayName": "Trinity\nStockpile",
+        "shortName": "Trinity\nStockpile",
         "faction": "belkosea",
         "synergy": [
             "PROPULSION",
@@ -14,7 +14,7 @@
     {
         "alias": "uydaibt",
         "name": "Prescient Warriors",
-        "displayName": "Prescient\nWarriors",
+        "shortName": "Prescient\nWarriors",
         "faction": "uydai",
         "synergy": [
             "PROPULSION",
@@ -26,7 +26,7 @@
     {
         "alias": "pharadnbt",
         "name": "Hidden Vaults",
-        "displayName": "Hidden\nVaults",
+        "shortName": "Hidden\nVaults",
         "faction": "pharadn",
         "synergy": [
             "CYBERNETIC",
@@ -38,7 +38,7 @@
     {
         "alias": "qhetbt",
         "name": "Duranium Outfitting",
-        "displayName": "Duranium\nOutfitting",
+        "shortName": "Duranium\nOutfitting",
         "faction": "qhet",
         "synergy": [
             "WARFARE",
@@ -50,7 +50,7 @@
     {
         "alias": "atokerabt",
         "name": "Panoply Animus",
-        "displayName": "Panoply\nAnimus",
+        "shortName": "Panoply\nAnimus",
         "faction": "atokera",
         "synergy": [
             "CYBERNETIC",
@@ -62,7 +62,7 @@
     {
         "alias": "toldarbt",
         "name": "Dyrun's War-Bell",
-        "displayName": "Dyrun's\nWar-Bell",
+        "shortName": "Dyrun's\nWar-Bell",
         "faction": "toldar",
         "synergy": [
             "CYBERNETIC",

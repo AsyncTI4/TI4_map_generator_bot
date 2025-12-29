@@ -448,7 +448,7 @@ class AgendaResolveButtonHandler {
         Player executiveOrderPlayer = game.getPlayerFromColorOrFaction(game.getStoredValue("executiveOrder"));
         if (executiveOrderPlayer != null) {
             voteMessage = executiveOrderPlayer.getRepresentation()
-                    + " use the buttons to proceed after fully resolving the agenda:";
+                    + ", please use this buttons to proceed after fully resolving the agenda.";
             buttons = StartTurnService.getStartOfTurnButtons(executiveOrderPlayer, game, true, event);
             game.removeStoredValue("executiveOrder");
             game.updateActivePlayer(executiveOrderPlayer);

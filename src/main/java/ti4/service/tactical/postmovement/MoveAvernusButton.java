@@ -20,7 +20,7 @@ public final class MoveAvernusButton implements PostMovementAbilityButton {
     public List<Button> build(PostMovementButtonContext ctx) {
         return List.of(Buttons.blue(
                 ctx.player.finChecker() + "moveAvernus_" + ctx.game.getActiveSystem(),
-                "Move Avernus into this system",
+                "Move Avernus Into This System",
                 FactionEmojis.Muaat));
     }
 }

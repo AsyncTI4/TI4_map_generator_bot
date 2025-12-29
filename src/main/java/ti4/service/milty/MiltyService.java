@@ -724,7 +724,7 @@ public class MiltyService {
                         "Do Rapid Mobilization For " + player.getFaction()));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        "You cannot do Rapid Mobilization now, but once the map is setup, you can click this button to do so.",
+                        "You cannot do _Rapid Mobilization_ __yet__, but once the map is setup, you can use this button to do so.",
                         buttons);
             }
         }

@@ -2275,9 +2275,9 @@ public class ButtonHelperAbilities {
 
         String prefix = player.getFinsFactionCheckerPrefix() + "starforge" + (free ? "Free" : "") + "_";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red(prefix + "destroyer_" + pos, "Starforge Destroyer", UnitEmojis.destroyer));
-        buttons.add(Buttons.red(prefix + "fighters_" + pos, "Starforge 2 Fighters", UnitEmojis.fighter));
-        String message = "Use the buttons to select what you would like to starforge.";
+        buttons.add(Buttons.red(prefix + "destroyer_" + pos, "Star Forge Destroyer", UnitEmojis.destroyer));
+        buttons.add(Buttons.red(prefix + "fighters_" + pos, "Star Forge 2 Fighters", UnitEmojis.fighter));
+        String message = "Please choose which units you wish to **Star Forge**.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }

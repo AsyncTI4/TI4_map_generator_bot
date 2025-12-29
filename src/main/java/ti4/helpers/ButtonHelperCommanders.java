@@ -483,8 +483,9 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation()
-                        + " using Sai Seravus, the Creuss commander. (Placing a total of "
-                        + player.getGhostCommanderCounter() + " fighters over the course of this game)");
+                        + " using Sai Seravus, the Creuss commander.\n-# " + player.getFactionEmoji()
+                        + " has placed a total of " + player.getGhostCommanderCounter()
+                        + " fighters over the course of this game.");
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")

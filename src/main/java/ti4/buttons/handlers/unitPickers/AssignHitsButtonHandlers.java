@@ -61,9 +61,10 @@ class AssignHitsButtonHandlers {
                     }
 
                     String verb = remove ? " removed " : " destroyed ";
+                    String plural = (amt == 1 || "infantry".equalsIgnoreCase(type.humanReadableName())) ? "" : "s";
                     String msg = player.getRepresentationNoPing() + verb + amt + " "
                             + (prefersState ? state.humanDescr() + " " : "")
-                            + type.humanReadableName().toLowerCase();
+                            + type.humanReadableName().toLowerCase() + plural;
                     msg += (planetName != null && holder != null
                                     ? " on " + holder.getRepresentation(game)
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
@@ -192,14 +193,16 @@ class AssignHitsButtonHandlers {
                             planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
                     if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
 
+                    String plural = (amt == 1 || "infantry".equalsIgnoreCase(type.humanReadableName())) ? "" : "s";
                     String msg = player.getRepresentationNoPing() + " sustained " + amt + " "
-                            + (prefersState ? state.humanDescr() : "") + type.humanReadableName();
+                            + (prefersState ? state.humanDescr() : "")
+                            + type.humanReadableName().toLowerCase() + plural;
                     msg += (planetName != null && holder != null
                                     ? " on " + holder.getRepresentation(game)
                                     : " in tile " + tile.getRepresentationForButtons(game, player))
                             + ".";
                     if (player.hasTech("nes"))
-                        msg += "\n> - These sustains cancel 2 hits due to _Non-Euclidean Shielding_.";
+                        msg += "\n> These sustains cancel 2 hits due to _Non-Euclidean Shielding_.";
                     String assignHitsType = getAssignHitsType(game, player);
                     List<Button> systemButtons =
                             ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);

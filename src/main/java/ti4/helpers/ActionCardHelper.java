@@ -774,7 +774,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " You can use this button to pick up the Sabo'd card from the discard, per Wild Wild Galaxy",
+                                + ", please pick up the Sabo'd card from the discard, per the _Wild Wild Galaxy_ galactic event.",
                         List.of(codex1));
             }
         } else {

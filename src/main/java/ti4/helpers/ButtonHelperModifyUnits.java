@@ -1219,7 +1219,7 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
                         player.getRepresentation(true, true)
-                                + " you may use this button to return Naalu fighters to space after combat concludes. This only needs to be done once. Reminder you can't take over a planet with only fighters.",
+                                + " you may use this button to return fighters to space after combat concludes. This only needs to be done once.",
                         b2s);
             }
         }
@@ -1602,19 +1602,19 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         player.getFactionEmoji()
-                                + " did not place a command token in system they retreated to due to the Eusosociality ability.");
+                                + " did not place a command token in system they retreated to due to **Eusosociality**.");
             } else {
                 if (game.isTwilightsFallMode() && buttonID.contains("skilled") && buttonID.contains("feint")) {
                     MessageHelper.sendMessageToChannel(
                             event.getMessageChannel(),
                             player.getFactionEmoji()
-                                    + " did not place a command token in system they retreated to due to Feint ability.");
+                                    + " did not place a command token in system they retreated to due to the _Feint_ action card.");
                 } else {
                     if (game.isWildWildGalaxyMode() && buttonID.contains("skilled")) {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 player.getFactionEmoji()
-                                        + " did not place a command token in system they retreated to due to the Wild Wild Galaxy Event.");
+                                        + " did not place a command token in system they retreated to due to _Skilled Retreat_ being buffed by _Wild Wild Galaxy_ galactic event.");
                     } else {
                         CommandCounterHelper.addCC(event, player, tile2, true);
                         Helper.isCCCountCorrect(player);
@@ -1858,7 +1858,8 @@ public class ButtonHelperModifyUnits {
                             "Build Up To " + solBtLimit + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
-                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline.  [Note: Finish your normal build first for best results.]";
+                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value), using _Bellum Gloriosum_. Use buttons to resolve or decline."
+                            + "\n-# Note: Finish your normal build first for best results.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons2);
                 }
             }
@@ -2223,7 +2224,8 @@ public class ButtonHelperModifyUnits {
                                     + " Ground Forces and Fighters"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = player.getRepresentation()
-                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using sol's breakthrough ability. Use buttons to resolve or decline. [Note: Finish your normal build first for best results.]";
+                            + " you have the opportunity to produce ground forces and fighters (a number up to the recently produced ships capacity value) using _Bellum Gloriosum_. Use buttons to resolve or decline."
+                            + "\n-# Note: Finish your normal build first for best results.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons2);
                 }
             }
@@ -2251,7 +2253,8 @@ public class ButtonHelperModifyUnits {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " readied the planet "
-                                + Helper.getPlanetRepresentation(planetName, game) + " per hero ability.");
+                                + Helper.getPlanetRepresentation(planetName, game)
+                                + " with _Planetary Defense Nexus_.");
                 PlanetService.refreshPlanet(player, planetName);
             }
         }

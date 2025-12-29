@@ -2,6 +2,7 @@
     {
         "alias": "arborecbt",
         "name": "Psychospore",
+        "shortName": "Psycho-\nspore",
         "faction": "arborec",
         "synergy": [
             "BIOTIC",
@@ -13,7 +14,7 @@
     {
         "alias": "argentbt",
         "name": "Wing Transfer",
-        "displayName": "Wing\nTransfer",
+        "shortName": "Wing\nTransfer",
         "faction": "argent",
         "synergy": [
             "PROPULSION",
@@ -25,7 +26,7 @@
     {
         "alias": "empyreanbt",
         "name": "Void Tether",
-        "displayName": "Void\nTether",
+        "shortName": "Void\nTether",
         "faction": "empyrean",
         "synergy": [
             "PROPULSION",
@@ -37,7 +38,7 @@
     {
         "alias": "letnevbt",
         "name": "Gravleash Maneuvers",
-        "displayName": "Gravleash\nManeuvers",
+        "shortName": "Gravleash\nManeuvers",
         "faction": "letnev",
         "synergy": [
             "PROPULSION",
@@ -49,7 +50,7 @@
     {
         "alias": "muaatbt",
         "name": "Stellar Genesis",
-        "displayName": "Stellar\nGenesis",
+        "shortName": "Stellar\nGenesis",
         "faction": "muaat",
         "synergy": [
             "CYBERNETIC",
@@ -61,7 +62,7 @@
     {
         "alias": "cabalbt",
         "name": "Al'Raith Ix Ianovar",
-        "displayName": "Al'Raith\nIx Ianovar",
+        "shortName": "Al'Raith\nIx Ianovar",
         "faction": "cabal",
         "synergy": [
             "BIOTIC",
@@ -73,7 +74,7 @@
     {
         "alias": "l1z1xbt",
         "name": "Fealty Uplink",
-        "displayName": "Fealty\nUplink",
+        "shortName": "Fealty\nUplink",
         "faction": "l1z1x",
         "synergy": [
             "BIOTIC",
@@ -85,7 +86,7 @@
     {
         "alias": "sardakkbt",
         "name": "N'orr Supremacy",
-        "displayName": "N'orr\nSupremacy",
+        "shortName": "N'orr\nSupremacy",
         "faction": "sardakk",
         "synergy": [
             "PROPULSION",
@@ -97,7 +98,7 @@
     {
         "alias": "solbt",
         "name": "Bellum Gloriosum",
-        "displayName": "Bellum\nGloriosum",
+        "shortName": "Bellum\nGloriosum",
         "faction": "sol",
         "synergy": [
             "BIOTIC",
@@ -120,7 +121,7 @@
     {
         "alias": "yinbt",
         "name": "Yin Ascendant",
-        "displayName": "Yin\nAscendant",
+        "shortName": "Yin\nAscendant",
         "faction": "yin",
         "synergy": [
             "BIOTIC",
@@ -132,7 +133,7 @@
     {
         "alias": "ghostbt",
         "name": "Particle Synthesis",
-        "displayName": "Particle\nSynthesis",
+        "shortName": "Particle\nSynthesis",
         "faction": "ghost",
         "synergy": [
             "PROPULSION",
@@ -144,7 +145,7 @@
     {
         "alias": "hacanbt",
         "name": "Auto-Factories",
-        "displayName": "Auto-\nFactories",
+        "shortName": "Auto-\nFactories",
         "faction": "hacan",
         "synergy": [
             "CYBERNETIC",
@@ -156,7 +157,7 @@
     {
         "alias": "mahactbt",
         "name": "Vaults of the Heir",
-        "displayName": "Vaults of\nthe Heir",
+        "shortName": "Vaults of\nthe Heir",
         "faction": "mahact",
         "synergy": [
             "BIOTIC",
@@ -168,7 +169,7 @@
     {
         "alias": "mentakbt",
         "name": "The Table's Grace",
-        "displayName": "Table's\nGrace",
+        "shortName": "The Table's\nGrace",
         "faction": "mentak",
         "synergy": [
             "BIOTIC",
@@ -180,7 +181,7 @@
     {
         "alias": "nekrobt",
         "name": "Valefar Assimilator Z",
-        "displayName": "Valefar Z",
+        "shortName": "Valefar Z\nAssimilator",
         "faction": "nekro",
         "synergy": [
             "NONE"
@@ -191,7 +192,8 @@
     {
         "alias": "titansbt",
         "name": "Slumberstate Computing",
-        "displayName": "Slumberstate\nComputing",
+        "shortName": "Sl'mb'rst'te\nComputing",
+        "shrinkName": true,
         "faction": "titans",
         "synergy": [
             "BIOTIC",
@@ -203,7 +205,7 @@
     {
         "alias": "xxchabt",
         "name": "Archon's Gift",
-        "displayName": "Archon's\nGift",
+        "shortName": "Archon's\nGift",
         "faction": "xxcha",
         "synergy": [
             "BIOTIC",
@@ -215,7 +217,7 @@
     {
         "alias": "nomadbt",
         "name": "Thunder's Paradox",
-        "displayName": "Thunder's\nParadox",
+        "shortName": "Thunder's\nParadox",
         "faction": "nomad",
         "synergy": [
             "BIOTIC",
@@ -227,7 +229,7 @@
     {
         "alias": "jolnarbt",
         "name": "Specialist Compounds",
-        "displayName": "Specialist\nCompounds",
+        "shortName": "Specialist\nCompounds",
         "faction": "jolnar",
         "synergy": [
             "BIOTIC",
@@ -239,7 +241,7 @@
     {
         "alias": "naalubt",
         "name": "Mindsieve",
-        "displayName": "Mindsieve",
+        "shortName": "Mindsieve",
         "faction": "naalu",
         "synergy": [
             "BIOTIC",
@@ -262,7 +264,7 @@
     {
         "alias": "crimsonbt",
         "name": "Resonance Generator",
-        "displayName": "Resonance\nGenerator",
+        "shortName": "Resonance\nGenerator",
         "faction": "crimson",
         "synergy": [
             "PROPULSION",
@@ -274,7 +276,7 @@
     {
         "alias": "naazbt",
         "name": "Absolute Synergy",
-        "displayName": "Absolute\nSynergy",
+        "shortName": "Absolute\nSynergy",
         "faction": "naaz",
         "synergy": [
             "PROPULSION",
@@ -297,7 +299,7 @@
     {
         "alias": "deepwroughtbt",
         "name": "Visionaria Select",
-        "displayName": "Visionaria\nSelect",
+        "shortName": "Visionaria\nSelect",
         "faction": "deepwrought",
         "synergy": [
             "BIOTIC",
@@ -320,7 +322,7 @@
     {
         "alias": "ralnelbt",
         "name": "Data Skimmer",
-        "displayName": "Data\nSkimmer",
+        "shortName": "Data\nSkimmer",
         "faction": "ralnel",
         "synergy": [
             "BIOTIC",
@@ -332,7 +334,7 @@
     {
         "alias": "saarbt",
         "name": "Deorbit Barrage",
-        "displayName": "Deorbit\nBarrage",
+        "shortName": "Deorbit\nBarrage",
         "faction": "saar",
         "synergy": [
             "PROPULSION",
@@ -344,7 +346,7 @@
     {
         "alias": "yssarilbt",
         "name": "Deepgloom Executable",
-        "displayName": "Deepgloom\nExecutable",
+        "shortName": "Deepgloom\nExecutable",
         "faction": "yssaril",
         "synergy": [
             "BIOTIC",
@@ -356,7 +358,7 @@
     {
         "alias": "keleresbt",
         "name": "I.I.H.Q. Modernization",
-        "displayName": "I.I.H.Q.",
+        "shortName": "I.I.H.Q.\nModernize",
         "faction": "keleres",
         "synergy": [
             "BIOTIC",

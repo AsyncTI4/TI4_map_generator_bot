@@ -72,7 +72,7 @@ public class NewStuffHelper {
                 buttonsToUse.add(nextPage);
             }
             if (extraButtons != null) buttonsToUse.addAll(extraButtons);
-            if (deleteButton) buttonsToUse.add(Buttons.red("deleteButtons", "Delete these buttons"));
+            if (deleteButton) buttonsToUse.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             return buttonsToUse;
         }
         return allButtons;
@@ -128,7 +128,8 @@ public class NewStuffHelper {
     public static void resolveGarboziaTE(
             GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String buttonPrefix = player.getFinsFactionCheckerPrefix() + "garbozia_";
-        String message = "Use buttons to pick an action card from the discard and put it on Doc 'N Pic's Salvage Yard:";
+        String message =
+                "Use buttons to pick an action card from the discard and put it on _Doc 'N Pic's Salvage Yard_.";
         List<Button> buttons = garboziaButtons(game, player);
         if (checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
@@ -143,9 +144,9 @@ public class NewStuffHelper {
             game.getDiscardACStatus().put(acNum, ACStatus.garbozia);
 
             String msg = player.getRepresentation() + " picked up " + acModel.getName()
-                    + " from the discard and placed it on Doc 'N Pic's Salvage Yard.";
+                    + " from the discard and placed it on _Doc 'N Pic's Salvage Yard_.";
             msg +=
-                    "\n> You can check the cards on garbozia at any time by looking at the Action Card discard pile in the bot map thread";
+                    "You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.deleteMessage(event);
