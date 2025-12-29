@@ -1561,9 +1561,9 @@ public class Player extends PlayerProperties {
 
         Member member = JdaService.guildPrimary.getMemberById(getStatsTrackedUserID());
         if (member == null) {
-            setStatsTrackedUserID(statsTrackedUser.getName());
+            setStatsTrackedUserName(statsTrackedUser.getName());
         } else {
-            setStatsTrackedUserID(member.getEffectiveName());
+            setStatsTrackedUserName(member.getEffectiveName());
         }
         return super.getStatsTrackedUserName();
     }
