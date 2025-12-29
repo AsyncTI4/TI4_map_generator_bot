@@ -568,7 +568,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button4 = ButtonHelperAgents.getTFAwakenButtons(game, tile, player);
         if (player.hasTech("tf-awaken") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged()
-                    + ", you can use these buttons to change an infantry into a PDS using awaken.";
+                    + ", you can use these buttons to change an infantry into a PDS using _Awaken_.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button4);
         }
 

@@ -4970,7 +4970,7 @@ public class ButtonHelper {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
-                                        + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to the legendary planet. This is optional though.");
+                                        + ", due to your _Reclamation_ ability, 1 PDS and 1 space dock have been added to the legendary planet. This is optional though.");
                     }
                 }
             }
@@ -5291,7 +5291,7 @@ public class ButtonHelper {
                 event, game.getTileByPosition(pos), game, player.getColor(), "1 infantry " + planetName);
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "1 pds " + planetName);
         String successMessage = player.getFactionEmoji() + " replaced 1 " + UnitEmojis.infantry + " on "
-                + Helper.getPlanetRepresentation(planetName, game) + " with 1 pds using awaken.";
+                + Helper.getPlanetRepresentation(planetName, game) + " with 1 PDS using _Awaken_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         deleteMessage(event);
     }

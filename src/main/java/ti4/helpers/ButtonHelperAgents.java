@@ -1556,17 +1556,17 @@ public class ButtonHelperAgents {
                             "Spend A Command Token to Ready " + agent));
                     buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                     msg = p2.getRepresentationNoPing()
-                            + " you have the opportunity to spend a command token via _ Temporal Command Suite_ to ready "
+                            + " you have the opportunity to spend a command token via _Temporal Command Suite_ to ready "
                             + agent
-                            + " and potentially resolve a transaction.";
+                            + ", and potentially resolve a transaction.";
                 } else {
                     buttons2.add(Buttons.green(
                             p2.getFinsFactionCheckerPrefix() + "exhaustTCS_" + agent + "_" + player.getFaction(),
                             "Exhaust Temporal Command Suite to Ready " + agent));
                     buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                     msg = p2.getRepresentationNoPing()
-                            + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready " + agent
-                            + " and potentially resolve a transaction.";
+                            + " you have the opportunity to exhaust _Temporal Command Suite_ to ready " + agent
+                            + ", and potentially resolve a transaction.";
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons2);
             }

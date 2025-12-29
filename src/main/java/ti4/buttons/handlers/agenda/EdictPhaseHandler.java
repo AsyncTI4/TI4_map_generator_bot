@@ -83,8 +83,9 @@ public class EdictPhaseHandler {
         int paradigms = Integer.parseInt(buttonID.split("_")[2]);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " has decided to draw " + relics + " extra relic" + (relics == 1 ? "" : "s") + " and " + paradigms
-                        + " extra paradigm" + (paradigms == 1 ? "" : "s") + ".");
+                player.getRepresentationNoPing() + " has decided to draw " + relics + " extra relic"
+                        + (relics == 1 ? "" : "s") + " and " + paradigms + " extra paradigm"
+                        + (paradigms == 1 ? "" : "s") + ".");
         if (relics > 0) {
             RelicHelper.drawWithAdvantage(player, game, 1 + relics);
         } else {
@@ -291,7 +292,8 @@ public class EdictPhaseHandler {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "artificeStep2_" + (x) + "_"
                                         + (vpDifference - x),
-                                "Draw " + x + " Extra Relic" + (x == 1 ? "" : "s") + " and " + (vpDifference - x) + " Extra Paradigm" + (vpDifference - x == 1 ? "" : "s")));
+                                "Draw " + x + " Extra Relic" + (x == 1 ? "" : "s") + " and " + (vpDifference - x)
+                                        + " Extra Paradigm" + (vpDifference - x == 1 ? "" : "s")));
                     }
                 }
             }
@@ -362,9 +364,7 @@ public class EdictPhaseHandler {
             } else {
                 String msg2 = player.getRepresentation()
                         + ", after resolving the edict, use this button to proceed to the strategy phase. This button will ready all cards, and ping the speaker.";
-                Button proceedToStrategyPhase = Buttons.green(
-                        "proceed_to_strategy",
-                        "Proceed to Strategy Phase");
+                Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
             }
         }

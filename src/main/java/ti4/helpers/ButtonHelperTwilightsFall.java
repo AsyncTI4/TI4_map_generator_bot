@@ -544,8 +544,9 @@ public class ButtonHelperTwilightsFall {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " unfortunately, there are no more splice cards remaining."+" Please reimburse yourself any costs associated with the splice, using the `/player cc` command."+" Same for anyone else after you in the splice.");
+                    player.getRepresentation() + " unfortunately, there are no more splice cards remaining."
+                            + " Please reimburse yourself any costs associated with the splice, using the `/player cc` command."
+                            + " Same for anyone else after you in the splice.");
         } else {
             List<MessageEmbed> embeds = getSpliceEmbeds(game, type, cards, player);
             String msg = player.getRepresentationUnfogged() + ", please choose the card you wish to splice.";
@@ -584,7 +585,9 @@ public class ButtonHelperTwilightsFall {
             Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), player.getRepresentation() + ", please pay the 3 resources and 3 influence.", buttons);
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", please pay the 3 resources and 3 influence.",
+                    buttons);
         }
         if (splice == 6) {
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -645,7 +648,8 @@ public class ButtonHelperTwilightsFall {
                 && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech, UnitType.Flagship)
                         .isEmpty()) {
             String message = player.getRepresentationUnfogged()
-                    + ", please resolve your mech and flagship abilities using these buttons. "+"Each mech triggers once, and the flagship has to do convert 2 commodities or gain 2 commodities.";
+                    + ", please resolve your mech and flagship abilities using these buttons. "
+                    + "Each mech triggers once, and the flagship has to do convert 2 commodities or gain 2 commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
@@ -963,11 +967,13 @@ public class ButtonHelperTwilightsFall {
     public static void addMagusSpliceCard(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("paid6ForSplice", "yes");
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "The **Magus** holder has chosen to pay the 3 resources and 3 influence for an extra draw.");
+                player.getCorrectChannel(),
+                "The **Magus** holder has chosen to pay the 3 resources and 3 influence for an extra draw.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
         Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Please pay the 3 resources and 3 influence.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(), "Please pay the 3 resources and 3 influence.", buttons);
     }
 
     public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, boolean scPara) {

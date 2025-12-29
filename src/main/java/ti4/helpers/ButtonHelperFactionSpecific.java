@@ -1410,7 +1410,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentationUnfogged() + " pay 3r for the mech", options);
+                event.getMessageChannel(), player.getRepresentationUnfogged() + ", please pay 3 resources for the mech.", options);
     }
 
     @ButtonHandler("rohdhnaDeploy_")

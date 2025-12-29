@@ -796,7 +796,7 @@ public class PlayerTechService {
                 .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
                 .map(p1 -> Buttons.gray(
                         "useDwsDiscount_" + p1.getFaction(),
-                        "Use " + p1.getFaction() + "'s DWS Commander Discount",
+                        "Use Aello Discount, Generating Money For " + p1.getFaction(),
                         p1.getFactionEmoji()))
                 .toList();
         if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {

@@ -1626,8 +1626,8 @@ public class UnfiledButtonHandlers {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.getFaction().equals(faction)) {
                     game.setSpeakerUserID(player_.getUserID());
-                    String message =
-                            MiscEmojis.SpeakerToken + " Speaker has been assigned to " + player_.getRepresentation(false, true) + ".";
+                    String message = MiscEmojis.SpeakerToken + " Speaker has been assigned to "
+                            + player_.getRepresentation(false, true) + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     if (!game.isFowMode()) {
                         ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
@@ -1647,8 +1647,8 @@ public class UnfiledButtonHandlers {
         for (Player player_ : game.getPlayers().values()) {
             if (player_.getFaction().equals(faction)) {
                 game.setSpeakerUserID(player_.getUserID());
-                String message =
-                        MiscEmojis.SpeakerToken + " Speaker has been assigned to " + player_.getRepresentation(false, true) + ".";
+                String message = MiscEmojis.SpeakerToken + " Speaker has been assigned to "
+                        + player_.getRepresentation(false, true) + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
@@ -1675,8 +1675,8 @@ public class UnfiledButtonHandlers {
         for (Player player_ : game.getPlayers().values()) {
             if (player_.getFaction().equals(faction)) {
                 game.setTyrantUserID(player_.getUserID());
-                String message =
-                        MiscEmojis.BenedictionToken + " Tyrant has been assigned to " + player_.getRepresentation(false, true) + ".";
+                String message = MiscEmojis.BenedictionToken + " Tyrant has been assigned to "
+                        + player_.getRepresentation(false, true) + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);

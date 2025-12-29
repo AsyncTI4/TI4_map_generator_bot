@@ -450,7 +450,7 @@ public class AddPlanetService {
                     FactionEmojis.Bastion));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    "Resolve Liberate on " + planetName + " (Before OR after exploration)",
+                    "Please resolve **Liberate** on " + planetName + " (before __or__ after exploration).",
                     liberateButtons);
         }
 
