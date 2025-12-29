@@ -51,6 +51,42 @@ import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTwilightsFall {
 
+    public static boolean checkForQueuedSplicePick(Player privatePlayer, Game game) {
+        Player player = privatePlayer;
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
+        if (!alreadyQueued.isEmpty()) {
+            String unpickedSpliceCard = "";
+            for (String spliceCard : alreadyQueued.split("_")) {
+                if (!player.isNpc()) {
+                    game.setStoredValue(
+                            player.getFaction() + "splicequeue",
+                            game.getStoredValue(player.getFaction() + "splicequeue")
+                                    .replace(spliceCard + "_", ""));
+                }
+                List<String> cards = getSpliceCards(game);
+                boolean held = !cards.contains(spliceCard)
+                        && !spliceCard.equalsIgnoreCase("antimatter")
+                        && !spliceCard.equalsIgnoreCase("wavelength");
+                if (held) continue;
+                unpickedSpliceCard = spliceCard;
+                break;
+            }
+            if (unpickedSpliceCard.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        "Tried to pick your queued splice card, but they were all already taken.");
+                return false;
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        privatePlayer.getCorrectChannel(),
+                        privatePlayer.getRepresentation(false, false) + " had queued a splice pick.");
+                selectASpliceCard(game, player, "selectASpliceCard_" + unpickedSpliceCard, null);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static List<Button> getQueueSplicePickButtons(Game game, Player player) {
         String type = game.getStoredValue("spliceType");
         List<String> cards = getSpliceCards(game);
@@ -85,7 +121,8 @@ public class ButtonHelperTwilightsFall {
                 String name = "";
                 if (cardID.equalsIgnoreCase("wavelength") || cardID.equalsIgnoreCase("antimatter")) {
                     name = Mapper.getTech(cardID).getName();
-                    spliceEmoji = Mapper.getTech(cardID).getFaction().orElse("neutral");
+                    String faction = player.getFaction();
+                    spliceEmoji = Mapper.getFaction(faction).getFactionEmoji();
                 } else {
                     if ("ability".equalsIgnoreCase(type)) {
                         name = Mapper.getTech(cardID).getName();
@@ -781,7 +818,6 @@ public class ButtonHelperTwilightsFall {
             participants.remove(player);
             game.removeStoredValue("savedParticipants");
             if (!participants.isEmpty()) {
-                sendPlayerSpliceOptions(game, participants.getFirst());
                 for (Player p : participants) {
                     if (game.getStoredValue("savedParticipants").isEmpty()) {
                         game.setStoredValue("savedParticipants", p.getFaction());
@@ -789,6 +825,9 @@ public class ButtonHelperTwilightsFall {
                         game.setStoredValue(
                                 "savedParticipants", game.getStoredValue("savedParticipants") + "_" + p.getFaction());
                     }
+                }
+                if (!checkForQueuedSplicePick(participants.getFirst(), game)) {
+                    sendPlayerSpliceOptions(game, participants.getFirst());
                 }
             } else {
                 MessageHelper.sendMessageToChannel(
