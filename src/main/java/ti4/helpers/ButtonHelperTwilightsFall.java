@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -49,6 +50,120 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.unit.AddUnitService;
 
 public class ButtonHelperTwilightsFall {
+
+    public static List<Button> getQueueSplicePickButtons(Game game, Player player) {
+        String type = game.getStoredValue("spliceType");
+        List<String> cards = getSpliceCards(game);
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
+        for (String cardID : alreadyQueued.split("_")) {
+            cards.remove(cardID);
+        }
+        return getSpliceButtons(game, type, cards, player, "queueSplicePick_");
+    }
+
+    public static String getQueueSpliceMessage(Game game, Player player) {
+        int number = getParticipantsList(game).indexOf(player) + 1;
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
+        int numQueued = alreadyQueued.split("_").length;
+        if (alreadyQueued.isEmpty()) {
+            numQueued = 0;
+        }
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you are #" + number
+                + " pick in this splice and so can queue " + number + " cards."
+                + " So far you have queued " + numQueued + " cards. ");
+        if (numQueued > 0) {
+            msg.append(
+                    "The queued splice cards are as follows (in the order the bot will attempt to select them for you):\n");
+            int count = 1;
+            for (String cardID : alreadyQueued.split("_")) {
+                if (cardID.isEmpty()) {
+                    continue;
+                }
+                String type = game.getStoredValue("spliceType");
+                String spliceEmoji = null;
+                String name = "";
+                if (cardID.equalsIgnoreCase("wavelength") || cardID.equalsIgnoreCase("antimatter")) {
+                    name = Mapper.getTech(cardID).getName();
+                    spliceEmoji = Mapper.getTech(cardID).getFaction().orElse("neutral");
+                } else {
+                    if ("ability".equalsIgnoreCase(type)) {
+                        name = Mapper.getTech(cardID).getName();
+                        String faction = Mapper.getTech(cardID).getFaction().orElse("neutral");
+                        if (faction.contains("keleres")) {
+                            faction = "keleresm";
+                        }
+                        spliceEmoji = Mapper.getFaction(faction).getFactionEmoji();
+                    }
+                    if ("genome".equalsIgnoreCase(type)) {
+                        name = Mapper.getLeader(cardID).getTFNameIfAble();
+                        String faction = Mapper.getLeader(cardID).getFaction();
+                        if (faction.contains("keleres")) {
+                            faction = "keleresm";
+                        }
+                        spliceEmoji = Mapper.getFaction(faction).getFactionEmoji();
+                    }
+                    if ("units".equalsIgnoreCase(type)) {
+                        name = Mapper.getUnit(cardID).getName();
+                        String faction = Mapper.getUnit(cardID).getFaction().orElse("neutral");
+                        if (faction.contains("keleres")) {
+                            faction = "keleresm";
+                        }
+                        spliceEmoji = Mapper.getFaction(faction).getFactionEmoji();
+                    }
+                }
+                msg.append(count)
+                        .append(". ")
+                        .append(name)
+                        .append(" ")
+                        .append(spliceEmoji)
+                        .append("\n");
+            }
+        }
+        return msg.toString();
+    }
+
+    @ButtonHandler("queueSplicePick_")
+    public static void queueSplicePick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        if (getParticipantsList(game).getFirst() == player) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    "You are currently up to pick a splice card, and should just do that instead of queueing.");
+            return;
+        }
+        String spliceCard = buttonID.split("_")[1];
+        game.setStoredValue(
+                player.getFaction() + "splicequeue",
+                game.getStoredValue(player.getFaction() + "splicequeue") + spliceCard + "_");
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
+        int number = getParticipantsList(game).indexOf(player) + 1;
+        int numQueued = alreadyQueued.split("_").length;
+        if (alreadyQueued.isEmpty()) {
+            numQueued = 0;
+        }
+        List<Button> buttons = getQueueSplicePickButtons(game, player);
+        String msg = getQueueSpliceMessage(game, player);
+        if (number <= numQueued || (alreadyQueued.contains("antimatter") || alreadyQueued.contains("wavelength"))) {
+            msg +=
+                    "You can use this button to restart if some mistake was made. Otherwise one of these cards should be selected for you when it is your turn to pick a splice card.";
+            buttons = new ArrayList<>();
+            buttons.add(Buttons.gray("restartSpliceQueue", "Restart Queue"));
+        } else {
+            msg +=
+                    "You can use these buttons to queue another card in case all the ones you currently have queued are taken.";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    @ButtonHandler("restartSpliceQueue")
+    public static void restartSpliceQueue(ButtonInteractionEvent event, Game game, Player player) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        game.setStoredValue(player.getFaction() + "splicequeue", "");
+        List<Button> buttons = getQueueSplicePickButtons(game, player);
+        String msg = getQueueSpliceMessage(game, player);
+        msg += "You can use these buttons to queue your splice pick.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
 
     @ButtonHandler("startFrankenSliceBuild")
     public static void startSliceBuild(Game game, GenericInteractionCreateEvent event) {
@@ -353,6 +468,19 @@ public class ButtonHelperTwilightsFall {
         }
 
         sendPlayerSpliceOptions(game, startPlayer);
+        for (Player player2 : getParticipantsList(game)) {
+            if (player2 == startPlayer) {
+                continue;
+            }
+            String msg = player2.getRepresentationUnfogged()
+                    + " in order to speed up the splice, you can now offer the bot a ranked list of your desired"
+                    + " splice cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";
+            MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), msg);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player2.getCardsInfoThread(),
+                    getQueueSpliceMessage(game, player2),
+                    getQueueSplicePickButtons(game, player2));
+        }
     }
 
     public static List<String> getSpliceCards(Game game) {
@@ -885,13 +1013,18 @@ public class ButtonHelperTwilightsFall {
     }
 
     public static List<Button> getSpliceButtons(Game game, String type, List<String> cards, Player player) {
+        return getSpliceButtons(game, type, cards, player, "selectASpliceCard_");
+    }
+
+    public static List<Button> getSpliceButtons(
+            Game game, String type, List<String> cards, Player player, String prefix) {
         List<Button> buttons = new ArrayList<>();
         if ("ability".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 String name = Mapper.getTech(card).getName();
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_" + card,
-                        "Select " + name,
+                        player.getFinsFactionCheckerPrefix() + prefix + card,
+                        name,
                         Mapper.getTech(card).getSingleTechEmoji()));
             }
         }
@@ -904,28 +1037,24 @@ public class ButtonHelperTwilightsFall {
                 }
                 FactionModel factionModel = Mapper.getFaction(faction);
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_" + card,
-                        "Select " + name,
-                        factionModel.getFactionEmoji()));
+                        player.getFinsFactionCheckerPrefix() + prefix + card, name, factionModel.getFactionEmoji()));
             }
         }
         if ("units".equalsIgnoreCase(type)) {
             for (String card : cards) {
                 String name = Mapper.getUnit(card).getName();
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_" + card,
-                        "Select " + name,
+                        player.getFinsFactionCheckerPrefix() + prefix + card,
+                        name,
                         Mapper.getUnit(card).getUnitEmoji()));
             }
         }
         if (!game.getStoredValue("engineerACSplice").startsWith("remove")) {
             if (!player.hasTech("wavelength")) {
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_wavelength", "Select Wavelength"));
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + prefix + "wavelength", "Wavelength"));
             }
             if (!player.hasTech("antimatter")) {
-                buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "selectASpliceCard_antimatter", "Select Antimatter"));
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + prefix + "antimatter", "Antimatter"));
             }
         }
         return buttons;

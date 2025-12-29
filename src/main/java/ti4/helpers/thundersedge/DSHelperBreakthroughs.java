@@ -266,7 +266,7 @@ public class DSHelperBreakthroughs {
         SecretObjectiveModel so = Mapper.getSecretObjective(buttonID.split("_")[2]);
         if (so != null) {
             MessageHelper.sendMessageToChannel(
-                    p1.getCorrectChannel(),
+                    p1.getCardsInfoThread(),
                     "You have shown " + so.getName() + " to " + p2.getFactionNameOrColor() + ".");
             MessageHelper.sendMessageToChannelWithEmbed(
                     p2.getCardsInfoThread(),
@@ -318,10 +318,7 @@ public class DSHelperBreakthroughs {
             Player player = p2;
             for (String planet : target.getPlanetsAllianceMode()) {
                 if (game.getUnitHolderFromPlanet(planet) != null
-                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)
-                        && !ButtonHelper.getPlanetExplorationButtons(
-                                        game, game.getUnitHolderFromPlanet(planet), player, false, true)
-                                .isEmpty()) {
+                        && game.getUnitHolderFromPlanet(planet).hasGroundForces(target)) {
                     buttons.add(Buttons.gray(
                             player.getFinsFactionCheckerPrefix() + "exchangeProgramPart3_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));

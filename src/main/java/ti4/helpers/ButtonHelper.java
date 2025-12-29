@@ -5478,7 +5478,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (player.hasUnlockedBreakthrough("augersbt")) {
+        if (player.hasUnlockedBreakthrough("augersbt") && buttons.size() > 0) {
             buttons.add(Buttons.green(
                     "draw_1_ACDelete", "Draw 1 Action Card Instead (Breakthrough)", FactionEmojis.augers));
         }
