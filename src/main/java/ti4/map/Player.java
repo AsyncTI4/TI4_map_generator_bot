@@ -135,6 +135,8 @@ public class Player extends PlayerProperties {
     public Player(String userID, String userName, Game game) {
         setUserID(userID);
         setUserName(userName);
+        setStatsTrackedUserID(userID);
+        setStatsTrackedUserName(userName);
         this.game = game;
     }
 
@@ -1544,8 +1546,27 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public User getUser() {
+        return getUser(getUserID());
+    }
+
+    private User getUser(String userId) {
         // TODO: This is to handle JDA being null during tests. We should think of a cleaner solution.
-        return JdaService.jda == null ? null : JdaService.jda.getUserById(getUserID());
+        return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getStatsTrackedUserName() {
+        User statsTrackedUser = getUser(getStatsTrackedUserID());
+        if (statsTrackedUser == null) return super.getStatsTrackedUserName();
+
+        Member member = JdaService.guildPrimary.getMemberById(getStatsTrackedUserID());
+        if (member == null) {
+            setStatsTrackedUserName(statsTrackedUser.getName());
+        } else {
+            setStatsTrackedUserName(member.getEffectiveName());
+        }
+        return super.getStatsTrackedUserName();
     }
 
     @Override

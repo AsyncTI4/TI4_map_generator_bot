@@ -114,8 +114,9 @@ public class DiceLuckService {
         for (Player player : game.getRealPlayers()) {
             Map.Entry<Double, Integer> playerDiceLuck =
                     Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
+            String statsTrackedUserId = player.getStatsTrackedUserID();
             playerDiceLucks.merge(
-                    player.getUserID(),
+                    statsTrackedUserId,
                     playerDiceLuck,
                     (oldEntry, newEntry) -> Map.entry(
                             oldEntry.getKey() + playerDiceLuck.getKey(),
@@ -123,7 +124,7 @@ public class DiceLuckService {
 
             if (playerDiceLuck.getKey() == 0) continue;
             Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-            playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+            playerAverageDiceLucks.compute(statsTrackedUserId, (key, value) -> {
                 if (value == null) value = new HashSet<>();
                 value.add(averageDiceLuck);
                 return value;

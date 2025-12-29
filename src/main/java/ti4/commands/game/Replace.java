@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.buttons.Buttons;
+import ti4.buttons.handlers.statistics.StatsTrackingButtonHandler;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -214,6 +216,20 @@ class Replace extends GameStateSubcommand {
         }
 
         game.setReplacementMade(true);
+
+        if (!replacementUser.isBot()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    "Should this game's stats be tracked for you, or the player you replaced?",
+                    List.of(
+                            Buttons.green(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId("me", replacementUser.getId()),
+                                    "Me"),
+                            Buttons.gray(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId(
+                                            "replaced", replacementUser.getId()),
+                                    "Replaced Player")));
+        }
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
                 + replacementUser.getName();
