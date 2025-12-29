@@ -1333,8 +1333,8 @@ public class ButtonHelper {
                     }
                 }
                 if (slumberBonus > 0) {
-                    message += " Drew `" + slumberBonus + "` additional cards for " + FactionEmojis.Titans
-                            + " Slumberstate Computing.";
+                    message += " Drew " + slumberBonus + " additional card" + (slumberBonus == 1 ? "" : "s") + " for "
+                            + FactionEmojis.Titans + " _Slumberstate Computing_.";
                     amount += slumberBonus;
                 }
             }

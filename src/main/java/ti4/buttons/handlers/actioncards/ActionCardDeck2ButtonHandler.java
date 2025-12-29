@@ -81,7 +81,8 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game));
+                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game)
+                        + ".");
     }
 
     @ButtonHandler("resolveBoardingParty")

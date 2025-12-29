@@ -104,7 +104,7 @@ public class StartCombatService {
                     + " or if you are coexisting. Please inform it with the buttons.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
-            buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+            buttons.add(Buttons.green("deleteButtons", "They Are Coexisting"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             return true;
         }
