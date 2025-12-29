@@ -10,6 +10,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
@@ -29,6 +30,7 @@ import ti4.message.logging.BotLogger;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TileEmojis;
+import ti4.service.map.AddTileService;
 import ti4.service.map.FractureService;
 
 @UtilityClass
@@ -59,7 +61,8 @@ public class SilverFlameService {
 
     private void silverFlameDrumroll(Game game, Player flamePlayer, int target) {
         String gameName = game.getName();
-        String watchPartyMsg = flamePlayer.getRepresentation() + " is rolling for the silver flame in " + gameName;
+        String watchPartyMsg =
+                flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + ".";
         watchPartyMsg += "! They are at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp() + " VP!";
         if (flamePlayer.hasRelicReady("heartofixth")) {
             watchPartyMsg += " They have the Heart of Ixth, so only need to roll a 9!";
@@ -160,8 +163,8 @@ public class SilverFlameService {
         }
 
         // Post messages
-        String message =
-                "## " + rep() + " was used to purge the " + player.fogSafeEmoji() + " home system in " + game.getName();
+        String message = "## " + rep() + " was used to purge the " + player.fogSafeEmoji() + " home system in "
+                + game.getName() + ".";
 
         message += "\n" + purgedUnitList;
         DisasterWatchHelper.postTileInFlameWatch(game, event, homeSystem, 0, message);
@@ -175,6 +178,9 @@ public class SilverFlameService {
         }
 
         game.removeTile(homeSystem.getPosition());
+        String planetTileName = AliasHandler.resolveTile("silver_flame");
+        Tile tile = new Tile(planetTileName, homeSystem.getPosition());
+        AddTileService.addTile(game, tile);
         if (!FractureService.isFractureInPlay(game)) {
             FractureService.spawnFracture(null, game);
             FractureService.spawnIngressTokens(null, game, player, null);

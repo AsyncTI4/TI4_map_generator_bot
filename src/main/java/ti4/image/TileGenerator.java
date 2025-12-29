@@ -1111,7 +1111,11 @@ public class TileGenerator {
                 BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                 tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
 
-                for (Planet planet : tile.getPlanetUnitHolders()) {
+                for (UnitHolder uh : tile.getUnitHolders().values()) {
+                    if (!(uh instanceof Planet)) {
+                        continue;
+                    }
+                    Planet planet = (Planet) uh;
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
                     if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {

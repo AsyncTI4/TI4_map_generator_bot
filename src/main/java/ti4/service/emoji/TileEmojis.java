@@ -107,6 +107,43 @@ public enum TileEmojis implements TI4Emoji {
     YlirAvarValkKeleres_93,
     MollPrimusKeleres_94,
 
+    // te
+    Ordinian_92,
+    Lizard_93,
+    Sorrow_94,
+    Katena_95,
+    Chronos_96a,
+    Hollow_96b,
+    Faunus_97,
+    Garbozia_98,
+    Emelpar_99,
+    Tempesta_100,
+    Olergodt_101,
+    Andeara_102,
+    ViraPicsIII_103,
+    Lesab_104,
+    Neutera_105,
+    Cresius_106,
+    Tiamat_107,
+    Kostboth_108,
+    Bellatrix_109,
+    Horizon_110,
+    Tarana_111,
+    MecatolL_112,
+    BetaRift_113,
+    EntropicScar_114,
+    Industrex_115,
+    Lemox_116,
+    TheWatchtower_117,
+    AhkCreuxx_118,
+    Cocytus_F1,
+    FracLeftEgr_F2,
+    FracLeftVoid_F3,
+    Styx_F4,
+    FracRightVoid_F5,
+    FracRightEgr_F6,
+    Leth_F7,
+
     // discordant stars
     D01_Rhune,
     D02_Kjalengard,
@@ -270,9 +307,46 @@ public enum TileEmojis implements TI4Emoji {
             case "82b", "82bh" -> MalliceUnlocked_82b;
 
             // Codex 3
-            case "92", "92new" -> ArchonRenTauKeleres_92;
-            case "93", "93new" -> YlirAvarValkKeleres_93;
-            case "94", "94new" -> MollPrimusKeleres_94;
+            case "92new" -> ArchonRenTauKeleres_92;
+            case "93new" -> YlirAvarValkKeleres_93;
+            case "94new" -> MollPrimusKeleres_94;
+
+            // TE
+            case "92" -> Ordinian_92;
+            case "93" -> Lizard_93;
+            case "94" -> Sorrow_94;
+            case "95" -> Katena_95;
+            case "96a" -> Chronos_96a;
+            case "96b" -> Hollow_96b;
+            case "97" -> Faunus_97;
+            case "98" -> Garbozia_98;
+            case "99" -> Emelpar_99;
+            case "100" -> Tempesta_100;
+            case "101" -> Olergodt_101;
+            case "102" -> Andeara_102;
+            case "103" -> ViraPicsIII_103;
+            case "104" -> Lesab_104;
+            case "105" -> Neutera_105;
+            case "106" -> Cresius_106;
+            case "107" -> Tiamat_107;
+            case "108" -> Kostboth_108;
+            case "109" -> Bellatrix_109;
+            case "110" -> Horizon_110;
+            case "111" -> Tarana_111;
+            case "112" -> MecatolL_112;
+            case "113" -> BetaRift_113;
+            case "114" -> EntropicScar_114;
+            case "115" -> Industrex_115;
+            case "116" -> Lemox_116;
+            case "117" -> TheWatchtower_117;
+            case "118" -> AhkCreuxx_118;
+            case "fracture1" -> Cocytus_F1;
+            case "fracture2" -> FracLeftEgr_F2;
+            case "fracture3" -> FracLeftVoid_F3;
+            case "fracture4" -> Styx_F4;
+            case "fracture5" -> FracRightVoid_F5;
+            case "fracture6" -> FracRightEgr_F6;
+            case "fracture7" -> Leth_F7;
 
             // DS
             case "D01" -> D01_Rhune;

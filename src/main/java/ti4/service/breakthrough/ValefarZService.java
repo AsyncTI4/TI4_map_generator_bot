@@ -24,9 +24,9 @@ public class ValefarZService {
             MessageHelper.sendMessageToChannel(nekro.getCorrectChannel(), "Target has no flagship...?");
             return;
         }
-        String ability = fs.getAbility().orElse(fs.getName() + " has no text ability, womp womp");
-        String msg = "Placed a Valefar Z token on " + faction + "'s flagship, " + fs.getNameRepresentation()
-                + ", gaining the ability:\n> " + ability;
+        String ability = fs.getAbility().orElse("Cataclysmic Error: " + fs.getName() + " has no text ability.");
+        String msg = "Placed a Valefar Z token on the " + faction + " flagship, " + fs.getNameRepresentation()
+                + ", gaining this ability:\n> " + ability;
 
         game.setStoredValue("valefarZ", game.getStoredValue("valefarZ") + faction + "|");
         MessageHelper.sendMessageToChannel(nekro.getCorrectChannel(), msg);

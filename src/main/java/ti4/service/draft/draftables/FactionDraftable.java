@@ -447,7 +447,7 @@ public class FactionDraftable extends SinglePickDraftable {
             message = "*Hrrnnggh*\n" + player.getPing()
                     + " This is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!";
         } else {
-            message = player.getPing() + " choose a flavor of keleres:";
+            message = player.getPing() + ", please choose a flavor of Keleres";
         }
 
         message += "\n\n" + String.join("\n\n", summarizeFlavors);

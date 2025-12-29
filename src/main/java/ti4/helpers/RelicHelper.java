@@ -138,7 +138,7 @@ public class RelicHelper {
                 Planet triad = game.getPlanetsInfo().get("triad");
                 if (triad != null) triad.updateTriadStats(player);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Added the Triad \"planet card\" to your play area.");
+                        player.getCorrectChannel(), "Added the Triad \"planet\" card to your play area.");
             }
 
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {

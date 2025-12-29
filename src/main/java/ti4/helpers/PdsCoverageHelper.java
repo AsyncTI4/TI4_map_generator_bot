@@ -24,7 +24,7 @@ public class PdsCoverageHelper {
      * @return Map of faction -> comprehensive PDS coverage data, null if no coverage
      */
     public static Map<String, PdsCoverage> calculatePdsCoverage(Game game, Tile tile) {
-        if (game.isFowMode() || tile.getTileModel().isHyperlane()) {
+        if (game.isFowMode() || tile.getTileModel().isHyperlane() || tile.isScar()) {
             return null;
         }
 
@@ -47,6 +47,9 @@ public class PdsCoverageHelper {
             for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
                 Tile adjTile = game.getTileByPosition(adjTilePos);
                 if (adjTile == null) {
+                    continue;
+                }
+                if (adjTile.isScar()) {
                     continue;
                 }
                 boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);

@@ -64,7 +64,7 @@ public class VoidTetherService {
     public void postInitialButtons(Game game, Player player, Tile activeSystem) {
         List<Button> buttons = getInitialVoidTetherButtons(game, player, activeSystem.getPosition());
         String message = player.getRepresentationNoPing()
-                + " you can use these buttons to place or move a Void Tether token using your breakthrough:";
+                + ", please use these buttons to place or move a Void Tether token using your breakthrough.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -87,7 +87,7 @@ public class VoidTetherService {
         for (BorderAnomalyHolder border : getTethersOnMap(game)) {
             String dir = "(" + directionStr(border.getDirection()) + ")";
             String id = prefixRemove + "_" + border.getTile() + "_" + border.getDirection();
-            buttons.add(Buttons.red(id, "Remove from " + border.getTile() + " " + dir));
+            buttons.add(Buttons.red(id, "Remove From " + border.getTile() + " " + dir));
         }
         return buttons;
     }
@@ -97,9 +97,9 @@ public class VoidTetherService {
         // If there are Tethers left in reinforcements...
         if (buttons.size() < 2) {
             String prefixNew = player.finChecker() + "newVoidTether_" + pos;
-            buttons.add(Buttons.green(prefixNew, "Use new token"));
+            buttons.add(Buttons.green(prefixNew, "Use New Token"));
         }
-        buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
         return buttons;
     }
 
@@ -109,10 +109,10 @@ public class VoidTetherService {
 
         List<Button> buttons = new ArrayList<>();
         buttons.addAll(getRemoveVoidTetherButtons(game, empyrean, null));
-        buttons.add(Buttons.blue(finChecker + "addVoidTetherStep1", "Add a void tether", FactionEmojis.Empyrean));
+        buttons.add(Buttons.blue(finChecker + "addVoidTetherStep1", "Add Void Tether", FactionEmojis.Empyrean));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-        String message = "Use the buttons to interact with Void Tether.";
+        String message = "Use the buttons to interact with your Void Tether tokens.";
         MessageHelper.sendMessageToChannelWithButtons(empyrean.getCorrectChannel(), message, buttons);
     }
 
@@ -141,7 +141,7 @@ public class VoidTetherService {
             if (game.getTileByPosition(position_) == null) continue;
             String tileBlocked = game.getTileByPosition(position_).getRepresentationForButtons(game, player);
             // there is a tile that exists in that direction
-            buttons.add(Buttons.blue(prefix + dir, directionStr(dir) + ", blocking " + tileBlocked));
+            buttons.add(Buttons.blue(prefix + dir, directionStr(dir) + ", Blocking " + tileBlocked));
         }
         return buttons;
     }
@@ -169,8 +169,9 @@ public class VoidTetherService {
             List<Button> buttons = getPlaceVoidTetherButtons(game, player, position);
             String message = "Removed Void Tether token from between "
                     + getVoidTetherBetweenText(game, player, removePos, removeDir) + ".";
-            message += "\nUse the buttons to decide where to put your new token, relative to the active system ("
-                    + position + "):";
+            message +=
+                    "\nPlease use these buttons to choose where to put your new token, relative to the active system ("
+                            + position + ").";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
         });
@@ -182,8 +183,9 @@ public class VoidTetherService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String position = matcher.group("pos");
             List<Button> buttons = getPlaceVoidTetherButtons(game, player, position);
-            String message = "Use buttons to decide where to put your new token, relative to the active system ("
-                    + position + "):";
+            String message =
+                    "Please use these buttons to choose where to put your new token, relative to the active system ("
+                            + position + ").";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
         });
@@ -229,7 +231,7 @@ public class VoidTetherService {
     private void addVoidTether(ButtonInteractionEvent event, Game game, Player player) {
         String prefix = "addVoidTetherStep2";
         List<Button> buttons = ButtonHelper.getTilesWithShipsForAction(player, game, prefix, false);
-        String message = "Choose a system with your ships that you want to place a Void Tether token near:";
+        String message = "Please choose a system with your ships that you want to place a Void Tether token near.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -247,7 +249,7 @@ public class VoidTetherService {
                 String label = tile.getRepresentationForButtons(game, player);
                 buttons.add(Buttons.blue(id, label, FactionEmojis.Empyrean));
             }
-            String message = "Use the buttons to decide where to put your Void Tether token:";
+            String message = "Please use these buttons to decide where to put your Void Tether token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
         });

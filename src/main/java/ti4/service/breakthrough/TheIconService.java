@@ -73,8 +73,8 @@ public class TheIconService {
         buttons.add(Buttons.blue("useTheIcon", "Use The Icon", FactionEmojis.Bastion));
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
 
-        String msg = player.getRepresentationUnfogged() + " you can use your breakthrough, " + theIcon()
-                + ", to place your produced ships in a different eligible system.";
+        String msg = player.getRepresentationUnfogged() + " you can use " + theIcon()
+                + " to place your produced ships in a different eligible system.";
         MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
     }
 
@@ -89,7 +89,7 @@ public class TheIconService {
                 || getEligibleIconDestinations(game, player).isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Something went wrong, I don't know how to resolve The Icon right now. Please resolve it manually.");
+                    "Something went wrong, I don't know how to resolve _The Icon_ right now. Please resolve it manually.");
             return;
         }
 
@@ -108,7 +108,7 @@ public class TheIconService {
 
         String msg = "You produced the following ships:" + producedSummary;
         msg += "\n\nChoose a system that contains your command token, your ground force, and no other player's ships.";
-        msg += "\n> Warning: ALL of the listed ships will be moved to the destination system.";
+        msg += "\n> Warning: __All__ of the listed ships will be moved to the destination system.";
         List<Button> destButtons = new ArrayList<>();
         for (String pos : getEligibleIconDestinations(game, player)) {
             Tile tile = game.getTileByPosition(pos);

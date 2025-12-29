@@ -5,7 +5,7 @@
     "aliases": ["cocy", "cody", "cocytus", "codytct"],
     "resources": 3,
     "influence": 0,
-    "planetTypes": ["NONE"],
+    "planetTypes": ["LIGHTNING"],
     "planetLayout": {
         "unitHolderName": "cocytus",
         "resourcesLocation": "BottomLeft",

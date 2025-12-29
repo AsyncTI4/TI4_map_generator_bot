@@ -1854,8 +1854,8 @@ public class AgendaHelper {
         }
         if (player.hasAbility("quantum_fabrication")) {
             String msg = player.getRepresentationUnfogged()
-                    + "since you have the Quantum Fabrication ability, if you placed this space dock via construction, you may use its PRODUCTION ability immediately in "
-                    + tile.getRepresentationForButtons(game, player) + ".";
+                    + ", if you placed this space dock via **Construction**, you may use its PRODUCTION ability immediately in "
+                    + tile.getRepresentationForButtons(game, player) + " via **Quantum Fabrication**.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     msg,

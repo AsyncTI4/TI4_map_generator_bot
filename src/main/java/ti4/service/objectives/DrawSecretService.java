@@ -178,7 +178,7 @@ public class DrawSecretService {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation()
-                                    + " Due to **Cultural Exchange Program**, you have received the leaders of "
+                                    + ", due to _Cultural Exchange Program_, you have received the leaders of "
                                     + Mapper.getFaction(faction).getFactionName() + " this game.");
                 }
             }

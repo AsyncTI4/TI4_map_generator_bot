@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -16,6 +15,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -61,18 +61,19 @@ public class TeHelperUnits {
                 .getTokenList()
                 .contains(Constants.TOKEN_BREACH_ACTIVE)) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "The system must have an active breach in it to deploy a mech.");
+                    player.getCorrectChannel(), "The system must have an active Breach in it to deploy a mech.");
             return;
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String planet = matcher.group("planet");
             AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "1 mech " + planet);
             String planetRep = Helper.getPlanetRepresentation(planet, game);
-            String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep;
-            String flavorMsg = "Out of the cold depths of the active breach a Crimson Revenant emerged, landing on "
-                    + planetRep + ".";
+            String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep + ".";
+            String flavorMsg =
+                    "Out of the cold depths of the active breach, a Crimson Revenant has emerged, landing on "
+                            + planetRep + ".";
 
-            String msg = ThreadLocalRandom.current().nextInt(10) == 0 ? flavorMsg : boringMsg;
+            String msg = RandomHelper.isOneInX(20) ? flavorMsg : boringMsg;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteButtonsWithPartialID(event, "revenantDeploy_");
         });
@@ -136,7 +137,7 @@ public class TeHelperUnits {
                     Tile tile = game.getTileByPosition(matcher.group("pos"));
                     List<Button> buttons = getForerunnerSystemButtons(game, player, tile, forerunnerMap);
                     String message = player.getRepresentation()
-                            + " Choose a system to move ground forces from using your Forerunner, or click DONE:";
+                            + ", please choose the system to move ground forces from using your Alarum, or click \"Done Moving\".";
                     message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
                     MessageHelper.editMessageWithButtons(event, message, buttons);
                 },
@@ -152,7 +153,7 @@ public class TeHelperUnits {
             List<Button> buttons = getForerunnerUnitButtonsForSystem(
                     game, player, tile, source, forerunnerMap.get(matcher.group("source")));
             String message = player.getRepresentation()
-                    + " Choose ground forces to move from the system using your Forerunner, or click DONE to move from a different system:";
+                    + ", please choose the ground forces to move with your Alarum, or click \"Done Moving\" to move from a different system.";
             message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         });
@@ -186,7 +187,7 @@ public class TeHelperUnits {
             List<Button> buttons =
                     getForerunnerUnitButtonsForSystem(game, player, destination, source, forerunnerMap.get(pos));
             String message = player.getRepresentation()
-                    + " Choose ground forces to move from the system using your Forerunner, or click DONE to move from a different system:";
+                    + ", please choose the ground forces to move with your Alarum, or click \"Done Moving\" to move from a different system.";
             message += TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.editMessageWithButtons(event, message, buttons);
         });
@@ -223,7 +224,7 @@ public class TeHelperUnits {
             }
             game.removeStoredValue("forerunnerMovementMap");
             String msg = player.getRepresentation()
-                    + " Moved the following units onto the active system with the Forerunner mech:"
+                    + " moved the following units into the active system with an Alarum:"
                     + TeHelperAbilities.unitSummary(game, player, forerunnerMap);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteMessage(event);
@@ -246,7 +247,7 @@ public class TeHelperUnits {
                 buttons.add(Buttons.green(id, label));
             }
         }
-        buttons.add(Buttons.red(player.finChecker() + "finishForerunner_" + tile.getPosition(), "Done moving"));
+        buttons.add(Buttons.red(player.finChecker() + "finishForerunner_" + tile.getPosition(), "Done Moving"));
         return buttons;
     }
 
@@ -289,7 +290,7 @@ public class TeHelperUnits {
             }
         }
         // Choose another system button
-        buttons.add(Buttons.gray(player.finChecker() + "startForerunner_" + destination.getPosition(), "Done moving"));
+        buttons.add(Buttons.gray(player.finChecker() + "startForerunner_" + destination.getPosition(), "Done Moving"));
         return buttons;
     }
 
@@ -327,12 +328,12 @@ public class TeHelperUnits {
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                 List<Button> buttons = new ArrayList<>(
                         Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline to deploy mech"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline To Deploy Mech"));
 
                 UnitModel icono = Mapper.getUnit("naalu_mech_te");
-                String msg = player.getRepresentationUnfogged() + " You have " + icono.getNameRepresentation()
-                        + " and someone pulled a relic.";
-                msg += " You can use the buttons to deploy 1 mech on a planet you control:";
+                String msg = player.getRepresentationUnfogged() + ", you have " + icono.getNameRepresentation()
+                        + ", and somebody just drew a relic.";
+                msg += " You may use the buttons to DEPLOY 1 Iconoclast onto a planet you control:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
         }

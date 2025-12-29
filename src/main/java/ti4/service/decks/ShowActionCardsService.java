@@ -184,7 +184,7 @@ public class ShowActionCardsService {
                 String name = Mapper.getActionCard(ac).getName();
                 cardsByName.computeIfAbsent(name, key -> new ArrayList<>()).addFirst(ac);
             } else {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Null AC with id " + ac);
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Null action card with id `" + ac + "`.");
             }
         });
 

@@ -1022,14 +1022,28 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("bombardConfirm_")
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, Game game) {
-        if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
-                .isEmpty()) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    player.getRepresentation() + " there are no planets in this system that you can legally bombard. "
-                            + "You cannot bombard planets you own, and you cannot bombard cultural planets if conventions of war law is in play");
+        if (game.getActiveSystem() == null) {
             return;
         }
+        if (game.getTileByPosition(game.getActiveSystem()).isScar()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    player.getRepresentation()
+                            + ", you cannot use BOMBARDMENT (or any other unit abilities) in an entropic scar.");
+            return;
+        }
+        if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem()))
+                .isEmpty()) {
+            String message = player.getRepresentation()
+                    + ", there are no planets in this system that you can legally use BOMBARDMENT against. "
+                    + "You cannot use BOMBARDMENT against planets you own";
+            message += ButtonHelper.isLawInPlay(game, "conventions")
+                    ? ", and you cannot bombard cultural planets while the _Conventions of War_ law is in play."
+                    : ".";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            return;
+        }
+
         autoAssignAllBombardmentToAPlanet(player, game);
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
@@ -1911,7 +1925,7 @@ public class UnfiledButtonHandlers {
             game.setStoredValue(player.getFaction() + "Round" + game.getRound() + "PreScored" + poOrSO, num);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Successfully queued an objective to score (wont score it if you later become unable to score it).");
+                    "Successfully queued an objective to score (it won't be scored if you later stop meeting the requirements).");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray("reverse" + buttonID, "Unqueue it"));
             MessageHelper.sendMessageToChannel(
@@ -2422,7 +2436,7 @@ public class UnfiledButtonHandlers {
                             "Redistribute Command Tokens"));
                     redistro.add(Buttons.DONE_DELETE_BUTTONS);
                     String warfareDone = player.getRepresentationUnfogged()
-                            + " your Warfare action is finished, you can redistribute your command tokens again.";
+                            + " your **Warfare** action is finished, you may redistribute your command tokens again.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warfareDone, redistro);
                 }
 
@@ -3793,7 +3807,7 @@ public class UnfiledButtonHandlers {
                 player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens"));
         buttons.add(Buttons.red(player.finChecker() + "beginTacticalTeWarfare", "Perform Tactical Action"));
         String message =
-                "Use the buttons to resolve the primary of Warfare. Redistributing your Command Tokens is optional.";
+                "Use the buttons to resolve the primary of **Warfare**. Redistributing your command tokens is optional.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

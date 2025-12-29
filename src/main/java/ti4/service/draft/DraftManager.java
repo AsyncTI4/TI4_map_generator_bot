@@ -363,15 +363,15 @@ public class DraftManager extends DraftPlayerManager {
         MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`)");
+                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`).");
         }
         if (orchestrator == null) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`)");
+                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`).");
         }
         if (playerStates.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`)");
+                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`).");
         }
         if (orchestrator != null) {
             String validationError = orchestrator.validateState(this);

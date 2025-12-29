@@ -36,8 +36,9 @@ public class AutoFactoriesService {
         if (!player.hasUnlockedBreakthrough("hacanbt")) return;
         if (getNumberOfProducedNonFighterShips(player, game) < 3) return;
 
-        String message = player.getPing() + " gained a fleet token from their breakthrough " + autoFactories();
-        message += "\n-# > Fleet tokens increased from " + player.gainFleetCC(1);
+        String message =
+                player.getPing() + " gained a command token into their fleet pool from " + autoFactories() + ".";
+        message += "\n-# Fleet pool increased from " + player.gainFleetCC(1) + ".";
 
         if (game.getLaws().containsKey("regulations") && player.getEffectiveFleetCC() > 4) {
             String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";

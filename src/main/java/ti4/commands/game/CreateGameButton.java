@@ -100,7 +100,7 @@ class CreateGameButton extends Subcommand {
                         if (ongoingAmount > 4) {
                             MessageHelper.sendMessageToChannel(
                                     event.getChannel(),
-                                    "One of the games proposed members"
+                                    "One of the game's proposed members"
                                             + " is currently under a limit and cannot join more games at this time");
                             return;
                         }

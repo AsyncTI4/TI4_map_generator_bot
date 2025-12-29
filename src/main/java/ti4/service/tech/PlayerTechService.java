@@ -70,12 +70,12 @@ public class PlayerTechService {
         }
         if ("cr2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("mentakbt")) {
-                message += "\nAutomatically added Mentak's cruiser 3.";
+                message += "\nAutomatically flipped _The Table's Grace_ and applied Corsair cruisers.";
             }
         }
         if ("dn2".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             if (player.hasUnlockedBreakthrough("kortalibt")) {
-                message += "\nAutomatically added Kortal's dread 2.";
+                message += "\nAutomatically flipped _The Queens’ Wrath_ and applied Tribune dreadnoughts.";
             }
         }
         CommanderUnlockCheckService.checkPlayer(player, "mirveda", "jolnar", "nekro", "dihmohn");
@@ -357,10 +357,10 @@ public class PlayerTechService {
                 buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard",
+                        player.getRepresentationUnfogged() + ", use buttons to discard.",
                         ActionCardHelper.getDiscardActionCardButtons(player, false));
-                String message =
-                        player.getRepresentationUnfogged() + ", after discarding an AC, use this button to draw an AC.";
+                String message = player.getRepresentationUnfogged()
+                        + ", after discarding an action card, use this button to draw an action card.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -368,7 +368,7 @@ public class PlayerTechService {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "Purging a frag or spending a CC (and exhausting tech) is not automated at this time");
+                        "Purging a relic fragment or spending a command token (and exhausting technology) is not automated at this time.");
                 ButtonHelperAgents.moveShipToAdjacentSystemStep1(game, player, null);
             }
             case "executiveorder" -> TeHelperTechs.postExecutiveOrderButtons(event, game, player);
@@ -472,7 +472,7 @@ public class PlayerTechService {
                 deleteIfButtonEvent(event);
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged() + " please choose the planet you wish to annihilate.",
+                        player.getRepresentationUnfogged() + ", please choose the planet you wish to annihilate.",
                         ButtonHelper.getButtonsForConventions(player, game));
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }

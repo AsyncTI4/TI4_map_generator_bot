@@ -1363,9 +1363,11 @@ public class Helper {
                     int wormholes =
                             thing.replace("ghostbt", "").isEmpty() ? 0 : Integer.parseInt(thing.replace("ghostbt", ""));
                     res += wormholes;
-                    msg.append("> Used Ghost Breakthrough ");
-                    msg.append("for ").append(wormholes).append(" resource").append(wormholes == 1 ? "" : "s");
-                    msg.append(". ").append(FactionEmojis.Ghost).append("\n");
+                    msg.append("> Used _Particle Synthesis_ for a ")
+                            .append(wormholes)
+                            .append(" resource discount. ")
+                            .append(FactionEmojis.Ghost)
+                            .append("\n");
                 }
                 if (thing.contains("aida")) {
                     msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");

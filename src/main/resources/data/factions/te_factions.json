@@ -45,6 +45,11 @@
             "pds",
             "bastion_spacedock"
         ],
+        "preferredColours": [
+            "dw",
+            "ylw",
+            "tpl"
+        ],
         "source": "thunders_edge",
         "priorityNumber": 21
     },
@@ -86,6 +91,11 @@
             "deepwrought_mech",
             "pds",
             "spacedock"
+        ],
+        "preferredColours": [
+            "gcr",
+            "ppl",
+            "vpw"
         ],
         "source": "thunders_edge",
         "priorityNumber": 7
@@ -134,6 +144,11 @@
             "firmament_mech",
             "pds",
             "spacedock"
+        ],
+        "preferredColours": [
+            "rby",
+            "gry",
+            "psn"
         ],
         "source": "thunders_edge",
         "priorityNumber": 30
@@ -225,6 +240,11 @@
             "pds",
             "spacedock"
         ],
+        "preferredColours": [
+            "red",
+            "nm",
+            "sns"
+        ],
         "source": "thunders_edge",
         "priorityNumber": 16
     },
@@ -272,6 +292,11 @@
             "ralnel_mech",
             "pds",
             "spacedock"
+        ],
+        "preferredColours": [
+            "lme",
+            "wtm",
+            "grn"
         ],
         "source": "thunders_edge",
         "priorityNumber": 12

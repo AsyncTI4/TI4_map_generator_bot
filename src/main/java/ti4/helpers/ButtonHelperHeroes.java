@@ -115,7 +115,7 @@ public class ButtonHelperHeroes {
     public static void xxchaHeroTEStart(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
 
-        String msg = player.getRepresentation() + ", please choose whether you want to place a mech or a pds.";
+        String msg = player.getRepresentation() + ", please choose whether you want to place a mech or a PDS.";
         buttons.add(Buttons.gray("xxchaHeroTEStep2_mech", "Place Mech", UnitEmojis.mech));
         buttons.add(Buttons.gray("xxchaHeroTEStep2_pds", "Place PDS", UnitEmojis.pds));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -2620,12 +2620,11 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     game.getPing()
-                            + " reminder that the others cannot follow this. Only the Overrule player gets to do anything.");
-            if (sc == 5) {
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        "# Reminder that the primary of trade does not enable the secondary of trade. You cannot replenish others with overrule.");
-            }
+                            + ", only the _Overrule_ player resolves the strategy card. Other players cannot perform the secondary."
+                            + (sc == 5
+                                    ? "\n" + player.getRepresentationUnfogged()
+                                            + ", you __cannot__ replenish other players' commodities."
+                                    : ""));
         } else {
             if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
                 MessageHelper.sendMessageToChannel(

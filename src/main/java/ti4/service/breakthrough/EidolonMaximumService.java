@@ -66,12 +66,12 @@ public class EidolonMaximumService {
     public void sendFlipButtonsToCardsInfo(Player player, Tile tile, List<UnitHolder> unitHolders) {
         String tileRep = tile.getRepresentationForButtons(player.getGame(), player);
         String msg = player.getRepresentation(true, false) + " you have 4 mechs in " + tileRep
-                + ". You can remove 3 of them to activate " + eidolonRep(true);
+                + ". You can remove 3 of them to activate " + eidolonRep(true) + ".";
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uh : unitHolders) {
             String id = "activateEidolonMaximum_" + tile.getPosition() + "_" + uh.getName();
-            String label = "Create in space";
-            if (!"space".equals(uh.getName())) label = "Create on " + Helper.getPlanetName(uh.getName());
+            String label = "Create In Space";
+            if (!"space".equals(uh.getName())) label = "Create On " + Helper.getPlanetName(uh.getName());
             buttons.add(Buttons.green(id, label));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -105,6 +105,10 @@ public class EidolonMaximumService {
                     uh.removeUnit(mech, uh.getUnitCount(mech));
                 }
             }
+            String message = "-# Ready to form Voltron!\n-# Activate interlocks!\n-# Dyna-therms connected."
+                    + "\n-# Infra-cells up!\n-# Mega-thrusters are go!\n-# Let's go, Voltron Force!"
+                    + "\n-# Form feet and legs!\n-# Form arms and body!\n-# And I'll form the head!";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             BreakthroughCommandHelper.activateBreakthrough(event, player, "naazbt");
         });
         ButtonHelper.deleteMessage(event);

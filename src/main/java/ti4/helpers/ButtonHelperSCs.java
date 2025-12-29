@@ -57,7 +57,8 @@ public class ButtonHelperSCs {
         tiles.forEach(
                 t -> buttons.add(Buttons.blue(prefix + t.getPosition(), t.getRepresentationForButtons(game, player))));
 
-        String message = player.getRepresentation() + " Choose a tile to resolve production using 1 space dock:";
+        String message = player.getRepresentation()
+                + ", please choose the system where you wish to resolve the PRODUCTION ability of one of your space docks.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -68,21 +69,24 @@ public class ButtonHelperSCs {
         Tile tile = game.getTileByPosition(pos);
 
         String infomsg =
-                player.getFactionEmoji() + " is resolving Construction Primary in tile " + tile.getRepresentation();
+                player.getFactionEmoji() + " is resolving the primary ability of **Construction** to build in the "
+                        + tile.getRepresentation() + " system.";
         ButtonHelper.sendMessageToRightStratThread(player, game, infomsg, "construction");
 
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "construction", "place");
         int productionVal = Helper.getProductionValue(player, game, tile, true);
-        String message = player.getRepresentation()
-                + " Use the buttons to produce. Reminder that when using construction primary, you can only use 1 dock. ";
+        String message = player.getRepresentation() + ", use these buttons to produce.";
         message += ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\nYou have " + productionVal
                 + " PRODUCTION value in this system.";
+        if (Helper.getProductionValue(player, game, tile, false) > productionVal) {
+            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system.";
+        }
         if (productionVal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander"))
             message +=
-                    "\n> - You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit.";
+                    "\nYou also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
         if (productionVal > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy"))
             message +=
-                    "\n> - Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated.";
+                    "\nA reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
 
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -133,17 +137,16 @@ public class ButtonHelperSCs {
         message += ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);
         message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
 
-        if (singleDock) {
-            message +=
-                    "\n> - Reminder that when following **Warfare**, you may only use 1 space dock in your home system. ";
+        if (Helper.getProductionValue(player, game, tile, singleDock) > productionValue) {
+            message += "\nYou may only use the PRODUCITON ability of __one__ of your space docks in this system. ";
         }
         if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message +=
-                    "\n> - You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
+                    "\nYou also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
         }
         if (productionValue > 0 && IsPlayerElectedService.isPlayerElected(game, player, "prophecy")) {
             message +=
-                    "\n> - Reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
+                    "\nA reminder that you have _Prophecy of Ixth_ and should produce at least 2 fighters if you wish to keep it. Its removal is not automated.";
         }
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
@@ -485,7 +488,7 @@ public class ButtonHelperSCs {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + " since you have the **Trade** strategy card, and the primary is done automatically when you play trade, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+                            + " since you have the **Trade** strategy card, and the primary is done automatically when you play **Trade**, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong.");
             return;
         }
 

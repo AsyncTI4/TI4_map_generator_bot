@@ -13,7 +13,7 @@
     "resources": 1,
     "influence": 2,
     "planetTypes": [
-        "NONE"
+        "LIGHTNING"
     ],
     "planetLayout": {
         "unitHolderName": "phlegethon",

@@ -63,7 +63,7 @@ public class SleeperTokenHelper {
     @ButtonHandler("selectPlayerToSleeper")
     public static void selectPlayerToSleeper(ButtonInteractionEvent event, Game game, Player player) {
         String msg =
-                "Choose the player who owns the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
+                "Choose the player who owns the planet that you wish to put a Sleeper token on. You need their permission, but this is not a transaction.";
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {

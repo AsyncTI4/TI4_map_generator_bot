@@ -239,7 +239,8 @@ public class TacticalActionOutputService {
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
                 maxBonus++;
-                output += " (has Winnu Breakthrough for +1 movement for one ship when moving to a legendary tile)";
+                output +=
+                        " (has _Imperator_ for +1 movement for one ship when moving into a legendary planet's system)";
             }
             if (player.getTechs().contains("dsgledb")) {
                 maxBonus++;

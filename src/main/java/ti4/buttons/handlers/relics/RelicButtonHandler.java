@@ -109,7 +109,7 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
+                event.getMessageChannel(), player.getRepresentationNoPing() + " has purged _Dominus Orb_.");
         ButtonHelper.deleteMessage(event);
         String message = "Please choose a system to move from.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
