@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -898,7 +897,9 @@ public class ButtonHelperAbilities {
     public static List<Button> getMitosisOptions(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("mitosisInf", "Place 1 infantry"));
-        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
+        if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4
+                && player.hasUnit("arborec_mech")
+                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             buttons.add(Buttons.blue("mitosisMech", "Remove 1 Infantry to Deploy 1 Mech"));
         }
         return buttons;

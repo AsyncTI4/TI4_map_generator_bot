@@ -78,7 +78,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship can move through systems that contain your units, even if other players' units are present; if it would, apply +1 to its move value for each of those systems."
+        "ability": "This ship can move through systems that contain your units, even if other players' units are present; if it would, apply +1 to its move value for each of those systems. [note: other players' units do not need to be present for the speed boost to apply.]"
     },
     {
         "id": "deepwrought_mech",

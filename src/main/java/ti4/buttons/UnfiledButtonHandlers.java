@@ -3551,6 +3551,7 @@ public class UnfiledButtonHandlers {
     public static void endOfTurnAbilities(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Use buttons to do an end of turn ability";
         List<Button> buttons = ButtonHelper.getEndOfTurnAbilities(player, game);
+        ButtonHelper.deleteMessage(event);
         if (!buttons.isEmpty()) {
             buttons.addFirst(Buttons.red(player.finChecker() + "turnEnd", "End Turn"));
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);
