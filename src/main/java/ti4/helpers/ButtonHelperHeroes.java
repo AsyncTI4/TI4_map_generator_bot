@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -199,7 +197,6 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("argentHeroStep4_")
     public static void argentHeroStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
         String pos2 = buttonID.split("_")[2];
@@ -214,6 +211,7 @@ public class ButtonHelperHeroes {
         destination = FlipTileService.flipTileIfNeeded(event, destination, game);
         RemoveUnitService.removeUnits(event, origin, game, player.getColor(), unitName + " " + unitHolderName);
         AddUnitService.addUnits(event, destination, game, player.getColor(), unitName);
+        List<Button> buttons = getArgentHeroStep3Buttons(game, player, buttonID);
         String msg2 = player.getFactionEmoji() + " moved 1 " + unitName + " from "
                 + origin.getRepresentationForButtons(game, player) + " to "
                 + destination.getRepresentationForButtons(game, player);
