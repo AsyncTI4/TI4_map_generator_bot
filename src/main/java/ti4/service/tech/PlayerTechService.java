@@ -790,13 +790,16 @@ public class PlayerTechService {
         }
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
-        // TODO: Make this fog safe
         List<Button> dwsCommanders = game.getPlayers().values().stream()
                 .filter(p1 -> p1 != player)
                 .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
                 .map(p1 -> Buttons.gray(
                         "useDwsDiscount_" + p1.getFaction(),
-                        "Use " + p1.getFaction() + "'s DWS Commander Discount",
+                        "Use "
+                                + (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, p1, player)
+                                        ? p1.getFaction()
+                                        : "?")
+                                + "'s DWS Commander Discount",
                         p1.getFactionEmoji()))
                 .toList();
         if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {
