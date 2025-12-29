@@ -88,8 +88,8 @@ public class ComponentActionHelper {
             }
             String commanderName =
                     StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
-            compButtons.add(
-                    Buttons.red(finChecker + prefix + "mercenariesForHireAction_", "Spend 3tg for " + commanderName));
+            compButtons.add(Buttons.red(
+                    finChecker + prefix + "mercenariesForHireAction_", "Spend 3 Trade Goods For " + commanderName));
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
@@ -548,7 +548,8 @@ public class ComponentActionHelper {
                                 p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
                     } else {
                         p1.addExhaustedRelic("emelpar");
-                        successMessage = p1.getFactionEmoji() + " used Scepter of Emelpar to Orbital Drop";
+                        successMessage = p1.getFactionEmoji() + " used the _" + RelicHelper.sillySpelling()
+                                + "_ to **Orbital Drop**.";
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Please choose the planet you wish to place 2 infantry on.";
@@ -816,13 +817,14 @@ public class ComponentActionHelper {
             case "mercenariesForHireAction" -> {
                 if (p1.getTg() < 2) {
                     MessageHelper.sendMessageToChannel(
-                            event.getMessageChannel(), "You don't have enough TG (3) to hire mercenaries.");
+                            event.getMessageChannel(),
+                            "You don't have three trade goods to pay your mercenaries. And Bad Things™ happen when you shortchange mercenaries.");
                     return;
                 }
                 p1.setTg(p1.getTg() - 3);
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(),
-                        p1.getRepresentationUnfogged() + " has spent 3 TG to hire mercenaries.");
+                        p1.getRepresentationUnfogged() + " has spent 3 trade goods to hire mercenaries.");
                 String leaderID = game.getStoredValue("mercCommander");
                 if (leaderID != null) {
                     p1.addLeader(leaderID);
@@ -853,14 +855,14 @@ public class ComponentActionHelper {
                 String btID = buttonID;
                 BreakthroughModel btModel = Mapper.getBreakthrough(btID);
                 p1.getBreakthroughExhausted().put(btID, true);
-                String message = p1.getRepresentation() + " exhausted " + btModel.getName();
+                String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
                 MessageHelper.sendMessageToChannelWithEmbed(
                         event.getMessageChannel(), message, btModel.getRepresentationEmbed());
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
                     String unimplemented =
-                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this bt";
+                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this breakthrough.";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
                 }
             }

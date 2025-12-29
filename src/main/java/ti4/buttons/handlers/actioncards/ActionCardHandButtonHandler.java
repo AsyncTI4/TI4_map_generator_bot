@@ -144,7 +144,7 @@ class ActionCardHandButtonHandler {
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
-                        player.getRepresentationUnfogged() + ", please resolve Scrap Metal ability using the buttons.";
+                        player.getRepresentationUnfogged() + ", please **Scrap Metal** by using these buttons.";
                 List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             }
@@ -214,7 +214,7 @@ class ActionCardHandButtonHandler {
             BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
                     .asThreadChannel()
-                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
+                    .sendMessage("Could not parse action card ID: `" + acID + "`. Please play manually.")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ButtonHelper.deleteMessage(event);

@@ -81,7 +81,8 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game));
+                player.getRepresentationUnfogged() + " put 1 PDS on " + Helper.getPlanetRepresentation(planet, game)
+                        + ".");
     }
 
     @ButtonHandler("resolveBoardingParty")
@@ -286,9 +287,9 @@ class ActionCardDeck2ButtonHandler {
             String cardId = game.drawExplore(type);
             ExploreModel card = Mapper.getExplore(cardId);
             String cardType = card.getResolution();
-            sb.append("\nRevealed '")
+            sb.append("\nRevealed _")
                     .append(card.getName())
-                    .append("' from the top of the ")
+                    .append("_ from the top of the ")
                     .append(type)
                     .append(" deck and ");
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {

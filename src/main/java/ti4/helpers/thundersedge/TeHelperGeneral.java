@@ -95,7 +95,7 @@ public class TeHelperGeneral {
             MessageHelper.sendMessageToChannel(
                     newOwner.getCorrectChannel(),
                     newOwner.getRepresentation() + " acquired control of the " + station.getRepresentation(game)
-                            + " trade station.");
+                            + " space station.");
         }
     }
 
@@ -121,17 +121,19 @@ public class TeHelperGeneral {
                     .map(t -> Buttons.green(
                             "placeThundersEdge_" + t.getPosition(), t.getRepresentationForButtons(game, player)))
                     .forEach(newButtons::add);
-            newMessage = player.getRepresentation() + " You can place Thunder's Edge on any of the following tiles:";
+            newMessage =
+                    player.getRepresentation() + ", please choose which system you wish to place Thunder's Edge in.";
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             String pos = matcher.group("pos");
             Tile tile = game.getTileByPosition(pos);
             String prefix = player.getFinsFactionCheckerPrefix() + "placeThundersEdge_" + pos + "_";
 
-            newMessage = player.getRepresentation() + " You are placing place Thunder's Edge on "
-                    + tile.getRepresentationForButtons(game, player);
-            newMessage +=
-                    "\nYou must select one of the players with the most completed expeditions to place infantry on Thunder's Edge:";
+            int most = exp.getMostCompleteByAny();
+            newMessage = player.getRepresentation() + ", you are placing place Thunder's Edge in "
+                    + tile.getRepresentationForButtons(game, player) + ".";
+            newMessage += "\nYou must select one of the players with the most completed expeditions to place " + most
+                    + " infantry on Thunder's Edge.";
             exp.getFactionsWithMostComplete().forEach(faction -> {
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 if (p2 != null) newButtons.add(Buttons.blue(prefix + faction, p2.getFactionNameOrColor()));

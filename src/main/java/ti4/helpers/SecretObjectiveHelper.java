@@ -61,7 +61,7 @@ public class SecretObjectiveHelper {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
                         player.getRepresentation()
-                                + " also scored 1 VP due to Zealous Orthodoxy. Everyone will gain their commander ability.");
+                                + " also scored 1 victory point due to _Zealous Orthodoxy_. Everyone will gain their commander ability.");
                 for (Leader leaderP : player.getLeaders()) {
                     if (leaderP.getId().contains("commander")) {
                         leader = leaderP.getId();

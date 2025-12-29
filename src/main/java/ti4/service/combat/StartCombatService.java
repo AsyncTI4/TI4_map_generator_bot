@@ -104,7 +104,7 @@ public class StartCombatService {
                     + " or if you are coexisting. Please inform it with the buttons.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("startCombatOn_" + unitHolder.getName(), "Engage in Combat"));
-            buttons.add(Buttons.green("deleteButtons", "They are coexisting"));
+            buttons.add(Buttons.green("deleteButtons", "They Are Coexisting"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             return true;
         }
@@ -880,11 +880,12 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "sardakkbtRes",
-                        "Resolve Sardakk Breakthrough (Upon Win)",
+                        "Resolve N'orr Supremacy (Upon Win)",
                         FactionEmojis.Sardakk));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        msg + ", a reminder that if you win this combat, you may resolve your breakthrough.",
+                        msg
+                                + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade or command token.",
                         buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
@@ -1420,7 +1421,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(
                         finChecker + "getAgentSelection_xanagent",
                         "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Xan Agent",
+                                + "Noro Weba",
                         FactionEmojis.xan));
             }
 
