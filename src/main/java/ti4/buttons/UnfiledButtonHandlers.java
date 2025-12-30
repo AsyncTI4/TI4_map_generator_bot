@@ -1224,7 +1224,8 @@ public class UnfiledButtonHandlers {
         if (sendReact) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), game.getPing() + ", an action card has been canceled.");
+                        game.getActionsChannel(),
+                        game.getPing() + ", the action card _" + acName + "_ has been canceled.");
             } else {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             }

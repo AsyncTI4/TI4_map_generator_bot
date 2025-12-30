@@ -24,7 +24,7 @@ public class ButtonListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
         if (!JdaService.isReadyToReceiveCommands()) {
-            event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton())
+            event.reply("You pressed: " + ButtonHelper.getButtonRepresentation(event.getButton(), false)
                             + "\nPlease try again in a few minutes. The bot is rebooting.")
                     .setEphemeral(true)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
