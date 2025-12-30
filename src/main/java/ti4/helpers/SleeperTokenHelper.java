@@ -17,6 +17,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.service.fow.BlindSelectionService;
 
 @UtilityClass
 public class SleeperTokenHelper {
@@ -76,7 +77,7 @@ public class SleeperTokenHelper {
     }
 
     @ButtonHandler("addSleeperViaBt_")
-    public static void addSleeperViaBt(String buttonID, ButtonInteractionEvent event, Game game) {
+    public static void addSleeperViaBt(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String msg =
                 "Choose the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
         List<Button> buttons = new ArrayList<>();
@@ -88,6 +89,7 @@ public class SleeperTokenHelper {
             }
             buttons.add(Buttons.gray("putSleeperOnPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
+        BlindSelectionService.filterForBlindPlanetSelection(game, player, buttons, "putSleeperOnPlanet");
         buttons.add(Buttons.red("deleteButtons", "Don't Place Sleeper"));
         MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
