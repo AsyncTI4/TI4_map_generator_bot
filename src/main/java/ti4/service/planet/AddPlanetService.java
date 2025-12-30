@@ -151,6 +151,7 @@ public class AddPlanetService {
                     }
                     for (String relic : relics) {
                         if (relic.contains("shard")
+                                && player.isRealPlayer()
                                 && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
                                 && !doubleCheck) {
                             String msg2 = player_.getRepresentation()
