@@ -150,11 +150,15 @@ public class ButtonHelper {
     }
 
     public static String getButtonRepresentation(Button button) {
+        return getButtonRepresentation(button, true);
+    }
+
+    public static String getButtonRepresentation(Button button, boolean includeId) {
         String id = button.getCustomId();
         String label = button.getLabel();
         EmojiUnion emoji = button.getEmoji();
-        return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__  `[" + id
-                + "]`";
+        return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__"
+                + (includeId ? "  `[" + id + "]`" : "");
     }
 
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile) {
