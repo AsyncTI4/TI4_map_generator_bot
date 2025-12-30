@@ -16,6 +16,7 @@ import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.StrategyCardModel;
 
 @UtilityClass
 public class FactionRecordOfStrategyCardPickService {
@@ -99,21 +100,20 @@ public class FactionRecordOfStrategyCardPickService {
             gamesThatHadThem.incrementAndGet();
             String[] scList = scs.split("_");
             for (String sc : scList) {
-                sc = game.getStrategyCardModelByInitiative(Integer.parseInt(sc))
-                        .get()
-                        .getName();
-                if (scsPicked.containsKey(sc)) {
-                    scsPicked.put(sc, scsPicked.get(sc) + 1);
-                } else {
-                    scsPicked.put(sc, 1);
+                if (!Helper.isInteger(sc)) {
+                    continue;
                 }
+                int scInitiative = Integer.parseInt(sc);
+                String scName = game.getStrategyCardModelByInitiative(scInitiative)
+                        .map(StrategyCardModel::getName)
+                        .orElse(null);
+                if (scName == null) {
+                    continue;
+                }
+                scsPicked.merge(scName, 1, Integer::sum);
                 if (game.getCustodiansTaker() != null
                         && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
-                    if (custodians.containsKey(sc)) {
-                        custodians.put(sc, custodians.get(sc) + 1);
-                    } else {
-                        custodians.put(sc, 1);
-                    }
+                    custodians.merge(scName, 1, Integer::sum);
                 }
             }
         }
