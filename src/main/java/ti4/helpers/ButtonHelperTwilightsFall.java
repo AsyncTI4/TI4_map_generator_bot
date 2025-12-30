@@ -96,7 +96,7 @@ public class ButtonHelperTwilightsFall {
             nCards.remove(cardID);
         }
         List<Button> buttons = new ArrayList<>(getSpliceButtons(game, type, nCards, player, "queueSplicePick_"));
-        if (!alreadyQueued.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
+        if (alreadyQueued.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
         buttons.add(Buttons.gray("restartSCQueue", "Restart Queue"));
         return buttons;
     }
