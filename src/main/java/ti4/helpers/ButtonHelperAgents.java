@@ -491,8 +491,8 @@ public class ButtonHelperAgents {
                     + Helper.getPlanetRepresentation(planetRemoval, game) + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
         }
-        List<RemoveUnitService.RemovedUnit> removedUnits =
-                RemoveUnitService.removeUnits(event, tileRemoval, game, player.getColor(), unit + " " + removalLocation);
+        List<RemoveUnitService.RemovedUnit> removedUnits = RemoveUnitService.removeUnits(
+                event, tileRemoval, game, player.getColor(), unit + " " + removalLocation);
         AddUnitService.addUnits(
                 event, tileDestination, game, player.getColor(), unit + " " + planetDestination, removedUnits);
         if ("mech".equalsIgnoreCase(unit)) {
