@@ -95,7 +95,10 @@ public class ButtonHelperTwilightsFall {
         for (String cardID : alreadyQueued.split("_")) {
             nCards.remove(cardID);
         }
-        return getSpliceButtons(game, type, nCards, player, "queueSplicePick_");
+        List<Button> buttons = new ArrayList<>(getSpliceButtons(game, type, nCards, player, "queueSplicePick_"));
+        if (alreadyQueued.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
+        buttons.add(Buttons.gray("restartSpliceQueue", "Restart Queue"));
+        return buttons;
     }
 
     public static String getQueueSpliceMessage(Game game, Player player) {
