@@ -207,8 +207,6 @@ class CreateGameButtonHandler {
             return;
         }
 
-        if (isLikelyDoublePressedButton(gameName, gameSillyName, lastGameName, event)) return;
-
         List<Member> members = new ArrayList<>();
         Member gameOwner = null;
         for (int i = 3; i <= 10; i++) {
@@ -261,6 +259,10 @@ class CreateGameButtonHandler {
             if (gameOwner == null) gameOwner = members.get(0);
         }
 
+        if (isLikelyDoublePressedButton(gameName, members, lastGameName, event)
+                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
+                && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;
+
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
@@ -289,19 +291,21 @@ class CreateGameButtonHandler {
     }
 
     private static boolean isLikelyDoublePressedButton(
-            String gameName, String gameSillyName, String lastGameName, ButtonInteractionEvent event) {
+            String gameName, List<Member> members, String lastGameName, ButtonInteractionEvent event) {
         if ("pbd1".equalsIgnoreCase(gameName)) return false;
 
         Game lastGame = GameManager.getManagedGame(lastGameName).getGame();
-        boolean lastGameHasSameSillyName = gameSillyName.equalsIgnoreCase(lastGame.getCustomName());
-        if (!lastGameHasSameSillyName) {
+        for (Member member : members) {
+            if (lastGame.getPlayerIDs().contains(member.getId())) {
+                continue;
+            }
             return false;
         }
 
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "The custom name of the last game is the same as the one for this game, so the bot suspects a double press "
-                        + "occurred and is cancelling the creation of another game.");
+                "The members of this game are identical to the members of the last game created, so the bot suspects a double press "
+                        + "occurred and is cancelling the creation of another game. Have a bothelper press the button if this is incorrect.");
         return true;
     }
 }
