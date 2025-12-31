@@ -94,45 +94,24 @@ public class ListSlashCommandsUsedService {
         }
         buttonsPressed.addAndGet(game.getButtonPressCount());
         slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
-        for (String command : game.getAllSlashCommandsUsed().keySet()) {
-            int numUsed = game.getAllSlashCommandsUsed().get(command);
-            int numUsed2 = 0;
-            if (slashCommands.containsKey(command)) {
-                numUsed2 = slashCommands.get(command);
-            }
-            slashCommands.put(command, numUsed + numUsed2);
-        }
+        game.getAllSlashCommandsUsed()
+                .forEach((command, numUsed) -> slashCommands.merge(command, numUsed, Integer::sum));
         if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
             return;
         }
-        for (String acName : game.getAllActionCardsSabod().keySet()) {
-            int numUsed = game.getAllActionCardsSabod().get(acName);
-            int numUsed2 = 0;
-            if (actionCards.containsKey(acName)) {
-                numUsed2 = actionCards.get(acName);
-            }
+        game.getAllActionCardsSabod().forEach((acName, numUsed) -> {
             acsSabod.addAndGet(numUsed);
-            actionCards.put(acName, numUsed + numUsed2);
-        }
+            actionCards.merge(acName, numUsed, Integer::sum);
+        });
         for (String acID : game.getDiscardActionCards().keySet()) {
             ActionCardModel ac = Mapper.getActionCard(acID);
             String acName = ac.getName();
-            int numUsed = 1;
-            int numUsed2 = 0;
-            if (actionCardsPlayed.containsKey(acName)) {
-                numUsed2 = actionCardsPlayed.get(acName);
-            }
-            actionCardsPlayed.put(acName, numUsed + numUsed2);
+            actionCardsPlayed.merge(acName, 1, Integer::sum);
         }
         for (String acID : game.getPurgedActionCards().keySet()) {
             ActionCardModel ac = Mapper.getActionCard(acID);
             String acName = ac.getName();
-            int numUsed = 1;
-            int numUsed2 = 0;
-            if (actionCardsPlayed.containsKey(acName)) {
-                numUsed2 = actionCardsPlayed.get(acName);
-            }
-            actionCardsPlayed.put(acName, numUsed + numUsed2);
+            actionCardsPlayed.merge(acName, 1, Integer::sum);
         }
     }
 }
