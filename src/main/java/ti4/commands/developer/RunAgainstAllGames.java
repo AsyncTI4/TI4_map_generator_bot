@@ -39,6 +39,7 @@ class RunAgainstAllGames extends Subcommand {
         // Developer's Delight
         if (game.isThundersEdge() && game.isTwilightsFallMode()) {
             game.setThundersEdge(false);
+            return true;
         }
         return false;
     }

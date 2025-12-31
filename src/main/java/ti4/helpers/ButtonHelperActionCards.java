@@ -2005,7 +2005,7 @@ public class ButtonHelperActionCards {
                 if (!p2.hasUnplayedSCs()) {
                     continue;
                 }
-                String label = "Expreme Duress " + p2.getFactionNameOrColor();
+                String label = "Extreme Duress " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
                 scButtons.add(Buttons.gray("resolvePreassignment_ExtremeDuress_" + p2.getColor(), label, scEmoji));
             }
