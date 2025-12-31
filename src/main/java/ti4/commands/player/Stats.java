@@ -233,7 +233,7 @@ class Stats extends GameStateSubcommand {
             if ("y".equals(value) || "yes".equals(value)) {
                 game.setSpeakerUserID(player.getUserID());
             } else {
-                message.append(", which is not a valid input. Please use one of: y/yes");
+                message.append(", which is not a valid input. Please use one of `y` or `yes`.");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -245,7 +245,7 @@ class Stats extends GameStateSubcommand {
             if ("y".equals(value) || "yes".equals(value)) {
                 game.setTyrantUserID(player.getUserID());
             } else {
-                message.append(", which is not a valid input. Please use one of: y/yes");
+                message.append(", which is not a valid input. Please use one of `y` or `yes`.");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -262,7 +262,7 @@ class Stats extends GameStateSubcommand {
             } else if ("n".equals(value) || "no".equals(value)) {
                 player.setPassed(false);
             } else {
-                message.append(", which is not a valid input. Please use one of: y/yes/n/no");
+                message.append(", which is not a valid input. Please use one of `y` `yes` `n` or `no`.");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -349,15 +349,15 @@ class Stats extends GameStateSubcommand {
                         "Remove View Permissions For " + player.getUserName()));
                 buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
                 String msg = player.getRepresentation()
-                        + " do you want to remove yourself from the game channels? If so, press this button.";
+                        + ", do you want to remove yourself from the game channels? If so, press this button.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
 
                 msg = player.getRepresentation()
-                        + " You should know that NPC is only to be used in doomed scenariors, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
+                        + ", you should know that NPC is only to be used in doomed scenariors, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
                 msg = game.getPing()
-                        + " A player has turned NPC. NPCs will auto pass on everything, and their only actions will be to pick the lowest initiative strategy card, play it as soon as possible, and then pass. If this doesn't sound quite right for this situation, we invite you to seek a replacement on the hub server channel #finding-replacements.";
+                        + ", a player has turned NPC. NPCs will auto pass on everything, and their only actions will be to pick the lowest initiative strategy card, play it as soon as possible, and then pass. If this doesn't sound quite right for this situation, we invite you to seek a replacement on the hub server channel #finding-replacements.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

@@ -755,7 +755,7 @@ class PlayerAreaGenerator {
                     .count();
             if (totalBreaches > maxBreachTokens) {
                 String msg = player.getRepresentation()
-                        + " there are too many breach tokens on the board. Please review and resolve manually.";
+                        + ", there are too many Breach tokens on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             xDeltaFromRightSide = displayRemainingFactionTokens(
@@ -775,7 +775,7 @@ class PlayerAreaGenerator {
 
             if (severtokens > maxSeverTokens) {
                 String msg = player.getRepresentation()
-                        + " there are too many sever tokens on the board. Please review and resolve manually.";
+                        + ", there are too many Sever tokens on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             xDeltaFromRightSide = displayRemainingFactionTokens(
@@ -797,7 +797,7 @@ class PlayerAreaGenerator {
                     .sum();
             if (totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
-                        + " there are too many galvanized units on the board. Please review and resolve manually.";
+                        + " there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             return displayRemainingFactionTokens(

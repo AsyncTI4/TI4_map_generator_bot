@@ -100,7 +100,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "mrte" -> {
                 channel = player.getCardsInfoThread();
                 output = player.getRepresentation()
-                        + " Choose a secret to discard, the bot will automatically draw a replacement:";
+                        + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
                 buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
             case "ordinianc4", "ordinian" -> {

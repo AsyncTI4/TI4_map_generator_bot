@@ -921,7 +921,8 @@ public class StartCombatService {
                         "Copy a Technology From " + StringUtils.capitalize(otherPlayer.getColor()),
                         FactionEmojis.Nekro);
                 String message = msg
-                        + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology. If you copy more techs than you have singularities, manually remove old ones with /tech remove";
+                        + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology."
+                        + " If you copy more techs than you have singularities, manually remove old ones with `/tech remove`.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech")

@@ -1410,7 +1410,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentationUnfogged() + " pay 3r for the mech", options);
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please pay 3 resources for the mech.",
+                options);
     }
 
     @ButtonHandler("rohdhnaDeploy_")
@@ -1783,7 +1785,11 @@ public class ButtonHelperFactionSpecific {
 
         String unit = buttonID.split("_")[2];
         RemoveUnitService.removeUnits(event, cabal.getNomboxTile(), game, player.getColor(), unit);
-        if (cabal == player) {
+        if ("infantry".equals(unit) || "fighter".equals(unit)) {
+            MessageHelper.sendMessageToChannel(
+                    cabal.getCorrectChannel(),
+                    cabal.getRepresentationUnfogged() + ", you released 1 " + unit + " token from your prison.");
+        } else if (cabal == player) {
             MessageHelper.sendMessageToChannel(
                     cabal.getCorrectChannel(),
                     cabal.getRepresentationUnfogged() + ", you released 1 of your own " + unit + " from your prison.");
@@ -2563,7 +2569,11 @@ public class ButtonHelperFactionSpecific {
             }
             String msg = p2.getRepresentationUnfogged() + ", the "
                     + (game.isFrankenGame() ? "_Military Support_ owner" : "Sol player")
-                    + " has started their turn, use the button to play _Military Support_ if you so wish.";
+                    + " has started their turn, use this button to play _Military Support_ if you so wish.";
+            if (!game.isFowMode()) {
+                msg += " They have " + player.getStrategicCC() + " command token"
+                        + (player.getStrategicCC() == 1 ? "" : "s") + " in their strategy pool.";
+            }
             Button transact = Buttons.green("resolvePNPlay_ms", "Play Military Support");
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
@@ -2718,11 +2728,11 @@ public class ButtonHelperFactionSpecific {
                 new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(p1, game, "fs", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                p1.getFactionEmoji() + " has chosen to discard an ability or genome to deploy their flagship.");
+                p1.getFactionEmoji() + " has chosen to discard an ability or genome to DEPLOY their flagship.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose which system you wish to place the flagship in.", buttons);
         if (p1.hasUnit("redtf_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
-            String message3 = "Use buttons to deploy a mech with the flagship or decline";
+            String message3 = "Use buttons to DEPLOY a mech with the flagship, or decline.";
             List<Button> buttons2 = new ArrayList<>(
                     Helper.getTileWithShipsPlaceUnitButtons(p1, game, "mech", "placeOneNDone_skipbuild"));
             buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
@@ -3478,7 +3488,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", please choose the system with the cruiser where you would like to place the creuss wormhole.",
+                        + ", please choose the system with the cruiser where you would like to place the Creuss wormhole.",
                 buttons);
     }
 

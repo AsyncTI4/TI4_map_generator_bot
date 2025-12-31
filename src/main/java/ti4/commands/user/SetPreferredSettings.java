@@ -16,8 +16,10 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
-        addOptions(
-                new OptionData(OptionType.BOOLEAN, "auto_debt_clearance", "True to auto clear debt when you send tgs"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "auto_debt_clearance",
+                "True to auto clear debt when you send trade goods or commodities"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "pass_on_agenda_stuff",

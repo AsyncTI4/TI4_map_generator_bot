@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -50,6 +51,9 @@ public class PdsCoverageHelper {
                     continue;
                 }
                 if (adjTile.isScar()) {
+                    continue;
+                }
+                if (TeHelperUnits.affectedByQuietus(game, player, adjTile)) {
                     continue;
                 }
                 boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);

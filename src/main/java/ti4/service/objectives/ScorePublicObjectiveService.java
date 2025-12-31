@@ -127,13 +127,13 @@ public class ScorePublicObjectiveService {
         }
         if (player.hasTech("tf-yinascendant") && !poName.toLowerCase().contains("custodian")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to Yin Ascendant.");
+                    player.getCorrectChannel(), player.getRepresentation() + " gains 1 card due to _Yin Ascendant_.");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_units", "Draw 1 Unit Upgrade"));
             buttons.add(Buttons.green("drawSingularNewSpliceCard_genome", "Draw 1 Genome"));
-            buttons.add(Buttons.red("deleteButtons", "Done resolving"));
-            String message2 = player.getRepresentationUnfogged() + " use buttons to resolve.";
+            buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+            String message2 = player.getRepresentationUnfogged() + ", please use these buttons to resolve.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (!poName.toLowerCase().contains("custodian")

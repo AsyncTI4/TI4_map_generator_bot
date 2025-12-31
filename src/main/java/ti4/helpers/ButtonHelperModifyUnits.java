@@ -1161,7 +1161,7 @@ public class ButtonHelperModifyUnits {
                             || player.hasUnit("tf-ambassador")) {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
-                                "We want to enter Coexistence"));
+                                "We Wish To Enter Coexistence"));
                     } else {
                         buttons.add(
                                 Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Coexistence"));
@@ -1174,7 +1174,7 @@ public class ButtonHelperModifyUnits {
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 player2.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
-                                "We want to enter Coexistence"));
+                                "We Wish To Enter Coexistence"));
                         buttons.add(Buttons.red(player2.getFinsFactionCheckerPrefix() + "deleteButtons", "Combat"));
                         msg = player2.getRepresentation()
                                 + " if you wish to enter coexistence on " + planetName
@@ -2063,13 +2063,13 @@ public class ButtonHelperModifyUnits {
         String planetName = unitNPlanet.replace(unitLong + "_", "");
         String unitID = AliasHandler.resolveUnit(unitLong);
         UnitKey unitKey = Mapper.getUnitKey(unitID, player.getColorID());
-        String producedOrPlaced = "Produced";
+        String producedOrPlaced = "produced";
 
         boolean willSkipBuild = skipbuild.contains("skipbuild");
         boolean xxchaTEhero = skipbuild.contains("xxcha");
         boolean orbitalDrop = skipbuild.contains("orbital");
         if (willSkipBuild) {
-            producedOrPlaced = "Placed";
+            producedOrPlaced = "placed";
         }
         String successMessage;
         String playerRep = player.getRepresentation();

@@ -45,7 +45,7 @@ public class FractureService {
         int result = new Die(0).getResult();
         if ("cabalbt".equals(bt)) {
             String msg = player.getRepresentation(false, false)
-                    + " has Cabal breakthrough so the Fracture enters automatically"
+                    + " has _Al'Raith Ix Ianovar_ so The Fracture enters automatically"
                     + "! Ingress tokens will automatically have been placed in their position on the map, if there were no choices to be made.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             spawnFracture(event, game);
@@ -137,7 +137,7 @@ public class FractureService {
         for (Tile t : automaticAdds) {
             t.addToken(Constants.TOKEN_INGRESS, "space");
             if (!game.isFowMode()) {
-                automatic.append("\n> ").append(t.getRepresentationForButtons(game, player));
+                automatic.append("\n- ").append(t.getRepresentationForButtons(game, player));
             }
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), automatic.toString());
@@ -150,16 +150,16 @@ public class FractureService {
             List<Button> buttons = new ArrayList<>(tilesWithSkip.stream()
                     .map(tile -> {
                         String id = player.finChecker() + "addIngressToken_" + tile.getPosition() + "_" + countPer;
-                        String label = "Add ingress to " + tile.getRepresentationForButtons(game, player);
+                        String label = "Add Ingress To " + tile.getRepresentationForButtons(game, player);
                         return Buttons.red(id, label, type.emoji());
                     })
                     .toList());
 
             String msg = game.isFowMode()
                     ? GMService.gmPing(game)
-                    : player.getRepresentation() + " choose tiles with a " + type.emoji()
-                            + " to place an Ingress token:";
-            buttons.add(Buttons.gray("deleteButtons", "Done resolving"));
+                    : player.getRepresentation() + ", please choose 3 systems with a " + type.emoji()
+                            + " to place an Ingress token.";
+            buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
                     game.isFowMode() ? GMService.getGMChannel(game) : player.getCorrectChannel(), msg, buttons);
             if (game.isFowMode()) {
@@ -179,11 +179,11 @@ public class FractureService {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons());
+                player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons() + ".");
         tile.addToken(Constants.TOKEN_INGRESS, "space");
 
         if (game.isFowMode()) {
-            FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into the Fracture.", false);
+            FoWHelper.pingSystem(game, tile.getPosition(), "A new ingress tears into The Fracture.", false);
         }
 
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);

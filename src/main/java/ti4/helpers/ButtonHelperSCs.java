@@ -1374,8 +1374,8 @@ public class ButtonHelperSCs {
                     player.getFactionEmojiOrColor() + " exhausted "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Jae Mir Kan, the Mahact"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow "
-                            + Helper.getSCName(scNum, game));
+                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow **"
+                            + Helper.getSCName(scNum, game) + "**.");
             Leader playerLeader = player.unsafeGetLeader("mahactagent");
             if (playerLeader != null) {
                 playerLeader.setExhausted(true);

@@ -270,7 +270,7 @@ public class TeHelperAgents {
                     if (game.isTwilightsFallMode()) {
                         buttons2.add(Buttons.green(
                                 p2.getFinsFactionCheckerPrefix() + "useTCS_naaluagent-te_" + player.getFaction(),
-                                "Spend A Command Token to Ready Limit Genome"));
+                                "Spend A Command Token To Ready Limit Genome"));
                         buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                         msg = p2.getRepresentationUnfogged()
                                 + " you have the opportunity to spend a command token via _Temporal Command Suite_ to ready _Limit Genome_, and potentially resolve a transaction.";

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -724,5 +725,53 @@ public class CreateGameService {
     public static boolean isGameCreationAllowed() {
         return GlobalSettings.getSetting(
                 GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
+    }
+
+    public String autoGenerateGameName() {
+        // spotless:off
+            // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
+            // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
+            List<String> words = new ArrayList<>(Arrays.asList(
+                "Relativity", "Photon", "Crystalline", "Particle", "Lunar", "Ecosystem", "Hardlight", "Halogen",
+                "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
+                "Fission", "Disruptor", "Network", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
+                "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
+                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Homoeostasis", "Vorpal",
+                "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Lattice", "Obelisk", "Yggdrasil", "Jargon",
+                "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
+                "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Gloom",
+                "Saturn", "Convex", "Nulldrive", "Distortion", "Equilibrium", "Abyss", "Hydra", "Friction",
+                "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
+                "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
+                "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
+                "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Sigma", "Imprint", "Overclock",
+                "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
+                "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Pulsar", "Kinetic", "Chimera",
+                "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
+                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Titration", "Emerald",
+                "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
+                "Tesseract", "Jupiter", "Volatile", "Moebius", "Antimatter", "Phoenix", "Hardwired", "Uninhabitable",
+                "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Terraform",
+                "Conduit", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
+                "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
+                "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
+                "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Atomic",
+                "Galactic", "Redshift", "Cerebral", "Fungi", "Cronus", "Dendrite", "Ziggurat", "Vermilion",
+                "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
+                "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
+                "Parasite", "Synchronisation", "Singularity", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
+                "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
+                "Nitrogen", "Odyssey", "Wavelength", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+                "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
+                "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
+            // extra words: "Bioluminescence", "Uranium", "Wetware", "Moonstone"
+            // spotless:on
+        int gameNumber = getNextGameNumber();
+        int first = gameNumber & 0xFF;
+        int second = (gameNumber >> 8) & 0xFF;
+        int third = (gameNumber >> 16) & 0xFF;
+        second ^= first;
+        third ^= second;
+        return words.get(37 * first & 0xFF) + "-" + words.get(53 * second & 0xFF) + "-" + words.get(83 * third & 0xFF);
     }
 }

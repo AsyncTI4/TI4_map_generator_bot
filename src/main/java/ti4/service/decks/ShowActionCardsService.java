@@ -76,7 +76,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
                 .toList();
         if (!purged.isEmpty()) {
-            String title = "PURGED Action cards";
+            String title = "__Purged__ Action cards";
             return acDiscardText(showFullText, purged, title, game);
         }
         return null;
@@ -87,7 +87,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.ralnelbt)
                 .toList();
         if (!dataSkimmer.isEmpty()) {
-            String title = "Action cards on " + FactionEmojis.Ralnel + " Data Skimmer";
+            String title = "Action cards on " + FactionEmojis.Ralnel + " _Data Skimmer_";
             return acDiscardText(showFullText, dataSkimmer, title, game);
         }
         return null;
@@ -98,7 +98,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.garbozia)
                 .toList();
         if (!garbozia.isEmpty()) {
-            String title = "Action cards on " + MiscEmojis.LegendaryPlanet + " Garbozia";
+            String title = "Action cards on " + MiscEmojis.LegendaryPlanet + " _Dok 'N Pic's Salvage Yard_";
             return acDiscardText(showFullText, garbozia, title, game);
         }
         return null;

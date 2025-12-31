@@ -644,7 +644,9 @@ public class PlayHeroService {
             case "eventhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getCabalHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(
-                        event.getMessageChannel(), "Use buttons to roll some dice", buttons);
+                        event.getMessageChannel(),
+                        "Use buttons to roll some dice, and maybe even kill some stuff.",
+                        buttons);
             }
             case "yssarilhero" -> {
                 for (Player p2 : game.getRealPlayers()) {

@@ -251,6 +251,7 @@ public class AutoCompleteProvider {
                         "traits",
                         "technology_specialties",
                         "attachments",
+                        "unlocked_units",
                         "shipless",
                         "googly",
                         "none");
