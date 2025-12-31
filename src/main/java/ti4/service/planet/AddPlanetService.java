@@ -451,7 +451,7 @@ public class AddPlanetService {
                     FactionEmojis.Bastion));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    "Resolve Liberate on " + planetName + " (Before OR after exploration)",
+                    "Please resolve **Liberate** on " + planetName + " (before __or__ after exploration).",
                     liberateButtons);
         }
 
@@ -625,8 +625,8 @@ public class AddPlanetService {
             } else {
                 id = game.addCustomPO(marrow, 1);
                 game.scorePublicObjective(player.getUserID(), id);
-                message = "Custom PO '" + marrow + "' has been added.\n" + player.getRepresentation() + " scored '"
-                        + marrow + "'";
+                message = "Custom public objective \"_" + marrow + "_\" has been added.\n" + player.getRepresentation()
+                        + " scored \"_" + marrow + "_\".";
             }
             for (Player p : game.getRealPlayers()) {
                 if (p.is(player)) continue;

@@ -28,14 +28,7 @@ public class TiglReportService {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
 
-        if (!game.isReplacementMade()) {
-            UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "This game had a replacement. Please report the results manually: "
-                            + "https://www.ti4ultimate.com/community/tigl/report-game");
-        }
+        UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
     }
 
     private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {

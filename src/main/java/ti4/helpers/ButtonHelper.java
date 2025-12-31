@@ -150,11 +150,15 @@ public class ButtonHelper {
     }
 
     public static String getButtonRepresentation(Button button) {
+        return getButtonRepresentation(button, true);
+    }
+
+    public static String getButtonRepresentation(Button button, boolean includeId) {
         String id = button.getCustomId();
         String label = button.getLabel();
         EmojiUnion emoji = button.getEmoji();
-        return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__  `[" + id
-                + "]`";
+        return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__"
+                + (includeId ? "  `[" + id + "]`" : "");
     }
 
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile) {
@@ -1748,7 +1752,8 @@ public class ButtonHelper {
                         TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
                 MessageHelper.sendMessageToChannelWithButtons(
                         ralnel.getCorrectChannel(),
-                        ralnel.getRepresentation() + " you can use the buttons to resolve Survival Instinct:",
+                        ralnel.getRepresentation()
+                                + ", please use these buttons if you wish to resolve **Survival Instinct**.",
                         buttons);
             }
 
@@ -4970,7 +4975,7 @@ public class ButtonHelper {
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
-                                        + ", due to your **Reclamation** ability, 1 PDS and 1 space dock have been added to the legendary planet. This is optional though.");
+                                        + ", due to your _Reclamation_ ability, 1 PDS and 1 space dock have been added to the legendary planet. This is optional though.");
                     }
                 }
             }
@@ -5291,7 +5296,7 @@ public class ButtonHelper {
                 event, game.getTileByPosition(pos), game, player.getColor(), "1 infantry " + planetName);
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "1 pds " + planetName);
         String successMessage = player.getFactionEmoji() + " replaced 1 " + UnitEmojis.infantry + " on "
-                + Helper.getPlanetRepresentation(planetName, game) + " with 1 pds using awaken.";
+                + Helper.getPlanetRepresentation(planetName, game) + " with 1 PDS using _Awaken_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         deleteMessage(event);
     }
@@ -7885,10 +7890,8 @@ public class ButtonHelper {
         }
 
         if (player.hasUnlockedBreakthrough("ghostbt")) {
-            youCanSpend
-                    .append(" You also have ")
-                    .append(
-                            " the Ghost Breakthrough for a discount equal to the number of wormholes in the system (not counted in the total rn.)");
+            youCanSpend.append(
+                    " You also have _Particle Synthesis_ for a discount equal to the number of wormholes in the system (not counted in the total at the moment).");
         }
         if (production) {
             if (player.hasTech("st")) {
@@ -7972,6 +7975,7 @@ public class ButtonHelper {
     public static void resolveDiploPrimary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
+        Tile tile = null;
         if (type.toLowerCase().contains("mahact")) {
             String color2 = type.replace("mahact", "");
             Player mahactP = game.getPlayerFromColorOrFaction(color2);
@@ -7979,7 +7983,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find Mahact player.");
                 return;
             }
-            Tile tile = game.getTileByPosition(planet);
+            tile = game.getTileByPosition(planet);
             CommandCounterHelper.addCC(event, mahactP, tile);
             Helper.isCCCountCorrect(mahactP);
             for (String color : mahactP.getMahactCC()) {
@@ -7995,8 +7999,9 @@ public class ButtonHelper {
             if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
-            String message = player.getFactionEmoji() + " chose to Diplo the system containing "
-                    + Helper.getPlanetRepresentation(planet, game) + ".";
+            tile = game.getTileFromPlanet(planet);
+            String message =
+                    player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons() + " system.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             if (!game.isFowMode()) {
                 sendMessageToRightStratThread(player, game, message, "diplomacy", null);

@@ -43,7 +43,7 @@ class SurveyResults extends Subcommand {
     }
 
     private void incrementCount(Map<String, Integer> map, String key) {
-        map.put(key, map.getOrDefault(key, 0) + 1);
+        map.merge(key, 1, Integer::sum);
     }
 
     private String generateQuestionResult(String questionHeader, Map<String, Integer> data) {

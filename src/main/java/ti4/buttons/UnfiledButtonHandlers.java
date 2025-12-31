@@ -1157,7 +1157,7 @@ public class UnfiledButtonHandlers {
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
             ButtonHelper.deleteMessage(event);
         } else if ("tf".equalsIgnoreCase(type)) {
-            message += " three triune fighters! The relevant fighters should now be removed by the owner.";
+            message += " three Triune fighters! The relevant fighters should now be removed by the owner.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     "Remove the Fighters",
@@ -1224,7 +1224,8 @@ public class UnfiledButtonHandlers {
         if (sendReact) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
-                        game.getActionsChannel(), game.getPing() + ", an action card has been canceled.");
+                        game.getActionsChannel(),
+                        game.getPing() + ", the action card _" + acName + "_ has been canceled.");
             } else {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             }
@@ -1626,8 +1627,8 @@ public class UnfiledButtonHandlers {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.getFaction().equals(faction)) {
                     game.setSpeakerUserID(player_.getUserID());
-                    String message =
-                            MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                    String message = MiscEmojis.SpeakerToken + " Speaker has been assigned to "
+                            + player_.getRepresentation(false, true) + ".";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     if (!game.isFowMode()) {
                         ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
@@ -1647,8 +1648,8 @@ public class UnfiledButtonHandlers {
         for (Player player_ : game.getPlayers().values()) {
             if (player_.getFaction().equals(faction)) {
                 game.setSpeakerUserID(player_.getUserID());
-                String message =
-                        MiscEmojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                String message = MiscEmojis.SpeakerToken + " Speaker has been assigned to "
+                        + player_.getRepresentation(false, true) + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
@@ -1675,8 +1676,8 @@ public class UnfiledButtonHandlers {
         for (Player player_ : game.getPlayers().values()) {
             if (player_.getFaction().equals(faction)) {
                 game.setTyrantUserID(player_.getUserID());
-                String message =
-                        MiscEmojis.SpeakerToken + " Tyrant assigned to: " + player_.getRepresentation(false, true);
+                String message = MiscEmojis.BenedictionToken + " Tyrant has been assigned to "
+                        + player_.getRepresentation(false, true) + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (game.isFowMode() && player != player_) {
                     MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
@@ -1855,7 +1856,7 @@ public class UnfiledButtonHandlers {
             List<Button> buttons = new ArrayList<>();
             buttons.add(rift);
             String message2 = "## " + player.getRepresentationUnfogged()
-                    + ", if applicable, use this button to rift retreating units BEFORE choosing where to retreat. It needs to be before you actually select where to retreat.";
+                    + ", if applicable, use this button to rift retreating units __before__ choosing where to retreat. It needs to be before you actually select where to retreat.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
         }
     }
@@ -2631,7 +2632,7 @@ public class UnfiledButtonHandlers {
                         Button flipAgenda = Buttons.blue("edictPhase", "Do Edict Phase");
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
-                                event.getChannel(), "Please proceed to edict phase now.", buttons);
+                                event.getChannel(), "Please proceed to the Edict Phase now.", buttons);
                     } else {
                         Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                         List<Button> buttons = List.of(flipAgenda);
@@ -2659,7 +2660,7 @@ public class UnfiledButtonHandlers {
                         List<Button> buttons = List.of(flipAgenda);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "Please proceed to edict phase after the last person finishing doing CCs.",
+                                "Please proceed to Edict Phase after the last person finishing doing gaining and redistributing command tokens.",
                                 buttons);
                     } else {
                         Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
@@ -3541,7 +3542,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("passingAbilities")
     private static void passingAbilities(ButtonInteractionEvent event, Player player, Game game) {
-        String msg = "Use buttons to do an ability when you pass:";
+        String msg = "Use these buttons to do an ability when you pass.";
         List<Button> buttons = ButtonHelper.getPassingAbilities(player, game);
         buttons.addFirst(Buttons.red(player.finChecker() + "passForRound", "Pass"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);

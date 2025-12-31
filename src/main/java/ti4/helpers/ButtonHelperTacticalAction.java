@@ -88,7 +88,7 @@ public class ButtonHelperTacticalAction {
             }
             if (player.hasAbility("miniaturization")) {
                 String msg = player.getRepresentation()
-                        + " You can land your structures on planets in any system you have floating structures using your ability Miniaturization:";
+                        + ", you may use **Miniaturization** to land any of your structures in the space area onto planets you control in this system.";
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
                 if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -97,7 +97,7 @@ public class ButtonHelperTacticalAction {
 
             if (player.hasUnlockedBreakthrough("argentbt")) {
                 String msg = player.getRepresentation()
-                        + " You can use your breakthrough to move ships (and things they transport) between the active system and any adjacent system with only your units and your CC";
+                        + ", you may use _Wing Transfer_ to move ships (and things they transport) between the active system and any adjacent system with only your units and your command tokens.";
                 List<Button> buttons = ButtonHelperHeroes.argentBreakthroughStep1(
                         game, player, game.getTileByPosition(game.getActiveSystem()));
                 if (buttons.size() > 2) {
@@ -568,7 +568,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button4 = ButtonHelperAgents.getTFAwakenButtons(game, tile, player);
         if (player.hasTech("tf-awaken") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged()
-                    + ", you can use these buttons to change an infantry into a PDS using awaken.";
+                    + ", you can use these buttons to change an infantry into a PDS using _Awaken_.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button4);
         }
 
@@ -605,12 +605,12 @@ public class ButtonHelperTacticalAction {
             if (game.isTwilightsFallMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", Please resolve a wavelength explore.",
+                        player.getRepresentation() + ", please resolve a _Wavelength_ exploration.",
                         button2);
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
+                        player.getRepresentation() + ", please resolve _Scanlink Drone Network_.",
                         button2);
             }
         }
@@ -652,19 +652,19 @@ public class ButtonHelperTacticalAction {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "flipBreach_" + pos, "Flip breach to " + label));
-                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 String msg = player.getRepresentation()
-                        + " You can use the buttons to flip the breach in the active system:";
+                        + ", you may use the buttons to flip the Breach in the active system.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
             if (player.hasPlayablePromissoryInHand("nanolink")
                     && !activeSystem.getPlanetUnitHolders().isEmpty()
                     && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
-                        + " You can use Nano Link Permit to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                        + ", you may use _Nano-Link Permit_ to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system.";
                 List<Button> buttons = List.of(
-                        Buttons.green("startCourierTransport_" + pos, "Play Nano Link Permit"),
-                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                        Buttons.green("startCourierTransport_" + pos, "Play Nano-Link Permit"),
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
                                 .size()
                         > 1) {
@@ -675,10 +675,10 @@ public class ButtonHelperTacticalAction {
                     && !activeSystem.getPlanetUnitHolders().isEmpty()
                     && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
-                        + " You can use courier transport to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                        + ", you may use _Courier Transport_ to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system.";
                 List<Button> buttons = List.of(
                         Buttons.green("startCourierTransport_" + pos, "Use Courier Transport"),
-                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
                                 .size()
                         > 1) {

@@ -356,7 +356,7 @@ public class PromissoryNoteHelper {
             ButtonHelperAgents.resolveArtunoCheck(player, 2);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you gained 2 trade goods " + ms + " from Black Ops.");
+                    player.getRepresentationUnfogged() + " you gained 2 trade goods " + ms + " from _Black Ops_.");
             String trueIdentity = player.getRepresentationUnfogged();
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
@@ -366,8 +366,8 @@ public class PromissoryNoteHelper {
             ActionCardHelper.sendPlotCardInfo(game, owner);
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
-                    owner.getRepresentation() + " place a plot into play with " + player.getRepresentationNoPing()
-                            + " token on it from black ops");
+                    owner.getRepresentation() + " _Black Ops_ has been played by " + player.getRepresentationNoPing()
+                            + ". Please choose a Plot to put into play with a control token from them on it.");
             owner.removeOwnedPromissoryNoteByID(id);
             player.removePromissoryNote(id);
             owner.removePromissoryNote(id);
@@ -381,8 +381,14 @@ public class PromissoryNoteHelper {
                         owner.getCorrectChannel(),
                         owner.getRepresentationUnfogged()
                                 + " lost a command token from strategy pool due to a _Military Support_ play.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        owner.getCorrectChannel(),
+                        owner.getRepresentationUnfogged()
+                                + " had no command tokens in their strategy pool when _Military Support_ was played.");
             }
-            String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
+            String message = player.getRepresentationUnfogged()
+                    + ", please choose which planet you wish to drop 2 infantry upon.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("malevolency".equalsIgnoreCase(id)) {

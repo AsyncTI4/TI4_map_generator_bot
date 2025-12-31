@@ -117,11 +117,15 @@ public class StartTurnService {
                         ? nextPlayer.getRepresentationUnfogged()
                         : nextPlayer.getRepresentationNoPing();
                 int numUnpassed = -2;
+                boolean anyPassed = false;
                 for (Player p2 : game.getPlayers().values()) {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                    anyPassed |= p2.isPassed() || p2.isEliminated();
                 }
                 text += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0) {
+                if (!anyPassed) {
+                    text += "All players are yet to pass.";
+                } else if (numUnpassed == 0) {
                     text += "No other players are unpassed.";
                 } else {
                     text += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
@@ -543,7 +547,7 @@ public class StartTurnService {
             if (player.ownsUnit("tf-ahksylfier")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 0) {
                 startButtons.add(
-                        Buttons.gray("creussTFCruiserStep1_", "Use Creuss Cruiser Ability", FactionEmojis.Ghost));
+                        Buttons.gray("creussTFCruiserStep1_", "Use Ahk Syl Fier Ability", CardEmojis.MixedWormhole));
             }
             if (player.hasUnit("redtf_flagship")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", true) < 1) {

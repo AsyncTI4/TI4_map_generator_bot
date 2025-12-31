@@ -12,8 +12,8 @@ import ti4.service.map.FractureService;
 
 public class SpawnFracture extends GameStateSubcommand {
     public SpawnFracture() {
-        super(Constants.FRACTURE, "Add the fracture tiles, neutral units, and ingress tokens to the map", true, true);
-        addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction that triggered the fracture", true, true);
+        super(Constants.FRACTURE, "Add The Fracture tiles, neutral units, and ingress tokens to the map", true, true);
+        addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction that triggered The Fracture", true, true);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class SpawnFracture extends GameStateSubcommand {
         }
 
         if (FractureService.isFractureInPlay(game)) {
-            MessageHelper.sendMessageToEventChannel(event, "Fracture is already in play.");
+            MessageHelper.sendMessageToEventChannel(event, "The Fracture is already in play.");
         }
 
         FractureService.spawnFracture(event, game);

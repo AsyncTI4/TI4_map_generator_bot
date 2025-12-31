@@ -42,10 +42,11 @@ public class DataSkimmerService {
                 Buttons.red(finChecker + "discardDataSkimmer", "Discard Cards on Data Skimmer", CardEmojis.ActionCard));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
-        String message = "Use the buttons to interact with Data Skimmer.";
+        String message = "Use these buttons to interact with _Data Skimmer_.";
         if (!ralnel.isPassed()) {
-            message = "### WARNING: You are not passed, so you probably shouldn't be messing with Data Skimmer yet.\n"
-                    + message;
+            message =
+                    "### __Warning!__ You are not passed, so you probably shouldn't be messing with _Data Skimmer_ yet.\n"
+                            + message;
         }
         MessageHelper.sendMessageToChannelWithButtons(ralnel.getCorrectChannel(), message, buttons);
     }
@@ -75,7 +76,7 @@ public class DataSkimmerService {
         List<Button> pickButtons = getPickCardButtons(game, ralnel, buttonPrefix);
         List<Button> peekButton = List.of(Buttons.gray("peekDataSkimmer", "See Cards on Data Skimmer", "👀"));
 
-        String message = "Use the buttons to pick a card from Data Skimmer to add to your hand";
+        String message = "Use these buttons to pick a card from _Data Skimmer_, to add to your hand.";
         if (NewStuffHelper.checkAndHandlePaginationChange(
                 null, ralnel.getCorrectChannel(), pickButtons, peekButton, message, buttonPrefix, buttonID)) {
             ButtonHelper.deleteMessage(event);
@@ -101,12 +102,12 @@ public class DataSkimmerService {
 
         if (game.pickActionCard(ralnel.getUserID(), acNum)) {
             ActionCardModel acModel = Mapper.getActionCard(acID);
-            String msg = ralnel.getRepresentation() + " picked up " + acModel.getName()
-                    + " from Data Skimmer and added it to their hand.";
+            String msg = ralnel.getRepresentation() + " picked up _" + acModel.getName()
+                    + "_ from _Data Skimmer_ and added it to their hand.";
             MessageHelper.sendMessageToChannel(ralnel.getCorrectChannel(), msg);
         } else {
-            String msg = "Error: Could not pick up action card from Data Skimmer.";
-            msg += "\nUse `\\breakthrough activate` to try again";
+            String msg = "Error: Could not pick up action card from _Data Skimmer_.";
+            msg += "\nUse `/breakthrough activate` to try again.";
             MessageHelper.sendMessageToChannel(ralnel.getCorrectChannel(), msg);
         }
     }
