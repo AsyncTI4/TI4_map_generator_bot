@@ -99,8 +99,7 @@ public class TeHelperCommanders {
             }
             game.setStoredValue("OjzRetreatMap", TeHelperAbilities.storeMovementMap(ojzMap));
 
-            List<Button> buttons =
-                    getWatchfulOjzUnitButtons(game, player, source, ojzMap.getOrDefault(pos, new ArrayList<>()));
+            List<Button> buttons = getWatchfulOjzUnitButtons(game, player, source, ojzMap.get(pos));
             String message = player.getRepresentation()
                     + ", choose up to 2 ships to retreat as well as anything they may transport using Watchful Ojz, the Ral Nel commander.";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);
