@@ -558,7 +558,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage =
-                            p1.getFactionEmoji() + " Spent 1 strategy token using " + FactionEmojis.Muaat
+                            p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Muaat
                                     + UnitEmojis.flagship + "The Inferno (" + (p1.getStrategicCC()) + "->"
                                     + (p1.getStrategicCC() - 1) + ") \n";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
@@ -580,7 +580,7 @@ public class ComponentActionHelper {
                     ButtonHelper.deleteMessage(event);
                 } else if ("muaatFSsigma".equalsIgnoreCase(buttonID)) {
                     String successMessage =
-                            p1.getFactionEmoji() + " Spent 1 strategy token using " + FactionEmojis.Muaat
+                            p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Muaat
                                     + UnitEmojis.flagship + "The Inferno (" + (p1.getStrategicCC()) + "->"
                                     + (p1.getStrategicCC() - 1) + ") \n";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);

@@ -2057,7 +2057,7 @@ public class ButtonHelperAbilities {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged()
-                                    + " your number of oceans reduced down to your number of coexisting planets ("
+                                    + ", your number of Oceans has been reduced down to your number of coexisting planets ("
                                     + coexisting.size() + ").");
                 } else {
                     if (oceans.size() < 5) {
@@ -2077,8 +2077,8 @@ public class ButtonHelperAbilities {
                         }
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
-                                player.getRepresentationUnfogged() + " your number of oceans increased and is now "
-                                        + player.getOceans().size() + ". The new oceans were also readied.");
+                                player.getRepresentationUnfogged() + " your number of Oceans has increased, and is now "
+                                        + player.getOceans().size() + ". The new Oceans were also readied.");
                         CommanderUnlockCheckService.checkPlayer(player, "deepwrought");
                     }
                 }

@@ -102,7 +102,7 @@ public class ActionCardHelper {
         // ACTION CARDS
         sb.append("### ")
                 .append(MiscEmojis.LegendaryPlanet)
-                .append(" **Garbozia Action Cards:**")
+                .append(" _Dok 'N Pic's Salvage Yard_ Action Cards:")
                 .append("\n");
 
         Map<String, Integer> actionCards = game.getDiscardActionCards();
@@ -255,13 +255,13 @@ public class ActionCardHelper {
                 .forEachOrdered(plotEntry -> {
                     GenericCardModel plot = plotEntry.getValue();
                     String buttonID = "removeFactionTokenFromPlot_" + plot.getAlias();
-                    String buttonText = "Remove from " + plot.getName();
+                    String buttonText = "Remove From " + plot.getName();
                     List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
                     if (factions != null && !factions.isEmpty()) {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players Secrets"));
+        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets"));
         return buttons;
     }
 
@@ -281,7 +281,7 @@ public class ActionCardHelper {
     }
 
     private static String getPlotCardInfo(Game game, Player player) {
-        StringBuilder sb = new StringBuilder("### **__Plot Cards:__**\n");
+        StringBuilder sb = new StringBuilder("### __Plot Cards:__\n");
         player.getPlotCards().entrySet().stream()
                 .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
                 .sorted(Comparator.comparingInt(Entry::getKey))
@@ -691,7 +691,7 @@ public class ActionCardHelper {
         String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
-        message += fromGarbozia ? " using Garbozia." : ".";
+        message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
 
         List<Button> buttons = new ArrayList<>();
 
@@ -721,7 +721,7 @@ public class ActionCardHelper {
                         empy.getCardsInfoThread(),
                         empy.getRepresentationUnfogged()
                                 + "You have one or more mechs adjacent to some units of the player who played _"
-                                + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
+                                + actionCardTitle + "_. Use these buttons to decide whether to Sabo this action card.",
                         empyButtons);
             }
             Player tfTriune = Helper.getPlayerFromUnit(game, "tf-triune");
@@ -737,8 +737,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         tfTriune.getCardsInfoThread(),
                         tfTriune.getRepresentationUnfogged()
-                                + "You have three fighters adjacent to some units of the player who played _"
-                                + actionCardTitle + "_. Use buttons to decide whether to Shatter this action card.",
+                                + "You have at least 3 Triune fighters adjacent to some units of the player who played _"
+                                + actionCardTitle
+                                + "_. Use these buttons to decide whether to cancel this action card.",
                         tfButtons);
             }
             String instinctTrainingID = "it";
@@ -756,7 +757,7 @@ public class ActionCardHelper {
                             player2.getCardsInfoThread(),
                             player2.getRepresentationUnfogged()
                                     + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
-                                    + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.",
+                                    + " Use these buttons to decide whether to Sabo _" + actionCardTitle + "_.",
                             xxchaButtons);
                 }
             }
@@ -1396,9 +1397,9 @@ public class ActionCardHelper {
 
             if ("tf-rise".equals(automationID)) {
                 codedButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", "1 infantry on every planet"));
+                        player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", "1 Infantry On Every Planet"));
                 codedButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 fighter with every ship"));
+                        player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 Fighter With Every Ship"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
@@ -1633,7 +1634,7 @@ public class ActionCardHelper {
                     List<Button> hackButtons = List.of(resetHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(
                             mainGameChannel,
-                            "The player who played hack election will now vote last."
+                            "The election hacker will now vote last."
                                     + " Please hit this button if _Hack Election_ is Sabo'd.",
                             game,
                             player,

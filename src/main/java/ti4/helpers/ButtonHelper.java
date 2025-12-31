@@ -1748,7 +1748,8 @@ public class ButtonHelper {
                         TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
                 MessageHelper.sendMessageToChannelWithButtons(
                         ralnel.getCorrectChannel(),
-                        ralnel.getRepresentation() + " you can use the buttons to resolve Survival Instinct:",
+                        ralnel.getRepresentation()
+                                + ", please use these buttons if you wish to resolve **Survival Instinct**.",
                         buttons);
             }
 
@@ -7876,10 +7877,8 @@ public class ButtonHelper {
         }
 
         if (player.hasUnlockedBreakthrough("ghostbt")) {
-            youCanSpend
-                    .append(" You also have ")
-                    .append(
-                            " the Ghost Breakthrough for a discount equal to the number of wormholes in the system (not counted in the total rn.)");
+            youCanSpend.append(
+                    " You also have _Particle Synthesis_ for a discount equal to the number of wormholes in the system (not counted in the total at the moment).");
         }
         if (production) {
             if (player.hasTech("st")) {
@@ -7963,6 +7962,7 @@ public class ButtonHelper {
     public static void resolveDiploPrimary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(planet);
         if (type.toLowerCase().contains("mahact")) {
             String color2 = type.replace("mahact", "");
             Player mahactP = game.getPlayerFromColorOrFaction(color2);
@@ -7970,7 +7970,6 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find Mahact player.");
                 return;
             }
-            Tile tile = game.getTileByPosition(planet);
             CommandCounterHelper.addCC(event, mahactP, tile);
             Helper.isCCCountCorrect(mahactP);
             for (String color : mahactP.getMahactCC()) {
@@ -7986,8 +7985,8 @@ public class ButtonHelper {
             if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
-            String message = player.getFactionEmoji() + " chose to Diplo the system containing "
-                    + Helper.getPlanetRepresentation(planet, game) + ".";
+            String message =
+                    player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons() + " system.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             if (!game.isFowMode()) {
                 sendMessageToRightStratThread(player, game, message, "diplomacy", null);

@@ -1157,7 +1157,7 @@ public class UnfiledButtonHandlers {
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
             ButtonHelper.deleteMessage(event);
         } else if ("tf".equalsIgnoreCase(type)) {
-            message += " three triune fighters! The relevant fighters should now be removed by the owner.";
+            message += " three Triune fighters! The relevant fighters should now be removed by the owner.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     "Remove the Fighters",
@@ -1855,7 +1855,7 @@ public class UnfiledButtonHandlers {
             List<Button> buttons = new ArrayList<>();
             buttons.add(rift);
             String message2 = "## " + player.getRepresentationUnfogged()
-                    + ", if applicable, use this button to rift retreating units BEFORE choosing where to retreat. It needs to be before you actually select where to retreat.";
+                    + ", if applicable, use this button to rift retreating units __before__ choosing where to retreat. It needs to be before you actually select where to retreat.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
         }
     }
@@ -3541,7 +3541,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("passingAbilities")
     private static void passingAbilities(ButtonInteractionEvent event, Player player, Game game) {
-        String msg = "Use buttons to do an ability when you pass:";
+        String msg = "Use these buttons to do an ability when you pass.";
         List<Button> buttons = ButtonHelper.getPassingAbilities(player, game);
         buttons.addFirst(Buttons.red(player.finChecker() + "passForRound", "Pass"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(event.getMessageChannel(), msg, buttons);

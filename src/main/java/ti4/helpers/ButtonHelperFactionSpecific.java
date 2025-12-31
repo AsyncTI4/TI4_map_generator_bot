@@ -1410,7 +1410,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentationUnfogged() + ", please pay 3 resources for the mech.", options);
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please pay 3 resources for the mech.",
+                options);
     }
 
     @ButtonHandler("rohdhnaDeploy_")
@@ -2563,7 +2565,11 @@ public class ButtonHelperFactionSpecific {
             }
             String msg = p2.getRepresentationUnfogged() + ", the "
                     + (game.isFrankenGame() ? "_Military Support_ owner" : "Sol player")
-                    + " has started their turn, use the button to play _Military Support_ if you so wish.";
+                    + " has started their turn, use this button to play _Military Support_ if you so wish.";
+            if (!game.isFowMode()) {
+                msg += " They have " + player.getStrategicCC() + " command token"
+                        + (player.getStrategicCC() == 1 ? "" : "s") + " in their strategy pool.";
+            }
             Button transact = Buttons.green("resolvePNPlay_ms", "Play Military Support");
             List<Button> buttons = new ArrayList<>();
             buttons.add(transact);
@@ -3478,7 +3484,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
-                        + ", please choose the system with the cruiser where you would like to place the creuss wormhole.",
+                        + ", please choose the system with the cruiser where you would like to place the Creuss wormhole.",
                 buttons);
     }
 

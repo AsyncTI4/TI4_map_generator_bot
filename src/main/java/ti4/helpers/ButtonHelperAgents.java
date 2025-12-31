@@ -621,7 +621,8 @@ public class ButtonHelperAgents {
         }
 
         if ("researchagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " used their genome to add 3 cards to the draft.";
+            String exhaustText =
+                    player.getRepresentation() + " has used the _Research Genome_ to add 3 cards to the draft.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             game.setStoredValue("researchagentSplice" + player.getFaction(), "Yes");
         }
@@ -714,8 +715,8 @@ public class ButtonHelperAgents {
                     player.getCorrectChannel(), msg, getJolNarAgentButtons(player, game));
         }
         if ("experimentalagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Experiment"
-                    + ssruuSlash + " genome.";
+            String exhaustText =
+                    player.getRepresentation() + " has exhausted the " + ssruuClever + "_Experimental Genome_.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String msg = player.getRepresentationUnfogged() + " you may use the buttons to remove infantry.";
             MessageHelper.sendMessageToChannelWithButtons(
@@ -901,7 +902,7 @@ public class ButtonHelperAgents {
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Crimson"
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Ahk Ravin, the Crimson"
                     + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("redcreussagent_", "").replace("crimsonagent_", "");
@@ -1002,7 +1003,7 @@ public class ButtonHelperAgents {
                     channel2, p2.getRepresentation() + " use these buttons to galvanize a unit.", buttons);
         }
         if ("valiantagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Valiant genome.";
+            String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Valiant Genome_.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1031,8 +1032,9 @@ public class ButtonHelperAgents {
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + " the Deepwrought"
-                    + ssruuSlash + " agent to allow " + p2.getRepresentation() + " to skip a pre-req.";
+            String exhaustText =
+                    player.getRepresentation() + " has exhausted " + ssruuClever + "Doctor Carrina, the Deepwrought"
+                            + ssruuSlash + " agent, to allow " + p2.getRepresentation() + " to skip a prerequisite.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
 
             List<Button> buttons = new ArrayList<>();
@@ -1046,7 +1048,7 @@ public class ButtonHelperAgents {
                 }
             }
             String msg = player.getRepresentation()
-                    + " after the user of the agent skips a pre-req, choose the planet of theirs that you will coexist on.";
+                    + " after the target for Doctor Carrina skips a prerequisite, please choose the planet of theirs that you will coexist on.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
 
@@ -1165,14 +1167,13 @@ public class ButtonHelperAgents {
         }
 
         if ("hyperagent".equalsIgnoreCase(agent)) {
-            String exhaustText =
-                    player.getRepresentation() + " has exhausted " + ssruuClever + "the Hyper" + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + " _Hyper Genome_.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
-            String successMessage = player.getFactionEmoji() + " drew 1 action card";
-            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card";
+            String successMessage = player.getFactionEmoji() + " drew 1 action card.";
+            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card.";
             if (p2.getTg() > 0) {
                 p2.setTg(p2.getTg() - 1);
                 player.gainTG(1, true);
@@ -1180,16 +1181,16 @@ public class ButtonHelperAgents {
             }
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
-                successMessage += ", then drew another action card for **Scheming**. Please now discard 1 action card";
+                successMessage += ", then drew another action card for _Scheming_. Please now discard 1 action card.";
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard an action card.",
+                        player.getRepresentationUnfogged() + ", please use these buttons to discard an action card.",
                         ActionCardHelper.getDiscardActionCardButtons(player, false));
             }
             successMessage += ". ";
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
-                successMessage2 += ", then drew another action card for **Scheming**. Please now discard 1 action card";
+                successMessage2 += ", then drew another action card for _Scheming_. Please now discard 1 action card";
                 MessageHelper.sendMessageToChannelWithButtons(
                         p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
@@ -1210,17 +1211,17 @@ public class ButtonHelperAgents {
 
             ButtonHelper.checkACLimit(game, player);
             ButtonHelper.checkACLimit(game, p2);
-            String headerText = player.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
-                    + "the Hyper" + ssruuSlash + " agent";
+            String headerText = player.getRepresentationUnfogged() + ", you got 1 action card from the " + ssruuClever
+                    + "_Hyper Genome_.";
             headerText += player.hasAbility("scheming")
-                    ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
+                    ? ", then drew another action card for _Scheming_. Please now discard 1 action card."
                     : ".";
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
             ActionCardHelper.sendActionCardInfo(game, player);
-            String headerText2 = p2.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
-                    + "the Hyper" + ssruuSlash + " agent";
+            String headerText2 = p2.getRepresentationUnfogged() + ", you got 1 action card from the " + ssruuClever
+                    + "_Hyper Genome_.";
             headerText2 += p2.hasAbility("scheming")
-                    ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
+                    ? ", then drew another action card for _Scheming_. Please now discard 1 action card."
                     : ".";
             MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
             ActionCardHelper.sendActionCardInfo(game, p2);

@@ -248,7 +248,7 @@ public class ButtonHelperTwilightsFall {
                         }
                         MessageHelper.sendMessageToChannel(
                                 p.getCardsInfoThread(),
-                                p.getRepresentation() + " choose your starting home system",
+                                p.getRepresentation() + ", please choose your home system tile.",
                                 buttons);
                     }
                     if (category == DraftItem.Category.STARTINGFLEET) {
@@ -258,7 +258,8 @@ public class ButtonHelperTwilightsFall {
                         }
                         MessageHelper.sendMessageToChannel(
                                 p.getCardsInfoThread(),
-                                p.getRepresentation() + " after choosing your home system, choose your starting fleet",
+                                p.getRepresentation()
+                                        + ", after choosing your home system, please choose your starting units.",
                                 buttons);
                     }
                     if (category == DraftItem.Category.BLUETILE || category == DraftItem.Category.REDTILE) {
@@ -395,10 +396,12 @@ public class ButtonHelperTwilightsFall {
             }
 
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), player.getRepresentation() + " set starting fleet successfully.");
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", you've set your starting units successfully.");
         } else {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), player.getRepresentation() + " couldnt figure out that fleet, sorry.");
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", I couldn't figure out the starting units you wanted, sorry.");
         }
 
         ButtonHelper.deleteMessage(event);
@@ -439,10 +442,12 @@ public class ButtonHelperTwilightsFall {
             player.setPlayerStatsAnchorPosition(pos);
             MiltyService.setupExtraFactionTiles(game, player, faction, positionHS, toAdd);
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), player.getRepresentation() + " set home system successfully.");
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", you've set your home system tile successfully.");
         } else {
             MessageHelper.sendMessageToChannel(
-                    player.getCardsInfoThread(), player.getRepresentation() + " couldnt figure out that HS, sorry.");
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", I couldn't figure out that home system tile, sorry.");
         }
 
         ButtonHelper.deleteMessage(event);
@@ -599,7 +604,7 @@ public class ButtonHelperTwilightsFall {
         ButtonHelper.sendMessageToRightStratThread(
                 player,
                 game,
-                player.getRepresentationNoPing() + " will participate in the splice",
+                player.getRepresentationNoPing() + " will participate in the splice.",
                 ButtonHelper.getStratName(splice));
 
         // Some message in SC thread to say they are participating?
@@ -742,7 +747,7 @@ public class ButtonHelperTwilightsFall {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " has chosen to get a commonly available technology instead of splicing. The technology is _"
+                            + " has chosen to get a generic technology instead of splicing. The technology is _"
                             + Mapper.getTech(cardID).getName() + "_.",
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
