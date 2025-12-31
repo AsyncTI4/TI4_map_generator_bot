@@ -3353,11 +3353,7 @@ public class Helper {
                 continue;
             }
             UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
-            if (unitCounts.containsKey(ut)) {
-                unitCounts.put(ut, unitCounts.get(ut) + count);
-            } else {
-                unitCounts.put(ut, count);
-            }
+            unitCounts.merge(ut, count, Integer::sum);
         }
         return unitCounts;
     }

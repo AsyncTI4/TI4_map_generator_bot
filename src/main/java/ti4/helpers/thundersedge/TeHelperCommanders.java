@@ -92,8 +92,7 @@ public class TeHelperCommanders {
             String unitStr = matcher.group("unittype") + " " + matcher.group("planet");
 
             if (buttonID.startsWith("move")) {
-                if (!ojzMap.containsKey(pos)) ojzMap.put(pos, new ArrayList<>());
-                ojzMap.get(pos).add(unitStr);
+                ojzMap.computeIfAbsent(pos, key -> new ArrayList<>()).add(unitStr);
             } else {
                 if (ojzMap.containsKey(pos)) ojzMap.get(pos).remove(unitStr);
                 if (ojzMap.containsKey(pos) && ojzMap.get(pos).isEmpty()) ojzMap.remove(pos);
