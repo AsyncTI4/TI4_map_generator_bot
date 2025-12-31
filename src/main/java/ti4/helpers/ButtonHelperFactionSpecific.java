@@ -1785,7 +1785,11 @@ public class ButtonHelperFactionSpecific {
 
         String unit = buttonID.split("_")[2];
         RemoveUnitService.removeUnits(event, cabal.getNomboxTile(), game, player.getColor(), unit);
-        if (cabal == player) {
+        if ("infantry".equals(unit) || "fighter".equals(unit)) {
+            MessageHelper.sendMessageToChannel(
+                    cabal.getCorrectChannel(),
+                    cabal.getRepresentationUnfogged() + ", you released 1 " + unit + " token from your prison.");
+        } else if (cabal == player) {
             MessageHelper.sendMessageToChannel(
                     cabal.getCorrectChannel(),
                     cabal.getRepresentationUnfogged() + ", you released 1 of your own " + unit + " from your prison.");

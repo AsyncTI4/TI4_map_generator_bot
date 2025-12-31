@@ -187,7 +187,7 @@ class CreateGameButtonHandler {
         }
 
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = "tabletalk";
+        String gameSillyName = CreateGameService.autoGenerateGameName();
         // StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameService.getNextGameName();
         String lastGameName = CreateGameService.getLastGameName();
