@@ -7975,7 +7975,6 @@ public class ButtonHelper {
     public static void resolveDiploPrimary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
-        Tile tile = null;
         if (type.toLowerCase().contains("mahact")) {
             String color2 = type.replace("mahact", "");
             Player mahactP = game.getPlayerFromColorOrFaction(color2);
@@ -7983,7 +7982,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find Mahact player.");
                 return;
             }
-            tile = game.getTileByPosition(planet);
+            Tile tile = game.getTileByPosition(planet);
             CommandCounterHelper.addCC(event, mahactP, tile);
             Helper.isCCCountCorrect(mahactP);
             for (String color : mahactP.getMahactCC()) {
@@ -7992,16 +7991,22 @@ public class ButtonHelper {
                     Helper.isCCCountCorrect(game, color);
                 }
             }
-            String message = player.getFactionEmoji() + " chose to use _Scepter of Dominion_ in the system "
-                    + tile.getRepresentation() + ".";
+            String message = player.getFactionEmoji() + " chose to use the _Scepter of Dominion_ in the "
+                    + tile.getRepresentation() + " system.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
             if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
-            tile = game.getTileFromPlanet(planet);
-            String message =
-                    player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons() + " system.";
+            Tile tile = game.getTileFromPlanet(planet);
+            String message;
+            if (tile != null) {
+                message =
+                        player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons() + " system.";
+            } else {
+                message = player.getFactionEmoji() + " chose to Diplo the system containing "
+                    + Helper.getPlanetRepresentation(planet, game) + ".";
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             if (!game.isFowMode()) {
                 sendMessageToRightStratThread(player, game, message, "diplomacy", null);
