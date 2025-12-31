@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorServiceManager;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -97,12 +96,12 @@ public class ModalListener extends ListenerAdapter {
 
     public static String getModalDebugText(ModalInteractionEvent event) {
         StringBuilder output = new StringBuilder("INPUT:\n```\n" + "MenuID: " + event.getModalId());
-        for (ModalMapping field : event.getValues()) {
-            output.append("\n> Field: ")
-                    .append(field.getCustomId())
-                    .append(" => ")
-                    .append(field.getAsString());
-        }
+        // for (ModalMapping field : event.getValues()) {
+        //     output.append("\n> Field: ")
+        //             .append(field.getCustomId())
+        //             .append(" => ")
+        //             .append(field.getAsString());
+        // }
         output.append("\n```");
         return output.toString();
     }

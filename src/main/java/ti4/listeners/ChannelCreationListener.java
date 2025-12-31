@@ -1,9 +1,14 @@
 package ti4.listeners;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.spring.jda.JdaService;
 
 public class ChannelCreationListener extends ListenerAdapter {
@@ -29,15 +34,20 @@ public class ChannelCreationListener extends ListenerAdapter {
 
         String parentName = channel.getParentChannel().getName();
         if (parentName.equalsIgnoreCase(PBD_MAKING_GAMES_CHANNEL)
-                || "making-private-games".equalsIgnoreCase(parentName)) {
+                || "making-private-games".equalsIgnoreCase(parentName)
+                || "making-superfast-games".equalsIgnoreCase(parentName)) {
             String message = """
-                To launch a new game, please run the command `/game create_game_button`, \
-                filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members \
-                are correct.
+                To launch a new game, please use the buttons. Players can add themselves or you can add them manually. Once all players are added, press the launch button. Don't forget to add yourself!
                 """;
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("joinGameList", "Join Game"));
+            buttons.add(Buttons.red("leaveGameList", "Leave Game"));
+            buttons.add(Buttons.gray("editPlayers~MDL", "Add Players"));
+            buttons.add(Buttons.blue("launchGame", "Launch Game"));
             channel.sendMessage(message)
+                    .addComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
                     .queueAfter(
-                            5, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel
+                            2, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel
             // having no messages.
 
         } else if (parentName.equalsIgnoreCase(FOW_MAKING_GAMES_CHANNEL) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
