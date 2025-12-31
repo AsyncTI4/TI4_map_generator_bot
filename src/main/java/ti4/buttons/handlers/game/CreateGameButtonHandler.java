@@ -258,7 +258,7 @@ class CreateGameButtonHandler {
         }
         if (members.isEmpty()) {
             members = fetchMembersFromMessage(event);
-            if (gameOwner == null) members.get(0);
+            if (gameOwner == null) gameOwner = members.get(0);
         }
 
         // CHECK IF GIVEN CATEGORY IS VALID
