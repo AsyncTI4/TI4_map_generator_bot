@@ -2,6 +2,7 @@ package ti4.commands.user;
 
 import static java.util.function.Predicate.not;
 
+import java.util.HashSet;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.executors.ExecutionLockManager;
@@ -26,7 +27,7 @@ class WipeTurnTime extends Subcommand {
         if (managedPlayer == null) {
             return;
         }
-        managedPlayer.getGames().stream()
+        new HashSet<>(managedPlayer.getGames()).stream()
                 .filter(not(ManagedGame::isFowMode))
                 .map(ManagedGame::getName)
                 .distinct()
