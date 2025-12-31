@@ -94,8 +94,8 @@ public class ListSlashCommandsUsedService {
         }
         buttonsPressed.addAndGet(game.getButtonPressCount());
         slashCommandsUsed.addAndGet(game.getSlashCommandsRunCount());
-        game.getAllSlashCommandsUsed().forEach((command, numUsed) ->
-                slashCommands.merge(command, numUsed, Integer::sum));
+        game.getAllSlashCommandsUsed()
+                .forEach((command, numUsed) -> slashCommands.merge(command, numUsed, Integer::sum));
         if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1698724000011L)) >= 0) {
             return;
         }
