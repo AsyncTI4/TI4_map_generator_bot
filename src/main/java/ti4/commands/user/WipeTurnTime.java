@@ -2,6 +2,7 @@ package ti4.commands.user;
 
 import static java.util.function.Predicate.not;
 
+import java.util.HashSet;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.executors.ExecutionLockManager;
@@ -26,13 +27,17 @@ class WipeTurnTime extends Subcommand {
         if (managedPlayer == null) {
             return;
         }
-        managedPlayer.getGames().stream()
-                .filter(not(ManagedGame::isFowMode))
-                .map(ManagedGame::getName)
-                .distinct()
-                .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
-                                gameName, ExecutionLockManager.LockType.WRITE, () -> wipeTurnTime(gameName, userId))
-                        .run());
+        // We need to place the games into a new set, to avoid a concurrent modification exception
+        new HashSet<>(managedPlayer.getGames())
+                .stream()
+                        .filter(not(ManagedGame::isFowMode))
+                        .map(ManagedGame::getName)
+                        .distinct()
+                        .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
+                                        gameName,
+                                        ExecutionLockManager.LockType.WRITE,
+                                        () -> wipeTurnTime(gameName, userId))
+                                .run());
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }
