@@ -1518,7 +1518,7 @@ public class UnfiledButtonHandlers {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
         }
         String message = ButtonHelperSCs.deductCC(game, player, -1);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        ReactionService.addReaction(event, game, player, message);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
@@ -3386,7 +3386,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("non_sc_draw_so")
     public static void nonSCDrawSO(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "Drew A Secret Objective";
+        String message = "drew a secret objective.";
         game.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
