@@ -48,7 +48,7 @@ public class TeHelperPromissories {
         }
         List<Button> buttons = ListTechService.getTechButtons(techsToAdd, player, "shareKnowledge");
         MessageHelper.sendMessageToChannelWithButtons(
-                game.getActionsChannel(),
+                player.getCorrectChannel(),
                 "Please choose the technology you wish to copy until the end of Status Phase.",
                 buttons);
     }

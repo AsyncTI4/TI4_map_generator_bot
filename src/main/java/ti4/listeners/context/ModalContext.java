@@ -3,6 +3,7 @@ package ti4.listeners.context;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
+import net.dv8tion.jda.api.components.Component.Type;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
@@ -35,6 +36,7 @@ public class ModalContext extends ListenerContext {
         messageID = event.getId();
         values = new HashMap<>();
         for (ModalMapping mapping : event.getValues()) {
+            if (mapping.getType() == Type.USER_SELECT) continue;
             values.put(mapping.getCustomId(), mapping.getAsString());
         }
     }

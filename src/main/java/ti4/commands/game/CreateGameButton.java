@@ -14,13 +14,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
-import ti4.commands.CommandHelper;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SearchGameHelper;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.spring.jda.JdaService;
 
 class CreateGameButton extends Subcommand {
 
@@ -76,35 +73,6 @@ class CreateGameButton extends Subcommand {
                 if (member != null) members.add(member);
                 else {
                     continue;
-                }
-
-                if (!member.getUser().isBot() && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
-                    int ongoingAmount = SearchGameHelper.searchGames(
-                            member.getUser(), event, false, false, false, true, false, true, true, true);
-                    int completedAndOngoingAmount = SearchGameHelper.searchGames(
-                            member.getUser(), event, false, true, false, true, false, true, true, true);
-                    int completedGames = completedAndOngoingAmount - ongoingAmount;
-                    if (ongoingAmount > completedGames + 2) {
-                        MessageHelper.sendMessageToChannel(
-                                event.getChannel(),
-                                member.getUser().getAsMention()
-                                        + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
-                                        + " Their number of ongoing games is " + ongoingAmount
-                                        + " and their number of completed games is " + completedGames + ".\n\n"
-                                        + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
-                        return;
-                    }
-                    // Used for specific people we are limiting the amount of games of
-                    if ("163392891148959744".equalsIgnoreCase(member.getId())
-                            || "774413088072925226".equalsIgnoreCase(member.getId())) {
-                        if (ongoingAmount > 4) {
-                            MessageHelper.sendMessageToChannel(
-                                    event.getChannel(),
-                                    "One of the game's proposed members"
-                                            + " is currently under a limit and cannot join more games at this time");
-                            return;
-                        }
-                    }
                 }
                 if (gameOwner == null) gameOwner = member;
             } else {

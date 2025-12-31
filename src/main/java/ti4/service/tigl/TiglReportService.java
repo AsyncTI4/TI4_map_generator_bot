@@ -28,14 +28,7 @@ public class TiglReportService {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
 
-        if (!game.isReplacementMade()) {
-            UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "This game had a replacement. Please report the results manually: "
-                            + "https://www.ti4ultimate.com/community/tigl/report-game");
-        }
+        UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
     }
 
     private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
@@ -94,8 +87,8 @@ public class TiglReportService {
                     } else {
                         tiglPlayerResult.setFaction(player.getFaction());
                     }
-                    tiglPlayerResult.setDiscordId(parseDiscordId(player.getUserID()));
-                    tiglPlayerResult.setDiscordTag(resolveDiscordTag(player));
+                    tiglPlayerResult.setDiscordId(parseDiscordId(player.getStatsTrackedUserID()));
+                    tiglPlayerResult.setDiscordTag(player.getStatsTrackedUserName());
                     tiglPlayerResult.setWinner(winners.contains(player));
                     return tiglPlayerResult;
                 })
@@ -126,14 +119,6 @@ public class TiglReportService {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    private static String resolveDiscordTag(Player player) {
-        User user = player.getUser();
-        if (user != null) {
-            return user.getEffectiveName();
-        }
-        return player.getUserName();
     }
 
     private static String determineLeague(Game game) {

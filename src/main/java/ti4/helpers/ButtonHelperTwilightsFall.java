@@ -95,7 +95,10 @@ public class ButtonHelperTwilightsFall {
         for (String cardID : alreadyQueued.split("_")) {
             nCards.remove(cardID);
         }
-        return getSpliceButtons(game, type, nCards, player, "queueSplicePick_");
+        List<Button> buttons = new ArrayList<>(getSpliceButtons(game, type, nCards, player, "queueSplicePick_"));
+        if (alreadyQueued.isEmpty()) buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
+        buttons.add(Buttons.gray("restartSpliceQueue", "Restart Queue"));
+        return buttons;
     }
 
     public static String getQueueSpliceMessage(Game game, Player player) {
@@ -515,6 +518,7 @@ public class ButtonHelperTwilightsFall {
             if (player2 == startPlayer || game.isFowMode()) {
                 continue;
             }
+            game.setStoredValue(player2.getFaction() + "splicequeue", "");
             String msg = player2.getRepresentationUnfogged()
                     + " in order to speed up the splice, you can now offer the bot a ranked list of your desired"
                     + " splice cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";

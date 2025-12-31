@@ -105,8 +105,9 @@ public class AverageTurnTimeService {
             Integer totalTurns = player.getNumberOfTurns();
             Long totalTurnTime = player.getTotalTurnTime();
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
+            String statsTrackedUserId = player.getStatsTrackedUserID();
             playerTurnTimes.merge(
-                    player.getUserID(),
+                    statsTrackedUserId,
                     playerTurnTime,
                     (oldEntry, newEntry) -> Map.entry(
                             oldEntry.getKey() + playerTurnTime.getKey(),
@@ -114,7 +115,7 @@ public class AverageTurnTimeService {
 
             if (playerTurnTime.getKey() == 0) continue;
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-            playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+            playerAverageTurnTimes.compute(statsTrackedUserId, (key, value) -> {
                 if (value == null) value = new HashSet<>();
                 value.add(averageTurnTime);
                 return value;

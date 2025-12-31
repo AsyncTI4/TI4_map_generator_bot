@@ -1646,7 +1646,7 @@ public class Helper {
                 if (player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     continue;
                 }
-                UnitModel unitModel = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
+                UnitModel unitModel = player.getPriorityUnitByAsyncID(unit.asyncID(), uH);
                 int productionValue = unitModel.getProductionValue();
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
                     productionValueTotal += player.getFleetCC();

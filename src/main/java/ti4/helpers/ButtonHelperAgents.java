@@ -480,18 +480,21 @@ public class ButtonHelperAgents {
         String unit = buttonID.split("_")[4];
         UnitHolder uH = tileRemoval.getUnitHolders().get(planetRemoval);
         String message;
+        String removalLocation = planetRemoval;
         if ("space".equalsIgnoreCase(planetRemoval)) {
             message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from space area of "
                     + tileRemoval.getRepresentation() + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
-            planetRemoval = "";
+            removalLocation = "";
         } else {
             message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from "
                     + Helper.getPlanetRepresentation(planetRemoval, game) + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
         }
-        RemoveUnitService.removeUnits(event, tileRemoval, game, player.getColor(), unit + " " + planetRemoval);
-        AddUnitService.addUnits(event, tileDestination, game, player.getColor(), unit + " " + planetDestination);
+        List<RemoveUnitService.RemovedUnit> removedUnits = RemoveUnitService.removeUnits(
+                event, tileRemoval, game, player.getColor(), unit + " " + removalLocation);
+        AddUnitService.addUnits(
+                event, tileDestination, game, player.getColor(), unit + " " + planetDestination, removedUnits);
         if ("mech".equalsIgnoreCase(unit)) {
             if (uH.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);

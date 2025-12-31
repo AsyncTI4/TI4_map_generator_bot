@@ -81,12 +81,13 @@ public class MedianTurnTimeService {
 
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-            playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+            String statsTrackedUserId = player.getStatsTrackedUserID();
+            playerAverageTurnTimes.compute(statsTrackedUserId, (key, value) -> {
                 if (value == null) value = new HashSet<>();
                 value.add(averageTurnTime);
                 return value;
             });
-            playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
+            playerTurnCount.merge(statsTrackedUserId, playerTurnTime.getKey(), Integer::sum);
         }
     }
 }

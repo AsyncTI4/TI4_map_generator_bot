@@ -341,8 +341,8 @@ public class EdictPhaseHandler {
                 msg += "\n\nChoose the player to _Censure_.";
             }
         }
-
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCorrectChannel(), msg, embeds, buttons);
+        MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), "Edict to Resolve", embeds);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         if (!game.getPhaseOfGame().contains("action")) {
             Player yellowFSPlayer = game.getPlayerFromColorOrFaction("orangetf");
             if (yellowFSPlayer != null
