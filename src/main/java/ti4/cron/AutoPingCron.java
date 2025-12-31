@@ -191,7 +191,7 @@ public class AutoPingCron {
             return;
         }
         String realIdentity = player.getRepresentationUnfogged();
-        String pingMessage = getPingMessage(realIdentity, milliSinceLastPing, pingNumber, quickPing);
+        String pingMessage = getPingMessage(game, realIdentity, milliSinceLastPing, pingNumber, quickPing);
         if (game.isFowMode()) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(
@@ -216,12 +216,12 @@ public class AutoPingCron {
     }
 
     private static String getPingMessage(
-            String playerPing, long milliSinceLastPing, int pingNumber, boolean quickPing) {
+            Game game, String playerPing, long milliSinceLastPing, int pingNumber, boolean quickPing) {
         if (quickPing && tenMinutesHavePassed(milliSinceLastPing)) {
             return playerPing
                     + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence.";
         }
-        return getPingMessage(playerPing, pingNumber);
+        return getPingMessage(game, playerPing, pingNumber);
     }
 
     private static void agendaPhasePing(Game game, long milliSinceLastPing) {
@@ -312,7 +312,13 @@ public class AutoPingCron {
         return pingIntervalInHours;
     }
 
-    private static String getPingMessage(String realIdentity, int pingNumber) {
+    private static String getPingMessage(Game game, String realIdentity, int pingNumber) {
+        if (pingNumber == 10) {
+            return game.getPing() + ", has your game unexpectedly stalled? If you'd like to keep playing without "
+                    + realIdentity + ", ping `@Bothelper` to start the replacement process. If the remaining players"
+                    + " agree to abandon the game, please run the `/game end` command. Note that this will not"
+                    + " increase your completed game count.";
+        }
         if (pingNumber > PING_MESSAGES.size()) {
             return realIdentity + ", rumors of the bot running out of stamina are greatly exaggerated."
                     + " The bot will win this stare-down, it is simply a matter of time.";
