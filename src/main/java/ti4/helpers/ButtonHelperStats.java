@@ -148,9 +148,17 @@ public class ButtonHelperStats {
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
         Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
         if (obsidian != null && obsidian.getPuppetedFactionsForPlot("siphon").contains(player.getFaction())) {
-            String siphonMsg = obsidian.getRepresentation()
-                    + " the puppeted player for Siphon has gained commodities, so you gain " + realGain
-                    + " trade goods. ";
+            String siphonMsg;
+            if (game.isFowMode()) {
+                siphonMsg = obsidian.getRepresentation()
+                        + ", the puppeted player for _Siphon_ has gained commodities, so you gain " + realGain
+                        + " trade goods. ";
+            } else {
+                siphonMsg = obsidian.getRepresentation()
+                        + ", your puppet, " + player.getRepresentationNoPing()
+                        + ", has gained commodities, and so you have _Siphon_'d " + realGain
+                        + " trade goods. ";
+            }
             siphonMsg += "(" + obsidian.getTg() + "->" + (obsidian.getTg() + realGain) + ")";
             MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), siphonMsg);
             obsidian.setTg(obsidian.getTg() + realGain);

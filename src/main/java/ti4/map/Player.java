@@ -167,8 +167,8 @@ public class Player extends PlayerProperties {
                 MessageHelper.sendMessageToChannel(
                         getCorrectChannel(),
                         getRepresentationNoPing()
-                                + " seems to have planets that dont exist. Try removing them with /planet remove. The planet ID is "
-                                + planet);
+                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is "
+                                + planet + ".");
             } else {
                 if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
                     return true;
@@ -2605,9 +2605,9 @@ public class Player extends PlayerProperties {
                 && !obsidian.is(this)
                 && obsidian.getPuppetedFactionsForPlot("extract").contains(getFaction())
                 && !obsidian.getTechs().contains(techID)) {
-            String msg = obsidian.getRepresentation()
-                    + ", your _Extract_ plot card allows you to gain a copy of the newly researched tech **"
-                    + Mapper.getTech(techID).getName() + "** for 4 resources.";
+            String msg = obsidian.getRepresentation() + ", _"
+                    + Mapper.getTech(techID).getName() + "_ has just been gained by " + getRepresentationNoPing()
+                    + ". Your _Extract_ plot card allows you to gain this technology for yourself by paying 4 resources.";
 
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Buttons.green("acquireATechdeleteThisMessage", "Get a Technology"));

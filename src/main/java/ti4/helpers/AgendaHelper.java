@@ -1504,7 +1504,7 @@ public class AgendaHelper {
             resolveTime = true;
             winner = buttonID.substring(buttonID.lastIndexOf('*') + 2);
             MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(), "## The speaker has broken the tie for " + winner);
+                    game.getActionsChannel(), "## The speaker has broken the tie for \"" + winner + "\".");
         }
         if (resolveTime) {
             resolveTime(game, winner);

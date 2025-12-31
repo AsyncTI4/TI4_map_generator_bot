@@ -579,7 +579,7 @@ public class ButtonHelperActionCards {
                 + ", which hits on a " + numHit + ", to have been _Courageous To The End_.";
         if (game.isTwilightsFallMode()) {
             msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
-                    + ", which hits on a " + numHit + ", to have been the target of the Valiant Genome.";
+                    + ", which hits on a " + numHit + ", to have been the target of the _Valiant Genome_.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         String result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";

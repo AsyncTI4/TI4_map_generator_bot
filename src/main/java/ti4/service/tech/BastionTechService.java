@@ -102,8 +102,8 @@ public class BastionTechService {
                     && ButtonHelper.anyLawInPlay(game, "conventions", "absol_conventionswar")) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
-                        "Cannot bombard " + planet.getRepresentation(game)
-                                + " because Conventions of War is in play and the planet is Cultural.");
+                        "Cannot use BOMBARDMENT against " + planet.getRepresentation(game)
+                                + " because _Conventions of War_ is in play, and the planet is cultural.");
                 return;
             }
 

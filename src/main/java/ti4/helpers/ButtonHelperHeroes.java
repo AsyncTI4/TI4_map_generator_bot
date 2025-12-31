@@ -1327,7 +1327,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(), "Use buttons to draw 1 ability.", buttons);
+                    player.getCorrectChannel(), "Please use these buttons to draw 1 ability.", buttons);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -2369,7 +2369,7 @@ public class ButtonHelperHeroes {
         String message = player.getRepresentationUnfogged() + ", please choose the technology you wish to acquire.";
         if (game.getPhaseOfGame().toLowerCase().contains("status")) {
             ButtonHelper.deleteMessage(event);
-            message += " It must contain exactly 1 more pre-requisite than the technology you are swapping out.";
+            message += " It must contain exactly 1 more prerequisite than the technology you are swapping out.";
         } else {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }

@@ -37,18 +37,18 @@ public class PlotCardsService {
         if (plotMatcher.matches()) {
             String plotID = plotMatcher.group("genericcard");
             String faction = plotMatcher.group("faction");
+            GenericCardModel plot = Mapper.getPlot(plotID);
             if (StringUtils.isBlank(faction)) {
                 List<Button> buttons =
                         ActionCardHelper.getFactionButtonsForPlot(game, player, plotID, "addFactionTokenToPlot_");
-                GenericCardModel plot = Mapper.getPlot(plotID);
-                String msg = "Add a faction to " + plot.getName();
+                String msg = "Add a faction to _" + plot.getName() + "_.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             } else {
                 player.setPlotCardFaction(plotID, faction);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
-                String msg = player.getRepresentation() + " added a " + player2 + " token to plot "
-                        + player.getPlotCards().get(plotID);
+                String msg = player.getRepresentation() + " added a " + player2 + " token to the _" + plot.getName()
+                        + "_ plot.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
@@ -65,18 +65,18 @@ public class PlotCardsService {
         if (plotMatcher.matches()) {
             String plotID = plotMatcher.group("genericcard");
             String faction = plotMatcher.group("faction");
+            GenericCardModel plot = Mapper.getPlot(plotID);
             if (StringUtils.isBlank(faction)) {
                 List<Button> buttons =
                         ActionCardHelper.getFactionButtonsForPlot(game, player, plotID, "removeFactionTokenFromPlot_");
-                GenericCardModel plot = Mapper.getPlot(plotID);
-                String msg = "Remove a faction from " + plot.getName();
+                String msg = "Remove a faction from _" + plot.getName() + "_.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             } else {
                 player.removePlotCardFaction(plotID);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
-                String msg = player.getRepresentation() + " removed a " + player2 + " token from plot "
-                        + player.getPlotCards().get(plotID);
+                String msg = player.getRepresentation() + " removed a " + player2 + " token from the _" + plot.getName()
+                        + "_ plot.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
@@ -105,8 +105,8 @@ public class PlotCardsService {
                 buttons.add(Buttons.red(id, label));
             }
 
-            String message = player.getRepresentation() + " Choose a non-home planet controlled by "
-                    + puppet.getRepresentation(false, false) + " to eradicate:";
+            String message = player.getRepresentation() + ", please choose a non-home planet controlled by "
+                    + puppet.getRepresentation(false, false) + " to eradicate.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
@@ -129,8 +129,8 @@ public class PlotCardsService {
             }
             List<Button> buttons = ListTechService.getTechButtons(techs, player, "free");
 
-            String message = player.getRepresentation() + " Choose a technology to gain from "
-                    + puppet.getRepresentation(false, false) + ":";
+            String message = player.getRepresentation() + ", please choose a technology to gain from "
+                    + puppet.getRepresentation(false, false) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         });
@@ -148,11 +148,11 @@ public class PlotCardsService {
 
             boolean disaster = planet.getUnitCount() >= 15;
             if (disaster) {
-                String disastermsg = "Moments before disaster in game " + game.getName();
+                String disastermsg = "Moments before disaster in game " + game.getName() + ".";
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
             String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
-                    + " has been eradicated with an obsidian plot.";
+                    + " has been eradicated with an Obsidian plot.";
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), disastermsg);
 

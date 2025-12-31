@@ -700,11 +700,15 @@ public class PlayerTechService {
                                     ? nextPlayer.getRepresentationUnfogged()
                                     : nextPlayer.getRepresentationNoPing();
                     int numUnpassed = -2;
+                    boolean anyPassed = false;
                     for (Player p2 : game.getPlayers().values()) {
                         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                        anyPassed |= p2.isPassed() || p2.isEliminated();
                     }
                     text += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                    if (numUnpassed == 0) {
+                    if (!anyPassed) {
+                        text += "All players are yet to pass.";
+                    } else if (numUnpassed == 0) {
                         text += "No other players are unpassed.";
                     } else {
                         text += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are")
@@ -795,11 +799,10 @@ public class PlayerTechService {
                 .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
                 .map(p1 -> Buttons.gray(
                         "useDwsDiscount_" + p1.getFaction(),
-                        "Use "
+                        "Use Aello Discount, Generating Money For "
                                 + (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, p1, player)
                                         ? p1.getFaction()
-                                        : "?")
-                                + "'s DWS Commander Discount",
+                                        : "Somebody"),
                         p1.getFactionEmoji()))
                 .toList();
         if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {

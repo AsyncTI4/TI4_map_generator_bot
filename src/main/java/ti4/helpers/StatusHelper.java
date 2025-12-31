@@ -158,8 +158,8 @@ public class StatusHelper {
                     ButtonHelperAgents.resolveArtunoCheck(player, oceans);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
-                                    + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
+                            player.getRepresentationUnfogged() + ", you gained " + oceans + " trade good"
+                                    + (oceans == 1 ? "" : "s") + " due to _ Hydrothermal Mining_.");
                 }
             }
             if (player.hasTech("tf-geneticresearch")) {
@@ -172,8 +172,8 @@ public class StatusHelper {
                 ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you gained " + maxNum + " trade good"
-                                + (maxNum == 1 ? "" : "s") + " due to the Genetic Research technology.");
+                        player.getRepresentationUnfogged() + ", you gained " + maxNum + " trade good"
+                                + (maxNum == 1 ? "" : "s") + " due to _Genetic Research_.");
             }
             if (player.hasTech("tf-radicaladvancement")) {
                 List<Button> buttons = new ArrayList<>();
@@ -182,7 +182,8 @@ public class StatusHelper {
                 buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " choose if you want to use Radical Advancement.",
+                        player.getRepresentationUnfogged()
+                                + " , please choose if you want to use _Radical Advancement_.",
                         buttons);
             }
             if (player.hasTech("radical")) {
@@ -197,7 +198,7 @@ public class StatusHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + " choose a technology to replace due to Radical Advancement.",
+                                + ", please choose a technology to replace via _Radical Advancement_.",
                         buttons);
             }
             if (player.getPromissoryNotes().containsKey("dspnuyda")
@@ -529,8 +530,8 @@ public class StatusHelper {
             Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
             if (obsidian != null
                     && obsidian.getPuppetedFactionsForPlot("seethe").contains(p2.getFaction())) {
-                String seetheMsg = obsidian.getRepresentation() + " use the buttons to destroy one of "
-                        + p2.getRepresentation() + " infantry using seethe.";
+                String seetheMsg = obsidian.getRepresentation() + ", please destroy one infantry belonging to "
+                        + p2.getRepresentation() + ", using _Seethe_.";
                 List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
                 MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), seetheMsg, removeButtons);
             }
@@ -558,8 +559,8 @@ public class StatusHelper {
                     p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done removing"));
-                String msg =
-                        p.getRepresentation() + " You may remove active breaches from systems that contain your ships:";
+                String msg = p.getRepresentation()
+                        + ", you may remove active Breaches from systems that contain your ships.";
                 MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
             }
         }

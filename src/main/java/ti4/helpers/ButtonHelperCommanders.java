@@ -746,7 +746,7 @@ public class ButtonHelperCommanders {
             if (!buttons2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.",
+                        player.getRepresentationUnfogged() + ", please resolve _Peace Accords_.",
                         buttons2);
             }
         }
