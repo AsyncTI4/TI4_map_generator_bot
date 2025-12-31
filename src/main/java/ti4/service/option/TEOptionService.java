@@ -48,7 +48,6 @@ public class TEOptionService {
 
     @ButtonHandler("chooseExp_")
     public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
-
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "newpok" -> {

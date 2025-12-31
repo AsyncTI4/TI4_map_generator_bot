@@ -568,6 +568,7 @@ public class Game extends GameProperties {
 
     public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
         setTwilightsFallMode(true);
+        setThundersEdge(false);
         validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
         validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
         setStrategyCardSet("twilights_fall_sc");
