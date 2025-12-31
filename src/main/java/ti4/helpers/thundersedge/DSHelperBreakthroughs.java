@@ -150,7 +150,7 @@ public class DSHelperBreakthroughs {
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 3 && x <= p2.getTg(); x++) {
             buttons.add(Buttons.gray(
-                    p1.getFinsFactionCheckerPrefix() + "florzenBTStep4_" + p1.getFaction() + "_" + originalBid + "_"
+                    p2.getFinsFactionCheckerPrefix() + "florzenBTStep4_" + p1.getFaction() + "_" + originalBid + "_"
                             + x,
                     x + " tg"));
         }
@@ -275,14 +275,14 @@ public class DSHelperBreakthroughs {
         }
         if (p2.getSecretsUnscored().size() > 0) {
             buttons.add(Buttons.green(
-                    "edynbtFinal_showSecret_" + p1.getFaction(),
-                    "Show Random Secret Objective to " + p2.getFactionNameOrColor()));
+                    "edynbtFinal_showSecret_" + p1.getFaction(), "Show Random SO to " + p1.getFactionNameOrColor()));
         }
         buttons.add(Buttons.blue(
-                "edynbtFinal_noShowSecret_" + p1.getFaction(), "Allow Coexistence to " + p2.getFactionNameOrColor()));
+                "edynbtFinal_noShowSecret_" + p1.getFaction(), "Allow Coexistence to " + p1.getFactionNameOrColor()));
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
-                "Choose whether to show a secret objective to " + p2.getFactionNameOrColor() + " or allow coexistence.",
+                p2.getRepresentation() + " " + "Choose whether to show a secret objective to "
+                        + p1.getFactionNameOrColor() + " or allow coexistence.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
