@@ -92,15 +92,15 @@ public class TeHelperCommanders {
             String unitStr = matcher.group("unittype") + " " + matcher.group("planet");
 
             if (buttonID.startsWith("move")) {
-                if (!ojzMap.containsKey(pos)) ojzMap.put(pos, new ArrayList<>());
-                ojzMap.get(pos).add(unitStr);
+                ojzMap.computeIfAbsent(pos, key -> new ArrayList<>()).add(unitStr);
             } else {
                 if (ojzMap.containsKey(pos)) ojzMap.get(pos).remove(unitStr);
                 if (ojzMap.containsKey(pos) && ojzMap.get(pos).isEmpty()) ojzMap.remove(pos);
             }
             game.setStoredValue("OjzRetreatMap", TeHelperAbilities.storeMovementMap(ojzMap));
 
-            List<Button> buttons = getWatchfulOjzUnitButtons(game, player, source, ojzMap.get(pos));
+            List<Button> buttons =
+                    getWatchfulOjzUnitButtons(game, player, source, ojzMap.getOrDefault(pos, new ArrayList<>()));
             String message = player.getRepresentation()
                     + ", choose up to 2 ships to retreat as well as anything they may transport using Watchful Ojz, the Ral Nel commander.";
             message += TeHelperAbilities.unitSummary(game, player, ojzMap);

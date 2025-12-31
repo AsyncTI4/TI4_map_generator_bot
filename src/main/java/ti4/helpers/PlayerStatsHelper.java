@@ -78,8 +78,8 @@ public class PlayerStatsHelper {
 
             for (String pos : PositionMapper.getAdjacentTilePositions(next)) {
                 if (numAdj.containsKey(pos)) {
-                    numAdj.put(pos, numAdj.get(pos) + 1);
-                    numAdj.put(next, numAdj.get(next) + 1);
+                    numAdj.merge(pos, 1, Integer::sum);
+                    numAdj.merge(next, 1, Integer::sum);
                 }
             }
             for (String pos : closestTiles) {
