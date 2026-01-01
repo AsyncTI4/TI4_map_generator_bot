@@ -39,8 +39,8 @@ import ti4.service.emoji.TI4Emoji;
 @Data
 public class MiltyDraftManager {
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
-    private static final Pattern PATTERN = Pattern.compile("e\\d{1,3}");
-    private static final Pattern REGEX = Pattern.compile("d\\d{1,3}");
+    private static final Pattern ERONOUS_PATTERN = Pattern.compile("e\\d{1,3}");
+    private static final Pattern UNCHARTED_SPACE_PATTERN = Pattern.compile("d\\d{1,3}");
     private static final Pattern MILTY_ = Pattern.compile("milty_");
 
     private final List<MiltyDraftTile> all = new ArrayList<>();
@@ -94,6 +94,11 @@ public class MiltyDraftManager {
     }
 
     public void addDraftTile(MiltyDraftTile draftTile) {
+        String id = draftTile.getTile().getTileID();
+        if (all.stream().anyMatch(t -> t.getTile().getTileID().equals(id))) {
+            return;
+        }
+
         TierList draftTileTier = draftTile.getTierList();
         switch (draftTileTier) {
             case high, mid, low -> blue.add(draftTile);
@@ -592,7 +597,7 @@ public class MiltyDraftManager {
         setMapTemplate(savedTemplate);
     }
 
-    public void loadSlicesFromString(String str) {
+    public void loadSlicesFromString(String str) throws Exception {
         int sliceIndex = 1;
         StringTokenizer sliceTokenizer = new StringTokenizer(str, ";");
         while (sliceTokenizer.hasMoreTokens()) {
@@ -601,37 +606,46 @@ public class MiltyDraftManager {
         }
     }
 
-    private void loadSliceFromString(String str, int index) {
+    private void loadSliceFromString(String str, int index) throws Exception {
         List<String> tiles = Arrays.asList(str.split(","));
-        List<MiltyDraftTile> draftTiles = tiles.stream()
-                .map(AliasHandler::resolveTile)
-                .map(this::findTile)
-                .toList();
+        List<MiltyDraftTile> draftTiles = new ArrayList<>();
+        for (String id : tiles) {
+            MiltyDraftTile tile = findTile(id);
+            draftTiles.add(tile);
+        }
         MiltyDraftSlice slice = new MiltyDraftSlice();
         slice.setTiles(draftTiles);
         slice.setName(Character.toString(index - 1 + 'A'));
         slices.add(slice);
     }
 
-    private MiltyDraftTile findTile(String tileId) {
+    private MiltyDraftTile findTile(String id) throws Exception {
+        String tileId = AliasHandler.resolveTile(id);
         MiltyDraftTile result = all.stream()
                 .filter(t -> t.getTile().getTileID().equals(tileId))
                 .findFirst()
                 .orElse(null);
         if (result == null) {
+            MiltyDraftHelper.addDraftTile(this, tileId);
             TileModel tileRequested = TileHelper.getTileById(tileId);
+            if (tileRequested == null) {
+                throw new Exception("Could not find tile for tile ID [" + id + "]");
+            }
             Set<ComponentSource> currentsources = all.stream()
                     .map(t -> t.getTile().getTileModel().getSource())
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
-            if (REGEX.matcher(tileId).matches()) currentsources.add(ComponentSource.uncharted_space);
-            if (PATTERN.matcher(tileId).matches()) currentsources.add(ComponentSource.eronous);
+            if (UNCHARTED_SPACE_PATTERN.matcher(tileId).matches()) currentsources.add(ComponentSource.uncharted_space);
+            if (ERONOUS_PATTERN.matcher(tileId).matches()) currentsources.add(ComponentSource.eronous);
             MiltyDraftHelper.initDraftTiles(this, new ArrayList<>(currentsources));
             result = all.stream()
                     .filter(t -> t.getTile().getTileID().equals(tileId))
                     .findFirst()
-                    .orElseThrow();
+                    .orElse(null);
+            if (result == null) {
+                throw new Exception("Could not find tile for tile ID [" + id + "]");
+            }
         }
         return result;
     }
