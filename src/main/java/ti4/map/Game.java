@@ -1697,6 +1697,35 @@ public class Game extends GameProperties {
         return revealSpecificObjective(publicObjectives2, id);
     }
 
+    public Entry<String, Integer> revealSpecificUnrevealedObjective(String id) {
+        if (publicObjectives1Peakable.contains(id)) {
+            return revealSpecificObjective(publicObjectives1Peakable, id);
+        }
+        if (publicObjectives2Peakable.contains(id)) {
+            return revealSpecificObjective(publicObjectives2Peakable, id);
+        }
+        return null;
+    }
+
+    public boolean unrevealSpecificObjective(String id) {
+        if (!revealedPublicObjectives.containsKey(id)) {
+            return false;
+        }
+        PublicObjectiveModel obj = Mapper.getPublicObjective(id);
+        if (obj == null) {
+            return false;
+        }
+        removeRevealedObjective(id);
+        if (obj.getPoints() == 1) {
+            publicObjectives1Peakable.add(id);
+        } else {
+            publicObjectives2Peakable.add(id);
+        }
+        publicObjectives1Peeked.remove(id);
+        publicObjectives2Peeked.remove(id);
+        return true;
+    }
+
     public void swapStage1(int place1, int place2) {
         swapObjective(publicObjectives1Peakable, place1, place2);
     }

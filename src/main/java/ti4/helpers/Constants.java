@@ -783,6 +783,8 @@ public class Constants {
     public static final String REVEAL_STAGE1 = "po_reveal_stage1";
     public static final String REVEAL_SPECIFIC_STAGE1 = "reveal_specific_stage1";
     public static final String REVEAL_SPECIFIC_STAGE2 = "reveal_specific_stage2";
+    public static final String REVEAL_SPECIFIC_UNREVEALED_OBJECTIVE = "reveal_specific_unrevealed_objective";
+    public static final String UNREVEAL_SPECIFIC_OBJECTIVE = "unreveal_specific_objective";
     public static final String SETUP_PEAKABLE_OBJECTIVES = "setup_peakable_objectives";
     public static final String NUMBER_OF_OBJECTIVES = "number_of_objectives";
     public static final String NUMBER_OF_STAGE1_OBJECTIVES = "number_of_stage1_objectives";

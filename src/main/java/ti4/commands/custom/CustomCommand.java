@@ -29,6 +29,8 @@ public class CustomCommand implements ParentCommand {
                     new SwapStage2(),
                     new RevealSpecificStage1(),
                     new RevealSpecificStage2(),
+                    new RevealSpecificUnrevealedObjective(),
+                    new UnrevealSpecificObjective(),
                     new SpinTilesInRings(),
                     new OfferAutoPassOptions(),
                     new ChangeToBaseGame(),
