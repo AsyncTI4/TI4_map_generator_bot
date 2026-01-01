@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.helper.GameHelper;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
 import ti4.website.UltimateStatisticsWebsiteHelper;
@@ -104,7 +103,6 @@ public class TiglReportService {
     }
 
     private static long determineStartTimestamp(Game game) {
-        GameHelper.updateCreationDateTimeIfNotSameDayAndMonthAsCreationDateField(game);
         return game.getCreationDateTime();
     }
 
