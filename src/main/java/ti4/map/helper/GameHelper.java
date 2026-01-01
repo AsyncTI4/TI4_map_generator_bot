@@ -21,7 +21,7 @@ public class GameHelper {
         return LocalDate.parse(game.getCreationDate(), CREATION_DATE_FORMATTER);
     }
 
-    public static boolean updateCreationDateTimeIfNotSameDayAndMonthAsCreationDateField(Game game) {
+    public static boolean updateCreationDateTimeIfNotSameDateAsCreationDateField(Game game) {
         long creationTimeMillis = game.getCreationDateTime();
         LocalDate creationDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(creationTimeMillis), ZoneOffset.UTC)
                 .toLocalDate();
@@ -36,7 +36,8 @@ public class GameHelper {
         int nanoseconds = random.nextInt(1000000000);
         LocalDateTime newCreationTime = creationDate.atTime(hours, minutes, seconds, nanoseconds);
         game.setCreationDateTime(newCreationTime.toInstant(ZoneOffset.UTC).toEpochMilli());
-        BotLogger.error("Had to update a game's creationDateTime field to: " + newCreationTime);
+        BotLogger.error("Had to update a " + game.getName() + " creationDateTime field from " + creationDateTime
+                + " to: " + newCreationTime + ". It's creation date was: " + creationDate);
         return true;
     }
 }

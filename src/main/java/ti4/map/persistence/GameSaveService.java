@@ -412,7 +412,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         // TODO: this can be removed when we don't see these errors anymore.
-        GameHelper.updateCreationDateTimeIfNotSameDayAndMonthAsCreationDateField(game);
+        GameHelper.updateCreationDateTimeIfNotSameDateAsCreationDateField(game);
         writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
