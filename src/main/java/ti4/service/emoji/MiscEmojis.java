@@ -60,6 +60,11 @@ public enum MiscEmojis implements TI4Emoji {
     Scout,
     ScoutSpinner,
 
+    // Twilight's Fall
+    tf_ability,
+    tf_genome,
+    tf_paradigm,
+
     // Tiles
     Supernova,
     Asteroids,
