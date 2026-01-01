@@ -38,6 +38,6 @@ class RunAgainstAllGames extends Subcommand {
 
     private static boolean makeChanges(Game game) {
         // Developer's Delight
-        return GameHelper.updateCreationDateTimeIfNotSameDayAndMonthAsCreationDateField(game);
+        return GameHelper.updateCreationDateTimeIfNotSameDateAsCreationDateField(game);
     }
 }
