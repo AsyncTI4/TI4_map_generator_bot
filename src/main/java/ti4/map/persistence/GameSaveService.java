@@ -55,6 +55,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.helper.GameHelper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -409,6 +410,9 @@ class GameSaveService {
 
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
         writer.write(System.lineSeparator());
+
+        // TODO: this can be removed when we don't see these errors anymore.
+        GameHelper.updateCreationDateTimeIfNotSameDayAndMonthAsCreationDateField(game);
         writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());

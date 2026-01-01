@@ -238,9 +238,10 @@ public class Game extends GameProperties {
     private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
-        setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
-        setCreationDateTime(System.currentTimeMillis());
-        setLastModifiedDate(System.currentTimeMillis());
+        long currentTimeMillis = System.currentTimeMillis();
+        setCreationDate(Helper.getDateRepresentation(currentTimeMillis));
+        setCreationDateTime(currentTimeMillis);
+        setLastModifiedDate(currentTimeMillis);
     }
 
     public void newGameSetup() {
