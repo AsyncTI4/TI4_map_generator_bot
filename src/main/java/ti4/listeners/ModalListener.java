@@ -90,6 +90,12 @@ public class ModalListener extends ListenerAdapter {
         if (handleKnownModals(context)) return;
 
         if (modalID.startsWith("jmfA_")) {
+            // Detect new settings menu navId() to route to the correct handler.
+            String draftSystemNavPart = ".*_draft[._].*";
+            if (modalID.matches(draftSystemNavPart)) {
+                game.initializeDraftSystemSettings().parseInput(context);
+                return;
+            }
             game.initializeMiltySettings().parseInput(context);
         }
     }
