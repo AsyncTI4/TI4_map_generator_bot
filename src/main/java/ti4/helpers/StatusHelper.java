@@ -584,7 +584,7 @@ public class StatusHelper {
             TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
             String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
                     + parasiteModel.getNameRepresentation() + ".";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), parasiteMsg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
         }
     }
 
