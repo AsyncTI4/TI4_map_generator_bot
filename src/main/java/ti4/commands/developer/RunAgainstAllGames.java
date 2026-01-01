@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
@@ -37,9 +38,6 @@ class RunAgainstAllGames extends Subcommand {
 
     private static boolean makeChanges(Game game) {
         // Developer's Delight
-        if (game.isThundersEdge() && game.isTwilightsFallMode()) {
-            game.setThundersEdge(false);
-        }
-        return false;
+        return GameHelper.updateCreationDateTimeIfNotSameDayAndMonthAsCreationDateField(game);
     }
 }
