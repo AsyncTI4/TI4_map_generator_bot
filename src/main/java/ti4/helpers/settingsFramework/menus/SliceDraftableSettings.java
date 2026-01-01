@@ -126,12 +126,12 @@ public class SliceDraftableSettings extends SettingsMenu {
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
-        ls.add(numSlices);
         ls.add(mapTemplate);
         ls.add(mapGenerationMode);
         if (presetSlices != null) {
             return ls;
         }
+        ls.add(numSlices);
         ls.addAll(getCurrentModeSettings().settings());
         return ls;
     }
