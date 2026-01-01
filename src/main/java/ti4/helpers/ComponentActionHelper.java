@@ -1051,7 +1051,7 @@ public class ComponentActionHelper {
                 if ("absol_dynamiscore".equals(relicID)) {
                     player.setTg(oldTg + Math.min(player.getCommoditiesBase() * 2, 10));
                 } else {
-                    player.setTg(oldTg + player.getCommoditiesTotal() + 2);
+                    player.setTg(oldTg + player.getCommoditiesBase() + 2);
                 }
                 message = player.getRepresentationUnfogged() + " Your trade goods increased from " + oldTg + " -> "
                         + player.getTg() + ".";
