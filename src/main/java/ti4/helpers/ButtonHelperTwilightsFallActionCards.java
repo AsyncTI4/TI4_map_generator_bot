@@ -395,11 +395,17 @@ public class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             String faction = tech.getFaction().get();
+            if (faction.contains("keleres")) {
+                faction = "keleres";
+            }
             factions.merge(faction, 1, Integer::sum);
         }
         for (String leaderID : player.getLeaderIDs()) {
             LeaderModel lead = Mapper.getLeader(leaderID);
             String faction = lead.getFaction();
+            if (faction.contains("keleres")) {
+                faction = "keleres";
+            }
             factions.merge(faction, 1, Integer::sum);
         }
         for (String unit : player.getUnitsOwned()) {
@@ -410,6 +416,9 @@ public class ButtonHelperTwilightsFallActionCards {
             String faction = unitM.getFaction().get();
             if (faction.equalsIgnoreCase(player.getFaction())) {
                 continue;
+            }
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
             factions.merge(faction, 1, Integer::sum);
         }
