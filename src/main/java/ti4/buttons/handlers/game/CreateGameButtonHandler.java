@@ -124,10 +124,10 @@ class CreateGameButtonHandler {
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 memberList
-                        .append(" ⚠️ (Above game limit: ")
+                        .append(" ⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
                         .append(" ongoing, ")
-                        .append(completedGames + 2)
+                        .append(completedGames + 3)
                         .append("-game limit)");
             } else {
                 memberList.append(" " + completedGames + " games completed. ");
@@ -256,6 +256,40 @@ class CreateGameButtonHandler {
         }
         if (members.isEmpty()) {
             members = fetchMembersFromMessage(event);
+            for (Member member : members) {
+                if (member != null) {
+                    if (!member.getUser().isBot()
+                            && !CommandHelper.hasRole(event, JdaService.developerRoles)
+                            && !CommandHelper.hasRole(event, JdaService.bothelperRoles)) {
+                        int ongoingAmount = SearchGameHelper.searchGames(
+                                member.getUser(), event, false, false, false, true, false, true, true, true);
+                        int completedAndOngoingAmount = SearchGameHelper.searchGames(
+                                member.getUser(), event, false, true, false, true, false, true, true, true);
+                        int completedGames = completedAndOngoingAmount - ongoingAmount;
+                        if (ongoingAmount > completedGames + 2) {
+                            MessageHelper.sendMessageToChannel(
+                                    event.getChannel(),
+                                    member.getUser().getAsMention()
+                                            + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
+                                            + " Their number of ongoing games is " + ongoingAmount
+                                            + " and their number of completed games is " + completedGames + ".\n\n"
+                                            + "If you're playing a private game with friends, you can ping a bothelper for a 1-game exemption from the limit.");
+                            return;
+                        }
+                        // Used for specific people we are limiting the amount of games of
+                        if ("163392891148959744".equalsIgnoreCase(member.getId())
+                                || "774413088072925226".equalsIgnoreCase(member.getId())) {
+                            if (ongoingAmount > 4) {
+                                MessageHelper.sendMessageToChannel(
+                                        event.getChannel(),
+                                        member.getUser().getAsMention()
+                                                + " is currently under a 5-game limit and cannot join more games at this time");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
             if (gameOwner == null) gameOwner = members.get(0);
         }
 
