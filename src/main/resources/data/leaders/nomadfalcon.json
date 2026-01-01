@@ -6,7 +6,7 @@
         "name": "Ener'ock",
         "title": "Titles Are Silly",
         "abilityWindow": "When a player uses PRODUCTION:",
-        "abilityText": "You may exhaust this card to allow that player to choose 1 produced unit in that system matching a unit in that system.",
+        "abilityText": "You may exhaust this card to allow that player to place one unit with a cost of 4 or less in that system.",
         "unlockCondition": "Always Unlocked",
         "source": "nomadfalcon"
     },

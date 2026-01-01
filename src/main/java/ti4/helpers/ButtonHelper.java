@@ -4888,6 +4888,9 @@ public class ButtonHelper {
         int count = 0;
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
+            if (player.getSingularityTechs().contains(tech)) {
+                continue;
+            }
             if (techM.getTypes().contains(type)) {
                 count++;
             }
