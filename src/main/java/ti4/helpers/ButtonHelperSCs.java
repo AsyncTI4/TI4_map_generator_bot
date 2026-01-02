@@ -1226,13 +1226,13 @@ public class ButtonHelperSCs {
     @ButtonHandler("anarchy10PeekStart")
     public static void anarchy10PeekStart(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        for (int x = 0; x < game.getPublicObjectives1Peakable().size(); x++) {
+        for (int x = 0; x < game.getPublicObjectives1Peekable().size(); x++) {
             buttons.add(Buttons.green(
-                    "anarchy10PeekAt_" + game.getPublicObjectives1Peakable().get(x), "Stage 1 Position " + (x + 1)));
+                    "anarchy10PeekAt_" + game.getPublicObjectives1Peekable().get(x), "Stage 1 Position " + (x + 1)));
         }
-        for (int x = 0; x < game.getPublicObjectives2Peakable().size(); x++) {
+        for (int x = 0; x < game.getPublicObjectives2Peekable().size(); x++) {
             buttons.add(Buttons.blue(
-                    "anarchy10PeekAt_" + game.getPublicObjectives2Peakable().get(x), "Stage 2 Position " + (x + 1)));
+                    "anarchy10PeekAt_" + game.getPublicObjectives2Peekable().get(x), "Stage 2 Position " + (x + 1)));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),

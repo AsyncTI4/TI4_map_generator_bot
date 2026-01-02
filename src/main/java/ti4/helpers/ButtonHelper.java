@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6689,11 +6692,11 @@ public class ButtonHelper {
 
     public static void offerRedTapeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (String poS : game.getPublicObjectives1Peakable()) {
+        for (String poS : game.getPublicObjectives1Peekable()) {
             buttons.add(Buttons.green(
                     "cutTape_" + poS, Mapper.getPublicObjective(poS).getName()));
         }
-        for (String poS : game.getPublicObjectives2Peakable()) {
+        for (String poS : game.getPublicObjectives2Peekable()) {
             buttons.add(Buttons.green(
                     "cutTape_" + poS, Mapper.getPublicObjective(poS).getName()));
         }
@@ -6710,7 +6713,7 @@ public class ButtonHelper {
         String poID = buttonID.replace("cutTape_", "");
         int location = 1;
         deleteMessage(event);
-        List<String> po1s = new ArrayList<>(game.getPublicObjectives1Peakable());
+        List<String> po1s = new ArrayList<>(game.getPublicObjectives1Peekable());
         for (String poS : po1s) {
             if (poS.equalsIgnoreCase(poID)) {
                 game.swapStage1(1, location);
@@ -6726,7 +6729,7 @@ public class ButtonHelper {
             location++;
         }
         location = 1;
-        List<String> po2s = new ArrayList<>(game.getPublicObjectives2Peakable());
+        List<String> po2s = new ArrayList<>(game.getPublicObjectives2Peekable());
         for (String poS : po2s) {
             if (poS.equalsIgnoreCase(poID)) {
                 game.swapStage2(1, location);
@@ -7456,7 +7459,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), game.getPing() + ", usage of _Imperial Arbiter_ has been declined.");
         }
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
     }
 
     @ButtonHandler("declinePath")

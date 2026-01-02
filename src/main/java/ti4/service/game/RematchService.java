@@ -134,8 +134,8 @@ public class RematchService {
         ThreadChannel botThread =
                 actionsChannel.createThreadChannel(newBotThreadName).complete();
         newGame.setBotMapUpdatesThreadID(botThread.getId());
-        newGame.setUpPeakableObjectives(5, 1);
-        newGame.setUpPeakableObjectives(5, 2);
+        newGame.setUpPeekableObjectives(5, 1);
+        newGame.setUpPeekableObjectives(5, 2);
         // INTRODUCTION TO TABLETALK CHANNEL
 
         // INTRODUCTION TO BOT-MAP THREAD

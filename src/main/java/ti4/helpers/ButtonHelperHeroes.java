@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2020,9 +2022,9 @@ public class ButtonHelperHeroes {
         String id = substringAfter(buttonID, ".");
         String num = substringBefore(buttonID, ".");
         if ("1".equalsIgnoreCase(num)) {
-            game.swapObjectiveOut(1, 0, id);
+            game.swapPublicObjectiveOut(1, 0, id);
         } else {
-            game.swapObjectiveOut(2, 0, id);
+            game.swapPublicObjectiveOut(2, 0, id);
         }
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
@@ -2038,13 +2040,13 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
             for (int x = 0; x < 3; x++) {
-                String obj = game.getTopObjective(1);
+                String obj = game.getTopPublicObjective(1);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
                 buttons.add(Buttons.green("augerHeroSwap.1." + obj, "Put " + po.getName() + " As The Next Objective"));
             }
         } else {
             for (int x = 0; x < 3; x++) {
-                String obj = game.getTopObjective(2);
+                String obj = game.getTopPublicObjective(2);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
                 buttons.add(Buttons.green("augerHeroSwap.2." + obj, "Put " + po.getName() + " As The Next Objective"));
             }
