@@ -1,23 +1,37 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
+import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TileEmojis;
+import ti4.service.map.MapStringMapper;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftSlice;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -39,6 +53,16 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     private final IntegerSetting minimumRedTiles;
 
     private boolean showAdvanced;
+
+    // Preset slices and map
+    private String presetSlices;
+    private String presetMapString;
+
+    @JsonIgnore
+    private List<MiltyDraftSlice> parsedSlices;
+
+    @JsonIgnore
+    private Map<String, String> parsedMapTiles;
 
     private static final String MENU_ID = "nucleusSlice";
 
@@ -110,11 +134,22 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         minimumRedTiles.initialize(json.get("minimumRedTiles"));
         showAdvanced =
                 json.get("showAdvanced") != null && json.get("showAdvanced").asBoolean(false);
+
+        if (json.has("presetSlices")) {
+            setPresetSlices(json.get("presetSlices").asText(null));
+        }
+        if (json.has("presetMapString")) {
+            setPresetMapString(json.get("presetMapString").asText(null));
+        }
     }
 
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
+        // If both presets are set, hide all generation settings
+        if (presetSlices != null && presetMapString != null) {
+            return ls;
+        }
         ls.add(nucleusWormholes);
         ls.add(totalWormholes);
         ls.add(nucleusLegendaries);
@@ -137,9 +172,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
         String toggleText = showAdvanced ? "Hide Advanced" : "Show Advanced";
         ls.add(Button.primary(idPrefix + "toggleAdvanced", toggleText));
-        // TODO: Presets
-        // TODO: Rich galaxy (rich nucleus? rich slices?)
-        // TODO: Poor galaxy (poor nucleus? poor slices?)
         return ls;
     }
 
@@ -164,6 +196,138 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         }
 
         return "success";
+    }
+
+    public String getPresetSlicesFromUser(GenericInteractionCreateEvent event) {
+        String modalId = menuAction + "_" + navId() + "_presetSlices";
+        TextInput ttsString = TextInput.create("sliceStrings", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("25,69,34|24,28,46|...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(modalId, "Enter preset slices")
+                .addComponents(Label.of("Slice String (pipe-separated, 3 tiles each)", ttsString))
+                .build();
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+            return null;
+        }
+        return "Unknown Event";
+    }
+
+    public String setPresetSlicesFromEvent(GenericInteractionCreateEvent event) {
+        if (event instanceof ModalInteractionEvent modalEvent) {
+            String slices = modalEvent.getValue("sliceStrings").getAsString();
+            return setPresetSlices(slices);
+        }
+        return "Unknown Event";
+    }
+
+    public String setPresetSlices(String sliceString) {
+        if (sliceString == null || sliceString.isEmpty()) {
+            presetSlices = null;
+            parsedSlices = null;
+            return null;
+        }
+
+        List<ComponentSource> sources = new ArrayList<>();
+        int players = 6;
+        presetSlices = sliceString;
+        if (parent instanceof SliceDraftableSettings sdParent
+                && sdParent.getParent() instanceof DraftSystemSettings dparent) {
+            players = dparent.getPlayerUserIds().size();
+            sources.addAll(dparent.getSourceSettings().getTileSources());
+        }
+
+        String error = null;
+        try {
+            parsedSlices = MiltyDraftHelper.parseSlices(sliceString, sources);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        if (parsedSlices == null || error != null) {
+            presetSlices = null;
+            if (error != null) return error;
+            return "Invalid slice string";
+        } else if (parsedSlices.size() < players) {
+            presetSlices = null;
+            parsedSlices = null;
+            return "Not enough slices for the number of players.";
+        }
+        return null;
+    }
+
+    public String getPresetMapFromUser(GenericInteractionCreateEvent event) {
+        String modalId = menuAction + "_" + navId() + "_presetMap";
+        TextInput ttsString = TextInput.create("mapStrings", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("{18} 25 30 -1 -1 -1 83a 35 40 ...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(modalId, "Enter preset map string")
+                .addComponents(Label.of("Map String (use -1 for slice positions)", ttsString))
+                .build();
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+            return null;
+        }
+        return "Unknown Event";
+    }
+
+    public String setPresetMapFromEvent(GenericInteractionCreateEvent event) {
+        if (event instanceof ModalInteractionEvent modalEvent) {
+            String mapString = modalEvent.getValue("mapStrings").getAsString();
+            return setPresetMapString(mapString);
+        }
+        return "Unknown Event";
+    }
+
+    public String setPresetMapString(String mapString) {
+        if (mapString == null || mapString.isEmpty()) {
+            presetMapString = null;
+            parsedMapTiles = null;
+            return null;
+        }
+
+        // Normalize the map string (replace newlines and commas with spaces)
+        String normalizedMapString =
+                mapString.replace("\n", " ").replace(",", " ").replace("  ", " ");
+        presetMapString = normalizedMapString;
+
+        // Parse using MapStringMapper
+        parsedMapTiles = MapStringMapper.getMappedTilesToPosition(normalizedMapString, null);
+
+        if (parsedMapTiles.isEmpty()) {
+            presetMapString = null;
+            parsedMapTiles = null;
+            return "Could not parse map string";
+        }
+
+        // Validate all non "-1" tile IDs
+        for (Map.Entry<String, String> entry : parsedMapTiles.entrySet()) {
+            String tileId = entry.getValue();
+            // Skip -1 positions (reserved for player slices)
+            if ("-1".equals(tileId)) {
+                continue;
+            }
+            // Validate tile exists
+            if (!TileHelper.isValidTile(tileId)) {
+                presetMapString = null;
+                parsedMapTiles = null;
+                return "Invalid tile ID at position " + entry.getKey() + ": " + tileId;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    protected String resetSettings() {
+        presetSlices = null;
+        parsedSlices = null;
+        presetMapString = null;
+        parsedMapTiles = null;
+        return super.resetSettings();
     }
 
     public void setDefaultsForTemplate(StringSelectInteractionEvent event, MapTemplateModel mapTemplateModel) {

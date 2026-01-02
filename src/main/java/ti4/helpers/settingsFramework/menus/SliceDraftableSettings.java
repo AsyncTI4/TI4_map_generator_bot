@@ -187,6 +187,16 @@ public class SliceDraftableSettings extends SettingsMenu {
         }
         if (presetSlices != null)
             sb.append("> Using preset slices: ").append(presetSlices).append("\n");
+        if (isNucleusMode()) {
+            if (nucleusSettings.getPresetSlices() != null)
+                sb.append("> Using preset slices: ")
+                        .append(nucleusSettings.getPresetSlices())
+                        .append("\n");
+            if (nucleusSettings.getPresetMapString() != null)
+                sb.append("> Using preset map: ")
+                        .append(nucleusSettings.getPresetMapString())
+                        .append("\n");
+        }
         if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
 
         if (!categories().isEmpty()) {
@@ -214,6 +224,17 @@ public class SliceDraftableSettings extends SettingsMenu {
         if (presetSlices != null) {
             sb.append("\n> Using preset slices: ").append(presetSlices);
             return sb.toString();
+        }
+        if (isNucleusMode()) {
+            boolean hasNucleusPresets =
+                    nucleusSettings.getPresetSlices() != null || nucleusSettings.getPresetMapString() != null;
+            if (hasNucleusPresets) {
+                if (nucleusSettings.getPresetSlices() != null)
+                    sb.append("\n> Using preset slices: ").append(nucleusSettings.getPresetSlices());
+                if (nucleusSettings.getPresetMapString() != null)
+                    sb.append("\n> Using preset map: ").append(nucleusSettings.getPresetMapString());
+                return sb.toString();
+            }
         }
         return super.shortSummaryString(descrOnly);
     }

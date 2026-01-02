@@ -9,8 +9,14 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
@@ -20,6 +26,7 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.draft.DraftComponentFactory;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.draft.draftables.AndcatReferenceCardsDraftable;
@@ -30,6 +37,7 @@ import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.milty.MiltyDraftSlice;
 
@@ -164,8 +172,18 @@ public class DraftSystemSettings extends SettingsMenu {
         if (preset.equals("Twilights Fall (Andcat Draft)")) {
             buttons.add(Buttons.blue(prefix + "tfTourney", "TF Tourney Prelims", MiscEmojis.tf_ability));
         }
+        // Add nucleus preset buttons when in Nucleus mode
+        if (isNucleusMode()) {
+            buttons.add(Buttons.blue(prefix + "nucleusPresetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
+            buttons.add(Buttons.blue(prefix + "nucleusPresetMap~MDL", "Use preset map", MiltyDraftEmojis.sliceB));
+        }
         buttons.add(Buttons.green(prefix + "startSetup", "Start Draft!"));
         return buttons;
+    }
+
+    private boolean isNucleusMode() {
+        return sliceSettings != null
+                && sliceSettings.getMapGenerationMode().getValue() == SliceDraftableSettings.MapGenerationMode.Nucleus;
     }
 
     @Override
@@ -174,9 +192,63 @@ public class DraftSystemSettings extends SettingsMenu {
                 switch (action) {
                     case "startSetup" -> startSetup(event);
                     case "tfTourney" -> tfTourney(event);
+                    case "nucleusPresetSlices~MDL" -> getNucleusPresetSlicesFromUser(event);
+                    case "nucleusPresetSlices" -> setNucleusPresetSlicesFromEvent(event);
+                    case "nucleusPresetMap~MDL" -> getNucleusPresetMapFromUser(event);
+                    case "nucleusPresetMap" -> setNucleusPresetMapFromEvent(event);
                     default -> null;
                 };
         return (error == null ? "success" : error);
+    }
+
+    private String getNucleusPresetSlicesFromUser(GenericInteractionCreateEvent event) {
+        String modalId = menuAction + "_" + navId() + "_nucleusPresetSlices";
+        TextInput ttsString = TextInput.create("sliceStrings", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("25,69,34|24,28,46|...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(modalId, "Enter preset slices")
+                .addComponents(Label.of("Slice String (pipe-separated, 3 tiles each)", ttsString))
+                .build();
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+            return null;
+        }
+        return "Unknown Event";
+    }
+
+    private String setNucleusPresetSlicesFromEvent(GenericInteractionCreateEvent event) {
+        if (event instanceof ModalInteractionEvent modalEvent) {
+            String slices = modalEvent.getValue("sliceStrings").getAsString();
+            return sliceSettings.getNucleusSettings().setPresetSlices(slices);
+        }
+        return "Unknown Event";
+    }
+
+    private String getNucleusPresetMapFromUser(GenericInteractionCreateEvent event) {
+        String modalId = menuAction + "_" + navId() + "_nucleusPresetMap";
+        TextInput ttsString = TextInput.create("mapStrings", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("{18} 25 30 -1 -1 -1 83a 35 40 ...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(modalId, "Enter preset map string")
+                .addComponents(Label.of("Map String (use -1 for slice positions)", ttsString))
+                .build();
+        if (event instanceof ButtonInteractionEvent buttonEvent) {
+            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+            return null;
+        }
+        return "Unknown Event";
+    }
+
+    private String setNucleusPresetMapFromEvent(GenericInteractionCreateEvent event) {
+        if (event instanceof ModalInteractionEvent modalEvent) {
+            String mapString = modalEvent.getValue("mapStrings").getAsString();
+            return sliceSettings.getNucleusSettings().setPresetMapString(mapString);
+        }
+        return "Unknown Event";
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
