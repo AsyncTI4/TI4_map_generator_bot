@@ -228,7 +228,7 @@ public class PlayerTechService {
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)
                             && !tile.isHomeSystem(game)
-                            && !tile.isMecatol()) {
+                            && !tile.isMecatol(game)) {
                         tiles.add(tile);
                     }
                 }
@@ -449,7 +449,7 @@ public class PlayerTechService {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "lgf" -> { // Lazax Gate Folding
-                if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), Constants.MECATOLS)) {
+                if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), game.mecatols())) {
                     deleteIfButtonEvent(event);
                     AddUnitService.addUnits(event, game.getMecatolTile(), game, player.getColor(), "inf mr");
                     MessageHelper.sendMessageToChannel(

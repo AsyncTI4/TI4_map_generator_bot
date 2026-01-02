@@ -678,6 +678,11 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isMecatol(Game game) {
+        return game.getMecatolTile().getPosition().equals(getPosition());
+    }
+
+    @JsonIgnore
     public boolean isMecatol() {
         if (Constants.MECATOL_SYSTEMS.contains(tileID)) {
             return true;

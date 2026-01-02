@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetRemove;
@@ -4521,6 +4522,15 @@ public class Game extends GameProperties {
             if (tile != null) return tile;
         }
         return null;
+    }
+
+    public List<String> mecatols() {
+        if (getMecatolTile() == null) return Constants.MECATOLS;
+        List<String> mecs = getMecatolTile().getPlanetUnitHolders().stream()
+                .map(UnitHolder::getName)
+                .toList();
+        List<String> result = new ArrayList<>(ListUtils.intersection(mecs, Constants.MECATOLS));
+        return result;
     }
 
     @Nullable

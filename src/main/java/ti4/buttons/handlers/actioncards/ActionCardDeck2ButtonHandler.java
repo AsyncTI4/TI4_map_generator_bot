@@ -350,7 +350,7 @@ class ActionCardDeck2ButtonHandler {
             if (tile.getPosition().contains("t")
                     || tile.getPosition().contains("b")
                     || tile.isHomeSystem(game)
-                    || tile.isMecatol()) {
+                    || tile.isMecatol(game)) {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -373,7 +373,7 @@ class ActionCardDeck2ButtonHandler {
                     || tile.getPosition().contains("b")
                     || tile == tile1
                     || tile.isHomeSystem(game)
-                    || tile.isMecatol()) {
+                    || tile.isMecatol(game)) {
                 continue;
             }
 

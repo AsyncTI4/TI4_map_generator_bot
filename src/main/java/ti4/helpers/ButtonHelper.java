@@ -1762,7 +1762,7 @@ public class ButtonHelper {
 
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
                     && FoWHelper.playerHasPlanetsInSystem(nonActivePlayer, activeSystem)
-                    && !activeSystem.isMecatol()) {
+                    && !activeSystem.isMecatol(game)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
@@ -4955,7 +4955,7 @@ public class ButtonHelper {
         }
         if (player.hasAbility("reclamation")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                if (Constants.MECATOLS.contains(uH.getName())
+                if (game.mecatols().contains(uH.getName())
                         && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "sd mr, pds mr");
                     MessageHelper.sendMessageToChannel(
@@ -7127,7 +7127,7 @@ public class ButtonHelper {
                 if (unitHolder instanceof Planet planet) {
                     if ((!player.getPlanetsAllianceMode().contains(planet.getName())
                                     && !isPlanetLegendaryOrHome(unitHolder.getName(), game, false, player)
-                                    && !Constants.MECATOLS.contains(planet.getName()))
+                                    && !game.mecatols().contains(planet.getName()))
                             || game.isWildWildGalaxyMode()) {
                         buttons.add(Buttons.green(
                                 finChecker + "stellarConvert_" + planet.getName(),
@@ -7219,7 +7219,7 @@ public class ButtonHelper {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                if (tilePos.equalsIgnoreCase(adjTilePos) && Constants.MECATOLS.contains(unitHolder.getName())) {
+                if (tilePos.equalsIgnoreCase(adjTilePos) && game.mecatols().contains(unitHolder.getName())) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.controlsMecatol(false)
                                 && p2.hasPlanet("custodiavigilia")
@@ -7846,7 +7846,7 @@ public class ButtonHelper {
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
         List<String> fakePlanets = new ArrayList<>(List.of(
                 "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
-        List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
+        List<String> ignoredPlanets = new ArrayList<>(game.mecatols());
         ignoredPlanets.addAll(fakePlanets);
 
         for (String planet : player.getPlanets()) {

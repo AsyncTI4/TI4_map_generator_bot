@@ -91,8 +91,7 @@ public class AddPlanetService {
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
 
-        List<String> mecatols = Constants.MECATOLS;
-        if (mecatols.contains(planet) && player.hasIIHQ()) {
+        if (game.mecatols().contains(planet) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -609,7 +608,7 @@ public class AddPlanetService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
-        if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
+        if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
         if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
