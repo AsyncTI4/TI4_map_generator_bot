@@ -227,8 +227,8 @@ public class AutoPingCron {
         return getPingMessage(game, playerPing, pingNumber);
     }
 
-    private static void sendReplacementReminder(Game game, int spacer, int pingNumber) {
-        long hoursPassed = (long) spacer * pingNumber;
+    private static void sendReplacementReminder(Game game, int hoursBetweenPings, int pingNumber) {
+        long hoursPassed = (long) hoursBetweenPings * pingNumber;
         boolean shouldSendReminder = hoursPassed >= REPLACEMENT_REMINDER_AFTER_HOURS
                 && !"true".equals(game.getStoredValue("replacementReminderSent"));
         if (!shouldSendReminder) return;
@@ -237,9 +237,8 @@ public class AutoPingCron {
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 game.getPing() + ", has your game unexpectedly stalled? If you'd like to start the replacement process,"
-                        + " ping `@Bothelper` to start the replacement process. If the remaining players"
-                        + " agree to abandon the game, please run the `/game end` command. Note that this will not"
-                        + " increase your completed game count.");
+                        + " ping `@Bothelper`. If the remaining players agree to abandon the game, please run the `/game end` command."
+                        + " Note that this will not increase your completed game count.");
     }
 
     private static void agendaPhasePing(Game game, long milliSinceLastPing) {
