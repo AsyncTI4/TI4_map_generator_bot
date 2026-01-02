@@ -1179,7 +1179,7 @@ public class ButtonHelperTwilightsFall {
                     "radAdvancementStep2_" + tech,
                     "Discard " + Mapper.getTech(tech).getName()));
         }
-        String msg = player.getRepresentation() + ", use these buttons to discard a card.";
+        String msg = player.getRepresentation() + ", use these buttons to discard an ability card.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 

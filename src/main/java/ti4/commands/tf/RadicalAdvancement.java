@@ -11,7 +11,11 @@ import ti4.map.Player;
 class RadicalAdvancement extends GameStateSubcommand {
 
     RadicalAdvancement() {
-        super(Constants.RADICAL_ADVANCEMENT, "Do the radical advancement ability", true, true);
+        super(
+                Constants.RADICAL_ADVANCEMENT,
+                "Do the Radical Advancement ability (return a technology then gain one with an additional prerequisite)",
+                true,
+                true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                         .setAutoComplete(true));

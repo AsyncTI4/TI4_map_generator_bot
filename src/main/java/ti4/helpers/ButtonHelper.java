@@ -5418,7 +5418,7 @@ public class ButtonHelper {
                     && !CommandCounterHelper.hasCC(player, tile2)
                     && FoWHelper.playerHasUnitsInSystem(player, tile2)) {
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "placeCC_" + pos,
+                        player.getFinsFactionCheckerPrefix() + "placeWingTransferCC_" + pos,
                         tile2.getRepresentationForButtons(),
                         FactionEmojis.Argent));
             }
@@ -8001,11 +8001,11 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planet);
             String message;
             if (tile != null) {
-                message =
-                        player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons() + " system.";
+                message = player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons()
+                        + " system.";
             } else {
                 message = player.getFactionEmoji() + " chose to Diplo the system containing "
-                    + Helper.getPlanetRepresentation(planet, game) + ".";
+                        + Helper.getPlanetRepresentation(planet, game) + ".";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             if (!game.isFowMode()) {

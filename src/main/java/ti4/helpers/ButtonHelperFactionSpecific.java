@@ -1042,7 +1042,8 @@ public class ButtonHelperFactionSpecific {
         }
         if (player.hasUnit("tf-productionbiomes")) {
             String msg2 = player.getRepresentation()
-                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+                    + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                    + " If you do, you will also give 2 trade goods to a player of your choice.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons2);

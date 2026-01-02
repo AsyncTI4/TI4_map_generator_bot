@@ -82,7 +82,7 @@ public class ActionCardHelper {
         if (game.isWildWildGalaxyMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    "This is a reminder that in Wild Wild Galaxy mode, each of the 4 of a type Action Cards are modified in some way. The text you see may not be entirely accurate as a result.");
+                    "This is a reminder that in Wild, Wild Galaxy mode, each of the four-of-a-type action cards are modified in some way. The text you see may not be entirely accurate as a result.");
         }
 
         sendTrapCardInfo(player);
@@ -335,6 +335,7 @@ public class ActionCardHelper {
                 sb.append("Something broke here");
             } else {
                 sb.append(CardEmojis.ActionCard)
+                        .append(actionCard.isWild(game) ? CardEmojis.Event : "")
                         .append(" _")
                         .append(actionCard.getName())
                         .append("_ `(")
@@ -809,7 +810,7 @@ public class ActionCardHelper {
                             it = true;
                         }
                         if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
-                            noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
+                            noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
                             watcher = true;
                         }
                         if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
@@ -1779,9 +1780,6 @@ public class ActionCardHelper {
             String twinningId = "tf-twinning";
             if (!player.getPlayableActionCards().contains(twinningId)) continue;
 
-            StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
-            if (actionCards.size() > 1) msg.append("one of the following cards:");
-
             List<Button> twinningButtons = new ArrayList<>();
 
             Integer twinningValue = player.getActionCards().get(twinningId);
@@ -1790,6 +1788,7 @@ public class ActionCardHelper {
             }
             String twinningPrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
 
+            String lastCardName = null;
             for (String acID : actionCards) {
                 ActionCardModel model = Mapper.getActionCard(acID);
                 if (!model.getWindow().toLowerCase().startsWith("action")) {
@@ -1798,11 +1797,18 @@ public class ActionCardHelper {
 
                 String id = twinningPrefix + model.getName();
                 String label = "Twin " + model.getName();
+                lastCardName = model.getName();
                 twinningButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
-                if (actionCards.size() == 1) msg.append(model.getName()).append(".");
             }
 
             if (!twinningButtons.isEmpty()) {
+                StringBuilder msg =
+                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
+                if (twinningButtons.size() > 1) {
+                    msg.append("one of the following cards.");
+                } else {
+                    msg.append("_").append(lastCardName).append("_.");
+                }
                 twinningButtons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), msg.toString(), twinningButtons);

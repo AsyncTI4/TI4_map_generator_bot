@@ -65,10 +65,11 @@ public class MoveUnits extends GameStateCommand {
                 true));
         data.add(new OptionData(
                 OptionType.BOOLEAN, Constants.PRIORITIZE_DAMAGED, "Prioritize moving damaged units. Default false."));
-        data.add(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.COEXIST,
-                "Coexist with existing units. Default false. True will skip combat."));
+        data.add(
+                new OptionData(
+                        OptionType.BOOLEAN,
+                        Constants.COEXIST,
+                        "\"True\" to coexist; \"False\" (default) to not, and to start a combat etc. if another player is present"));
         data.add(new OptionData(
                 OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"));
         return data;

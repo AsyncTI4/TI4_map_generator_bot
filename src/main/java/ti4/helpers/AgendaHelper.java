@@ -2056,8 +2056,8 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), message);
                     if (size > 0) {
                         keleres.setTg(keleres.getTg() + size);
-                        String msg2 = "Gained " + size + " trade goods (" + (keleres.getTg() - size) + " -> **"
-                                + keleres.getTg() + "**).";
+                        String msg2 = "Gained " + size + " trade good" + (size == 1 ? "" : "s") + " ("
+                                + (keleres.getTg() - size) + " -> **" + keleres.getTg() + "**).";
                         ButtonHelperAbilities.pillageCheck(keleres, game);
                         ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);

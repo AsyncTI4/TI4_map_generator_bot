@@ -2675,10 +2675,18 @@ public class UnfiledButtonHandlers {
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
+                    String condition = "the conditions for an Agenda Phase has not yet been met";
+                    if (game.isOrdinianC1Mode()) {
+                        condition = "the _Coatl_ is still damaged";
+                    } else if (game.isTwilightsFallMode()) {
+                        condition = "there is no Tyrant";
+                    } else {
+                        condition = "the Custodians token is still on Mecatol Rex";
+                    }
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getChannel(),
                             "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                                    + " As the pre-req for an agenda phase has not yet been met, there will be no Agenda Phase this round."
+                                    + " As " + condition + ", there will be no Agenda Phase this round."
                                     + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
                             buttons);
                 }
@@ -3130,17 +3138,28 @@ public class UnfiledButtonHandlers {
     public static void startTradeStationConvert(ButtonInteractionEvent event, Player player, Game game) {
 
         List<Button> buttons = new ArrayList<>();
+        String onlyPlanet = null;
         for (String planet : player.getReadiedPlanets()) {
             if (game.getUnitHolderFromPlanet(planet) == null
                     || !game.getUnitHolderFromPlanet(planet).isSpaceStation()) {
                 continue;
             }
+            onlyPlanet = planet;
             buttons.add(Buttons.gray("useTradeStation_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        if (buttons.size() == 1) {
+            useTradeStation(event, player, game, onlyPlanet);
+            return;
+        } else if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), player.getRepresentation() + ", you have no readied space stations.");
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getRepresentation()
-                        + " choose the space station you wish to exhaust in order to wash your commodities. Reminder that the space station must be readied/unexhausted in order to exhaust it.",
+                        + ", please choose the space station you wish to exhaust to wash your commodit"
+                        + (player.getCommodities() == 1 ? "y" : "ies")
+                        + ". A reminder that the space station must be readied in order to exhaust it this way.",
                 buttons);
     }
 
@@ -3152,8 +3171,8 @@ public class UnfiledButtonHandlers {
         convertAllComm(event, player, game);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " exhausted th space station of "
-                        + Helper.getPlanetRepresentation(planet, game) + " in order to wash their commodities");
+                player.getRepresentation() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
+                        + ", washing their commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ".");
     }
 
     @ButtonHandler("convertAllComms")
@@ -3414,14 +3433,16 @@ public class UnfiledButtonHandlers {
         CommandCounterHelper.addCC(event, player, game.getTileByPosition(position));
     }
 
-    @ButtonHandler("placeCC_")
+    @ButtonHandler("placeWingTransferCC_")
     public static void placeCC(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String position = buttonID.split("_")[1];
-        String message = player.getRepresentationUnfogged()
-                + " has is using their breakthrough to place their command token in tile " + position + ".";
+        Tile tile = game.getTileByPosition(position);
+        String message =
+                player.getRepresentationUnfogged() + " is using _Wing Transfer_ to place their command token the "
+                        + tile.getRepresentationForButtons() + " system.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        CommandCounterHelper.addCC(event, player, game.getTileByPosition(position));
+        CommandCounterHelper.addCC(event, player, tile);
     }
 
     @ButtonHandler("lose1CC")

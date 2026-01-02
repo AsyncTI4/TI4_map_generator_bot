@@ -168,7 +168,8 @@ public class ButtonHelperTacticalAction {
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
                         .contains(game.getTileByPosition(pos))) {
             String msg = player.getRepresentation()
-                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+                    + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                    + " If you do, you will also give 2 trade goods to a player of your choice.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
@@ -236,12 +237,12 @@ public class ButtonHelperTacticalAction {
 
         if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.getPosition().contains("frac")) {
             String msg = player.getRepresentation()
-                    + " you should gain 1 command token due to moving in the fracture while the Call of the Void Galactic Event is in play.";
+                    + " you should gain 1 command token due to moving in The Fracture while the _Call of the Void_ galactic event is in play.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String trueIdentity = player.getRepresentationUnfogged();
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
-                    + ". Use buttons to gain 1 command tokens.";
+                    + ". Use these buttons to gain 1 command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
@@ -594,7 +595,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", you can use this button to place command tokens down via Argent breakthrough ability.",
+                            + ", you can use this button to place command tokens down via _Wing Transfer_.",
                     button2);
         }
 

@@ -473,12 +473,12 @@ public class StartTurnService {
                 if (game.getStoredValue("ralnelHero") != null) {}
 
                 String presetRalnelHero =
-                        "You have the ralnel hero unlocked! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
-                presetRalnelHero +=
-                        "to automatically use your hero when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+                        "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
+                                + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."
+                                + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
 
                 List<Button> ralnelHeroButtons = new ArrayList<>();
-                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset RalNel Hero"));
+                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
                 ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete these buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
@@ -486,9 +486,9 @@ public class StartTurnService {
 
             if (player.getPlayableActionCards().contains("puppetsonastring")) {
                 String msg =
-                        "You have the action card puppets on a string! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
-                msg +=
-                        "to automatically use it when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+                        "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
+                                + " Otherwise, you can use the preset button to automatically use it when the last player passes."
+                                + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("resolvePreassignment_Puppets On A String", "Pre-Play Puppets On A String"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -504,7 +504,7 @@ public class StartTurnService {
                         sb.append(" You are getting this ping because **")
                                 .append(Helper.getSCName(sc, game))
                                 .append(
-                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone.");
                         appendScMessages(game, p2, sc, sb);
                     }
                 }

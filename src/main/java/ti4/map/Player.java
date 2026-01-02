@@ -167,8 +167,8 @@ public class Player extends PlayerProperties {
                 MessageHelper.sendMessageToChannel(
                         getCorrectChannel(),
                         getRepresentationNoPing()
-                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is "
-                                + planet + ".");
+                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is `"
+                                + planet + "`.");
             } else {
                 if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
                     return true;

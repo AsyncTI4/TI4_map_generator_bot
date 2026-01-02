@@ -1614,7 +1614,7 @@ public class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 player.getFactionEmoji()
-                                        + " did not place a command token in system they retreated to due to _Skilled Retreat_ being buffed by _Wild Wild Galaxy_ galactic event.");
+                                        + " did not place a command token in system they retreated to due to _Skilled Retreat_ being buffed by _Wild, Wild Galaxy_ galactic event.");
                     } else {
                         CommandCounterHelper.addCC(event, player, tile2, true);
                         Helper.isCCCountCorrect(player);
@@ -1808,11 +1808,11 @@ public class ButtonHelperModifyUnits {
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the Crimson Hero.",
+                                "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
                                 shroadedFleets);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the Crimson Hero.",
+                                "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
                                 shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1844,7 +1844,7 @@ public class ButtonHelperModifyUnits {
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the Crimson Hero.",
+                                "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
                                 cloakedFleets);
                     }
                 }
@@ -2021,7 +2021,7 @@ public class ButtonHelperModifyUnits {
                     player.getRepresentationUnfogged() + " captured\\* 1 newly produced "
                             + UnitEmojis.getUnitEmoji(name)
                             + " in " + tile.getRepresentationForButtons(game, player)
-                            + " using the Crimson Hero ability."
+                            + " using the _Fragment Reality_ hero ability."
                             + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
@@ -2161,7 +2161,9 @@ public class ButtonHelperModifyUnits {
                                 "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
-                                event.getChannel(), "You may place this produced ship on the Crimson.", shroadedFleets);
+                                event.getChannel(),
+                                "You may place this produced ship on Homesick Phantom, the Rebellion hero.",
+                                shroadedFleets);
                     }
                     if (tile2 != null
                             && !willSkipBuild

@@ -147,7 +147,7 @@ public class TeHelperActionCards {
             }
         }
         String message = player.getRepresentationUnfogged()
-                + ", please tell the bot which neighbor of your's did the transaction";
+                + ", please tell the bot which two of your neighbor did the transaction.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);

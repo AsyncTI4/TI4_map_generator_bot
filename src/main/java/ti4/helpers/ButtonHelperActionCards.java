@@ -783,8 +783,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged()
-                + ", please choose the planet you wish to resolve remove enemy landed ground forces from."
-                + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
+                + ", please choose the planet you wish to remove enemy landed ground forces from."
+                + " If it's not present (because the opponent took it already), try pressing \"UNDO\", then `/planet add` it back to yourself, then try again.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(

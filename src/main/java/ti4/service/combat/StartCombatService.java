@@ -571,7 +571,7 @@ public class StartCombatService {
                     }
                     if (inRange) {
                         String msg = p.getRepresentation()
-                                + " at the end of the combat, if your destroyer is still within or adjacent to the tile containing the combat, you can use this button to place an inactive breach";
+                                + ", at the end of the combat, if your destroyer is still within or adjacent to the tile containing the combat, you may place an inactive Breach.";
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 p.getFinsFactionCheckerPrefix() + "placeInactiveBreach_" + tile.getPosition(),
@@ -598,7 +598,7 @@ public class StartCombatService {
 
                     if (inRange) {
                         String msg = p.getRepresentation()
-                                + " at the end of the combat, if your destroyer is still in the active system or within 2 tiles away, you can use these buttons to place an active or inactive breach";
+                                + ", at the end of the combat, if your destroyer is still in the active system or within 2 tiles away, you may place a Breach (active or inactive).";
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 p.getFinsFactionCheckerPrefix() + "placeBreach_" + tile.getPosition() + "_destroyer",
@@ -617,13 +617,13 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player2.getRepresentation()
-                            + " you are affected by the crimson flagship and your units will have lost all unit abilities");
+                            + ", you are affected by the _Quietus_ (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
         if (TeHelperUnits.affectedByQuietus(game, player1, tile)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player1.getRepresentation()
-                            + " you are affected by the crimson flagship and your units will have lost all unit abilities");
+                            + ", you are affected by the _Quietus_ (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
 
         if (tile.isHomeSystem(game)
@@ -662,7 +662,7 @@ public class StartCombatService {
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
             String message = player.getRepresentation(true, true)
                     + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
-                    + " with Ahk Siever, the Crimson commander."
+                    + " with Ahk Siever, the Rebellion commander."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
             MessageHelper.sendMessageToChannelWithButtons(
@@ -942,8 +942,7 @@ public class StartCombatService {
                 Button reap = Buttons.gray(
                         player.finChecker() + "theReapingAddTg", "Add TG to The Reaping", FactionEmojis.Obsidian);
                 String message = msg
-                        + " this is a reminder that if you win this combat, you may use the button to add a trade good onto your breakthrough, "
-                        + FactionEmojis.Obsidian + " **The Reaping**.";
+                        + ", a reminder that if you win this combat, you may use the button to add a trade good to _The Reaping_.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, reap);
             }
             if ("space".equalsIgnoreCase(type) && player.hasTech("so")) {
@@ -1494,7 +1493,7 @@ public class StartCombatService {
         if (p1.hasUnlockedBreakthrough("sardakkbt")) {
             buttons.add(Buttons.gray(
                     p1.getFinsFactionCheckerPrefix() + "sardakkbtRes",
-                    "Resolve Sardakk Breakthrough (Upon Win)",
+                    "Resolve N'orr Breakthrough (Upon Win)",
                     FactionEmojis.Sardakk));
         }
         if (p1.hasUnit("pinktf_mech") && isGroundCombat) {
@@ -1507,7 +1506,7 @@ public class StartCombatService {
         if (p2.hasUnlockedBreakthrough("sardakkbt") && !game.isFowMode()) {
             buttons.add(Buttons.gray(
                     p2.getFinsFactionCheckerPrefix() + "sardakkbtRes",
-                    "Resolve Sardakk Breakthrough (Upon Win)",
+                    "Resolve N'orr Breakthrough (Upon Win)",
                     FactionEmojis.Sardakk));
         }
         if (p2.hasUnit("pinktf_mech") && isGroundCombat && !game.isFowMode()) {
@@ -1884,7 +1883,7 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "purgeRedCreussHero_" + tile.getPosition(),
-                    "Purge Crimson Hero",
+                    "Purge Rebellion Hero",
                     FactionEmojis.Crimson));
         }
         if ((p2.hasLeaderUnlocked("redcreusshero") || p2.hasLeaderUnlocked("crimsonhero"))
@@ -1893,18 +1892,22 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "purgeRedCreussHero_" + tile.getPosition(),
-                    "Purge Crimson Hero",
+                    "Purge Rebellion Hero",
                     FactionEmojis.Crimson));
         }
         if (p1.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    finChecker + "purgeBastionHero_" + tile.getPosition(), "Purge Bastion", FactionEmojis.Bastion));
+                    finChecker + "purgeBastionHero_" + tile.getPosition(),
+                    "Purge Bastion Hero",
+                    FactionEmojis.Bastion));
         }
         if (p2.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
-                    finChecker + "purgeBastionHero_" + tile.getPosition(), "Purge Bastion", FactionEmojis.Bastion));
+                    finChecker + "purgeBastionHero_" + tile.getPosition(),
+                    "Purge Bastion Hero",
+                    FactionEmojis.Bastion));
         }
 
         if (game.isLiberationC4Mode()) {
