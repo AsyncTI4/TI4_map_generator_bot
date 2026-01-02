@@ -274,7 +274,7 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po7 = Mapper.getPublicObjective(objective7.getKey());
         PublicObjectiveModel po8 = Mapper.getPublicObjective(objective8.getKey());
         PublicObjectiveModel po9 = Mapper.getPublicObjective(objective9.getKey());
-        if (game.getPublicObjectives1Peakable().isEmpty()) {
+        if (game.getPublicObjectives1Peekable().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel, game.getPing() + ", all objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(
                             po1.getRepresentationEmbed(),

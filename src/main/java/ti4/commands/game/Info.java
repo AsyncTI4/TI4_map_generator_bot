@@ -132,7 +132,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getPublicObjectives1DeckSize())
                 .append("/")
                 .append(game.getPublicObjectives1FullDeckSize());
-        sb.append(" (+").append(game.getPublicObjectives1Peakable().size()).append(" are staged/peekable)\n");
+        sb.append(" (+").append(game.getPublicObjectives1Peekable().size()).append(" are staged/peekable)\n");
         sb.append("- ")
                 .append(CardEmojis.Public2)
                 .append("Stage 2 Public Objective Deck: `")
@@ -141,7 +141,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getPublicObjectives2DeckSize())
                 .append("/")
                 .append(game.getPublicObjectives2FullDeckSize());
-        sb.append(" (+").append(game.getPublicObjectives2Peakable().size()).append(" are staged/peekable)\n");
+        sb.append(" (+").append(game.getPublicObjectives2Peekable().size()).append(" are staged/peekable)\n");
         sb.append("- ")
                 .append(CardEmojis.Agenda)
                 .append("Agenda Deck: `")

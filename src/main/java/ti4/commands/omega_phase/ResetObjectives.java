@@ -56,18 +56,18 @@ class ResetObjectives extends GameStateSubcommand {
         List<String> allOmegaPhaseObjs = deck.getNewShuffledDeck();
         allOmegaPhaseObjs.removeIf(game.getRevealedPublicObjectives().keySet()::contains);
         allOmegaPhaseObjs.remove(Constants.IMPERIUM_REX_ID);
-        allOmegaPhaseObjs.removeIf(game.getPublicObjectives1Peakable()::contains);
+        allOmegaPhaseObjs.removeIf(game.getPublicObjectives1Peekable()::contains);
         game.setPublicObjectives1(allOmegaPhaseObjs);
 
         // Remove Imperium Rex if it's already staged
-        game.getPublicObjectives1Peakable().removeIf(s -> s.equals(Constants.IMPERIUM_REX_ID));
+        game.getPublicObjectives1Peekable().removeIf(s -> s.equals(Constants.IMPERIUM_REX_ID));
 
         // Set up the right number of peakable objectives
         int revealedObjectiveCount = game.getRevealedPublicObjectives().size();
         int customObjectiveCount = game.getCustomPublicVP().size();
         int revealedStage1Count = revealedObjectiveCount - customObjectiveCount;
         int desiredPeakableObjectives = Math.max(0, 9 - revealedStage1Count);
-        game.setUpPeakableObjectives(desiredPeakableObjectives, 1);
+        game.setUpPeekableObjectives(desiredPeakableObjectives, 1);
         int bottomSize = Math.min(5, desiredPeakableObjectives + 1);
         if (bottomSize > 0) {
             game.shuffleInBottomObjective(Constants.IMPERIUM_REX_ID, bottomSize, 1);
@@ -76,7 +76,7 @@ class ResetObjectives extends GameStateSubcommand {
 
     private void setPublicObjectivesStage2Deck(Game game) {
         // No stage 2s in this mode
-        game.setUpPeakableObjectives(0, 2);
+        game.setUpPeekableObjectives(0, 2);
 
         DeckModel deck = Mapper.getDeck("public_stage_2_objectives_omegaphase");
         if (!game.getStage2PublicDeckID().equals(deck.getAlias())) {
