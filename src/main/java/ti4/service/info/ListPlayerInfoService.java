@@ -478,7 +478,8 @@ public class ListPlayerInfoService {
             case "make_history", "become_legend", "become_legend_omegaphase" -> {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
+                    boolean tileCounts =
+                            tile.isMecatol(game) || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
                         counter++;
                     }
@@ -701,7 +702,7 @@ public class ListPlayerInfoService {
                         Units.UnitType.Warsun,
                         Units.UnitType.Lady,
                         Units.UnitType.Celagrom)) {
-                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
+                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol(game)) {
                         count++;
                     }
                 }
@@ -855,7 +856,7 @@ public class ListPlayerInfoService {
             }
             case "ose" -> {
                 Tile mecatol = game.getMecatolTile();
-                boolean controlsMecatol = player.getPlanets().stream().anyMatch(Constants.MECATOLS::contains);
+                boolean controlsMecatol = player.getPlanets().stream().anyMatch(game.mecatols()::contains);
                 if (!FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {

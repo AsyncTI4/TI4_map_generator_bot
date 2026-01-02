@@ -286,7 +286,7 @@ public class ButtonHelperAbilities {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
                     || tile.isHomeSystem(game)
                     || ButtonHelper.isTileLegendary(tile)
-                    || tile.isMecatol()
+                    || tile.isMecatol(game)
                     || tile.getPlanetUnitHolders().isEmpty()) {
                 continue;
             }
@@ -940,7 +940,7 @@ public class ButtonHelperAbilities {
                             break;
                         }
                     }
-                    if (!alreadyOwned && !Constants.MECATOLS.contains(planet)) {
+                    if (!alreadyOwned && !game.mecatols().contains(planet)) {
                         unitHolder.addToken("token_freepeople.png");
                     }
                 }
@@ -1087,7 +1087,7 @@ public class ButtonHelperAbilities {
                 continue;
             }
             if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)
-                    && !Constants.MECATOLS.contains(planetName)
+                    && !game.mecatols().contains(planetName)
                     && !tile.isHomeSystem(game)) {
                 buttons.add(
                         Buttons.gray("mantleCrack_" + planetName, Helper.getPlanetRepresentation(planetName, game)));

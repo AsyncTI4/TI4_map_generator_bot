@@ -282,7 +282,7 @@ public class StartCombatService {
                 return;
             }
         }
-        if (tile.isMecatol()) {
+        if (tile.isMecatol(game)) {
             CommanderUnlockCheckService.checkPlayer(player1, "winnu");
             CommanderUnlockCheckService.checkPlayer(player2, "winnu");
         }

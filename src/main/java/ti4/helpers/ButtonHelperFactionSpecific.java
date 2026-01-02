@@ -2469,7 +2469,7 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getMecatolTile();
         if (tile == null) return; // no mecatol tile
         for (Planet mecatol : tile.getPlanetUnitHolders()) {
-            if (Constants.MECATOLS.contains(mecatol.getName())) {
+            if (game.mecatols().contains(mecatol.getName())) {
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1))
                     mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2))
@@ -3073,7 +3073,7 @@ public class ButtonHelperFactionSpecific {
                 + ", please choose the planet (other than Mecatol Rex) that you wish to ready.";
         buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
-            if (Constants.MECATOLS.contains(planet)) {
+            if (game.mecatols().contains(planet)) {
                 continue;
             }
             buttons.add(Buttons.gray(
