@@ -27,6 +27,8 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = Duration.ofHours(1).toMillis();
     private static final long TEN_MINUTES_IN_MILLISECONDS =
             Duration.ofMinutes(10).toMillis();
+    private static final long REPLACEMENT_REMINDER_AFTER_MILLISECONDS =
+            Duration.ofHours(72).toMillis();
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
     private static final int PING_NUMBER_TO_GIVE_UP_ON = 50;
     private static final List<String> PING_MESSAGES = List.of(
@@ -221,7 +223,23 @@ public class AutoPingCron {
             return playerPing
                     + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinence.";
         }
+        if (shouldSendReplacementReminder(milliSinceLastPing, pingNumber)) {
+            return game.getPing() + ", has your game unexpectedly stalled? If you'd like to keep playing without "
+                    + playerPing + ", ping `@Bothelper` to start the replacement process. If the remaining players"
+                    + " agree to abandon the game, please run the `/game end` command. Note that this will not"
+                    + " increase your completed game count.";
+        }
         return getPingMessage(game, playerPing, pingNumber);
+    }
+
+    private static boolean shouldSendReplacementReminder(long milliSinceLastPing, int pingNumber) {
+        if (pingNumber <= 0) {
+            return false;
+        }
+        long elapsedMillis = milliSinceLastPing * pingNumber;
+        long previousElapsedMillis = milliSinceLastPing * (pingNumber - 1L);
+        return elapsedMillis >= REPLACEMENT_REMINDER_AFTER_MILLISECONDS
+                && previousElapsedMillis < REPLACEMENT_REMINDER_AFTER_MILLISECONDS;
     }
 
     private static void agendaPhasePing(Game game, long milliSinceLastPing) {
@@ -313,12 +331,6 @@ public class AutoPingCron {
     }
 
     private static String getPingMessage(Game game, String realIdentity, int pingNumber) {
-        if (pingNumber == 10) {
-            return game.getPing() + ", has your game unexpectedly stalled? If you'd like to keep playing without "
-                    + realIdentity + ", ping `@Bothelper` to start the replacement process. If the remaining players"
-                    + " agree to abandon the game, please run the `/game end` command. Note that this will not"
-                    + " increase your completed game count.";
-        }
         if (pingNumber > PING_MESSAGES.size()) {
             return realIdentity + ", rumors of the bot running out of stamina are greatly exaggerated."
                     + " The bot will win this stare-down, it is simply a matter of time.";
