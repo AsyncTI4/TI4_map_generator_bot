@@ -831,6 +831,7 @@ public class Constants {
     public static final String PO_ID = "public_id";
     public static final String PO_NAME = "public_name";
     public static final String PO_VP_WORTH = "public_vp_worth";
+    public static final String UNREVEALED_OBJECTIVE_INDEX = "unrevealed_objective_index";
     public static final String CUSTODIAN = "Custodian/Imperial";
     public static final String IMPERIAL_RIDER = "Imperial Rider";
     public static final String REVEALED_PO = "revealedPublicObjectives";

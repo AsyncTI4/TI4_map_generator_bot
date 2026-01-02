@@ -1697,6 +1697,14 @@ public class Game extends GameProperties {
         return revealSpecificObjective(publicObjectives2, id);
     }
 
+    public Entry<String, Integer> revealSpecificStage1ByIndex(int index) {
+        return revealSpecificObjectiveByIndex(publicObjectives1, index);
+    }
+
+    public Entry<String, Integer> revealSpecificStage2ByIndex(int index) {
+        return revealSpecificObjectiveByIndex(publicObjectives2, index);
+    }
+
     public void swapStage1(int place1, int place2) {
         swapObjective(publicObjectives1Peakable, place1, place2);
     }
@@ -1808,6 +1816,14 @@ public class Game extends GameProperties {
             }
         }
         return null;
+    }
+
+    private Entry<String, Integer> revealSpecificObjectiveByIndex(List<String> objectiveList, int index) {
+        if (index <= 0 || index > objectiveList.size()) {
+            return null;
+        }
+        String id = objectiveList.get(index - 1);
+        return revealSpecificObjective(objectiveList, id);
     }
 
     public Entry<String, Integer> addSpecificStage1(String objective) {
