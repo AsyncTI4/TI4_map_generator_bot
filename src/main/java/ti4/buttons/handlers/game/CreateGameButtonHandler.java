@@ -32,6 +32,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.game.CreateGameService;
 import ti4.service.statistics.AverageTurnTimeService;
+import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
@@ -65,6 +66,34 @@ class CreateGameButtonHandler {
                 .build();
 
         Modal modal = Modal.create(modalID, "Players For The Game")
+                .addComponents(Label.of("Select Players", menu))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ModalHandler("removeSignupModal")
+    public static void removeSignup(ModalInteractionEvent event) {
+        List<Member> members = event.getValue("players").getAsMentions().getMembers();
+        List<Member> membersOG = fetchMembersFromMessage(event);
+        for (Member member : members) {
+            if (!membersOG.contains(member)) continue;
+            membersOG.remove(member);
+            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " was removed from the game.");
+        }
+        event.getMessage().editMessage(generateMemberListMessage(membersOG)).queue();
+    }
+
+    @ButtonHandler("removePlayers~MDL")
+    public static void removePlayers(ButtonInteractionEvent event) {
+        String modalID = "removeSignupModal";
+        String fieldID = "players";
+        EntitySelectMenu menu = EntitySelectMenu.create(fieldID, SelectTarget.USER)
+                .setPlaceholder(
+                        "Choose your players to remove") // shows the placeholder indicating what this menu is for
+                .setRequiredRange(1, 8)
+                .build();
+
+        Modal modal = Modal.create(modalID, "Removing Players In The Game")
                 .addComponents(Label.of("Select Players", menu))
                 .build();
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -141,6 +170,14 @@ class CreateGameButtonHandler {
                 memberList.append("`").append(" ");
                 memberList.append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime));
                 memberList.append("` average turn time.");
+            }
+            var userSettings = UserSettingsManager.get(member.getId());
+            if (userSettings.enoughHeatData()) {
+                String activeHoursSummary = userSettings.summarizeActiveHours(userSettings.getActiveHours());
+                memberList
+                        .append(" Active Hours (UTC): `")
+                        .append(activeHoursSummary)
+                        .append("`.");
             }
             memberList.append("\n");
             x++;
