@@ -27,7 +27,7 @@ public class AutoPingCron {
     private static final long ONE_HOUR_IN_MILLISECONDS = Duration.ofHours(1).toMillis();
     private static final long TEN_MINUTES_IN_MILLISECONDS =
             Duration.ofMinutes(10).toMillis();
-    private static final long REPLACEMENT_REMINDER_AFTER_HOURS = 72;
+    private static final long REPLACEMENT_REMINDER_AFTER_HOURS = 120;
     private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
     private static final int PING_NUMBER_TO_GIVE_UP_ON = 50;
     private static final List<String> PING_MESSAGES = List.of(
@@ -230,7 +230,7 @@ public class AutoPingCron {
     private static void sendReplacementReminder(Game game, int spacer, int pingNumber) {
         long hoursPassed = (long) spacer * pingNumber;
         boolean shouldSendReminder = hoursPassed >= REPLACEMENT_REMINDER_AFTER_HOURS
-                && "true".equals(game.getStoredValue("replacementReminderSent"));
+                && !"true".equals(game.getStoredValue("replacementReminderSent"));
         if (!shouldSendReminder) return;
 
         game.setStoredValue("replacementReminderSent", "true");
