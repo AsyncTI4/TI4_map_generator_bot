@@ -174,7 +174,7 @@ public class AutoPingCron {
             }
         }
 
-        sendReplacementReminder(spacer, pingNumber);
+        sendReplacementReminder(game, spacer, pingNumber);
     }
 
     private static boolean hoursHavePassed(long milliSinceLastPing, int numberOfHours) {
