@@ -1,6 +1,9 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.io.File;
 import java.io.IOException;
@@ -2551,10 +2554,10 @@ public class UnfiledButtonHandlers {
             message2 = "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
                     + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
         }
-        if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
+        if (game.getRound() < 4 || !game.getPublicObjectives1Peekable().isEmpty()) {
             buttons.add(drawStage1);
         }
-        if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) && !game.isOmegaPhaseMode()) {
+        if ((game.getRound() > 3 || game.getPublicObjectives1Peekable().isEmpty()) && !game.isOmegaPhaseMode()) {
             if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                 buttons.add(draw2Stage2);
             } else {
@@ -2562,7 +2565,7 @@ public class UnfiledButtonHandlers {
             }
         }
         var endGameDeck =
-                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peakable() : game.getPublicObjectives2Peakable();
+                game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
         var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
         if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
             if (game.isFowMode()) {

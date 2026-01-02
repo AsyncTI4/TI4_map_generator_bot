@@ -149,8 +149,8 @@ public class MapGenerator implements AutoCloseable {
         }
         int otherObjCount = revealedObjectives.size() - stage1PublicObjCount - stage2PublicObjCount;
         otherObjCount = Math.max(Objective.retrieveCustom(game).size(), otherObjCount);
-        stage1PublicObjCount += game.getPublicObjectives1Peakable().size();
-        stage2PublicObjCount += game.getPublicObjectives2Peakable().size();
+        stage1PublicObjCount += game.getPublicObjectives1Peekable().size();
+        stage2PublicObjCount += game.getPublicObjectives2Peekable().size();
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 

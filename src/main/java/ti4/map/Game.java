@@ -113,6 +113,8 @@ public class Game extends GameProperties {
 
     // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile
+
+    @Getter
     private Map<String, Player> players = new LinkedHashMap<>();
 
     private final @JsonIgnore Map<String, Planet> planets = new HashMap<>();
@@ -171,8 +173,8 @@ public class Game extends GameProperties {
 
     private List<String> publicObjectives1;
     private List<String> publicObjectives2;
-    private List<String> publicObjectives1Peakable = new ArrayList<>();
-    private List<String> publicObjectives2Peakable = new ArrayList<>();
+    private List<String> publicObjectives1Peekable = new ArrayList<>();
+    private List<String> publicObjectives2Peekable = new ArrayList<>();
 
     @Getter
     @Setter
@@ -258,8 +260,8 @@ public class Game extends GameProperties {
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora
         addCustomPO(Constants.CUSTODIAN, 1);
-        setUpPeakableObjectives(5, 1);
-        setUpPeakableObjectives(5, 2);
+        setUpPeekableObjectives(5, 1);
+        setUpPeekableObjectives(5, 2);
     }
 
     public void fixScrewedRelics() {
@@ -1537,59 +1539,46 @@ public class Game extends GameProperties {
         savedButtons = savedButtonsPassed;
     }
 
-    /**
-     *
-     * @return unrevealed Stage 1 Objectives
-     */
-    public List<String> getPublicObjectives1Peakable() {
-        return publicObjectives1Peakable;
+    public List<String> getPublicObjectives1Peekable() {
+        return publicObjectives1Peekable;
     }
 
     public List<String> getPublicObjectives2() {
         return publicObjectives2;
     }
 
-    /**
-     *
-     * @return unrevealed Stage 2 Objectives
-     */
-    public List<String> getPublicObjectives2Peakable() {
-        return publicObjectives2Peakable;
+    public List<String> getPublicObjectives2Peekable() {
+        return publicObjectives2Peekable;
     }
 
     public Map.Entry<String, Integer> revealStage1() {
-        if (publicObjectives1Peakable.isEmpty() || getPhaseOfGame().contains("agenda")) {
-            return revealObjective(publicObjectives1);
+        if (publicObjectives1Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
+            return revealNextPublicObjective(publicObjectives1);
         } else {
-            return revealObjective(publicObjectives1Peakable);
+            return revealNextPublicObjective(publicObjectives1Peekable);
         }
     }
 
     public Map.Entry<String, Integer> revealStage2() {
-        if (publicObjectives2Peakable.isEmpty() || getPhaseOfGame().contains("agenda")) {
-            return revealObjective(publicObjectives2);
+        if (publicObjectives2Peekable.isEmpty() || getPhaseOfGame().contains("agenda")) {
+            return revealNextPublicObjective(publicObjectives2);
         } else {
-            return revealObjective(publicObjectives2Peakable);
+            return revealNextPublicObjective(publicObjectives2Peekable);
         }
     }
 
     public Map.Entry<String, Integer> revealStage2Random() {
         Collections.shuffle(publicObjectives2);
-        return revealObjective(publicObjectives2);
+        return revealNextPublicObjective(publicObjectives2);
     }
 
     public Map.Entry<String, Integer> revealStage1Random() {
         Collections.shuffle(publicObjectives1);
-        return revealObjective(publicObjectives1);
-    }
-
-    public Map.Entry<String, Integer> revealSOAsPO() {
-
-        return revealSecretObjective();
+        return revealNextPublicObjective(publicObjectives1);
     }
 
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
-        List<String> objectiveList = type == 1 ? publicObjectives1Peakable : publicObjectives2Peakable;
+        List<String> objectiveList = type == 1 ? publicObjectives1Peekable : publicObjectives2Peekable;
         if (objectiveList.size() + 1 < sizeOfBottom) {
             throw new IllegalArgumentException(
                     "Cannot shuffle in bottom objective, size of bottom exceeds new size of deck.");
@@ -1602,65 +1591,46 @@ public class Game extends GameProperties {
         objectiveList.add(insertPosition, cardIdToShuffle);
     }
 
-    public void setUpPeakableObjectives(int num, int type) {
+    public void setUpPeekableObjectives(int num, int type) {
         if (type == 1) {
-            var maxSize = publicObjectives1.size() + publicObjectives1Peakable.size();
+            var maxSize = publicObjectives1.size() + publicObjectives1Peekable.size();
             if (num > maxSize) {
                 num = maxSize;
             }
-            while (publicObjectives1Peakable.size() != num) {
-                if (publicObjectives1Peakable.size() > num) {
-                    String id = publicObjectives1Peakable.removeLast();
+            while (publicObjectives1Peekable.size() != num) {
+                if (publicObjectives1Peekable.size() > num) {
+                    String id = publicObjectives1Peekable.removeLast();
                     publicObjectives1.add(id);
                     Collections.shuffle(publicObjectives1);
                 } else {
                     Collections.shuffle(publicObjectives1);
                     String id = publicObjectives1.getFirst();
                     publicObjectives1.remove(id);
-                    publicObjectives1Peakable.add(id);
+                    publicObjectives1Peekable.add(id);
                 }
             }
         } else {
-            var maxSize = publicObjectives2.size() + publicObjectives2Peakable.size();
+            var maxSize = publicObjectives2.size() + publicObjectives2Peekable.size();
             if (num > maxSize) {
                 num = maxSize;
             }
-            while (publicObjectives2Peakable.size() != num) {
-                if (publicObjectives2Peakable.size() > num) {
-                    String id = publicObjectives2Peakable.removeLast();
+            while (publicObjectives2Peekable.size() != num) {
+                if (publicObjectives2Peekable.size() > num) {
+                    String id = publicObjectives2Peekable.removeLast();
                     publicObjectives2.add(id);
                     Collections.shuffle(publicObjectives2);
                 } else {
                     Collections.shuffle(publicObjectives2);
                     String id = publicObjectives2.getFirst();
                     publicObjectives2.remove(id);
-                    publicObjectives2Peakable.add(id);
-                }
-            }
-        }
-    }
-
-    public void setUpPeakableObjectives(int num) {
-        if (publicObjectives1Peakable != null && publicObjectives1Peakable.size() < num - 1) {
-            for (int x = 0; x < num; x++) {
-                if (!publicObjectives1.isEmpty()) {
-                    Collections.shuffle(publicObjectives1);
-                    String id = publicObjectives1.getFirst();
-                    publicObjectives1.remove(id);
-                    publicObjectives1Peakable.add(id);
-                }
-                if (!publicObjectives2.isEmpty()) {
-                    Collections.shuffle(publicObjectives2);
-                    String id = publicObjectives2.getFirst();
-                    publicObjectives2.remove(id);
-                    publicObjectives2Peakable.add(id);
+                    publicObjectives2Peekable.add(id);
                 }
             }
         }
     }
 
     public String peekAtStage1(int place, Player player) {
-        String objective = peekAtObjective(publicObjectives1Peakable, place);
+        String objective = peekAtObjective(publicObjectives1Peekable, place);
 
         if (publicObjectives1Peeked.containsKey(objective)
                 && !publicObjectives1Peeked.get(objective).contains(player.getUserID())) {
@@ -1675,7 +1645,7 @@ public class Game extends GameProperties {
     }
 
     public String peekAtStage2(int place, Player player) {
-        String objective = peekAtObjective(publicObjectives2Peakable, place);
+        String objective = peekAtObjective(publicObjectives2Peekable, place);
 
         if (publicObjectives2Peeked.containsKey(objective)
                 && !publicObjectives2Peeked.get(objective).contains(player.getUserID())) {
@@ -1689,54 +1659,53 @@ public class Game extends GameProperties {
         return objective;
     }
 
-    public Entry<String, Integer> revealSpecificStage1(String id) {
-        return revealSpecificObjective(publicObjectives1, id);
+    public boolean revealSpecificStage1(String id) {
+        return revealPublicObjective(publicObjectives1, id) != null
+                || revealPublicObjective(publicObjectives1Peekable, id) != null;
     }
 
-    public Entry<String, Integer> revealSpecificStage2(String id) {
-        return revealSpecificObjective(publicObjectives2, id);
+    public boolean revealSpecificStage2(String id) {
+        return revealPublicObjective(publicObjectives2, id) != null
+                || revealPublicObjective(publicObjectives2Peekable, id) != null;
     }
 
     public void swapStage1(int place1, int place2) {
-        swapObjective(publicObjectives1Peakable, place1, place2);
+        swapObjective(publicObjectives1Peekable, place1, place2);
     }
 
     public void swapStage2(int place1, int place2) {
-        swapObjective(publicObjectives2Peakable, place1, place2);
+        swapObjective(publicObjectives2Peekable, place1, place2);
     }
 
     private void swapObjective(List<String> objectiveList, int place1, int place2) {
-        if (!objectiveList.isEmpty()) {
-            place1 -= 1;
-            place2 -= 1;
-            String id = objectiveList.get(place1);
-            String id2 = objectiveList.get(place2);
-            objectiveList.set(place1, id2);
-            objectiveList.set(place2, id);
-        }
+        if (objectiveList.isEmpty()) return;
+        place1 -= 1;
+        place2 -= 1;
+        String id = objectiveList.get(place1);
+        String id2 = objectiveList.get(place2);
+        objectiveList.set(place1, id2);
+        objectiveList.set(place2, id);
     }
 
-    public void swapObjectiveOut(int stage1Or2, int place, String id) {
+    public void swapPublicObjectiveOut(int stage1Or2, int place, String id) {
         if (stage1Or2 == 1) {
-            String removed = publicObjectives1Peakable.remove(place);
-            publicObjectives1Peakable.add(place, id);
-            addObjectiveToDeck(removed);
+            String removed = publicObjectives1Peekable.remove(place);
+            publicObjectives1Peekable.add(place, id);
+            addPublicObjectiveToDeck(removed);
         } else {
-            String removed = publicObjectives2Peakable.remove(place);
-            publicObjectives2Peakable.add(place, id);
-            addObjectiveToDeck(removed);
+            String removed = publicObjectives2Peekable.remove(place);
+            publicObjectives2Peekable.add(place, id);
+            addPublicObjectiveToDeck(removed);
         }
     }
 
     private String peekAtObjective(List<String> objectiveList, int place) {
-        if (!objectiveList.isEmpty()) {
-            place -= 1;
-            return objectiveList.get(place);
-        }
-        return null;
+        if (objectiveList.isEmpty()) return null;
+        place -= 1;
+        return objectiveList.get(place);
     }
 
-    public String getTopObjective(int stage1Or2) {
+    public String getTopPublicObjective(int stage1Or2) {
         if (stage1Or2 == 1) {
             String id = publicObjectives1.getFirst();
             publicObjectives1.remove(id);
@@ -1748,34 +1717,32 @@ public class Game extends GameProperties {
         }
     }
 
-    private void addObjectiveToDeck(String id) {
+    private void addPublicObjectiveToDeck(String id) {
         PublicObjectiveModel obj = Mapper.getPublicObjective(id);
-        if (obj != null) {
-            if (obj.getPoints() == 1) {
-                publicObjectives1.add(id);
-                Collections.shuffle(publicObjectives1);
-            } else {
-                publicObjectives2.add(id);
-                Collections.shuffle(publicObjectives2);
-            }
+        if (obj == null) return;
+        if (obj.getPoints() == 1) {
+            publicObjectives1.add(id);
+            Collections.shuffle(publicObjectives1);
+        } else {
+            publicObjectives2.add(id);
+            Collections.shuffle(publicObjectives2);
         }
     }
 
-    private Entry<String, Integer> revealObjective(List<String> objectiveList) {
-        if (!objectiveList.isEmpty()) {
-            String id = objectiveList.getFirst();
-            objectiveList.remove(id);
-            int counter = 20;
-            while (revealedPublicObjectives.containsKey(id) && objectiveList.size() > 1 && counter > 0) {
-                id = objectiveList.getFirst();
-                objectiveList.remove(id);
-                counter -= 1;
-            }
-            addRevealedPublicObjective(id);
-            for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
-                if (entry.getKey().equals(id)) {
-                    return entry;
-                }
+    private Entry<String, Integer> revealNextPublicObjective(List<String> objectives) {
+        if (objectives.isEmpty()) return null;
+        String id = objectives.getFirst();
+        return revealPublicObjective(objectives, id);
+    }
+
+    private Entry<String, Integer> revealPublicObjective(Collection<String> objectives, String objective) {
+        boolean removedFromDeck = objectives.remove(objective);
+        if (!removedFromDeck) return null;
+
+        addRevealedPublicObjective(objective);
+        for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+            if (entry.getKey().equals(objective)) {
+                return entry;
             }
         }
         return null;
@@ -1786,46 +1753,10 @@ public class Game extends GameProperties {
         String id = getSecretObjectives().getFirst();
         removeSOFromGame(id);
         addToSoToPoList(id);
-        // addRevealedPublicObjective(id);
-        Integer so = addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
+        addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
         for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
             if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
                 return entry;
-            }
-        }
-
-        return null;
-    }
-
-    private Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
-        if (objectiveList.contains(id)) {
-            objectiveList.remove(id);
-            addRevealedPublicObjective(id);
-            for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
-                if (entry.getKey().equals(id)) {
-                    return entry;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Entry<String, Integer> addSpecificStage1(String objective) {
-        return addSpecificObjective(publicObjectives1, objective);
-    }
-
-    public Entry<String, Integer> addSpecificStage2(String objective) {
-        return addSpecificObjective(publicObjectives2, objective);
-    }
-
-    private Entry<String, Integer> addSpecificObjective(List<String> objectiveList, String objective) {
-        if (!objectiveList.isEmpty()) {
-            objectiveList.remove(objective);
-            addRevealedPublicObjective(objective);
-            for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
-                if (entry.getKey().equals(objective)) {
-                    return entry;
-                }
             }
         }
         return null;
@@ -1839,22 +1770,21 @@ public class Game extends GameProperties {
                 break;
             }
         }
-        if (!id.isEmpty()) {
-            revealedPublicObjectives.remove(id);
-            Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
-            Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
-            if (po1.contains(id)) {
-                publicObjectives1Peeked.remove(id);
-                publicObjectives1.add(id);
-                Collections.shuffle(publicObjectives1);
-            } else if (po2.contains(id)) {
-                publicObjectives2Peeked.remove(id);
-                publicObjectives2.add(id);
-                Collections.shuffle(publicObjectives2);
-            }
-            return true;
+        if (id.isEmpty()) return false;
+
+        revealedPublicObjectives.remove(id);
+        Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
+        Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
+        if (po1.contains(id)) {
+            publicObjectives1Peeked.remove(id);
+            publicObjectives1.add(id);
+            Collections.shuffle(publicObjectives1);
+        } else if (po2.contains(id)) {
+            publicObjectives2Peeked.remove(id);
+            publicObjectives2.add(id);
+            Collections.shuffle(publicObjectives2);
         }
-        return false;
+        return true;
     }
 
     public void shuffleObjectiveDeck(int stage) {
@@ -2102,12 +2032,12 @@ public class Game extends GameProperties {
         this.publicObjectives2 = publicObjectives2;
     }
 
-    public void setPublicObjectives1Peakable(List<String> publicObjectives1) {
-        publicObjectives1Peakable = publicObjectives1;
+    public void setPublicObjectives1Peekable(List<String> publicObjectives1) {
+        publicObjectives1Peekable = publicObjectives1;
     }
 
-    public void setPublicObjectives2Peakable(List<String> publicObjectives2) {
-        publicObjectives2Peakable = publicObjectives2;
+    public void setPublicObjectives2Peekable(List<String> publicObjectives2) {
+        publicObjectives2Peekable = publicObjectives2;
     }
 
     public void removePublicObjective1(String key) {
@@ -3536,15 +3466,15 @@ public class Game extends GameProperties {
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         // Setup peakable objectives
-        if (publicObjectives1Peakable.size() != 4) {
+        if (publicObjectives1Peekable.size() != 4) {
             if (isOmegaPhaseMode()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "This game is using Omega Phase, so the objective setup was ignored. If there's a problem with it, use `/omegaphase "
                                 + Constants.RESET_OMEGA_PHASE_OBJECTIVES + "`");
             } else {
-                setUpPeakableObjectives(stage1Count, 1);
-                setUpPeakableObjectives(stage2Count, 2);
+                setUpPeekableObjectives(stage1Count, 1);
+                setUpPeekableObjectives(stage2Count, 2);
             }
         }
 
@@ -3572,8 +3502,8 @@ public class Game extends GameProperties {
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getStage1PublicDeckID().equals(deck.getAlias())) return true;
 
-        int peekableStageOneCount = publicObjectives1Peakable.size();
-        setUpPeakableObjectives(0, 1);
+        int peekableStageOneCount = publicObjectives1Peekable.size();
+        setUpPeekableObjectives(0, 1);
         if (revealedPublicObjectives.size() > 1) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -3584,15 +3514,15 @@ public class Game extends GameProperties {
 
         setStage1PublicDeckID(deck.getAlias());
         publicObjectives1 = deck.getNewShuffledDeck();
-        setUpPeakableObjectives(peekableStageOneCount, 1);
+        setUpPeekableObjectives(peekableStageOneCount, 1);
         return true;
     }
 
     public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getStage2PublicDeckID().equals(deck.getAlias())) return true;
 
-        int peekableStageTwoCount = publicObjectives2Peakable.size();
-        setUpPeakableObjectives(0, 2);
+        int peekableStageTwoCount = publicObjectives2Peekable.size();
+        setUpPeekableObjectives(0, 2);
         if (revealedPublicObjectives.size() > 1) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
@@ -3603,7 +3533,7 @@ public class Game extends GameProperties {
 
         setStage2PublicDeckID(deck.getAlias());
         publicObjectives2 = deck.getNewShuffledDeck();
-        setUpPeakableObjectives(peekableStageTwoCount, 2);
+        setUpPeekableObjectives(peekableStageTwoCount, 2);
         return true;
     }
 
@@ -3916,10 +3846,6 @@ public class Game extends GameProperties {
         Player player = new Player(id, name, this);
         players.put(id, player);
         return player;
-    }
-
-    public Map<String, Player> getPlayers() {
-        return players;
     }
 
     @JsonIgnore
