@@ -1891,23 +1891,6 @@ public class Game extends GameProperties {
         return scoredPlayerList.contains(userID);
     }
 
-    public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
-        String id = "";
-        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-            if (po.getValue().equals(idNumber)) {
-                id = po.getKey();
-                break;
-            }
-        }
-        if (!id.isEmpty()) {
-            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            scoredPlayerList.add(userID);
-            scoredPublicObjectives.put(id, scoredPlayerList);
-            return true;
-        }
-        return false;
-    }
-
     public boolean unscorePublicObjective(String userID, Integer idNumber) {
         String id = "";
         for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
