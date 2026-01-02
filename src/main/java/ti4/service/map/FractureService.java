@@ -157,7 +157,7 @@ public class FractureService {
 
             String msg = game.isFowMode()
                     ? GMService.gmPing(game)
-                    : player.getRepresentation() + ", please choose 3 systems with a " + type.emoji()
+                    : player.getRepresentation() + ", please a system with a " + type.emoji()
                             + " to place an Ingress token.";
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
@@ -167,6 +167,10 @@ public class FractureService {
                         player.getPrivateChannel(),
                         player.getRepresentationUnfogged()
                                 + ", buttons to resolve Ingress tokens for the Fracture have been sent to the GM.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "## Please do not place more ingress tokens than legal. If brought in by breakthrough, that means 3 per technology type of the breakthrough. Otherwise, 1 per technology type.");
             }
         }
 

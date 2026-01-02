@@ -2341,7 +2341,9 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasTechReady(String techID) {
-        return hasTech(techID) && !getExhaustedTechs().contains(techID);
+        return hasTech(techID)
+                && !getExhaustedTechs().contains(techID)
+                && !getExhaustedTechs().contains("tf-" + techID);
     }
 
     public boolean controlsMecatol(boolean includeAlliance) {
