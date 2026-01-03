@@ -2005,7 +2005,7 @@ public class ButtonHelperActionCards {
                 if (!p2.hasUnplayedSCs()) {
                     continue;
                 }
-                String label = "Expreme Duress " + p2.getFactionNameOrColor();
+                String label = "Extreme Duress " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
                 scButtons.add(Buttons.gray("resolvePreassignment_ExtremeDuress_" + p2.getColor(), label, scEmoji));
             }
@@ -2934,7 +2934,7 @@ public class ButtonHelperActionCards {
         StringBuilder bestPlanet = new StringBuilder();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count) {
+            if (p != null && p.getResources() > count && !p.getName().equalsIgnoreCase("triad")) {
                 count = p.getResources();
                 bestPlanet = new StringBuilder(planet);
             } else if (p != null

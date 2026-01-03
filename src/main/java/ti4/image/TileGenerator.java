@@ -830,12 +830,12 @@ public class TileGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                boolean isLegendary = ButtonHelper.isTileLegendary(tile) || tile.isMecatol();
+                boolean isLegendary = ButtonHelper.isTileLegendary(tile) || tile.isMecatol(game);
 
                 if (!isLegendary) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
-                } else if (tile.isMecatol()) {
+                } else if (tile.isMecatol(game)) {
                     String councilFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
                     BufferedImage bufferedImage = ImageHelper.readScaled(councilFile, 2.0f);
                     if (bufferedImage == null) break;
@@ -1122,7 +1122,7 @@ public class TileGenerator {
                         traits.add(planet.getOriginalPlanetType());
                     }
 
-                    if (tile.isMecatol()) {
+                    if (tile.isMecatol(game)) {
                         traitFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
                     } else if ("faction".equalsIgnoreCase(planet.getOriginalPlanetType())) {
                         traitFile = ResourceHelper.getInstance()
@@ -1153,9 +1153,9 @@ public class TileGenerator {
                                 Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                         int w = bufferedImage.getWidth();
                         int h = bufferedImage.getHeight();
-                        int innerBorder = (tile.isMecatol() ? 3 : 2);
-                        int outerBorder = innerBorder + (tile.isMecatol() ? -1 : 2);
-                        int padding = outerBorder + (tile.isMecatol() ? 3 : 2);
+                        int innerBorder = (tile.isMecatol(game) ? 3 : 2);
+                        int outerBorder = innerBorder + (tile.isMecatol(game) ? -1 : 2);
+                        int padding = outerBorder + (tile.isMecatol(game) ? 3 : 2);
                         BufferedImage backgroundInner =
                                 new BufferedImage(w + 2 * padding, h + 2 * padding, bufferedImage.getType());
                         BufferedImage backgroundOuter =

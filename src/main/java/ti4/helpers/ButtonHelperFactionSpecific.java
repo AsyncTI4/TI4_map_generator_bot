@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -2472,7 +2470,7 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getMecatolTile();
         if (tile == null) return; // no mecatol tile
         for (Planet mecatol : tile.getPlanetUnitHolders()) {
-            if (Constants.MECATOLS.contains(mecatol.getName())) {
+            if (game.mecatols().contains(mecatol.getName())) {
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1))
                     mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
                 if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2))
@@ -3076,7 +3074,7 @@ public class ButtonHelperFactionSpecific {
                 + ", please choose the planet (other than Mecatol Rex) that you wish to ready.";
         buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
-            if (Constants.MECATOLS.contains(planet)) {
+            if (game.mecatols().contains(planet)) {
                 continue;
             }
             buttons.add(Buttons.gray(
@@ -3811,9 +3809,9 @@ public class ButtonHelperFactionSpecific {
         Button loseStrat = Buttons.red(finsFactionCheckerPrefix + "decrease_strategy_cc", "Lose 1 Strategy Token");
         Button DoneGainingCC = Buttons.red(finsFactionCheckerPrefix + "deleteButtons", "Done Losing Tokens");
         List<Button> buttons = List.of(loseTactic, loseFleet, loseStrat, DoneGainingCC);
-        String message2 = p2.getRepresentationUnfogged() + "! Your current command tokens are "
-                + p2.getCCRepresentation() + ". Use buttons to lose a token.";
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
+        String message2 = player.getRepresentationUnfogged() + "! Your current command tokens are "
+                + player.getCCRepresentation() + ". Use buttons to lose a token.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         Leader playerLeader = p2.getLeader(agent).orElse(null);
         if (playerLeader == null) {
             if (agent.contains("titanprototype")) {
@@ -3850,14 +3848,14 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getFactionEmoji() + " spent 3 influence via _Temporal Command Suite_ to ready " + agent
-                        + ", owned by " + p2.getColor() + ".");
+                player.getFactionEmoji() + " spent 1 CC via _Temporal Command Suite_ to ready " + agent + ", owned by "
+                        + p2.getColor() + ".");
 
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
-                    p2.getRepresentationUnfogged() + " 3 influence was spent by " + player.getColor()
-                            + " to ready your " + agent + ".");
+                    p2.getRepresentationUnfogged() + " 1 CC was spent by " + player.getColor() + " to ready your "
+                            + agent + ".");
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

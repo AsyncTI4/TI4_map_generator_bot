@@ -797,7 +797,7 @@ public class FoWHelper {
         }
         if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
             return true;
-        } else if (tile.isMecatol() && player.hasIIHQ()) {
+        } else if (tile.isMecatol(game) && player.hasIIHQ()) {
             return true;
         } else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
             return true;

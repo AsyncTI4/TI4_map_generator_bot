@@ -138,6 +138,7 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
+        if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (codexes.isVal())
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));

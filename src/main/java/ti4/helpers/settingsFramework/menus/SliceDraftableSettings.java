@@ -126,12 +126,12 @@ public class SliceDraftableSettings extends SettingsMenu {
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
-        ls.add(numSlices);
         ls.add(mapTemplate);
         ls.add(mapGenerationMode);
         if (presetSlices != null) {
             return ls;
         }
+        ls.add(numSlices);
         ls.addAll(getCurrentModeSettings().settings());
         return ls;
     }
@@ -328,9 +328,15 @@ public class SliceDraftableSettings extends SettingsMenu {
             sources.addAll(dparent.getSourceSettings().getTileSources());
         }
 
-        parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
-        if (parsedSlices == null) {
+        String error = null;
+        try {
+            parsedSlices = MiltyDraftHelper.parseSlices(sliceString, sources);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        if (parsedSlices == null || error != null) {
             presetSlices = null;
+            if (error != null) return error;
             return "Invalid slice string";
         } else if (parsedSlices.size() < players) {
             presetSlices = null;

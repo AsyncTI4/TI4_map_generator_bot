@@ -395,20 +395,18 @@ public class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             String faction = tech.getFaction().get();
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         for (String leaderID : player.getLeaderIDs()) {
             LeaderModel lead = Mapper.getLeader(leaderID);
             String faction = lead.getFaction();
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         for (String unit : player.getUnitsOwned()) {
             UnitModel unitM = Mapper.getUnit(unit);
@@ -419,11 +417,10 @@ public class ButtonHelperTwilightsFallActionCards {
             if (faction.equalsIgnoreCase(player.getFaction())) {
                 continue;
             }
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         int max = 0;
         String bestFaction = "";

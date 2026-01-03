@@ -1372,6 +1372,7 @@ public class CombatRollService {
 
     private static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(
             Planet planet, Player player, GenericInteractionCreateEvent event) {
+        Game game = player.getGame();
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -1396,7 +1397,7 @@ public class CombatRollService {
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
-        if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasIIHQ()) {
+        if (player.controlsMecatol(true) && game.mecatols().contains(planet.getName()) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -1458,7 +1459,7 @@ public class CombatRollService {
 
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet planet) {
-                if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasIIHQ()) {
+                if (player.controlsMecatol(true) && game.mecatols().contains(planet.getName()) && player.hasIIHQ()) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
                     planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());

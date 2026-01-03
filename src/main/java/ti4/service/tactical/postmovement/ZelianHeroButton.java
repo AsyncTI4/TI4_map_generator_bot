@@ -11,7 +11,7 @@ import ti4.service.tactical.PostMovementButtonContext;
 public final class ZelianHeroButton implements PostMovementAbilityButton {
     public boolean enabled(PostMovementButtonContext ctx) {
         return ctx.player.hasLeaderUnlocked("zelianhero")
-                && !ctx.tile.isMecatol()
+                && !ctx.tile.isMecatol(ctx.game)
                 && ButtonHelper.getTilesOfUnitsWithBombard(ctx.player, ctx.game).contains(ctx.tile);
     }
 

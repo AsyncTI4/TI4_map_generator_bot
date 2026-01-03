@@ -2342,17 +2342,18 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasTechReady(String techID) {
-        return hasTech(techID) && !getExhaustedTechs().contains(techID);
+        return hasTech(techID)
+                && !getExhaustedTechs().contains(techID)
+                && !getExhaustedTechs().contains("tf-" + techID);
     }
 
     public boolean controlsMecatol(boolean includeAlliance) {
-
         if (game.isOrdinianC1Mode()) {
             Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(game);
             return p2 != null && p2.getFaction().equalsIgnoreCase(getFaction());
         }
-        if (includeAlliance) return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
-        return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
+        if (includeAlliance) return CollectionUtils.containsAny(getPlanetsAllianceMode(), game.mecatols());
+        return CollectionUtils.containsAny(getPlanets(), game.mecatols());
     }
 
     public boolean isPlayerMemberOfAlliance(Player player2) {

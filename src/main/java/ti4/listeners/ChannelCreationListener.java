@@ -43,6 +43,7 @@ public class ChannelCreationListener extends ListenerAdapter {
             buttons.add(Buttons.green("joinGameList", "Join Game"));
             buttons.add(Buttons.red("leaveGameList", "Leave Game"));
             buttons.add(Buttons.gray("editPlayers~MDL", "Add Players"));
+            buttons.add(Buttons.gray("removePlayers~MDL", "Remove Players"));
             buttons.add(Buttons.blue("launchGame", "Launch Game"));
             channel.sendMessage(message)
                     .addComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))

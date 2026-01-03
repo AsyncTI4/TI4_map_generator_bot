@@ -515,7 +515,7 @@ public class ButtonHelperTwilightsFall {
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
-            if (player2 == startPlayer || game.isFowMode()) {
+            if (player2 == startPlayer || game.isFowMode() || game.isVeiledHeartMode()) {
                 continue;
             }
             game.setStoredValue(player2.getFaction() + "splicequeue", "");

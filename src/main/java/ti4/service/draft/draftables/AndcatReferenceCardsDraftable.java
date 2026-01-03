@@ -437,6 +437,15 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         AndcatReferenceCardsDraftableSettings settings = draftSystemSettings.getAndcatReferenceCardsDraftableSettings();
         SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
+        // Use preset packages when provided
+        if (settings.getParsedPackages() != null && settings.getParsedPackages().size() > 0) {
+            referenceCardPackages.clear();
+            for (ReferenceCardPackage refPackage : settings.getParsedPackages()) {
+                referenceCardPackages.put(refPackage.key(), refPackage);
+            }
+            return null;
+        }
+
         return initialize(
                 settings.getNumPackages().getVal(),
                 sourceSettings.getFactionSources(),

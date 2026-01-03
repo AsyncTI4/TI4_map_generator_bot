@@ -738,7 +738,7 @@ public class ButtonHelperTacticalAction {
         }
         if (player.hasRelic("absol_plenaryorbital")
                 && !tile.isHomeSystem(game)
-                && !tile.isMecatol()
+                && !tile.isMecatol(game)
                 && !player.hasUnit("plenaryorbital")) {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, tile, player);
             if (!buttons4.isEmpty()) {

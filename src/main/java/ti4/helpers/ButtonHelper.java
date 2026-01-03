@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1759,7 +1762,7 @@ public class ButtonHelper {
 
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
                     && FoWHelper.playerHasPlanetsInSystem(nonActivePlayer, activeSystem)
-                    && !activeSystem.isMecatol()) {
+                    && !activeSystem.isMecatol(game)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(
@@ -4888,6 +4891,9 @@ public class ButtonHelper {
         int count = 0;
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
+            if (player.getSingularityTechs().contains(tech)) {
+                continue;
+            }
             if (techM.getTypes().contains(type)) {
                 count++;
             }
@@ -4949,7 +4955,7 @@ public class ButtonHelper {
         }
         if (player.hasAbility("reclamation")) {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                if (Constants.MECATOLS.contains(uH.getName())
+                if (game.mecatols().contains(uH.getName())
                         && game.getStoredValue("planetsTakenThisRound").contains(uH.getName())) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "sd mr, pds mr");
                     MessageHelper.sendMessageToChannel(
@@ -6686,11 +6692,11 @@ public class ButtonHelper {
 
     public static void offerRedTapeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        for (String poS : game.getPublicObjectives1Peakable()) {
+        for (String poS : game.getPublicObjectives1Peekable()) {
             buttons.add(Buttons.green(
                     "cutTape_" + poS, Mapper.getPublicObjective(poS).getName()));
         }
-        for (String poS : game.getPublicObjectives2Peakable()) {
+        for (String poS : game.getPublicObjectives2Peekable()) {
             buttons.add(Buttons.green(
                     "cutTape_" + poS, Mapper.getPublicObjective(poS).getName()));
         }
@@ -6707,7 +6713,7 @@ public class ButtonHelper {
         String poID = buttonID.replace("cutTape_", "");
         int location = 1;
         deleteMessage(event);
-        List<String> po1s = new ArrayList<>(game.getPublicObjectives1Peakable());
+        List<String> po1s = new ArrayList<>(game.getPublicObjectives1Peekable());
         for (String poS : po1s) {
             if (poS.equalsIgnoreCase(poID)) {
                 game.swapStage1(1, location);
@@ -6723,7 +6729,7 @@ public class ButtonHelper {
             location++;
         }
         location = 1;
-        List<String> po2s = new ArrayList<>(game.getPublicObjectives2Peakable());
+        List<String> po2s = new ArrayList<>(game.getPublicObjectives2Peekable());
         for (String poS : po2s) {
             if (poS.equalsIgnoreCase(poID)) {
                 game.swapStage2(1, location);
@@ -7121,7 +7127,7 @@ public class ButtonHelper {
                 if (unitHolder instanceof Planet planet) {
                     if ((!player.getPlanetsAllianceMode().contains(planet.getName())
                                     && !isPlanetLegendaryOrHome(unitHolder.getName(), game, false, player)
-                                    && !Constants.MECATOLS.contains(planet.getName()))
+                                    && !game.mecatols().contains(planet.getName()))
                             || game.isWildWildGalaxyMode()) {
                         buttons.add(Buttons.green(
                                 finChecker + "stellarConvert_" + planet.getName(),
@@ -7213,7 +7219,7 @@ public class ButtonHelper {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                if (tilePos.equalsIgnoreCase(adjTilePos) && Constants.MECATOLS.contains(unitHolder.getName())) {
+                if (tilePos.equalsIgnoreCase(adjTilePos) && game.mecatols().contains(unitHolder.getName())) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.controlsMecatol(false)
                                 && p2.hasPlanet("custodiavigilia")
@@ -7453,7 +7459,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), game.getPing() + ", usage of _Imperial Arbiter_ has been declined.");
         }
-        ButtonHelper.deleteMessage(event);
+        deleteMessage(event);
     }
 
     @ButtonHandler("declinePath")
@@ -7840,7 +7846,7 @@ public class ButtonHelper {
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
         List<String> fakePlanets = new ArrayList<>(List.of(
                 "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
-        List<String> ignoredPlanets = new ArrayList<>(Constants.MECATOLS);
+        List<String> ignoredPlanets = new ArrayList<>(game.mecatols());
         ignoredPlanets.addAll(fakePlanets);
 
         for (String planet : player.getPlanets()) {

@@ -265,8 +265,7 @@ class JimboConst {
             }
             if (index < -1) continue;
             baseStringOrder.add(color);
-            if (!tilesByNum.containsKey(index)) tilesByNum.put(index, new HashMap<>());
-            tilesByNum.get(index).put(color, tile);
+            tilesByNum.computeIfAbsent(index, key -> new HashMap<>()).put(color, tile);
         }
 
         // Store the data for convenient use later
