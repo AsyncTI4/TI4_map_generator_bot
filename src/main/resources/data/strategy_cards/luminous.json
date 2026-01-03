@@ -72,7 +72,7 @@
         "secondaryTexts": [
             "Spend 1 token from your strategy pool to place 1 structure on a planet you control."
         ],
-        "botSCAutomationID": "pok4construction",
+        "botSCAutomationID": "te4construction",
         "imageFileName": "luminous_5",
         "source": "other"
     },
