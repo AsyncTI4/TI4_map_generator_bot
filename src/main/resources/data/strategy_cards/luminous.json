@@ -5,11 +5,11 @@
         "name": "Anticipation",
         "primaryTexts": [
             "Ready 2 planets you control.",
-            "Ready a technology, an agent, or relic",
-            "Redistribute any number of tokens on your sheet"
+            "Ready a technology, an agent, or relic you control.",
+            "Redistribute any number of tokens on your sheet."
         ],
         "secondaryTexts": [
-            "Spend 1 token from your strategy pool to ready up to 2 planets you control"
+            "Spend 1 token from your strategy pool to ready up to 2 planets you control."
         ],
         "imageFileName": "luminous_1",
         "source": "other"
