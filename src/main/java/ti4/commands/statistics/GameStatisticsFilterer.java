@@ -114,6 +114,13 @@ public class GameStatisticsFilterer {
                 .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
     }
 
+    private static boolean filterOnFaction(String factionFilter, Game game) {
+        if (factionFilter == null) {
+            return true;
+        }
+        return game.getFactions().stream().anyMatch(faction -> faction.equalsIgnoreCase(factionFilter));
+    }
+
     public static Predicate<Game> getNormalFinishedGamesFilter(
             Integer playerCountFilter, Integer victoryPointGoalFilter) {
         return getFinishedGamesFilter(playerCountFilter, victoryPointGoalFilter)
