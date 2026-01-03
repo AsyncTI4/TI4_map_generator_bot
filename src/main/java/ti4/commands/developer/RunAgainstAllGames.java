@@ -1,15 +1,16 @@
 package ti4.commands.developer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.map.Game;
-import ti4.map.helper.GameHelper;
-import ti4.map.persistence.GameManager;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.website.model.stats.GameStatsDashboardPayload;
 
 class RunAgainstAllGames extends Subcommand {
 
@@ -21,23 +22,43 @@ class RunAgainstAllGames extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
-        List<String> changedGames = new ArrayList<>();
+        Map<Long, List<String>> creationDateTimeToGames = new HashMap<>();
+        Map<Long, List<String>> setupTimestampToGames = new HashMap<>();
         GamesPage.consumeAllGames(game -> {
-            boolean changed = makeChanges(game);
-            if (changed) {
-                changedGames.add(game.getName());
-                GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
-            }
+            long creationDateTime = game.getCreationDateTime();
+            creationDateTimeToGames
+                    .computeIfAbsent(creationDateTime, key -> new ArrayList<>())
+                    .add(formatGameLabel(game));
+
+            long setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
+            setupTimestampToGames
+                    .computeIfAbsent(setupTimestamp, key -> new ArrayList<>())
+                    .add(formatGameLabel(game));
         });
 
-        BotLogger.info("Changes made to " + changedGames.size() + " games:" + String.join(", ", changedGames));
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
-        BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()
-                + " games: " + String.join(", ", changedGames));
+        List<String> creationDateTimeOverlaps = formatOverlaps("creationDateTime", creationDateTimeToGames);
+        List<String> setupTimestampOverlaps = formatOverlaps("setupTimestamp", setupTimestampToGames);
+
+        BotLogger.info(String.join(System.lineSeparator(), creationDateTimeOverlaps));
+        BotLogger.info(String.join(System.lineSeparator(), setupTimestampOverlaps));
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games. "
+                + "creationDateTime overlaps: " + (creationDateTimeOverlaps.size() - 1)
+                + ", setupTimestamp overlaps: " + (setupTimestampOverlaps.size() - 1) + ".");
     }
 
-    private static boolean makeChanges(Game game) {
-        // Developer's Delight
-        return GameHelper.updateCreationDateTimeIfNotSameDateAsCreationDateField(game);
+    private static List<String> formatOverlaps(String label, Map<Long, List<String>> timestampToGames) {
+        List<String> overlaps = timestampToGames.entrySet().stream()
+                .filter(entry -> entry.getValue().size() > 1)
+                .map(entry -> label + " overlap at " + entry.getKey() + ": " + String.join(", ", entry.getValue()))
+                .toList();
+        List<String> lines = new ArrayList<>();
+        lines.add("Found " + overlaps.size() + " " + label + " overlap(s).");
+        lines.addAll(overlaps);
+        return lines;
+    }
+
+    private static String formatGameLabel(Game game) {
+        return game.getName() + " (" + game.getID() + ")";
     }
 }
