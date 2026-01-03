@@ -114,16 +114,21 @@ public class TeHelperActionCards {
     private static void concedeToED(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
+        int acCount = player.getAcCount();
         ActionCardHelper.discardRandomAC(event, game, player, player.getAcCount());
-        if (player.getTg() > 0) {
-            p2.gainTG(player.getTg(), true);
+        int tgCount = player.getTg();
+        if (tgCount > 0) {
+            p2.gainTG(tgCount, true);
             player.setTg(0);
         }
+        int soCount = player.getSecretsUnscored().size();
         if (!player.getSecretsUnscored().isEmpty()) {
             SecretObjectiveHelper.showAll(player, p2, game);
         }
-        String message = player.getRepresentation()
-                + " lost all their ACs, gave all their tgs to the player who played extreme duress, and showed their secrets to them as well.";
+        String message = player.getRepresentation() + " discarded their " + acCount + " action card"
+                + (acCount == 1 ? "" : "s") + ", gave their " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                + " to " + p2.getRepresentationNoPing() + ", and showed their " + soCount + " unscored secret objective"
+                + (soCount == 1 ? "" : "s") + " to them as well.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }

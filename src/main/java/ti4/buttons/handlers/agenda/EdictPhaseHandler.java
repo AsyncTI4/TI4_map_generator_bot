@@ -316,8 +316,9 @@ public class EdictPhaseHandler {
                             "Assign " + Mapper.getTech(tech).getName()));
                     embeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                 }
-                msg += "\n\n" + game.getSpeaker().getRepresentation()
-                        + " needs to assign the first ability to the player resolving the edict, then that player does the rest.";
+                msg += "\n\n" + game.getSpeaker().getRepresentation() + " needs to assign the first ability to "
+                        + (buttonID.contains("_orangetf") ? "Radiant Aur" : "the tyrant")
+                        + ", then that player assigns the rest.";
             }
             case "tf-foretell" -> {
                 int loc = 1;

@@ -412,7 +412,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + "Select the secret you would like to score. The bot has not verified you can score these, so double check.",
+                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.",
                 buttons);
     }
 
@@ -1991,7 +1991,7 @@ public class ButtonHelperFactionSpecific {
                         buttons.add(Buttons.green(
                                 player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
                                         + uH.getName(),
-                                "Release Inf on " + Helper.getPlanetRepresentation(uH.getName(), game),
+                                "Release Infantry On " + Helper.getPlanetRepresentation(uH.getName(), game),
                                 UnitEmojis.infantry));
                     }
 
@@ -1999,14 +1999,14 @@ public class ButtonHelperFactionSpecific {
                     if (hasFF) {
                         buttons.add(Buttons.blue(
                                 player.finChecker() + "vortexRevive_" + tile.getPosition() + "_fighter_" + uH.getName(),
-                                "Release FF in " + tile.getRepresentationForButtons(),
+                                "Release Fighter In " + tile.getRepresentationForButtons(),
                                 UnitEmojis.fighter));
                     }
                     if (hasInf) {
                         buttons.add(Buttons.green(
                                 player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
                                         + uH.getName(),
-                                "Release Inf in space of " + tile.getRepresentationForButtons(),
+                                "Release Infantry " + tile.getRepresentationForButtons() + " Space Area",
                                 UnitEmojis.infantry));
                     }
                 }
@@ -2037,14 +2037,14 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of tile " + pos
-                            + " using the Vortexer ability. (" + amount + " left to revive)");
+                            + " using _Vortexer_ (" + amount + " left to revive).");
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " put 1 captured " + unit + " on the planet of "
-                            + Helper.getPlanetRepresentation(uHName, game) + " using the Vortexer ability. (" + amount
-                            + " left to revive)");
+                            + Helper.getPlanetRepresentation(uHName, game) + " using _Vortexer_ (" + amount
+                            + " left to revive).");
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
         }
         // AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);

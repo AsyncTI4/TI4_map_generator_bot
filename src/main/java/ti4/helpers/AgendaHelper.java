@@ -4356,7 +4356,9 @@ public class AgendaHelper {
                     }
                 } else {
                     sb.append(
-                            "The top agenda is currently in somebody's hand. If you are not currently resolving the covert legislation agenda and politics player is done assigning agendas, fix this situation by running the command: /agenda reset_draw_state_for_deck confirm:YES.");
+                            "The top agenda is currently in somebody's hand."
+                                    + " If you are not currently resolving the _Covert Legislation_ agenda, and the **Politics** player (if any) is done assigning agendas,"
+                                    + " fix this situation by running the command: `/agenda reset_draw_state_for_deck confirm:YES`.");
                 }
             } else if (agendaID != null) {
                 embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();

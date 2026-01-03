@@ -238,11 +238,12 @@ public class StartTurnService {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.red(
                             player.getFinsFactionCheckerPrefix() + "concedeToED_" + p2.getFaction(),
-                            "Lose ACs, TGs, Show Secrets"));
-                    buttons2.add(Buttons.green("deleteButtons", "Give in and Play SC (or sabo Extreme Duress)"));
+                            "Lose Action Cards, Give Trade Goods, And Show Secrets"));
+                    buttons2.add(
+                            Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            player.getRepresentation() + ", please resolve _Extreme Duress_.",
                             buttons2);
                 }
             }
@@ -253,11 +254,11 @@ public class StartTurnService {
                     game.removeStoredValue("Crisis Target");
                     ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End turn"));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was canceled)"));
+                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete These (If Crisis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            player.getRepresentation() + ", please resolve _Crisis_.",
                             buttons2);
                 }
             }
@@ -269,10 +270,10 @@ public class StartTurnService {
                     ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(ButtonHelper.getEndTurnButton(game, player));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was canceled)"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete These (If Stasis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            player.getRepresentation() + ", please resolve _Stasis_.",
                             buttons2);
                 }
             }
@@ -639,7 +640,7 @@ public class StartTurnService {
         }
         if (player.hasUnexhaustedLeader("hyperagent")) {
             startButtons.add(Buttons.gray(
-                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+                    "getAgentSelection_hyperagent", "Use Hyper Genome on Someone Else", FactionEmojis.Mentak));
         }
 
         if (game.isVeiledHeartMode()

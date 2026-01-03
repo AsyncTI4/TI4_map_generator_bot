@@ -13,7 +13,7 @@ class RadicalAdvancement extends GameStateSubcommand {
     RadicalAdvancement() {
         super(
                 Constants.RADICAL_ADVANCEMENT,
-                "Do the Radical Advancement ability (return a technology then gain one with an additional prerequisite)",
+                "Do the Radical Advancement ability (return a technology then gain one with one extra prerequisite)",
                 true,
                 true);
         addOptions(

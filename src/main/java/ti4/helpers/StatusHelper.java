@@ -602,7 +602,7 @@ public class StatusHelper {
             if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                     List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
-                    String msg = player.getRepresentation() + " Use buttons to revive infantry. You have "
+                    String msg = player.getRepresentation() + ", please use these buttons to revive infantry. You have "
                             + player.getStasisInfantry() + " infantry left to revive.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 } else {

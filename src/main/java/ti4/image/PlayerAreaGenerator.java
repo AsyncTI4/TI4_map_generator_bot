@@ -797,7 +797,7 @@ class PlayerAreaGenerator {
                     .sum();
             if (totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
-                        + " there are too many Galvanized units on the board. Please review and resolve manually.";
+                        + ", there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             return displayRemainingFactionTokens(

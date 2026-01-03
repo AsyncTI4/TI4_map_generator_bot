@@ -106,7 +106,7 @@ class FrankenButtonHandler {
                     if (player.getGame().isVeiledHeartMode()) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCardsInfoThread(),
-                                "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                                "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                         player.getGame()
                                 .setStoredValue(
                                         "veiledCards" + player.getFaction(),
@@ -132,7 +132,7 @@ class FrankenButtonHandler {
                 if (player.getGame().isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                            "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                     player.getGame()
                             .setStoredValue(
                                     "veiledCards" + player.getFaction(),
@@ -146,7 +146,7 @@ class FrankenButtonHandler {
                 if (player.getGame().isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                            "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                     player.getGame()
                             .setStoredValue(
                                     "veiledCards" + player.getFaction(),

@@ -814,8 +814,7 @@ public class ActionCardHelper {
                             watcher = true;
                         }
                         if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
-                            noSabosMessage.append(
-                                    "\n> A player may have access to a Triune fighter cancel, so watch out.");
+                            noSabosMessage.append("\n> A player may have access to 3 Triune fighters, so watch out.");
                             triune = true;
                         }
                     }
@@ -1803,7 +1802,7 @@ public class ActionCardHelper {
 
             if (!twinningButtons.isEmpty()) {
                 StringBuilder msg =
-                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
+                        new StringBuilder(player.getRepresentationUnfogged() + ", you may use _Twinning_ on ");
                 if (twinningButtons.size() > 1) {
                     msg.append("one of the following cards.");
                 } else {

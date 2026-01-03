@@ -220,7 +220,7 @@ public class ButtonHelperTacticalAction {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation()
-                                    + " use this button to resolve the ability of your yssaril infantry.",
+                                    + " use this button to resolve the ability of your Guild Agents.",
                             buttons);
                 }
             }
