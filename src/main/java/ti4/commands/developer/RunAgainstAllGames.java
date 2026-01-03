@@ -1,5 +1,8 @@
 package ti4.commands.developer;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,10 +10,10 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.website.model.stats.GameStatsDashboardPayload;
 
 class RunAgainstAllGames extends Subcommand {
 
@@ -30,7 +33,7 @@ class RunAgainstAllGames extends Subcommand {
                     .computeIfAbsent(creationDateTime, key -> new ArrayList<>())
                     .add(formatGameLabel(game));
 
-            long setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
+            long setupTimestamp = getSetupTimestamp(game);
             setupTimestampToGames
                     .computeIfAbsent(setupTimestamp, key -> new ArrayList<>())
                     .add(formatGameLabel(game));
@@ -42,9 +45,11 @@ class RunAgainstAllGames extends Subcommand {
         BotLogger.info(String.join(System.lineSeparator(), creationDateTimeOverlaps));
         BotLogger.info(String.join(System.lineSeparator(), setupTimestampOverlaps));
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games. "
-                + "creationDateTime overlaps: " + (creationDateTimeOverlaps.size() - 1)
-                + ", setupTimestamp overlaps: " + (setupTimestampOverlaps.size() - 1) + ".");
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Finished custom command against all games. "
+                        + "creationDateTime overlaps: " + (creationDateTimeOverlaps.size() - 1)
+                        + ", setupTimestamp overlaps: " + (setupTimestampOverlaps.size() - 1) + ".");
     }
 
     private static List<String> formatOverlaps(String label, Map<Long, List<String>> timestampToGames) {
@@ -60,5 +65,24 @@ class RunAgainstAllGames extends Subcommand {
 
     private static String formatGameLabel(Game game) {
         return game.getName() + " (" + game.getID() + ")";
+    }
+
+    private static long getSetupTimestamp(Game game) {
+        LocalDate localDate;
+        try {
+            localDate = GameHelper.getCreationDateAsLocalDate(game);
+        } catch (DateTimeParseException e) {
+            localDate = LocalDate.now();
+        }
+
+        int gameNameHash = game.getName().hashCode();
+        int hours = Math.floorMod(gameNameHash, 24);
+        int minutes = Math.floorMod(gameNameHash, 60);
+
+        int customNameHash = game.getCustomName().hashCode();
+        int seconds = Math.floorMod(customNameHash, 60);
+
+        var localDateTime = localDate.atTime(hours, minutes, seconds);
+        return localDateTime.atZone(ZoneId.of("UTC")).toInstant().getEpochSecond();
     }
 }
