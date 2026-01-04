@@ -166,7 +166,7 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(
                         player.getPrivateChannel(),
                         player.getRepresentationUnfogged()
-                                + ", buttons to resolve Ingress tokens for the Fracture have been sent to the GM.");
+                                + ", buttons to resolve Ingress tokens for The Fracture have been sent to the GM.");
             } else {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),

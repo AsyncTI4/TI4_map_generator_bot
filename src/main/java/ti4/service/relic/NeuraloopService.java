@@ -35,12 +35,12 @@ public class NeuraloopService {
                 String msg = player.getRepresentationUnfogged()
                         + " you have the opportunity to use the _Neuraloop_ relic to replace the objective " + name
                         + " with a random objective from __any__ of the objective decks. Doing so will cause you to purge one of your relics."
-                        + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from..";
+                        + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from.";
                 List<Button> buttons = new ArrayList<>();
 
                 String pre = "neuraloopPart1;" + poID + ";";
-                buttons.add(Buttons.gray(pre + "stage1", "Replace with Stage 1", CardEmojis.Public1));
-                buttons.add(Buttons.gray(pre + "stage2", "Replace with Stage 2", CardEmojis.Public2));
+                buttons.add(Buttons.gray(pre + "stage1", "Replace with Stage 1 Public Objective", CardEmojis.Public1));
+                buttons.add(Buttons.gray(pre + "stage2", "Replace with Stage 2 Public Objective", CardEmojis.Public2));
                 buttons.add(Buttons.gray(pre + "secret", "Replace with Secret Objective", CardEmojis.SecretObjective));
                 buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -66,8 +66,17 @@ public class NeuraloopService {
     private void neuraloopPart1(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String poID = buttonID.split(";")[1];
         String type = buttonID.split(";")[2];
+        String deck = type;
+        switch (type) {
+            case "stage1":
+                deck = "stage 1 public objective";
+            case "stage2":
+                deck = "stage 2 public objective";
+            case "secret":
+                deck = "secret objective";
+        }
         String msg = player.getRepresentation()
-                + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
+                + ", please choose the relic you wish to purge in order to replace the objective with a " + deck + ".";
         List<Button> buttons = getNeuraloopButton(player, poID, type, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -78,17 +87,26 @@ public class NeuraloopService {
         String poID = buttonID.split(";")[1];
         String type = buttonID.split(";")[2];
         String relic = buttonID.split(";")[3];
+        String deck = type;
+        switch (type) {
+            case "stage1":
+                deck = "stage 1 public objective";
+            case "stage2":
+                deck = "stage 2 public objective";
+            case "secret":
+                deck = "secret objective";
+        }
         player.removeRelic(relic);
         player.removeExhaustedRelic(relic);
         RelicHelper.resolveRelicLossEffects(event, game, player, relic);
         game.removeRevealedObjective(poID);
         String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purging "
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
-                + ", to replace the recently revealed objective with a random " + type + ".";
+                + ", to replace the recently revealed objective with a random " + deck + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), game.getPing() + " Revealed objective `" + poID + "` was replaced.");
+                    game.getMainGameChannel(), game.getPing() + ", revealed objective `" + poID + "` was replaced.");
         }
         if ("stage1".equalsIgnoreCase(type)) {
             RevealPublicObjectiveService.revealS1(game, event, true);

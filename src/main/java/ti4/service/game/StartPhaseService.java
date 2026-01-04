@@ -666,7 +666,8 @@ public class StartPhaseService {
         }
         if (player.hasTech("bio")) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getRepresentationUnfogged() + " can resolve Bioplasmosis now");
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " may resolve _Bioplasmosis_ now.");
             ButtonHelper.resolveTransitDiodesStep1(game, player);
         }
         if (game.isCustodiansScored() && player.hasTech("dsrohdy")) {
@@ -820,28 +821,31 @@ public class StartPhaseService {
         boolean custodiansTaken = game.isCustodiansScored();
         Button passOnAbilities;
         if (custodiansTaken || game.isOmegaPhaseMode()) {
-            String agenda = "Agenda";
+            String agenda = "Agenda Phase";
             if (game.isTwilightsFallMode()) {
                 agenda = "Benediction Phase";
             }
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For " + agenda);
-            message2 += """
-                This is the moment when you should resolve:\s
-                - _Political Stability_\s
-                - _Ancient Burial Sites_\s
-                - _Maw of Worlds_\s
-                - The Oracle, the Naalu hero
-                - _Neuraloop_
-                - _The Crown of Emphidia_
-                Please click the "Ready For """ + agenda + "\" button once you are done resolving these or if you decline to do so.";
+            message2 +=
+                    "This is the moment when you should resolve:\n- _Political Stability_\n- _Ancient Burial Sites_\n";
+            boolean crownPresent = false, mawPresent = false, neuraloopPresent = false, oraclePresent = false;
+            for (Player p : game.getRealPlayers()) {
+                crownPresent |= p.hasRelic("mawofworlds");
+                mawPresent |= p.hasRelic("mawofworlds");
+                neuraloopPresent |= p.hasRelic("neuraloop");
+                oraclePresent |= p.hasLeader("naaluHero");
+            }
+            if (crownPresent) message2 += "- _The Crown of Emphidia_\n";
+            if (mawPresent) message2 += "- _Maw of Worlds_\n";
+            if (neuraloopPresent) message2 += "- _Neuraloop_\n";
+            if (oraclePresent) message2 += "- The Oracle, the Naalu hero\n";
+            message2 += "Please click the \"Ready For " + agenda
+                    + "\" button once you are done resolving these, or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 += """
-                This is the moment when you should resolve:\s
-                - _Political Stability_\s
-                - _Summit_\s
-                - _Manipulate Investments_
-                Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
+            message2 +=
+                    "This is the moment when you should resolve:\n- _Political Stability_\n- _Summit_\n- _Manipulate Investments_\n"
+                            + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(draw1AC);
@@ -1040,7 +1044,7 @@ public class StartPhaseService {
         List<Player> actionPhaseTurnOrder = game.getActionPhaseTurnOrder();
         if (actionPhaseTurnOrder.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Unable to start action phase: no turn order set.");
+                    game.getMainGameChannel(), "Unable to start Action Phase: no turn order set.");
             return;
         }
         Player nextPlayer = actionPhaseTurnOrder.getFirst();

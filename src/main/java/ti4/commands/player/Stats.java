@@ -349,11 +349,11 @@ class Stats extends GameStateSubcommand {
                         "Remove View Permissions For " + player.getUserName()));
                 buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
                 String msg = player.getRepresentation()
-                        + ", do you want to remove yourself from the game channels? If so, press this button.";
+                        + ", do you wish to remove yourself from the game channels? If so, press this button.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
 
                 msg = player.getRepresentation()
-                        + ", you should know that NPC is only to be used in doomed scenariors, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
+                        + ", you should know that NPC is only to be used in doomed scenarios, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
                 msg = game.getPing()
