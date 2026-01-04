@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
@@ -23,9 +24,13 @@ class DeleteFOWCommThreads extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!"YES".equalsIgnoreCase(event.getOption(Constants.CONFIRM).getAsString())) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(), "Must confirm with YES. (case sensitive/full uppercase YES)");
+        OptionMapping option = event.getOption(Constants.CONFIRM);
+        ;
+        if (!"YES".equals(option.getAsString())) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
             return;
         }
 

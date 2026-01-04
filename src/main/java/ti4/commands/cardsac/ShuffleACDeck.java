@@ -19,7 +19,10 @@ class ShuffleACDeck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String confirm = event.getOption(Constants.CONFIRM).getAsString();
         if (!"YES".equals(confirm)) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`" + ("YES".equalsIgnoreCase(confirm) ? " - this is case sensitive" : "")
+                            + ".");
             return;
         }
 

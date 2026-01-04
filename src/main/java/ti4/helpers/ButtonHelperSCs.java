@@ -459,7 +459,7 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Unable to locate the Trade strategy card. Commodity washing was not processed.");
+                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
             return;
         }
         int tradeInitiative = scModel.getInitiative();
@@ -529,7 +529,7 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Unable to locate the Trade strategy card. Commodity washing was not processed.");
+                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
             return;
         }
         int tradeInitiative = scModel.getInitiative();

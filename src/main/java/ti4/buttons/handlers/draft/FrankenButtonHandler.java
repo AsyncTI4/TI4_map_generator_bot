@@ -264,8 +264,8 @@ class FrankenButtonHandler {
                                     Buttons.green("startOfGameStrategyPhase", "Start Strategy Phase");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),
-                                    game.getPing() + " the Inaugural Splice is complete!\n\n"
-                                            + "Once all players have selected their kept abilities/techs, genome and unit, press this button to start the game.",
+                                    game.getPing() + ", the inaugural splice is complete!\n\n"
+                                            + "Once all players have selected their kept abilities, genome and unit, press this button to start the game.",
                                     List.of(startStrategyPhaseButton));
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {

@@ -3151,11 +3151,12 @@ public class UnfiledButtonHandlers {
             buttons.add(Buttons.gray("useTradeStation_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         if (buttons.size() == 1) {
-            useTradeStation(event, player, game, onlyPlanet);
+            useTradeStation(event, player, game, "useTradeStation_" + onlyPlanet);
             return;
         } else if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), player.getRepresentation() + ", you have no readied space stations.");
+            return;
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
