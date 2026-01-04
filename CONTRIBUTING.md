@@ -30,7 +30,7 @@ Branch permissions can be granted, but for now you may fork the repository and c
    * Ensure Default Install Settings are correct.
    * Create an install link, paste it into the discord server you want your bot in.
 5. Invite your Test Bot to your server
-6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/JdaService.java`
+6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/spring/jda/JdaService.java`
 
 # Setup a Test Bot
 

@@ -260,7 +260,7 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     public String getPresetMapFromUser(GenericInteractionCreateEvent event) {
         String modalId = menuAction + "_" + navId() + "_presetMap";
         TextInput ttsString = TextInput.create("mapStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("{18} 25 30 -1 -1 -1 83a 35 40 ...")
+                .setPlaceholder("{112} 25 30 -1 -1 -1 83a 35 40 ...")
                 .setMinLength(1)
                 .setRequired(true)
                 .build();
