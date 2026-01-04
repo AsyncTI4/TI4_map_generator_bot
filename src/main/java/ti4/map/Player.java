@@ -167,8 +167,8 @@ public class Player extends PlayerProperties {
                 MessageHelper.sendMessageToChannel(
                         getCorrectChannel(),
                         getRepresentationNoPing()
-                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is "
-                                + planet + ".");
+                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is `"
+                                + planet + "`.");
             } else {
                 if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
                     return true;
@@ -2150,7 +2150,8 @@ public class Player extends PlayerProperties {
                 }
                 MessageHelper.sendMessageToChannel(
                         holder.getCorrectChannel(),
-                        holder.getRepresentation() + " everyone has reacted to the splice.");
+                        holder.getRepresentation() + ", everyone has reacted to the **" + Helper.getSCName(sc, game)
+                                + "** splice.");
                 if (holder.isNpc()) {
                     ButtonHelperTwilightsFall.startSplice(game, holder, "startSplice_" + sc, null);
                 }
@@ -2175,7 +2176,7 @@ public class Player extends PlayerProperties {
                 }
                 game.setStoredValue("fleetLogWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                String message = p2.getRepresentation() + " Use buttons to end turn or do another action.";
+                String message = p2.getRepresentation() + ", please end turn or do another action.";
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p2, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, systemButtons);
             }

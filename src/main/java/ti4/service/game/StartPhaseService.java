@@ -749,7 +749,7 @@ public class StartPhaseService {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
                 } else {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + ", a reminder";
-                    malevMsg += " you should gain 1 less Command token here due to _Malevolency";
+                    malevMsg += " you should gain 1 fewer command token here due to _Malevolency_.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
                 }
             }

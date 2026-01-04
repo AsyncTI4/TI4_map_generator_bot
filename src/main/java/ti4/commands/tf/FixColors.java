@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 class FixColors extends GameStateSubcommand {
 
     public FixColors() {
-        super(Constants.FIX_COLORS, "Make the Mahact Players match their faction", true, true);
+        super(Constants.FIX_COLORS, "Make the Mahact Kings match their faction", true, true);
     }
 
     @Override

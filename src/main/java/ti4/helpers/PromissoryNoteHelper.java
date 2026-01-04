@@ -395,7 +395,7 @@ public class PromissoryNoteHelper {
 
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getFactionEmojiOrColor() + " is paying 1 influence to pass a note to a neighbor.");
+                    player.getFactionEmojiOrColor() + " is paying 1 influence to pass _Malevolency_ to a neighbor.");
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
             Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
             buttons.add(doneExhausting);
@@ -408,7 +408,7 @@ public class PromissoryNoteHelper {
             }
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " Choose a neighbor to pass the note to",
+                    player.getRepresentation() + ", please choose the neighbor to pass the note to.",
                     buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps") && !id.contains("absol")) {

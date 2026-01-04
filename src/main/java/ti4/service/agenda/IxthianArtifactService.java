@@ -91,10 +91,10 @@ public class IxthianArtifactService {
     }
 
     private String resultMessage(Die result, boolean heartUsed) {
-        String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for Ixthian Artifact";
+        String msg = "## Rolled a " + result.getGreenDieIfSuccessOrRedDieIfFailure() + " for _Ixthian Artifact_";
 
         if (!heartUsed) {
-            msg += "!!";
+            msg += "!";
             if (result.isSuccess()) {
                 msg += TechEmojis.Propulsion3.toString();
                 msg += TechEmojis.Biotic3.toString();
@@ -104,7 +104,7 @@ public class IxthianArtifactService {
                 msg += "💥💥💥💥";
             }
         } else if (heartUsed) {
-            msg += "........\n# BUT THE HEART OF IXTH PLAYER CHANGED THE OUTCOME!!!";
+            msg += "............\n# But the _Heart of Ixth_ has changed the outcome!";
             if (result.isSuccess()) {
                 msg += "💥💥💥💥";
             } else {
@@ -142,13 +142,13 @@ public class IxthianArtifactService {
             Player heartPlayer = HeartOfIxthService.getHeartOfIxthPlayer(game, true);
             String buttonID = heartPlayer.finChecker() + "resolveIxthian_" + result.getResult();
             buttonID += publish ? "_publish" : "";
-            Button good = Buttons.green(buttonID, "Get Tech", TechEmojis.PropulsionTech);
+            Button good = Buttons.green(buttonID, "Get Technology", TechEmojis.PropulsionTech);
             Button bad = Buttons.red(buttonID, "Explode", MiscEmojis.DoubleBoom);
 
             List<Button> buttons = HeartOfIxthService.makeHeartOfIxthButtons(game, heartPlayer, good, bad, result);
             String msg = resultMessage(result, false).replaceFirst("## ", "");
-            msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the Heart of Ixth";
-            msg += " to modify the outcome of Ixthian Artifact.";
+            msg += "\nHOWEVER, " + heartPlayer.getRepresentation() + " you can use the _Heart of Ixth_";
+            msg += " to modify the outcome of _Ixthian Artifact_.";
             MessageHelper.sendMessageToChannelWithButtons(heartPlayer.getCorrectChannel(), msg, buttons);
 
             if (game.isFowMode()) {

@@ -128,6 +128,14 @@ class UnitRenderGenerator {
             if (shouldSkipInvalidUnit(unitKey)) continue;
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
 
+            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+            if (player == null) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
+                continue;
+            }
+
             if (displayType
                     == DisplayType
                             .unlocked) { // diplay type = unlocked hides locked units (could be written in a single
@@ -140,15 +148,9 @@ class UnitRenderGenerator {
                         .flatMap(str -> Stream.of(str.replace(".png", "").replace("command_", "")))
                         .toList();
                 if (tileCCsColorIDs.contains(unitEntryColorID)) continue;
+                if (player.isPassed() || player.isNeutral()) continue;
             }
 
-            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-            if (player == null) {
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
-                continue;
-            }
             int unitCount = unitHolder.getUnitCount(unitKey);
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);

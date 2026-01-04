@@ -410,7 +410,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + "Select the secret you would like to score. The bot has not verified you can score these, so double check.",
+                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.",
                 buttons);
     }
 
@@ -1040,7 +1040,8 @@ public class ButtonHelperFactionSpecific {
         }
         if (player.hasUnit("tf-productionbiomes")) {
             String msg2 = player.getRepresentation()
-                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+                    + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                    + " If you do, you will also give 2 trade goods to a player of your choice.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons2);
@@ -1988,7 +1989,7 @@ public class ButtonHelperFactionSpecific {
                         buttons.add(Buttons.green(
                                 player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
                                         + uH.getName(),
-                                "Release Inf on " + Helper.getPlanetRepresentation(uH.getName(), game),
+                                "Release Infantry On " + Helper.getPlanetRepresentation(uH.getName(), game),
                                 UnitEmojis.infantry));
                     }
 
@@ -1996,14 +1997,14 @@ public class ButtonHelperFactionSpecific {
                     if (hasFF) {
                         buttons.add(Buttons.blue(
                                 player.finChecker() + "vortexRevive_" + tile.getPosition() + "_fighter_" + uH.getName(),
-                                "Release FF in " + tile.getRepresentationForButtons(),
+                                "Release Fighter In " + tile.getRepresentationForButtons(),
                                 UnitEmojis.fighter));
                     }
                     if (hasInf) {
                         buttons.add(Buttons.green(
                                 player.finChecker() + "vortexRevive_" + tile.getPosition() + "_infantry_"
                                         + uH.getName(),
-                                "Release Inf in space of " + tile.getRepresentationForButtons(),
+                                "Release Infantry " + tile.getRepresentationForButtons() + " Space Area",
                                 UnitEmojis.infantry));
                     }
                 }
@@ -2034,14 +2035,14 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " put 1 captured " + unit + " in the space area of tile " + pos
-                            + " using the Vortexer ability. (" + amount + " left to revive)");
+                            + " using _Vortexer_ (" + amount + " left to revive).");
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentationUnfogged() + " put 1 captured " + unit + " on the planet of "
-                            + Helper.getPlanetRepresentation(uHName, game) + " using the Vortexer ability. (" + amount
-                            + " left to revive)");
+                            + Helper.getPlanetRepresentation(uHName, game) + " using _Vortexer_ (" + amount
+                            + " left to revive).");
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
         }
         // AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + uHName);
