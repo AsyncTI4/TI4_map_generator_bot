@@ -238,11 +238,12 @@ public class StartTurnService {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.red(
                             player.getFinsFactionCheckerPrefix() + "concedeToED_" + p2.getFaction(),
-                            "Lose ACs, TGs, Show Secrets"));
-                    buttons2.add(Buttons.green("deleteButtons", "Give in and Play SC (or sabo Extreme Duress)"));
+                            "Lose Action Cards, Give Trade Goods, And Show Secrets"));
+                    buttons2.add(
+                            Buttons.green("deleteButtons", "Give In And Play Strategy Card (or Sabo Extreme Duress)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            player.getRepresentation() + ", please resolve _Extreme Duress_.",
                             buttons2);
                 }
             }
@@ -253,11 +254,11 @@ public class StartTurnService {
                     game.removeStoredValue("Crisis Target");
                     ActionCardHelper.playAC(event, game, p2, "crisis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End turn"));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was canceled)"));
+                    buttons2.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete These (If Crisis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            player.getRepresentation() + ", please resolve _Crisis_.",
                             buttons2);
                 }
             }
@@ -269,10 +270,10 @@ public class StartTurnService {
                     ActionCardHelper.playAC(event, game, p2, "tf-stasis", game.getMainGameChannel());
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(ButtonHelper.getEndTurnButton(game, player));
-                    buttons2.add(Buttons.green("deleteButtons", "Delete these (if AC was canceled)"));
+                    buttons2.add(Buttons.green("deleteButtons", "Delete These (If Stasis Was Sabo'd)"));
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentation() + " use buttons to resolve the AC.",
+                            player.getRepresentation() + ", please resolve _Stasis_.",
                             buttons2);
                 }
             }
@@ -473,12 +474,12 @@ public class StartTurnService {
                 if (game.getStoredValue("ralnelHero") != null) {}
 
                 String presetRalnelHero =
-                        "You have the ralnel hero unlocked! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
-                presetRalnelHero +=
-                        "to automatically use your hero when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+                        "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
+                                + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."
+                                + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
 
                 List<Button> ralnelHeroButtons = new ArrayList<>();
-                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset RalNel Hero"));
+                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
                 ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete these buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
@@ -486,9 +487,9 @@ public class StartTurnService {
 
             if (player.getPlayableActionCards().contains("puppetsonastring")) {
                 String msg =
-                        "You have the action card puppets on a string! If you're not about to pass, you can ignore this message. Otherwise, you can use the preset button ";
-                msg +=
-                        "to automatically use it when the last player passes. Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+                        "You have _Puppets On A String_ in your hand. If you're not about to pass, you can ignore this message."
+                                + " Otherwise, you can use the preset button to automatically use it when the last player passes."
+                                + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("resolvePreassignment_Puppets On A String", "Pre-Play Puppets On A String"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -504,7 +505,7 @@ public class StartTurnService {
                         sb.append(" You are getting this ping because **")
                                 .append(Helper.getSCName(sc, game))
                                 .append(
-                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone.");
                         appendScMessages(game, p2, sc, sb);
                     }
                 }
@@ -639,7 +640,7 @@ public class StartTurnService {
         }
         if (player.hasUnexhaustedLeader("hyperagent")) {
             startButtons.add(Buttons.gray(
-                    "getAgentSelection_hyperagent", "Use Hyper Agent on Someone Else", FactionEmojis.Mentak));
+                    "getAgentSelection_hyperagent", "Use Hyper Genome on Someone Else", FactionEmojis.Mentak));
         }
 
         if (game.isVeiledHeartMode()

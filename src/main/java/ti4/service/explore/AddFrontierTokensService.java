@@ -33,7 +33,7 @@ public class AddFrontierTokensService {
     public static void addFrontierTokens(Game game, ButtonInteractionEvent event) {
         addFrontierTokens(event, game);
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
+                event.getChannel(), ExploreEmojis.Frontier + " Frontier tokens have been added to empty spaces.");
         ButtonHelper.deleteMessage(event);
     }
 }

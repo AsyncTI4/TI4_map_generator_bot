@@ -1488,13 +1488,13 @@ public class ButtonHelper {
                 && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work in an entropic scar.");
+                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work in an entropic scar.");
         }
 
         if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) are turned off for other players in systems with active breaches while Crimson flagship is in an active breach.");
+                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active breaches while Crimson flagship is in an active breach.");
         }
 
         if (!game.isFowMode()) {
@@ -1512,7 +1512,7 @@ public class ButtonHelper {
                                         sent = true;
                                         MessageHelper.sendMessageToChannel(
                                                 player.getCorrectChannel(),
-                                                "### Friendly reminder that all unit abilities (sustain, production, space cannon, etc) do not work when next to another player's structure when they have smothering presence, like this tile is.");
+                                                "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) do not work when next to another player's structure when they have smothering presence, like this tile is.");
                                     }
                                 }
                             }
@@ -5046,7 +5046,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + " Reminder you have the Malevolency promissory note, and now is the window to cackle evilly and pass it on if you so wish.",
+                            + ", a reminder you have _Malevolency_ promissory note; now is the window to cackle evilly and pass it on if you so wish.",
                     buttons);
         }
         if (player.hasUnit("winnu_mech") && !isLawInPlay(game, "articles_war")) {
@@ -5424,7 +5424,7 @@ public class ButtonHelper {
                     && !CommandCounterHelper.hasCC(player, tile2)
                     && FoWHelper.playerHasUnitsInSystem(player, tile2)) {
                 buttons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "placeCC_" + pos,
+                        player.getFinsFactionCheckerPrefix() + "placeWingTransferCC_" + pos,
                         tile2.getRepresentationForButtons(),
                         FactionEmojis.Argent));
             }
@@ -7736,7 +7736,7 @@ public class ButtonHelper {
                 .withLabel("Confirm " + event.getButton().getLabel());
         StringBuilder message = new StringBuilder(
                 player.getRepresentation()
-                        + " you have some abilities that you could resolve before you pass, are you sure you want to preset a pass?");
+                        + ", you have some abilities that you could resolve before you pass, are you sure you want to preset a pass?");
         for (Button b : getPassingAbilities(player, game)) {
             message.append("\n> ").append(b.getLabel());
         }
@@ -7981,7 +7981,6 @@ public class ButtonHelper {
     public static void resolveDiploPrimary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
-        Tile tile = null;
         if (type.toLowerCase().contains("mahact")) {
             String color2 = type.replace("mahact", "");
             Player mahactP = game.getPlayerFromColorOrFaction(color2);
@@ -7989,7 +7988,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find Mahact player.");
                 return;
             }
-            tile = game.getTileByPosition(planet);
+            Tile tile = game.getTileByPosition(planet);
             CommandCounterHelper.addCC(event, mahactP, tile);
             Helper.isCCCountCorrect(mahactP);
             for (String color : mahactP.getMahactCC()) {
@@ -7998,16 +7997,22 @@ public class ButtonHelper {
                     Helper.isCCCountCorrect(game, color);
                 }
             }
-            String message = player.getFactionEmoji() + " chose to use _Scepter of Dominion_ in the system "
-                    + tile.getRepresentation() + ".";
+            String message = player.getFactionEmoji() + " chose to use the _Scepter of Dominion_ in the "
+                    + tile.getRepresentation() + " system.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         } else {
             if (!DiploSystemHelper.diploSystem(event, game, player, planet.toLowerCase())) {
                 return;
             }
-            tile = game.getTileFromPlanet(planet);
-            String message =
-                    player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons() + " system.";
+            Tile tile = game.getTileFromPlanet(planet);
+            String message;
+            if (tile != null) {
+                message = player.getFactionEmoji() + " chose to Diplo the " + tile.getRepresentationForButtons()
+                        + " system.";
+            } else {
+                message = player.getFactionEmoji() + " chose to Diplo the system containing "
+                        + Helper.getPlanetRepresentation(planet, game) + ".";
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             if (!game.isFowMode()) {
                 sendMessageToRightStratThread(player, game, message, "diplomacy", null);

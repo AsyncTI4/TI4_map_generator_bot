@@ -242,13 +242,9 @@ class OtherHeroButtonHandler {
 
     @ButtonHandler("purgeBastionHero_")
     public static void purgeBastionHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
-        StringBuilder p = new StringBuilder("p");
-        while (RandomHelper.isOneInX(12)) {
-            p.append("p");
-        }
         purgeHeroPreamble(event, player, game, "bastionhero", "Lyra Keen, the Bastion hero");
         String msg = player.getRepresentationNoPing()
-                + ", please choose the galvanized unit that recently died, with which you wish to resolve _Intelligence Unshackledl_.";
+                + ", please choose the galvanized unit that recently died, with which you wish to resolve _Intelligence Unshackled_.";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 msg,
@@ -259,7 +255,7 @@ class OtherHeroButtonHandler {
     @ButtonHandler("purgeRedCreussHero_")
     public static void purgeRedCreussHero(
             ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
-        purgeHeroPreamble(event, player, game, "redcreusshero", "the Crimson hero");
+        purgeHeroPreamble(event, player, game, "redcreusshero", "Homesick Phantom, the Rebellion hero");
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         UnitHolder captureUnitHolder = player.getNombox();

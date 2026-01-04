@@ -832,7 +832,7 @@ public class ButtonHelperSCs {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                        + ", use the buttons to resolve the secondary (remember to spend a strategy token).",
+                        + ", please use these buttons to resolve the secondary (remember to spend a strategy token).",
                 buttons);
     }
 
@@ -841,7 +841,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = getAnarchy3SecondaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to resolve the secondary.",
+                player.getRepresentation(true, true) + ", please use these buttons to resolve the secondary.",
                 buttons);
     }
 
@@ -850,7 +850,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = getAnarchy7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                player.getRepresentation(true, true) + ", please use these buttons to build in the desired system.",
                 buttons);
     }
 
@@ -860,7 +860,7 @@ public class ButtonHelperSCs {
         game.setStoredValue("manifestDiscount", player.getFaction());
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                player.getRepresentation(true, true) + ", please use these buttons to build in the desired system.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -870,7 +870,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = getLumi7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                player.getRepresentation(true, true) + ", please use these buttons to build in the desired system.",
                 buttons);
     }
 
@@ -1413,7 +1413,7 @@ public class ButtonHelperSCs {
         } else {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with /player cc.");
+                    "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with `/player cc`.");
         }
         ButtonHelper.deleteMessage(event);
     }

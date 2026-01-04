@@ -71,8 +71,8 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
         if (player.hasSpaceStation()) {
-            buttons.add(
-                    Buttons.gray("startTradeStationConvert", "Convert Comms by Exhausting Station", MiscEmojis.comm));
+            buttons.add(Buttons.gray(
+                    "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
             buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));

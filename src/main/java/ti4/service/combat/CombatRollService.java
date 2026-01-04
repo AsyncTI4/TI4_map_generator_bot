@@ -297,7 +297,7 @@ public class CombatRollService {
                 && opponent.hasTech("proxima")
                 && h > 0) {
             if (opponent.hasTech("tf-proxima") && h > 0) {
-                message += "\nProxima canceled 1 hit automatically";
+                message += "\n_Proxima Targeting VI_ canceled 1 hit automatically.";
                 h--;
             } else {
                 if (!bombardPlanet.isEmpty()) {
@@ -305,7 +305,7 @@ public class CombatRollService {
                     if (planet != null && planet.getGalvanizedUnitCount(player.getColorID()) > 0) {
                         int oldH = h;
                         h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                        message += "\nProxima canceled " + (oldH - h) + " hit(s) automatically";
+                        message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit(s) automatically.";
                     }
                 }
             }
@@ -677,7 +677,7 @@ public class CombatRollService {
                 && player.ownsUnit("naaz_voltron")
                 && "space".equalsIgnoreCase(unitHolder.getName())
                 && unitHolder.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
-            result = "Repaired the Naaz Rohka Supermech at start of this combat round with its ability.\n" + result;
+            result = "The Eidolon Maximum self-repaired at the start of this combat round.\n" + result;
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
@@ -712,13 +712,13 @@ public class CombatRollService {
                 }
             }
             if (player.hasTech("tf-supercharge")) {
-                resultBuilder.append("Applied +2 to the rolls of 1 unit via supercharge\n");
+                resultBuilder.append("Applied +2 to the rolls of 1 unit with _Supercharge_.\n");
                 letnevBTBoost = 2;
             } else {
                 resultBuilder
                         .append("Applied +")
                         .append(letnevBTBoost)
-                        .append(" to the rolls of 1 unit via letnev breakthrough\n");
+                        .append(" to the rolls of 1 unit with _Gravleash Maneuvers_.\n");
             }
         }
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {

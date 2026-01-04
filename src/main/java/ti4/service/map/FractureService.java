@@ -183,7 +183,7 @@ public class FractureService {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons() + ".");
+                player.getCorrectChannel(), "Placed an ingress token in " + tile.getRepresentationForButtons() + ".");
         tile.addToken(Constants.TOKEN_INGRESS, "space");
 
         if (game.isFowMode()) {

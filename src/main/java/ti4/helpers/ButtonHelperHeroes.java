@@ -1274,7 +1274,7 @@ public class ButtonHelperHeroes {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " purged "
                         + Mapper.getTech(techID).getName()
-                        + " with their hero. Those who owned the tech can now research one tech");
+                        + " with _Wave Function Collapse_. Those who owned this can now research a replacement technology.");
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getTechs().contains(techID)) {
                 ButtonHelperActionCards.resolveResearch(game, p2, event);
