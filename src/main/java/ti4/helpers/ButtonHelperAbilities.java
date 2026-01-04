@@ -1782,38 +1782,40 @@ public class ButtonHelperAbilities {
             if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
                 buttons.add(Buttons.red(
                         "yssarilbtStep2_scheming_" + p2.getFaction(),
-                        "Remove Scheming From " + p2.getFactionNameOrColor(),
+                        "Revoke Scheming For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             } else {
                 buttons.add(Buttons.green(
                         "yssarilbtStep2_scheming_" + p2.getFaction(),
-                        "Add Scheming To " + p2.getFactionNameOrColor(),
+                        "Allow Scheming For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationNoPing() + ", please use buttons to add or remove Scheming from factions.",
+                player.getRepresentationNoPing()
+                        + ", please use these buttons to allow other players to use **Scheming**, or to revoke this allowance.",
                 buttons);
         buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
                 buttons.add(Buttons.red(
                         "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                        "Remove Stall Tactics From " + p2.getFactionNameOrColor(),
+                        "Revoke Stall Tactics For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             } else {
                 buttons.add(Buttons.green(
                         "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                        "Add Stall Tactics To " + p2.getFactionNameOrColor(),
+                        "Allow Stall Tactics For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationNoPing() + ", please use buttons to add or remove Stall Tactics from factions.",
+                player.getRepresentationNoPing()
+                        + ", please use these buttons to allow other players to use **Stall Tactics**, or to revoke this allowance.",
                 buttons);
     }
 
@@ -1829,25 +1831,25 @@ public class ButtonHelperAbilities {
                         game.getStoredValue("schemingFactions").replace(faction, ""));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " removed scheming from "
+                        player.getRepresentationNoPing() + " revoked **Scheming** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             } else {
                 game.setStoredValue("schemingFactions", game.getStoredValue("schemingFactions") + faction + "_");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " added scheming to "
+                        player.getRepresentationNoPing() + " allowed **Scheming** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             }
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
                     buttons.add(Buttons.red(
                             "yssarilbtStep2_scheming_" + p2.getFaction(),
-                            "Remove Scheming From " + p2.getFactionNameOrColor(),
+                            "Revoke Scheming For " + p2.getFactionNameOrColor(),
                             p2.fogSafeEmoji()));
                 } else {
                     buttons.add(Buttons.green(
                             "yssarilbtStep2_scheming_" + p2.getFaction(),
-                            "Add Scheming To " + p2.getFactionNameOrColor(),
+                            "Allow Scheming For " + p2.getFactionNameOrColor(),
                             p2.fogSafeEmoji()));
                 }
             }
@@ -1859,25 +1861,25 @@ public class ButtonHelperAbilities {
                         game.getStoredValue("stalltacticsFactions").replace(faction, ""));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " removed stall tactics from "
+                        player.getRepresentationNoPing() + " revoked **Stall Tactics** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             } else {
                 game.setStoredValue(
                         "stalltacticsFactions", game.getStoredValue("stalltacticsFactions") + faction + "_");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " added stall tactics to "
+                        player.getRepresentationNoPing() + " allowed **Stall Tactics** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             }
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
                     buttons.add(Buttons.red(
                             "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                            "Remove Stall Tactics From " + p2.getFactionNameOrColor()));
+                            "Revoke Stall Tactics For " + p2.getFactionNameOrColor()));
                 } else {
                     buttons.add(Buttons.green(
                             "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                            "Add Stall Tactics To " + p2.getFactionNameOrColor()));
+                            "Allow Stall Tactics For " + p2.getFactionNameOrColor()));
                 }
             }
         }
@@ -1934,13 +1936,13 @@ public class ButtonHelperAbilities {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationNoPing()
-                            + " will get pinged about pillage on their own trade transactions in future pillage opportunities.");
+                            + " will get pinged about **Pillage** on their own trade transactions in future **Pillage** opportunities.");
         } else {
             game.setStoredValue("willPillageOwnTransactions" + player.getFaction(), "no");
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + " will NOT get pinged about pillage on their own trade transactions in future pillage opportunities.");
+                            + " will __not__ get pinged **Pillage** pillage on their own trade transactions in future **Pillage** opportunities.");
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }

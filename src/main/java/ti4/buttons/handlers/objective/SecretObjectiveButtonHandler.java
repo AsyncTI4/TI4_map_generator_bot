@@ -63,7 +63,7 @@ class SecretObjectiveButtonHandler {
                         && event.getUser().getId().equals(player.getUserID())) {
                     event.getHook()
                             .setEphemeral(true)
-                            .sendMessage("OH NO!!! You drew the same secret you discarded! How unlucky 😭😭😭")
+                            .sendMessage("Oh no! You drew the same secret you discarded! How unlucky 😭😭😭!")
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }

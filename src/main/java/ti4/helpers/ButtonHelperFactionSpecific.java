@@ -3625,7 +3625,9 @@ public class ButtonHelperFactionSpecific {
         String msg;
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Constants.TOKEN_SEVERED, Constants.SPACE);
-        sb.append(" added the sever token to ").append(tile.getRepresentationForButtons(game, player));
+        sb.append(" added the Sever token to ")
+                .append(tile.getRepresentationForButtons(game, player))
+                .append(".");
         msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

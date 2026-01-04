@@ -58,6 +58,11 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, bt);
+            } else if (result == 6) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "> Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(result)
+                                + ".\\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";

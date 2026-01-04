@@ -29,7 +29,7 @@ public class GalvanizeService {
     public static void postToggleGalvanizeTiles(Game game, Player player) {
         List<Button> buttons = ButtonHelper.getTilesWithUnitsForAction(player, game, "toggleGalvanize", true);
         String message = player.getRepresentationUnfogged()
-                + " Use the buttons to select the tile in which you wish to modify units. ";
+                + ", please choose the system containing the unit you with to galvanize. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -51,9 +51,9 @@ public class GalvanizeService {
             String uhName = unitHolder.getName();
             String uhRepresentation;
             if ("space".equalsIgnoreCase(uhName)) {
-                uhRepresentation = " in Space " + tile.getPosition();
+                uhRepresentation = " In Space " + tile.getPosition();
             } else {
-                uhRepresentation = " on " + Helper.getPlanetRepresentation(uhName, game);
+                uhRepresentation = " On " + Helper.getPlanetRepresentation(uhName, game);
             }
             for (UnitKey unit : unitHolder.getUnitsByState().keySet()) {
                 int total = unitHolder.getUnitCount(unit);
@@ -76,7 +76,7 @@ public class GalvanizeService {
                             unit.unitEmoji()));
             }
         }
-        buttons.add(Buttons.blue("deleteButtons", "Done galvanizing units"));
+        buttons.add(Buttons.blue("deleteButtons", "Done Galvanizing Units"));
         return buttons;
     }
 

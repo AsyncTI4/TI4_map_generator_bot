@@ -31,22 +31,22 @@ public class DSHelperBreakthroughs {
                     p2.getFactionEmojiOrColor()));
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                p1.getCorrectChannel(), "Select a player to target with your breakthrough:", buttons);
+                p1.getCorrectChannel(), "Please choose a player to target with _Arms Brokerage_.", buttons);
     }
 
     public static void kolumeBTStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
-        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Tech for 3i"));
+        buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
+        buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Spend 3 Influence To Research A Technology"));
 
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " is resolving the kolume breakthrough to either spend 3i to research 1 tech as the same color of one of their exhausted techs or gain 1 command token");
+                        + " is resolving _Synchronicity VI_, either to spend 3 influence to research 1 technology (that's the same colour as one of their exhausted technologies), or to or gain 1 command token.");
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " choose whether you want to either spend 3i to research 1 tech as the same color of one of their exhausted techs or gain 1 command token",
+                        + ", please choose whether you are researching a technology or gaining a command token.",
                 buttons);
     }
 
@@ -58,7 +58,7 @@ public class DSHelperBreakthroughs {
             MessageHelper.sendMessageToChannelWithButtons(
                     p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", " + p1.getFactionNameOrColor()
-                            + " has activated their Bentor breakthrough. Do you wish to explore one of your planets?",
+                            + " has _Historian Conclave_. This allows to to explore a planet you control. If you do, they will gain 1 commodity.",
                     buttons);
         }
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "Sent buttons to every player to resolve.");
@@ -67,10 +67,14 @@ public class DSHelperBreakthroughs {
     @ButtonHandler("acceptBentorBT")
     public static void acceptBentorBT(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
-                p2.getRepresentation() + " " + p1.getFactionNameOrColor()
-                        + " has accepted your breakthrough offer to explore one of their planets and you have been given 1 commodity (if possible).");
+                p2.getRepresentation() + ", your _Historian Conclave_ offer to " + p1.getFactionNameOrColor()
+                        + " has been accepted. "
+                        + (p2.getCommodities() >= p2.getCommoditiesTotal()
+                                ? "You would gain 1 commodity, but you are already at maximum commodities."
+                                : "You have gained 1 commodity."));
         p2.gainCommodities(1);
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         ButtonHelper.deleteMessage(event);
@@ -84,9 +88,9 @@ public class DSHelperBreakthroughs {
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
-                        + " has used their Axis breakthrough to move any number of ships between two systems with their spacedocks.");
+                        + " has used _Arms Brokerage_ to move any number of ships between two systems with their space docks.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        String message = ", please choose the first system that you wish to swap a ship between (and transport).";
+        String message = ", please choose the first system that you wish to swap ships between (and transport).";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock);
         for (Tile tile : tiles) {
@@ -107,7 +111,10 @@ public class DSHelperBreakthroughs {
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
                 p1.getRepresentation()
-                        + " has used their Florzen breakthrough to choose another player and each simultaenously spend 0/1/2tgs. If they spend the same, Florzen gets a random PN.");
+                        + " has used _Arms Brokerage_."
+                        + " They will choose another player, and both players will secretly choose to spend 0, 1, or 2 trade goods."
+                        + " If both players spent the same, the chosen player must give " + p1.getRepresentationNoPing()
+                        + " a random promissory note.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         String message = ", please choose the target player.";
         List<Button> buttons = new ArrayList<>();
@@ -127,7 +134,7 @@ public class DSHelperBreakthroughs {
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(), p1.getRepresentation() + " has targeted " + p2.getRepresentation());
         ButtonHelper.deleteMessage(event);
-        String message = ", please choose the amount of tg you want to spend.";
+        String message = ", please choose the amount of trade goods you wish to spend.";
         List<Button> buttons = new ArrayList<>();
         for (int x = 0; x < 3 && x <= p1.getTg(); x++) {
             buttons.add(Buttons.gray(
@@ -143,8 +150,8 @@ public class DSHelperBreakthroughs {
         String originalBid = buttonID.split("_")[2];
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation() + " has chosen and buttons have been sent to " + p2.getRepresentation()
-                        + " for them to choose an amount.");
+                p1.getRepresentation() + " has locked in their trade goods, and buttons have been sent to "
+                        + p2.getRepresentation() + " for them to choose an amount of trade goods.");
         ButtonHelper.deleteMessage(event);
         String message = ", please choose the amount of tg you want to spend.";
         List<Button> buttons = new ArrayList<>();
@@ -162,22 +169,25 @@ public class DSHelperBreakthroughs {
     public static void florzenBTStep4(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String originalBid = buttonID.split("_")[2];
-        String originalBid2 = buttonID.split("_")[3];
+        String originalBidFlorz = buttonID.split("_")[3];
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation() + " has chosen to spend " + originalBid2 + " tg and " + p2.getRepresentation()
-                        + " has chosen to spend " + originalBid + ". The tg have been subtracted");
+                p1.getRepresentation() + " has chosen to spend " + originalBidFlorz + " trade good"
+                        + ("1".equals(originalBidFlorz) ? "" : "s") + " and " + p2.getRepresentation()
+                        + " has chosen to spend " + originalBid + " trade good" + ("1".equals(originalBid) ? "" : "s")
+                        + ". These trade goods have been returned to the supply."
+                        + (originalBid.equalsIgnoreCase(originalBidFlorz)
+                                ? "\nAs both players spend the same number of trade goods, " + p1.getRepresentation()
+                                        + " has sent a random promissory note to " + p2.getRepresentation() + "."
+                                : ""));
         ButtonHelper.deleteMessage(event);
-        if (StringUtils.isNumeric(originalBid2) && Integer.parseInt(originalBid2) > 0) {
-            p1.setTg(p1.getTg() - Integer.parseInt(originalBid2));
+        if (StringUtils.isNumeric(originalBidFlorz) && Integer.parseInt(originalBidFlorz) > 0) {
+            p1.setTg(p1.getTg() - Integer.parseInt(originalBidFlorz));
         }
         if (StringUtils.isNumeric(originalBid) && Integer.parseInt(originalBid) > 0) {
             p2.setTg(p2.getTg() - Integer.parseInt(originalBid));
         }
-        if (originalBid.equalsIgnoreCase(originalBid2)) {
-            MessageHelper.sendMessageToChannel(
-                    p1.getCorrectChannel(),
-                    p1.getRepresentation() + " has sent a random PN to " + p2.getRepresentation());
+        if (originalBid.equalsIgnoreCase(originalBidFlorz)) {
             PromissoryNoteHelper.sendRandom(event, game, p1, p2);
         }
     }
@@ -187,7 +197,7 @@ public class DSHelperBreakthroughs {
         p1.setBreakthroughExhausted("lanefirbt", true);
         MessageHelper.sendMessageToChannel(
                 p1.getCorrectChannel(),
-                p1.getRepresentation() + " has used their Lanefir breakthrough to explore 1 planet they control.");
+                p1.getRepresentation() + " has used _Erasure Corps_ to explore 1 planet they control.");
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(p1, game);
         MessageHelper.sendMessageToChannelWithButtons(
@@ -199,18 +209,19 @@ public class DSHelperBreakthroughs {
             if (p2.hasUnlockedBreakthrough("lanefirbt")) {
                 List<Button> buttons = new ArrayList<>();
                 if (p2.isBreakthroughExhausted("lanefirbt")) {
-                    buttons.add(Buttons.green("readyLanefirBt", "Ready Lanefir Breakthrough"));
+                    buttons.add(Buttons.green("readyLanefirBt", "Ready Erasure Corps"));
                 }
-                buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 CC"));
+                buttons.add(Buttons.green("gain_CC_deleteThisMessage", "Gain 1 Command Token"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation()
-                                + " is resolving the lanefir breakthrough to either ready the breakthrough or gain 1 command token after another player has purged a non-action card component.");
+                        "Another player has purged a component (that isn't an action card). As such, "
+                                + p2.getRepresentation()
+                                + " is resolving _Erasure Corps_, either to ready the breakthrough, or to gain 1 command token.");
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
                         p2.getRepresentation()
-                                + " choose whether you want to either ready the breakthrough or gain 1 command token",
+                                + ", pleas choose whether you wish to ready _Erasure Corps_ or gain 1 command token.",
                         buttons);
             }
         }
@@ -220,7 +231,7 @@ public class DSHelperBreakthroughs {
     public static void axisBTStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String message =
-                ", please choose the second system that you wish to swap a ship between (and transport). The first system is position "
+                ", please choose the second system that you wish to swap ships between (and transport). The first system is position "
                         + pos + ".";
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
@@ -250,11 +261,13 @@ public class DSHelperBreakthroughs {
                         p1.getFinsFactionCheckerPrefix() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
                         Mapper.getSecretObjective(soID).getName()));
             }
-            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, "Choose a secret to show.", buttons);
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                    event, "Choose a secret objective to show.", buttons);
             ButtonHelper.deleteMessage(event);
         } else {
             MessageHelper.sendMessageToChannel(
-                    p1.getCorrectChannel(), "Sent buttons to " + p2.getFactionNameOrColor() + "'s channel to resolve.");
+                    p1.getCorrectChannel(),
+                    "Sent " + p2.getFactionNameOrColor() + " resolution buttons in their `#cards-info` channel.");
             edynbtTarget(game, p1, event, "edynbtTarget_" + p2.getFaction() + "_none");
         }
     }
@@ -275,14 +288,15 @@ public class DSHelperBreakthroughs {
         }
         if (p2.getSecretsUnscored().size() > 0) {
             buttons.add(Buttons.green(
-                    "edynbtFinal_showSecret_" + p1.getFaction(), "Show Random SO to " + p1.getFactionNameOrColor()));
+                    "edynbtFinal_showSecret_" + p1.getFaction(),
+                    "Show Random Secret Objective to " + p1.getFactionNameOrColor()));
         }
         buttons.add(Buttons.blue(
                 "edynbtFinal_noShowSecret_" + p1.getFaction(), "Allow Coexistence to " + p1.getFactionNameOrColor()));
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
-                p2.getRepresentation() + " " + "Choose whether to show a secret objective to "
-                        + p1.getFactionNameOrColor() + " or allow coexistence.",
+                p2.getRepresentation() + " , please choose whether to show a secret objective to "
+                        + p1.getFactionNameOrColor() + " or to allow coexistence.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -303,7 +317,7 @@ public class DSHelperBreakthroughs {
                                 + " has shown you the secret objective: " + so.getName() + ".",
                         so.getRepresentationEmbed());
                 MessageHelper.sendMessageToChannel(
-                        p1.getCorrectChannel(), p2.getFactionNameOrColor() + " was shown a random secret objective..");
+                        p1.getCorrectChannel(), p2.getFactionNameOrColor() + " was shown a random secret objective.");
             } else {
                 MessageHelper.sendMessageToChannel(
                         p1.getCorrectChannel(), p1.getFactionNameOrColor() + " has no unscored secret objectives.");

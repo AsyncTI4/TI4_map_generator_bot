@@ -1004,7 +1004,7 @@ public class ComponentActionHelper {
             List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    "Use buttons to gain a command token from Endurance Steroids.",
+                    "Use buttons to gain a command token from _Endurance Steroids_.",
                     buttons2);
         } else if ("the_incursion_gate".equalsIgnoreCase(relicID)) {
             player.addExhaustedRelic(relicID);
@@ -1014,7 +1014,7 @@ public class ComponentActionHelper {
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though",
+                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though.",
                     buttons);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);

@@ -384,17 +384,18 @@ public class AddPlanetService {
                 && !doubleCheck
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove CC"));
-            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Tech"));
+            buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove Command Token"));
+            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Technology"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
 
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " is resolving the zealots breakthrough to either research a tech or remove the command token from the system.");
+                            + " is resolving _Rhodun's Reliquary_ to either research a technology or remove the command token from the system.");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " choose whether you want to research a tech (you need the pre-requistites) or remove the command token from the system",
+                            + ", please choose whether you want to __research__ a technology or remove the command token from the system (or neither).",
                     buttons);
         }
 
