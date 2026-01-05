@@ -68,12 +68,9 @@ public class NeuraloopService {
         String type = buttonID.split(";")[2];
         String deck = type;
         switch (type) {
-            case "stage1" ->
-                deck = "stage 1 public objective";
-            case "stage2" ->
-                deck = "stage 2 public objective";
-            case "secret" ->
-                deck = "secret objective";
+            case "stage1" -> deck = "stage 1 public objective";
+            case "stage2" -> deck = "stage 2 public objective";
+            case "secret" -> deck = "secret objective";
         }
         String msg = player.getRepresentation()
                 + ", please choose the relic you wish to purge in order to replace the objective with a " + deck + ".";
