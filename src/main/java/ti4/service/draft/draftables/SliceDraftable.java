@@ -289,7 +289,6 @@ public class SliceDraftable extends SinglePickDraftable {
 
         // Immediately allow draft to start since we're not waiting for generation
         game.getDraftManager().tryStartDraft();
-        GameManager.save(game, "Nucleus preset setup");
 
         return null;
     }

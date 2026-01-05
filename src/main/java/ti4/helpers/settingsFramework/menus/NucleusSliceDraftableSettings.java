@@ -8,22 +8,15 @@ import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.components.label.Label;
-import net.dv8tion.jda.api.components.textinput.TextInput;
-import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.modals.Modal;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiscEmojis;
@@ -198,31 +191,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         return "success";
     }
 
-    public String getPresetSlicesFromUser(GenericInteractionCreateEvent event) {
-        String modalId = menuAction + "_" + navId() + "_presetSlices";
-        TextInput ttsString = TextInput.create("sliceStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("25,69,34|24,28,46|...")
-                .setMinLength(1)
-                .setRequired(true)
-                .build();
-        Modal modal = Modal.create(modalId, "Enter preset slices")
-                .addComponents(Label.of("Slice String (pipe-separated, 3 tiles each)", ttsString))
-                .build();
-        if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
-            return null;
-        }
-        return "Unknown Event";
-    }
-
-    public String setPresetSlicesFromEvent(GenericInteractionCreateEvent event) {
-        if (event instanceof ModalInteractionEvent modalEvent) {
-            String slices = modalEvent.getValue("sliceStrings").getAsString();
-            return setPresetSlices(slices);
-        }
-        return "Unknown Event";
-    }
-
     public String setPresetSlices(String sliceString) {
         if (sliceString == null || sliceString.isEmpty()) {
             presetSlices = null;
@@ -255,31 +223,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
             return "Not enough slices for the number of players.";
         }
         return null;
-    }
-
-    public String getPresetMapFromUser(GenericInteractionCreateEvent event) {
-        String modalId = menuAction + "_" + navId() + "_presetMap";
-        TextInput ttsString = TextInput.create("mapStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("{112} 25 30 -1 -1 -1 83a 35 40 ...")
-                .setMinLength(1)
-                .setRequired(true)
-                .build();
-        Modal modal = Modal.create(modalId, "Enter preset map string")
-                .addComponents(Label.of("Map String (use -1 for slice positions)", ttsString))
-                .build();
-        if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
-            return null;
-        }
-        return "Unknown Event";
-    }
-
-    public String setPresetMapFromEvent(GenericInteractionCreateEvent event) {
-        if (event instanceof ModalInteractionEvent modalEvent) {
-            String mapString = modalEvent.getValue("mapStrings").getAsString();
-            return setPresetMapString(mapString);
-        }
-        return "Unknown Event";
     }
 
     public String setPresetMapString(String mapString) {

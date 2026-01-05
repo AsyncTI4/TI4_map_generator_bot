@@ -155,8 +155,8 @@ public class SliceDraftableSettings extends SettingsMenu {
         if (!isNucleusMode()) {
             ls.add(Buttons.blue(idPrefix + "presetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
         } else {
-            ls.add(Buttons.blue(idPrefix + "nucleusPresetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
-            ls.add(Buttons.blue(idPrefix + "nucleusPresetMap~MDL", "Use preset map", MiltyDraftEmojis.sliceB));
+            ls.add(Buttons.blue(
+                    idPrefix + "nucleusPresetSlicesAndMap~MDL", "Use preset slices and map", MiltyDraftEmojis.sliceA));
         }
         return ls;
     }
@@ -167,10 +167,8 @@ public class SliceDraftableSettings extends SettingsMenu {
                 switch (action) {
                     case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
                     case "presetSlices" -> setPresetSlices(event);
-                    case "nucleusPresetSlices~MDL" -> getNucleusPresetSlicesFromUser(event);
-                    case "nucleusPresetSlices" -> setNucleusPresetSlicesFromEvent(event);
-                    case "nucleusPresetMap~MDL" -> getNucleusPresetMapFromUser(event);
-                    case "nucleusPresetMap" -> setNucleusPresetMapFromEvent(event);
+                    case "nucleusPresetSlicesAndMap~MDL" -> getNucleusPresetSlicesAndMapFromUser(event);
+                    case "nucleusPresetSlicesAndMap" -> setNucleusPresetSlicesAndMapFromEvent(event);
                     default -> getCurrentModeSettings().handleSpecialButtonAction(event, action);
                 };
 
@@ -379,15 +377,15 @@ public class SliceDraftableSettings extends SettingsMenu {
         return null;
     }
 
-    private String getNucleusPresetSlicesFromUser(GenericInteractionCreateEvent event) {
-        String modalId = menuAction + "_" + navId() + "_nucleusPresetSlices";
-        TextInput ttsString = TextInput.create("sliceStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("25,69,34|24,28,46|...")
+    private String getNucleusPresetSlicesAndMapFromUser(GenericInteractionCreateEvent event) {
+        String modalId = menuAction + "_" + navId() + "_nucleusPresetSlicesAndMap";
+        TextInput presetStrings = TextInput.create("presetStrings", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("25,69,34|24,28,46|...\n{112} 25 30 -1 -1 -1 83a 35 40 ...")
                 .setMinLength(1)
                 .setRequired(true)
                 .build();
-        Modal modal = Modal.create(modalId, "Enter preset slices")
-                .addComponents(Label.of("Slice String (pipe-separated, 3 tiles each)", ttsString))
+        Modal modal = Modal.create(modalId, "Enter preset slices and preset map string")
+                .addComponents(Label.of("Slice, newline, Map (-1 for slice tiles)", presetStrings))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -396,35 +394,31 @@ public class SliceDraftableSettings extends SettingsMenu {
         return "Unknown Event";
     }
 
-    private String setNucleusPresetSlicesFromEvent(GenericInteractionCreateEvent event) {
+    private String setNucleusPresetSlicesAndMapFromEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ModalInteractionEvent modalEvent) {
-            String slices = modalEvent.getValue("sliceStrings").getAsString();
-            return this.getNucleusSettings().setPresetSlices(slices);
-        }
-        return "Unknown Event";
-    }
-
-    private String getNucleusPresetMapFromUser(GenericInteractionCreateEvent event) {
-        String modalId = menuAction + "_" + navId() + "_nucleusPresetMap";
-        TextInput ttsString = TextInput.create("mapStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("{112} 25 30 -1 -1 -1 83a 35 40 ...")
-                .setMinLength(1)
-                .setRequired(true)
-                .build();
-        Modal modal = Modal.create(modalId, "Enter preset map string")
-                .addComponents(Label.of("Map String (use -1 for slice positions)", ttsString))
-                .build();
-        if (event instanceof ButtonInteractionEvent buttonEvent) {
-            buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
-            return null;
-        }
-        return "Unknown Event";
-    }
-
-    private String setNucleusPresetMapFromEvent(GenericInteractionCreateEvent event) {
-        if (event instanceof ModalInteractionEvent modalEvent) {
-            String mapString = modalEvent.getValue("mapStrings").getAsString();
-            return this.getNucleusSettings().setPresetMapString(mapString);
+            String presetStrings = modalEvent.getValue("presetStrings").getAsString();
+            String[] temp = presetStrings.split("\n");
+            if (temp.length < 2) {
+                return "Malformed preset string";
+            }
+            String slices = temp[0];
+            String mapString = temp[1];
+            String sliceStringError = this.getNucleusSettings().setPresetSlices(slices);
+            String mapStringError = this.getNucleusSettings().setPresetMapString(mapString);
+            if (sliceStringError == null && mapStringError == null) {
+                return null;
+            }
+            StringBuilder errorSb = new StringBuilder();
+            if (sliceStringError != null) {
+                errorSb.append(sliceStringError);
+            }
+            if (errorSb.length() > 0) {
+                errorSb.append("\n");
+            }
+            if (mapStringError != null) {
+                errorSb.append(mapStringError);
+            }
+            return errorSb.toString();
         }
         return "Unknown Event";
     }
