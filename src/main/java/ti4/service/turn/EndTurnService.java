@@ -149,7 +149,7 @@ public class EndTurnService {
         }
 
         // First, check for the ralnel hero and play it if it has been preset
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)
                 && !game.getStoredValue("ralnelHero").isEmpty()) {
             String value = game.getStoredValue("ralnelHero");
             Matcher matcher = Pattern.compile(RegexHelper.factionRegex(game)).matcher(value);
@@ -164,7 +164,7 @@ public class EndTurnService {
         }
 
         // Next, check if puppets on a string has been pre-played
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)
                 && !game.getStoredValue("Puppets On A String").isEmpty()) {
             String value = game.getStoredValue("Puppets On A String");
             Player puppeteer = game.getPlayerFromColorOrFaction(value);
@@ -182,7 +182,7 @@ public class EndTurnService {
             }
         }
 
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
