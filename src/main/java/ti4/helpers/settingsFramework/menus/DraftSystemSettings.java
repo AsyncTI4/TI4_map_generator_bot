@@ -230,7 +230,7 @@ public class DraftSystemSettings extends SettingsMenu {
                         event,
                         "This draft supports at most 8 players; you'll need to remove excess players from the draft.");
             }
-            if ("_andcatPresetMilty".equals(preset)) {
+            if ("_andcatPresetMilty".equals(preset) || "_andcatPreset".equals(preset)) {
                 settings.setupAndcatMiltyTwilightsFallPreset();
                 ButtonHelper.deleteMessage(event);
             } else if ("_andcatPresetNucleus".equals(preset)) {

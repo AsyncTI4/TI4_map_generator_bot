@@ -379,13 +379,20 @@ public class SliceDraftableSettings extends SettingsMenu {
 
     private String getNucleusPresetSlicesAndMapFromUser(GenericInteractionCreateEvent event) {
         String modalId = menuAction + "_" + navId() + "_nucleusPresetSlicesAndMap";
-        TextInput presetStrings = TextInput.create("presetStrings", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("25,69,34|24,28,46|...\n{112} 25 30 -1 -1 -1 83a 35 40 ...")
+        TextInput sliceString = TextInput.create("sliceString", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("25,69,34|24,28,46|...")
                 .setMinLength(1)
                 .setRequired(true)
                 .build();
-        Modal modal = Modal.create(modalId, "Enter preset slices and preset map string")
-                .addComponents(Label.of("Slice, newline, Map (-1 for slice tiles)", presetStrings))
+        TextInput mapString = TextInput.create("mapString", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("{112} 25 30 -1 -1 -1 83a 35 40 ...")
+                .setMinLength(1)
+                .setRequired(true)
+                .build();
+        Modal modal = Modal.create(modalId, "\"Enter preset slices and preset map string\"")
+                .addComponents(
+                        Label.of("Slice String (pipe-separated, 3 tiles each)", sliceString),
+                        Label.of("Map String (use -1 for slice positions)", mapString))
                 .build();
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             buttonEvent.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -396,14 +403,9 @@ public class SliceDraftableSettings extends SettingsMenu {
 
     private String setNucleusPresetSlicesAndMapFromEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ModalInteractionEvent modalEvent) {
-            String presetStrings = modalEvent.getValue("presetStrings").getAsString();
-            String[] temp = presetStrings.split("\n");
-            if (temp.length < 2) {
-                return "Malformed preset string";
-            }
-            String slices = temp[0];
-            String mapString = temp[1];
-            String sliceStringError = this.getNucleusSettings().setPresetSlices(slices);
+            String sliceString = modalEvent.getValue("sliceString").getAsString();
+            String mapString = modalEvent.getValue("mapString").getAsString();
+            String sliceStringError = this.getNucleusSettings().setPresetSlices(sliceString);
             String mapStringError = this.getNucleusSettings().setPresetMapString(mapString);
             if (sliceStringError == null && mapStringError == null) {
                 return null;
