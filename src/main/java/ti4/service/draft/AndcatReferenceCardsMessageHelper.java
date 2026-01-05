@@ -45,7 +45,7 @@ public class AndcatReferenceCardsMessageHelper {
         Player player = draftManager.getGame().getPlayer(playerUserId);
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " Here's an overview of the packages:");
+                player.getRepresentationUnfogged() + ", here is an overview of the packages:");
         sendPackageInfos(player.getCardsInfoThread(), packages);
     }
 
@@ -91,7 +91,7 @@ public class AndcatReferenceCardsMessageHelper {
         List<FactionModel> factionsInPackage = AndcatReferenceCardsDraftable.getFactionsInPackage(refPackage);
         MessageV2Builder messageBuilder = new MessageV2Builder(cardsInfoThread, 3);
 
-        messageBuilder.appendLine(player.getRepresentation() + " Select how each faction will be used.");
+        messageBuilder.appendLine(player.getRepresentation() + ", select how each faction will be used.");
 
         // Part: Home System
         String factionForPart = refPackage.homeSystemFaction();

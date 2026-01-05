@@ -247,6 +247,7 @@ public class GameStatsDashboardPayload {
         return game.getVp();
     }
 
+    @Deprecated
     public long getSetupTimestamp() {
         LocalDate localDate;
         try {

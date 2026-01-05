@@ -34,8 +34,8 @@ class PingActivePlayer extends GameStateSubcommand {
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "This is not a fog game, just ping the person normally (" + activePlayer.getRepresentationNoPing()
-                            + ").");
+                    "This is not a fog of war game, just ping the person normally ("
+                            + activePlayer.getRepresentationNoPing() + ").");
             return;
         }
 

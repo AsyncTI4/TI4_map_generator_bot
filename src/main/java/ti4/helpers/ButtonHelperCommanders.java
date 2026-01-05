@@ -92,7 +92,7 @@ public class ButtonHelperCommanders {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
             Tile tile = game.getTileFromPlanet(planet);
-            if (Constants.MECATOLS.contains(planet) || tile == null || tile.isHomeSystem(game)) {
+            if (game.mecatols().contains(planet) || tile == null || tile.isHomeSystem(game)) {
                 continue;
             }
             buttons.add(Buttons.green("olradinCommanderStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));

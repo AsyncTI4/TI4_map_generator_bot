@@ -671,7 +671,7 @@ public class PlayStrategyCardService {
                             MessageHelper.sendMessageToChannel(
                                     m5,
                                     "The **Trade** player has a space station and can transact with players who also have a space station ("
-                                            + spaceStation + ")");
+                                            + spaceStation + ").");
                         }
                     }
                 }
@@ -748,7 +748,7 @@ public class PlayStrategyCardService {
         Button pdsButton = Buttons.green("construction_pds", "Place a PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         if (game.isMonumentToTheAgesMode()) {
-            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5r)");
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 Resources)");
             return List.of(followButton, buildButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, buildButton, sdButton, pdsButton, noFollowButton);
@@ -970,7 +970,7 @@ public class PlayStrategyCardService {
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         if (game.isMonumentToTheAgesMode()) {
-            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5r)");
+            Button facilityButton = Buttons.green("construction_agesmonument", "Place A Monument (Cost 5 Resources)");
             return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
         }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);

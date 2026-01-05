@@ -1578,7 +1578,9 @@ public class TransactionHelper {
                     SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
                 }
 
-                String msg = p1.getRepresentation() + " sent a secret objective to " + p2.getRepresentation();
+                String msg = p1.getRepresentation() + " sent "
+                        + (RandomHelper.isOneInX(20) ? "||a secret objective||" : "a secret objective") + " to "
+                        + p2.getRepresentation() + ".";
                 MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
                 if (game.isFowMode()) MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
             }
@@ -1953,9 +1955,9 @@ public class TransactionHelper {
             String prevBlackMarketFaction = buttonID.substring(buttonID.indexOf("_BMD_") + 5);
             Player bmdPlayer = game.getPlayerFromColorOrFaction(prevBlackMarketFaction);
             if (bmdPlayer != null) {
-                String msg = "The previous offer you made using Black Market Dealing was rejected, rescinded, ";
+                String msg = "The previous offer you made using _Black Market Dealing_ was rejected, rescinded, ";
                 msg += "or is being counter offered. Therefore, the next transaction offer you make will be ";
-                msg += "allowed to use Black Market Dealing again.";
+                msg += "allowed to use _Black Market Dealing_ again.";
                 MessageHelper.sendMessageToChannel(bmdPlayer.getCardsInfoThread(), msg);
                 game.setStoredValue("blackmarketdealing", prevBlackMarketFaction);
             }

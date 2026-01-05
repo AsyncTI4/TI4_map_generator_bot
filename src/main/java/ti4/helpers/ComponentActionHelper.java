@@ -841,7 +841,7 @@ public class ComponentActionHelper {
                         if (led != null) {
                             MessageHelper.sendMessageToChannelWithEmbed(
                                     game.getActionsChannel(),
-                                    game.getPing() + " this is the next commander on top of the mercenary pile.",
+                                    game.getPing() + ", this is the next commander on top of the mercenary pile.",
                                     led.getRepresentationEmbed());
                         }
                     }

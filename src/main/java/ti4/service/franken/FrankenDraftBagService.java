@@ -110,12 +110,13 @@ public class FrankenDraftBagService {
                 embeds.add(Mapper.getTech("antimatter").getRepresentationEmbed());
 
                 String msg = player.getRepresentation()
-                        + " You should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted. Instead of keeping 1 of those, you can instead use these buttons to take one of the two following technologies instead.";
+                        + ", you should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted."
+                        + " Instead of keeping one (or two) of those, you may use these buttons to take one (or two) of these generic technologies.";
                 MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), msg, embeds);
                 buttons.add(Buttons.green("getTech_wavelength__noPay__comp", "Select Wavelength"));
                 buttons.add(Buttons.green("getTech_antimatter__noPay__comp", "Select Antimatter"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
             }
             MessageEmbed embed = player.getRepresentationEmbed();
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(

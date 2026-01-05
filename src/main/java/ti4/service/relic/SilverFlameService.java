@@ -63,11 +63,12 @@ public class SilverFlameService {
         String gameName = game.getName();
         String watchPartyMsg =
                 flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + ".";
-        watchPartyMsg += "! They are at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp() + " VP!";
+        watchPartyMsg += "! They are currently at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp()
+                + " victory points.";
         if (flamePlayer.hasRelicReady("heartofixth")) {
-            watchPartyMsg += " They have the Heart of Ixth, so only need to roll a 9!";
+            watchPartyMsg += " They have the _Heart of Ixth_, so only need to roll a 9!";
         } else if (HeartOfIxthService.isHeartAvailable(game)) {
-            watchPartyMsg += " Somebody else has the Heart of Ixth though! 😱";
+            watchPartyMsg += " Somebody else has the _Heart of Ixth_ though! 😱";
         }
         DisasterWatchHelper.postTileInFlameWatch(game, null, flamePlayer.getHomeSystemTile(), 0, watchPartyMsg);
 
@@ -108,12 +109,12 @@ public class SilverFlameService {
         String message = null;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
-            message = player.getRepresentation() + " scored '" + flame + "'";
+            message = player.getRepresentation() + " scored \"" + flame + "\".";
         } else {
             id = game.addCustomPO(flame, 1);
             game.scorePublicObjective(player.getUserID(), id);
-            message = "Custom PO '" + flame + "' has been added.";
-            message += "\n" + player.getRepresentation() + " scored '" + flame + "'";
+            message = "Custom PO \"" + flame + "\" has been added.";
+            message += "\n" + player.getRepresentation() + " scored \"" + flame + "\".";
         }
         Helper.checkEndGame(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

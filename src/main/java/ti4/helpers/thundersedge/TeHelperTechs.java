@@ -256,7 +256,7 @@ public class TeHelperTechs {
         String buttonPrefix = player.getFinsFactionCheckerPrefix() + "planesplitterStep1_";
         List<Button> buttons = getPlanesplitterStep1Buttons(game, player);
 
-        String message = "Pick a system to move an Ingress token to:";
+        String message = "Please choose a system to move an Ingress token into.";
         // if (NewStuffHelper.checkAndHandlePaginationChange(
         //         event, player.getCorrectChannel(), buttons, message, buttonPrefix, buttonID)) {
         //     return;

@@ -440,7 +440,7 @@ public class RiftUnitsHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
-                            + " is rifting some units. However, because of their Crucible tech, they do not roll.");
+                            + " is rifting some units. However, because of _Crucible_, they do not roll.");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
                     channel,

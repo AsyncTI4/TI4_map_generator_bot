@@ -31,7 +31,7 @@
         "name": "Armistice",
         "phase": "Action",
         "window": "When another player activates a system that contains your units",
-        "text": "Return that player's command token from that system to their strategy pool and end their turn.",
+        "text": "Remove that player's command token from that system and end their turn.",
         "flavorText": "The Mahact envoy wore a mask of pity as she turned from Menda. \"Why do you lay these troubles on an already troubled mind? Can you not see that she is wearied by your malcontent, your warmongering?\"",
         "source": "action_deck_2"
     },
