@@ -1109,6 +1109,12 @@ public class StartCombatService {
         // if (!thereAreAFBUnits)
         //     return;
 
+        if (tile.isScar(game)) {
+            MessageHelper.sendMessageToChannel(
+                    threadChannel, "## Reminder that you cannot use any unit abilities in an Entropic Scar.");
+            return;
+        }
+
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Buttons.gray(
                 "combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));

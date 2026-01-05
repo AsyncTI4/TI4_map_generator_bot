@@ -257,10 +257,10 @@ public class Expeditions {
                 output = String.format(whichExp, "secret objective");
                 List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
                 if (!soButtons.isEmpty()) {
-                    output += "\n-# Use the buttons in your private channel to discard an unscored secret objective.";
+                    output += "\n-# Use the buttons below to discard an unscored secret objective.";
                     MessageHelper.sendMessageToChannel(channel, output);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), "Use the buttons to discard a secret objective:", soButtons);
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event, "Use the buttons to discard a secret objective:", soButtons);
                 } else {
                     output +=
                             "\n-# you may not have an unscored secret to discard... use `/game undo` if this was a mistake";

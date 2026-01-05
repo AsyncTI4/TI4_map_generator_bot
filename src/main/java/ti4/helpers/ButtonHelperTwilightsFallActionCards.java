@@ -628,7 +628,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     }
                 }
                 player.addOwnedUnitByID(card);
-                found = "_" + Mapper.getUnit(card).getAutoCompleteName() + "_. It has been automatically gained.";
+                found = "" + Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
                 break;
             }
         }

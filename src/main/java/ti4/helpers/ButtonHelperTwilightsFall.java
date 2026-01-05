@@ -1187,7 +1187,6 @@ public class ButtonHelperTwilightsFall {
     public static void radAdvancementStep2(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
 
         String cardID = buttonID.split("_")[1];
-        player.removeTech(cardID);
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " has lost the ability: "
@@ -1214,12 +1213,13 @@ public class ButtonHelperTwilightsFall {
             embeds.add(Mapper.getTech(card).getRepresentationEmbed());
             if (Mapper.getTech(card).getFirstType() == type) {
                 player.addTech(card);
-                found = Mapper.getTech(card).getAutoCompleteName() + "\nIt has been automatically gained.";
+                found = Mapper.getTech(card).getRepresentation(false) + "\nIt has been automatically gained.";
                 break;
             }
         }
         String msg = player.getRepresentation() + " searched through the following cards and found: " + found;
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), msg, embeds);
+        player.removeTech(cardID);
         ButtonHelper.deleteMessage(event);
     }
 
