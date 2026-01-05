@@ -98,7 +98,7 @@ public class NeuraloopService {
         }
         player.removeRelic(relic);
         player.removeExhaustedRelic(relic);
-        RelicHelper.resolveRelicLossEffects(event, game, player, relic);
+        RelicHelper.resolveRelicLossEffects(game, player, relic);
         game.removeRevealedObjective(poID);
         String msg = "## " + game.getPing() + " " + player.getRepresentation() + " is using _Neuraloop_, purging "
                 + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
