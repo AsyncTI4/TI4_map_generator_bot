@@ -41,6 +41,35 @@ class CreateGameButtonHandler {
     @ButtonHandler("createGameChannels")
     @ButtonHandler("launchGame")
     public static void createGameChannelsButton(ButtonInteractionEvent event) {
+        List<Member> members = new ArrayList<>();
+        members.add(event.getMember());
+        Member member = event.getMember();
+        List<User> users = members.stream().map(Member::getUser).toList();
+        List<ManagedGame> userGames = users.stream()
+                .map(user -> GameManager.getManagedPlayer(user.getId()))
+                .filter(Objects::nonNull)
+                .map(ManagedPlayer::getGames)
+                .flatMap(Collection::stream)
+                .distinct()
+                .toList();
+
+        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
+        for (ManagedGame game : userGames) {
+            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+        }
+
+        int completedAndOngoingAmount =
+                SearchGameHelper.searchGames(member.getUser(), null, false, true, false, true, false, true, true, true);
+        if (completedAndOngoingAmount < 1) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "You need to have completed at least one game (or be currently in a game) to create new games via this button. "
+                            + "This is to prevent mistakes by people who dont know what theyre doing. There are a couple of ways to get around this:\n"
+                            + "1) Have someone else who has completed a game press the button for you.\n"
+                            + "2) Ping a bothelper for help.");
+            return;
+        }
+
         createGameChannels(event);
     }
 

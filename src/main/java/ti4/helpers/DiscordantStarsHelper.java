@@ -23,6 +23,7 @@ import ti4.message.logging.BotLogger;
 import ti4.model.GenericCardModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -57,25 +58,33 @@ public class DiscordantStarsHelper {
     }
 
     public static void checkTFTerraform(Game game) {
-        List<String> planets = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            if (player.hasTech("tf-terraform")) {
-
+        if (game.isTwilightsFallMode()) {
+            for (Player player : game.getRealPlayers()) {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
-                                if (!planet.hasStructures(game)
-                                        && planet.getTokenList().contains("attachment_threetraits.png")) {
-                                    planet.removeToken("attachment_threetraits.png");
-                                } else if (planet.hasStructures(game)) {
-                                    planet.addToken("attachment_threetraits.png");
-                                    planets.add(planet.getName());
+                                if (planet.getTokenList().contains("attachment_threetraits.png")) {
+                                    if (!game.isMinorFactionsMode()
+                                            || tile.getTileModel().getTileBack() != TileBack.GREEN
+                                            || tile.isHomeSystem(game)) {
+                                        planet.removeToken("attachment_threetraits.png");
+                                    }
                                 }
-                            } else if (planet.getTokenList().contains("attachment_threetraits.png")
-                                    && !planets.contains(planet.getName())) {
-
-                                planet.removeToken("attachment_threetraits.png");
+                            }
+                        }
+                    }
+                }
+                if (player.hasTech("tf-terraform")) {
+                    for (Tile tile : game.getTileMap().values()) {
+                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                            if (unitHolder instanceof Planet planet) {
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    if (planet.hasStructures(game)
+                                            && !planet.getTokenList().contains("attachment_threetraits.png")) {
+                                        planet.addToken("attachment_threetraits.png");
+                                    }
+                                }
                             }
                         }
                     }

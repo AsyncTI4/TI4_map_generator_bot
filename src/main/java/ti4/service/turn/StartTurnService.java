@@ -118,7 +118,7 @@ public class StartTurnService {
                         : nextPlayer.getRepresentationNoPing();
                 int numUnpassed = -2;
                 boolean anyPassed = false;
-                for (Player p2 : game.getPlayers().values()) {
+                for (Player p2 : game.getRealPlayers()) {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                     anyPassed |= p2.isPassed() || p2.isEliminated();
                 }
@@ -402,7 +402,7 @@ public class StartTurnService {
             List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(player);
             int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event)
                             .size()
-                    - 2
+                    - 3
                     - acButtons.size();
             if (game.isFowMode()) {
                 numOfComponentActions += acButtons.size();
