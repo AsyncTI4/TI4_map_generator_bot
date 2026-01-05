@@ -253,7 +253,7 @@
         "name": "Unravel",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose and purge a relic. If the relic belonged to another player, that player gains 1 victory point; if it belonged to you, put the Fracture into play and place 1 additional ingress token in a system that contains your units.",
+        "text": "Choose and purge a relic. If the relic belonged to another player, that player gains 1 victory point; if it belonged to you, put The Fracture into play and place 1 additional ingress token in a system that contains your units.",
         "source": "twilights_fall"
     },
     {

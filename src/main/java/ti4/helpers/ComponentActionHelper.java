@@ -180,7 +180,7 @@ public class ComponentActionHelper {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Crimson Agent",
+                                    "Use " + leaderName + " as Rebellion Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
@@ -344,7 +344,7 @@ public class ComponentActionHelper {
                                 .isEmpty()
                         || game.isTwilightsFallMode())) {
             Button abilityButton =
-                    Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", FactionEmojis.Muaat);
+                    Buttons.green(finChecker + prefix + "ability_starForge", "Star Forge", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("meditation")

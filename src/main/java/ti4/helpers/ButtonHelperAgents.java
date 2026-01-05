@@ -905,8 +905,8 @@ public class ButtonHelperAgents {
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Ahk Ravin, the Crimson"
-                    + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
+                    + "Ahk Ravin, the Rebellion" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("redcreussagent_", "").replace("crimsonagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);

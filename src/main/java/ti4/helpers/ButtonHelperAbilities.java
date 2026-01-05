@@ -2300,7 +2300,7 @@ public class ButtonHelperAbilities {
             successMessage = player.getRepresentationUnfogged() + " spent 1 strategy token ("
                     + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Starforge");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Star Forge");
         } else {
             player.addExhaustedRelic("emelpar");
             successMessage =

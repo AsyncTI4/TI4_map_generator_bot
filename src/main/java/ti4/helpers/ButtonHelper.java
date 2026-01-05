@@ -1494,7 +1494,7 @@ public class ButtonHelper {
         if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active breaches while Crimson flagship is in an active breach.");
+                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the _Quietus_ (the Rebellion flagship) is in an active Breach.");
         }
 
         if (!game.isFowMode()) {

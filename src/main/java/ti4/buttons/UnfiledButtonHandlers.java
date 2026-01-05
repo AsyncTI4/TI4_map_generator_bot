@@ -255,7 +255,7 @@ public class UnfiledButtonHandlers {
         }
         if ("WildGalaxy".equalsIgnoreCase(mode)) {
             game.setWildWildGalaxyMode(enable);
-            message += "Wild Wild Galaxy Mode. Nothing more needs to be done.";
+            message += "Wild, Wild Galaxy Mode. Nothing more needs to be done.";
         }
         if ("WeirdWormholes".equalsIgnoreCase(mode)) {
             game.setWeirdWormholesMode(enable);
