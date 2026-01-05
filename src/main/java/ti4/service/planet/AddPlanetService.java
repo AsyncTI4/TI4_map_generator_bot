@@ -91,8 +91,7 @@ public class AddPlanetService {
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
 
-        List<String> mecatols = Constants.MECATOLS;
-        if (mecatols.contains(planet) && player.hasIIHQ()) {
+        if (game.mecatols().contains(planet) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -334,9 +333,9 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
             unitHolder.removeToken("token_relictoken.png");
             if (!alreadyOwned) {
-                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw a relic");
+                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw A Relic");
                 String message = player.getRepresentation()
-                        + " has gained control of a planet which allows them to draw a relic!\nUse the button AFTER you have resolved ALL ground combats:";
+                        + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
         }
@@ -609,7 +608,7 @@ public class AddPlanetService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
-        if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
+        if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
         if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {

@@ -750,7 +750,7 @@ public class CreateGameService {
                 "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
                 "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Titration", "Emerald",
                 "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
-                "Tesseract", "Jupiter", "Volatile", "Moebius", "Antimatter", "Phoenix", "Hardwired", "Uninhabitable",
+                "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
                 "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Terraform",
                 "Conduit", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
                 "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
@@ -761,10 +761,10 @@ public class CreateGameService {
                 "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
                 "Parasite", "Synchronisation", "Singularity", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
                 "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
-                "Nitrogen", "Odyssey", "Wavelength", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+                "Nitrogen", "Odyssey", "Bioluminescence", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
                 "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
                 "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
-            // extra words: "Bioluminescence", "Uranium", "Wetware", "Moonstone"
+            // extra words: "Wetware", "Moonstone"
             // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;

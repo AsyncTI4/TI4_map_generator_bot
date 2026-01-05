@@ -819,7 +819,7 @@ public class ButtonHelperTwilightsFall {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationNoPing()
-                                    + " has taken a secret card. They may put it into play with a button in their cards info.");
+                                    + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
                 }
                 if (!buttonID.contains("spoof_")) {
                     triggerYellowUnits(game, player);
@@ -1179,7 +1179,7 @@ public class ButtonHelperTwilightsFall {
                     "radAdvancementStep2_" + tech,
                     "Discard " + Mapper.getTech(tech).getName()));
         }
-        String msg = player.getRepresentation() + ", use these buttons to discard a card.";
+        String msg = player.getRepresentation() + ", use these buttons to discard an ability card.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 

@@ -304,9 +304,9 @@ class GameLoadService {
                 case Constants.AC -> game.setActionCards(getCardList(info));
                 case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));
-                case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peakable(getCardList(info));
+                case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peekable(getCardList(info));
                 case Constants.SAVED_BUTTONS -> game.setSavedButtons(getCardList(info));
-                case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peakable(getCardList(info));
+                case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peekable(getCardList(info));
                 case Constants.PO1PEEKED -> game.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
                 case Constants.PO2PEEKED -> game.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
                 case Constants.EXPEDITION_TECHSKIP -> game.getExpeditions().setTechSkip(info);

@@ -2,6 +2,7 @@ package ti4.commands.tokens;
 
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
@@ -32,12 +33,17 @@ public class RemoveAllCC extends GameStateCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            for (Tile tile : getGame().getTileMap().values()) {
-                tile.removeAllCC();
-            }
-        } else {
-            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
+        OptionMapping option = event.getOption(Constants.CONFIRM);
+        if (option == null || !"YES".equals(option.getAsString())) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
+            return;
+        }
+
+        for (Tile tile : getGame().getTileMap().values()) {
+            tile.removeAllCC();
         }
     }
 }

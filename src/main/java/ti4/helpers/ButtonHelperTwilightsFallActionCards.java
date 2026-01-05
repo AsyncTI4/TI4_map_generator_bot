@@ -193,7 +193,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String relic = buttonID.split("_")[2];
         p2.removeRelic(relic);
-        RelicHelper.resolveRelicLossEffects(event, game, player, relic);
+        RelicHelper.resolveRelicLossEffects(game, player, relic);
         String msg = player.getRepresentation() + " has chosen for _"
                 + Mapper.getRelic(relic).getName() + "_, owned by " + p2.getRepresentation() + ", to be _Unravel_'d.";
         if (p2 == player) {
@@ -672,7 +672,8 @@ public class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("resolveConverge")
     public static void resolveConverge(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue(player.getFaction() + "graviton", "true");
-        String msg = player.getRepresentation() + " will auto target non-fighter ships and/or mechs in auto assigment.";
+        String msg = "Hits that " + player.getRepresentation()
+                + " produces will auto target non-fighter ships and/or mechs in the auto hit assignment.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }

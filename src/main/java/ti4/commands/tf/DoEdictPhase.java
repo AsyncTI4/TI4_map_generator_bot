@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 class DoEdictPhase extends GameStateSubcommand {
 
     public DoEdictPhase() {
-        super(Constants.DO_EDICT_PHASE, "Do the edict phase", true, true);
+        super(Constants.DO_EDICT_PHASE, "Do the Edict Phase", true, true);
     }
 
     @Override

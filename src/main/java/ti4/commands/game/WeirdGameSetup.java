@@ -42,7 +42,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.TWILIGHTS_FALL_MODE, "True to enable Twilights Fall Mode"));
+                OptionType.BOOLEAN, Constants.TWILIGHTS_FALL_MODE, "True to enable Twilight's Fall Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,

@@ -336,13 +336,13 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_PN + " " + String.join(",", game.getPurgedPN()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", game.getPublicObjectives1Peakable()));
+        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", game.getPublicObjectives1Peekable()));
         writer.write(System.lineSeparator());
         writer.write(Constants.SAVED_BUTTONS + " " + String.join(",", game.getSavedButtons()));
         writer.write(System.lineSeparator());
         writer.write(Constants.PINGED_SYSTEMS + " " + String.join(",", game.getListOfTilesPinged()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", game.getPublicObjectives2Peakable()));
+        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", game.getPublicObjectives2Peekable()));
         writer.write(System.lineSeparator());
 
         savePeekedPublicObjectives(writer, Constants.PO1PEEKED, game.getPublicObjectives1Peeked());

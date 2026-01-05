@@ -459,7 +459,7 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Unable to locate the Trade strategy card. Commodity washing was not processed.");
+                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
             return;
         }
         int tradeInitiative = scModel.getInitiative();
@@ -529,7 +529,7 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Unable to locate the Trade strategy card. Commodity washing was not processed.");
+                    "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
             return;
         }
         int tradeInitiative = scModel.getInitiative();
@@ -832,7 +832,7 @@ public class ButtonHelperSCs {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                        + ", use the buttons to resolve the secondary (remember to spend a strategy token).",
+                        + ", please use these buttons to resolve the secondary (remember to spend a strategy token).",
                 buttons);
     }
 
@@ -841,7 +841,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = getAnarchy3SecondaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to resolve the secondary.",
+                player.getRepresentation(true, true) + ", please use these buttons to resolve the secondary.",
                 buttons);
     }
 
@@ -850,7 +850,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = getAnarchy7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                player.getRepresentation(true, true) + ", please use these buttons to build in the desired system.",
                 buttons);
     }
 
@@ -860,7 +860,7 @@ public class ButtonHelperSCs {
         game.setStoredValue("manifestDiscount", player.getFaction());
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                player.getRepresentation(true, true) + ", please use these buttons to build in the desired system.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -870,7 +870,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = getLumi7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
-                player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
+                player.getRepresentation(true, true) + ", please use these buttons to build in the desired system.",
                 buttons);
     }
 
@@ -1226,13 +1226,13 @@ public class ButtonHelperSCs {
     @ButtonHandler("anarchy10PeekStart")
     public static void anarchy10PeekStart(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        for (int x = 0; x < game.getPublicObjectives1Peakable().size(); x++) {
+        for (int x = 0; x < game.getPublicObjectives1Peekable().size(); x++) {
             buttons.add(Buttons.green(
-                    "anarchy10PeekAt_" + game.getPublicObjectives1Peakable().get(x), "Stage 1 Position " + (x + 1)));
+                    "anarchy10PeekAt_" + game.getPublicObjectives1Peekable().get(x), "Stage 1 Position " + (x + 1)));
         }
-        for (int x = 0; x < game.getPublicObjectives2Peakable().size(); x++) {
+        for (int x = 0; x < game.getPublicObjectives2Peekable().size(); x++) {
             buttons.add(Buttons.blue(
-                    "anarchy10PeekAt_" + game.getPublicObjectives2Peakable().get(x), "Stage 2 Position " + (x + 1)));
+                    "anarchy10PeekAt_" + game.getPublicObjectives2Peekable().get(x), "Stage 2 Position " + (x + 1)));
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -1413,7 +1413,7 @@ public class ButtonHelperSCs {
         } else {
             MessageHelper.sendMessageToChannel(
                     channel,
-                    "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with /player cc.");
+                    "Hey, something went wrong leaving a react. Try following anyways and if it spends a strategy token, given yourself one back with `/player cc`.");
         }
         ButtonHelper.deleteMessage(event);
     }

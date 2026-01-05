@@ -183,7 +183,7 @@ public class StatusHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + " , please choose if you want to use _Radical Advancement_.",
+                                + " , please choose if you wish to use _Radical Advancement_.",
                         buttons);
             }
             if (player.hasTech("radical")) {
@@ -602,7 +602,7 @@ public class StatusHelper {
             if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                     List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
-                    String msg = player.getRepresentation() + " Use buttons to revive infantry. You have "
+                    String msg = player.getRepresentation() + ", please use these buttons to revive infantry. You have "
                             + player.getStasisInfantry() + " infantry left to revive.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 } else {
@@ -627,7 +627,7 @@ public class StatusHelper {
 
                     int remaining = game.changeCommsOnPlanet(1, planet.getName());
 
-                    String msg = "A commodity was placed on the Monument to the Ages at " + planet.getName() + ".";
+                    String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
                 }
             }

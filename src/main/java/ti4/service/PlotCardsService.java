@@ -151,8 +151,8 @@ public class PlotCardsService {
                 String disastermsg = "Moments before disaster in game " + game.getName() + ".";
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
-            String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
-                    + " has been eradicated with an Obsidian plot.";
+            String disastermsg =
+                    Helper.getPlanetRepresentation(planet.getName(), game) + " has been eradicated with _Seethe_.";
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), disastermsg);
 

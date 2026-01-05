@@ -1333,9 +1333,16 @@ public class Helper {
                     if (game.isFowMode()) {
                         faction = "someone";
                     }
-                    msg.append("> Used ")
-                            .append(faction)
-                            .append("'s Commander Discount ")
+                    msg.append("> Used Aello Discount ")
+                            .append(
+                                    "deepwrought".equals(faction)
+                                            ? ""
+                                            : " (from "
+                                                    + ("someone".equals(faction)
+                                                            ? "someone"
+                                                            : game.getPlayerFromColorOrFaction(faction)
+                                                                    .getRepresentationNoPing())
+                                                    + ") ")
                             .append(MiscEmojis.Resources_1)
                             .append("\n");
                     res += 1;
@@ -1723,7 +1730,7 @@ public class Helper {
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }
-        if (Constants.MECATOLS.contains(planet) && player.hasIIHQ() && player.controlsMecatol(true)) {
+        if (game.mecatols().contains(planet) && player.hasIIHQ() && player.controlsMecatol(true)) {
             productionValueTotal += 3;
             planetUnitVal = 3;
         }

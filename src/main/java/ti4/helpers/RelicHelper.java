@@ -216,23 +216,15 @@ public class RelicHelper {
     }
 
     /** Meant to be called AFTER removing the relic from the player */
-    public void resolveRelicLossEffects(GenericInteractionCreateEvent event, Game game, Player p1, String relicID) {
-        // HANDLE LOSING SHARD OF THE THRONE
+    public void resolveRelicLossEffects(Game game, Player p1, String relicID) {
         String shardCustomPOName = null;
-        Integer shardPublicObjectiveID = null;
         switch (relicID) {
-            case "shard" -> {
-                shardCustomPOName = "Shard of the Throne";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
-            }
+            case "shard" -> shardCustomPOName = "Shard of the Throne";
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
                 shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
-                shardPublicObjectiveID = game.getRevealedPublicObjectives().get(shardCustomPOName);
             }
-            case "thetriad" -> {
-                p1.removePlanet("triad");
-            }
+            case "thetriad" -> p1.removePlanet("triad");
             case "obsidian", "absol_obsidian" -> {
                 if (p1.getSoScored() > p1.getMaxSOCount()) {
                     // do something for 4 scored secrets
@@ -241,11 +233,8 @@ public class RelicHelper {
             }
         }
 
-        if (shardCustomPOName != null
-                && shardPublicObjectiveID != null
-                && game.getCustomPublicVP().containsKey(shardCustomPOName)
-                && game.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
-            game.unscorePublicObjective(p1.getUserID(), shardPublicObjectiveID);
+        if (shardCustomPOName != null && game.getCustomPublicVP().containsKey(shardCustomPOName)) {
+            game.unscorePublicObjective(p1.getUserID(), shardCustomPOName);
             String msg = p1.getRepresentation() + " lost 1 point due to losing _" + shardCustomPOName + "_.";
             MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), msg);
         }

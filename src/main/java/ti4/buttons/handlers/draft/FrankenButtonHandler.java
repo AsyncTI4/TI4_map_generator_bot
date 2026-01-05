@@ -106,7 +106,7 @@ class FrankenButtonHandler {
                     if (player.getGame().isVeiledHeartMode()) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCardsInfoThread(),
-                                "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                                "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                         player.getGame()
                                 .setStoredValue(
                                         "veiledCards" + player.getFaction(),
@@ -132,7 +132,7 @@ class FrankenButtonHandler {
                 if (player.getGame().isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                            "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                     player.getGame()
                             .setStoredValue(
                                     "veiledCards" + player.getFaction(),
@@ -146,7 +146,7 @@ class FrankenButtonHandler {
                 if (player.getGame().isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                            "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                     player.getGame()
                             .setStoredValue(
                                     "veiledCards" + player.getFaction(),
@@ -264,14 +264,14 @@ class FrankenButtonHandler {
                                     Buttons.green("startOfGameStrategyPhase", "Start Strategy Phase");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),
-                                    game.getPing() + " the Inaugural Splice is complete!\n\n"
-                                            + "Once all players have selected their kept abilities/techs, genome and unit, press this button to start the game.",
+                                    game.getPing() + ", the inaugural splice is complete!\n\n"
+                                            + "Once all players have selected their kept abilities, genome and unit, press this button to start the game.",
                                     List.of(startStrategyPhaseButton));
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
                             Button randomizeButton =
-                                    Buttons.green("startFrankenSliceBuild", "Randomize your slices (sorta)");
-                            Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
+                                    Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");
+                            Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis Build Slices");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),
                                     game.getPing()

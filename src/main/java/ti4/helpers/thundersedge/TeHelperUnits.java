@@ -61,7 +61,7 @@ public class TeHelperUnits {
                 .getTokenList()
                 .contains(Constants.TOKEN_BREACH_ACTIVE)) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), "The system must have an active Breach in it to deploy a mech.");
+                    player.getCorrectChannel(), "The system must have an active Breach in it to deploy a Revenant.");
             return;
         }
         RegexService.runMatcher(regex, buttonID, matcher -> {
@@ -70,7 +70,7 @@ public class TeHelperUnits {
             String planetRep = Helper.getPlanetRepresentation(planet, game);
             String boringMsg = player.getRepresentation(true, false) + " deployed a Revenant on " + planetRep + ".";
             String flavorMsg =
-                    "Out of the cold depths of the active breach, a Crimson Revenant has emerged, landing on "
+                    "Out of the cold depths of the active Breach, a Rebellion Revenant has emerged, landing on "
                             + planetRep + ".";
 
             String msg = RandomHelper.isOneInX(20) ? flavorMsg : boringMsg;

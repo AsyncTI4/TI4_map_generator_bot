@@ -108,8 +108,7 @@ public class SabotageService {
             return false;
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
-            GMService.logPlayerActivity(
-                    game, player, "Sabotage not allowed due to Last Bastion commander.", null, true);
+            GMService.logPlayerActivity(game, player, "Sabotage not allowed due to Nip and Tuck.", null, true);
             if (!game.isFowMode()) {
                 return false;
             }
@@ -139,12 +138,14 @@ public class SabotageService {
         } else if (allSabotagesAreDiscarded(game, player) || isAcd2AndAllSabotagesAreDiscarded(game, player)) {
             return "All _Sabotages_ are in the discard.";
         }
+        String playerName = game.isFowMode() ? "Player" : player.getRepresentationNoPing();
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
-            return "Player has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation();
+            return playerName + " has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation()
+                    + ".";
         }
         if (player.hasTech("tf-biosyntheticsynergy")) {
-            return "Player has Bio Synthetic Synergy.";
+            return playerName + " has _Bio Synthetic Synergy_.";
         }
         if (player.hasTech("tp")
                 && game.getActivePlayerID() != null
@@ -153,11 +154,11 @@ public class SabotageService {
                 if (p2 == player) continue;
                 if (!p2.isPassed()) return null;
             }
-            return "Player has " + FactionEmojis.Yssaril
+            return playerName + " has " + FactionEmojis.Yssaril
                     + " _Transparasteel Plating_, and all other players have passed.";
         }
         if (player.hasTech("baarvag")) {
-            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
+            return playerName + " has _Unyielding Will_ and, thus their action cards cannot be cancelled.";
         }
         return null;
     }

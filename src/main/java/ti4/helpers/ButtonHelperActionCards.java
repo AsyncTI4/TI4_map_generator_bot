@@ -783,8 +783,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged()
-                + ", please choose the planet you wish to resolve remove enemy landed ground forces from."
-                + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
+                + ", please choose the planet you wish to remove enemy landed ground forces from."
+                + " If it's not present (because the opponent took it already), try pressing \"UNDO\", then `/planet add` it back to yourself, then try again.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(
@@ -1997,7 +1997,7 @@ public class ButtonHelperActionCards {
         if (player.getPlayableActionCards().contains("extremeduress")) {
             game.setStoredValue("ExtremeDuress", "");
             String msg = player.getRepresentation()
-                    + ", you have the option to pre-assign which player you wish to experience extreme duress."
+                    + ", you have the option to pre-assign which player you wish to experience _Extreme Duress_."
                     + " _Extreme Duress_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
@@ -2022,7 +2022,7 @@ public class ButtonHelperActionCards {
         if (player.getPlayableActionCards().contains("crisis")) {
             game.setStoredValue("Crisis Target", "");
             String msg = player.getRepresentation()
-                    + ", you have the option to pre-assign which player whose turn you wish to skip with crisis."
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with _Crisis_."
                     + " _Crisis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
