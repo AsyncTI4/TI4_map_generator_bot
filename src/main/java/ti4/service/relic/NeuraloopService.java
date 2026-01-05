@@ -89,11 +89,11 @@ public class NeuraloopService {
         String relic = buttonID.split(";")[3];
         String deck = type;
         switch (type) {
-            case "stage1":
+            case "stage1" ->
                 deck = "stage 1 public objective";
-            case "stage2":
+            case "stage2" ->
                 deck = "stage 2 public objective";
-            case "secret":
+            case "secret" ->
                 deck = "secret objective";
         }
         player.removeRelic(relic);
