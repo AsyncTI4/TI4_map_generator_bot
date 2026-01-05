@@ -48,7 +48,7 @@ public class NeuraloopService {
         }
     }
 
-    public static List<Button> getNeuraloopButton(Player player, String poID, String type, Game game) {
+    private static List<Button> getNeuraloopButton(Player player, String poID, String type) {
         List<Button> buttons = new ArrayList<>();
 
         for (String relic : player.getRelics()) {
@@ -63,21 +63,21 @@ public class NeuraloopService {
     }
 
     @ButtonHandler("neuraloopPart1")
-    private void neuraloopPart1(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private void neuraloopPart1(ButtonInteractionEvent event, Player player, String buttonID) {
         String poID = buttonID.split(";")[1];
         String type = buttonID.split(";")[2];
         String deck = type;
         switch (type) {
-            case "stage1":
+            case "stage1" ->
                 deck = "stage 1 public objective";
-            case "stage2":
+            case "stage2" ->
                 deck = "stage 2 public objective";
-            case "secret":
+            case "secret" ->
                 deck = "secret objective";
         }
         String msg = player.getRepresentation()
                 + ", please choose the relic you wish to purge in order to replace the objective with a " + deck + ".";
-        List<Button> buttons = getNeuraloopButton(player, poID, type, game);
+        List<Button> buttons = getNeuraloopButton(player, poID, type);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -89,12 +89,9 @@ public class NeuraloopService {
         String relic = buttonID.split(";")[3];
         String deck = type;
         switch (type) {
-            case "stage1" ->
-                deck = "stage 1 public objective";
-            case "stage2" ->
-                deck = "stage 2 public objective";
-            case "secret" ->
-                deck = "secret objective";
+            case "stage1" -> deck = "stage 1 public objective";
+            case "stage2" -> deck = "stage 2 public objective";
+            case "secret" -> deck = "secret objective";
         }
         player.removeRelic(relic);
         player.removeExhaustedRelic(relic);
