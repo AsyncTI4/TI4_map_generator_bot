@@ -107,8 +107,7 @@ public class ComponentActionHelper {
                         switch (bt.getAlias()) {
                             case "arborecbt" ->
                                 game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                            case "crimsonbt" ->
-                                game.getTileMap().values().stream().anyMatch(Tile.tileHasBreach());
+                            case "crimsonbt" -> true;
                             case "mahactbt" -> !p1.getTechs().isEmpty();
                             case "saarbt" ->
                                 game.getTileMap().values().stream()
@@ -457,6 +456,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(finChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
+        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
 
         return compButtons;
     }

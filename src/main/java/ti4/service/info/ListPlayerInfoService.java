@@ -214,6 +214,10 @@ public class ListPlayerInfoService {
             resources += influence;
             influence += planet.getResources();
         }
+        if (player.hasUnlockedBreakthrough("xxchabt")) {
+            resources = Math.max(resources, influence);
+            influence = Math.max(resources, influence);
+        }
         if (resources > 0) {
             ObjectiveResult resourceResult = backtrack(
                     planets,
