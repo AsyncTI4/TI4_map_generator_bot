@@ -2,13 +2,15 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -107,8 +109,7 @@ public class ComponentActionHelper {
                         switch (bt.getAlias()) {
                             case "arborecbt" ->
                                 game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                            case "crimsonbt" ->
-                                game.getTileMap().values().stream().anyMatch(Tile.tileHasBreach());
+                            case "crimsonbt" -> true;
                             case "mahactbt" -> !p1.getTechs().isEmpty();
                             case "saarbt" ->
                                 game.getTileMap().values().stream()
