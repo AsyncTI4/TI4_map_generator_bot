@@ -233,8 +233,11 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         }
 
         // Normalize the map string (replace newlines and commas with spaces)
-        String normalizedMapString =
-                mapString.replace("\n", " ").replace(",", " ").replace("  ", " ");
+        String normalizedMapString = mapString
+                .replace("\n", " ")
+                .replace(",", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
         presetMapString = normalizedMapString;
 
         // Parse using MapStringMapper
@@ -247,10 +250,17 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         }
 
         // Validate all non "-1" tile IDs
+        int numSliceTiles = 0;
+        int numPlayers = 6;
+        if (parent instanceof SliceDraftableSettings sdParent
+                && sdParent.getParent() instanceof DraftSystemSettings dparent) {
+            numPlayers = dparent.getPlayerUserIds().size();
+        }
         for (Map.Entry<String, String> entry : parsedMapTiles.entrySet()) {
             String tileId = entry.getValue();
             // Skip -1 positions (reserved for player slices)
             if ("-1".equals(tileId)) {
+                numSliceTiles++;
                 continue;
             }
             // Validate tile exists
@@ -259,6 +269,9 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
                 parsedMapTiles = null;
                 return "Invalid tile ID at position " + entry.getKey() + ": " + tileId;
             }
+        }
+        if (numSliceTiles / numPlayers != 3) {
+            return "Invalid number of slice tiles in map string; required numberOfPlayers × 3";
         }
 
         return null;

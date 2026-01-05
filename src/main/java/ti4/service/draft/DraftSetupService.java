@@ -7,14 +7,12 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.helpers.settingsFramework.menus.SliceDraftableSettings.MapGenerationMode;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.draft.draftables.FactionDraftable;
-import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
@@ -175,13 +173,7 @@ public class DraftSetupService {
         tileManager.clear();
         tileManager.addAllDraftTiles(tileSources);
 
-        boolean isNucleusMode =
-                settings.getSliceSettings().getMapGenerationMode().getValue() == MapGenerationMode.Nucleus;
-        boolean hasSeatDraftable = false;
         for (String draftableKey : settings.getDraftablesList().getKeys()) {
-            if (draftableKey.equals(SeatDraftable.class.getSimpleName())) {
-                hasSeatDraftable = true;
-            }
             Draftable draftable = DraftComponentFactory.createDraftable(draftableKey);
 
             String error = draftable.applySetupMenuChoices(event, settings);
@@ -189,15 +181,6 @@ public class DraftSetupService {
                 return error;
             }
             draftManager.addDraftable(draftable);
-        }
-
-        if (isNucleusMode && !hasSeatDraftable) {
-            Draftable seatDraftable = DraftComponentFactory.createDraftable(SeatDraftable.class.getSimpleName());
-            String error = seatDraftable.applySetupMenuChoices(event, settings);
-            if (error != null) {
-                return error;
-            }
-            draftManager.addDraftable(seatDraftable);
         }
 
         // Setup Public Snake Draft Orchestrator
