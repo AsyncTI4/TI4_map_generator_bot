@@ -480,7 +480,7 @@ public class StartTurnService {
 
                 List<Button> ralnelHeroButtons = new ArrayList<>();
                 ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
-                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
             }

@@ -1053,7 +1053,7 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesBase() + 2);
                 }
-                message = player.getRepresentationUnfogged() + " Your trade goods increased from " + oldTg + " -> "
+                message = player.getRepresentationUnfogged() + ", your trade goods increased from " + oldTg + " -> "
                         + player.getTg() + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);

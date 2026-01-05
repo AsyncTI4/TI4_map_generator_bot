@@ -440,7 +440,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " acquired the War Sun technology.");
-            MahactTokenService.removeFleetCC(game, owner, "due to _Fires of the Gashlai_ being played.");
+            MahactTokenService.removeFleetCC(game, owner, "due to _Fires of the Gashlai_ being played");
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");

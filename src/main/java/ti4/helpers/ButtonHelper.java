@@ -5513,8 +5513,8 @@ public class ButtonHelper {
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId
                             + "_" + trait + "kolleccbt";
-                    String buttonMessage2 = "Exhaust Kollect BT and explore discard on " + planetRepresentation
-                            + (explorationTraits.size() > 1 ? " as " + trait : "");
+                    String buttonMessage2 = "Exhaust _The Collector's Museum_ and explore discard on "
+                            + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "") + ".";
                     buttons.add(Buttons.gray(buttonId2, buttonMessage2, ExploreEmojis.getTraitEmoji(trait)));
                 }
             }
@@ -7383,7 +7383,7 @@ public class ButtonHelper {
         deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "The bot will probably not know who's turn it should be after you complete this action. Use /player turn_start if necessary to fix this.");
+                "The bot will probably not know who's turn it should be after you complete this action. Use `/player turn_start` if necessary to fix this.");
     }
 
     @ButtonHandler("startScoring")

@@ -175,7 +175,9 @@ public class FractureService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
-                        "## Please do not place more ingress tokens than legal. If brought in by breakthrough, that means 3 per technology type of the breakthrough. Otherwise, 1 per technology type.");
+                        "## Please do not place more ingress tokens than legal."
+                                + " If brought in by breakthrough, that means up to 3 planets per technology type of the breakthrough (6 total)."
+                                + " Otherwise, 1 planet per technology type (4 total).");
             }
         }
 

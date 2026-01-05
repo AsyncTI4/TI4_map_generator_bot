@@ -553,7 +553,7 @@ public class ButtonHelperTwilightsFall {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " unfortunately, there are no more splice cards remaining."
+                    player.getRepresentation() + ", unfortunately, there are no more splice cards remaining."
                             + " Please reimburse yourself any costs associated with the splice, using the `/player cc` command."
                             + " Same for anyone else after you in the splice.");
         } else {
