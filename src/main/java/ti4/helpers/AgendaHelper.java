@@ -1842,7 +1842,7 @@ public class AgendaHelper {
 
     public static void ministerOfIndustryCheck(
             Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
-        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_industry")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_industry") && !tile.isScar(game)) {
             String msg = player.getRepresentationUnfogged()
                     + "since you have _Minister of Industry_, you may build in tile "
                     + tile.getRepresentationForButtons(game, player) + ". You have "
@@ -1852,7 +1852,7 @@ public class AgendaHelper {
                     msg,
                     Helper.getPlaceUnitButtons(event, player, game, tile, "ministerBuild", "place"));
         }
-        if (player.hasAbility("quantum_fabrication")) {
+        if (player.hasAbility("quantum_fabrication") && !tile.isScar(game)) {
             String msg = player.getRepresentationUnfogged()
                     + ", if you placed this space dock via **Construction**, you may use its PRODUCTION ability immediately in "
                     + tile.getRepresentationForButtons(game, player) + " via **Quantum Fabrication**.";

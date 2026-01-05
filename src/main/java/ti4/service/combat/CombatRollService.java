@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -935,6 +934,9 @@ public class CombatRollService {
                 resultBuilder.append(unitRoll);
                 List<DiceHelper.Die> resultRolls2 = new ArrayList<>();
                 int numMisses = numRolls - hitRolls;
+                if (player.ownsUnit("tf-justicerrail") && rollType == CombatRollType.SpaceCannonOffence) {
+                    game.setStoredValue(player.getFaction() + "graviton", "yes");
+                }
                 if ((game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
                                 || player.hasTech("tf-tacticalbrilliance"))
                         && rollType != CombatRollType.combatround

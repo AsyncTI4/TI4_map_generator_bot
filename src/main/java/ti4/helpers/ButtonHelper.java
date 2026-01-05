@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,7 +65,6 @@ import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.helpers.thundersedge.TeHelperAbilities;
 import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperUnits;
-import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -137,7 +133,6 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
-import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
 
 @UtilityClass
@@ -442,6 +437,13 @@ public class ButtonHelper {
             msg += " and failed. No revival.";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+    }
+
+    @ButtonHandler("pingGame")
+    public static void pingGame(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
+        Helper.fixGameChannelPermissions(game.getActionsChannel().getGuild(), game);
+        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Ping Game: " + game.getPing());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game");
     }
 
     @ButtonHandler("statusInfRevival_")
@@ -7218,6 +7220,9 @@ public class ButtonHelper {
                                 + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
             }
+            if (adjTile.isScar(game)) {
+                continue;
+            }
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 if (tilePos.equalsIgnoreCase(adjTilePos) && game.mecatols().contains(unitHolder.getName())) {
                     for (Player p2 : game.getRealPlayers()) {
@@ -7360,77 +7365,6 @@ public class ButtonHelper {
     public static void startScoring(Game game, Player player, ButtonInteractionEvent event) {
         EndTurnService.pingNextPlayer(event, game, player, true);
         deleteMessage(event);
-    }
-
-    public static void startMyTurn(GenericInteractionCreateEvent event, Game game, Player player) {
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
-
-        // INFORM FIRST PLAYER IS UP FOR ACTION
-        if (player != null) {
-            game.updateActivePlayer(player);
-            if (game.isFowMode()) {
-                FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
-            }
-            ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
-            ButtonHelperFactionSpecific.resolveKolleccAbilities(player, game);
-
-            game.setPhaseOfGame("action");
-        } else {
-            BotLogger.warning(new LogOrigin(event, player), "`ButtonHelper.startMyTurn` player is null");
-            return;
-        }
-
-        if (isFowPrivateGame) {
-            if (game.isShowBanners()) {
-                BannerGenerator.drawFactionBanner(player);
-            }
-            String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your "
-                    + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
-            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), msgExtra);
-            game.updateActivePlayer(player);
-
-            StartTurnService.reviveInfantryII(player);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getPrivateChannel(),
-                    msgExtra + "\n Use Buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(player, game, false, event));
-        } else {
-            if (game.isShowBanners()) {
-                BannerGenerator.drawFactionBanner(player);
-            }
-            String msgExtra = player.getRepresentationUnfogged() + ", it is now your turn (your "
-                    + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
-            Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
-            if (nextPlayer == player) {
-                msgExtra +=
-                        "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
-            } else if (nextPlayer != null) {
-                String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
-                        ? nextPlayer.getRepresentationUnfogged()
-                        : nextPlayer.getRepresentationNoPing();
-                int numUnpassed = -2;
-                boolean anyPassed = false;
-                for (Player p2 : game.getPlayers().values()) {
-                    numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
-                    anyPassed |= p2.isPassed() || p2.isEliminated();
-                }
-                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (!anyPassed) {
-                    msgExtra += "All players are yet to pass.";
-                } else if (numUnpassed == 0) {
-                    msgExtra += "No other players are unpassed.";
-                } else {
-                    msgExtra +=
-                            numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
-                }
-            }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-            StartTurnService.reviveInfantryII(player);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.getMainGameChannel(),
-                    "Use buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(player, game, false, event));
-        }
     }
 
     @ButtonHandler("startArbiter")

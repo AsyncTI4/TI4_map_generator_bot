@@ -646,7 +646,7 @@ public class ButtonHelperModifyUnits {
                 if (p2 == player) {
                     continue;
                 }
-                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty() || p2.ownsUnit("tf-justicerrail")) {
+                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
                     assignHitOrder = new ArrayList<>(List.of(
                             "destroyer",
                             "cruiser",
