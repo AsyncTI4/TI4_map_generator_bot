@@ -241,7 +241,10 @@ public class Helper {
         Tile hs = player.getHomeSystemTile();
         if (hs != null) {
             for (Planet planet : hs.getPlanetUnitHolders()) {
-                if (!player.getPlanets().contains(planet.getName())) {
+                if (planet.isSpaceStation()) {
+                    continue;
+                }
+                if (!player.getPlanetsForScoring(false).contains(planet)) {
                     return false;
                 }
             }

@@ -1,9 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -565,7 +562,7 @@ public class UnfiledButtonHandlers {
         userSettings.setSandbagPref(buttonID.split("_")[1]);
         UserSettingsManager.save(userSettings);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Thank you for answering.");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Decision saved.");
     }
 
     @ButtonHandler("setAutoPassMedian_")
@@ -2112,7 +2109,8 @@ public class UnfiledButtonHandlers {
                             MessageHelper.sendMessageToChannel(
                                     player.getCorrectChannel(),
                                     player.getRepresentationUnfogged()
-                                            + ", heads up, bot thinks you should have gained " + properGain
+                                            + ", heads up, bot thinks you should have gained "
+                                            + (properGain == 1 ? "only " : "") + properGain
                                             + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons
                                             + ".");
                         } else {
@@ -2367,50 +2365,8 @@ public class UnfiledButtonHandlers {
             }
             if (buttonID.contains("tacticalAction")
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
-                ButtonHelper.exploreDET(player, game, event);
-                ButtonHelperFactionSpecific.cleanCavUp(game, event);
-                if (player.hasAbility("cunning")) {
-                    List<Button> trapButtons = new ArrayList<>();
-                    for (Planet uH :
-                            game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders()) {
-                        String planet = uH.getName();
-                        trapButtons.add(
-                                Buttons.gray("setTrapStep3_" + planet, Helper.getPlanetRepresentation(planet, game)));
-                    }
-                    trapButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = player.getRepresentationUnfogged()
-                            + ", you may use the buttons to place a trap on a planet.";
-                    if (trapButtons.size() > 1) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, trapButtons);
-                    }
-                }
-                if (player.hasUnexhaustedLeader("celdauriagent")) {
-                    List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.gray(
-                            "exhaustAgent_celdauriagent_" + player.getFaction(),
-                            "Use Celdauri Agent",
-                            FactionEmojis.celdauri));
-                    buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", you may use "
-                                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                    + "George Nobin, the Celdauri"
-                                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                                    + " agent, to place 1 space dock for 2 trade goods or 2 commodities.",
-                            buttons);
-                }
+                ButtonHelperTacticalAction.endOfTacticalActionThings(player, game, event);
                 List<Button> systemButtons2 = new ArrayList<>();
-                if (!game.isAbsolMode()
-                        && player.getRelics().contains("emphidia")
-                        && !player.getExhaustedRelics().contains("emphidia")) {
-                    String message = player.getRepresentationUnfogged()
-                            + ", you may explore a planet using _The Crown of Emphidia_.";
-                    systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-                    systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-                }
-                systemButtons2 = new ArrayList<>();
                 if (player.hasUnexhaustedLeader("sardakkagent")) {
                     String message = player.getRepresentationUnfogged() + ", you may use "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -2434,21 +2390,11 @@ public class UnfiledButtonHandlers {
                 if (game.isNaaluAgent()) {
                     player = game.getPlayer(game.getActivePlayerID());
                 }
-                if (game.isWarfareAction()) {
-                    List<Button> redistro = new ArrayList<>();
-                    redistro.add(Buttons.blue(
-                            player.finChecker() + "redistributeCCButtons_deleteThisButton",
-                            "Redistribute Command Tokens"));
-                    redistro.add(Buttons.DONE_DELETE_BUTTONS);
-                    String warfareDone = player.getRepresentationUnfogged()
-                            + " your **Warfare** action is finished, you may redistribute your command tokens again.";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warfareDone, redistro);
-                }
 
                 if (game.isFowMode()) {
                     LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
                 }
-                ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+
                 game.removeStoredValue("producedUnitCostFor" + player.getFaction());
 
                 String message = player.getRepresentationUnfogged()
@@ -3443,7 +3389,7 @@ public class UnfiledButtonHandlers {
         String position = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(position);
         String message =
-                player.getRepresentationUnfogged() + " is using _Wing Transfer_ to place their command token the "
+                player.getRepresentationUnfogged() + " is using _Wing Transfer_ to place their command token in the "
                         + tile.getRepresentationForButtons() + " system.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -3546,7 +3492,8 @@ public class UnfiledButtonHandlers {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         "## " + player.getRepresentationUnfogged()
-                                + ", heads up, the bot thinks you should gain " + properGain + " command token"
+                                + ", heads up, the bot thinks you should gain " + (properGain == 1 ? "only " : "")
+                                + properGain + " command token"
                                 + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
                 if (player.getMahactCC().size() > 0) {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";

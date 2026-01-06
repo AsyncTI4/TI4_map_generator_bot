@@ -102,6 +102,21 @@ public class StatusHelper {
                 String msg = player.getRepresentation()
                         + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            } else {
+                var userSettings = UserSettingsManager.get(player.getUserID());
+                if (userSettings.getSandbagPref().contains("bot")) {
+                    String message = player.getRepresentation()
+                            + " the bot will auto pass on scoring a secret objective this round for you (if you're still unable to score one when scoring occurs). Click this button to change it and do it manually. You will be asked every round like this when you pass early, so no decision is final.";
+                    buttons.add(Buttons.red("sandbagPref_manual", "Manually Say No Scoring"));
+                    buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                } else {
+                    String message = player.getRepresentation()
+                            + " the bot will let you manually decide whether to score a secret objective this round. Click this button to change it and auto pass on scoring this round (if you still have no secrets to score when scoring occurs). You will be asked every round like this when you pass early, so no decision is final.";
+                    buttons.add(Buttons.green("sandbagPref_bot", "Auto Say No Scoring"));
+                    buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                }
             }
         }
     }

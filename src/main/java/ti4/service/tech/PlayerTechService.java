@@ -701,7 +701,7 @@ public class PlayerTechService {
                                     : nextPlayer.getRepresentationNoPing();
                     int numUnpassed = -2;
                     boolean anyPassed = false;
-                    for (Player p2 : game.getPlayers().values()) {
+                    for (Player p2 : game.getRealPlayers()) {
                         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                         anyPassed |= p2.isPassed() || p2.isEliminated();
                     }

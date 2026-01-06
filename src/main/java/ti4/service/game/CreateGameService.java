@@ -281,7 +281,7 @@ public class CreateGameService {
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg = """
-                Which expansion are you using for this game?
+                ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
                 > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
                 > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
@@ -433,11 +433,11 @@ public class CreateGameService {
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
-            sb.append(
-                    "You will be automatically added to the game channels when you join the server."
-                            + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
-                            + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
+            sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
+            String msg2 = "If you have joined the server and cannot find your game, please hit this button";
+            Button findGameButton = Buttons.green("pingGame", "Locate My Game");
+            MessageHelper.sendMessageToChannelWithButton(channel, msg2, findGameButton);
         }
         return missingMembers;
     }

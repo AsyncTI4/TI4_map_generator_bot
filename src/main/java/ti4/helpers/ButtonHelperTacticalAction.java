@@ -45,8 +45,9 @@ import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
 
-    @ButtonHandler("doneWithTacticalAction")
-    public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+    public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.exploreDET(player, game, event);
+        ButtonHelperFactionSpecific.cleanCavUp(game, event);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
@@ -104,29 +105,34 @@ public class ButtonHelperTacticalAction {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
             }
+            if (!game.isAbsolMode()
+                    && player.getRelics().contains("emphidia")
+                    && !player.getExhaustedRelics().contains("emphidia")) {
+                String message = player.getRepresentation()
+                        + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
+                List<Button> systemButtons2 = new ArrayList<>();
+                systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+            }
+            if (game.isWarfareAction()) {
+                Button redistro = Buttons.blue(
+                        player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
+                String warfareDone = player.getRepresentationUnfogged()
+                        + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
+            }
+            ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         }
+    }
 
-        if (!game.isAbsolMode()
-                && player.getRelics().contains("emphidia")
-                && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation()
-                    + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
-            List<Button> systemButtons2 = new ArrayList<>();
-            systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-        }
+    @ButtonHandler("doneWithTacticalAction")
+    public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+        endOfTacticalActionThings(player, game, event);
+
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
         }
-        if (game.isWarfareAction()) {
-            Button redistro = Buttons.blue(
-                    player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
-            String warfareDone = player.getRepresentationUnfogged()
-                    + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
-        }
 
-        resetStoredValuesForTacticalAction(game);
         game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
@@ -137,6 +143,7 @@ public class ButtonHelperTacticalAction {
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
         ButtonHelper.deleteMessage(event);
+        player.resetOlradinPolicyFlags();
     }
 
     @ButtonHandler("tacticalActionBuild_")
