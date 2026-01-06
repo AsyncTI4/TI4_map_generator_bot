@@ -1197,6 +1197,7 @@ public class Constants {
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String DRAFT_MODE = "draft_mode";
     public static final String BAN_LIST = "ban_list";
+    public static final String BOT_ALL_REACTS = "bot_all_reacts";
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String BOT_COLOR_REACTS = "bot_color_reacts";
     public static final String BOT_STRAT_REACTS = "bot_strat_reacts";
