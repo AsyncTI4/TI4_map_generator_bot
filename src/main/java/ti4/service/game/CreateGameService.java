@@ -435,7 +435,7 @@ public class CreateGameService {
             }
             sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
-            String msg2 = "If you have joined the server and cannot find your game, please hit this button";
+            String msg2 = "If you have joined the server and cannot find your game, please click this button.";
             Button findGameButton = Buttons.green("pingGame", "Locate My Game");
             MessageHelper.sendMessageToChannelWithButton(channel, msg2, findGameButton);
         }

@@ -442,8 +442,8 @@ public class ButtonHelper {
     @ButtonHandler("pingGame")
     public static void pingGame(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
         Helper.fixGameChannelPermissions(game.getActionsChannel().getGuild(), game);
-        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Ping Game: " + game.getPing());
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game");
+        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Pinging game" + game.getPing() + ".");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
     }
 
     @ButtonHandler("statusInfRevival_")
