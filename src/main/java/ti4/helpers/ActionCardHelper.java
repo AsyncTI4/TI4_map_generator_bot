@@ -1711,7 +1711,7 @@ public class ActionCardHelper {
         return null;
     }
 
-    private static boolean isSabotageOrShatter(String acID) {
+    public static boolean isSabotageOrShatter(String acID) {
         return acID.contains("sabo") || acID.contains("shatter");
     }
 
