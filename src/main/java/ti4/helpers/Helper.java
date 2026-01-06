@@ -230,7 +230,7 @@ public class Helper {
         if (player.isNpc()) {
             return false;
         }
-        if (player.hasAbility("nomadic")) {
+        if (player.hasAbility("nomadic") || player.hasTech("tf-nomadic")) {
             return true;
         }
         if (player.hasAbility("mobile_command")
