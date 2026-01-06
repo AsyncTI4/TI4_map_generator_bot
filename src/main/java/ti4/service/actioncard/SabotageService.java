@@ -55,7 +55,7 @@ public class SabotageService {
 
         if (isAffectedByTransparasteel(player, game)) return false;
 
-        if (hasGarboziaSabotage(player)) return true;
+        if (playerHasSabotage(player)) return true;
 
         if (player.getAcCount() == 0) return false;
 
@@ -68,10 +68,6 @@ public class SabotageService {
         if (!player.isPassed() || game.getActivePlayer() == null) return false;
 
         return game.getActivePlayer().hasTech("tp") || game.getActivePlayer().hasTech("tf-crafty");
-    }
-
-    private static boolean hasGarboziaSabotage(Player player) {
-        return player.getPlayableActionCards().stream().anyMatch(actionCard -> actionCard.contains("sabotage"));
     }
 
     public static boolean couldUseInstinctTraining(Player player) {
