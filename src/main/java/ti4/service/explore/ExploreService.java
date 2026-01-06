@@ -237,9 +237,10 @@ public class ExploreService {
             player.setBreakthroughExhausted("kolleccbt", kolleccbt);
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
-                    player.getRepresentation() + " has exhausted Kollecct Breakthrough to explore the discard pile of "
+                    player.getRepresentation()
+                            + " has exhausted _The Collector's Museum_ to explore from the discard pile of "
                             + drawColor + " on " + planetName
-                            + ". Not yet implemented fully. Use /explore shuffle_back_into_deck and then /explore use to resolve. (and then maybe shuffle back into deck again).");
+                            + ". Not yet implemented fully. Please use `/explore shuffle_back_into_deck` and then `/explore use` to resolve (and then maybe `/explore shuffle_back_into_deck` back into deck again).");
             return;
         }
         String cardID = game.drawExplore(drawColor);

@@ -182,10 +182,10 @@ public class BastionTechService {
                 message = message.substring(0, message.length() - 2);
             }
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing());
+                    event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");
             if (h > 0) {
-                String msg = p2.getRepresentationUnfogged() + ", you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
-                        + ".";
+                String msg = p2.getRepresentationUnfogged() + ", you may auto-assign " + h + " hit"
+                        + (h == 1 ? "" : "s") + ".";
                 List<Button> buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + p2.getFaction() + "_";
                 buttons.add(Buttons.green(
@@ -214,7 +214,7 @@ public class BastionTechService {
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), message + "\nRolled against " + p1.getRepresentationNoPing());
+                    event.getMessageChannel(), message + "\nRolled against " + p1.getRepresentationNoPing() + ".");
             if (h > 0) {
                 String msg = p1.getRepresentationUnfogged() + ", you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
                         + ".";

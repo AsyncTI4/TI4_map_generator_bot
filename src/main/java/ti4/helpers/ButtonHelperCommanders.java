@@ -737,7 +737,7 @@ public class ButtonHelperCommanders {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + ", please tell the bot who was the active player when you spent this strategy token. You will be able to coexist with them due to your **Free Systems** breakthrough.",
+                            + ", please tell the bot who was the active player when you spent this strategy token. You will be able to coexist with them due to _Galactic Movement_.",
                     buttons);
         }
         if (player.hasTech("tf-peaceaccords")) {
@@ -882,23 +882,20 @@ public class ButtonHelperCommanders {
     public static void resolveMykoBT(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         Die d1 = new Die(7);
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " is attempting to place 1 captured infantry on "
-                        + Helper.getPlanetRepresentation(planet, game)
-                        + " using the Mykomentori Breakthrough. Rolling a die... (need 7+ to succeed)");
-        MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                player.getFactionEmoji() + " rolled a " + d1.getResult() + " for the Mykomentori Breakthrough.");
+        String msg = player.getFactionEmoji() + " is rolling a dice to place 1 captured infantry on "
+                + Helper.getPlanetRepresentation(planet, game)
+                + " using _Dreamwalkers_. They rolled a " + d1.getResult();
         if (d1.isSuccess()) {
             Tile tile = game.getTileFromPlanet(planet);
             AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
             RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), "infantry");
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    player.getFactionEmoji() + " placed 1 captured infantry on "
-                            + Helper.getPlanetRepresentation(planet, game) + " using the Mykomentori Breakthrough.");
+            msg += ", and successfully placed an infantry on " + Helper.getPlanetRepresentation(planet, game) + ". ";
+        } else {
+            msg += ", and failed to place an infantry. ";
         }
+        msg += "They have " + player.getNombox().getUnitCount(UnitType.Infantry, player)
+                + " captured infantry remaining.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("utilizePharadnCommander_")

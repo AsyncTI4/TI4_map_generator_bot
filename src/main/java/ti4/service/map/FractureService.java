@@ -58,6 +58,11 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, bt);
+            } else if (result == 6) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "> Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(result)
+                                + ".\\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";
@@ -170,7 +175,9 @@ public class FractureService {
             } else {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
-                        "## Please do not place more ingress tokens than legal. If brought in by breakthrough, that means 3 per technology type of the breakthrough. Otherwise, 1 per technology type.");
+                        "## Please do not place more ingress tokens than legal."
+                                + " If brought in by breakthrough, that means up to 3 planets per technology type of the breakthrough (6 total)."
+                                + " Otherwise, 1 planet per technology type (4 total).");
             }
         }
 
