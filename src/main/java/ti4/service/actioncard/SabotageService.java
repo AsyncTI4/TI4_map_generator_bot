@@ -59,9 +59,9 @@ public class SabotageService {
 
         if (player.getAcCount() == 0) return false;
 
-        if (game.isAcd2()) return allAcd2SabotagesAreDiscarded(game, player);
-        if (game.isTwilightsFallMode()) return allShattersAreDiscarded(game, player);
-        return allSabotagesAreDiscarded(game, player);
+        if (game.isAcd2()) return !allAcd2SabotagesAreDiscarded(game, player);
+        if (game.isTwilightsFallMode()) return !allShattersAreDiscarded(game, player);
+        return !allSabotagesAreDiscarded(game, player);
     }
 
     private static boolean isAffectedByTransparasteel(Player player, Game game) {
@@ -103,7 +103,7 @@ public class SabotageService {
     public static boolean isSaboAllowed(Game game, Player player) {
         if (game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) return false;
         if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) return false;
-        else if (allSabotagesAreDiscarded(game, player)) return false;
+        if (allSabotagesAreDiscarded(game, player)) return false;
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             GMService.logPlayerActivity(game, player, "Sabotage not allowed due to Nip and Tuck.", null, true);
@@ -135,7 +135,7 @@ public class SabotageService {
             return "All _Shatter_ cards are in the discard.";
         }
 
-        if (game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player) || allSabotagesAreDiscarded(game, player)) {
+        if ((game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) || allSabotagesAreDiscarded(game, player)) {
             return "All _Sabotages_ are in the discard.";
         }
 
