@@ -41,7 +41,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
@@ -406,25 +405,13 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player2.getRepresentation()
-                                + ", your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
-            } else if (IsPlayerElectedService.isPlayerElected(game, player1, "censure")
-                    || IsPlayerElectedService.isPlayerElected(game, player1, "absol_censure")) {
-                MessageHelper.sendMessageToChannel(
-                        threadChannel,
-                        player2.getRepresentation()
-                                + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
+                                + ", your opponent has no action cards to play, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             if (player2.getPlayableActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player1.getRepresentation()
-                                + " your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
-            } else if (IsPlayerElectedService.isPlayerElected(game, player2, "censure")
-                    || IsPlayerElectedService.isPlayerElected(game, player2, "absol_censure")) {
-                MessageHelper.sendMessageToChannel(
-                        threadChannel,
-                        player1.getRepresentation()
-                                + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
+                                + " your opponent has no action cards to play, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             String ms2 = StartTurnService.getMissedSCFollowsText(game, player1);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
