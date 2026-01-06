@@ -4494,12 +4494,13 @@ public class ButtonHelper {
         if ("unknown".equalsIgnoreCase(newTileID)) {
             DiceHelper.Die d1 = new DiceHelper.Die(5);
 
-            String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
+            String message = player.getRepresentation() + " rolled a " + d1.getResult() + " and will thus place a ";
             if (d1.getResult() > 4 || redTilesToPullFrom.isEmpty()) {
-                message += "blue backed tile.";
+                message += "blue backed tile";
                 if (d1.getResult() < 5) {
-                    message += " (All red backed tiles were already placed)";
+                    message += " (all red backed tiles were already placed)";
                 }
+                message += ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                         .filter(tile -> tile.getTierList().isBlue())
@@ -4568,7 +4569,11 @@ public class ButtonHelper {
 
         for (String pos2 : directlyAdjacentTiles) {
             Tile tile = game.getTileByPosition(pos2);
-            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos) && !usedPos.contains(pos2)) {
+            if (tile != null
+                    && tile.isEdgeOfBoard(game)
+                    && !pos2.equalsIgnoreCase(pos)
+                    && !usedPos.contains(pos2)
+                    && !"silver_flame".equals(tile.getTileID())) {
                 if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;
                 }
@@ -4579,13 +4584,14 @@ public class ButtonHelper {
                         tile.getRepresentationForButtons(game, player)));
             }
 
-            if (tile == null) {
+            if (tile == null || "silver_flame".equals(tile.getTileID())) {
                 for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
                     Tile tile2 = game.getTileByPosition(pos3);
                     if (tile2 != null
                             && tile2.isEdgeOfBoard(game)
                             && !pos3.equalsIgnoreCase(pos)
-                            && !usedPos.contains(pos3)) {
+                            && !usedPos.contains(pos3)
+                            && !"silver_flame".equals(tile2.getTileID())) {
                         if (game.isAgeOfExplorationMode() && tile2.isHomeSystem(game)) {
                             continue;
                         }
@@ -4614,8 +4620,10 @@ public class ButtonHelper {
         List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
         String inBoth = "";
         for (String pos3 : directlyAdjacentTiles) {
-            if (directlyAdjacentTiles2.contains(pos3) && game.getTileByPosition(pos3) == null) {
+            Tile tile3 = game.getTileByPosition(pos3);
+            if (directlyAdjacentTiles2.contains(pos3) && (tile3 == null || "silver_flame".equals(tile3.getTileID()))) {
                 inBoth = pos3;
+                break;
             }
         }
 
