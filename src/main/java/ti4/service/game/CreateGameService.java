@@ -736,7 +736,7 @@ public class CreateGameService {
                 "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
                 "Fission", "Disruptor", "Network", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
                 "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
-                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Homoeostasis", "Vorpal",
+                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Homeostasis", "Vorpal",
                 "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Lattice", "Obelisk", "Yggdrasil", "Jargon",
                 "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
                 "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Gloom",
@@ -748,7 +748,7 @@ public class CreateGameService {
                 "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
                 "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Pulsar", "Kinetic", "Chimera",
                 "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
-                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Titration", "Emerald",
+                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
                 "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
                 "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
                 "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Terraform",
@@ -756,7 +756,7 @@ public class CreateGameService {
                 "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
                 "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
                 "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Atomic",
-                "Galactic", "Redshift", "Cerebral", "Fungi", "Cronus", "Dendrite", "Ziggurat", "Vermilion",
+                "Galactic", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
                 "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
                 "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
                 "Parasite", "Synchronisation", "Singularity", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
@@ -764,7 +764,7 @@ public class CreateGameService {
                 "Nitrogen", "Odyssey", "Bioluminescence", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
                 "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
                 "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
-            // extra words: "Wetware", "Moonstone"
+            // extra words: "Neutrino", "Aurora", "Datastream", "Monolith", "Coriolis", "Lagrange", "Blackbody", "Causality"
             // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;

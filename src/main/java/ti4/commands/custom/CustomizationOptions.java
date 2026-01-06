@@ -44,18 +44,23 @@ class CustomizationOptions extends GameStateSubcommand {
                 .addChoices(onOff));
         addOptions(new OptionData(
                         OptionType.STRING,
+                        Constants.BOT_ALL_REACTS,
+                        "Turn ON or OFF the bot leaving your faction, colour and strategy card react on messages")
+                .addChoices(onOff));
+        addOptions(new OptionData(
+                        OptionType.STRING,
                         Constants.BOT_FACTION_REACTS,
-                        "Turn ON or OFF the bot leaving your faction react on msgs")
+                        "Turn ON or OFF the bot leaving your faction react on messages")
                 .addChoices(onOff));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.BOT_COLOR_REACTS,
-                        "Turn ON or OFF the bot leaving your color react on msgs")
+                        "Turn ON or OFF the bot leaving your color react on messages")
                 .addChoices(onOff));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.BOT_STRAT_REACTS,
-                        "Turn ON or OFF the bot leaving your strategy card react on msgs")
+                        "Turn ON or OFF the bot leaving your strategy card react on messages")
                 .addChoices(onOff));
         addOptions(new OptionData(
                 OptionType.STRING,
@@ -102,51 +107,40 @@ class CustomizationOptions extends GameStateSubcommand {
 
         OptionMapping stratPings = event.getOption(Constants.STRAT_PINGS);
         if (stratPings != null) {
-            String stratP = stratPings.getAsString();
-            if ("ON".equalsIgnoreCase(stratP)) {
-                game.setStratPings(true);
-            } else if ("OFF".equalsIgnoreCase(stratP)) {
-                game.setStratPings(false);
-            }
+            game.setStratPings("ON".equalsIgnoreCase(stratPings.getAsString()));
         }
 
         OptionMapping ccNPlastic = event.getOption(Constants.CC_N_PLASTIC_LIMIT);
         if (ccNPlastic != null) {
-            String ccNP = ccNPlastic.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setCcNPlasticLimit(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setCcNPlasticLimit(false);
+            game.setCcNPlasticLimit("ON".equalsIgnoreCase(ccNPlastic.getAsString()));
+        }
+
+        OptionMapping allReacts = event.getOption(Constants.BOT_ALL_REACTS);
+        if (allReacts != null) {
+            String val = allReacts.getAsString();
+            if ("ON".equalsIgnoreCase(val)) {
+                game.setBotFactionReacts(true);
+                game.setBotColorReacts(true);
+                game.setBotStratReacts(true);
+            } else {
+                game.setBotFactionReacts(false);
+                game.setBotColorReacts(false);
+                game.setBotStratReacts(false);
             }
         }
         OptionMapping factReacts = event.getOption(Constants.BOT_FACTION_REACTS);
         if (factReacts != null) {
-            String ccNP = factReacts.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotFactionReacts(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotFactionReacts(false);
-            }
+            game.setBotFactionReacts("ON".equalsIgnoreCase(factReacts.getAsString()));
         }
         OptionMapping colorReacts = event.getOption(Constants.BOT_COLOR_REACTS);
         if (colorReacts != null) {
-            String ccNP = colorReacts.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotColorReacts(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotColorReacts(false);
-            }
+            game.setBotColorReacts("ON".equalsIgnoreCase(colorReacts.getAsString()));
         }
-
         OptionMapping stratReacts = event.getOption(Constants.BOT_STRAT_REACTS);
         if (stratReacts != null) {
-            String ccNP = stratReacts.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotStratReacts(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotStratReacts(false);
-            }
+            game.setBotStratReacts("ON".equalsIgnoreCase(stratReacts.getAsString()));
         }
+
         OptionMapping spin = event.getOption(Constants.SPIN_MODE);
         if (spin != null) {
             String ccNP = spin.getAsString();

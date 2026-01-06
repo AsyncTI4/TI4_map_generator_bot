@@ -701,7 +701,8 @@ public class Tile {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
-            if (game.getTileByPosition(position_) == null) {
+            Tile tile = game.getTileByPosition(position_);
+            if (tile == null || "silver_flame".equals(tile.getTileID())) {
                 return true;
             }
         }
