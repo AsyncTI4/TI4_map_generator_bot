@@ -874,13 +874,19 @@ public class Player extends PlayerProperties {
             return Collections.emptyList();
         }
         List<String> cards = new ArrayList<>(actionCards.keySet());
-        if (hasPlanet("garbozia")) {
-            game.getDiscardACStatus().entrySet().stream()
-                    .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
-                    .map(Entry::getKey)
-                    .forEach(cards::add);
-        }
+        cards.addAll(getGarboziableActionCards());
         return cards;
+    }
+
+    @NotNull
+    public List<String> getGarboziableActionCards() {
+        if (!hasPlanet("garbozia")) {
+            return Collections.emptyList();
+        }
+        return game.getDiscardACStatus().entrySet().stream()
+                .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
+                .map(Entry::getKey)
+                .toList();
     }
 
     public Map<String, Integer> getEvents() {
