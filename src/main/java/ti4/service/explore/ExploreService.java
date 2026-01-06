@@ -492,6 +492,8 @@ public class ExploreService {
                         }
                     }
 
+                    String groundForces = "";
+                    String structures = "";
                     if (attachment.equals(Constants.DMZ)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
@@ -504,6 +506,9 @@ public class ExploreService {
                             if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
                                     .contains(key.getUnitType())) {
                                 spaceUnitHolder.addUnitsWithStates(key, removed);
+                                groundForces += key.unitEmoji().emojiString().repeat(amt);
+                            } else {
+                                structures += key.unitEmoji().emojiString().repeat(amt);
                             }
                         }
                     }
@@ -513,6 +518,15 @@ public class ExploreService {
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
                     message = "Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
+                    if (!groundForces.isEmpty()) {
+                        message += "\n" + player.getRepresentationUnfogged() + ", your " + groundForces
+                                + " have been yote into space" + (structures.isEmpty() ? "." : "");
+                    }
+                    if (!structures.isEmpty()) {
+                        message +=
+                                (groundForces.isEmpty() ? "\n" + player.getRepresentationUnfogged() + ", " : ", and ")
+                                        + "your " + structures + " have been yote into the shadow realm.";
+                    }
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                     ButtonHelper.checkFleetAndCapacity(player, game, tile);
                 }
