@@ -42,22 +42,10 @@ public class SabotageService {
             "tf-shatter2");
 
     public static boolean couldFeasiblySabotage(Player player, Game game) {
-        if (player.isNpc()) {
-            return false;
-        }
+        if (player.isNpc()) return false;
 
         if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game) || couldUseTriune(player, game)) {
             return true;
-        }
-
-        if (player.getAcCount() == 0) {
-            return false;
-        }
-
-        if (allSabotagesAreDiscarded(game, player)
-                || isAcd2AndAllSabotagesAreDiscarded(game, player)
-                || isTwilightFallAndAllShattersAreDiscarded(game, player)) {
-            return false;
         }
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -65,10 +53,24 @@ public class SabotageService {
             return false;
         }
 
-        return !player.isPassed()
-                || game.getActivePlayer() == null
-                || (!game.getActivePlayer().hasTech("tp")
-                        && !game.getActivePlayer().hasTech("tf-crafty"));
+        if (isAffectedByTransparasteel(player, game)) return false;
+
+        if (hasGarboziaSabotage(player)) return true;
+
+        return player.getAcCount() == 0
+                || allSabotagesAreDiscarded(game, player)
+                || isAcd2AndAllSabotagesAreDiscarded(game, player)
+                || isTwilightFallAndAllShattersAreDiscarded(game, player);
+    }
+
+    private static boolean isAffectedByTransparasteel(Player player, Game game) {
+        if (!player.isPassed() || game.getActivePlayer() == null) return false;
+
+        return game.getActivePlayer().hasTech("tp") || game.getActivePlayer().hasTech("tf-crafty");
+    }
+
+    private static boolean hasGarboziaSabotage(Player player) {
+        return player.getPlayableActionCards().stream().anyMatch(actionCard -> actionCard.contains("sabotage"));
     }
 
     public static boolean couldUseInstinctTraining(Player player) {

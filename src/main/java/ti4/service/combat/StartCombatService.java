@@ -402,7 +402,7 @@ public class StartCombatService {
         // General Space Combat
         sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
         if (!game.isFowMode()) {
-            if (player1.getAcCount() == 0) {
+            if (player1.getPlayableActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player2.getRepresentation()
@@ -414,7 +414,7 @@ public class StartCombatService {
                         player2.getRepresentation()
                                 + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
-            if (player2.getAcCount() == 0) {
+            if (player2.getPlayableActionCards().isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player1.getRepresentation()
