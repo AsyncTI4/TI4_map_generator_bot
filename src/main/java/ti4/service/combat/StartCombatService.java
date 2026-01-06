@@ -885,7 +885,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg
-                                + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade or command token.",
+                                + ", a reminder that if you win this combat, you may resolve _N'orr Supremacy_ for a unit upgrade technology or a command token.",
                         buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {

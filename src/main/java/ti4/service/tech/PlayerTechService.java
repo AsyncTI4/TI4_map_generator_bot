@@ -755,7 +755,7 @@ public class PlayerTechService {
                 game.setStoredValue(player.getFaction() + "singularityTechs", prev + techID);
                 if (player.getSingularityTechs().size() > player.getSingularities()) {
                     String msg = player.getRepresentation()
-                            + " you have more copied techs than you have singularities, please remove a copied tech with the buttons";
+                            + " you have more copied abilities than you have Singularities. Please remove a copied ability with these buttons.";
                     List<Button> buttons = new ArrayList<>();
                     for (String tech : player.getSingularityTechs()) {
                         buttons.add(Buttons.gray(

@@ -172,11 +172,11 @@ public class EndTurnService {
                 game.removeStoredValue("Puppets On A String");
                 ActionCardHelper.playAC(event, game, puppeteer, "puppetsonastring", game.getMainGameChannel());
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.red("startScoring", "Start Scoring"));
-                buttons.add(Buttons.gray("deleteButtons", "Was not sabod"));
+                buttons.add(Buttons.red("startScoring", "Puppets On A String Sabo'd - Start Status Phase"));
+                buttons.add(Buttons.gray("deleteButtons", "Was Not Sabo'd"));
                 MessageHelper.sendMessageToChannel(
                         puppeteer.getCorrectChannel(),
-                        "Use these buttons to start scoring if puppets is sabod",
+                        "If _Puppets On A String_ is sabo'd, please use these buttons to start the status phase.",
                         buttons);
                 return;
             }
@@ -186,7 +186,7 @@ public class EndTurnService {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
-                        "You were the last player to pass, and so you can score _Prove Endurance_.");
+                        "You were the last player to pass, and so you may score _Prove Endurance_.");
             }
             CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {

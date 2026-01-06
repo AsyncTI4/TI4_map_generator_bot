@@ -2080,7 +2080,7 @@ public class AgendaHelper {
                     if (winningR != null && specificVote.contains("Sanction")) {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
                         for (Player p2 : loseFleetPlayers) {
-                            MahactTokenService.removeFleetCC(game, p2, "due to voting the same way as a _Sanction_.");
+                            MahactTokenService.removeFleetCC(game, p2, "due to voting the same way as a _Sanction_");
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {

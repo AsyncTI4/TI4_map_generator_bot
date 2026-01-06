@@ -64,7 +64,7 @@ public class GameStatisticsFilterer {
         filters.add(
                 new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
         filters.add(new OptionData(
-                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if the fracture was in play"));
+                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if The Fracture was in play"));
         return filters;
     }
 

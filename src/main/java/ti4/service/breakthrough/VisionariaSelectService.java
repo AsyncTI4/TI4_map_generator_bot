@@ -83,7 +83,7 @@ public class VisionariaSelectService {
 
     @ButtonHandler("declineVisionaria")
     private void declineVisionaria(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = "declined to use Visionaria Select.";
+        String msg = "declined to use _Visionaria Select_.";
         respondToVisionaria(event, game, player);
         ReactionService.addReaction(event, player.getGame(), player, msg);
     }

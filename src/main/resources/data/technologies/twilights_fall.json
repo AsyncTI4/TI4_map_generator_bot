@@ -883,7 +883,7 @@
         "types": [
             "WARFARE"
         ],
-        "text": "When you gain this card, put the Fracture into play.\nApply +1 to the Move value to each of your ships that starts its movement in The Fracture.\nApply +2 to the result of each of your units' combat rolls in The Fracture.",
+        "text": "When you gain this card, put The Fracture into play.\nApply +1 to the Move value to each of your ships that starts its movement in The Fracture.\nApply +2 to the result of each of your units' combat rolls in The Fracture.",
         "source": "twilights_fall",
         "faction": "obsidian"
     }
