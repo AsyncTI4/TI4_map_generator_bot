@@ -526,6 +526,13 @@ public class ExploreService {
                         message +=
                                 (groundForces.isEmpty() ? "\n" + player.getRepresentationUnfogged() + ", " : ", and ")
                                         + "your " + structures + " have been yote into the shadow realm.";
+                        if (!game.isFowMode()) {
+                            DisasterWatchHelper.sendMessageInDisasterWatch(
+                                    game,
+                                    "\\> \"" + structures + "⁉️" + UnitEmojis.Blank
+                                            + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
+                                            + player.getRepresentation() + ", in " + game.getName() + ".");
+                        }
                     }
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                     ButtonHelper.checkFleetAndCapacity(player, game, tile);
