@@ -100,8 +100,8 @@
         "source": "absol"
     },
     {
-        "alias": "absol_disarmamament",
-        "name": "Compensated Disarmamanet",
+        "alias": "absol_disarmament",
+        "name": "Compensated Disarmament",
         "type": "Directive",
         "target": "Elect non-home Planet",
         "text1": "Remove each ground force on the elected planet; the player who controls that planet gains 1 trade good for each infantry removed and 2 trade goods for each mech removed.\nThe other player who cast the most votes for the elected planet gives the owner of the elected planet 1 promissory note from their hand.",
