@@ -131,7 +131,7 @@ public class SabotageService {
     }
 
     public static String noSaboReason(Game game, Player player) {
-        if (allShattersAreDiscarded(game, player)) {
+        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) {
             return "All _Shatter_ cards are in the discard.";
         }
 
