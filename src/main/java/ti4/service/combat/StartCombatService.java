@@ -411,7 +411,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(
                         threadChannel,
                         player1.getRepresentation()
-                                + " your opponent has no action cards to play, so if they have no applicable technologies/abilities/retreats you can roll.");
+                                + ", your opponent has no action cards to play, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             String ms2 = StartTurnService.getMissedSCFollowsText(game, player1);
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
