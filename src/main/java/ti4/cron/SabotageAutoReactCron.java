@@ -59,7 +59,7 @@ public class SabotageAutoReactCron {
         }
 
         for (Player player : game.getRealPlayers()) {
-            if (!playerShouldRandomlyReact(player) || SabotageService.canSabotage(player, game)) {
+            if (!playerShouldRandomlyReact(player, game)) {
                 continue;
             }
 
@@ -72,17 +72,16 @@ public class SabotageAutoReactCron {
         }
     }
 
-    private static boolean playerShouldRandomlyReact(Player player) {
-        if (player.isAFK() && player.getAcCount() != 0) {
+    private static boolean playerShouldRandomlyReact(Player player, Game game) {
+        if (player.isAFK() || player.getAutoSaboPassMedian() == 0) {
             return false;
         }
-        return shouldRandomlyReact(player);
-    }
 
-    private static boolean shouldRandomlyReact(Player player) {
-        if (player.getAutoSaboPassMedian() == 0) {
+        boolean canSabotage = SabotageService.canSabotage(player, game);
+        if (canSabotage) {
             return false;
         }
+
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;
         int rollResult = ThreadLocalRandom.current().nextInt(1, rollMax + 1);
         return rollResult == rollMax;
