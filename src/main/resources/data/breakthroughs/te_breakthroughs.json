@@ -182,6 +182,7 @@
         "alias": "nekrobt",
         "name": "Valefar Assimilator Z",
         "shortName": "Valefar Z\nAssimilator",
+        "shrinkName": true,
         "faction": "nekro",
         "synergy": [
             "NONE"
@@ -253,6 +254,7 @@
     {
         "alias": "bastionbt",
         "name": "The Icon",
+        "shortName": "The\nIcon",
         "faction": "bastion",
         "synergy": [
             "CYBERNETIC",
@@ -288,6 +290,7 @@
     {
         "alias": "firmamentbt",
         "name": "The Sowing",
+        "shortName": "The\nSowing",
         "faction": "firmament",
         "synergy": [
             "BIOTIC",

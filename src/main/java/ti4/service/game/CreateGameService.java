@@ -764,7 +764,7 @@ public class CreateGameService {
                 "Nitrogen", "Odyssey", "Bioluminescence", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
                 "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
                 "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
-            // extra words: "Aurora", "Datastream", "Monolith", "Coriolis", "Lagrange", "Causality"
+            // extra words: "Aurora", "Datastream", "Monolith", "Coriolis", "Lagrange", "Causality", "Wintermute"
             // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;

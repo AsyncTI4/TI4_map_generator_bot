@@ -22,6 +22,7 @@
     {
         "alias": "tf-bio",
         "name": "Bioplasmosis",
+        "shortName": "Bio-\nplasmosis",
         "types": [
             "BIOTIC"
         ],
@@ -52,6 +53,8 @@
     {
         "alias": "wavelength",
         "name": "Wavelength",
+        "shortName": "Wave-\nlength",
+        "initials": "W#L",
         "types": [
             "NONE"
         ],
@@ -61,6 +64,8 @@
     {
         "alias": "antimatter",
         "name": "Antimatter",
+        "shortName": "Anti-\nmatter",
+        "initials": "A#M",
         "types": [
             "NONE"
         ],
@@ -70,6 +75,7 @@
     {
         "alias": "tf-nes",
         "name": "Non-Euclidean Shielding",
+        "shortName": "Non-Euclid.\nShielding",
         "types": [
             "WARFARE"
         ],
@@ -140,6 +146,7 @@
     {
         "alias": "tf-guildships",
         "name": "Guild Ships",
+        "shortName": "Guild\nShips",
         "types": [
             "PROPULSION"
         ],
@@ -160,6 +167,8 @@
     {
         "alias": "tf-qdn",
         "name": "Quantum Datahub Node",
+        "shrinkName": true,
+        "shortName": "Quantum\nDatahub Nd",
         "types": [
             "CYBERNETIC"
         ],
@@ -200,6 +209,8 @@
     {
         "alias": "tf-quantumentanglement",
         "name": "Quantum Entanglement",
+        "shortName": "Quantum\nEnt'glem'nt",
+        "shrinkName": true,
         "types": [
             "PROPULSION"
         ],
@@ -210,6 +221,7 @@
     {
         "alias": "tf-slipstream",
         "name": "Slipstream",
+        "shortName": "Slip-\nstream",
         "types": [
             "PROPULSION"
         ],
@@ -220,6 +232,7 @@
     {
         "alias": "tf-ds",
         "name": "Dimensional Splicer",
+        "shrinkName": true,
         "types": [
             "WARFARE"
         ],
@@ -230,6 +243,7 @@
     {
         "alias": "tf-assimilate",
         "name": "Assimilate",
+        "shortName": "Assim\n-ilate",
         "types": [
             "CYBERNETIC"
         ],
@@ -250,6 +264,7 @@
     {
         "alias": "tf-inheritancesystems",
         "name": "Inheritance Systems",
+        "shrinkName": true,
         "types": [
             "CYBERNETIC"
         ],
@@ -310,6 +325,7 @@
     {
         "alias": "tf-ng",
         "name": "Neuroglaive",
+        "shortName": "Neuro-\nglaive",
         "types": [
             "WARFARE"
         ],
@@ -320,6 +336,7 @@
     {
         "alias": "tf-singularityx",
         "name": "Singularity X",
+        "shortName": "Singular.\nX",
         "types": [
             "BIOTIC"
         ],
@@ -330,6 +347,7 @@
     {
         "alias": "tf-singularityy",
         "name": "Singularity Y",
+        "shortName": "Singular.\nY",
         "types": [
             "BIOTIC"
         ],
@@ -340,6 +358,7 @@
     {
         "alias": "tf-singularityz",
         "name": "Singularity Z",
+        "shortName": "Singular.\nZ",
         "types": [
             "BIOTIC"
         ],
@@ -350,6 +369,7 @@
     {
         "alias": "tf-unrelenting",
         "name": "Unrelenting",
+        "shortName": "Unre-\nlenting",
         "types": [
             "WARFARE"
         ],
@@ -370,6 +390,8 @@
     {
         "alias": "tf-vpw",
         "name": "Valkyrie Particle Weave",
+        "shortName": "Valkyrie\nPtcl. Weave",
+        "shrinkName": true,
         "types": [
             "WARFARE"
         ],
@@ -380,6 +402,7 @@
     {
         "alias": "tf-scc",
         "name": "Spatial Conduit Cylinder",
+        "shortName": "Spatial\nCond't Cyl.",
         "types": [
             "PROPULSION"
         ],
@@ -409,6 +432,7 @@
     },
     {
         "alias": "tf-reclamation",
+        "shortName": "Recla-\nmation",
         "name": "Reclamation",
         "types": [
             "CYBERNETIC"
@@ -420,6 +444,8 @@
     {
         "alias": "tf-htp",
         "name": "Hegemonic Trade Policy",
+        "shrinkName": true,
+        "shortName": "Hegemonic Trade Plcy",
         "types": [
             "CYBERNETIC"
         ],
@@ -450,6 +476,8 @@
     {
         "alias": "tf-nf",
         "name": "Nullification Field",
+        "shrinkName": true,
+        "shortName": "Nullificat'n\nField",
         "types": [
             "CYBERNETIC"
         ],
@@ -470,6 +498,7 @@
     {
         "alias": "tf-indoctrination",
         "name": "Indoctrination",
+        "shortName": "Indoctri\n-nation",
         "types": [
             "BIOTIC"
         ],
@@ -490,6 +519,7 @@
     {
         "alias": "tf-yinascendant",
         "name": "Yin Ascendant",
+        "shrinkName": true,
         "types": [
             "BIOTIC"
         ],
@@ -550,6 +580,8 @@
     {
         "alias": "tf-tcs",
         "name": "Temporal Command Suite",
+        "shrinkName": true,
+        "shortName": "Temporal\nC'mm'nd St.",
         "types": [
             "CYBERNETIC"
         ],
@@ -560,6 +592,7 @@
     {
         "alias": "tf-terraform",
         "name": "Terraform",
+        "shortName": "Terra-\nform",
         "types": [
             "PROPULSION"
         ],
@@ -570,6 +603,7 @@
     {
         "alias": "tf-abundance",
         "name": "Abundance",
+        "shortName": "Abun-\ndance",
         "types": [
             "CYBERNETIC"
         ],
@@ -590,6 +624,7 @@
     {
         "alias": "tf-supercharge",
         "name": "Supercharge",
+        "shortName": "Super-\ncharge",
         "types": [
             "WARFARE"
         ],
@@ -610,6 +645,7 @@
     {
         "alias": "tf-fabrication",
         "name": "Fabrication",
+        "shortName": "Fabri-\ncation",
         "types": [
             "CYBERNETIC"
         ],
@@ -630,6 +666,7 @@
     {
         "alias": "tf-amalgamation",
         "name": "Amalgamation",
+        "shortName": "Amalga\n-mation",
         "types": [
             "WARFARE"
         ],
@@ -640,6 +677,7 @@
     {
         "alias": "tf-dimensionaltear",
         "name": "Dimensional Tear",
+        "shrinkName": true,
         "types": [
             "PROPULSION"
         ],
@@ -660,6 +698,7 @@
     {
         "alias": "tf-ahl",
         "name": "Aerie Hololattice",
+        "shortName": "Aerie Holo\n-lattice",
         "types": [
             "CYBERNETIC"
         ],
@@ -680,6 +719,7 @@
     {
         "alias": "tf-as",
         "name": "Aetherstream",
+        "shortName": "Aether-\nstream",
         "types": [
             "PROPULSION"
         ],
@@ -700,6 +740,7 @@
     {
         "alias": "tf-overwatch",
         "name": "Overwatch",
+        "shortName": "Over-\nwatch",
         "types": [
             "WARFARE"
         ],
@@ -720,6 +761,7 @@
     {
         "alias": "tf-proxima",
         "name": "Proxima Targeting VI",
+        "shrinkName": true,
         "types": [
             "WARFARE"
         ],
@@ -730,6 +772,7 @@
     {
         "alias": "tf-biosyntheticsynergy",
         "name": "Bio-Synthetic Synergy",
+        "shortName": "Bio-Synth.\nSynergy",
         "types": [
             "BIOTIC"
         ],
@@ -760,6 +803,7 @@
     {
         "alias": "tf-smotheringpresence",
         "name": "Smothering Presence",
+        "shrinkName": true,
         "types": [
             "BIOTIC"
         ],
@@ -780,6 +824,7 @@
     {
         "alias": "tf-radicaladvancement",
         "name": "Radical Advancement",
+        "shortName": "Radical\nAdv'nc'm'nt",
         "types": [
             "BIOTIC"
         ],
@@ -820,6 +865,7 @@
     {
         "alias": "tf-nanomachines",
         "name": "Nanomachines",
+        "shortName": "Nano-\nmachines",
         "types": [
             "WARFARE"
         ],
@@ -840,6 +886,8 @@
     {
         "alias": "tf-asn",
         "name": "Agency Supply Network",
+        "shortName": "Agency\nSupply Net.",
+        "shrinkName": true,
         "types": [
             "CYBERNETIC"
         ],
@@ -860,6 +908,7 @@
     {
         "alias": "tf-theburningeye",
         "name": "The Burning Eye",
+        "shortName": "Burning\nEye",
         "types": [
             "WARFARE"
         ],
@@ -880,6 +929,7 @@
     {
         "alias": "tf-planesplitter",
         "name": "Planesplitter",
+        "shortName": "Plane-\nsplitter",
         "types": [
             "WARFARE"
         ],

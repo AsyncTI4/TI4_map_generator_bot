@@ -31,6 +31,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
@@ -531,7 +532,7 @@ public class MapGenerator implements AutoCloseable {
             case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
             case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
             case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
-            case "1410728648817770526" -> server = "asyncti_icon_unknown"; // TODO: replace
+            case "1410728648817770526" -> server = "asyncti_icon_shipflag";
             case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
             case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
             // fog of war?
@@ -952,7 +953,12 @@ public class MapGenerator implements AutoCloseable {
         addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
 
-        drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+        drawPAImageScaled(
+                x,
+                y,
+                game.isTwilightsFallMode() ? "cardback_action_tf.jpg" : "cardback_action.jpg",
+                cardWidth,
+                cardHeight);
         DrawingUtil.superDrawString(
                 graphics,
                 Integer.toString(game.getActionCards().size()),
@@ -1046,7 +1052,8 @@ public class MapGenerator implements AutoCloseable {
         addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
 
-        drawPAImageScaled(x, y, "cardback_agenda.png", cardWidth, cardHeight);
+        drawPAImageScaled(
+                x, y, game.isTwilightsFallMode() ? "cardback_edict.jpg" : "cardback_agenda.png", cardWidth, cardHeight);
         DrawingUtil.superDrawString(
                 graphics,
                 Integer.toString(game.getAgendaDeckSize()),
@@ -1060,6 +1067,82 @@ public class MapGenerator implements AutoCloseable {
         overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
         addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
+
+        if (game.isTwilightsFallMode()) {
+            int cardCount, fullDeck;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "ability", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("techs_tf").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_tf_ability.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Ability Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "units", 100, true)
+                    .size();
+            fullDeck = Mapper.getUnits().size();
+            drawPAImageScaled(x, y, "cardback_unit_upgrade.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Unit Upgrade Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "genome", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("tf_genome").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_genome.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Genome Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "paradigm", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("tf_paradigm").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_paradigm.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Paradigm Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+        }
 
         return x;
     }

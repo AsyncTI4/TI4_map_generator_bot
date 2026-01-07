@@ -23,9 +23,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String type;
     private String faction;
     private String name;
-    private String tfName;
     private String shortName;
     private Boolean shrinkName;
+    private String tfName;
+    private String tfShortName;
+    private Boolean tfShrinkName;
     private String title;
     private String tfTitle;
     private String abilityName;
@@ -82,6 +84,14 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             return tfName;
         }
         return name;
+    }
+
+    public String getTFShortName() {
+        return Optional.ofNullable(tfShortName).orElse(getTFNameIfAble());
+    }
+
+    public boolean getTFShrinkName() {
+        return Optional.ofNullable(tfShrinkName).orElse(false);
     }
 
     public String getLeaderPositionAndFaction() {
