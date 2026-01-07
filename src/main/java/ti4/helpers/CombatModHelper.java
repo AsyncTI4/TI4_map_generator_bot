@@ -212,8 +212,7 @@ public class CombatModHelper {
                         new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
             }
         }
-        if (player.getBreakthroughModel() != null) {
-            BreakthroughModel model = player.getBreakthroughModel();
+        for (BreakthroughModel model : player.getBreakthroughModels()) {
             List<CombatModifierModel> relevantMods = combatModifiers.values().stream()
                     .filter(modifier -> modifier.isRelevantTo("breakthrough", model.getAlias()))
                     .toList();
