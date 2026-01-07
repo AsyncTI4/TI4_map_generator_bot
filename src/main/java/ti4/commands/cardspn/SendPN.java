@@ -119,7 +119,7 @@ class SendPN extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(
                         targetPlayer.getCorrectChannel(),
                         targetPlayer.getRepresentationUnfogged() + " you sent 1 debt token to "
-                                + pnOwner.getFactionEmojiOrColor() + " due to their breakthrough ability.");
+                                + pnOwner.getFactionEmojiOrColor() + " due to _Arms Brokerage_.");
             }
         }
 

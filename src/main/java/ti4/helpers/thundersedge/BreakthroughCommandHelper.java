@@ -181,7 +181,7 @@ public class BreakthroughCommandHelper {
                 Planet grove = game.getPlanetsInfo().get("grove");
                 if (grove != null) grove.updateGroveStats(player);
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), "Added the Grove \"planet card\" to your play area.");
+                        player.getCorrectChannel(), "Added the Grove \"planet\" card to your play area.");
             }
             if ("mentakbt".equalsIgnoreCase(bt.getID())) {
                 if (player.hasTech("cr2")) {
@@ -192,7 +192,7 @@ public class BreakthroughCommandHelper {
             if ("celdauribt".equalsIgnoreCase(bt.getID())) {
                 player.addOwnedUnitByID("celdauri_celagrom");
                 String output = player.getRepresentation()
-                        + ", please choose the system in which you wish to place the Celagrom token.";
+                        + ", please choose the system in which you wish to place the _Celagrom_.";
                 List<Button> buttons =
                         Helper.getTileWithShipsPlaceUnitButtons(player, game, "celagrom", "placeOneNDone_skipbuild");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), output, buttons);
@@ -242,9 +242,9 @@ public class BreakthroughCommandHelper {
     public static void serveRollFractureButtons(Game game, Player player, String btID) {
         String id = player.finChecker() + "rollFracture_" + btID;
         Button rollFracture = Buttons.green(id, "Roll For The Fracture", MiscEmojis.RollDice);
-        String message = "It looks like The Fracture isn't in play yet. Use the button to roll for The Fracture!";
-        message += "\n> If you roll a [" + DiceEmojis.d10blue_1 + "] or ";
-        message += "[" + DiceEmojis.d10blue_0 + "], the fracture will appear.";
+        String message = "It looks like The Fracture isn't in play yet. Use the button to roll for The Fracture!"
+                + "\n If you roll a " + DiceEmojis.d10blue_1 + " or a"
+                + DiceEmojis.d10blue_0 + ", The Fracture will appear.";
         if ("cabalbt".equals(btID)) {
             rollFracture = rollFracture.withLabel("Spawn Fracture").withEmoji(FactionEmojis.Cabal.asEmoji());
             message =
@@ -334,8 +334,8 @@ public class BreakthroughCommandHelper {
         } else {
             int initial = player.getBreakthroughTGs(btID);
             player.getBreakthroughTGs().put(btID, newTgs);
-            String msg = player.getRepresentation() + " set the trade goods on their breakthrough to " + newTgs + ". ("
-                    + initial + "->" + newTgs + ")";
+            String msg = player.getRepresentation() + " set the trade goods on their breakthrough to " + newTgs + " ("
+                    + initial + "->" + newTgs + ").";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }

@@ -744,9 +744,9 @@ public class StartPhaseService {
             if (!player.ownsPromissoryNote("malevolency") && "malevolency".equalsIgnoreCase(pn)) {
                 boolean mahactMalev = !player.getMahactCC().isEmpty();
                 if (mahactMalev) {
-                    String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
-                    malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
-                    malevMsg += " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";
+                    String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal"
+                            + " amount of tokens now, and then you will have the option to lose your own or another"
+                            + " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), malevMsg);
                 } else {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + ", a reminder";

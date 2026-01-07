@@ -50,7 +50,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing Leadership. You do not have to declare what you are researching until after all players have chosen not to cancel this ability.]",
-        "flavorText": "Kyver stared mathis in the eye, unblinking. For a time, neither made a move. The greens and browns of Kyver's eyes were impassive. They betrayed nothing of his intent. Nothing of his past or his future. They were but windows to the wild, unforgiving jungles of Retillion.",
+        "flavorText": "Kyver stared Mathis in the eye, unblinking. For a time, neither made a move. The greens and browns of Kyver's eyes were impassive. They betrayed nothing of his intent. Nothing of his past or his future. They were but windows to the wild, unforgiving jungles of Retillion.",
         "source": "thunders_edge"
     },
     {
@@ -176,7 +176,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Perform the primary ability of a readied or unchosen strategy card. [Note: cannot allow others to refresh off of trade, as that would be them resolving the secondary, which is not enabled by this card]",
-        "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luch, he'd be dead or demoted within a day or two.",
+        "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luck, he'd be dead or demoted within a day or two.",
         "source": "thunders_edge"
     }
 ]

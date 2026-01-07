@@ -264,7 +264,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("loseAFleetCultural")
     private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String mahactReason = "due to failing to reach an agreement on _Exchange Program_.";
+        String mahactReason = "due to failing to reach an agreement on _Exchange Program_";
         MahactTokenService.removeFleetCC(game, player, mahactReason);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }

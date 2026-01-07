@@ -252,7 +252,7 @@ public class UnfiledButtonHandlers {
         }
         if ("WildGalaxy".equalsIgnoreCase(mode)) {
             game.setWildWildGalaxyMode(enable);
-            message += "Wild Wild Galaxy Mode. Nothing more needs to be done.";
+            message += "Wild, Wild Galaxy Mode. Nothing more needs to be done.";
         }
         if ("WeirdWormholes".equalsIgnoreCase(mode)) {
             game.setWeirdWormholesMode(enable);
@@ -1167,7 +1167,7 @@ public class UnfiledButtonHandlers {
             message += "_Instinct Training_! A command token was removed from strategy pool.";
             if (player.hasTech(AliasHandler.resolveTech("Instinct Training"))) {
                 if (game.isTwilightsFallMode()) {
-                    message += " (Twilights Fall mode: no tech exhaustion)";
+                    message += " (the Twilight's Fall version of _Instinct Training_ does not exhaust).";
                 } else {
                     message += " The technology is now exhausted.";
                     player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
@@ -1181,7 +1181,8 @@ public class UnfiledButtonHandlers {
                 sendReact = false;
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        "You clicked the _Instinct Training_ button but did not have the technology.");
+                        "You clicked the _Instinct Training_ button but you do not have the "
+                                + (game.isTwilightsFallMode() ? "ability" : "technology") + ".");
             }
         } else if ("ac".equalsIgnoreCase(type)) {
             message += "a _Sabotage_!";

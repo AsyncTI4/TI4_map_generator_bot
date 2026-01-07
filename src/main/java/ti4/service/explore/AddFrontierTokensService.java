@@ -20,6 +20,7 @@ public class AddFrontierTokensService {
     public static void addFrontierTokens(GenericInteractionCreateEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {
+            if ("silver_flame".equalsIgnoreCase(tile.getTileID())) continue;
             if (tile.getPlanetUnitHolders().isEmpty()
                     && Mapper.getFrontierTileIds().contains(tile.getTileID())
                     && !game.isBaseGameMode()) {

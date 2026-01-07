@@ -442,8 +442,8 @@ public class ButtonHelper {
     @ButtonHandler("pingGame")
     public static void pingGame(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
         Helper.fixGameChannelPermissions(game.getActionsChannel().getGuild(), game);
-        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Ping Game: " + game.getPing());
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game");
+        MessageHelper.sendMessageToChannel(game.getBotMapUpdatesThread(), "Pinging game" + game.getPing() + ".");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
     }
 
     @ButtonHandler("statusInfRevival_")
@@ -1496,7 +1496,7 @@ public class ButtonHelper {
         if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active breaches while Crimson flagship is in an active breach.");
+                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the _Quietus_ (the Rebellion flagship) is in an active Breach.");
         }
 
         if (!game.isFowMode()) {
@@ -3781,6 +3781,8 @@ public class ButtonHelper {
         int numFighter2sFleet = 0;
         boolean capacityViolated = false;
         boolean fleetSupplyViolated = false;
+        String tooManyDocks = "";
+        String tooManyPDS = "";
         int fleetCap = (player.getFleetCC()
                         + armadaValue
                         + player.getMahactCC().size()
@@ -3799,6 +3801,7 @@ public class ButtonHelper {
         }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
+            int numDocks = 0, numPDS = 0;
             for (Map.Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
                 UnitModel unit = entry.getKey();
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
@@ -3814,6 +3817,7 @@ public class ButtonHelper {
                 // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())
                         && !"space".equalsIgnoreCase(capChecker.getName())) {
+                    numDocks += entry.getValue();
                     if (player.ownsUnit("cabal_spacedock")) {
                         fightersIgnored += 6;
                     } else if (player.ownsUnit("cabal_spacedock2")) {
@@ -3833,6 +3837,9 @@ public class ButtonHelper {
                     } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
                         fightersIgnored += 3;
                     }
+                }
+                if ("pds".equalsIgnoreCase(unit.getBaseType()) && !"space".equalsIgnoreCase(capChecker.getName())) {
+                    numPDS += entry.getValue();
                 }
             }
             if (player.getPlanets().contains(capChecker.getName())) {
@@ -3871,6 +3878,12 @@ public class ButtonHelper {
             }
             if (capChecker.getUnitCount(UnitType.PlenaryOrbital, player.getColor()) > 0) {
                 fightersIgnored += 8;
+            }
+            if ((capChecker instanceof Planet p) && numDocks > 1) {
+                tooManyDocks = p.getRepresentation(game);
+            }
+            if ((capChecker instanceof Planet p) && numPDS > 2 && !isLawInPlay(game, "defense_act")) {
+                tooManyPDS = p.getRepresentation(game);
             }
         }
         // System.out.println(fightersIgnored);
@@ -3973,7 +3986,7 @@ public class ButtonHelper {
                 }
             }
         }
-        String message = player.getRepresentationUnfogged();
+        String message = "";
         boolean structuresViolated = false;
 
         if (spaceHolder.getUnitCount(UnitType.Spacedock, player) > 0) {
@@ -3994,11 +4007,13 @@ public class ButtonHelper {
             }
         }
         if (structuresViolated) {
-            message += ", you have a floating structure in tile " + tile.getRepresentation()
-                    + ". You can place the structure on the ground using the modify units button (present in your cards info), and remove the floating structure using the same button. ";
+            message += player.getRepresentationUnfogged() + ", you have a floating structure in tile "
+                    + tile.getRepresentation()
+                    + ". You can place the structure on the ground using the modify units button (present in your cards info), and remove the floating structure using the same button.\n";
         }
         if (fleetSupplyViolated) {
-            message += ", you are violating fleet pool limits in the system " + tile.getRepresentation()
+            message += player.getRepresentationUnfogged() + ", you are violating fleet pool limits in the system "
+                    + tile.getRepresentation()
                     + ". Specifically, you have "
                     + (player.getFleetCC() + player.getMahactCC().size())
                     + " command tokens in your fleet pool,"
@@ -4011,17 +4026,31 @@ public class ButtonHelper {
                             : "")
                     + " and you currently are filling "
                     + (numFighter2sFleet + numOfCapitalShips + 1) / 2
-                    + " of that. ";
+                    + " of that.\n";
         }
         if (capacityViolated) {
-            message += ", you are violating carrying capacity in tile " + tile.getRepresentation()
+            message += player.getRepresentationUnfogged() + ", you are violating carrying capacity in tile "
+                    + tile.getRepresentation()
                     + ". Specifically, you have " + capacity + " capacity, and you are trying to carry "
                     + (numInfNFightersNMechs - numFighter2s) + " thing"
-                    + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
+                    + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + ".\n";
         }
+
+        if (!tooManyDocks.isEmpty()) {
+            message +=
+                    player.getRepresentationUnfogged() + ", you have too many space docks on " + tooManyDocks + ".\n";
+        }
+        if (!tooManyPDS.isEmpty()) {
+            message += player.getRepresentationUnfogged() + ", you have too many PDS on " + tooManyPDS + ".\n";
+        }
+
         if (issuePing) {
             if (!game.getStoredValue("violatedSystems").contains(tile.getPosition())) {
-                if (capacityViolated || fleetSupplyViolated || structuresViolated) {
+                if (capacityViolated
+                        || fleetSupplyViolated
+                        || structuresViolated
+                        || !tooManyDocks.isEmpty()
+                        || !tooManyPDS.isEmpty()) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.blue(
                             "getDamageButtons_" + tile.getPosition() + "_remove",
@@ -4191,7 +4220,8 @@ public class ButtonHelper {
         }
 
         if (player.hasReadyBreakthrough("veldyrbt")) {
-            passButtons.add(Buttons.green(finChecker + "veldyrBTExplore", "Explore DET at Home", FactionEmojis.veldyr));
+            passButtons.add(Buttons.green(
+                    finChecker + "veldyrBTExplore", "Explore Frontier Deck At Home", FactionEmojis.veldyr));
         }
 
         passButtons.addAll(getEndOfTurnAbilities(player, game));
@@ -4204,7 +4234,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " is using their breakthrough to explore the frontier deck in their home system.");
+                        + " is using _Aurora Research Base_ to explore the frontier deck in their home system.");
         Tile tile = game.getTileByPosition(pos);
         ExploreService.expFront(event, tile, game, player, true);
         deleteButtonAndDeleteMessageIfEmpty(event);
@@ -4464,12 +4494,13 @@ public class ButtonHelper {
         if ("unknown".equalsIgnoreCase(newTileID)) {
             DiceHelper.Die d1 = new DiceHelper.Die(5);
 
-            String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
+            String message = player.getRepresentation() + " rolled a " + d1.getResult() + " and will thus place a ";
             if (d1.getResult() > 4 || redTilesToPullFrom.isEmpty()) {
-                message += "blue backed tile.";
+                message += "blue backed tile";
                 if (d1.getResult() < 5) {
-                    message += " (All red backed tiles were already placed)";
+                    message += " (all red backed tiles were already placed)";
                 }
+                message += ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                         .filter(tile -> tile.getTierList().isBlue())
@@ -4538,7 +4569,11 @@ public class ButtonHelper {
 
         for (String pos2 : directlyAdjacentTiles) {
             Tile tile = game.getTileByPosition(pos2);
-            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos) && !usedPos.contains(pos2)) {
+            if (tile != null
+                    && tile.isEdgeOfBoard(game)
+                    && !pos2.equalsIgnoreCase(pos)
+                    && !usedPos.contains(pos2)
+                    && !"silver_flame".equals(tile.getTileID())) {
                 if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;
                 }
@@ -4549,13 +4584,14 @@ public class ButtonHelper {
                         tile.getRepresentationForButtons(game, player)));
             }
 
-            if (tile == null) {
+            if (tile == null || "silver_flame".equals(tile.getTileID())) {
                 for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
                     Tile tile2 = game.getTileByPosition(pos3);
                     if (tile2 != null
                             && tile2.isEdgeOfBoard(game)
                             && !pos3.equalsIgnoreCase(pos)
-                            && !usedPos.contains(pos3)) {
+                            && !usedPos.contains(pos3)
+                            && !"silver_flame".equals(tile2.getTileID())) {
                         if (game.isAgeOfExplorationMode() && tile2.isHomeSystem(game)) {
                             continue;
                         }
@@ -4584,8 +4620,10 @@ public class ButtonHelper {
         List<String> directlyAdjacentTiles2 = PositionMapper.getAdjacentTilePositions(pos2);
         String inBoth = "";
         for (String pos3 : directlyAdjacentTiles) {
-            if (directlyAdjacentTiles2.contains(pos3) && game.getTileByPosition(pos3) == null) {
+            Tile tile3 = game.getTileByPosition(pos3);
+            if (directlyAdjacentTiles2.contains(pos3) && (tile3 == null || "silver_flame".equals(tile3.getTileID()))) {
                 inBoth = pos3;
+                break;
             }
         }
 
@@ -5485,8 +5523,8 @@ public class ButtonHelper {
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId
                             + "_" + trait + "kolleccbt";
-                    String buttonMessage2 = "Exhaust Kollect BT and explore discard on " + planetRepresentation
-                            + (explorationTraits.size() > 1 ? " as " + trait : "");
+                    String buttonMessage2 = "Exhaust _The Collector's Museum_ and explore discard on "
+                            + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "") + ".";
                     buttons.add(Buttons.gray(buttonId2, buttonMessage2, ExploreEmojis.getTraitEmoji(trait)));
                 }
             }
@@ -5833,14 +5871,14 @@ public class ButtonHelper {
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                         + "_infantry",
-                                "Move Inf from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
+                                "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
                         if (!bioplasmosis) {
                             buttons.add(Buttons.green(
                                     "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                             + "_infantry",
-                                    "Move Inf from Space of " + tile.getPosition() + " to "
+                                    "Move Infantry from Space of " + tile.getPosition() + " To "
                                             + Helper.getPlanetRepresentation(planetName, game)));
                         }
                     }
@@ -7358,7 +7396,7 @@ public class ButtonHelper {
         deleteMessage(event);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                "The bot will probably not know who's turn it should be after you complete this action. Use /player turn_start if necessary to fix this.");
+                "The bot will probably not know who's turn it should be after you complete this action. Use `/player turn_start` if necessary to fix this.");
     }
 
     @ButtonHandler("startScoring")
