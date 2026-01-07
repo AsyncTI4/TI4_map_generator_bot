@@ -10,9 +10,12 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
@@ -57,10 +60,16 @@ class CreateGameButtonHandler {
         for (ManagedGame game : userGames) {
             AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
         }
+        boolean owner = false;
+        if (event.getChannel() instanceof ThreadChannel threadChannel) {
+            if (threadChannel.getOwnerId().equals(member.getId())) {
+                owner = true;
+            }
+        }
 
         int completedAndOngoingAmount =
                 SearchGameHelper.searchGames(member.getUser(), null, false, true, false, true, false, true, true, true);
-        if (completedAndOngoingAmount < 1) {
+        if (completedAndOngoingAmount < 1 && !owner) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "You need to have completed at least one game (or be currently in a game) to create new games via this button. "
@@ -82,7 +91,9 @@ class CreateGameButtonHandler {
             membersOG.add(member);
             MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " joined the game.");
         }
-        event.getMessage().editMessage(generateMemberListMessage(membersOG)).queue();
+        event.getMessage()
+                .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
+                .queue();
     }
 
     @ButtonHandler("editPlayers~MDL")
@@ -109,7 +120,32 @@ class CreateGameButtonHandler {
             membersOG.remove(member);
             MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " was removed from the game.");
         }
-        event.getMessage().editMessage(generateMemberListMessage(membersOG)).queue();
+        event.getMessage()
+                .editMessage(generateMemberListMessage(membersOG, fetchSillyNameFromMessage(event)))
+                .queue();
+    }
+
+    @ModalHandler("addSillyNameModal")
+    public static void addSillyNameModal(ModalInteractionEvent event) {
+        String sillyName = event.getValue("sillyName").getAsString();
+        List<Member> membersOG = fetchMembersFromMessage(event);
+        event.getMessage()
+                .editMessage(generateMemberListMessage(membersOG, sillyName))
+                .queue();
+    }
+
+    @ButtonHandler("addSillyName~MDL")
+    public static void addSillyName(ButtonInteractionEvent event) {
+        String modalID = "addSillyNameModal";
+        String fieldID = "sillyName";
+        TextInput summary = TextInput.create(fieldID, TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Specify a fun game name here")
+                .setValue(CreateGameService.autoGenerateGameName())
+                .build();
+        Modal modal = Modal.create(modalID, "Fun Game Name")
+                .addComponents(Label.of("Edit game name", summary))
+                .build();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("removePlayers~MDL")
@@ -156,7 +192,23 @@ class CreateGameButtonHandler {
         return members;
     }
 
+    public static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
+        String buttonMsg = event.getMessage().getContentRaw();
+        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        return gameSillyName;
+    }
+
+    public static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
+        String buttonMsg = event.getMessage().getContentRaw();
+        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        return gameSillyName;
+    }
+
     public static String generateMemberListMessage(List<Member> members) {
+        return generateMemberListMessage(members, "");
+    }
+
+    public static String generateMemberListMessage(List<Member> members, String gameFunName) {
         StringBuilder memberList = new StringBuilder();
         int x = 1;
         List<User> users = members.stream().map(Member::getUser).toList();
@@ -171,6 +223,11 @@ class CreateGameButtonHandler {
         Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         for (ManagedGame game : userGames) {
             AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+        }
+        if (gameFunName == null || gameFunName.isEmpty()) {
+            memberList.append("## Players Signed Up:\n");
+        } else {
+            memberList.append("## Game Fun Name: " + gameFunName.replace(":", "") + "\n\nPlayers:\n");
         }
         for (Member member : members) {
             memberList.append(x + ". " + member.getUser().getAsMention());
@@ -220,7 +277,9 @@ class CreateGameButtonHandler {
         if (!members.contains(event.getMember())) {
             members.add(event.getMember());
         }
-        event.getMessage().editMessage(generateMemberListMessage(members)).queue();
+        event.getMessage()
+                .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
+                .queue();
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " joined the game.");
     }
 
@@ -228,7 +287,9 @@ class CreateGameButtonHandler {
     public static void leaveGameList(ButtonInteractionEvent event) {
         List<Member> members = fetchMembersFromMessage(event);
         members.remove(event.getMember());
-        event.getMessage().editMessage(generateMemberListMessage(members)).queue();
+        event.getMessage()
+                .editMessage(generateMemberListMessage(members, fetchSillyNameFromMessage(event)))
+                .queue();
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " left the game.");
     }
 
@@ -253,8 +314,12 @@ class CreateGameButtonHandler {
         }
 
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = CreateGameService.autoGenerateGameName();
-        // StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Message for posterity:\n\n" + buttonMsg);
+
+        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
+        if (gameSillyName == null || gameSillyName.isEmpty()) {
+            gameSillyName = CreateGameService.autoGenerateGameName();
+        }
         String gameName = CreateGameService.getNextGameName();
         String lastGameName = CreateGameService.getLastGameName();
 
