@@ -2,6 +2,7 @@
     {
         "alias": "proxima",
         "name": "Proxima Targeting VI",
+        "shrinkName": true,
         "types": [
             "WARFARE"
         ],
@@ -25,6 +26,7 @@
     {
         "alias": "hydrothermal",
         "name": "Hydrothermal Mining",
+        "shortName": "Hydro...\nMining",
         "types": [
             "BIOTIC"
         ],
@@ -70,6 +72,7 @@
     {
         "alias": "nanomachines",
         "name": "Nanomachines",
+        "shortName": "Nano-\nmachines",
         "types": [
             "WARFARE"
         ],
@@ -93,6 +96,7 @@
     {
         "alias": "planesplitter-firm",
         "name": "Planesplitter (Firmament)",
+        "shortName": "Plane\n-splitter",
         "types": [
             "CYBERNETIC"
         ],
@@ -104,6 +108,7 @@
     {
         "alias": "parasite-firm",
         "name": "Neural Parasite (Firmament)",
+        "shortName": "Neural Parasite",
         "types": [
             "BIOTIC"
         ],
@@ -115,6 +120,7 @@
     {
         "alias": "planesplitter-obs",
         "name": "Planesplitter (Obsidian)",
+        "shortName": "Plane\n-splitter",
         "types": [
             "CYBERNETIC"
         ],
@@ -126,6 +132,7 @@
     {
         "alias": "parasite-obs",
         "name": "Neural Parasite (Obsidian)",
+        "shortName": "Neural Parasite",
         "types": [
             "BIOTIC"
         ],

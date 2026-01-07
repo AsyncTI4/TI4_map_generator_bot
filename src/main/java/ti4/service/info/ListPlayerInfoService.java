@@ -384,7 +384,8 @@ public class ListPlayerInfoService {
                         .append(player.getSoScored())
                         .append("/")
                         .append(player.getMaxSOCount())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -398,7 +399,10 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1  ");
+                        .append("/1 ")
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
+                ;
             }
         }
         return representation.toString();
@@ -457,7 +461,8 @@ public class ListPlayerInfoService {
                         .append(player.getTotalVictoryPoints())
                         .append("/")
                         .append(game.getVp())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
