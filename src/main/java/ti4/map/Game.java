@@ -3,13 +3,7 @@ package ti4.map;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -80,8 +74,6 @@ import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
 import ti4.map.persistence.GameManager;
 import ti4.map.pojo.ExportableField;
-import ti4.map.pojo.MapPairKeyDeserializer;
-import ti4.map.pojo.MapPairKeySerializer;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -118,7 +110,6 @@ public class Game extends GameProperties {
     @Getter
     private Map<String, Player> players = new LinkedHashMap<>();
 
-    private final @JsonIgnore Map<String, Planet> planets = new HashMap<>();
     private final Map<FOWOption, Boolean> fowOptions = new HashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
@@ -144,7 +135,6 @@ public class Game extends GameProperties {
     private final BorderAnomalyManager borderAnomalyManager = new BorderAnomalyManager();
     private Date lastActivePlayerChange = new Date(0);
 
-    @JsonProperty("autoPingStatus")
     private boolean autoPingEnabled;
 
     @Getter
@@ -168,8 +158,6 @@ public class Game extends GameProperties {
     @Setter
     private Map<String, String> customHyperlaneData = new LinkedHashMap<>();
 
-    @JsonProperty("adjacentTileOverrides")
-    @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
 
     private List<String> publicObjectives1;
@@ -188,20 +176,17 @@ public class Game extends GameProperties {
     private List<String> savedButtons = new ArrayList<>();
     private List<String> soToPoList = new ArrayList<>();
 
-    @JsonIgnore
     private List<String> purgedPN = new ArrayList<>();
 
     private List<String> explore;
     private List<String> discardExplore = new ArrayList<>();
     private List<String> relics;
 
-    @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
 
     private final Set<String> runDataMigrations = new HashSet<>();
     private BagDraft activeDraft;
 
-    @JsonIgnore
     @Getter
     @Setter
     private Map<String, Integer> tileDistances = new HashMap<>();
@@ -321,7 +306,6 @@ public class Game extends GameProperties {
         return null;
     }
 
-    @JsonIgnore
     public Player setupNeutralPlayer(String color) {
         Player neutral = players.get(Constants.dicecordId);
         if (neutral != null) {
@@ -483,7 +467,6 @@ public class Game extends GameProperties {
     }
 
     @Nullable
-    @JsonProperty("miltySettings")
     public MiltySettings getMiltySettingsUnsafe() {
         return miltySettings;
     }
@@ -600,12 +583,10 @@ public class Game extends GameProperties {
         return purgedPN;
     }
 
-    @JsonIgnore
     public boolean hasWinner() {
         return getWinner().isPresent();
     }
 
-    @JsonIgnore
     public Optional<Player> getWinner() {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
@@ -630,7 +611,6 @@ public class Game extends GameProperties {
         return Optional.ofNullable(winner);
     }
 
-    @JsonIgnore
     public List<Player> getWinners() {
         Optional<Player> winnerOptional = getWinner();
         if (winnerOptional.isEmpty()) {
@@ -826,7 +806,6 @@ public class Game extends GameProperties {
         return getFowOption(FOWOption.HIDE_PLAYER_NAMES);
     }
 
-    @JsonIgnore
     public String getGameModesText() {
         boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>();
@@ -890,7 +869,6 @@ public class Game extends GameProperties {
         return getAcDeckID().startsWith("action_deck_2");
     }
 
-    @JsonIgnore
     public boolean isNormalGame() {
         return !hasHomebrew()
                 && !isMinorFactionsMode()
@@ -927,35 +905,30 @@ public class Game extends GameProperties {
         return String.format("%s %s %s", getName(), getTabletalkJumpLinkFormatted(), getActionsJumpLinkFormatted());
     }
 
-    @JsonIgnore
     public String getTabletalkJumpLink() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return null;
         return tt.getJumpUrl();
     }
 
-    @JsonIgnore
     private String getTabletalkJumpLinkFormatted() {
         TextChannel tt = getTableTalkChannel();
         if (tt == null) return "[no tt]";
         return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
     }
 
-    @JsonIgnore
     public String getActionsJumpLink() {
         TextChannel act = getActionsChannel();
         if (act == null) return null;
         return act.getJumpUrl();
     }
 
-    @JsonIgnore
     private String getActionsJumpLinkFormatted() {
         TextChannel act = getActionsChannel();
         if (act == null) return "[no actions]";
         return String.format("[__[Actions](%s)__]", act.getJumpUrl());
     }
 
-    @JsonIgnore
     @Nullable
     public TextChannel getTableTalkChannel() {
         try {
@@ -975,7 +948,6 @@ public class Game extends GameProperties {
         return null;
     }
 
-    @JsonIgnore
     public TextChannel getMainGameChannel() {
         try {
             return JdaService.jda.getTextChannelById(getMainChannelID());
@@ -992,7 +964,6 @@ public class Game extends GameProperties {
         return null;
     }
 
-    @JsonIgnore
     public TextChannel getSavedChannel() {
         try {
             return JdaService.jda.getTextChannelById(getSavedChannelID());
@@ -1001,12 +972,10 @@ public class Game extends GameProperties {
         }
     }
 
-    @JsonIgnore
     public TextChannel getActionsChannel() {
         return getMainGameChannel();
     }
 
-    @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
         if (isFowMode()) {
             return null;
@@ -1061,7 +1030,6 @@ public class Game extends GameProperties {
      * @return Guild that the ActionsChannel or MainGameChannel resides
      */
     @Nullable
-    @JsonIgnore
     public Guild getGuild() {
         return getActionsChannel() == null ? null : getActionsChannel().getGuild();
     }
@@ -1130,7 +1098,6 @@ public class Game extends GameProperties {
         currentAgendaVotes = new HashMap<>();
     }
 
-    @JsonIgnore
     public Set<Integer> getPlayedSCs() {
         return scPlayed.entrySet().stream()
                 .filter(Entry::getValue)
@@ -1284,12 +1251,10 @@ public class Game extends GameProperties {
         setPlayersWhoHitPersistentNoWhen(existing);
     }
 
-    @JsonIgnore
     public Player getActivePlayer() {
         return getPlayer(getActivePlayerID());
     }
 
-    @JsonIgnore
     public Player getSpeaker() {
         return getPlayer(getSpeakerUserID());
     }
@@ -1307,7 +1272,6 @@ public class Game extends GameProperties {
         setTyrantUserID(speaker.getUserID());
     }
 
-    @JsonIgnore
     public Player getTyrant() {
         return getPlayer(getTyrantUserID());
     }
@@ -1515,7 +1479,6 @@ public class Game extends GameProperties {
         return strategyCardManager.remove(sc);
     }
 
-    @JsonIgnore
     public List<Integer> getSCList() {
         return strategyCardManager.list();
     }
@@ -2062,8 +2025,6 @@ public class Game extends GameProperties {
         return customAdjacentTiles;
     }
 
-    @JsonGetter
-    @JsonSerialize(keyUsing = MapPairKeySerializer.class)
     public Map<Pair<String, Integer>, String> getAdjacentTileOverrides() {
         return adjacencyOverrides;
     }
@@ -2076,7 +2037,6 @@ public class Game extends GameProperties {
         adjacencyOverrides.put(secondary, primaryTile);
     }
 
-    @JsonIgnore
     public void setAdjacentTileOverride(Map<Pair<String, Integer>, String> overrides) {
         adjacencyOverrides = new LinkedHashMap<>(overrides);
     }
@@ -2153,7 +2113,6 @@ public class Game extends GameProperties {
         sentAgendas.clear();
     }
 
-    @JsonSetter
     public void setDiscardAgendas(Map<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
@@ -2782,7 +2741,6 @@ public class Game extends GameProperties {
         return getExplores(reqType, discardExplore);
     }
 
-    @JsonIgnore
     public List<String> getTechnologyDeck() {
         List<String> techDeck = Mapper.getDecks().get(getTechnologyDeckID()).getNewDeck();
         for (Player player : getRealPlayers()) {
@@ -2799,7 +2757,6 @@ public class Game extends GameProperties {
         return techDeck;
     }
 
-    @JsonIgnore
     public List<TechnologyModel> getPropulsionTechDeck() {
         return getTechnologyDeck().stream()
                 .map(Mapper::getTech)
@@ -2808,7 +2765,6 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<TechnologyModel> getWarfareTechDeck() {
         return getTechnologyDeck().stream()
                 .map(Mapper::getTech)
@@ -2817,7 +2773,6 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<TechnologyModel> getCyberneticTechDeck() {
         return getTechnologyDeck().stream()
                 .map(Mapper::getTech)
@@ -2826,7 +2781,6 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<TechnologyModel> getBioticTechDeck() {
         return getTechnologyDeck().stream()
                 .map(Mapper::getTech)
@@ -2835,7 +2789,6 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<TechnologyModel> getUnitUpgradeTechDeck() {
         return getTechnologyDeck().stream()
                 .map(Mapper::getTech)
@@ -3119,7 +3072,6 @@ public class Game extends GameProperties {
         setDiscardActionCard(id, ACStatus.purged);
     }
 
-    @JsonIgnore
     public boolean discardActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
@@ -3367,7 +3319,6 @@ public class Game extends GameProperties {
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
     }
 
-    @JsonIgnore
     public boolean islandMode() {
         boolean otherThings =
                 getName().contains("island") || (getMapTemplateID() != null && "1pIsland".equals(getMapTemplateID()));
@@ -3722,12 +3673,10 @@ public class Game extends GameProperties {
         return true;
     }
 
-    @JsonSetter
     public void setDiscardActionCards(Map<String, Integer> discardActionCards) {
         discardActionCards.forEach((key, value) -> getDiscardActionCards().put(key, value));
     }
 
-    @JsonSetter
     public void setDiscardActionCardStatus(Map<String, ACStatus> discardACStatus) {
         discardACStatus.forEach((key, value) -> getDiscardACStatus().put(key, value));
     }
@@ -3743,12 +3692,10 @@ public class Game extends GameProperties {
         }
     }
 
-    @JsonIgnore
     public void setPurgedActionCards(List<String> purgedActionCardList) {
         purgedActionCardList.forEach(ac -> setDiscardActionCard(ac, ACStatus.purged));
     }
 
-    @JsonIgnore
     public String getPing() {
         Role role = getGameRole();
         if (role != null) {
@@ -3762,7 +3709,6 @@ public class Game extends GameProperties {
         return sb.toString();
     }
 
-    @JsonIgnore
     private Role getGameRole() {
         if (getGuild() != null) {
             for (Role role : getGuild().getRoles()) {
@@ -3832,12 +3778,10 @@ public class Game extends GameProperties {
         return player;
     }
 
-    @JsonIgnore
     public List<Player> getRealPlayers() {
         return players.values().stream().filter(Player::isRealPlayer).toList();
     }
 
-    @JsonIgnore
     public List<Player> getRealPlayersExcludingThis(Player p) {
         return players.values().stream()
                 .filter(Player::isRealPlayer)
@@ -3845,14 +3789,12 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return players.values().stream()
                 .filter(p -> p.isRealPlayer() || (p.getFaction() != null && "neutral".equals(p.getFaction())))
                 .toList();
     }
 
-    @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
         return players.values().stream()
                 .filter(player -> player.isRealPlayer()
@@ -3860,31 +3802,26 @@ public class Game extends GameProperties {
                 .collect(Collectors.toList());
     }
 
-    @JsonIgnore
     public List<Player> getRealAndEliminatedPlayers() {
         return players.values().stream()
                 .filter(player -> (player.isRealPlayer() || player.isEliminated()))
                 .toList();
     }
 
-    @JsonIgnore
     public List<Player> getRealAndEliminatedAndDummyPlayers() {
         return players.values().stream()
                 .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
                 .toList();
     }
 
-    @JsonIgnore
     public List<Player> getDummies() {
         return players.values().stream().filter(Player::isDummy).toList();
     }
 
-    @JsonIgnore
     public List<Player> getNotRealPlayers() {
         return players.values().stream().filter(not(Player::isRealPlayer)).toList();
     }
 
-    @JsonIgnore
     public List<Player> getPlayersWithGMRole() {
         if (getGuild() == null) return Collections.emptyList();
         List<Role> roles = getGuild().getRolesByName(getName() + " GM", true);
@@ -3897,7 +3834,6 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<Player> getPassedPlayers() {
         List<Player> passedPlayers = new ArrayList<>();
         for (Player player : getRealPlayers()) {
@@ -3908,14 +3844,12 @@ public class Game extends GameProperties {
         return passedPlayers;
     }
 
-    @JsonIgnore
     public Set<String> getFactions() {
         return getRealAndEliminatedAndDummyPlayers().stream()
                 .map(Player::getFaction)
                 .collect(Collectors.toSet());
     }
 
-    @JsonIgnore
     public Set<String> getRealFactions() {
         return getRealPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
@@ -3933,12 +3867,10 @@ public class Game extends GameProperties {
         return players.get(userID);
     }
 
-    @JsonIgnore
     public Set<String> getPlayerIDs() {
         return players.keySet();
     }
 
-    @JsonIgnore
     public List<String> getRealPlayerIDs() {
         List<String> pIDs = new ArrayList<>();
         for (Player player : getRealPlayers()) {
@@ -4023,7 +3955,6 @@ public class Game extends GameProperties {
         planets.clear();
     }
 
-    @JsonIgnore
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
@@ -4065,7 +3996,6 @@ public class Game extends GameProperties {
                 .toList();
     }
 
-    @JsonIgnore
     public List<SimpleEntry<String, String>> getTileNameAutocompleteOptionsCache() {
         if (tileNameAutocompleteOptionsCache != null) {
             return tileNameAutocompleteOptionsCache;
@@ -4272,17 +4202,14 @@ public class Game extends GameProperties {
         return runDataMigrations;
     }
 
-    @JsonIgnore
     public StrategyCardSetModel getStrategyCardSet() {
         return Mapper.getStrategyCardSets().get(getScSetID());
     }
 
-    @JsonIgnore
     public Optional<StrategyCardModel> getStrategyCardModelByInitiative(int scInitiative) {
         return getStrategyCardSet().getStrategyCardModelByInitiative(scInitiative);
     }
 
-    @JsonIgnore
     public Optional<StrategyCardModel> getStrategyCardModelByName(String name) {
         return getStrategyCardSet().getStrategyCardModelByName(name);
     }
@@ -4310,84 +4237,70 @@ public class Game extends GameProperties {
                 .anyMatch(sc -> scID.equals(sc.getBotSCAutomationID()));
     }
 
-    @JsonIgnore
     public int getActionCardDeckSize() {
         return getActionCards().size();
     }
 
-    @JsonIgnore
     public int getActionCardFullDeckSize() {
         DeckModel acDeckModel = Mapper.getDeck(getAcDeckID());
         if (acDeckModel != null) return acDeckModel.getCardCount();
         return -1;
     }
 
-    @JsonIgnore
     public int getAgendaDeckSize() {
         return getAgendas().size();
     }
 
-    @JsonIgnore
     public int getAgendaFullDeckSize() {
         DeckModel agendaDeckModel = Mapper.getDeck(getAgendaDeckID());
         if (agendaDeckModel != null) return agendaDeckModel.getCardCount();
         return -1;
     }
 
-    @JsonIgnore
     public int getEventDeckSize() {
         return getEvents().size();
     }
 
-    @JsonIgnore
     public int getEventFullDeckSize() {
         DeckModel eventDeckModel = Mapper.getDeck(getEventDeckID());
         if (eventDeckModel != null) return eventDeckModel.getCardCount();
         return -1;
     }
 
-    @JsonIgnore
     public int getPublicObjectives1DeckSize() {
         return publicObjectives1.size();
     }
 
-    @JsonIgnore
     public int getPublicObjectives1FullDeckSize() {
         DeckModel po1DeckModel = Mapper.getDeck(getStage1PublicDeckID());
         if (po1DeckModel != null) return po1DeckModel.getCardCount();
         return -1;
     }
 
-    @JsonIgnore
     public int getPublicObjectives2DeckSize() {
         return publicObjectives2.size();
     }
 
-    @JsonIgnore
     public int getPublicObjectives2FullDeckSize() {
         DeckModel po2DeckModel = Mapper.getDeck(getStage2PublicDeckID());
         if (po2DeckModel != null) return po2DeckModel.getCardCount();
         return -1;
     }
 
-    @JsonIgnore
     public int getRelicDeckSize() {
         return relics.size();
     }
 
-    @JsonIgnore
     public int getRelicFullDeckSize() {
         DeckModel relicDeckModel = Mapper.getDeck(getRelicDeckID());
         if (relicDeckModel != null) return relicDeckModel.getCardCount();
         return -1;
     }
 
-    @JsonIgnore
     public int getSecretObjectiveDeckSize() {
         return getSecretObjectives().size();
     }
 
-    @JsonIgnore
     public int getSecretObjectiveFullDeckSize() {
         DeckModel soDeckModel = Mapper.getDeck(getSoDeckID());
         if (soDeckModel != null) return soDeckModel.getCardCount();
@@ -4412,67 +4325,54 @@ public class Game extends GameProperties {
         return count;
     }
 
-    @JsonIgnore
     public int getHazardousExploreDeckSize() {
         return getExploreDeckSize(Constants.HAZARDOUS);
     }
 
-    @JsonIgnore
     public int getHazardousExploreDiscardSize() {
         return getExploreDiscard(Constants.HAZARDOUS).size();
     }
 
-    @JsonIgnore
     public int getHazardousExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.HAZARDOUS);
     }
 
-    @JsonIgnore
     public int getCulturalExploreDeckSize() {
         return getExploreDeckSize(Constants.CULTURAL);
     }
 
-    @JsonIgnore
     public int getCulturalExploreDiscardSize() {
         return getExploreDiscard(Constants.CULTURAL).size();
     }
 
-    @JsonIgnore
     public int getCulturalExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.CULTURAL);
     }
 
-    @JsonIgnore
     public int getIndustrialExploreDeckSize() {
         return getExploreDeckSize(Constants.INDUSTRIAL);
     }
 
-    @JsonIgnore
     public int getIndustrialExploreDiscardSize() {
         return getExploreDiscard(Constants.INDUSTRIAL).size();
     }
 
-    @JsonIgnore
     public int getIndustrialExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.INDUSTRIAL);
     }
 
-    @JsonIgnore
     public int getFrontierExploreDeckSize() {
         return getExploreDeckSize(Constants.FRONTIER);
     }
 
-    @JsonIgnore
     public int getFrontierExploreDiscardSize() {
         return getExploreDiscard(Constants.FRONTIER).size();
     }
 
-    @JsonIgnore
     public int getFrontierExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.FRONTIER);
     }
 
-    @JsonIgnore
     public List<String> getAllPlanetsWithSleeperTokens() {
         List<String> planetsWithSleepers = new ArrayList<>();
         for (Tile tile : tileMap.values()) {
@@ -4481,7 +4381,6 @@ public class Game extends GameProperties {
         return planetsWithSleepers;
     }
 
-    @JsonIgnore
     public int getSleeperTokensPlacedCount() {
         return getAllPlanetsWithSleeperTokens().size();
     }
@@ -4509,7 +4408,6 @@ public class Game extends GameProperties {
         return false;
     }
 
-    @JsonIgnore
     public Tile getMecatolTile() {
         if (isOrdinianC1Mode()) {
             return ButtonHelper.getTileWithCoatl(this);
@@ -4676,7 +4574,6 @@ public class Game extends GameProperties {
         }
     }
 
-    @JsonIgnore
     public void swapInVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;
@@ -4708,7 +4605,6 @@ public class Game extends GameProperties {
         }
     }
 
-    @JsonIgnore
     public void swapOutVariantTechs() {
         DeckModel deckModel = Mapper.getDeck(getTechnologyDeckID());
         if (deckModel == null) return;
@@ -4765,12 +4661,10 @@ public class Game extends GameProperties {
         return sources;
     }
 
-    @JsonIgnore
     public boolean isThundersEdgeDemo() {
         return getTags().contains("Thunder's Edge Demo");
     }
 
-    @JsonIgnore
     public boolean hasHomebrew() {
         return isHomebrew()
                 || isExtraSecretMode()
@@ -4862,7 +4756,6 @@ public class Game extends GameProperties {
                         setScTradeGood(scModel.getInitiative(), oldTGs.getOrDefault(scModel.getInitiative(), 0)));
     }
 
-    @JsonIgnore
     public List<ColorModel> getUnusedColorsPreferringBase() {
         List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
         List<ColorModel> priorityColours = priorityColourIDs.stream()
@@ -4898,7 +4791,6 @@ public class Game extends GameProperties {
     /**
      * @return String : TTS/TTPG Map String
      */
-    @JsonIgnore
     public String getMapString() {
         List<String> tilePositions = new ArrayList<>();
         tilePositions.add("000");
