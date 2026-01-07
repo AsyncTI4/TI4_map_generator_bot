@@ -1297,10 +1297,30 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No technology specialties found.");
             return;
         }
+        String message = "";
+        String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(unitHolder.getName(), game);
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
             }
+
+            Set<UnitKey> uk = unitHolder.getUnitKeys();
+            String emoji = "";
+            for (UnitKey key : unitHolder.getUnitKeys()) {
+                if (!p2.getColor().equals(key.getColor())) continue;
+                int amt = unitHolder.getUnitCount(key);
+                unitHolder.removeUnit(key, amt);
+                emoji += key.unitEmoji().emojiString().repeat(amt);
+            }
+            if (!emoji.isEmpty()) {
+                message += p2.getRepresentation() + ", your " + emoji + " on " + planetRep
+                        + " have become the latest casualties in the Nekro Virus War Upon Life.\n";
+            }
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message);
+                message = "";
+            }
+
             String color = p2.getColor();
             unitHolder.removeAllUnits(color);
             unitHolder.removeAllUnitDamage(color);
@@ -1308,12 +1328,9 @@ public class ButtonHelperHeroes {
         int oldTg = player.getTg();
         int count = unitHolder.getResources() + unitHolder.getInfluence();
         player.setTg(oldTg + count);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
-                        + "->" + player.getTg() + ") from choosing the planet "
-                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(unitHolder.getName(), game)
-                        + ".");
+        message += player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " ("
+                + oldTg + "->" + player.getTg() + ") from scouring " + planetRep + ".";
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
 
@@ -1322,7 +1339,7 @@ public class ButtonHelperHeroes {
             List<TechnologyModel> techs = new ArrayList<>();
             for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));
             List<Button> buttons = ListTechService.getTechButtons(techs, player, "nekro");
-            String message = player.getRepresentation() + ", please choose which technology you wish to get.";
+            message = player.getRepresentation() + ", please choose which technology you wish to get.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         } else {
             List<Button> buttons = new ArrayList<>();

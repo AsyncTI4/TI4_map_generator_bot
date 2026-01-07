@@ -492,48 +492,53 @@ public class ExploreService {
                         }
                     }
 
-                    String groundForces = "";
-                    String structures = "";
+                    AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
+                    message = "Attachment _" + aModel.getName() + "_ added to "
+                            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     if (attachment.equals(Constants.DMZ)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                         UnitHolder planetUnitHolder = unitHolders.get(planetID);
                         UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                        for (UnitKey key : planetUnitHolder.getUnitKeys()) {
-                            int amt = planetUnitHolder.getUnitCount(key);
-                            var removed = planetUnitHolder.removeUnit(key, amt);
-                            if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                                    .contains(key.getUnitType())) {
-                                spaceUnitHolder.addUnitsWithStates(key, removed);
-                                groundForces += key.unitEmoji().emojiString().repeat(amt);
-                            } else {
-                                structures += key.unitEmoji().emojiString().repeat(amt);
+                        for (Player p2 : game.getPlayers().values()) {
+                            String groundForces = "";
+                            String structures = "";
+                            for (UnitKey key : planetUnitHolder.getUnitKeys()) {
+                                if (!p2.getColor().equals(key.getColor())) continue;
+                                int amt = planetUnitHolder.getUnitCount(key);
+                                var removed = planetUnitHolder.removeUnit(key, amt);
+                                if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
+                                        .contains(key.getUnitType())) {
+                                    spaceUnitHolder.addUnitsWithStates(key, removed);
+                                    groundForces +=
+                                            key.unitEmoji().emojiString().repeat(amt);
+                                } else {
+                                    structures += key.unitEmoji().emojiString().repeat(amt);
+                                }
+                            }
+                            if (!groundForces.isEmpty()) {
+                                message += "\n" + p2.getRepresentationUnfogged() + ", your " + groundForces
+                                        + " have been yote into space" + (structures.isEmpty() ? "." : "");
+                            }
+                            if (!structures.isEmpty()) {
+                                message += (groundForces.isEmpty()
+                                                ? "\n" + p2.getRepresentationUnfogged() + ", "
+                                                : ", and ")
+                                        + "your " + structures + " have been yote into the shadow realm.";
+                                if (!game.isFowMode()) {
+                                    DisasterWatchHelper.sendMessageInDisasterWatch(
+                                            game,
+                                            "\\> \"" + structures + "⁉️" + UnitEmojis.Blank
+                                                    + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
+                                                    + p2.getRepresentation() + ", in " + game.getName() + ".");
+                                }
                             }
                         }
                     }
 
                     tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
-                    AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
-                    message = "Attachment _" + aModel.getName() + "_ added to "
-                            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
-                    if (!groundForces.isEmpty()) {
-                        message += "\n" + player.getRepresentationUnfogged() + ", your " + groundForces
-                                + " have been yote into space" + (structures.isEmpty() ? "." : "");
-                    }
-                    if (!structures.isEmpty()) {
-                        message +=
-                                (groundForces.isEmpty() ? "\n" + player.getRepresentationUnfogged() + ", " : ", and ")
-                                        + "your " + structures + " have been yote into the shadow realm.";
-                        if (!game.isFowMode()) {
-                            DisasterWatchHelper.sendMessageInDisasterWatch(
-                                    game,
-                                    "\\> \"" + structures + "⁉️" + UnitEmojis.Blank
-                                            + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
-                                            + player.getRepresentation() + ", in " + game.getName() + ".");
-                        }
-                    }
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                     ButtonHelper.checkFleetAndCapacity(player, game, tile);
                 }
