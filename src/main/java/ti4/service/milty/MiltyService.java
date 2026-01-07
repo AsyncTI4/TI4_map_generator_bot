@@ -298,6 +298,7 @@ public class MiltyService {
         player.getPlanets().clear();
         player.getTechs().clear();
         player.getFactionTechs().clear();
+        for (String bt : player.getBreakthroughIDs()) player.removeBreakthrough(bt);
 
         FactionModel factionModel = player.getFactionSetupInfo();
 
@@ -318,7 +319,7 @@ public class MiltyService {
             player.addBreakthrough(breakthrough);
             if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
                 List<MessageEmbed> embeds = new ArrayList<>();
-                embeds.add(player.getBreakthroughModel().getRepresentationEmbed());
+                for (var bt : player.getBreakthroughModels()) embeds.add(bt.getRepresentationEmbed());
                 MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "Breakthrough info", embeds);
             }
         }

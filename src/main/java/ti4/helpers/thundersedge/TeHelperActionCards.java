@@ -542,12 +542,12 @@ public class TeHelperActionCards {
                 }
             }
 
-            if (lockedCount > 0) {
-                String id = "resolveBrillianceUnlock_" + p.getFaction();
+            String id = "resolveBrillianceUnlock_" + p.getFaction();
+            if (lockedCount == 1) {
                 String label = "Unlock " + p.getBreakthroughModel().getName();
-                if (lockedCount > 1) {
-                    label = "Unlock Breakthrough Of " + p.getFactionModel().getShortName();
-                }
+                buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+            } else if (lockedCount > 1) {
+                String label = "Unlock " + p.getFactionModel().getShortName() + " breakthroughs";
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             }
         }

@@ -100,28 +100,29 @@ public class ComponentActionHelper {
             compButtons.add(tButton);
         }
 
-        BreakthroughModel bt = p1.getBreakthroughModel();
-        if (bt != null && bt.getText().contains("ACTION:")) {
-            if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                boolean validAction =
-                        switch (bt.getAlias()) {
-                            case "arborecbt" ->
-                                game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                            case "crimsonbt" -> true;
-                            case "mahactbt" -> !p1.getTechs().isEmpty();
-                            case "saarbt" ->
-                                game.getTileMap().values().stream()
-                                        .filter(Tile::isAsteroidField)
-                                        .anyMatch(Tile.tileHasPlayerShips(p1));
-                            case "deepwroughtbt" -> true;
-                            default -> true;
-                        };
+        for (BreakthroughModel bt : p1.getBreakthroughModels()) {
+            if (bt != null && bt.getText().contains("ACTION:")) {
+                if (p1.hasReadyBreakthrough(bt.getAlias())) {
+                    boolean validAction =
+                            switch (bt.getAlias()) {
+                                case "arborecbt" ->
+                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                                case "crimsonbt" -> true;
+                                case "mahactbt" -> !p1.getTechs().isEmpty();
+                                case "saarbt" ->
+                                    game.getTileMap().values().stream()
+                                            .filter(Tile::isAsteroidField)
+                                            .anyMatch(Tile.tileHasPlayerShips(p1));
+                                case "deepwroughtbt" -> true;
+                                default -> true;
+                            };
 
-                if (validAction) {
-                    TI4Emoji btEmoji = bt.getFactionEmoji();
-                    Button btButton = Buttons.green(
-                            finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
-                    compButtons.add(btButton);
+                    if (validAction) {
+                        TI4Emoji btEmoji = bt.getFactionEmoji();
+                        Button btButton = Buttons.green(
+                                finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
+                        compButtons.add(btButton);
+                    }
                 }
             }
         }

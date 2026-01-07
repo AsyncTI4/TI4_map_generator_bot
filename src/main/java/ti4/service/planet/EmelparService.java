@@ -137,7 +137,7 @@ public class EmelparService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String bt = matcher.group("breakthrough");
             player2.setBreakthroughExhausted(bt, false);
-            String readyItem = player2.getBreakthroughModel().getNameRepresentation();
+            String readyItem = player2.getBreakthroughModel(bt).getNameRepresentation();
             postSummary(event, player, readyItem);
         });
     }
