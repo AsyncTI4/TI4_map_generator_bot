@@ -518,14 +518,36 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
         }
 
-        // GAME FUN NAME
-        deltaY = 35;
         deltaY = 35;
         y += 40; // needed for ghost HS on br
+
+        String server;
+        switch (game.getGuild().getId()) {
+            case "943410040369479690" -> server = "asyncti_icon_hub";
+            case "1176104225932058694" -> server = "asyncti_icon_warsuntzu";
+            case "1145823841227112598" -> server = "asyncti_icon_dreadnot";
+            case "1250131684393881610" -> server = "asyncti_icon_tommerhawk";
+            case "1312882116597518416" -> server = "asyncti_icon_dudersdomain";
+            case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
+            case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
+            case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
+            case "1410728648817770526" -> server = "asyncti_icon_unknown"; // TODO: replace
+            case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
+            case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
+            // fog of war?
+            // megagames?
+            default -> server = "asyncti_icon_unknown";
+        }
+        String serverPath = ResourceHelper.getResourceFromFolder("server_icons/", server + ".png");
+        int serverSize = 96;
+        BufferedImage serverImage = ImageHelper.readScaled(serverPath, serverSize, serverSize);
+        graphics.drawImage(serverImage, x, y - 3 * serverSize / 4, null);
+
+        // GAME FUN NAME
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), landscapeShift, y);
-        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName());
+        graphics.drawString(game.getCustomName(), landscapeShift + 4 * serverSize / 3, y);
+        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName()) + 5 * serverSize / 3;
 
         // STRATEGY CARDS
         coord = drawStrategyCards(new Point(x, y));
