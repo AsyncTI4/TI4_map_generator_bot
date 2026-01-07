@@ -1,1 +1,18 @@
-{"id":"102","name":"Andeara","aliases":["te03","andeara"],"imagePath":"102_Andeara.png","planets":["andeara"],"shipPositionsType":"TYPE05","wormholes":["ALPHA"],"tileBack":"blue","source":"thunders_edge"}
+{
+    "id": "102",
+    "name": "Andeara",
+    "aliases": [
+        "te03",
+        "andeara"
+    ],
+    "imagePath": "102_Andeara.png",
+    "planets": [
+        "andeara"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "ALPHA"
+    ],
+    "tileBack": "blue",
+    "source": "thunders_edge"
+}

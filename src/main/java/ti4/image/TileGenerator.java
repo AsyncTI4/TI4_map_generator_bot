@@ -447,6 +447,10 @@ public class TileGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
+                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
+                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
+                    drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40, true);
                 }
                 if (reconstruction && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA))) {
                     BufferedImage doubleWormholeImage = ImageHelper.readScaled(
@@ -1948,6 +1952,35 @@ public class TileGenerator {
         return Comparator.comparing(sortTokenPlanet);
     }
 
+    private static boolean isWormholeToken(String tokenPath) {
+        tokenPath = tokenPath.toLowerCase();
+        if (tokenPath.contains("wormhole")) {
+            return true;
+        }
+        if (tokenPath.contains("token_creuss")) {
+            return true;
+        }
+        if (tokenPath.contains("token_crimsoncreuss")) {
+            return true;
+        }
+        if (tokenPath.contains("token_custom_eronous_wh")) {
+            return true;
+        }
+        if (tokenPath.toLowerCase().contains("token_custom_eronous_wh")) {
+            return !tokenPath.contains("token_custom_eronous_whno");
+        }
+        if (tokenPath.contains("token_gamma")) {
+            return true;
+        }
+        if (tokenPath.contains("token_ion")) {
+            return true;
+        }
+        if (tokenPath.contains("token_wh")) {
+            return true;
+        }
+        return false;
+    }
+
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort(sortTokensForDisplay());
@@ -2038,6 +2071,19 @@ public class TileGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
+                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)
+                        && isWormholeToken(tokenPath)) {
+                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
+                            .getTokenFile("agenda_wormhole_blocked"
+                                    + (reconstruction
+                                                    && (tokenPath.toLowerCase().contains("alpha")
+                                                            || tokenPath
+                                                                    .toLowerCase()
+                                                                    .contains("beta"))
+                                            ? "_half"
+                                            : "")
+                                    + ".png"));
+                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
                 }
                 if (reconstruction && tokenPath.toLowerCase().contains("alpha")) {
                     BufferedImage doubleWormholeImage = ImageHelper.readScaled(
@@ -2065,68 +2111,99 @@ public class TileGenerator {
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {
-        drawOnWormhole(tile, graphics, icon, offset, "ab");
+        drawOnWormhole(tile, graphics, icon, offset, "ab", false);
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, String types) {
+        drawOnWormhole(tile, graphics, icon, offset, types, false);
+    }
+
+    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, boolean all) {
+        drawOnWormhole(tile, graphics, icon, offset, "", all);
+    }
+
+    private static void drawOnWormhole(
+            Tile tile, Graphics graphics, BufferedImage icon, int offset, String types, boolean all) {
         switch (tile.getTileID()) {
-            case "82b": // wormhole nexus
-                if (types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 95, TILE_PADDING + offset + 249, null);
-                if (types.contains("b"))
+            case "17": // creuss gate
+                if (all || types.contains("d"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 187, TILE_PADDING + offset + 206, null);
+                break;
+            case "51": // creuss hs
+                if (all || types.contains("d"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 239, TILE_PADDING + offset + 251, null);
+                break;
+            case "82a": // inactuve wormhole nexus
+                if (all || types.contains("g"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
                 break;
+            case "82b": // wormhole nexus
+                if (all || types.contains("a"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 95, TILE_PADDING + offset + 249, null);
+                if (all || types.contains("b"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
+                if (all || types.contains("g"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 243, TILE_PADDING + offset + 249, null);
+                break;
+            case "94": // sorrow
+                if (all || types.contains("e"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 45, TILE_PADDING + offset + 152, null);
+                break;
+            case "118": // rebellion hs
+                if (all || types.contains("e"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 250, TILE_PADDING + offset + 236, null);
+                break;
             case "c02": // Locke/Bentham
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 37, TILE_PADDING + offset + 158, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 223, TILE_PADDING + offset + 62, null);
                 break;
             case "c10": // Kwon
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 182, TILE_PADDING + offset + 22, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 259, TILE_PADDING + offset + 241, null);
                 break;
             case "c11": // Ethan
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 54, TILE_PADDING + offset + 138, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 159, TILE_PADDING + offset + 275, null);
                 break;
             case "d119": // beta/nebula
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 94, TILE_PADDING + offset + 170, null);
                 break;
             case "d123": // alpha/beta/supernova
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 22, TILE_PADDING + offset + 110, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 190, TILE_PADDING + offset + 206, null);
                 break;
             case "er19": // alpha/beta/rift
             case "er119": // alpha/beta/nebula
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 60, TILE_PADDING + offset + 44, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 192, TILE_PADDING + offset + 184, null);
                 break;
             case "er94": // Iynntani
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 157, TILE_PADDING + offset + 165, null);
                 break;
             case "er95": // Kytos/Prymis
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 60, TILE_PADDING + offset + 155, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 215, TILE_PADDING + offset + 61, null);
                 break;
             case "m05": // Shanh
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 185, TILE_PADDING + offset + 180, null);
                 break;
             case "m32": // Vespa/Apis
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 49, TILE_PADDING + offset + 147, null);
                 break;
             default:
