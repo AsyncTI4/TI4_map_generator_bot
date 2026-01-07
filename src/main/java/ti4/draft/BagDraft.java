@@ -1,6 +1,7 @@
 package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -116,6 +117,20 @@ public abstract class BagDraft {
                         "You are passing the following cards to your right:\n"
                                 + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
                 FrankenDraftBagService.displayPlayerHand(owner, p);
+            } else {
+                if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p)) {
+                    p.getCurrentDraftBag().Contents.removeAll(draftableItemsInBag(p));
+                    p.getDraftHand().Contents.addAll(draftableItemsInBag(p));
+                    setPlayerReadyToPass(p, true);
+                    MessageHelper.sendMessageToChannel(
+                            this.findExistingBagChannel(p),
+                            "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+                    MessageHelper.sendMessageToChannel(
+                            p.getCardsInfoThread(),
+                            "You are passing the following cards to your right:\n"
+                                    + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
+                    FrankenDraftBagService.displayPlayerHand(owner, p);
+                }
             }
         }
         return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
@@ -123,6 +138,14 @@ public abstract class BagDraft {
 
     public boolean playerHasDraftableItemInBag(Player player) {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
+    }
+
+    public List<DraftItem> draftableItemsInBag(Player player) {
+        ArrayList<DraftItem> draftableItems = new ArrayList<>();
+        draftableItems.addAll(player.getCurrentDraftBag().Contents.stream()
+                .filter(draftItem -> draftItem.isDraftable(player))
+                .toList());
+        return draftableItems;
     }
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
