@@ -48,6 +48,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
@@ -2249,6 +2250,10 @@ public class ButtonHelperModifyUnits {
                             player.getRepresentation()
                                     + ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).",
                             orbFollowUp);
+                } else {
+                    String message = "Use buttons to end turn or do another action.";
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                 }
             }
             if (xxchaTEhero && player.getExhaustedPlanets().contains(planetName)) {
