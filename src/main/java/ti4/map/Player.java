@@ -2113,6 +2113,11 @@ public class Player extends PlayerProperties {
         return getPublicVictoryPoints(true) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
+    @JsonIgnore
+    public int getTotalVictoryPointsCapped() {
+        return Math.min(getTotalVictoryPoints(), game.getVp());
+    }
+
     @Override
     public void setTg(int tg) {
         super.setTg(Math.max(0, tg));
