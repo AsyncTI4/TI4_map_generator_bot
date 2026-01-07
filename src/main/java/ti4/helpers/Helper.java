@@ -230,7 +230,7 @@ public class Helper {
         if (player.isNpc()) {
             return false;
         }
-        if (player.hasAbility("nomadic")) {
+        if (player.hasAbility("nomadic") || player.hasTech("tf-nomadic")) {
             return true;
         }
         if (player.hasAbility("mobile_command")
@@ -1544,7 +1544,7 @@ public class Helper {
             if (solBtLimit > 0) {
                 msg.append("Producing a total of ")
                         .append(unitCount)
-                        .append(" units (Bellum Gloriosum limit is ")
+                        .append(" units (_Bellum Gloriosum_ limit is ")
                         .append(solBtLimit)
                         .append(")")
                         .append(" for a total cost of ")
@@ -1553,7 +1553,7 @@ public class Helper {
                         .append(cost == 1 ? "" : "s")
                         .append(".");
                 if (solBtLimit < unitCount) {
-                    msg.append("\n### Warning! Exceeding Bellum Gloriosum limit of ")
+                    msg.append("\n### Warning! Exceeding _Bellum Gloriosum_ limit of ")
                             .append(solBtLimit)
                             .append("!");
                 }

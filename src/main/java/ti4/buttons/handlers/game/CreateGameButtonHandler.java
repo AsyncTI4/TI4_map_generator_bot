@@ -74,7 +74,7 @@ class CreateGameButtonHandler {
                     event.getMessageChannel(),
                     "You need to have completed at least one game (or be currently in a game) to create new games via this button. "
                             + "This is to prevent mistakes by people who don't know what they're doing. There are a couple of ways to get around this:\n"
-                            + "1) Have someone else who has completed a game press the button for you.\n"
+                            + "1) Have someone else who has completed a game press the button for you; or\n"
                             + "2) Ping a bothelper for help.");
             return;
         }

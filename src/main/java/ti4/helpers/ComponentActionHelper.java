@@ -179,7 +179,7 @@ public class ComponentActionHelper {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Crimson Agent",
+                                    "Use " + leaderName + " as Rebellion Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
@@ -343,7 +343,7 @@ public class ComponentActionHelper {
                                 .isEmpty()
                         || game.isTwilightsFallMode())) {
             Button abilityButton =
-                    Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", FactionEmojis.Muaat);
+                    Buttons.green(finChecker + prefix + "ability_starForge", "Star Forge", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("meditation")
@@ -1004,7 +1004,7 @@ public class ComponentActionHelper {
             List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    "Use buttons to gain a command token from Endurance Steroids.",
+                    "Use buttons to gain a command token from _Endurance Steroids_.",
                     buttons2);
         } else if ("the_incursion_gate".equalsIgnoreCase(relicID)) {
             player.addExhaustedRelic(relicID);
@@ -1014,7 +1014,7 @@ public class ComponentActionHelper {
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though",
+                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though.",
                     buttons);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
@@ -1053,7 +1053,7 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesBase() + 2);
                 }
-                message = player.getRepresentationUnfogged() + " Your trade goods increased from " + oldTg + " -> "
+                message = player.getRepresentationUnfogged() + ", your trade goods increased from " + oldTg + " -> "
                         + player.getTg() + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);

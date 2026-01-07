@@ -112,9 +112,9 @@
     },
     {
         "alias": "dont_play_ti_secret_objectives",
-        "name": "Secret Objectives for Dont Play TI",
+        "name": "Secret Objectives for Don't Play TI",
         "type": "secret_objective",
-        "description": "Custom secret objectives for Dont Play TI",
+        "description": "Custom secret objectives for Don't Play TI",
         "cardIDs": [
             "dont_ans",
             "dont_baf",
@@ -154,9 +154,9 @@
     },
     {
         "alias": "dont_play_ti_public_stage_1_objectives",
-        "name": "Dont Play TI Public Stage I Objectives",
+        "name": "Don't Play TI Public Stage I Objectives",
         "type": "public_stage_1_objective",
-        "description": "All Stage I public objectives for a Dont Play TI game",
+        "description": "All Stage I public objectives for a Don't Play TI game",
         "cardIDs": [
             "dont_amass_wealth",
             "dont_build_defenses",
@@ -183,9 +183,9 @@
     },
     {
         "alias": "dont_player_ti_public_stage_2_objectives",
-        "name": "Dont Play TI Public Stage II Objectives",
+        "name": "Don't Play TI Public Stage II Objectives",
         "type": "public_stage_2_objective",
-        "description": "All Stage II public objectives in a Dont Play TI game",
+        "description": "All Stage II public objectives in a Don't Play TI game",
         "cardIDs": [
             "dont_ancient_monuments",
             "dont_become_legend",

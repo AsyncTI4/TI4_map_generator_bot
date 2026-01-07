@@ -237,8 +237,8 @@
         "title": "Broken Standard",
         "tfTitle": "",
         "abilityWindow": "At any time",
-        "abilityText": "Apply +1 to the result of each of your units' combat rolls in the Fracture.",
-        "unlockCondition": "Have units in the Fracture.",
+        "abilityText": "Apply +1 to the result of each of your units' combat rolls in The Fracture.",
+        "unlockCondition": "Have units in The Fracture.",
         "source": "thunders_edge"
     },
     {

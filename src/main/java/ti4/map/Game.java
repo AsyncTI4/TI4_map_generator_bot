@@ -3998,7 +3998,7 @@ public class Game extends GameProperties {
             String marrow = "A Song Like Marrow";
             for (Player p : players.values()) {
                 if (unscorePublicObjective(p.getUserID(), marrow)) {
-                    String msg = p.getRepresentation() + " lost 1 VP because Styx is gone.";
+                    String msg = p.getRepresentation() + " lost 1 victory point because Styx is gone.";
                     MessageHelper.sendMessageToChannel(p.getCorrectChannel(), msg);
                 }
             }

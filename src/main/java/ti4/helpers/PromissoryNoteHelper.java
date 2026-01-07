@@ -232,7 +232,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you sent 1 debt token to " + owner.getFactionEmojiOrColor()
-                            + " due to their breakthrough ability.");
+                            + " due to _Arms Brokerage_.");
         }
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
@@ -287,7 +287,7 @@ public class PromissoryNoteHelper {
 
         if ("sever".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getSeverLocationOptions(game, player));
-            String message = player.getRepresentationUnfogged() + ", please choose the system that you wish to sever";
+            String message = player.getRepresentationUnfogged() + ", please choose the system that you wish to Sever.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("greyfire".equalsIgnoreCase(id)) {
@@ -440,7 +440,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " acquired the War Sun technology.");
-            MahactTokenService.removeFleetCC(game, owner, "due to _Fires of the Gashlai_ being played.");
+            MahactTokenService.removeFleetCC(game, owner, "due to _Fires of the Gashlai_ being played");
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");

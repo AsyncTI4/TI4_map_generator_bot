@@ -776,7 +776,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + ", please pick up the Sabo'd card from the discard, per the _Wild Wild Galaxy_ galactic event.",
+                                + ", please pick up the Sabo'd card from the discard, per the _Wild, Wild Galaxy_ galactic event.",
                         List.of(codex1));
             }
         } else {
@@ -1711,7 +1711,7 @@ public class ActionCardHelper {
         return null;
     }
 
-    private static boolean isSabotageOrShatter(String acID) {
+    public static boolean isSabotageOrShatter(String acID) {
         return acID.contains("sabo") || acID.contains("shatter");
     }
 

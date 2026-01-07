@@ -2328,7 +2328,7 @@ public class ButtonHelperModifyUnits {
                     + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation(false, false) + " used dimensional splicer.");
+                    event.getMessageChannel(), player.getRepresentation(false, false) + " used _Dimensional Splicer_.");
             buttons = getOpposingUnitsToHit(player, game, tile, false);
             msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         } else if (cause.contains("exo")) {

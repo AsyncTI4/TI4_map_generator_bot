@@ -24,7 +24,8 @@ public class StandardizationAgendaResolver implements AgendaResolver {
         String msg = "Set " + p2.getFactionEmojiOrColor() + " command sheet to 3/" + p2.getFleetCC() + "/2.";
         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
         if (p2.getEffectiveFleetCC() > 3) {
-            msg = p2.getRepresentation() + " use the buttons to lose fleet tokens until you are at 3 total:";
+            msg = p2.getRepresentation()
+                    + ", please lose command tokens from your fleet pool until you are at 4 total.";
             var buttons = ButtonHelper.getLoseFleetCCButtons(p2);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
         }

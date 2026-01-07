@@ -156,12 +156,12 @@ public class CardsInfoService {
                     .isEmpty()) {
                 buttons.add(Buttons.green(
                         "setwillPillageOwnTransactions_no",
-                        "Turn off Pillage pings on your transactions",
+                        "Turn Off Pillage Pings On Your Transactions",
                         FactionEmojis.Mentak));
             } else {
                 buttons.add(Buttons.red(
                         "setwillPillageOwnTransactions_yes",
-                        "Turn on Pillage pings on your transactions",
+                        "Turn On Pillage Pings On Your Transactions",
                         FactionEmojis.Mentak));
             }
         }
@@ -346,7 +346,8 @@ public class CardsInfoService {
         if (game.isTwilightsFallMode() && game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "## Reminder that Genomes can be shattered in Twilight's Fall mode! Use best judgement on whether that is likely to occur and whether you should wait on shatters, usually it will not.");
+                    player.getRepresentation()
+                            + ", a reminder that genomes can be _Shatter_'d! Use best judgement on whether that is likely to occur and whether you should wait for a _Shatter_ (usually it will not).");
         }
     }
 }

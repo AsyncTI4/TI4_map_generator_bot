@@ -26,6 +26,9 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.TileEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -332,7 +335,7 @@ public class ListPlayerInfoService {
                             || game.didPlayerScoreThisAlready(
                                     player.getUserID(),
                                     Mapper.getSecretObjectivesJustNames().get(objID))) {
-                        representation.append("✅  ");
+                        representation.append("✅");
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
                             representation
@@ -342,21 +345,30 @@ public class ListPlayerInfoService {
                                     .append(getObjectiveThreshold(objID, game))
                                     .append(")  ");
                         } else {
-                            representation.append("0/1  ");
+                            representation.append("0/1");
                         }
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
                             && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
-                        representation.append("✅  ");
+                        representation.append("✅");
                     } else {
                         representation
                                 .append(getPlayerProgressOnObjective(objID, game, player))
                                 .append("/")
                                 .append(getObjectiveThreshold(objID, game))
-                                .append("  ");
+                                .append("");
                     }
                 }
+
+                if (!player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
+                    if (player.getFaction().equals(game.getStoredValue("silverFlamed"))) {
+                        representation.append(ExploreEmojis.SilverFlame);
+                    } else if (!Helper.canPlayerScorePOs(game, player)) {
+                        representation.append(TileEmojis.TileGreenBack);
+                    }
+                }
+                representation.append(UnitEmojis.Blank).append(UnitEmojis.Blank);
             }
         }
         return representation.toString();

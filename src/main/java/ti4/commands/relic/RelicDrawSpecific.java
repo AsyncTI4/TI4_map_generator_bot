@@ -41,10 +41,12 @@ class RelicDrawSpecific extends GameStateSubcommand {
         Player player = getPlayer();
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
-        String message = player.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
+        String message = player.getFactionEmoji() + " drew _" + relicModel.getName() + "_ from the relic deck";
         if (forced) {
-            message += " (FORCE DRAW: This relic was not in the deck but was forcefully drawn from the ether)";
+            message +=
+                    " (this was a __forced__ draw; this relic might not have been the deck, but was forcefully summoned from the ether)";
         }
+        message += ".";
         MessageHelper.sendMessageToChannelWithEmbed(
                 event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         RelicHelper.resolveRelicEffects(event, game, player, relicID);

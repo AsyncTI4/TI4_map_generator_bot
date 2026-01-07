@@ -553,7 +553,7 @@ public class ButtonHelperTwilightsFall {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " unfortunately, there are no more splice cards remaining."
+                    player.getRepresentation() + ", unfortunately, there are no more splice cards remaining."
                             + " Please reimburse yourself any costs associated with the splice, using the `/player cc` command."
                             + " Same for anyone else after you in the splice.");
         } else {
@@ -1402,7 +1402,7 @@ public class ButtonHelperTwilightsFall {
                                     player.getCorrectChannel(),
                                     player.getRepresentation() + " you automatically lost the "
                                             + u.getNameRepresentation()
-                                            + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, plase click the green button.",
+                                            + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
                                     buttons);
                         }
                         player.removeOwnedUnitByID(u.getId());
@@ -1427,7 +1427,7 @@ public class ButtonHelperTwilightsFall {
         if (buttonID.contains("pinktfmech")) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " Remove the Mech",
+                    player.getRepresentation() + ", please remove a mech.",
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
         }
     }
