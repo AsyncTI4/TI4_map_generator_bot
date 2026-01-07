@@ -3494,7 +3494,7 @@ public class UnfiledButtonHandlers {
                                 + ", heads up, the bot thinks you should gain " + (properGain == 1 ? "only " : "")
                                 + properGain + " command token"
                                 + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
-                if (player.getMahactCC().size() > 0) {
+                if (player.getMahactCC().size() > 0 && mahactMalev) {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
                     malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
                     malevMsg += " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";

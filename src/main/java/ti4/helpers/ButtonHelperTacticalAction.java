@@ -46,8 +46,6 @@ import ti4.settings.users.UserSettingsManager;
 public class ButtonHelperTacticalAction {
 
     public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
-        ButtonHelper.exploreDET(player, game, event);
-        ButtonHelperFactionSpecific.cleanCavUp(game, event);
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
