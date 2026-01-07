@@ -547,7 +547,7 @@ public class TeHelperActionCards {
                 String label = "Unlock " + p.getBreakthroughModel().getName();
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             } else if (lockedCount > 1) {
-                String label = "Unlock " + p.getFactionModel().getShortName() + " breakthroughs";
+                String label = "Unlock " lockedCount + " " + p.getFactionModel().getShortName() + " Breakthroughs";
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             }
         }
