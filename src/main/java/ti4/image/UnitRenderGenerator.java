@@ -377,6 +377,26 @@ class UnitRenderGenerator {
                     imagePath = "voltron_saiyan_cyan.png";
                 }
                 break;
+            case "at_field":
+                imagePath = "voltron_at_field.png";
+                if (Set.of("tan", "splittan", "cpr", "chk", "splitchk", "bwn", "pch", "org", "splitorg")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_at_field_magenta.png";
+                }
+                break;
+            case "nyan":
+                imagePath = "voltron_nyan.png";
+                break;
+            case "royal":
+                imagePath = "voltron_royal.png";
+                break;
+            case "fancy":
+                imagePath = "voltron_fancy.png";
+                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_fancy_red.png";
+                }
+                break;
             case "eyes":
             default:
                 imagePath = "voltron_eyes.png";
