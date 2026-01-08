@@ -35,6 +35,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
+import ti4.settings.users.UserSettingsManager;
 
 class UnitRenderGenerator {
 
@@ -258,8 +259,8 @@ class UnitRenderGenerator {
                 }
 
                 // INFORMATIONAL DECALS
-                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
                 optionallyDrawMechTearDecal(unitKey, imageX, imageY);
+                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
                 optionallyDrawWarsunCrackDecal(unitKey, imageX, imageY);
 
                 // UNIT TAGS
@@ -330,8 +331,85 @@ class UnitRenderGenerator {
     private void optionallyDrawEidolonMaximumDecal(UnitKey unitKey, int imageX, int imageY) {
         UnitModel model = game.getUnitFromUnitKey(unitKey);
         if (model == null || !"naaz_voltron".equals(model.getAlias())) return;
-        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile("Voltron.png"));
-        tileGraphics.drawImage(voltron, imageX, imageY, null);
+        String style = "eyes";
+        Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+        if (player != null) {
+            style = UserSettingsManager.get(player.getUserID()).getVoltronStyle();
+        }
+        String imagePath;
+        switch (style) {
+            case "arms":
+                imagePath = "voltron_arms.png";
+                if (RandomHelper.isOneInX(20)) {
+                    imagePath = "voltron_arms_pose.png";
+                }
+                break;
+            case "link":
+                imagePath = "voltron_link.png";
+                break;
+            case "saiyan":
+                imagePath = "voltron_saiyan.png";
+                if (Set.of(
+                                "red",
+                                "splitred",
+                                "mgm",
+                                "rby",
+                                "rst",
+                                "bld",
+                                "splitbld",
+                                "pld",
+                                "tan",
+                                "splittan",
+                                "cpr",
+                                "chk",
+                                "splitchk",
+                                "bwn",
+                                "pch",
+                                "org",
+                                "splitorg",
+                                "wsp",
+                                "gld",
+                                "splitgld",
+                                "spr",
+                                "ylw",
+                                "splitylw")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_saiyan_cyan.png";
+                }
+                break;
+            case "eyes":
+            default:
+                imagePath = "voltron_eyes.png";
+                if (Set.of(
+                                "red",
+                                "splitred",
+                                "mgm",
+                                "rby",
+                                "rst",
+                                "bld",
+                                "splitbld",
+                                "pld",
+                                "tan",
+                                "splittan",
+                                "cpr",
+                                "chk",
+                                "splitchk",
+                                "bwn",
+                                "pch",
+                                "org",
+                                "splitorg",
+                                "wsp",
+                                "gld",
+                                "splitgld",
+                                "spr",
+                                "ylw",
+                                "splitylw")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_eyes_blue.png";
+                }
+        }
+        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile(imagePath));
+        tileGraphics.drawImage(voltron, imageX - 22, imageY - 22, null);
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
