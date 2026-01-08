@@ -119,8 +119,8 @@ public abstract class BagDraft {
                 FrankenDraftBagService.displayPlayerHand(owner, p);
             } else {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p)) {
-                    p.getCurrentDraftBag().Contents.removeAll(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItemsInBag(p));
+                    p.getCurrentDraftBag().Contents.removeAll(draftableItemsInBag(p));
                     setPlayerReadyToPass(p, true);
                     MessageHelper.sendMessageToChannel(
                             this.findExistingBagChannel(p),
