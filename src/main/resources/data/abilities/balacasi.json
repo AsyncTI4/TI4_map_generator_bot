@@ -82,7 +82,7 @@
         "id": "patience",
         "name": "Patience",
         "faction": "onyxxa",
-        "permanentEffect": "At the end of the strategy phase, place the Onyxxa Infinity token on your strategy card. You are last in initiative order. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
+        "permanentEffect": "At the end of the strategy phase, place the Onyxxa Infinity token on your strategy card; you are last in initiative order.",
         "source": "balacasi"
     },
     {
@@ -97,6 +97,13 @@
         "name": "Increased Surveillance",
         "faction": "onyxxa",
         "permanentEffect": "When you resolve the primary ability of a strategy card, place a control token on your commander. At the start of the status phase, remove your control tokens from your commander.",
+        "source": "balacasi"
+    },
+    {
+        "id": "detachment",
+        "name": "Detachment",
+        "faction": "onyxxa",
+        "permanentEffect": "During the strategy phase, you cannot choose or be given the “Politics” strategy card if there is another unchosen strategy card. When you perform a strategic action, resolve your strategy card’s secondary ability instead of its primary ability.",
         "source": "balacasi"
     },
     {
