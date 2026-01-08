@@ -110,6 +110,7 @@ public class Game extends GameProperties {
     @Getter
     private Map<String, Player> players = new LinkedHashMap<>();
 
+    private final Map<String, Planet> planets = new HashMap<>();
     private final Map<FOWOption, Boolean> fowOptions = new HashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
