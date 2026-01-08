@@ -536,6 +536,9 @@ public class MapGenerator implements AutoCloseable {
             case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
             case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
             case "1434632452097446040" -> server = "asyncti_icon_tournaments";
+            case "1458845770672377989" -> server = "asyncti_icon_planetaryducksystem";
+            case "1458844879709929532" -> server = "asyncti_icon_stroatymcstroatface";
+            case "1458845518393246032" -> server = "asyncti_icon_dannelscampground";
             // fog of war?
             // megagames?
             default -> server = "asyncti_icon_unknown";
