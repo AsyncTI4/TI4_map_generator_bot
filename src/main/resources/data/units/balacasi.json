@@ -96,7 +96,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Apply +2 to this unit combat rolls if there is a space dock on this planet."
+        "ability": "During combat on a planet that contains a space dock, apply +2 to the result of this unit's combat rolls."
     },
     {
         "id": "kalora_flagship",
@@ -241,7 +241,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "After you activate this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives."
+        "ability": "At the end of a tactical action in this system, you may place 1 fighter in this system. Apply +1 to the capacity of this ship for each of your scored secret objectives."
     },
     {
         "id": "onyxxa_flagship",
@@ -440,7 +440,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "Apply +3 to the result to each of this unit's combat rolls if this planet contains a technology specialty."
+        "ability": "After your units on this planet make rolls for a unit ability, if this planet contains no more than 1 of your mechs, apply +2 to the result of each of those dice."
     },
     {
         "id": "vyserix_pds",
@@ -506,7 +506,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "During a tactical action, you may apply +1 to the move value of 1 ship moving out of or through this system. This effect cannot be applied multiple times to the same ship."
+        "ability": "During a tactical action, you may damage this unit to apply +1 to the move value of 1 ship moving through this system. This effect cannot be applied multiple times to the same ship."
     },
     {
         "id": "zephyrion_cruiser",
