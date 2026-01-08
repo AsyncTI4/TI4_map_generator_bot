@@ -284,6 +284,32 @@ class FrankenButtonHandler {
                     }
                     int passCounter = 0;
                     while (draft.allPlayersReadyToPass()) {
+                        if (draft.isDraftStageComplete()) {
+                            if (draft instanceof InauguralSpliceFrankenDraft) {
+                                // The Inaugural Splice is AFTER secret/public objectives, BEFORE the strategy phase, so
+                                // need a button to start that now
+                                Button startStrategyPhaseButton =
+                                        Buttons.green("startOfGameStrategyPhase", "Start Strategy Phase");
+                                MessageHelper.sendMessageToChannel(
+                                        game.getActionsChannel(),
+                                        game.getPing() + ", the inaugural splice is complete!\n\n"
+                                                + "Once all players have selected their kept abilities, genome and unit, press this button to start the game.",
+                                        List.of(startStrategyPhaseButton));
+                                FrankenDraftBagService.applyDraftBags(event, game, false);
+                            } else {
+                                Button randomizeButton =
+                                        Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");
+                                Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis Build Slices");
+                                MessageHelper.sendMessageToChannel(
+                                        game.getActionsChannel(),
+                                        game.getPing()
+                                                + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.",
+                                        List.of(randomizeButton, mantisButton));
+
+                                FrankenDraftBagService.applyDraftBags(event, game);
+                            }
+                            return;
+                        }
                         FrankenDraftBagService.passBags(game);
                         passCounter++;
                         if (passCounter > game.getRealPlayers().size()) {
