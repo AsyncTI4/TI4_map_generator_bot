@@ -596,7 +596,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
         p2.refreshPlanet(planet);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getRepresentationUnfogged() + " you readied " + planetRep + ".");
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + ", you readied " + planetRep + ".");
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),

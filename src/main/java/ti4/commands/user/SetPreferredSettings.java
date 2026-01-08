@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.settings.users.UserSettingsManager;
 
@@ -16,6 +17,9 @@ class SetPreferredSettings extends Subcommand {
                 OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.VOLTRON_STYLE, "Choose what your Eidolon Maximum looks like")
+                .setAutoComplete(true));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "auto_debt_clearance",
@@ -53,6 +57,9 @@ class SetPreferredSettings extends Subcommand {
 
         Boolean sarween = event.getOption("sarween_msg", null, OptionMapping::getAsBoolean);
         if (sarween != null) userSettings.setPrefersSarweenMsg(sarween);
+
+        String voltron = event.getOption(Constants.VOLTRON_STYLE, null, OptionMapping::getAsString);
+        if (voltron != null) userSettings.setVoltronStyle(voltron);
 
         Boolean agenda = event.getOption("pass_on_agenda_stuff", null, OptionMapping::getAsBoolean);
         if (agenda != null) userSettings.setPrefersPassOnWhensAfters(agenda);
