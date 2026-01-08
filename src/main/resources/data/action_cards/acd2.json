@@ -337,7 +337,7 @@
         "phase": "Action",
         "window": "After 1 of your non-fighter ships is destroyed",
         "text": "Choose 1 planet in that unit's system. Destroy 1 ground force and 1 PDS on that planet.",
-        "flavorText": "The Exotrireme became a guide missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
+        "flavorText": "The Exotrireme became a guided missile in its death-throes, transforming the Sol base into a burning crater of steel and death.",
         "source": "action_deck_2"
     },
     {
