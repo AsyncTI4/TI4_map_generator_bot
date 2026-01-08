@@ -171,6 +171,10 @@ public class BreakthroughCommandHelper {
             player.setBreakthroughUnlocked(btID, true);
             player.setBreakthroughExhausted(btID, false);
             String message = player.getRepresentation() + " unlocked their _" + bt.getName() + "_ breakthrough.";
+            if ("naazbt".equalsIgnoreCase(bt.getID())) {
+                message +=
+                        "\n-# You may choose a style of Eidolon Maximum with the `/user set_preferred_settings voltron_style:` command.";
+            }
             List<MessageEmbed> embeds = Collections.singletonList(bt.getRepresentationEmbed());
             MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), message, embeds);
             if ("yinbt".equalsIgnoreCase(bt.getID())) {
