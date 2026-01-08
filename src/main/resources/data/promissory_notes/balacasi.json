@@ -34,7 +34,7 @@
         "color": "",
         "playArea": true,
         "source": "balacasi",
-        "text": "When you would spend a command token from your strategy pool to resolve the secondary ability of a strategy card other than Politics: Place this card face up in your play area. You may spend an additional command token from your strategy pool to resolve the primary ability of that card instead. At the start of the status phase, return this card to the Onyxxa player."
+        "text": "When you would spend a command token from your strategy pool to resolve the secondary ability of the Onyxxa player's strategy card: Place this card face up in your play area. You may resolve the primary ability of that card instead. At the start of the status phase, return this card to the Onyxxa player."
     },
     {
         "alias": "bapnluna",
@@ -61,7 +61,7 @@
         "color": "",
         "playArea": false,
         "source": "balacasi",
-        "text": "At the start of an invasion: During this invasion, all planets you control in this system gain PLANETARY SHIELD as if they were a unit. Then, return this card to the Vyserix player."
+        "text": "At the end of your tactical action: Remove up to 3 of your ground forces from the active system and place them on planets you control in your home system. Then, return this card to the Vyserix player."
     },
     {
         "alias": "bapnzeph",

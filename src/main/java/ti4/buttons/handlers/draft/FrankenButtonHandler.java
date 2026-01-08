@@ -12,6 +12,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.CommoditiesDraftItem;
+import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -332,6 +333,14 @@ class FrankenButtonHandler {
         DraftItem selectedItem = DraftItem.generateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {
+            if (player.getCurrentDraftBag().Contents.contains(selectedItem)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "You have already automatically drafted " + selectedItem.getShortDescription()
+                                + ". Please wait now until the rest of the players finish drafting.");
+                ButtonHelper.deleteAllButtons(event);
+                return;
+            }
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription()
