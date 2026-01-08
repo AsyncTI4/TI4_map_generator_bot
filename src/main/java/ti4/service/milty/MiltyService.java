@@ -298,7 +298,7 @@ public class MiltyService {
         player.getPlanets().clear();
         player.getTechs().clear();
         player.getFactionTechs().clear();
-        for (String bt : player.getBreakthroughIDs()) player.removeBreakthrough(bt);
+        for (String bt : new ArrayList<>(player.getBreakthroughIDs())) player.removeBreakthrough(bt);
 
         FactionModel factionModel = player.getFactionSetupInfo();
 
