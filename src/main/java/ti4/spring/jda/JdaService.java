@@ -342,6 +342,12 @@ public class JdaService {
     }
 
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
+        if (!guildID.matches("\\b[0-9]+\\b")) {
+            BotLogger.error(
+                    "Invalid Guild ID provided: " + guildID
+                            + "\n> Please correct the ID [here](https://github.com/AsyncTI4/TI4_map_generator_bot/settings/variables/actions/GUILDID_LIST)");
+            return null;
+        }
         Guild guild = jda.getGuildById(guildID);
         if (guild == null) {
             BotLogger.error("JDA FAILED TO FIND GUILD with ID: `" + guildID
