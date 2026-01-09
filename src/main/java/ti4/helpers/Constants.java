@@ -644,6 +644,7 @@ public class Constants {
     public static final String TARGET_FACTION_OR_COLOR = "target_faction_or_color";
     public static final String TARGET_PLAYER = "target_player";
     public static final String TECH_TYPE = "tech_type";
+    public static final String TECH_TYPE_AND_UNIT_UPGRADES = "tech_type_and_unit_upgrades";
     public static final String STATS = "stats";
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
@@ -921,6 +922,7 @@ public class Constants {
     public static final String TECH_UNPURGE = "unpurge";
     public static final String TECH_EXHAUST = "exhaust";
     public static final String TECH_REFRESH = "ready";
+    public static final String TECH_SHOW_DECK = "show_deck";
 
     public static final String PLANET_ADD = "add";
     public static final String PLANET_REMOVE = "remove";
