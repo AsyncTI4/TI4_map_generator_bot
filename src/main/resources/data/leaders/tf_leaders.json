@@ -75,7 +75,7 @@
         "name": "Voice of the Council",
         "title": "Xxcha Paradigm",
         "abilityWindow": "ACTION:",
-        "abilityText": "Reveal 3 editcs; choose 1 to resolve and suffle the rest back into the edict deck. Then, purge this card.",
+        "abilityText": "Reveal 3 edicts; choose 1 to resolve and shuffle the rest back into the edict deck. Then, purge this card.",
         "unlockCondition": "Always Unlocked",
         "source": "twilights_fall"
     },

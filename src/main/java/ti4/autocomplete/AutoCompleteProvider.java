@@ -217,7 +217,8 @@ public class AutoCompleteProvider {
             }
             case Constants.VOLTRON_STYLE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = List.of("eyes", "arms", "link", "saiyan", "at_field", "nyan", "fancy", "royal");
+                List<String> values = List.of(
+                        "eyes", "arms", "link", "saiyan", "at_field", "nyan", "fancy", "royal", "baba", "minis");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }

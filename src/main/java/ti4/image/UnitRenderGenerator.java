@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
@@ -336,6 +337,25 @@ class UnitRenderGenerator {
         if (player != null) {
             style = UserSettingsManager.get(player.getUserID()).getVoltronStyle();
         }
+
+        if ("minis".equals(style)) {
+            BufferedImage unitImage = ImageHelper.readScaled(getUnitPath(unitKey), 0.5f);
+            double angle = 2 * Math.PI * ThreadLocalRandom.current().nextDouble();
+            for (int i = 0; i < 3; i++) {
+                double radius = 12 * ThreadLocalRandom.current().nextDouble() + 22;
+                tileGraphics.drawImage(
+                        unitImage,
+                        (int) (imageX + radius * Math.cos(angle) + 11.5),
+                        (int) (imageY + radius * Math.sin(angle) + 11.5),
+                        null);
+                angle += (4 * Math.PI / 9)
+                        * (ThreadLocalRandom.current().nextDouble()
+                                + ThreadLocalRandom.current().nextDouble()
+                                + ThreadLocalRandom.current().nextDouble());
+            }
+            return;
+        }
+
         String imagePath;
         switch (style) {
             case "arms":
@@ -396,6 +416,9 @@ class UnitRenderGenerator {
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_fancy_red.png";
                 }
+                break;
+            case "baba":
+                imagePath = "voltron_baba.png";
                 break;
             case "eyes":
             default:
