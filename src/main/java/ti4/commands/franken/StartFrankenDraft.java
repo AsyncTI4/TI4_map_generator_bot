@@ -34,7 +34,9 @@ class StartFrankenDraft extends GameStateSubcommand {
         Game game = getGame();
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
-        if (!force && game.getPlayers().values().stream().anyMatch(Player::isRealPlayer)) {
+        if (!force
+                && game.getPlayers().values().stream().anyMatch(Player::isRealPlayer)
+                && !game.isTwilightsFallMode()) {
             String message =
                     "There are players that are currently set up already. Please rerun the command with the force option set to True to overwrite them.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
