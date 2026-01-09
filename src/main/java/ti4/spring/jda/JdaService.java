@@ -178,7 +178,7 @@ public class JdaService {
         // Async: FOW Chapter
         if (args.length >= 5) {
             guildFogOfWar = initGuild(args[4], false);
-            fowServers.add(guildFogOfWar);
+            if (guildFogOfWar != null) fowServers.add(guildFogOfWar);
         }
 
         // Async: Stroter's Paradise
@@ -229,7 +229,7 @@ public class JdaService {
         // Async: FOW Chapter Secondary
         if (args.length >= 15) {
             guildFogOfWarSecondary = initGuild(args[14], false);
-            fowServers.add(guildFogOfWarSecondary);
+            if (guildFogOfWarSecondary != null) fowServers.add(guildFogOfWarSecondary);
         }
 
         // Async: Tournament Server 1
