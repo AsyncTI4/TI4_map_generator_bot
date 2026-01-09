@@ -100,8 +100,6 @@ public class JdaService {
     private static Guild guildDecenary;
     private static Guild guildUndenary;
     private static Guild guildDuodenary;
-    private static Guild guildTredenary;
-    private static Guild guildQuadrodenary;
     public static Guild guildFogOfWar;
     public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
@@ -247,19 +245,9 @@ public class JdaService {
             guildUndenary = initGuild(args[17], true);
         }
 
-        // Async: Stroaty McStroatface
+        // Async: 12th Server
         if (args.length >= 19) {
             guildDuodenary = initGuild(args[18], true);
-        }
-
-        // Async: Planetary Duck System
-        if (args.length >= 20) {
-            guildTredenary = initGuild(args[19], true);
-        }
-
-        // Async: Dannel's Camp Ground
-        if (args.length >= 21) {
-            guildQuadrodenary = initGuild(args[20], true);
         }
 
         if (guildPrimary == null || guilds.isEmpty()) {
@@ -270,9 +258,8 @@ public class JdaService {
         }
 
         BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
-                + guilds.size() + " total servers connected\n> "
-                + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
-                + fowServers.size() + " Fog of War servers");
+                + guilds.size() + " servers connected\n> "
+                + serversToCreateNewGamesOn.size() + " servers for new games");
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -430,9 +417,7 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1434632452097446046")); // Async Tourney
         adminRoles.add(jda.getRoleById("1434180793139204204")); // Async Decenary (Great Carrier Reef)
         adminRoles.add(jda.getRoleById("1434181175944941655")); // Async Undenary (PDStrians)
-        adminRoles.add(jda.getRoleById("1458844879709929540")); // Async Duodenary (Stroaty McStroatface)
-        adminRoles.add(jda.getRoleById("1458845770672377997")); // Async Tredenary (Planetary Duck System)
-        adminRoles.add(jda.getRoleById("1458845518393246040")); // Async Quadrodenary (Dannel's Camp Ground)
+        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1429853811899502675")); // FoW Server Chapter 2
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
@@ -473,9 +458,7 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1434632452097446045")); // Async Tourney
         developerRoles.add(jda.getRoleById("1434180793139204203")); // Async Decenary (Great Carrier Reef)
         developerRoles.add(jda.getRoleById("1434181175944941654")); // Async Undenary (PDStrians)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (Stroaty McStroatface)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Tredenary (Planetary Duck System)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Quadrodenary (Dannel's Camp Ground)
+        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1429853811882594528")); // FoW Server Chapter 2
         developerRoles.add(jda.getRoleById("1395072365389680711")); // Megagame Server
@@ -508,9 +491,7 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1434632452097446043")); // Async Tourney
         bothelperRoles.add(jda.getRoleById("1434180793139204201")); // Async Decenary (Great Carrier Reef)
         bothelperRoles.add(jda.getRoleById("1434181175944941652")); // Async Undenary (PDStrians)
-        bothelperRoles.add(jda.getRoleById("1458844879709929536")); // Async Duodenary (Stroaty McStroatface)
-        bothelperRoles.add(jda.getRoleById("1458845770672377993")); // Async Tredenary (Planetary Duck System)
-        bothelperRoles.add(jda.getRoleById("1458845518393246036")); // Async Quadrodenary (Dannel's Camp Ground)
+        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1429853811891241128")); // FoW Server Chapter 2 Bothelper
