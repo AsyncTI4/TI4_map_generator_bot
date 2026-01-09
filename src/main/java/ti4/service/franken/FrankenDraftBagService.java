@@ -447,7 +447,7 @@ public class FrankenDraftBagService {
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }
-        if (skipped) {
+        if (skipped && !game.isTwilightsFallMode()) {
             sb.append(
                     "\nSome players were skipped. Please confirm they are set up as an empty franken shell faction before proceeding with the draft");
         }
