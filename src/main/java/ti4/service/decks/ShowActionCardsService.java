@@ -76,7 +76,7 @@ public class ShowActionCardsService {
                 .filter(x -> game.getDiscardACStatus().get(x.getKey()) == ACStatus.purged)
                 .toList();
         if (!purged.isEmpty()) {
-            String title = "__Purged__ Action cards";
+            String title = "Purged action cards";
             return acDiscardText(showFullText, purged, title, game);
         }
         return null;
