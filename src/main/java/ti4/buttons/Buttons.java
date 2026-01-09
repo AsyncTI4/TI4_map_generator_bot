@@ -167,6 +167,10 @@ public class Buttons {
             // BotLogger.log("Button sanitized: " + id);
             return Button.of(style, id, " ", null);
         }
+        if (label != null && label.length() > 80) {
+            BotLogger.info("Button [" + id + "] label too long, truncating: " + label);
+            label = label.substring(0, 77) + "...";
+        }
         return Button.of(style, id, label, e);
     }
 
