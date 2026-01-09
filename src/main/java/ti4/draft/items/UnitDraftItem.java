@@ -81,11 +81,16 @@ public class UnitDraftItem extends DraftItem {
             sb.append(unit.getCapacityValue());
             sb.append(" ");
         }
+        if (unit.getMoveValue() > 0) {
+            sb.append("Move ");
+            sb.append(unit.getMoveValue());
+            sb.append(" ");
+        }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(" ");
         if (unit.getFaction().isPresent()) {
             sb.append("Faction: ").append(unit.getFaction().get());
         }
-        return sb.toString();
+        return sb.toString() + "\n";
     }
 
     @JsonIgnore

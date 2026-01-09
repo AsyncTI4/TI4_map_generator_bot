@@ -5523,15 +5523,14 @@ public class ButtonHelper {
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId
                             + "_" + trait + "kolleccbt";
-                    String buttonMessage2 = "Exhaust _The Collector's Museum_ and explore discard on "
-                            + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "") + ".";
+                    String buttonMessage2 =
+                            "Explore " + trait + " discard on " + planetRepresentation + ". (Kollecc BT)";
                     buttons.add(Buttons.gray(buttonId2, buttonMessage2, ExploreEmojis.getTraitEmoji(trait)));
                 }
             }
         }
         if (player.hasUnlockedBreakthrough("augersbt") && buttons.size() > 0) {
-            buttons.add(Buttons.green(
-                    "draw_1_ACDelete", "Draw 1 Action Card Instead (Breakthrough)", FactionEmojis.augers));
+            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 AC Instead (Breakthrough)", FactionEmojis.augers));
         }
         return buttons;
     }
@@ -7128,6 +7127,19 @@ public class ButtonHelper {
                 if (t.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip)
                         && !t.getWormholes(game).isEmpty()) {
                     tilesWithProduction.add(t);
+                }
+            }
+        }
+        if (player.hasTech("ahl")) {
+            for (Tile t : game.getTileMap().values()) {
+                for (UnitHolder uh : t.getUnitHolders().values()) {
+                    if (uh instanceof Planet planet) {
+                        if (planet.getUnitCount(UnitType.Pds, player) + planet.getUnitCount(UnitType.Spacedock, player)
+                                > 0) {
+                            tilesWithProduction.add(t);
+                            break;
+                        }
+                    }
                 }
             }
         }
