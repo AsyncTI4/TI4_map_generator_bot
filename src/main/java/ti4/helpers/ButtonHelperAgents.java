@@ -1540,11 +1540,7 @@ public class ButtonHelperAgents {
                     && !exhaustedMessage.contains("please choose the target")
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
-                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
-                    buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-                } else {
-                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
-                }
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
 
             } else {
                 buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

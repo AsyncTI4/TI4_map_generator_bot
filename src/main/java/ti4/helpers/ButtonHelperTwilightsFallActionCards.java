@@ -36,7 +36,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveEngineer(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("engineerACSplice", "take_remove_remove");
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(),
+                player.getCorrectChannel(),
                 player.getRepresentation()
                         + " added 2 more cards to the splice. You should be prompted to discard 2 cards from the splice after choosing yours.");
         ButtonHelper.deleteMessage(event);

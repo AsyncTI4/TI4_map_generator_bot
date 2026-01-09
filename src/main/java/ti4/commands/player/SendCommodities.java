@@ -72,7 +72,7 @@ class SendCommodities extends GameStateSubcommand {
         String p2 = targetPlayer.getRepresentation();
         String commString = sendCommodities + " commodit" + (sendCommodities == 1 ? "y" : "ies");
         String message = p1 + " sent " + commString + " to " + p2 + ".";
-        MessageHelper.sendMessageToEventChannel(event, message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, targetPlayer, sendCommodities);
         ButtonHelperAbilities.pillageCheck(targetPlayer, game);
         ButtonHelperAbilities.pillageCheck(player, game);

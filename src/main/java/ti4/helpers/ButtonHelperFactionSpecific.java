@@ -1097,7 +1097,8 @@ public class ButtonHelperFactionSpecific {
                     .orElse("")
                     .isEmpty()) {
                 techs.add(Buttons.green(
-                        "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
+                        player.getFinsFactionCheckerPrefix() + "getTech_"
+                                + Mapper.getTech(tech).getAlias() + "__noPay",
                         Mapper.getTech(tech).getName()));
             }
         }
