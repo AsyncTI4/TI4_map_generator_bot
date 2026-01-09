@@ -245,10 +245,10 @@ public class JdaService {
             guildUndenary = initGuild(args[17], true);
         }
 
-        // Async: 12th Server
-        if (args.length >= 19) {
-            guildDuodenary = initGuild(args[18], true);
-        }
+        // // Async: 12th Server
+        // if (args.length >= 19) {
+        //     guildDuodenary = initGuild(args[18], true);
+        // }
 
         if (guildPrimary == null || guilds.isEmpty()) {
             BotLogger.info("Failed to start the bot on the primary guild. Aborting.");
