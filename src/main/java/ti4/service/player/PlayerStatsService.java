@@ -77,6 +77,11 @@ public class PlayerStatsService {
         sb.append("> Faction Technologies: `").append(player.getFactionTechs()).append("`\n");
         sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
+        if (player.getBreakthroughIDs().isEmpty()) {
+            sb.append("> Breakthroughs: `None`\n");
+        } else {
+            sb.append("> Breakthroughs: `").append(player.getBreakthroughIDs()).append("`\n");
+        }
         sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
         sb.append("> Owned Promissory Notes: `")

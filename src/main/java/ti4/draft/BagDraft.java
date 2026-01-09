@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -119,8 +120,20 @@ public abstract class BagDraft {
                 FrankenDraftBagService.displayPlayerHand(owner, p);
             } else {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p)) {
-                    p.getDraftHand().Contents.addAll(draftableItemsInBag(p));
-                    p.getCurrentDraftBag().Contents.removeAll(draftableItemsInBag(p));
+                    List<DraftItem> draftableItems = new ArrayList<>();
+                    draftableItems.addAll(draftableItemsInBag(p));
+                    p.getDraftHand().Contents.addAll(draftableItems);
+                    this.findExistingBagChannel(p)
+                            .getHistory()
+                            .retrievePast(100)
+                            .queue(m -> {
+                                if (!m.isEmpty()) {
+                                    this.findExistingBagChannel(p)
+                                            .deleteMessages(m)
+                                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                                }
+                            });
+                    p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);
                     MessageHelper.sendMessageToChannel(
                             this.findExistingBagChannel(p),
@@ -328,6 +341,7 @@ public abstract class BagDraft {
             sb.append("> ");
             if (player.isReadyToPassBag()) {
                 sb.append("✅");
+
             } else {
                 sb.append("❌");
             }
@@ -341,6 +355,10 @@ public abstract class BagDraft {
                     .append("/")
                     .append(owner.getFrankenBagSize())
                     .append(")");
+            if (player.isReadyToPassBag()) {
+                sb.append(" (passing a bag of size "
+                        + player.getCurrentDraftBag().Contents.size() + ")");
+            }
             sb.append("\n");
         }
         return sb.toString();
