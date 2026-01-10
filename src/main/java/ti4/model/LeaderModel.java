@@ -186,8 +186,19 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         String title_name_component = "";
         String title_subtitle_component = "";
         if (useTwilightsFallText) {
-            title_name_component = getTFName().orElse(name);
-            title_subtitle_component = getTFTitle().orElse(title);
+            if (getTFName().isPresent() && !getTFName().get().isBlank()) {
+                title_name_component = getTFName().get();
+            } else {
+                title_name_component = name;
+            }
+            if (getTFTitle().isPresent() && !getTFTitle().get().isBlank()) {
+                title_subtitle_component = getTFTitle().get();
+            } else {
+                title_subtitle_component = title;
+            }
+        } else {
+            title_name_component = name;
+            title_subtitle_component = title;
         }
         String title = factionEmoji + " __**" + title_name_component + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type)
                 + " " + title_subtitle_component + source.emoji();
