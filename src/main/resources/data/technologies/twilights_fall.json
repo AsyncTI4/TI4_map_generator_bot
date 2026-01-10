@@ -6,6 +6,7 @@
             "BIOTIC"
         ],
         "text": "At the start of the status phase: Place 1 infantry from your reinforcements on any planet you control.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-mitosis.png?raw=true",
         "source": "twilights_fall",
         "faction": "arborec"
     },
@@ -16,6 +17,7 @@
             "BIOTIC"
         ],
         "text": "After another player moves ships into a system that contains 1 or more of your units: You may place 1 command token from that player's reinforcements in any non-home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-stymie.png?raw=true",
         "source": "twilights_fall",
         "faction": "arborec"
     },
@@ -27,6 +29,7 @@
             "BIOTIC"
         ],
         "text": "At the end of the status phase: You may remove any number of ground forces from planets you control and place them on 1 or more planets you control in the same or adjacent systems.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-bio.png?raw=true",
         "source": "twilights_fall",
         "faction": "arborec"
     },
@@ -37,6 +40,7 @@
             "WARFARE"
         ],
         "text": "The maximum number of non-fighter ships you can have in each system is equal to 2 more than the number of tokens in your fleet pool.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-armada.png?raw=true",
         "source": "twilights_fall",
         "faction": "letnev"
     },
@@ -47,6 +51,7 @@
             "WARFARE"
         ],
         "text": "At the start of each round of space combat: You may spend 2 trade goods; you may re-roll any number of your dice during that combat round.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-munitions.png?raw=true",
         "source": "twilights_fall",
         "faction": "letnev"
     },
@@ -54,10 +59,11 @@
         "alias": "wavelength",
         "name": "Wavelength",
         "shortName": "Wave-\nlength",
-        "initials": "W#L",
+        "initials": "WL",
         "types": [
             "NONE"
         ],
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/wavelength.png?raw=true",
         "source": "twilights_fall",
         "text": "Your ships can move into and through asteroid fields. When you activate a system, you may explore 1 planet in that system that contains 1 or more of your units."
     },
@@ -65,10 +71,11 @@
         "alias": "antimatter",
         "name": "Antimatter",
         "shortName": "Anti-\nmatter",
-        "initials": "A#M",
+        "initials": "AM",
         "types": [
             "NONE"
         ],
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/antimatter.png?raw=true",
         "source": "twilights_fall",
         "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, explore that token.\nYour ships can retreat into adjacent systems that do not contain other players' units, even if you do not have units or control planets in that system."
     },
@@ -80,6 +87,7 @@
             "WARFARE"
         ],
         "text": "When 1 of your units uses SUSTAIN DAMAGE: Cancel 2 hits instead of 1.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-nes.png?raw=true",
         "source": "twilights_fall",
         "faction": "letnev"
     },
@@ -90,6 +98,7 @@
             "CYBERNETIC"
         ],
         "text": "After you gain control of a planet: Gain 1 trade good.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-scavenge.png?raw=true",
         "source": "twilights_fall",
         "faction": "saar"
     },
@@ -100,6 +109,7 @@
             "PROPULSION"
         ],
         "text": "You can score objectives even if you do not control the planets in your home system.\nOther players cannot activate asteroid fields that contain 1 or more of your ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-nomadic.png?raw=true",
         "source": "twilights_fall",
         "faction": "saar"
     },
@@ -110,6 +120,7 @@
             "CYBERNETIC"
         ],
         "text": "At the start of your turn in the action phase: You may produce 1 unit in a system that contains at least 1 of your units that has PRODUCTION.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-chaos.png?raw=true",
         "source": "twilights_fall",
         "faction": "saar"
     },
@@ -120,6 +131,7 @@
             "CYBERNETIC"
         ],
         "text": "After you spend a token from your strategy pool: You may gain 1 trade good.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-stellargenesis.png?raw=true",
         "source": "twilights_fall",
         "faction": "muaat"
     },
@@ -130,6 +142,7 @@
             "CYBERNETIC"
         ],
         "text": "Action: Spend 1 token from your strategy pool to place either 2 fighters or 1 destroyer from your reinforcements in a system that contains 1 or more of your ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-starforge.png?raw=true",
         "source": "twilights_fall",
         "faction": "muaat"
     },
@@ -140,6 +153,7 @@
             "PROPULSION"
         ],
         "text": "Your units can move into and through supernovas.\nEach supernova that does not contain other players' units and each system that contains 1 or more of your war suns gains PRODUCTION 5 as if it were one of your units.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-mr.png?raw=true",
         "source": "twilights_fall",
         "faction": "muaat"
     },
@@ -151,6 +165,7 @@
             "PROPULSION"
         ],
         "text": "You can negotiate transactions with players who are not your neighbor.\nYou can exchange action cards with other players as part of transactions.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-guildships.png?raw=true",
         "source": "twilights_fall",
         "faction": "hacan"
     },
@@ -161,6 +176,7 @@
             "CYBERNETIC"
         ],
         "text": "When 1 or more of your units use PRODUCTION: Reduce the combined cost of the produced units by 2.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-sledfactories.png?raw=true",
         "source": "twilights_fall",
         "faction": "hacan"
     },
@@ -173,6 +189,7 @@
             "CYBERNETIC"
         ],
         "text": "At the end of the strategy phase: You may spend 1 token from your strategy pool and give another player 3 of your trade goods. If you do, give 1 of your strategy cards to that player and take 1 of their strategy cards.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-qdn.png?raw=true",
         "source": "twilights_fall",
         "faction": "hacan"
     },
@@ -183,6 +200,7 @@
             "BIOTIC"
         ],
         "text": "When you gain command tokens during the status phase: Gain 1 additional command token.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-versatile.png?raw=true",
         "source": "twilights_fall",
         "faction": "sol"
     },
@@ -193,6 +211,7 @@
             "BIOTIC"
         ],
         "text": "ACTION: Spend 1 token from your strategy pool to place 2 infantry from your reinforcements on 1 planet you control.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-orbitaldrop.png?raw=true",
         "source": "twilights_fall",
         "faction": "sol"
     },
@@ -203,6 +222,7 @@
             "BIOTIC"
         ],
         "text": "After 1 of your ground forces are destroyed: Roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-specops.png?raw=true",
         "source": "twilights_fall",
         "faction": "sol"
     },
@@ -215,6 +235,7 @@
             "PROPULSION"
         ],
         "text": "You treat all systems that contain an alpha or beta wormhole as adjacent to each other. Game effects cannot prevent you from using this ability.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-quantumentanglement.png?raw=true",
         "source": "twilights_fall",
         "faction": "ghost"
     },
@@ -226,6 +247,7 @@
             "PROPULSION"
         ],
         "text": "During your tactical actions: Apply +1 to the move value of each of your ships that starts its movement in a system that contains a wormhole.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-slipstream.png?raw=true",
         "source": "twilights_fall",
         "faction": "ghost"
     },
@@ -237,6 +259,7 @@
             "WARFARE"
         ],
         "text": "At the start of a space combat in a system that contains a wormhole and 1 or more of your ships: You may produce 1 hit and assign it to 1 of your opponent's ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-ds.png?raw=true",
         "source": "twilights_fall",
         "faction": "ghost"
     },
@@ -248,6 +271,7 @@
             "CYBERNETIC"
         ],
         "text": "When you gain control of a planet: Replace each structure on that planet with a matching unit from your reinforcements.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-assimilate.png?raw=true",
         "source": "twilights_fall",
         "faction": "l1z1x"
     },
@@ -258,6 +282,7 @@
             "WARFARE"
         ],
         "text": "At the end of each round of ground combat: Your ships in the active system may use their bombardment abilities against your opponent's ground forces on the planet.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-harrow.png?raw=true",
         "source": "twilights_fall",
         "faction": "l1z1x"
     },
@@ -269,6 +294,7 @@
             "CYBERNETIC"
         ],
         "text": "During the status phase: Draw 1 additional action card and gain 1 additional command token.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-inheritancesystems.png?raw=true",
         "source": "twilights_fall",
         "faction": "l1z1x"
     },
@@ -279,6 +305,7 @@
             "WARFARE"
         ],
         "text": "At the start of a space combat: You may roll 1 die for each of up to 2 of your cruisers or destroyers in the system. For each result equal to or greater than that ship's combat value, produce 1 hit; your opponent must assign it to 1 of their ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-ambush.png?raw=true",
         "source": "twilights_fall",
         "faction": "mentak"
     },
@@ -289,6 +316,7 @@
             "CYBERNETIC"
         ],
         "text": "After 1 of your neighbors gains trade goods or resolves a transaction: If they have 3 or more trade goods, you may take 1 of their trade goods or commodities.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-pillage.png?raw=true",
         "source": "twilights_fall",
         "faction": "mentak"
     },
@@ -299,6 +327,7 @@
             "CYBERNETIC"
         ],
         "text": "When you spend trade goods: Each trade good is worth 2 resources or influence instead of 1.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-mc.png?raw=true",
         "source": "twilights_fall",
         "faction": "mentak"
     },
@@ -309,6 +338,7 @@
             "PROPULSION"
         ],
         "text": "After another player moves ships into a system that contains 1 or more of your ships: You may place 1 token from your reinforcements in an adjacent system that does not contain another player's ships; move your ships from the active system into that system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-foresight.png?raw=true",
         "source": "twilights_fall",
         "faction": "naalu"
     },
@@ -319,6 +349,7 @@
             "BIOTIC"
         ],
         "text": "At the end of the strategy phase: Place the Naalu \"0\" token on your strategy card; you are first in initiative order.\nThis card cannot have a singularity token placed on it.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-telepathic.png?raw=true",
         "source": "twilights_fall",
         "faction": "naalu"
     },
@@ -330,6 +361,7 @@
             "WARFARE"
         ],
         "text": "After another player activates a system that contains 1 or more of your ships: That player removes 1 token from their fleet pool and returns it to their reinforcements.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-ng.png?raw=true",
         "source": "twilights_fall",
         "faction": "naalu"
     },
@@ -341,6 +373,7 @@
             "BIOTIC"
         ],
         "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity X\" token on one of your opponent's abilities. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-singularityx.png?raw=true",
         "source": "twilights_fall",
         "faction": "nekro"
     },
@@ -352,6 +385,7 @@
             "BIOTIC"
         ],
         "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity Y\" token on one of your opponent's abilities. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-singularityy.png?raw=true",
         "source": "twilights_fall",
         "faction": "nekro"
     },
@@ -363,6 +397,7 @@
             "BIOTIC"
         ],
         "text": "Once per combat, after 1 of your opponent's units is destroyed: You may place the \"Singularity Z\" token on one of your opponent's abilities. While that token is on a card, this card gains that card's text. You cannot place a singularity token on a card that already has a singularity token.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-singularityz.png?raw=true",
         "source": "twilights_fall",
         "faction": "nekro"
     },
@@ -374,6 +409,7 @@
             "WARFARE"
         ],
         "text": "Apply +1 to the result of each of your unit's combat rolls.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-unrelenting.png?raw=true",
         "source": "twilights_fall",
         "faction": "sardakk"
     },
@@ -384,6 +420,7 @@
             "PROPULSION"
         ],
         "text": "During the \"Commit Ground Forces\" step: You can commit up to 1 ground force from each planet in the active system and each planet in adjacent systems that do not contain 1 of your command tokens.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-valkyrie.png?raw=true",
         "source": "twilights_fall",
         "faction": "sardakk"
     },
@@ -396,6 +433,7 @@
             "WARFARE"
         ],
         "text": "After making combat rolls during a round of ground combat: If your opponent produced 1 or more hits, you produce 1 additional hit.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-vpw.png?raw=true",
         "source": "twilights_fall",
         "faction": "sardakk"
     },
@@ -407,6 +445,7 @@
             "PROPULSION"
         ],
         "text": "After you activate a system that contains 1 or more of your units: That system is adjacent to all other systems that contain 1 or more of your units during this action.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-scc.png?raw=true",
         "source": "twilights_fall",
         "faction": "jolnar"
     },
@@ -417,6 +456,7 @@
             "CYBERNETIC"
         ],
         "text": "After another player activates a system that contains 1 or more of your ships: Gain 4 trade goods.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-ers.png?raw=true",
         "source": "twilights_fall",
         "faction": "jolnar"
     },
@@ -427,6 +467,7 @@
             "WARFARE"
         ],
         "text": "After you roll dice for a unit ability: You may reroll any of those dice.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-tacticalbrilliance.png?raw=true",
         "source": "twilights_fall",
         "faction": "jolnar"
     },
@@ -438,6 +479,7 @@
             "CYBERNETIC"
         ],
         "text": "After you resolve an action during which you gained control of a legendary planet: You may place 1 PDS and 1 space dock from your reinforcements on that planet.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-reclamation.png?raw=true",
         "source": "twilights_fall",
         "faction": "winnu"
     },
@@ -450,6 +492,7 @@
             "CYBERNETIC"
         ],
         "text": "When 1 or more of your units use PRODUCTION: You may swap the resource and influence values of 1 planet you control during this use of PRODUCTION.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-htp.png?raw=true",
         "source": "twilights_fall",
         "faction": "winnu"
     },
@@ -460,6 +503,7 @@
             "PROPULSION"
         ],
         "text": "During your tactical actions: Treat systems that contain legendary planets you do not control as if they contain both an alpha and beta wormhole.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-lazaxgatefolding.png?raw=true",
         "source": "twilights_fall",
         "faction": "winnu"
     },
@@ -470,6 +514,7 @@
             "BIOTIC"
         ],
         "text": "When another player plays an action card: You may spend 1 token from your strategy pool to cancel that action card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-it.png?raw=true",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -482,6 +527,7 @@
             "CYBERNETIC"
         ],
         "text": "When another player activates a system that contains 1 or more of your ships: You may exhaust this card and spend 1 token from your strategy pool to immediately end that player's turn.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-nf.png?raw=true",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -492,6 +538,7 @@
             "CYBERNETIC"
         ],
         "text": "After you spend a token from your strategy pool: You may gain control of 1 planet that does not contain the custodians token or any units and is adjacent to a planet you control.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-peaceaccords.png?raw=true",
         "source": "twilights_fall",
         "faction": "xxcha"
     },
@@ -503,6 +550,7 @@
             "BIOTIC"
         ],
         "text": "At the start of a ground combat: You may spend 2 influence to replace 1 of your opponent's participating infantry with 1 infantry from your reinforcements.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-indoctrination.png?raw=true",
         "source": "twilights_fall",
         "faction": "yin"
     },
@@ -513,6 +561,7 @@
             "PROPULSION"
         ],
         "text": "After each space combat round: You may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit and assign it to 1 of your opponent's ships in that system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-devotion.png?raw=true",
         "source": "twilights_fall",
         "faction": "yin"
     },
@@ -524,6 +573,7 @@
             "BIOTIC"
         ],
         "text": "When you score an objective: Draw 1 genome, ability, or unit upgrade.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-yinascendant.png?raw=true",
         "source": "twilights_fall",
         "faction": "yin"
     },
@@ -534,6 +584,7 @@
             "BIOTIC"
         ],
         "text": "When you draw 1 or more action cards: Draw 1 additional action card.  Then, choose and discard 1 action card from your hand.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-scheming.png?raw=true",
         "source": "twilights_fall",
         "faction": "yssaril"
     },
@@ -544,6 +595,7 @@
             "BIOTIC"
         ],
         "text": "You can have any number of action cards in your hand.  Game effects cannot prevent you from using this ability.\nDuring your turn of the action phase, players that have passed cannot play action cards.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-crafty.png?raw=true",
         "source": "twilights_fall",
         "faction": "yssaril"
     },
@@ -554,6 +606,7 @@
             "PROPULSION"
         ],
         "text": "ACTION: Discard 1 action card from your hand.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-stalltactics.png?raw=true",
         "source": "twilights_fall",
         "faction": "yssaril"
     },
@@ -564,6 +617,7 @@
             "PROPULSION"
         ],
         "text": "You can produce your flagship without spending resources.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-quantumdrive.png?raw=true",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -574,6 +628,7 @@
             "PROPULSION"
         ],
         "text": "When you gain trade goods from choosing a previously unchosen strategy card or from the \"Amicus\" strategy card: Triple those trade goods.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-futurepath.png?raw=true",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -585,7 +640,8 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After any player's genome becomes exhausted: You may spend 1 command token from any pool to ready that genome; if you ready another player's genome you may perform a transaction with that player. [Note: Cost changed from 3 influence to 1 CC, to combat infinite loops and with Dane's assent.)",
+        "text": "After any player's genome becomes exhausted: You may spend 1 command token from any pool to ready that genome; if you ready another player's genome you may perform a transaction with that player. [Note: Cost changed from 3 influence to 1 command token, to combat infinite loops and with Dane's assent.)",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-tcs.png?raw=true",
         "source": "twilights_fall",
         "faction": "nomad"
     },
@@ -597,6 +653,7 @@
             "PROPULSION"
         ],
         "text": "Planets that contain your structures are treated as having all 3 planet traits (cultural, hazardous, and industrial).",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-terraform.png?raw=true",
         "source": "twilights_fall",
         "faction": "titans"
     },
@@ -608,6 +665,7 @@
             "CYBERNETIC"
         ],
         "text": "When 1 or more of your units use PRODUCTION, you may gain 1 trade good.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-abundance.png?raw=true",
         "source": "twilights_fall",
         "faction": "titans"
     },
@@ -618,6 +676,7 @@
             "PROPULSION"
         ],
         "text": "After you activate a system that contains 1 or more of your infantry, you may replace 1 of those infantry with a PDS from your reinforcements.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-awaken.png?raw=true",
         "source": "twilights_fall",
         "faction": "titans"
     },
@@ -629,6 +688,7 @@
             "WARFARE"
         ],
         "text": "Before making a combat roll: Choose 1 of your units and apply +2 to the result of its combat roll.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-supercharge.png?raw=true",
         "source": "twilights_fall",
         "faction": "naaz"
     },
@@ -639,6 +699,7 @@
             "PROPULSION"
         ],
         "text": "When you explore a planet that contains 1 of your mechs: You may draw 1 additional card; choose 1 to resolve and discard the rest.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-distantsuns.png?raw=true",
         "source": "twilights_fall",
         "faction": "naaz"
     },
@@ -650,6 +711,7 @@
             "CYBERNETIC"
         ],
         "text": "ACTION: Either purge 2 of your relic fragments of the same type to gain 1 relic or purge 1 of your relic fragments to gain 1 command token.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-fabrication.png?raw=true",
         "source": "twilights_fall",
         "faction": "naaz"
     },
@@ -660,6 +722,7 @@
             "PROPULSION"
         ],
         "text": "Your ships do not roll for gravity rifts; apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-crucible.png?raw=true",
         "source": "twilights_fall",
         "faction": "cabal"
     },
@@ -671,6 +734,7 @@
             "WARFARE"
         ],
         "text": "Capture your opponent's non-structure units that are destroyed during combat.\nWhen you produce a unit, you may return 1 captured unit of that type to produce that unit without spending resources.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-amalgamation.png?raw=true",
         "source": "twilights_fall",
         "faction": "cabal"
     },
@@ -682,6 +746,7 @@
             "PROPULSION"
         ],
         "text": "Systems that contain your space docks are also gravity rifts; your ships do not roll for these gravity rifts.\nPlace a dimensional tear token beneath your space docks as a reminder.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-dimensionaltear.png?raw=true",
         "source": "twilights_fall",
         "faction": "cabal"
     },
@@ -692,6 +757,7 @@
             "WARFARE"
         ],
         "text": "When 1 or more of your units uses ANTI-FIGHTER BARRAGE: For each hit produced in excess of your opponent's fighters, choose 1 of your opponent's ships that has SUSTAIN DAMAGE to become damaged.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-raidformation.png?raw=true",
         "source": "twilights_fall",
         "faction": "argent"
     },
@@ -703,6 +769,7 @@
             "CYBERNETIC"
         ],
         "text": "Other players cannot move ships through systems that contain your structures.\nEach planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-ahl.png?raw=true",
         "source": "twilights_fall",
         "faction": "argent"
     },
@@ -713,6 +780,7 @@
             "WARFARE"
         ],
         "text": "When 1 or more of your units roll dice for a unit ability: You may choose 1 of those units to roll 1 additional die.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-zealous.png?raw=true",
         "source": "twilights_fall",
         "faction": "argent"
     },
@@ -724,6 +792,7 @@
             "PROPULSION"
         ],
         "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly: You may apply +1 to the move value of all of that player's ships during this tactical action",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-as.png?raw=true",
         "source": "twilights_fall",
         "faction": "empyrean"
     },
@@ -734,6 +803,7 @@
             "PROPULSION"
         ],
         "text": "Nebulae do not affect your ships' movement.\nYou can allow players to move their ships through systems that contain your ships.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-voidborn.png?raw=true",
         "source": "twilights_fall",
         "faction": "empyrean"
     },
@@ -745,6 +815,7 @@
             "WARFARE"
         ],
         "text": "After another player moves ships into a system that contains 1 of your command tokens: You may return that token to your reinforcements.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-overwatch.png?raw=true",
         "source": "twilights_fall",
         "faction": "empyrean"
     },
@@ -755,6 +826,7 @@
             "WARFARE"
         ],
         "text": "When you gain control of a planet: Ready that planet if it contains a number of your infantry equal to or greater than that planet's resource value; otherwise, place 1 infantry on that planet.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-liberate.png?raw=true",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -766,6 +838,7 @@
             "WARFARE"
         ],
         "text": "Cancel 1 hit produced by each BOMBARDMENT roll against your units.\nAt the start of a round of ground combat, you may resolve BOMBARDMENT 7(x3) against your opponet's ground forces; if you do, resolve BOMBARDMENT 7 (x3) agianst your own ground forces.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-proxima.png?raw=true",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -777,6 +850,7 @@
             "BIOTIC"
         ],
         "text": "Your action cards cannot be canceled by \"Shatter\" action cards.\nYour other abilities cannot be taken, purged, or discarded by other players and cannot have singularity tokens placed on them.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-biosyntheticsynergy.png?raw=true",
         "source": "twilights_fall",
         "faction": "bastion"
     },
@@ -787,6 +861,7 @@
             "CYBERNETIC"
         ],
         "text": "When one of your ships is destroyed: You may produce a ship of the same type at a space dock in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-subatomic.png?raw=true",
         "source": "twilights_fall",
         "faction": "crimson"
     },
@@ -797,6 +872,7 @@
             "CYBERNETIC"
         ],
         "text": "At the end of any player's combat: Gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-entropicharvest.png?raw=true",
         "source": "twilights_fall",
         "faction": "crimson"
     },
@@ -808,6 +884,7 @@
             "BIOTIC"
         ],
         "text": "Other players units in or adjacent to systems that contain your structures lose all of their unit abilities.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-smotheringpresence.png?raw=true",
         "source": "twilights_fall",
         "faction": "crimson"
     },
@@ -818,6 +895,7 @@
             "BIOTIC"
         ],
         "text": "When ground forces are committed: If your units on that planet are not already coexisting, you may choose for your units to coexist.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-pacifist.png?raw=true",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
@@ -829,6 +907,7 @@
             "BIOTIC"
         ],
         "text": "At the start of the status phase: You may choose to replace 1 of your abilities; if you do, reveal abilities from the deck until you reveal another ability with the same technology color and gain it; shuffle the replaced technology and the other revealed cards back into your deck.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-radicaladvancement.png?raw=true",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
@@ -839,6 +918,7 @@
             "BIOTIC"
         ],
         "text": "At the start of the status phase: Choose a technology color and gain trade goods equal to the number of abilities you own that have that technology color.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-geneticresearch.png?raw=true",
         "source": "twilights_fall",
         "faction": "deepwrought"
     },
@@ -849,6 +929,7 @@
             "WARFARE"
         ],
         "text": "After a player activates a system that contains your ships: You may move up to 2 of your ships into the active system from adjacent systems that do not contain your command tokens.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-survivalinstinct.png?raw=true",
         "source": "twilights_fall",
         "faction": "ralnel"
     },
@@ -859,6 +940,7 @@
             "PROPULSION"
         ],
         "text": "After you activate a system: You may move your structures from adjacent systems that do not contain your command tokens onto planets you control in the active system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-couriertransport.png?raw=true",
         "source": "twilights_fall",
         "faction": "ralnel"
     },
@@ -870,6 +952,7 @@
             "WARFARE"
         ],
         "text": "ACTION: Exhaust this card to place 1 PDS on a planet you control.\nACTION: Exhaust this card to repair all of your damaged units.\nACTION: Exhaust this card and discard an action card to draw 1 action card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-nanomachines.png?raw=true",
         "source": "twilights_fall",
         "faction": "ralnel"
     },
@@ -880,6 +963,7 @@
             "BIOTIC"
         ],
         "text": "At the start of the strategy phase: Replenish your commodities, then gain 1 trade good.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-puppetcouncil.png?raw=true",
         "source": "twilights_fall",
         "faction": "keleres"
     },
@@ -892,6 +976,7 @@
             "CYBERNETIC"
         ],
         "text": "Once per action, when you resolve a unit's PRODUCTION ability: You may resolve another of your unit's PRODUCTION abilities in any system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-asn.png?raw=true",
         "source": "twilights_fall",
         "faction": "keleres"
     },
@@ -902,6 +987,7 @@
             "PROPULSION"
         ],
         "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-fl.png?raw=true",
         "source": "twilights_fall",
         "faction": "keleres"
     },
@@ -913,6 +999,7 @@
             "WARFARE"
         ],
         "text": "You can treat planets in systems that contain your ships as if you controlled them for the purpose of scoring secret objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-theburningeye.png?raw=true",
         "source": "twilights_fall",
         "faction": "obsidian"
     },
@@ -923,6 +1010,7 @@
             "BIOTIC"
         ],
         "text": "At the start of your turn: Destroy 1 of another player's infantry in or adjacent to a system that contains your infantry.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-neuralparasite.png?raw=true",
         "source": "twilights_fall",
         "faction": "obsidian"
     },
@@ -934,6 +1022,7 @@
             "WARFARE"
         ],
         "text": "When you gain this card, put The Fracture into play.\nApply +1 to the Move value to each of your ships that starts its movement in The Fracture.\nApply +2 to the result of each of your units' combat rolls in The Fracture.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-planesplitter.png?raw=true",
         "source": "twilights_fall",
         "faction": "obsidian"
     }

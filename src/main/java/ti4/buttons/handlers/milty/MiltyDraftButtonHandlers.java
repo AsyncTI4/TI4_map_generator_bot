@@ -69,8 +69,10 @@ class MiltyDraftButtonHandlers {
             first = true;
             for (MessageEmbed e : teEmbeds) {
                 String message = "";
-                if (first)
-                    message = player.getRepresentationUnfogged() + " Here's an overview of the faction breakthroughs:";
+                if (first) {
+                    message =
+                            player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.";
+                }
                 MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                 first = false;
             }

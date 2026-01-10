@@ -99,7 +99,8 @@ public class DrawSecretService {
                 List<FileUpload> files = new ArrayList<>();
                 for (Player player : game.getRealPlayers()) {
                     String path = ResourceHelper.getResourceFromFolder(
-                            "quick_reference/", player.getFaction().toLowerCase() + ".png");
+                            "quick_reference/" + (game.isThundersEdge() ? "TE/" : "PoK/"),
+                            player.getFaction().toLowerCase() + ".png");
                     if (path == null) {
                         message.append("\n- Could not get quick reference for ")
                                 .append(player.getFaction())
