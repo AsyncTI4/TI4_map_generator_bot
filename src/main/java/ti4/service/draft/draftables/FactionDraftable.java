@@ -503,7 +503,7 @@ public class FactionDraftable extends SinglePickDraftable {
                     factions.stream().map(FactionModel::fancyEmbed).toList();
             for (MessageEmbed e : embeds) {
                 String message = "";
-                if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
+                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions.";
                 MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                 first = false;
             }
@@ -524,7 +524,7 @@ public class FactionDraftable extends SinglePickDraftable {
                     String message = "";
                     if (first)
                         message = player.getRepresentationUnfogged()
-                                + " Here's an overview of the faction breakthroughs:";
+                                + ", here is an overview of the faction breakthroughs.";
                     MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                     first = false;
                 }

@@ -26,6 +26,23 @@
         "name": "Echo of Something",
         "faction": "neutral",
         "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/echo_divergence.png?raw=true",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "echo_of_divergence",
+        "name": "Echo of Divergence",
+        "faction": "neutral",
+        "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/echo_divergence.png?raw=true",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "echo_of_sacrifice",
+        "name": "Echo of Sacrifice",
+        "faction": "neutral",
+        "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/echo_sacrifice.png?raw=true",
         "source": "twilights_fall"
     },
     {
