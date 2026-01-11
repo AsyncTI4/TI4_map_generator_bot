@@ -222,9 +222,11 @@ class UnitRenderGenerator {
                         .computeIfAbsent(unitId, k -> new ArrayList<>())
                         .add(new Point(imageX, imageY));
 
-                if (containsDMZ
-                        || (isSpace && unitModel.getIsPlanetOnly())
-                        || (!isSpace && unitModel.getIsSpaceOnly())) {
+                boolean wrongPlace = containsDMZ;
+                wrongPlace |= isSpace && unitModel.getIsPlanetOnly();
+                wrongPlace |= !isSpace && unitModel.getIsSpaceOnly();
+                wrongPlace &= !unitModel.getIsStructure() || !player.hasAbility("miniaturization");
+                if (wrongPlace) {
                     String badPath = resourceHelper.getPositionFile(
                             "badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
                     BufferedImage badPositionImage =

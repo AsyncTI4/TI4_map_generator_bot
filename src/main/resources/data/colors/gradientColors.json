@@ -232,5 +232,14 @@
         "primaryColor": { "red": 242, "green": 242, "blue": 242 },
         "secondaryColor": { "red": 255, "green": 210, "blue": 112 },
         "hue": "MULTI2"
+    },
+    {
+        "alias": "abr",
+        "name": "aberration",
+        "aliases": ["abr","aberration"],
+        "textColor": "black",
+        "primaryColor": { "red": 206, "green": 206, "blue": 206 },
+        "secondaryColor": { "red": 50, "green": 50, "blue": 50 },
+        "hue": "MULTI1"
     }
 ]
