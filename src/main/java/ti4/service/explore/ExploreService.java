@@ -582,7 +582,9 @@ public class ExploreService {
                         Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
-                        if (!game.isFowMode() && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                        if (!game.isFowMode()
+                                && FoWHelper.playerHasShipsInSystem(player, tile)
+                                && tile.getPlanetUnitHolders().size() == 1) {
                             if (game.getRevealedPublicObjectives().containsKey("deep_space")
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(
