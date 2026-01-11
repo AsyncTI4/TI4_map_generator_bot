@@ -5517,20 +5517,21 @@ public class ButtonHelper {
                 String source = impressment ? "dsdihmy_" : (scanlink ? "scanlink_" : "filler_");
                 String buttonId =
                         player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId + "_" + trait;
-                String buttonMessage =
-                        "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
-                buttons.add(Buttons.gray(buttonId, buttonMessage, ExploreEmojis.getTraitEmoji(trait)));
+                String buttonLabel =
+                        "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " As " + trait : "");
+                buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId
                             + "_" + trait + "kolleccbt";
-                    String buttonMessage2 =
-                            "Explore " + trait + " discard on " + planetRepresentation + ". (Kollecc BT)";
-                    buttons.add(Buttons.gray(buttonId2, buttonMessage2, ExploreEmojis.getTraitEmoji(trait)));
+                    String buttonLabel2 =
+                            "Explore " + trait + " Discard On " + planetRepresentation + " With Breakthrough";
+                    buttons.add(Buttons.gray(buttonId2, buttonLabel2, ExploreEmojis.getTraitEmoji(trait)));
                 }
             }
         }
         if (player.hasUnlockedBreakthrough("augersbt") && buttons.size() > 0) {
-            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 AC Instead (Breakthrough)", FactionEmojis.augers));
+            buttons.add(Buttons.green(
+                    "draw_1_ACDelete", "Draw 1 Action Card Instead With Breakthrough", FactionEmojis.augers));
         }
         return buttons;
     }

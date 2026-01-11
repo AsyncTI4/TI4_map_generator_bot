@@ -38,6 +38,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String unlockCondition;
     private String flavourText;
     private String imageURL;
+    private String imageBackURL;
+    private String tfImageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
     private String homebrewReplacesID;
