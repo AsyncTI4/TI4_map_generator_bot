@@ -532,7 +532,8 @@ public class TransactionHelper {
             "Artisanal, Hand-Crafted Nothing",
             "Reticulating Splines",
             "ADDITIONAL PYLONS",
-            "A State-of-the-Art Turbo Encabulator");
+            "A State-of-the-Art Turbo Encabulator",
+            "Help! I'm trapped in a transaction factory!");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {

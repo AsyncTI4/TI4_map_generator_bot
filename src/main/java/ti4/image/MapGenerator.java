@@ -523,22 +523,26 @@ public class MapGenerator implements AutoCloseable {
         y += 40; // needed for ghost HS on br
 
         String server;
-        switch (game.getGuild().getId()) {
-            case "943410040369479690" -> server = "asyncti_icon_hub";
-            case "1176104225932058694" -> server = "asyncti_icon_warsuntzu";
-            case "1145823841227112598" -> server = "asyncti_icon_dreadnot";
-            case "1250131684393881610" -> server = "asyncti_icon_tommerhawk";
-            case "1312882116597518416" -> server = "asyncti_icon_dudersdomain";
-            case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
-            case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
-            case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
-            case "1410728648817770526" -> server = "asyncti_icon_shipflag";
-            case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
-            case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
-            case "1434632452097446040" -> server = "asyncti_icon_tournaments";
-            // fog of war?
-            // megagames?
-            default -> server = "asyncti_icon_unknown";
+        if (game.getGuild() == null) {
+            server = "asyncti_icon_nothing";
+        } else {
+            switch (game.getGuild().getId()) {
+                case "943410040369479690" -> server = "asyncti_icon_hub";
+                case "1176104225932058694" -> server = "asyncti_icon_warsuntzu";
+                case "1145823841227112598" -> server = "asyncti_icon_dreadnot";
+                case "1250131684393881610" -> server = "asyncti_icon_tommerhawk";
+                case "1312882116597518416" -> server = "asyncti_icon_dudersdomain";
+                case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
+                case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
+                case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
+                case "1410728648817770526" -> server = "asyncti_icon_shipflag";
+                case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
+                case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
+                case "1434632452097446040" -> server = "asyncti_icon_tournaments";
+                // fog of war?
+                // megagames?
+                default -> server = "asyncti_icon_unknown";
+            }
         }
         String serverPath = ResourceHelper.getResourceFromFolder("server_icons/", server + ".png");
         int serverSize = 96;
