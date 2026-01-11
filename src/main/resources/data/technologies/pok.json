@@ -1083,10 +1083,10 @@
         "requirements": "YY",
         "faction": "keleres",
         "source": "pok",
-        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
+        "text": "Whenever you resolve a unit's PRODUCTION ability, you may resolve another of your unit's PRODUCTION abilities in any system; this ability can be used only once per action.",
         "shortName": "Agency\nSupply Net.",
         "shrinkName": false,
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network_te.jpg?raw=true"
     },
     {
         "alias": "nekroc4y",

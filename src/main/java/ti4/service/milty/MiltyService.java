@@ -746,7 +746,7 @@ public class MiltyService {
             game.setTile(tile);
             player.setHomeSystemPosition(pos);
             if (game.isTwilightsFallMode()) {
-                player.addAbility("song_of_something");
+                player.addAbility("echo_of_sacrifice");
             }
         }
 
@@ -756,7 +756,7 @@ public class MiltyService {
             if (!game.isTwilightsFallMode()) {
                 tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
             } else {
-                player.addAbility("song_of_something");
+                player.addAbility("echo_of_divergence");
             }
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {

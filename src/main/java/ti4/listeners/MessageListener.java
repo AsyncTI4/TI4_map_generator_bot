@@ -360,6 +360,8 @@ public class MessageListener extends ListenerAdapter {
         if (!JdaService.fowServers.isEmpty()
                 && // fog servers exists
                 !JdaService.fowServers.contains(event.getGuild())
+                && // 2nd server actually exists
+                JdaService.guildCommunityPlays != null
                 && // event server IS NOT the fog server
                 !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
                 && // NOR the community server

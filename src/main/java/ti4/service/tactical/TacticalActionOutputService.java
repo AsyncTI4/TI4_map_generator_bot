@@ -326,7 +326,10 @@ public class TacticalActionOutputService {
             bonusMoveValue++;
         }
 
-        if (player.hasAbility("song_of_something") && movingFromHome) {
+        if ((player.hasAbility("song_of_something")
+                        || player.hasAbility("echo_of_divergence")
+                        || player.hasAbility("echo_of_sacrifice"))
+                && movingFromHome) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {
