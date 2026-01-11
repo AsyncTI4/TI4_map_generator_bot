@@ -2,13 +2,15 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1052,7 +1054,7 @@ public class ComponentActionHelper {
                 if ("absol_dynamiscore".equals(relicID)) {
                     player.setTg(oldTg + Math.min(player.getCommoditiesBase() * 2, 10));
                 } else {
-                    player.setTg(oldTg + player.getCommodities() + 2);
+                    player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
                 message = player.getRepresentationUnfogged() + ", your trade goods increased from " + oldTg + " -> "
                         + player.getTg() + ".";
