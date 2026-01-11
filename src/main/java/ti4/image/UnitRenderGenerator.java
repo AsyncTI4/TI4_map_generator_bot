@@ -420,6 +420,22 @@ class UnitRenderGenerator {
             case "baba":
                 imagePath = "voltron_baba.png";
                 break;
+            case "lightning":
+                imagePath = "voltron_lightning.png";
+                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_lightning_yellow.png";
+                }
+                break;
+            case "epaulettes":
+                imagePath = "voltron_epaulettes.png";
+                break;
+            case "lion":
+                imagePath = "voltron_lion.png";
+                break;
+            case "panther":
+                imagePath = "voltron_panther.png";
+                break;
             case "eyes":
             default:
                 imagePath = "voltron_eyes.png";
