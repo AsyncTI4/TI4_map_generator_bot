@@ -1,1 +1,17 @@
-{"id":"s22","name":"Trith Tao/Trith Chek","aliases":["s22","trithtao","trithchek"],"imagePath":"S22_TrithTao.png","planets":["trithtao","trithchek"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{
+    "id": "s22",
+    "name": "Trith Tao/Trith Chek",
+    "aliases": [
+        "s22",
+        "trithtao",
+        "trithchek"
+    ],
+    "imagePath": "S22_TrithTao.png",
+    "planets": [
+        "trithtao",
+        "trithchek"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "somno"
+}

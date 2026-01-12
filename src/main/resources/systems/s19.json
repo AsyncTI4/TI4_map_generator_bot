@@ -1,1 +1,16 @@
-{"id":"s19","name":"Iota 8217","aliases":["s19","iota8217","iota"],"imagePath":"S19_Iota8217.png","planets":["iota8217"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{
+    "id": "s19",
+    "name": "Iota 8217",
+    "aliases": [
+        "s19",
+        "iota8217",
+        "iota"
+    ],
+    "imagePath": "S19_Iota8217.png",
+    "planets": [
+        "iota8217"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "somno"
+}

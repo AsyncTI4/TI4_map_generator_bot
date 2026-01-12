@@ -62,8 +62,8 @@ public class SilverFlameService {
     private void silverFlameDrumroll(Game game, Player flamePlayer, int target) {
         String gameName = game.getName();
         String watchPartyMsg =
-                flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + ".";
-        watchPartyMsg += "! They are currently at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp()
+                flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + "!";
+        watchPartyMsg += " They are currently at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp()
                 + " victory points";
         watchPartyMsg +=
                 (flamePlayer.getTotalVictoryPoints() + 1 == game.getVp()) ? "; this is for all the marbles." : ".";
