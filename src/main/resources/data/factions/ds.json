@@ -1866,7 +1866,7 @@
         "factionName": "Belkosea Allied States",
         "homeSystem": "br5",
         "startingFleet": "1 cv,5 ff,1 inf s, 1 sd s, 1 pds r,1 inf r, 1 dn, 1 cr",
-        "commodities": 1,
+        "commodities": 2,
         "factionTech": [
             "dsbelky",
             "dsbelkff"
