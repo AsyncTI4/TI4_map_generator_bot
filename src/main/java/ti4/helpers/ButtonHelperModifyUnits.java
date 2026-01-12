@@ -1020,7 +1020,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(),
                     player.getRepresentationNoPing()
-                            + " if you just replaced a spacedock, you may now use the button below to build using your production value on "
+                            + ", if you just replaced a space dock, you may now use the button below to build using your PRODUCTION value on "
                             + Helper.getPlanetRepresentation(uH.getName(), game)
                             + ".",
                     List.of(button));
