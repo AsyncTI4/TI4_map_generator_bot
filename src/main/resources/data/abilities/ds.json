@@ -824,7 +824,7 @@
         "name": "The Starlit Path",
         "faction": "uydai",
         "window": "At the end of your turn",
-        "windowEffect": "You may return 6 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of any strategy card without spending a command token.",
+        "windowEffect": "At the end of your turn, you may spend 5 path tokens to resolve the secondary ability of any strategy card, or 8 path tokens to do so without spending a command token.",
         "source": "ds"
     },
     {
@@ -832,7 +832,7 @@
         "name": "Narrow Way",
         "faction": "uydai",
         "window": "At any time",
-        "windowEffect": "You may return 1 path token to your reinforcements to redistribute 1 of your command tokens.",
+        "windowEffect": "At any time, you may spend 1 path token to redistribute 1 of your command tokens and move 2 of your infantry on the game board onto a planet you control.",
         "source": "ds"
     },
     {
@@ -847,7 +847,7 @@
         "name": "Dark Purpose",
         "faction": "pharadn",
         "window": "When you score an objective",
-        "windowEffect": "When you score an objective, gain 1 command token.",
+        "windowEffect": "Gain 1 command token.",
         "source": "ds"
     },
     {
@@ -883,7 +883,7 @@
         "name": "Black Ops",
         "faction": "qhet",
         "window": "After you win a combat as the attacker",
-        "windowEffect": "You may remove 2 of your opponent’s control tokens from your faction sheet to draw 1 secret objective, or 5 of those tokens to gain 1 command token and take 1 of their unscored secret objectives. ",
+        "windowEffect": "You may remove 3 of your opponent’s control tokens from your faction sheet to gain 1 command token, draw 2 action cards, or draw 1 secret objective",
         "source": "ds"
     },
     {
@@ -904,14 +904,14 @@
         "id": "classified_developments",
         "name": "Classified Developments",
         "faction": "belkosea",
-        "permanentEffect": "ACTION: Spend a combined total of 5 resources or influence to place 1 superweapon ability card in your play area, and the corresponding superweapon token on a planet you control.",
+        "permanentEffect": "ACTION: Spend a combined total of 5 resources or influence to place 1 superweapon on a planet you control, and gain its superweapon card.",
         "source": "ds"
     },
     {
         "id": "superweapon_projects",
         "name": "Superweapon Projects",
         "faction": "belkosea",
-        "permanentEffect": "Superweapons you control are structures and cannot be destroyed by abilities. Each planet can contain a maximum of 1 superweapon. ",
+        "permanentEffect": "Superweapons you control are structures and cannot be destroyed by abilities. Each planet can contain a maximum of 1 superweapon. When a superweapon is destroyed, instead purge it and its superweapon card. ",
         "source": "ds"
     },
     {
@@ -946,7 +946,7 @@
         "id": "reflect",
         "name": "Reflect (5 Honor)",
         "faction": "toldar",
-        "permanentEffect": "When you score an objective, if another player has already scored that objective, draw 1 action card.",
+        "permanentEffect": "When you score an objective, if another player has already scored that objective, draw 2 action cards.",
         "source": "ds"
     },
     {

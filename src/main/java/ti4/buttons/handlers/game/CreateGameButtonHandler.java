@@ -39,7 +39,7 @@ import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
-class CreateGameButtonHandler {
+public class CreateGameButtonHandler {
 
     @ButtonHandler("createGameChannels")
     @ButtonHandler("launchGame")

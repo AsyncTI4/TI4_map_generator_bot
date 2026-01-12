@@ -2264,14 +2264,7 @@ public class UnfiledButtonHandlers {
                             "Use Gledge Agent",
                             FactionEmojis.gledge));
                 }
-                if (player.hasUnexhaustedLeader("uydaiagent")
-                        && !"muaatagent".equalsIgnoreCase(buttonID)
-                        && !"arboHeroBuild".equalsIgnoreCase(buttonID)
-                        && !"solBtBuild".equalsIgnoreCase(buttonID)
-                        && !buttonID.contains("integrated")) {
-                    buttons.add(Buttons.red(
-                            "exhaustAgent_uydaiagent_" + player.getFaction(), "Use Uydai Agent", FactionEmojis.gledge));
-                }
+
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
                     buttons.add(Buttons.red(
                             "exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));

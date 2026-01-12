@@ -105,21 +105,34 @@ public class StatusHelper {
             } else {
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (userSettings.getSandbagPref().contains("bot")) {
-                    String message = player.getRepresentation()
+                    String message = player.getRepresentationNoPing()
                             + ", the bot will auto pass on scoring a secret objective this round for you (if you're still unable to score one when scoring occurs)."
                             + " Click this button to change it and do it manually."
                             + " You will be asked every round like this when you pass early, so no decision is final.";
-                    buttons.add(Buttons.red("sandbagPref_manual", "Manually Say No Scoring"));
+                    buttons.add(Buttons.gray("sandbagPref_manual", "Manually Say No Scoring"));
                     buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                 } else {
-                    String message = player.getRepresentation()
+                    String message = player.getRepresentationNoPing()
                             + ", the bot will let you manually decide whether to score a secret objective this round."
                             + " Click this button to change it and auto pass on scoring this round (if you still have no secrets to score when scoring occurs)."
                             + " You will be asked every round like this when you pass early, so no decision is final.";
                     buttons.add(Buttons.green("sandbagPref_bot", "Auto Say No Scoring"));
                     buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                }
+            }
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (!game.getStoredValue("ralnelHero").isEmpty()) {
+                    String presetRalnelHero =
+                            "You have Director Nel, the Ral Nel hero, unlocked. You can use the preset button to automatically use your hero when the last player passes."
+                                    + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                    List<Button> ralnelHeroButtons = new ArrayList<>();
+                    ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
+                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
                 }
             }
         }

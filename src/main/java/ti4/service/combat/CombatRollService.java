@@ -24,6 +24,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.CombatModHelper;
@@ -871,12 +872,12 @@ public class CombatRollService {
                 }
                 if ("belkosea_mech".equalsIgnoreCase(unitModel.getId())) {
                     if (hitRolls > 0) {
-                        player.setCommodities(player.getCommodities() + hitRolls);
-                        ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
+                        ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
-                                player.getRepresentation() + " gained " + hitRolls + " commodit"
-                                        + (hitRolls == 1 ? "y" : "ies") + " due to their Uzean Wardog mech ability.");
+                                player.getRepresentation() + " please gain or convert 1 commodity a total of "
+                                        + hitRolls + " time" + (hitRolls == 1 ? "" : "s")
+                                        + " due to your Uzean Wardog mech ability.");
                     }
                 }
                 int misses = numRolls - hitRolls;
