@@ -152,7 +152,8 @@ public class VisionariaSelectService {
         Player activePlayer = game.getActivePlayer();
         if (activePlayer == null) {
             MessageHelper.sendMessageToChannel(
-                    game.getActionsChannel(), "Could not find active player when trying to move on after Visionaria.");
+                    game.getActionsChannel(),
+                    "Could not find active player when trying to move on after _Visionaria Select_.");
             game.removeStoredValue("endTurnAfterVisionaria");
             game.removeStoredValue("fleetLogAfterVisionaria");
             game.removeStoredValue("VisionariaResponded");

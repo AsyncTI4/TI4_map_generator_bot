@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -16,6 +17,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -169,14 +171,20 @@ public class SilverFlameService {
         String message = "## " + rep() + " was used to purge the " + player.fogSafeEmoji() + " home system in "
                 + game.getName() + ".";
 
-        message += "\n" + purgedUnitList;
-        DisasterWatchHelper.sendMessageInDisasterWatch(game, message);
+        if (!allUnitsCount.isEmpty()) {
+            message += "\n" + purgedUnitList;
+        }
+        DisasterWatchHelper.sendMessageInFlameWatch(game, message);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         // remove all planets
+        boolean controlsAPlanet = false;
         for (Planet planet : homeSystem.getPlanetUnitHolders()) {
             for (Player p : game.getRealPlayers()) {
                 if (p.hasPlanet(planet.getName())) p.removePlanet(buttonID);
+            }
+            if (!planet.isSpaceStation() && player.getPlanetsForScoring(false).contains(planet)) {
+                controlsAPlanet = true;
             }
         }
 
@@ -189,5 +197,45 @@ public class SilverFlameService {
             FractureService.spawnIngressTokens(null, game, player, null);
         }
         ButtonHelper.deleteMessage(event);
+
+        if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {
+            List<Button> scoreButtons = new ArrayList<>();
+            String ffcc = player.finChecker();
+            scoreButtons.add(Buttons.green(
+                    ffcc + "scoreSilverFlameBAM", "Score Become A Martyr", CardEmojis.SecretObjectiveAlt));
+            scoreButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    "You have _Become A Martyr_, and have just catastrophically lost control of a planet in your home system. "
+                            + "Do you wish to score this secret objective?",
+                    scoreButtons);
+        }
+    }
+
+    @ButtonHandler("scoreSilverFlameBAM")
+    private void scoreSilverFlameBAM(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Map<String, Integer> secretObjectives = player.getSecrets();
+        Integer idValue = null;
+        if (secretObjectives != null && !secretObjectives.isEmpty()) {
+            for (Map.Entry<String, Integer> so : secretObjectives.entrySet()) {
+                if ("bam".equals(so.getKey())) {
+                    idValue = so.getValue();
+                    break;
+                }
+            }
+        }
+        if (idValue == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find _Become A Martyr_; please score manually.");
+            return;
+        }
+        MessageChannel channel = game.isFowMode() ? player.getCardsInfoThread() : game.getMainGameChannel();
+        SecretObjectiveHelper.scoreSO(event, game, player, idValue, channel);
+        if (!game.isFowMode()) {
+            DisasterWatchHelper.sendMessageInFlameWatch(
+                    game,
+                    "### Every _Silver Flame_ has a silver lining; " + player.getRepresentation()
+                            + " has scored _Become A Martyr_ in " + game.getName() + ".");
+        }
     }
 }
