@@ -114,7 +114,7 @@ public class AddUnitService {
             if (planetNames.isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         game.getActionsChannel(),
-                        "Could not find any planets for this unit list " + unitList + " Let Fin know!");
+                        "Could not find any planets for this unit list " + unitList + ". Let Fin know!");
                 continue;
             }
             int minUnitsPerPlanet = totalAmt / planetNames.size();
