@@ -1,1 +1,21 @@
-{"id":"93","name":"Mez Lo Orz Fei Zsha/Rep Lo Orz Qet (RalNel)","aliases":["te02","mez","mezlo","rep","replo","ralnel","ralnelhs"],"imagePath":"93_RalNel.png","planets":["mez","rep"],"shipPositionsType":"TYPE02","tileBack":"green","source":"thunders_edge"}
+{
+    "id": "93",
+    "name": "Mez Lo Orz Fei Zsha/Rep Lo Orz Qet - Ral Nel",
+    "aliases": [
+        "te02",
+        "mez",
+        "mezlo",
+        "rep",
+        "replo",
+        "ralnel",
+        "ralnelhs"
+    ],
+    "imagePath": "93_RalNel.png",
+    "planets": [
+        "mez",
+        "rep"
+    ],
+    "shipPositionsType": "TYPE02",
+    "tileBack": "green",
+    "source": "thunders_edge"
+}

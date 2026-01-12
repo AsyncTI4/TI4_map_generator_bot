@@ -1,1 +1,15 @@
-{"id":"s17","name":"Belsung IX","aliases":["s17","belsungix"],"imagePath":"S17_BelsungIX.png","planets":["belsungix"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{
+    "id": "s17",
+    "name": "Belsung IX",
+    "aliases": [
+        "s17",
+        "belsungix"
+    ],
+    "imagePath": "S17_BelsungIX.png",
+    "planets": [
+        "belsungix"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "somno"
+}

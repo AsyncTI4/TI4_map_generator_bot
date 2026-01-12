@@ -1103,13 +1103,12 @@ public class StartCombatService {
         }
 
         List<Button> afbButtons = new ArrayList<>();
-        afbButtons.add(Buttons.gray(
-                "combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
+        afbButtons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_afb", "Roll ANTI-FIGHTER BARRAGE"));
         for (Player player : combatPlayers) {
             if (player.isNpc() || player.isDummy()) {
                 afbButtons.add(Buttons.green(
                         player.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_space_afb",
-                        "Roll " + CombatRollType.AFB.getValue() + " for Dummy"));
+                        "Roll ANTI-FIGHTER BARRAGE For Dummy"));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -1132,9 +1131,9 @@ public class StartCombatService {
     public static List<Button> getSpaceCannonButtons(Game game, Player activePlayer, Tile tile) {
         List<Button> spaceCannonButtons = new ArrayList<>();
         spaceCannonButtons.add(Buttons.gray(
-                "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll Space Cannon Offence"));
+                "combatRoll_" + tile.getPosition() + "_space_spacecannonoffence", "Roll SPACE CANNON Offence"));
         if (game.isFowMode()) return spaceCannonButtons;
-        spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline PDS"));
+        spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline SPACE CANNON"));
 
         // Add Graviton Laser System button if applicable
         for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {
@@ -1604,7 +1603,7 @@ public class StartCombatService {
                 && isSpaceCombat) {
             buttons.add(Buttons.gray(
                     "combatRoll_" + tile.getPosition() + "_space_afb",
-                    "Roll " + CombatRollType.AFB.getValue(),
+                    "Roll ANTI-FIGHTER BARRAGE",
                     FactionEmojis.belkosea));
         }
         if (p2.hasAbility("necrophage") && !game.isFowMode()) {
@@ -1934,11 +1933,11 @@ public class StartCombatService {
             if (tile.getUnitHolders().size() > 2) {
                 buttons.add(Buttons.gray(
                         "bombardConfirm_combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment,
-                        "Roll Bombardment"));
+                        "Roll BOMBARDMENT"));
             } else {
                 buttons.add(Buttons.gray(
                         "combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment,
-                        "Roll Bombardment"));
+                        "Roll BOMBARDMENT"));
             }
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander")
@@ -2111,7 +2110,7 @@ public class StartCombatService {
             } else {
                 if (!isSpaceCombat && !"space".equalsIgnoreCase(nameOfHolder)) {
                     buttons.add(Buttons.gray(
-                            "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder));
+                            "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat For " + nameOfHolder));
                     Player nonActive = p1;
                     if (p1 == game.getActivePlayer()) {
                         nonActive = p2;
@@ -2119,20 +2118,20 @@ public class StartCombatService {
                     if (p1.isDummy() || p1.isNpc()) {
                         buttons.add(Buttons.gray(
                                         p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
-                                        "Roll Ground Combat for " + nameOfHolder + " for Dummy")
+                                        "Roll Ground Combat For " + nameOfHolder + " For Dummy")
                                 .withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                     }
                     if (p2.isDummy() || p2.isNpc()) {
                         buttons.add(Buttons.gray(
                                         p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(),
-                                        "Roll Ground Combat for " + nameOfHolder + " for Dummy")
+                                        "Roll Ground Combat For " + nameOfHolder + " For Dummy")
                                 .withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
                     if (CombatRollService.checkIfUnitsOfType(
                             nonActive, game, null, tile, unitH.getName(), CombatRollType.SpaceCannonDefence)) {
                         buttons.add(Buttons.gray(
                                 "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",
-                                "Roll Space Cannon Defence for " + nameOfHolder));
+                                "Roll SPACE CANNON Defence for " + nameOfHolder));
                     }
                 }
             }
@@ -2159,8 +2158,9 @@ public class StartCombatService {
             > 2. Bombardment
             > 3. Commit Ground Forces
             > 4. After commit window (_Parley_, _Ghost Squad_, etc.)
-            > 5. Start of Combat (_Morale Boost_, etc.)
-            > 6. Roll Dice!
+            > 5. Space Cannon Defense
+            > 6. Start of Combat (_Morale Boost_, etc.)
+            > 7. Roll Dice!
             """;
     }
 
