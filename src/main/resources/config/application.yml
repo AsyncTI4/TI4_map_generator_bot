@@ -35,3 +35,29 @@ spring:
     jdbc:
       repositories:
         enabled: false
+
+# AI Player Configuration:
+# - What: Controls AI player system behavior, scheduling, and safety limits.
+# - How: 'ai.enabled' is the master feature flag; other settings control timing, actions, and logging.
+ai:
+  # Master feature flag - set to true to enable AI players (default: false)
+  enabled: false
+  
+  # Scheduler settings
+  scheduler:
+    # Polling delay in milliseconds between AI turn checks (default: 5000ms = 5s)
+    delay: 5000
+  
+  # Action limits and timing
+  max-actions-per-phase: 10        # Maximum actions per phase to prevent runaway behavior
+  action-timeout: 30000            # Timeout for single action in milliseconds (30s)
+  action-delay: 1000               # Minimum delay between actions in milliseconds (1s)
+  action-jitter: 500               # Random jitter added to delays in milliseconds (0.5s)
+  max-retries: 3                   # Maximum retries for failed actions
+  
+  # Strategy and behavior
+  default-difficulty: simple       # Default strategy difficulty (simple, medium, hard)
+  
+  # Development and debugging
+  dry-run: false                   # When true, AI logs decisions without executing
+  verbose-logging: true            # Enable detailed logging of AI decisions
