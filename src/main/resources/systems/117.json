@@ -1,1 +1,19 @@
-{"id":"117","name":"The Watchtower","aliases":["te29","watchtower","thewatch","thewatchtower"],"imagePath":"117_TheWatchtower.png","planets":["thewatchtower"],"shipPositionsType":"TYPE05","tileBack":"red","isAsteroidField":true,"isGravityRift":true,"source":"thunders_edge"}
+{
+    "id": "117",
+    "name": "The Watchtower",
+    "aliases": [
+        "te29",
+        "watchtower",
+        "thewatch",
+        "thewatchtower"
+    ],
+    "imagePath": "117_TheWatchtower.png",
+    "planets": [
+        "thewatchtower"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "red",
+    "isAsteroidField": true,
+    "isGravityRift": true,
+    "source": "thunders_edge"
+}

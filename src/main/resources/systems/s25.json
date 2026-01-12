@@ -1,1 +1,17 @@
-{"id":"s25","name":"Jaferra/Suul Mogg","aliases":["s25","jaferra","suulmogg"],"imagePath":"S25_Jaferra.png","planets":["jaferra","suulmogg"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{
+    "id": "s25",
+    "name": "Jaferra/Suul Mogg",
+    "aliases": [
+        "s25",
+        "jaferra",
+        "suulmogg"
+    ],
+    "imagePath": "S25_Jaferra.png",
+    "planets": [
+        "jaferra",
+        "suulmogg"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "somno"
+}

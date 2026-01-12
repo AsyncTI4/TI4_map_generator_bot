@@ -1,1 +1,17 @@
-{"id":"116","name":"Lemox","aliases":["te28","lemox","lemoxscar"],"imagePath":"116_Lemox.png","planets":["lemox"],"shipPositionsType":"TYPE04","tileBack":"red","isScar":true,"source":"thunders_edge"}
+{
+    "id": "116",
+    "name": "Lemox",
+    "aliases": [
+        "te28",
+        "lemox",
+        "lemoxscar"
+    ],
+    "imagePath": "116_Lemox.png",
+    "planets": [
+        "lemox"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "red",
+    "isScar": true,
+    "source": "thunders_edge"
+}
