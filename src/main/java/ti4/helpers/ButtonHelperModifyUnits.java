@@ -1011,6 +1011,20 @@ public class ButtonHelperModifyUnits {
                         + " space dock" + (sdAmount == 1 ? "" : "s") + " on "
                         + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own unit"
                         + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
+        Tile tile = game.getTileFromPlanet(uH.getName());
+        int productionVal = Helper.getProductionValue(player, game, tile, false);
+        if (productionVal > 0 && player == game.getActivePlayer()) {
+            String id = player.finChecker() + "tacticalActionBuild_" + tile.getPosition();
+            String label = "Build in This System (" + productionVal + " PRODUCTION value)";
+            Button button = Buttons.green(id, label);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    player.getRepresentationNoPing()
+                            + " if you just replaced a spacedock, you may now use the button below to build using your production value on "
+                            + Helper.getPlanetRepresentation(uH.getName(), game)
+                            + ".",
+                    List.of(button));
+        }
     }
 
     public static List<Button> getRetreatSystemButtons(

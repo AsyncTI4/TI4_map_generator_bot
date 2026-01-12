@@ -493,6 +493,7 @@ public class ExploreService {
                     }
 
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
+                    tile.addToken(attachmentFilename, planetID);
                     message = "Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     if (attachment.equals(Constants.DMZ)) {
@@ -537,7 +538,6 @@ public class ExploreService {
                         }
                     }
 
-                    tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                     ButtonHelper.checkFleetAndCapacity(player, game, tile);

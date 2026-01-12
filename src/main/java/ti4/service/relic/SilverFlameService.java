@@ -170,7 +170,7 @@ public class SilverFlameService {
                 + game.getName() + ".";
 
         message += "\n" + purgedUnitList;
-        DisasterWatchHelper.postTileInFlameWatch(game, event, homeSystem, 0, message);
+        DisasterWatchHelper.sendMessageInDisasterWatch(game, message);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         // remove all planets

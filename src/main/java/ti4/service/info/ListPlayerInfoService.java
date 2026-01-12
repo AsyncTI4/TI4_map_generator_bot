@@ -478,7 +478,8 @@ public class ListPlayerInfoService {
                 int aboveN = 0;
                 for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanetsForScoring(false).size();
-                    int p2count = p2.getPlanetsForScoring(false).size();
+                    int p2count = p2.getPlanetsForScoring(false).size()
+                            - game.getPlanetsPlayerIsCoexistingOn(p2).size();
                     if (p1count > p2count) {
                         aboveN++;
                     }
