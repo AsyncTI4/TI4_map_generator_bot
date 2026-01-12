@@ -379,7 +379,7 @@ public class PlayerTechService {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydag" -> {
-                deleteIfButtonEvent(event);
+                deleteTheOneButtonIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
@@ -389,7 +389,6 @@ public class PlayerTechService {
                         "Please choose the planets you wish to exhaust to pay the required "
                                 + player.getPlanetsAllianceMode().size() + " influence.",
                         buttons);
-                sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydab" -> {
                 game.setDominusOrb(true);

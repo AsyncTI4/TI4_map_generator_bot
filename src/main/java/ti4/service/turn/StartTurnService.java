@@ -296,7 +296,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf") && !player.hasUnit("tf-yinclone")) {
+        if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone")) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
@@ -471,18 +471,18 @@ public class StartTurnService {
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
             if (player.hasLeaderUnlocked("ralnelhero")) {
-                if (game.getStoredValue("ralnelHero") != null) {}
+                if (!game.getStoredValue("ralnelHero").isEmpty()) {
+                    String presetRalnelHero =
+                            "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
+                                    + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."
+                                    + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
 
-                String presetRalnelHero =
-                        "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
-                                + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."
-                                + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
-
-                List<Button> ralnelHeroButtons = new ArrayList<>();
-                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
-                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+                    List<Button> ralnelHeroButtons = new ArrayList<>();
+                    ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
+                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+                }
             }
 
             if (player.getPlayableActionCards().contains("puppetsonastring")) {
@@ -610,6 +610,10 @@ public class StartTurnService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             startButtons.add(
                     Buttons.green(finChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
+        }
+        if (player.hasTechReady("dsuydag")) {
+            startButtons.add(Buttons.green(
+                    finChecker + "exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
         }
 
         Button transaction = Buttons.blue("transaction", "Transaction");

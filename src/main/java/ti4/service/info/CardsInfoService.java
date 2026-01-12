@@ -239,6 +239,9 @@ public class CardsInfoService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
+        if (player.hasTechReady("dsuydag")) {
+            buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
+        }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }

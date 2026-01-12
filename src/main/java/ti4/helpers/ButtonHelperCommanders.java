@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -562,22 +562,16 @@ public class ButtonHelperCommanders {
 
     @ButtonHandler("uydaiCommander")
     public static void uydaiCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + ", you need at least 1 trade good to use this ability.");
-            return;
-        }
+
         if (game.getActivePlayer() != player) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing() + ", you need to be the active player to use this ability.");
             return;
         }
-        player.setTg(player.getTg() - 1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
+                player.getRepresentationNoPing() + " is looking at the top card of a deck.");
         List<Button> buttons = getUydaiCommanderButtons(game, false, player);
         String message =
                 player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";

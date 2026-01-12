@@ -437,9 +437,11 @@ public class CreateGameService {
             }
             sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
-            String msg2 = "If you have joined the server and cannot find your game, please click this button.";
+            String msg2 =
+                    "If you have joined the server and cannot find your game, please click this button. If the invite has expired, please press this other button.";
             Button findGameButton = Buttons.green("pingGame", "Locate My Game");
-            MessageHelper.sendMessageToChannelWithButton(channel, msg2, findGameButton);
+            Button resendInvite = Buttons.blue("resendInvite_" + guild.getId(), "Resend Server Invite");
+            MessageHelper.sendMessageToChannelWithButtons(channel, msg2, List.of(findGameButton, resendInvite));
         }
         return missingMembers;
     }

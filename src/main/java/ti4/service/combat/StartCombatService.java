@@ -498,19 +498,7 @@ public class StartCombatService {
                     if (player.hasRelic("thalnos")) {
                         thalnos = true;
                     }
-                    if (player.getPromissoryNotesInPlayArea().contains("dspnphar")) {
-                        Player pharadn = game.getPNOwner("dspnphar");
-                        List<Button> buttons = new ArrayList<>();
-                        buttons.add(Buttons.green(
-                                pharadn.getFinsFactionCheckerPrefix() + "capture1Pharad",
-                                "Capture 1 Infantry",
-                                FactionEmojis.pharadn));
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                threadChannel,
-                                pharadn.getRepresentation() + " you may use this button when/if "
-                                        + player.getFactionEmoji() + " uses _Death Binding_.",
-                                buttons);
-                    }
+
                     if ((player.hasTech("md") || player.hasTech("md_c1"))
                             && player.getPlanetsAllianceMode().contains(unitHolderName)) {
                         if (uH.getUnitCount(UnitType.Pds, player) > 0
@@ -962,33 +950,26 @@ public class StartCombatService {
                         finChecker + "qhetHero_" + tile.getPosition(),
                         "Unlock " + tile.getRepresentationForButtons(),
                         FactionEmojis.qhet));
-                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card", FactionEmojis.qhet));
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCardsInfoThread(),
                         msg + ", a reminder that if you win the combat, "
-                                + "you may use the button unlock the system or draw 1 action card, due to Tvor Khage, the Qhet hero.",
+                                + "you may use the button unlock the system, due to Tvor Khage, the Qhet hero.",
                         buttons);
             }
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
                 int debt = player.getDebtTokenCount(otherPlayer.getColor());
-                if (debt > 1) {
+                if (debt > 2) {
                     String finChecker = "FFCC_" + player.getFaction() + "_";
                     buttons = new ArrayList<>();
                     buttons.add(Buttons.gray(
-                            finChecker + "blackOps_" + otherPlayer.getColor() + "_2",
-                            "Draw 1 Secret Objective",
+                            finChecker + "blackOps_" + otherPlayer.getColor() + "_3",
+                            "Turn in 3 Tokens",
                             FactionEmojis.qhet));
-                    if (debt > 4) {
-                        buttons.add(Buttons.gray(
-                                finChecker + "blackOps_" + otherPlayer.getColor() + "_5",
-                                "Gain 1 Command Token and Steal 1 Secret Objective",
-                                FactionEmojis.qhet));
-                    }
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
                             msg + ", a reminder that if you win the combat, you may use the button to"
-                                    + " cash in 2 of the control tokens you hold in order to draw an secret objective,"
-                                    + " or turn in 5 control tokens to grain a command token and steal an unscored secret objective from your opponent.",
+                                    + " cash in 3 of the control tokens you hold in order to draw a secret objective,"
+                                    + " or draw 2 AC, or gain 1 CC.",
                             buttons);
                 }
             }
@@ -1798,16 +1779,7 @@ public class StartCombatService {
             }
             addForesightButton.accept(p1);
         }
-        // if (p2.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty()
-        // && !game.isFowMode()) {
-        //     buttons.add(Buttons.gray(p2.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You
-        // Control", FactionEmojis.pharadn));
-        // }
-        // if (p1.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty())
-        // {
-        //     buttons.add(Buttons.gray(p1.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You
-        // Control", FactionEmojis.pharadn));
-        // }
+
         boolean gheminaCommanderApplicable = false;
         if (tile.getPlanetUnitHolders().isEmpty()) {
             gheminaCommanderApplicable = true;
