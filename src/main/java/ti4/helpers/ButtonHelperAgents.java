@@ -81,7 +81,10 @@ public class ButtonHelperAgents {
             }
             if (cabal.hasUnexhaustedLeader("cabalagent")) {
                 List<Button> buttons = new ArrayList<>();
-                String msg = cabal.getRepresentationUnfogged() + " you may use "
+                String msg = (cabal.hasUnexhaustedLeader("yssarilagent")
+                                ? cabal.getRepresentationNoPing()
+                                : cabal.getRepresentationUnfogged())
+                        + " you may use "
                         + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "The Stillness of Stars, the Vuil'raith"
                         + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
