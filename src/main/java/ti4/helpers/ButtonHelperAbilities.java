@@ -42,7 +42,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
-import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
@@ -83,37 +82,9 @@ public class ButtonHelperAbilities {
         int amount = Integer.parseInt(buttonID.split("_")[2]);
         player.clearDebt(p2, amount);
         String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation()
-                + " control tokens on their sheet via their **Black Ops** ability to ";
-        if (amount == 2) {
-            msg += "draw 1 secret objective.";
-            game.drawSecretObjective(player.getUserID());
-            if (player.hasAbility("plausible_deniability")) {
-                game.drawSecretObjective(player.getUserID());
-                msg += " Drew a second secret objective due to **Plausible Deniability**.";
-            }
-            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-        } else {
-            msg += "gain 1 command token and steal 1 of their opponents unscored secret objectives.";
-            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
-                    + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
-            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
-            if (!p2.getSecretsUnscored().isEmpty()) {
-                int randInt = ThreadLocalRandom.current()
-                        .nextInt(0, p2.getSecretsUnscored().size());
-                List<Map.Entry<String, Integer>> entries =
-                        new ArrayList<>(p2.getSecretsUnscored().entrySet());
-                Map.Entry<String, Integer> randomEntry = entries.get(randInt);
-                p2.removeSecret(randomEntry.getValue());
-                player.setSecret(randomEntry.getKey());
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
-                game.checkSOLimit(player);
-            } else {
-                msg += " Alas, their opponent did not have an unscored secret objectives.";
-            }
-        }
+                + " control tokens on their sheet via their **Black Ops** ability. ";
+        msg +=
+                "Unfortunately the effect is not automated at this time. Use /so draw, /player cc, or /ac draw as needed.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
 
         ButtonHelper.deleteMessage(event);

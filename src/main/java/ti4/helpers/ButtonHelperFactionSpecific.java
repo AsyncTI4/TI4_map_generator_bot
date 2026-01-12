@@ -264,6 +264,7 @@ public class ButtonHelperFactionSpecific {
         if (player.getHonorCounter() > 1) {
             if (!player.hasAbility("bestow")) {
                 player.addAbility("bestow");
+                CommanderUnlockCheckService.checkPlayer(player, "toldar");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has gained the _Bestow_ Honor card.\n"
@@ -279,7 +280,6 @@ public class ButtonHelperFactionSpecific {
         if (player.getHonorCounter() > 4) {
             if (!player.hasAbility("reflect")) {
                 player.addAbility("reflect");
-                CommanderUnlockCheckService.checkPlayer(player, "toldar");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has gained the _Reflect_ Honor card.\n"
@@ -318,6 +318,7 @@ public class ButtonHelperFactionSpecific {
         if (player.getDishonorCounter() > 1) {
             if (!player.hasAbility("thwart")) {
                 player.addAbility("thwart");
+                CommanderUnlockCheckService.checkPlayer(player, "toldar");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has gained the _Thwart_ Dishonor card.\n"
@@ -334,7 +335,6 @@ public class ButtonHelperFactionSpecific {
         if (player.getDishonorCounter() > 4) {
             if (!player.hasAbility("deceive")) {
                 player.addAbility("deceive");
-                CommanderUnlockCheckService.checkPlayer(player, "toldar");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation() + " has gained the _Deceive_ Dishonor card.\n"
@@ -2233,26 +2233,6 @@ public class ButtonHelperFactionSpecific {
                     player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
                             + " that may replace infantry.",
                     buttons);
-        }
-    }
-
-    @ButtonHandler("startQhetInfRevival")
-    public static void startQhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
-        List<Button> infButtons = new ArrayList<>();
-        for (String planet : ButtonHelper.getPlanetsWithUnits(player, game)) {
-            infButtons.add(Buttons.green("qhetInfRevival_" + planet, Helper.getPlanetRepresentation(planet, game)));
-        }
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", use this button to put down an infantry on a planet with your units.",
-                infButtons);
-        if (player.getStasisInfantry() > 1) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", use these buttons to put a second infantry down on the same planet if you so wish.",
-                    infButtons);
         }
     }
 
