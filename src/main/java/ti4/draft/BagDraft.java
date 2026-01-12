@@ -119,7 +119,7 @@ public abstract class BagDraft {
                                 + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
                 FrankenDraftBagService.displayPlayerHand(owner, p);
             } else {
-                if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p)) {
+                if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
                     List<DraftItem> draftableItems = new ArrayList<>();
                     draftableItems.addAll(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);

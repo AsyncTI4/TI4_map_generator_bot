@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2900,6 +2898,7 @@ public class ButtonHelperHeroes {
                 && "82a".equalsIgnoreCase(game.getTileByPosition("tl").getTileID())) {
             buttons.add(Buttons.green("yinHeroPlanet_lockedmallice", "Invade Mallice"));
         }
+        buttons.add(Buttons.green("yinHeroTarget_unowned", "Take Unowned Planet"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(), "Please choose the player that owns the planet you wish to land on.", buttons);
     }
@@ -2925,6 +2924,29 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(), "Please choose which planet to invade.", buttons);
             ButtonHelper.deleteMessage(event);
+        } else {
+            for (Tile tile : game.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder instanceof Planet) {
+                        Planet planet = (Planet) unitHolder;
+                        if (planet.isSpaceStation()) {
+                            continue;
+                        }
+                        boolean owned = false;
+                        for (Player p2 : game.getRealPlayersNNeutral()) {
+                            if (p2.getPlanets().contains(planet.getName())) {
+                                owned = true;
+                                break;
+                            }
+                        }
+                        if (!owned) {
+                            buttons.add(Buttons.green(
+                                    player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet.getName(),
+                                    Helper.getPlanetRepresentation(planet.getName(), game)));
+                        }
+                    }
+                }
+            }
         }
     }
 

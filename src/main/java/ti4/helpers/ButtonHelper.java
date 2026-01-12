@@ -2835,7 +2835,9 @@ public class ButtonHelper {
             List<Button> planetsWithSleepers = new ArrayList<>();
             planetsWithSleepers.add(Buttons.green(
                     finChecker + "replaceSleeperWith_pds_" + planet, "Replace Sleeper on " + planet + " With 1 PDS."));
-            if (getNumberOfUnitsOnTheBoard(game, player, "mech") < 4 && player.hasUnit("titans_mech")) {
+            if (getNumberOfUnitsOnTheBoard(game, player, "mech") < 4
+                    && player.hasUnit("titans_mech")
+                    && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 planetsWithSleepers.add(Buttons.green(
                         finChecker + "replaceSleeperWith_mech_" + planet,
                         "Replace Sleeper on " + planet + " With 1 Mech & Infantry."));
