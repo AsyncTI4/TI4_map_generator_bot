@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.game.CreateGameButtonHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.spring.jda.JdaService;
 
@@ -37,7 +39,7 @@ public class ChannelCreationListener extends ListenerAdapter {
                 || "making-private-games".equalsIgnoreCase(parentName)
                 || "making-superfast-games".equalsIgnoreCase(parentName)) {
             String message = """
-                To launch a new game, please use the buttons. Players can add themselves or you can add them manually. Once all players are added, press the launch button. Don't forget to add yourself!
+                To launch a new game, please use the buttons. Players can add themselves or you can add them manually. Once all players are added, press the launch button.
                 """;
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("joinGameList", "Join Game"));
@@ -46,7 +48,10 @@ public class ChannelCreationListener extends ListenerAdapter {
             buttons.add(Buttons.gray("removePlayers~MDL", "Remove Players"));
             buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
             buttons.add(Buttons.blue("launchGame", "Launch Game"));
-            channel.sendMessage(message)
+            channel.getOwnerId();
+            List<Member> membersOG = new ArrayList<>(List.of(channel.getOwner()));
+
+            channel.sendMessage(message + CreateGameButtonHandler.generateMemberListMessage(membersOG, ""))
                     .addComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
                     .queueAfter(
                             2, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel

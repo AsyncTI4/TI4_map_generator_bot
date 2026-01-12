@@ -398,9 +398,9 @@
         "name": "Death Binding",
         "faction": "pharadn",
         "color": "",
-        "playArea": true,
+        "playArea": false,
         "source": "ds",
-        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAfter 1 of your opponent’s infantry is destroyed during ground combat, you may exhaust this card to place 1 infantry from your reinforcements on that planet. Then, the Pharad'n player captures 1 infantry from their reinforcements."
+        "text": "When the Pharad’n player passes, remove 4 of your infantry from the game board to gain 1 technology with no prerequisites. Then, return this card to the Pharad'n player; that player captures 1 infantry from the supply."
     },
     {
         "alias": "dspnqhet",
@@ -427,7 +427,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of combat: Roll 4 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat.Then, return this card to the Belkosea player."
+        "text": "At the start of combat: Roll 3 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat. After the first round of this combat, return this card to the Belkosea player."
     },
     {
         "alias": "dspntold",
@@ -437,6 +437,6 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens  from your reinforcements and return this card to that player."
+        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens from your reinforcements and return this card to that player."
     }
 ]

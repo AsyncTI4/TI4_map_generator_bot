@@ -873,7 +873,7 @@
         "requirements": "GG",
         "faction": "uydai",
         "source": "ds",
-        "text": "ACTION: Exhaust this card and spend an amount of influence equal to the number of planets you control. Then, place 1 infantry from your reinforcements on each planet you control."
+        "text": "During the action phase, you may exhaust this card and spend any amount of influence to place 1 infantry from your reinforcements on a number of different planets you control equal to the influence spent."
     },
     {
         "alias": "dsuydab",
@@ -978,7 +978,8 @@
         "baseUpgrade": "ff2",
         "source": "ds",
         "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships’ capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)"
-    },{
+    },
+    {
         "alias": "dstoldb",
         "name": "Emergency Modifications",
         "types": [
@@ -988,7 +989,8 @@
         "faction": "toldar",
         "source": "ds",
         "text": "After a player activates a system, choose 1 unit on the game board; apply +2 to that unit's Capacity value, if it has one, until the end of this tactical action. "
-    },{
+    },
+    {
         "alias": "dstoldr",
         "name": "V.I.R. Training",
         "types": [

@@ -281,7 +281,7 @@ public class ButtonHelper {
                     (totalAmount <= 10
                                     ? UnitEmojis.infantry.toString().repeat(totalAmount)
                                     : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be able to place up to two of these infantry on a planet with your units at the end of your turn.");
+                            + " died and auto-revived. You will be able to place all of these units on a planet with your spacedocks at the beginning of your turn.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
@@ -446,6 +446,17 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Attempted to ping the game.");
     }
 
+    @ButtonHandler("resendInvite")
+    public static void pingGame(Game game, ButtonInteractionEvent event, String buttonID) {
+        Guild guild = event.getJDA().getGuildById(buttonID.replace("resendInvite_", ""));
+        if (guild == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Guild not found.");
+            return;
+        }
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), "Here is a new server invite: " + Helper.getGuildInviteURL(guild, 15));
+    }
+
     @ButtonHandler("statusInfRevival_")
     public static void placeInfantryFromRevival(
             Game game, ButtonInteractionEvent event, Player player, String buttonID) {
@@ -593,6 +604,22 @@ public class ButtonHelper {
                     buttons.add(Buttons.green(
                             "statusInfRevival_" + planet + "_1",
                             "Place 1 infantry on " + Helper.getPlanetRepresentation(planet, game)));
+                }
+            }
+        }
+        if (player.hasTech("dsqhetinf")) {
+            buttons = new ArrayList<>();
+            for (String planet : player.getPlanets()) {
+                if (game.getTileFromPlanet(planet) != null
+                        && game.getUnitHolderFromPlanet(planet).getUnitCount(UnitType.Spacedock, player) > 0) {
+                    buttons.add(Buttons.green(
+                            "statusInfRevival_" + planet + "_1",
+                            "Place 1 infantry on " + Helper.getPlanetRepresentation(planet, game)));
+                    if (infCount > 1) {
+                        buttons.add(Buttons.green(
+                                "statusInfRevival_" + planet + "_" + infCount,
+                                "Place " + infCount + "infantry on " + Helper.getPlanetRepresentation(planet, game)));
+                    }
                 }
             }
         }
@@ -4276,6 +4303,10 @@ public class ButtonHelper {
 
             if (player.hasPlanet(planet)
                     && !player.getExhaustedPlanetsAbilities().contains(planet)) {
+                if (planet.equalsIgnoreCase("mrte")
+                        && player.getSecretsUnscored().size() < 1) {
+                    continue;
+                }
                 String id = player.finChecker() + "planetAbilityExhaust_" + planet;
                 endButtons.add(Buttons.green(id, label, PlanetEmojis.getPlanetEmojiOrNull(planet)));
             }
@@ -4354,10 +4385,10 @@ public class ButtonHelper {
         if (player.hasRelic("absol_tyrantslament") && !player.hasUnit("tyrantslament")) {
             endButtons.add(Buttons.green("deployTyrant", "Deploy The Tyrant's Lament", SourceEmojis.Absol));
         }
-        if (player.getPathTokenCounter() > 5) {
+        if (player.getPathTokenCounter() > 4) {
             endButtons.add(Buttons.green(
                     player.finChecker() + "cashInPathTokens",
-                    "Spend 6 Path Tokens For Secondary",
+                    "Spend 5 or 8 Path Tokens For Secondary",
                     FactionEmojis.uydai));
         }
         if (player.hasAbility("the_starlit_path")) {
@@ -4365,9 +4396,6 @@ public class ButtonHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "ravencommander")) {
             endButtons.add(Buttons.green(player.finChecker() + "ravenMigration", "Use Migration", FactionEmojis.raven));
-        }
-        if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
-            endButtons.add(Buttons.red(player.finChecker() + "startQhetInfRevival", "Revive Up To 2 Infantry"));
         }
         if (player.hasUnlockedBreakthrough("axisbt") && player.hasReadyBreakthrough("axisbt")) {
             endButtons.add(
@@ -7537,9 +7565,9 @@ public class ButtonHelper {
     @ButtonHandler("cashInPathTokens")
     public static void cashInPathTokens(ButtonInteractionEvent event, Game game, Player player) {
         deleteButtonAndDeleteMessageIfEmpty(event);
-        player.setPathTokenCounter(player.getPathTokenCounter() - 6);
+        player.setPathTokenCounter(player.getPathTokenCounter() - 5);
         String msg1 = player.getRepresentation()
-                + " chose to turn in 6 **Path** tokens in order to resolve the secondary ability of any strategy card.";
+                + " chose to turn in 5 **Path** tokens in order to resolve the secondary ability of any strategy card. They can spend 3 more to do it without spending a token.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),

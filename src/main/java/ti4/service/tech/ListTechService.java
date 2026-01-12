@@ -86,6 +86,7 @@ public class ListTechService {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteMessage(event);
             }
