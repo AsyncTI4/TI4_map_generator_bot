@@ -49,7 +49,7 @@ public class ChannelCreationListener extends ListenerAdapter {
             buttons.add(Buttons.gray("addSillyName~MDL", "Add Fun Game Name"));
             buttons.add(Buttons.blue("launchGame", "Launch Game"));
             channel.getOwnerId();
-            List<Member> membersOG = new ArrayList<>(channel.getMembers());
+            List<Member> membersOG = new ArrayList<>(List.of(channel.getOwner()));
 
             channel.sendMessage(message + CreateGameButtonHandler.generateMemberListMessage(membersOG, ""))
                     .addComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
