@@ -150,6 +150,14 @@ public class VisionariaSelectService {
         if (!readyToMoveOn(game)) return;
 
         Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "Could not find active player when trying to move on after Visionaria.");
+            game.removeStoredValue("endTurnAfterVisionaria");
+            game.removeStoredValue("fleetLogAfterVisionaria");
+            game.removeStoredValue("VisionariaResponded");
+            return;
+        }
         if (game.getStoredValue("endTurnAfterVisionaria").equals(activePlayer.getFaction())) {
             EndTurnService.endTurnAndUpdateMap(null, game, activePlayer);
 
