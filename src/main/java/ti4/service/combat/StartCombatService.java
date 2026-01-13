@@ -969,7 +969,7 @@ public class StartCombatService {
                             player.getCardsInfoThread(),
                             msg + ", a reminder that if you win the combat, you may use the button to"
                                     + " cash in 3 of the control tokens you hold in order to draw a secret objective,"
-                                    + " or draw 2 AC, or gain 1 CC.",
+                                    + " or draw 2 action cards, or gain 1 command token.",
                             buttons);
                 }
             }
