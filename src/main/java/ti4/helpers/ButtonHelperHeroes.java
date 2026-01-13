@@ -1260,7 +1260,7 @@ public class ButtonHelperHeroes {
         String techID = buttonID.replace("purgeTech_", "");
         player.purgeTech(techID);
         String msg = player.getRepresentationUnfogged() + " purged _"
-                + Mapper.getTech(techID).getName() + _.";
+                + Mapper.getTech(techID).getName() + "_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
