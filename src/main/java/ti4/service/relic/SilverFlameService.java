@@ -31,6 +31,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.map.AddTileService;
 import ti4.service.map.FractureService;
@@ -88,8 +89,18 @@ public class SilverFlameService {
     private void resolveSilverFlameRoll(Game game, Player flamePlayer, int target) {
         Die result = new Die(target);
 
-        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled a " + result.getResult() + " for " + rep()
-                + "! " + result.getGreenDieIfSuccessOrRedDieIfFailure();
+        String dice;
+        if (flamePlayer.hasRelicReady("heartofixth") && result.getResult() == 9) {
+            dice = DiceEmojis.d10blue_9.toString();
+        } else if (HeartOfIxthService.isHeartAvailable(game)
+                && !flamePlayer.hasRelicReady("heartofixth")
+                && result.getResult() >= 9) {
+            dice = DiceEmojis.getGrayDieEmoji(result.getResult());
+        } else {
+            dice = result.getGreenDieIfSuccessOrRedDieIfFailure();
+        }
+
+        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for " + rep() + "! ";
         DisasterWatchHelper.sendMessageInFlameWatch(game, resultMsg);
         resultMsg += "\nUse the button%s to resolve:";
         List<Button> buttons = silverFlameResolveButtons(game, flamePlayer, result);
@@ -231,7 +242,12 @@ public class SilverFlameService {
         }
         MessageChannel channel = game.isFowMode() ? player.getCardsInfoThread() : game.getMainGameChannel();
         SecretObjectiveHelper.scoreSO(event, game, player, idValue, channel);
-        if (!game.isFowMode()) {
+        if (!game.isFowMode() && (player.getTotalVictoryPoints() == game.getVp())) {
+            DisasterWatchHelper.sendMessageInFlameWatch(
+                    game,
+                    "### Just According to _Keikaku_ - " + player.getRepresentation() + " has won " + game.getName()
+                            + " by scoring _Become A Martyr_.");
+        } else if (!game.isFowMode()) {
             DisasterWatchHelper.sendMessageInFlameWatch(
                     game,
                     "### Every _Silver Flame_ has a silver lining; " + player.getRepresentation()
