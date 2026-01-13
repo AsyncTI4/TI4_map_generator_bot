@@ -84,7 +84,7 @@ public class ButtonHelperAbilities {
         String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation()
                 + " control tokens on their sheet via their **Black Ops** ability. ";
         msg +=
-                "Unfortunately the effect is not automated at this time. Use /so draw, /player cc, or /ac draw as needed.";
+                "Unfortunately the effect is not automated at this time. Use `/so draw`, `/player cc`, or `/ac draw` as needed.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
 
         ButtonHelper.deleteMessage(event);
@@ -2517,7 +2517,7 @@ public class ButtonHelperAbilities {
                     event.getMessageChannel(),
                     player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                             + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
-        } else if (RandomHelper.isOneInX(100) && !colour.isEmpty() && "infantry".equals(unit)) {
+        } else if (RandomHelper.isOneInX(40) && !colour.isEmpty() && "infantry".equals(unit)) {
             String poem = "";
             switch (ThreadLocalRandom.current().nextInt(20)) {
                 case 0:
