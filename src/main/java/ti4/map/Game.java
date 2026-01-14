@@ -2703,7 +2703,7 @@ public class Game extends GameProperties {
             return player.getActionCards();
         }
 
-        if (!hasReshuffableActionCards()) {
+        if (hasReshuffableActionCards()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
         }
@@ -2987,7 +2987,7 @@ public class Game extends GameProperties {
             return id;
         }
 
-        if (!hasReshuffableActionCards()) {
+        if (hasReshuffableActionCards()) {
             reshuffleActionCardDiscard();
             return drawActionCardAndDiscard();
         }
