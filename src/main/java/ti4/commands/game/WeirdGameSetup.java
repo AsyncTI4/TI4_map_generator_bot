@@ -20,7 +20,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
 
-    public WeirdGameSetup() {
+    WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
@@ -187,15 +187,15 @@ class WeirdGameSetup extends GameStateSubcommand {
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
-    public static boolean setGameMode(
-            GenericInteractionCreateEvent event,
-            Game game,
-            boolean baseGameMode,
-            boolean absolMode,
-            boolean miltyModMode,
-            boolean discordantStarsMode,
-            boolean isTIGLGame,
-            boolean votcMode) {
+    static boolean setGameMode(
+        GenericInteractionCreateEvent event,
+        Game game,
+        boolean baseGameMode,
+        boolean absolMode,
+        boolean miltyModMode,
+        boolean discordantStarsMode,
+        boolean isTIGLGame,
+        boolean votcMode) {
         if (isTIGLGame
                 && (baseGameMode
                         || absolMode
@@ -212,11 +212,10 @@ class WeirdGameSetup extends GameStateSubcommand {
             TIGLHelper.initializeTIGLGame(game);
             return true;
         }
-        if (!isTIGLGame) {
-            game.setCompetitiveTIGLGame(false);
-        }
 
-        if (miltyModMode && !baseGameMode) {
+      game.setCompetitiveTIGLGame(false);
+
+      if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Milty Mod Mode can only be combined with No Expansion Mode. Please set the game to No Expansion Mode first.");
