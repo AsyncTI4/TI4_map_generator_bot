@@ -2669,20 +2669,20 @@ public class Game extends GameProperties {
                 .toList();
 
         if (acsToShuffle.isEmpty()) {
-            MessageHelper.sendMessageToChannel(getActionsChannel(),
-                "Unable to reshuffle the AC deck because the discard pile is empty.");
+            MessageHelper.sendMessageToChannel(
+                    getActionsChannel(), "Unable to reshuffle the AC deck because the discard pile is empty.");
             return;
         }
 
         getActionCards().addAll(acsToShuffle);
         String names = acsToShuffle.stream()
-            .map(ac -> Mapper.getActionCard(ac).getName())
-            .collect(Collectors.joining("\n"));
+                .map(ac -> Mapper.getActionCard(ac).getName())
+                .collect(Collectors.joining("\n"));
         Collections.shuffle(getActionCards());
         acsToShuffle.forEach(ac -> getDiscardActionCards().remove(ac)); // clear out the shuffled back cards
         acsToShuffle.forEach(ac -> getDiscardACStatus().remove(ac)); // just in case
         String msg = "# " + getPing()
-            + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
+                + ", the action card deck has run out of cards, and so the discard pile has been shuffled to form a new action card deck.";
         if (!isFowMode()) {
             msg += "The shuffled cards are:\n" + names;
         }
@@ -2707,7 +2707,7 @@ public class Game extends GameProperties {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
         }
-        
+
         MessageHelper.sendMessageToChannel(getActionsChannel(), "Unable to draw an action card.");
         return null;
     }
@@ -2992,14 +2992,13 @@ public class Game extends GameProperties {
             return drawActionCardAndDiscard();
         }
 
-        MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "Unable to draw an action card.");
+        MessageHelper.sendMessageToChannel(getActionsChannel(), "Unable to draw an action card.");
         return null;
     }
 
     private boolean hasReshuffableActionCards() {
         return getDiscardActionCards().keySet().stream()
-            .anyMatch(ac -> getDiscardACStatus().get(ac) == null);
+                .anyMatch(ac -> getDiscardACStatus().get(ac) == null);
     }
 
     public void checkSOLimit(Player player) {
