@@ -27,6 +27,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     private String faction;
     private String text;
     private String homebrewReplacesID;
+    private String imageURL;
     private ComponentSource source;
 
     public boolean isValid() {

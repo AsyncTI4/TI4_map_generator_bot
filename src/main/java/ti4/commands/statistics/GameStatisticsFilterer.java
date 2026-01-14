@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
@@ -63,7 +64,7 @@ public class GameStatisticsFilterer {
         filters.add(
                 new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
         filters.add(new OptionData(
-                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if the fracture was in play"));
+                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if The Fracture was in play"));
         return filters;
     }
 
@@ -84,6 +85,7 @@ public class GameStatisticsFilterer {
         String gameTypesFilter = event.getOption(GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         String excludedGameTypesFilter = event.getOption(EXCLUDED_GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
+        String factionFilter = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         String winningFactionFilter = event.getOption(WINNING_FACTION_FILTER, null, OptionMapping::getAsString);
         Boolean galacticEventFilter = event.getOption(HAS_GALACTIC_EVENT_FILTER, null, OptionMapping::getAsBoolean);
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
@@ -96,6 +98,7 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnGameTypes(gameTypesFilter, game))
                 .and(game -> filterOnExcludedGameTypes(excludedGameTypesFilter, game))
                 .and(game -> filterOnFogType(fogFilter, game))
+                .and(game -> filterOnFaction(factionFilter, game))
                 .and(game -> filterOnHomebrew(homebrewFilter, game))
                 .and(game -> filterOnHasWinner(hasWinnerFilter, game))
                 .and(game -> filterOnWinningFaction(winningFactionFilter, game))
@@ -112,6 +115,13 @@ public class GameStatisticsFilterer {
         }
         return game.getWinners().stream()
                 .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
+    }
+
+    private static boolean filterOnFaction(String factionFilter, Game game) {
+        if (factionFilter == null) {
+            return true;
+        }
+        return game.getFactions().stream().anyMatch(faction -> faction.equalsIgnoreCase(factionFilter));
     }
 
     public static Predicate<Game> getNormalFinishedGamesFilter(

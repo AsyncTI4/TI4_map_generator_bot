@@ -1,9 +1,11 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -12,12 +14,17 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
+import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.MapTemplateModel;
+import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TileEmojis;
+import ti4.service.map.MapStringMapper;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftSlice;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -39,6 +46,16 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
     private final IntegerSetting minimumRedTiles;
 
     private boolean showAdvanced;
+
+    // Preset slices and map
+    private String presetSlices;
+    private String presetMapString;
+
+    @JsonIgnore
+    private List<MiltyDraftSlice> parsedSlices;
+
+    @JsonIgnore
+    private Map<String, String> parsedMapTiles;
 
     private static final String MENU_ID = "nucleusSlice";
 
@@ -110,11 +127,22 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         minimumRedTiles.initialize(json.get("minimumRedTiles"));
         showAdvanced =
                 json.get("showAdvanced") != null && json.get("showAdvanced").asBoolean(false);
+
+        if (json.has("presetSlices")) {
+            setPresetSlices(json.get("presetSlices").asText(null));
+        }
+        if (json.has("presetMapString")) {
+            setPresetMapString(json.get("presetMapString").asText(null));
+        }
     }
 
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<>();
+        // If both presets are set, hide all generation settings
+        if (presetSlices != null && presetMapString != null) {
+            return ls;
+        }
         ls.add(nucleusWormholes);
         ls.add(totalWormholes);
         ls.add(nucleusLegendaries);
@@ -137,9 +165,6 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         List<Button> ls = new ArrayList<>(super.specialButtons());
         String toggleText = showAdvanced ? "Hide Advanced" : "Show Advanced";
         ls.add(Button.primary(idPrefix + "toggleAdvanced", toggleText));
-        // TODO: Presets
-        // TODO: Rich galaxy (rich nucleus? rich slices?)
-        // TODO: Poor galaxy (poor nucleus? poor slices?)
         return ls;
     }
 
@@ -164,6 +189,101 @@ public class NucleusSliceDraftableSettings extends SettingsMenu {
         }
 
         return "success";
+    }
+
+    public String setPresetSlices(String sliceString) {
+        if (sliceString == null || sliceString.isEmpty()) {
+            presetSlices = null;
+            parsedSlices = null;
+            return null;
+        }
+
+        List<ComponentSource> sources = new ArrayList<>();
+        int players = 6;
+        presetSlices = sliceString;
+        if (parent instanceof SliceDraftableSettings sdParent
+                && sdParent.getParent() instanceof DraftSystemSettings dparent) {
+            players = dparent.getPlayerUserIds().size();
+            sources.addAll(dparent.getSourceSettings().getTileSources());
+        }
+
+        String error = null;
+        try {
+            parsedSlices = MiltyDraftHelper.parseSlices(sliceString, sources);
+        } catch (Exception e) {
+            error = e.getMessage();
+        }
+        if (parsedSlices == null || error != null) {
+            presetSlices = null;
+            if (error != null) return error;
+            return "Invalid slice string";
+        } else if (parsedSlices.size() < players) {
+            presetSlices = null;
+            parsedSlices = null;
+            return "Not enough slices for the number of players.";
+        }
+        return null;
+    }
+
+    public String setPresetMapString(String mapString) {
+        if (mapString == null || mapString.isEmpty()) {
+            presetMapString = null;
+            parsedMapTiles = null;
+            return null;
+        }
+
+        // Normalize the map string (replace newlines and commas with spaces)
+        String normalizedMapString = mapString
+                .replace("\n", " ")
+                .replace(",", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
+        presetMapString = normalizedMapString;
+
+        // Parse using MapStringMapper
+        parsedMapTiles = MapStringMapper.getMappedTilesToPosition(normalizedMapString, null);
+
+        if (parsedMapTiles.isEmpty()) {
+            presetMapString = null;
+            parsedMapTiles = null;
+            return "Could not parse map string";
+        }
+
+        // Validate all non "-1" tile IDs
+        int numSliceTiles = 0;
+        int numPlayers = 6;
+        if (parent instanceof SliceDraftableSettings sdParent
+                && sdParent.getParent() instanceof DraftSystemSettings dparent) {
+            numPlayers = dparent.getPlayerUserIds().size();
+        }
+        for (Map.Entry<String, String> entry : parsedMapTiles.entrySet()) {
+            String tileId = entry.getValue();
+            // Skip -1 positions (reserved for player slices)
+            if ("-1".equals(tileId)) {
+                numSliceTiles++;
+                continue;
+            }
+            // Validate tile exists
+            if (!TileHelper.isValidTile(tileId)) {
+                presetMapString = null;
+                parsedMapTiles = null;
+                return "Invalid tile ID at position " + entry.getKey() + ": " + tileId;
+            }
+        }
+        if (numSliceTiles / numPlayers != 3) {
+            return "Invalid number of slice tiles in map string; required numberOfPlayers × 3";
+        }
+
+        return null;
+    }
+
+    @Override
+    protected String resetSettings() {
+        presetSlices = null;
+        parsedSlices = null;
+        presetMapString = null;
+        parsedMapTiles = null;
+        return super.resetSettings();
     }
 
     public void setDefaultsForTemplate(StringSelectInteractionEvent event, MapTemplateModel mapTemplateModel) {

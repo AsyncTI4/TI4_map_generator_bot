@@ -81,7 +81,10 @@ public class ButtonHelperAgents {
             }
             if (cabal.hasUnexhaustedLeader("cabalagent")) {
                 List<Button> buttons = new ArrayList<>();
-                String msg = cabal.getRepresentationUnfogged() + " you may use "
+                String msg = (cabal.hasUnexhaustedLeader("yssarilagent")
+                                ? cabal.getRepresentationNoPing()
+                                : cabal.getRepresentationUnfogged())
+                        + " you may use "
                         + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "The Stillness of Stars, the Vuil'raith"
                         + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
@@ -757,16 +760,6 @@ public class ButtonHelperAgents {
                     + " agent, for +3 PRODUCTION value.");
         }
 
-        if ("uydaiagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Garstil, the Uydai"
-                    + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
-            String faction = rest.split("_")[1];
-            Player p2 = game.getPlayerFromColorOrFaction(faction);
-            if (p2 == null) return;
-            p2.addSpentThing("Exhausted " + ssruuClever + "Garstil, the Uydai" + ssruuSlash
-                    + " agent, for up to 3 infantry not to count towards production limit.");
-        }
         if ("khraskagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Udosh B'rtul, the Khrask" + ssruuSlash + " agent.";
@@ -905,8 +898,8 @@ public class ButtonHelperAgents {
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent) || "crimsonagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Ahk Ravin, the Crimson"
-                    + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
+                    + "Ahk Ravin, the Rebellion" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("redcreussagent_", "").replace("crimsonagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -990,8 +983,8 @@ public class ButtonHelperAgents {
             game.setCurrentReacts("solagent", p2.getFaction());
         }
         if ("bastionagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + " the Bastion"
-                    + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
+                    + " Dame Briar, the Bastion" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1003,7 +996,7 @@ public class ButtonHelperAgents {
             List<Button> buttons = GalvanizeService.getToggleGalvanizeButtons(
                     p2, game, game.getTileByPosition(game.getActiveSystem()));
             MessageHelper.sendMessageToChannel(
-                    channel2, p2.getRepresentation() + " use these buttons to galvanize a unit.", buttons);
+                    channel2, p2.getRepresentation() + ", please choose the unit you wish to galvanize.", buttons);
         }
         if ("valiantagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted the " + ssruuClever + "_Valiant Genome_.";
@@ -1540,11 +1533,7 @@ public class ButtonHelperAgents {
                     && !exhaustedMessage.contains("please choose the target")
                     && !exhaustedMessage.contains("please choose the faction to give")
                     && !exhaustedMessage.contains("choose the target of the agent")) {
-                if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 2) {
-                    buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-                } else {
-                    ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
-                }
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(buttonEvent);
 
             } else {
                 buttonEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1696,7 +1685,7 @@ public class ButtonHelperAgents {
             Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
             game.setStoredValue("edynAgentInAction", "");
             if (newActivePlayer != null) {
-                ButtonHelper.startMyTurn(event, game, newActivePlayer);
+                StartTurnService.turnStart(event, game, newActivePlayer);
             }
             return true;
         }

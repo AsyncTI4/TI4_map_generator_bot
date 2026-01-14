@@ -40,7 +40,7 @@ class SecretObjectiveButtonHandler {
             int soIndex = Integer.parseInt(soID);
 
             String msg = player.getRepresentation() + " discarded a secret objective";
-            if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 0) {
+            if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 1) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.getSo() > 1) {
@@ -63,7 +63,7 @@ class SecretObjectiveButtonHandler {
                         && event.getUser().getId().equals(player.getUserID())) {
                     event.getHook()
                             .setEphemeral(true)
-                            .sendMessage("OH NO!!! You drew the same secret you discarded! How unlucky 😭😭😭")
+                            .sendMessage("Oh no! You drew the same secret you discarded! How unlucky 😭😭😭!")
                             .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }

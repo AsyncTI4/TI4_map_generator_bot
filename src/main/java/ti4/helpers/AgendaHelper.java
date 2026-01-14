@@ -1842,7 +1842,7 @@ public class AgendaHelper {
 
     public static void ministerOfIndustryCheck(
             Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
-        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_industry")) {
+        if (IsPlayerElectedService.isPlayerElected(game, player, "minister_industry") && !tile.isScar(game)) {
             String msg = player.getRepresentationUnfogged()
                     + "since you have _Minister of Industry_, you may build in tile "
                     + tile.getRepresentationForButtons(game, player) + ". You have "
@@ -1852,7 +1852,7 @@ public class AgendaHelper {
                     msg,
                     Helper.getPlaceUnitButtons(event, player, game, tile, "ministerBuild", "place"));
         }
-        if (player.hasAbility("quantum_fabrication")) {
+        if (player.hasAbility("quantum_fabrication") && !tile.isScar(game)) {
             String msg = player.getRepresentationUnfogged()
                     + ", if you placed this space dock via **Construction**, you may use its PRODUCTION ability immediately in "
                     + tile.getRepresentationForButtons(game, player) + " via **Quantum Fabrication**.";
@@ -2056,8 +2056,8 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), message);
                     if (size > 0) {
                         keleres.setTg(keleres.getTg() + size);
-                        String msg2 = "Gained " + size + " trade goods (" + (keleres.getTg() - size) + " -> **"
-                                + keleres.getTg() + "**).";
+                        String msg2 = "Gained " + size + " trade good" + (size == 1 ? "" : "s") + " ("
+                                + (keleres.getTg() - size) + " -> **" + keleres.getTg() + "**).";
                         ButtonHelperAbilities.pillageCheck(keleres, game);
                         ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);
@@ -2080,7 +2080,7 @@ public class AgendaHelper {
                     if (winningR != null && specificVote.contains("Sanction")) {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
                         for (Player p2 : loseFleetPlayers) {
-                            MahactTokenService.removeFleetCC(game, p2, "due to voting the same way as a _Sanction_.");
+                            MahactTokenService.removeFleetCC(game, p2, "due to voting the same way as a _Sanction_");
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
@@ -4356,7 +4356,9 @@ public class AgendaHelper {
                     }
                 } else {
                     sb.append(
-                            "The top agenda is currently in somebody's hand. If you are not currently resolving the covert legislation agenda and politics player is done assigning agendas, fix this situation by running the command: /agenda reset_draw_state_for_deck confirm:YES.");
+                            "The top agenda is currently in somebody's hand."
+                                    + " If you are not currently resolving the _Covert Legislation_ agenda, and the **Politics** player (if any) is done assigning agendas,"
+                                    + " fix this situation by running the command: `/agenda reset_draw_state_for_deck confirm:YES`.");
                 }
             } else if (agendaID != null) {
                 embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();

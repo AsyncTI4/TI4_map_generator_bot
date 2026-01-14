@@ -47,8 +47,8 @@ public class PlotCardsService {
                 player.setPlotCardFaction(plotID, faction);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
-                String msg = player.getRepresentation() + " added a " + player2 + " token to the _" + plot.getName()
-                        + "_ plot.";
+                String msg = player.getRepresentation() + " added a " + player2 + " token to plot "
+                        + player.getPlotCards().get(plotID);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
@@ -75,8 +75,8 @@ public class PlotCardsService {
                 player.removePlotCardFaction(plotID);
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 String player2 = p2 == null ? faction : p2.getRepresentation(false, true);
-                String msg = player.getRepresentation() + " removed a " + player2 + " token from the _" + plot.getName()
-                        + "_ plot.";
+                String msg = player.getRepresentation() + " removed a " + player2 + " token from plot "
+                        + player.getPlotCards().get(plotID);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
             }
@@ -151,8 +151,8 @@ public class PlotCardsService {
                 String disastermsg = "Moments before disaster in game " + game.getName() + ".";
                 DisasterWatchHelper.postTileInDisasterWatch(game, event, t, 0, disastermsg);
             }
-            String disastermsg = Helper.getPlanetRepresentation(planet.getName(), game)
-                    + " has been eradicated with an Obsidian plot.";
+            String disastermsg =
+                    Helper.getPlanetRepresentation(planet.getName(), game) + " has been eradicated with _Seethe_.";
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), disastermsg);
 

@@ -1,5 +1,5 @@
 {
-    "tileBack":"green",
+    "tileBack": "green",
     "id": "as01",
     "name": "Thyolcian - Cantokylegance",
     "aliases": [
@@ -27,6 +27,8 @@
         }
     ],
     "wormholes": [],
-    "planets": ["thyolcian"],
+    "planets": [
+        "thyolcian"
+    ],
     "source": "eronous"
 }

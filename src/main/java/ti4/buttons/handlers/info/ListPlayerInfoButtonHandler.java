@@ -17,6 +17,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.model.BreakthroughModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.player.PlayerStatsService;
@@ -113,8 +114,8 @@ class ListPlayerInfoButtonHandler {
                             messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                         }
                     }
-                    if (p2.getBreakthroughModel() != null) {
-                        messageEmbeds.add(p2.getBreakthroughModel().getRepresentationEmbed());
+                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
+                        messageEmbeds.add(bt.getRepresentationEmbed());
                     }
                 }
                 case "abilities" -> {
@@ -134,8 +135,8 @@ class ListPlayerInfoButtonHandler {
                     }
                 }
                 case "breakthrough" -> {
-                    if (p2.getBreakthroughModel() != null) {
-                        messageEmbeds.add(p2.getBreakthroughModel().getRepresentationEmbed());
+                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
+                        messageEmbeds.add(bt.getRepresentationEmbed());
                     }
                 }
                 case "tech" -> {

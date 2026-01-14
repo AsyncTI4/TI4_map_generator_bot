@@ -298,6 +298,7 @@ public class MiltyService {
         player.getPlanets().clear();
         player.getTechs().clear();
         player.getFactionTechs().clear();
+        for (String bt : new ArrayList<>(player.getBreakthroughIDs())) player.removeBreakthrough(bt);
 
         FactionModel factionModel = player.getFactionSetupInfo();
 
@@ -318,7 +319,7 @@ public class MiltyService {
             player.addBreakthrough(breakthrough);
             if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
                 List<MessageEmbed> embeds = new ArrayList<>();
-                embeds.add(player.getBreakthroughModel().getRepresentationEmbed());
+                for (var bt : player.getBreakthroughModels()) embeds.add(bt.getRepresentationEmbed());
                 MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), "Breakthrough info", embeds);
             }
         }
@@ -745,7 +746,7 @@ public class MiltyService {
             game.setTile(tile);
             player.setHomeSystemPosition(pos);
             if (game.isTwilightsFallMode()) {
-                player.addAbility("song_of_something");
+                player.addAbility("echo_of_sacrifice");
             }
         }
 
@@ -755,7 +756,7 @@ public class MiltyService {
             if (!game.isTwilightsFallMode()) {
                 tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
             } else {
-                player.addAbility("song_of_something");
+                player.addAbility("echo_of_divergence");
             }
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {

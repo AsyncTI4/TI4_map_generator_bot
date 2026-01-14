@@ -2383,16 +2383,18 @@
         "id": "belkosea_mech",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Orator",
+        "name": "Uzean Wardog",
         "source": "ds",
         "faction": "belkosea",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
+        "afbHitsOn": 6,
+        "afbDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When this unit produces a hit, gain 1 commodity."
+        "ability": "When this unit produces a hit, gain 1 commodity or convert 1 of your commodities to a trade good."
     },
     {
         "id": "belkosea_flagship",

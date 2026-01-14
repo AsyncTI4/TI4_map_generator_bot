@@ -32,7 +32,9 @@ public class TEOptionService {
             The second option is closer to Rules As Written, the first is closer to a classic franken draft.""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("startTFDraft_bag", "Use Bag Draft of Everything"));
-        buttons.add(Buttons.gray("startDraftSystem_andcatPreset", "Start Milty Draft + Later Inaugural Splice"));
+        buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
+        buttons.add(
+                Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
@@ -48,7 +50,6 @@ public class TEOptionService {
 
     @ButtonHandler("chooseExp_")
     public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
-
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "newpok" -> {
@@ -195,9 +196,9 @@ public class TEOptionService {
             galacticEventButtons.add(Buttons.green("enableDaneMode_WeirdWormholes_enable", "Enable Weird Wormholes"));
         }
         if (game.isWildWildGalaxyMode()) {
-            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild Wild Galaxy"));
+            galacticEventButtons.add(Buttons.red("enableDaneMode_WildGalaxy_disable", "Disable Wild, Wild Galaxy"));
         } else {
-            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild Wild Galaxy"));
+            galacticEventButtons.add(Buttons.green("enableDaneMode_WildGalaxy_enable", "Enable Wild, Wild Galaxy"));
         }
         if (game.isCallOfTheVoidMode()) {
             galacticEventButtons.add(Buttons.red("enableDaneMode_CallOfTheVoid_disable", "Disable Call of the Void"));

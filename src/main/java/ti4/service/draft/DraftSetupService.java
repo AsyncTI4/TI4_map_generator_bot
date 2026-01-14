@@ -192,16 +192,6 @@ public class DraftSetupService {
         orchestrator.applySetupMenuChoices(event, settings);
         draftManager.setOrchestrator(orchestrator);
 
-        // TODO: Support this in the Nucleus generator, by factoring in to the nucleus generation
-        // if (specs.presetSlices != null) {
-        //     SliceDraftable sliceDraftable = new SliceDraftable();
-        //     draftManager.addDraftable(sliceDraftable);
-        //     sliceDraftable.initialize(specs.presetSlices);
-        //     draftManager.tryStartDraft();
-        // }
-
-        // TODO: Support presetting the Nucleus in the Settings object, maybe via modal w/ TTS string
-
         game.setPhaseOfGame("miltydraft");
         draftManager.tryStartDraft();
 

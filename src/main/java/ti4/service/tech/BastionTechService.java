@@ -77,7 +77,7 @@ public class BastionTechService {
             Game game, Player p1, Player p2, Tile tile, UnitHolder holder, List<Button> combatButtons) {
         if ((p1.hasTech("proxima") || (p2.hasTech("proxima")) && !game.isFowMode())) {
             String id = "resolveProxima_" + tile.getPosition() + "_" + holder.getName();
-            String label = "Use Proxima Targeting on " + holder.getRepresentation(game);
+            String label = "Use Proxima Targeting VI On " + holder.getRepresentation(game);
             combatButtons.add(Buttons.red(id, label, FactionEmojis.Bastion));
         }
     }
@@ -182,15 +182,15 @@ public class BastionTechService {
                 message = message.substring(0, message.length() - 2);
             }
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing());
+                    event.getMessageChannel(), message + "\nRolled against " + p2.getRepresentationNoPing() + ".");
             if (h > 0) {
-                String msg = p2.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
-                        + ".";
+                String msg = p2.getRepresentationUnfogged() + ", you may auto-assign " + h + " hit"
+                        + (h == 1 ? "" : "s") + ".";
                 List<Button> buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + p2.getFaction() + "_";
                 buttons.add(Buttons.green(
                         finChecker + "autoAssignGroundHits_" + planetN + "_" + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
@@ -204,25 +204,25 @@ public class BastionTechService {
                 message = message.substring(0, message.length() - 2);
             }
             if (player.hasTech("tf-proxima") && h > 0) {
-                message += "\nProxima canceled 1 hit automatically";
+                message += "\n_Proxima Targeting VI_ canceled 1 hit automatically.";
                 h--;
             } else {
                 if (planet.getGalvanizedUnitCount(player.getColorID()) > 0 && h > 0) {
                     int oldH = h;
                     h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                    message += "\nProxima canceled " + (oldH - h) + " hit(s) automatically";
+                    message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit(s) automatically.";
                 }
             }
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), message + "\nRolled against " + p1.getRepresentationNoPing());
+                    event.getMessageChannel(), message + "\nRolled against " + p1.getRepresentationNoPing() + ".");
             if (h > 0) {
-                String msg = p1.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
+                String msg = p1.getRepresentationUnfogged() + ", you may autoassign " + h + " hit" + (h == 1 ? "" : "s")
                         + ".";
                 List<Button> buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + p1.getFaction() + "_";
                 buttons.add(Buttons.green(
                         finChecker + "autoAssignGroundHits_" + planetN + "_" + h,
-                        "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        "Auto-Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }

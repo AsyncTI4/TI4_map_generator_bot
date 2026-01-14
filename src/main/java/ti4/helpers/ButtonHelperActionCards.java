@@ -552,8 +552,8 @@ public class ButtonHelperActionCards {
                     MessageHelper.sendMessageToChannel(
                             p3.getCardsInfoThread(),
                             p3.getRepresentation()
-                                    + " this is a reminder that you have the action card \"Lie In Wait\" and two of your neighbors just resolved a transaction. The two neighbors are "
-                                    + p1.getRepresentationNoPing() + " and " + p2.getRepresentationNoPing());
+                                    + " this is a reminder that you have _Lie In Wait_, and two of your neighbors just resolved a transaction. The two neighbors are "
+                                    + p1.getRepresentationNoPing() + " and " + p2.getRepresentationNoPing() + ".");
                 }
             }
         }
@@ -783,8 +783,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged()
-                + ", please choose the planet you wish to resolve remove enemy landed ground forces from."
-                + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
+                + ", please choose the planet you wish to remove enemy landed ground forces from."
+                + " If it's not present (because the opponent took it already), try pressing \"UNDO\", then `/planet add` it back to yourself, then try again.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(
@@ -1997,7 +1997,7 @@ public class ButtonHelperActionCards {
         if (player.getPlayableActionCards().contains("extremeduress")) {
             game.setStoredValue("ExtremeDuress", "");
             String msg = player.getRepresentation()
-                    + ", you have the option to pre-assign which player you wish to experience extreme duress."
+                    + ", you have the option to pre-assign which player you wish to experience _Extreme Duress_."
                     + " _Extreme Duress_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
@@ -2005,7 +2005,7 @@ public class ButtonHelperActionCards {
                 if (!p2.hasUnplayedSCs()) {
                     continue;
                 }
-                String label = "Expreme Duress " + p2.getFactionNameOrColor();
+                String label = "Extreme Duress " + p2.getFactionNameOrColor();
                 String scEmoji = p2.getFactionEmojiOrColor();
                 scButtons.add(Buttons.gray("resolvePreassignment_ExtremeDuress_" + p2.getColor(), label, scEmoji));
             }
@@ -2022,7 +2022,7 @@ public class ButtonHelperActionCards {
         if (player.getPlayableActionCards().contains("crisis")) {
             game.setStoredValue("Crisis Target", "");
             String msg = player.getRepresentation()
-                    + ", you have the option to pre-assign which player whose turn you wish to skip with crisis."
+                    + ", you have the option to pre-assign which player whose turn you wish to skip with _Crisis_."
                     + " _Crisis_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                     + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
@@ -2934,7 +2934,7 @@ public class ButtonHelperActionCards {
         StringBuilder bestPlanet = new StringBuilder();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count) {
+            if (p != null && p.getResources() > count && !p.getName().equalsIgnoreCase("triad")) {
                 count = p.getResources();
                 bestPlanet = new StringBuilder(planet);
             } else if (p != null

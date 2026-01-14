@@ -5,13 +5,12 @@
         "elokphi",
         "eloknu",
         "phi",
-        "nu", 
+        "nu",
         "ephi",
         "enu"
     ],
     "imagePath": "er_10_async.png",
     "planets": [
-
         "elokphi",
         "eloknu"
     ],
@@ -23,4 +22,3 @@
     "tileBack": "red",
     "source": "eronous"
 }
-

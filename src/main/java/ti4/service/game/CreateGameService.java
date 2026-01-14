@@ -225,6 +225,8 @@ public class CreateGameService {
         if (event.getChannel() instanceof ThreadChannel thread
                 && ("making-new-games".equals(thread.getParentChannel().getName())
                         || "making-private-games"
+                                .equals(thread.getParentChannel().getName())
+                        || "making-superfast-games"
                                 .equals(thread.getParentChannel().getName()))) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
@@ -281,10 +283,10 @@ public class CreateGameService {
         buttons.add(Buttons.gray("chooseExp_oldPoK", "Old PoK"));
         buttons.add(Buttons.blue("chooseExp_te", "Thunder's Edge + New PoK"));
         String expMsg = """
-                Which expansion are you using for this game?
+                ## Which expansion are you using for this game? (Required)
                 -# This will adjust available components accordingly. To elaborate on the options:
-                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, ACs, or the fracture. This mode has the new relics, finalized codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
-                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codex 1-4.5
+                > **New PoK** - Use components from Prophecy of Kings and Thunder's Edge, but don't include the new factions, breakthroughs, action cards, or The Fracture. This mode has the new relics, finalized Codex cards (except Xxcha hero), new tiles, and new Strategy Cards. It is the default if you do not press any of these buttons.
+                > **Old PoK** - Use only components from Prophecy of Kings expansion + Codicies 1-4.5
                 > **Thunder's Edge + New PoK** - Use components from both expansions, including all mechanics from Thunder's Edge.\
 
                 -# Please realize that these are broad overviews and that some small components may not fit perfectly into these categories.""";
@@ -433,11 +435,13 @@ public class CreateGameService {
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
-            sb.append(
-                    "You will be automatically added to the game channels when you join the server."
-                            + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
-                            + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
+            sb.append("You will be automatically added to the game channels when you join the server.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
+            String msg2 =
+                    "If you have joined the server and cannot find your game, please click this button. If the invite has expired, please press this other button.";
+            Button findGameButton = Buttons.green("pingGame", "Locate My Game");
+            Button resendInvite = Buttons.blue("resendInvite_" + guild.getId(), "Resend Server Invite");
+            MessageHelper.sendMessageToChannelWithButtons(channel, msg2, List.of(findGameButton, resendInvite));
         }
         return missingMembers;
     }
@@ -736,7 +740,7 @@ public class CreateGameService {
                 "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
                 "Fission", "Disruptor", "Network", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
                 "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
-                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Homoeostasis", "Vorpal",
+                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
                 "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Lattice", "Obelisk", "Yggdrasil", "Jargon",
                 "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
                 "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Gloom",
@@ -748,23 +752,23 @@ public class CreateGameService {
                 "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
                 "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Pulsar", "Kinetic", "Chimera",
                 "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
-                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Titration", "Emerald",
+                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
                 "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
-                "Tesseract", "Jupiter", "Volatile", "Moebius", "Antimatter", "Phoenix", "Hardwired", "Uninhabitable",
+                "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
                 "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Terraform",
                 "Conduit", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
                 "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
                 "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
                 "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Atomic",
-                "Galactic", "Redshift", "Cerebral", "Fungi", "Cronus", "Dendrite", "Ziggurat", "Vermilion",
+                "Galactic", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
                 "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
                 "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
                 "Parasite", "Synchronisation", "Singularity", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
                 "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
-                "Nitrogen", "Odyssey", "Wavelength", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+                "Nitrogen", "Odyssey", "Bioluminescence", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
                 "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
                 "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
-            // extra words: "Bioluminescence", "Uranium", "Wetware", "Moonstone"
+            // extra words: "Aurora", "Datastream", "Monolith", "Coriolis", "Lagrange", "Causality", "Wintermute"
             // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;

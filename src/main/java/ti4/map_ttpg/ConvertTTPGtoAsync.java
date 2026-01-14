@@ -170,12 +170,12 @@ public class ConvertTTPGtoAsync {
 
         // ADD STAGE 1 PUBLIC OBJECTIVES
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesI()) {
-            asyncGame.addSpecificStage1(AliasHandler.resolveObjective(objective));
+            asyncGame.revealSpecificStage1(AliasHandler.resolveObjective(objective));
         }
 
         // ADD STAGE 2 PUBLIC OBJECTIVES
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesII()) {
-            asyncGame.addSpecificStage2(AliasHandler.resolveObjective(objective));
+            asyncGame.revealSpecificStage2(AliasHandler.resolveObjective(objective));
         }
 
         // ADD CUSTOM PUBLIC OBJECTIVES FROM AGENDAS

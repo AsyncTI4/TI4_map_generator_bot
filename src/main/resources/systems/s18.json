@@ -1,1 +1,15 @@
-{"id":"s18","name":"Cycada VII","aliases":["s18","cycadavii"],"imagePath":"S18_CycadaVII.png","planets":["cycadavii"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{
+    "id": "s18",
+    "name": "Cycada VII",
+    "aliases": [
+        "s18",
+        "cycadavii"
+    ],
+    "imagePath": "S18_CycadaVII.png",
+    "planets": [
+        "cycadavii"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "somno"
+}

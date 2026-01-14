@@ -1,6 +1,7 @@
 package ti4.commands.map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -27,8 +28,13 @@ class InitTspmap extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        if (!"YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
+
+        OptionMapping option = event.getOption(Constants.CONFIRM);
+        if (option == null || !"YES".equals(option.getAsString())) {
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
             return;
         }
 

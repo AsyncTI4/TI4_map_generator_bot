@@ -21,6 +21,7 @@
     {
         "alias": "malevolency",
         "name": "Malevolency",
+        "shortName": "Malevo\n-lency",
         "faction": "obsidian",
         "playArea": false,
         "attachment": false,

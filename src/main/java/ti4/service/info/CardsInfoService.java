@@ -71,8 +71,8 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
         if (player.hasSpaceStation()) {
-            buttons.add(
-                    Buttons.gray("startTradeStationConvert", "Convert Comms by Exhausting Station", MiscEmojis.comm));
+            buttons.add(Buttons.gray(
+                    "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));
         }
         if (player.hasUnexhaustedLeader("researchagent")) {
             buttons.add(Buttons.gray("exhaustAgent_researchagent", "Use Research Genome", FactionEmojis.Deepwrought));
@@ -156,12 +156,12 @@ public class CardsInfoService {
                     .isEmpty()) {
                 buttons.add(Buttons.green(
                         "setwillPillageOwnTransactions_no",
-                        "Turn off Pillage pings on your transactions",
+                        "Turn Off Pillage Pings On Your Transactions",
                         FactionEmojis.Mentak));
             } else {
                 buttons.add(Buttons.red(
                         "setwillPillageOwnTransactions_yes",
-                        "Turn on Pillage pings on your transactions",
+                        "Turn On Pillage Pings On Your Transactions",
                         FactionEmojis.Mentak));
             }
         }
@@ -238,6 +238,9 @@ public class CardsInfoService {
         if (player.hasTech("pa")
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
+        }
+        if (player.hasTechReady("dsuydag")) {
+            buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
         }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
@@ -346,7 +349,8 @@ public class CardsInfoService {
         if (game.isTwilightsFallMode() && game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "## Reminder that Genomes can be shattered in Twilight's Fall mode! Use best judgement on whether that is likely to occur and whether you should wait on shatters, usually it will not.");
+                    player.getRepresentation()
+                            + ", a reminder that genomes can be _Shatter_'d! Use best judgement on whether that is likely to occur and whether you should wait for a _Shatter_ (usually it will not).");
         }
     }
 }

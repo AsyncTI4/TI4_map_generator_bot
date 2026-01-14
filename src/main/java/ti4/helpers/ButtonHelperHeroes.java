@@ -594,7 +594,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
         p2.refreshPlanet(planet);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getRepresentationUnfogged() + " you readied " + planetRep + ".");
+                player.getCorrectChannel(), player.getRepresentationUnfogged() + ", you readied " + planetRep + ".");
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(
                     p2.getCorrectChannel(),
@@ -1259,8 +1259,8 @@ public class ButtonHelperHeroes {
     public static void purgeTech(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String techID = buttonID.replace("purgeTech_", "");
         player.purgeTech(techID);
-        String msg = player.getRepresentationUnfogged() + " purged "
-                + Mapper.getTech(techID).getName();
+        String msg = player.getRepresentationUnfogged() + " purged _"
+                + Mapper.getTech(techID).getName() + "_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -1272,7 +1272,7 @@ public class ButtonHelperHeroes {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " purged "
                         + Mapper.getTech(techID).getName()
-                        + " with their hero. Those who owned the tech can now research one tech");
+                        + " with _Wave Function Collapse_. Those who owned this can now research a replacement technology.");
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getTechs().contains(techID)) {
                 ButtonHelperActionCards.resolveResearch(game, p2, event);
@@ -1295,10 +1295,30 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No technology specialties found.");
             return;
         }
+        String message = "";
+        String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(unitHolder.getName(), game);
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
             }
+
+            Set<UnitKey> uk = unitHolder.getUnitKeys();
+            String emoji = "";
+            for (UnitKey key : unitHolder.getUnitKeys()) {
+                if (!p2.getColor().equals(key.getColor())) continue;
+                int amt = unitHolder.getUnitCount(key);
+                unitHolder.removeUnit(key, amt);
+                emoji += key.unitEmoji().emojiString().repeat(amt);
+            }
+            if (!emoji.isEmpty()) {
+                message += p2.getRepresentation() + ", your " + emoji + " on " + planetRep
+                        + " have become the latest casualties in the Nekro Virus War Upon Life.\n";
+            }
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message);
+                message = "";
+            }
+
             String color = p2.getColor();
             unitHolder.removeAllUnits(color);
             unitHolder.removeAllUnitDamage(color);
@@ -1306,12 +1326,9 @@ public class ButtonHelperHeroes {
         int oldTg = player.getTg();
         int count = unitHolder.getResources() + unitHolder.getInfluence();
         player.setTg(oldTg + count);
-        MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg
-                        + "->" + player.getTg() + ") from choosing the planet "
-                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(unitHolder.getName(), game)
-                        + ".");
+        message += player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " ("
+                + oldTg + "->" + player.getTg() + ") from scouring " + planetRep + ".";
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
 
@@ -1320,7 +1337,7 @@ public class ButtonHelperHeroes {
             List<TechnologyModel> techs = new ArrayList<>();
             for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));
             List<Button> buttons = ListTechService.getTechButtons(techs, player, "nekro");
-            String message = player.getRepresentation() + ", please choose which technology you wish to get.";
+            message = player.getRepresentation() + ", please choose which technology you wish to get.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         } else {
             List<Button> buttons = new ArrayList<>();
@@ -2063,9 +2080,9 @@ public class ButtonHelperHeroes {
         String id = substringAfter(buttonID, ".");
         String num = substringBefore(buttonID, ".");
         if ("1".equalsIgnoreCase(num)) {
-            game.swapObjectiveOut(1, 0, id);
+            game.swapPublicObjectiveOut(1, 0, id);
         } else {
-            game.swapObjectiveOut(2, 0, id);
+            game.swapPublicObjectiveOut(2, 0, id);
         }
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
@@ -2081,13 +2098,13 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
             for (int x = 0; x < 3; x++) {
-                String obj = game.getTopObjective(1);
+                String obj = game.getTopPublicObjective(1);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
                 buttons.add(Buttons.green("augerHeroSwap.1." + obj, "Put " + po.getName() + " As The Next Objective"));
             }
         } else {
             for (int x = 0; x < 3; x++) {
-                String obj = game.getTopObjective(2);
+                String obj = game.getTopPublicObjective(2);
                 PublicObjectiveModel po = Mapper.getPublicObjective(obj);
                 buttons.add(Buttons.green("augerHeroSwap.2." + obj, "Put " + po.getName() + " As The Next Objective"));
             }
@@ -2924,6 +2941,7 @@ public class ButtonHelperHeroes {
                 && "82a".equalsIgnoreCase(game.getTileByPosition("tl").getTileID())) {
             buttons.add(Buttons.green("yinHeroPlanet_lockedmallice", "Invade Mallice"));
         }
+        buttons.add(Buttons.green("yinHeroTarget_unowned", "Take Unowned Planet"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(), "Please choose the player that owns the planet you wish to land on.", buttons);
     }
@@ -2949,6 +2967,29 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getChannel(), "Please choose which planet to invade.", buttons);
             ButtonHelper.deleteMessage(event);
+        } else {
+            for (Tile tile : game.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder instanceof Planet) {
+                        Planet planet = (Planet) unitHolder;
+                        if (planet.isSpaceStation()) {
+                            continue;
+                        }
+                        boolean owned = false;
+                        for (Player p2 : game.getRealPlayersNNeutral()) {
+                            if (p2.getPlanets().contains(planet.getName())) {
+                                owned = true;
+                                break;
+                            }
+                        }
+                        if (!owned) {
+                            buttons.add(Buttons.green(
+                                    player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet.getName(),
+                                    Helper.getPlanetRepresentation(planet.getName(), game)));
+                        }
+                    }
+                }
+            }
         }
     }
 

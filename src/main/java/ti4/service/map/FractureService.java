@@ -58,6 +58,11 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 spawnFracture(event, game);
                 spawnIngressTokens(event, game, player, bt);
+            } else if (result == 6) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "> Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(result)
+                                + ".\\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";
@@ -157,7 +162,7 @@ public class FractureService {
 
             String msg = game.isFowMode()
                     ? GMService.gmPing(game)
-                    : player.getRepresentation() + ", please choose 3 systems with a " + type.emoji()
+                    : player.getRepresentation() + ", please a system with a " + type.emoji()
                             + " to place an Ingress token.";
             buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
             MessageHelper.sendMessageToChannelWithButtons(
@@ -166,7 +171,13 @@ public class FractureService {
                 MessageHelper.sendMessageToChannel(
                         player.getPrivateChannel(),
                         player.getRepresentationUnfogged()
-                                + ", buttons to resolve Ingress tokens for the Fracture have been sent to the GM.");
+                                + ", buttons to resolve Ingress tokens for The Fracture have been sent to the GM.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "## Please do not place more ingress tokens than legal."
+                                + " If brought in by breakthrough, that means up to 3 planets per technology type of the breakthrough (6 total)."
+                                + " Otherwise, 1 planet per technology type (4 total).");
             }
         }
 
@@ -179,7 +190,7 @@ public class FractureService {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), "Placed an ingress token on " + tile.getRepresentationForButtons() + ".");
+                player.getCorrectChannel(), "Placed an ingress token in " + tile.getRepresentationForButtons() + ".");
         tile.addToken(Constants.TOKEN_INGRESS, "space");
 
         if (game.isFowMode()) {

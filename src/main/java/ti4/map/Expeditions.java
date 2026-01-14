@@ -226,7 +226,7 @@ public class Expeditions {
                 List<Button> buttons = null;
                 if (oldTg < 3) {
                     output =
-                            "You do not have enough trade goods to do this automatically. Use the buttons to spend trade goods:";
+                            "You do not have enough trade goods to do this automatically. Use these buttons to spend trade goods.";
                     buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "tgsonly");
                     buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Spending Trade Goods"));
                 } else {
@@ -242,7 +242,7 @@ public class Expeditions {
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 resources"));
                 MessageHelper.sendMessageToChannelWithButtons(
-                        channel, "Use the buttons to spend 5 resources:", buttons);
+                        channel, "Use these buttons to spend 5 resources.", buttons);
             }
             case "fiveInf" -> {
                 success = true;
@@ -250,17 +250,17 @@ public class Expeditions {
                 buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
                 MessageHelper.sendMessageToChannel(channel, String.format(whichExp, "5 influence"));
                 MessageHelper.sendMessageToChannelWithButtons(
-                        channel, "Use the buttons to spend 5 influence:", buttons);
+                        channel, "Use these buttons to spend 5 influence.", buttons);
             }
             case "secret" -> {
                 success = true;
                 output = String.format(whichExp, "secret objective");
                 List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
                 if (!soButtons.isEmpty()) {
-                    output += "\n-# Use the buttons in your private channel to discard an unscored secret objective.";
+                    output += "\n-# Use the buttons below to discard an unscored secret objective.";
                     MessageHelper.sendMessageToChannel(channel, output);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), "Use the buttons to discard a secret objective:", soButtons);
+                    MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                            event, "Use these buttons to discard a secret objective:", soButtons);
                 } else {
                     output +=
                             "\n-# you may not have an unscored secret to discard... use `/game undo` if this was a mistake";
@@ -275,7 +275,7 @@ public class Expeditions {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), "Use the buttons to discard action cards:", acButtons);
+                            player.getCardsInfoThread(), "Use these buttons to discard action cards.", acButtons);
                 } else {
                     output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake";
                     MessageHelper.sendMessageToChannel(channel, output);
@@ -291,7 +291,7 @@ public class Expeditions {
                 message += player.getRepresentation()
                         + " has completed the last expedition! They can now place the Thunder's Edge planet on the board:";
                 message +=
-                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or the fracture.";
+                        "\n-# Thunder's Edge must be placed on a tile that does not have any planets or printed wormholes, and cannot be placed in a supernova or The Fracture.";
                 Button button = Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "placeThundersEdge", "Place Thunder's Edge");
                 MessageHelper.sendMessageToChannel(channel, message);

@@ -109,7 +109,7 @@ public class SecretObjectiveHelper {
                     && !game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "## " + game.getPing() + " a player has scored an action phase secret.");
+                        "## " + game.getPing() + ", a player has scored an Action Phase secret objective.");
             }
             if ("dhw".equalsIgnoreCase(entry.getKey())) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {

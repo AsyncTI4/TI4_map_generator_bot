@@ -23,22 +23,20 @@ public class MahactTokenService {
                 // exactly 1 token in fleet
                 String color = player.getMahactCC().getFirst();
                 Player p2 = game.getPlayerFromColorOrFaction(color);
-                message += " has been forced to lose the " + p2.fogSafeEmoji();
-                message += " token from their fleet pool " + reason;
-
+                message += " has been forced to lose the " + p2.fogSafeEmoji() + " command token from their fleet pool "
+                        + reason + ".";
                 player.getMahactCC().remove(color);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelper.checkFleetInEveryTile(player, game);
             } else {
-                message += " you are being forced to lose 1 fleet token " + reason + ", and have the";
-                message += " option to remove another player's CC from your pool instead of your own.";
-
+                message += ", you are being forced to lose 1 command token from your fleet pool, " + reason
+                        + ", and have the option to remove another player's command token from your pool instead of your own.";
                 List<Button> options = removeFleetTokenOptions(game, player, true, false);
                 MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, options);
             }
         } else {
-            message += " has removed a command token from their fleet pool " + reason;
-            message += " " + player.gainFleetCC(-1);
+            message +=
+                    " has removed a command token from their fleet pool " + reason + " " + player.gainFleetCC(-1) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.checkFleetInEveryTile(player, game);
         }

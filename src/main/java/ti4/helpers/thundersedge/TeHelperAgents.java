@@ -259,8 +259,8 @@ public class TeHelperAgents {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " exhausted their agent to remove a command counter from "
-                                + tile.getRepresentationForButtons());
+                        player.getRepresentation() + " exhausted Z'eu ΩΩ to remove the just-placed command token from "
+                                + tile.getRepresentationForButtons() + ".");
                 RemoveCommandCounterService.fromTile(event, p3, tile);
             });
             for (Player p2 : game.getRealPlayers()) {

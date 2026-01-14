@@ -24,6 +24,9 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "red"
+        ],
         "source": "twilights_fall"
     },
     {
@@ -50,6 +53,9 @@
             "pds",
             "spacedock",
             "tf_warsun"
+        ],
+        "preferredColours": [
+            "org"
         ],
         "source": "twilights_fall"
     },
@@ -78,6 +84,9 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "ylw"
+        ],
         "source": "twilights_fall"
     },
     {
@@ -104,6 +113,9 @@
             "pds",
             "spacedock",
             "tf_warsun"
+        ],
+        "preferredColours": [
+            "grn"
         ],
         "source": "twilights_fall"
     },
@@ -132,6 +144,9 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "blu"
+        ],
         "source": "twilights_fall"
     },
     {
@@ -158,6 +173,9 @@
             "pds",
             "spacedock",
             "tf_warsun"
+        ],
+        "preferredColours": [
+            "ppl"
         ],
         "source": "twilights_fall"
     },
@@ -186,6 +204,9 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "pnk"
+        ],
         "source": "twilights_fall"
     },
     {
@@ -212,6 +233,9 @@
             "pds",
             "spacedock",
             "tf_warsun"
+        ],
+        "preferredColours": [
+            "blk"
         ],
         "source": "twilights_fall"
     }

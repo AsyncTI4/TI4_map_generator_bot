@@ -84,7 +84,7 @@ public class ButtonHelperRelics {
         List<Button> buttons = new ArrayList<>();
         for (String planetName : player.getPlanetsAllianceMode()) {
             Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null || planet.isFake()) {
+            if (planet == null || planet.isFake() || planet.isSpaceStation()) {
                 continue;
             }
             if (ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null)) {
@@ -108,7 +108,7 @@ public class ButtonHelperRelics {
             String buttonLabel = Helper.getPlanetRepresentation(planetName, game);
             buttons.add(Buttons.green(buttonID, buttonLabel));
         }
-        String message = "Please choose which planet you wish to attach _Titans Hero_ to.";
+        String message = "Please choose which planet you wish to attach _Geoform_ to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
@@ -130,7 +130,7 @@ public class ButtonHelperRelics {
         planetReal.addToken("attachment_titanshero.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Attached _Titans Hero_ to " + Helper.getPlanetRepresentation(planet, game) + " and readied it.");
+                "Attached _Geoform_ to " + Helper.getPlanetRepresentation(planet, game) + ", and readied it.");
         ButtonHelper.deleteMessage(event);
         player.refreshPlanet(planet);
         CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");

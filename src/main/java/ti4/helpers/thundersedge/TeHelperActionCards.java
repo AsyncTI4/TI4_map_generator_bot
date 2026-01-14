@@ -114,16 +114,21 @@ public class TeHelperActionCards {
     private static void concedeToED(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
+        int acCount = player.getAcCount();
         ActionCardHelper.discardRandomAC(event, game, player, player.getAcCount());
-        if (player.getTg() > 0) {
-            p2.gainTG(player.getTg(), true);
+        int tgCount = player.getTg();
+        if (tgCount > 0) {
+            p2.gainTG(tgCount, true);
             player.setTg(0);
         }
+        int soCount = player.getSecretsUnscored().size();
         if (!player.getSecretsUnscored().isEmpty()) {
             SecretObjectiveHelper.showAll(player, p2, game);
         }
-        String message = player.getRepresentation()
-                + " lost all their ACs, gave all their tgs to the player who played extreme duress, and showed their secrets to them as well.";
+        String message = player.getRepresentation() + " discarded their " + acCount + " action card"
+                + (acCount == 1 ? "" : "s") + ", gave their " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                + " to " + p2.getRepresentationNoPing() + ", and showed their " + soCount + " unscored secret objective"
+                + (soCount == 1 ? "" : "s") + " to them as well.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
@@ -147,7 +152,7 @@ public class TeHelperActionCards {
             }
         }
         String message = player.getRepresentationUnfogged()
-                + ", please tell the bot which neighbor of your's did the transaction";
+                + ", please tell the bot which two of your neighbor did the transaction.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -259,7 +264,7 @@ public class TeHelperActionCards {
 
     @ButtonHandler("loseAFleetCultural")
     private static void loseAFleetCultural(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String mahactReason = "due to failing to reach an agreement on _Exchange Program_.";
+        String mahactReason = "due to failing to reach an agreement on _Exchange Program_";
         MahactTokenService.removeFleetCC(game, player, mahactReason);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -537,12 +542,13 @@ public class TeHelperActionCards {
                 }
             }
 
-            if (lockedCount > 0) {
-                String id = "resolveBrillianceUnlock_" + p.getFaction();
+            String id = "resolveBrillianceUnlock_" + p.getFaction();
+            if (lockedCount == 1) {
                 String label = "Unlock " + p.getBreakthroughModel().getName();
-                if (lockedCount > 1) {
-                    label = "Unlock Breakthrough Of " + p.getFactionModel().getShortName();
-                }
+                buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+            } else if (lockedCount > 1) {
+                String label =
+                        "Unlock " + lockedCount + " " + p.getFactionModel().getShortName() + " Breakthroughs";
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             }
         }

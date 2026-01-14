@@ -1,6 +1,11 @@
 package ti4.website.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Data;
 import ti4.helpers.Constants;
@@ -99,7 +104,7 @@ public class WebObjectives {
         }
 
         // Process unrevealed Stage 1 objectives
-        List<String> unrevealed1 = game.getPublicObjectives1Peakable();
+        List<String> unrevealed1 = game.getPublicObjectives1Peekable();
         boolean isRevealed = isRedTapeMode || isCivilizedSocietyMode;
         boolean hasRedTape = isRedTapeMode;
         for (String key : unrevealed1) {
@@ -128,7 +133,7 @@ public class WebObjectives {
         }
 
         // Process unrevealed Stage 2 objectives
-        List<String> unrevealed2 = game.getPublicObjectives2Peakable();
+        List<String> unrevealed2 = game.getPublicObjectives2Peekable();
         boolean isRevealed = isRedTapeMode || isCivilizedSocietyMode;
         boolean hasRedTape = isRedTapeMode;
         for (String key : unrevealed2) {

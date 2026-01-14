@@ -48,6 +48,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.planet.PlanetService;
 import ti4.service.tactical.TacticalActionService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
@@ -646,7 +647,7 @@ public class ButtonHelperModifyUnits {
                 if (p2 == player) {
                     continue;
                 }
-                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty() || p2.ownsUnit("tf-justicerrail")) {
+                if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
                     assignHitOrder = new ArrayList<>(List.of(
                             "destroyer",
                             "cruiser",
@@ -1010,6 +1011,20 @@ public class ButtonHelperModifyUnits {
                         + " space dock" + (sdAmount == 1 ? "" : "s") + " on "
                         + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own unit"
                         + (pdsAmount + sdAmount == 1 ? "" : "s") + ".");
+        Tile tile = game.getTileFromPlanet(uH.getName());
+        int productionVal = Helper.getProductionValue(player, game, tile, false);
+        if (productionVal > 0 && player == game.getActivePlayer()) {
+            String id = player.finChecker() + "tacticalActionBuild_" + tile.getPosition();
+            String label = "Build in This System (" + productionVal + " PRODUCTION value)";
+            Button button = Buttons.green(id, label);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    player.getRepresentationNoPing()
+                            + ", if you just replaced a space dock, you may now use the button below to build using your PRODUCTION value on "
+                            + Helper.getPlanetRepresentation(uH.getName(), game)
+                            + ".",
+                    List.of(button));
+        }
     }
 
     public static List<Button> getRetreatSystemButtons(
@@ -1149,7 +1164,7 @@ public class ButtonHelperModifyUnits {
                         || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     String msg = player.getRepresentation()
-                            + " the game is unsure if a combat should occur on " + planetName
+                            + " the bot is unsure if a combat should occur on " + planetName
                             + " or if you wish to allow coexisting (or be forced into). Please inform it with the buttons.\n\n";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.red(
@@ -1161,7 +1176,7 @@ public class ButtonHelperModifyUnits {
                             || player.hasUnit("tf-ambassador")) {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
-                                "We Wish To Enter Coexistence"));
+                                "Enter Into Coexistence"));
                     } else {
                         buttons.add(
                                 Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Coexistence"));
@@ -1174,11 +1189,11 @@ public class ButtonHelperModifyUnits {
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(
                                 player2.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
-                                "We Wish To Enter Coexistence"));
+                                "Enter Into Coexistence"));
                         buttons.add(Buttons.red(player2.getFinsFactionCheckerPrefix() + "deleteButtons", "Combat"));
                         msg = player2.getRepresentation()
                                 + " if you wish to enter coexistence on " + planetName
-                                + " please tell the bot so with the buttons.\n\n";
+                                + " please tell the bot with the buttons.\n\n";
                         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg, buttons);
                     }
 
@@ -1614,7 +1629,7 @@ public class ButtonHelperModifyUnits {
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
                                 player.getFactionEmoji()
-                                        + " did not place a command token in system they retreated to due to _Skilled Retreat_ being buffed by _Wild Wild Galaxy_ galactic event.");
+                                        + " did not place a command token in system they retreated to due to _Skilled Retreat_ being buffed by _Wild, Wild Galaxy_ galactic event.");
                     } else {
                         CommandCounterHelper.addCC(event, player, tile2, true);
                         Helper.isCCCountCorrect(player);
@@ -1808,11 +1823,11 @@ public class ButtonHelperModifyUnits {
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the Crimson Hero.",
+                                "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
                                 shroadedFleets);
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the Crimson Hero.",
+                                "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
                                 shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1844,7 +1859,7 @@ public class ButtonHelperModifyUnits {
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
                                 event.getChannel(),
-                                "You may place this produced ship on the Crimson Hero.",
+                                "You may place this produced ship on Homesick Phantom, the Rebellion Hero.",
                                 cloakedFleets);
                     }
                 }
@@ -2021,7 +2036,7 @@ public class ButtonHelperModifyUnits {
                     player.getRepresentationUnfogged() + " captured\\* 1 newly produced "
                             + UnitEmojis.getUnitEmoji(name)
                             + " in " + tile.getRepresentationForButtons(game, player)
-                            + " using the Crimson Hero ability."
+                            + " using the _Fragment Reality_ hero ability."
                             + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
@@ -2161,7 +2176,9 @@ public class ButtonHelperModifyUnits {
                                 "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(
-                                event.getChannel(), "You may place this produced ship on the Crimson.", shroadedFleets);
+                                event.getChannel(),
+                                "You may place this produced ship on Homesick Phantom, the Rebellion hero.",
+                                shroadedFleets);
                     }
                     if (tile2 != null
                             && !willSkipBuild
@@ -2247,6 +2264,10 @@ public class ButtonHelperModifyUnits {
                             player.getRepresentation()
                                     + ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).",
                             orbFollowUp);
+                } else {
+                    String message = "Use buttons to end turn or do another action.";
+                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                 }
             }
             if (xxchaTEhero && player.getExhaustedPlanets().contains(planetName)) {
@@ -2321,7 +2342,7 @@ public class ButtonHelperModifyUnits {
                     + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation(false, false) + " used dimensional splicer.");
+                    event.getMessageChannel(), player.getRepresentation(false, false) + " used _Dimensional Splicer_.");
             buttons = getOpposingUnitsToHit(player, game, tile, false);
             msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         } else if (cause.contains("exo")) {
@@ -2348,7 +2369,7 @@ public class ButtonHelperModifyUnits {
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "combat");
         } else {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), player.getRepresentation(false, false) + " used assault cannon.");
+                    event.getMessageChannel(), player.getRepresentation(false, false) + " used _Assault Cannon_.");
             msg = opponent.getRepresentationUnfogged()
                     + ", your opponent used _Assault Cannon_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");

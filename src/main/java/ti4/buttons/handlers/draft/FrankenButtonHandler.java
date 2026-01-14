@@ -12,6 +12,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.items.CommoditiesDraftItem;
+import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -106,7 +107,7 @@ class FrankenButtonHandler {
                     if (player.getGame().isVeiledHeartMode()) {
                         MessageHelper.sendMessageToChannel(
                                 player.getCardsInfoThread(),
-                                "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                                "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                         player.getGame()
                                 .setStoredValue(
                                         "veiledCards" + player.getFaction(),
@@ -132,7 +133,7 @@ class FrankenButtonHandler {
                 if (player.getGame().isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                            "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                     player.getGame()
                             .setStoredValue(
                                     "veiledCards" + player.getFaction(),
@@ -146,7 +147,7 @@ class FrankenButtonHandler {
                 if (player.getGame().isVeiledHeartMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
-                            "Added a veiled card. Use cards info refresh to find a button to reveal it");
+                            "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it");
                     player.getGame()
                             .setStoredValue(
                                     "veiledCards" + player.getFaction(),
@@ -264,14 +265,14 @@ class FrankenButtonHandler {
                                     Buttons.green("startOfGameStrategyPhase", "Start Strategy Phase");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),
-                                    game.getPing() + " the Inaugural Splice is complete!\n\n"
-                                            + "Once all players have selected their kept abilities/techs, genome and unit, press this button to start the game.",
+                                    game.getPing() + ", the inaugural splice is complete!\n\n"
+                                            + "Once all players have selected their kept abilities, genome and unit, press this button to start the game.",
                                     List.of(startStrategyPhaseButton));
                             FrankenDraftBagService.applyDraftBags(event, game, false);
                         } else {
                             Button randomizeButton =
-                                    Buttons.green("startFrankenSliceBuild", "Randomize your slices (sorta)");
-                            Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis build slices");
+                                    Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");
+                            Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis Build Slices");
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),
                                     game.getPing()
@@ -284,6 +285,32 @@ class FrankenButtonHandler {
                     }
                     int passCounter = 0;
                     while (draft.allPlayersReadyToPass()) {
+                        if (draft.isDraftStageComplete()) {
+                            if (draft instanceof InauguralSpliceFrankenDraft) {
+                                // The Inaugural Splice is AFTER secret/public objectives, BEFORE the strategy phase, so
+                                // need a button to start that now
+                                Button startStrategyPhaseButton =
+                                        Buttons.green("startOfGameStrategyPhase", "Start Strategy Phase");
+                                MessageHelper.sendMessageToChannel(
+                                        game.getActionsChannel(),
+                                        game.getPing() + ", the inaugural splice is complete!\n\n"
+                                                + "Once all players have selected their kept abilities, genome and unit, press this button to start the game.",
+                                        List.of(startStrategyPhaseButton));
+                                FrankenDraftBagService.applyDraftBags(event, game, false);
+                            } else {
+                                Button randomizeButton =
+                                        Buttons.green("startFrankenSliceBuild", "Randomize Your Slices (Sorta)");
+                                Button mantisButton = Buttons.green("startFrankenMantisBuild", "Mantis Build Slices");
+                                MessageHelper.sendMessageToChannel(
+                                        game.getActionsChannel(),
+                                        game.getPing()
+                                                + " the draft stage of the FrankenDraft is complete. Choose how to set up the map. Once the map is finalized, select your abilities from your drafted hands.",
+                                        List.of(randomizeButton, mantisButton));
+
+                                FrankenDraftBagService.applyDraftBags(event, game);
+                            }
+                            return;
+                        }
                         FrankenDraftBagService.passBags(game);
                         passCounter++;
                         if (passCounter > game.getRealPlayers().size()) {
@@ -306,6 +333,14 @@ class FrankenButtonHandler {
         DraftItem selectedItem = DraftItem.generateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {
+            if (player.getCurrentDraftBag().Contents.contains(selectedItem)) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "You have already automatically drafted " + selectedItem.getShortDescription()
+                                + ". Please wait now until the rest of the players finish drafting.");
+                ButtonHelper.deleteAllButtons(event);
+                return;
+            }
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription()

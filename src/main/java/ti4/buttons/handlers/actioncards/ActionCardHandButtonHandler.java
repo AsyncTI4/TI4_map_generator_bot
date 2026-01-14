@@ -158,11 +158,10 @@ class ActionCardHandButtonHandler {
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
-        if (acID.contains("sabo")) {
+        if (ActionCardHelper.isSabotageOrShatter(acID)) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentation()
-                            + ", please play _Sabotage_ by clicking the Sabo button on the action card you wish to Sabo.");
+                    player.getRepresentation() + ", to cancel an action card, use the button in the actions channel.");
             return;
         }
 

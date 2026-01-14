@@ -42,7 +42,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
-import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
@@ -83,37 +82,9 @@ public class ButtonHelperAbilities {
         int amount = Integer.parseInt(buttonID.split("_")[2]);
         player.clearDebt(p2, amount);
         String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation()
-                + " control tokens on their sheet via their **Black Ops** ability to ";
-        if (amount == 2) {
-            msg += "draw 1 secret objective.";
-            game.drawSecretObjective(player.getUserID());
-            if (player.hasAbility("plausible_deniability")) {
-                game.drawSecretObjective(player.getUserID());
-                msg += " Drew a second secret objective due to **Plausible Deniability**.";
-            }
-            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-        } else {
-            msg += "gain 1 command token and steal 1 of their opponents unscored secret objectives.";
-            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
-                    + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
-            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
-            if (!p2.getSecretsUnscored().isEmpty()) {
-                int randInt = ThreadLocalRandom.current()
-                        .nextInt(0, p2.getSecretsUnscored().size());
-                List<Map.Entry<String, Integer>> entries =
-                        new ArrayList<>(p2.getSecretsUnscored().entrySet());
-                Map.Entry<String, Integer> randomEntry = entries.get(randInt);
-                p2.removeSecret(randomEntry.getValue());
-                player.setSecret(randomEntry.getKey());
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
-                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
-                game.checkSOLimit(player);
-            } else {
-                msg += " Alas, their opponent did not have an unscored secret objectives.";
-            }
-        }
+                + " control tokens on their sheet via their **Black Ops** ability. ";
+        msg +=
+                "Unfortunately the effect is not automated at this time. Use `/so draw`, `/player cc`, or `/ac draw` as needed.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
 
         ButtonHelper.deleteMessage(event);
@@ -286,7 +257,7 @@ public class ButtonHelperAbilities {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
                     || tile.isHomeSystem(game)
                     || ButtonHelper.isTileLegendary(tile)
-                    || tile.isMecatol()
+                    || tile.isMecatol(game)
                     || tile.getPlanetUnitHolders().isEmpty()) {
                 continue;
             }
@@ -940,7 +911,7 @@ public class ButtonHelperAbilities {
                             break;
                         }
                     }
-                    if (!alreadyOwned && !Constants.MECATOLS.contains(planet)) {
+                    if (!alreadyOwned && !game.mecatols().contains(planet)) {
                         unitHolder.addToken("token_freepeople.png");
                     }
                 }
@@ -1087,7 +1058,7 @@ public class ButtonHelperAbilities {
                 continue;
             }
             if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)
-                    && !Constants.MECATOLS.contains(planetName)
+                    && !game.mecatols().contains(planetName)
                     && !tile.isHomeSystem(game)) {
                 buttons.add(
                         Buttons.gray("mantleCrack_" + planetName, Helper.getPlanetRepresentation(planetName, game)));
@@ -1782,38 +1753,40 @@ public class ButtonHelperAbilities {
             if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
                 buttons.add(Buttons.red(
                         "yssarilbtStep2_scheming_" + p2.getFaction(),
-                        "Remove Scheming From " + p2.getFactionNameOrColor(),
+                        "Revoke Scheming For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             } else {
                 buttons.add(Buttons.green(
                         "yssarilbtStep2_scheming_" + p2.getFaction(),
-                        "Add Scheming To " + p2.getFactionNameOrColor(),
+                        "Allow Scheming For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationNoPing() + ", please use buttons to add or remove Scheming from factions.",
+                player.getRepresentationNoPing()
+                        + ", please use these buttons to allow other players to use **Scheming**, or to revoke this allowance.",
                 buttons);
         buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
                 buttons.add(Buttons.red(
                         "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                        "Remove Stall Tactics From " + p2.getFactionNameOrColor(),
+                        "Revoke Stall Tactics For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             } else {
                 buttons.add(Buttons.green(
                         "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                        "Add Stall Tactics To " + p2.getFactionNameOrColor(),
+                        "Allow Stall Tactics For " + p2.getFactionNameOrColor(),
                         p2.fogSafeEmoji()));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentationNoPing() + ", please use buttons to add or remove Stall Tactics from factions.",
+                player.getRepresentationNoPing()
+                        + ", please use these buttons to allow other players to use **Stall Tactics**, or to revoke this allowance.",
                 buttons);
     }
 
@@ -1829,25 +1802,25 @@ public class ButtonHelperAbilities {
                         game.getStoredValue("schemingFactions").replace(faction, ""));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " removed scheming from "
+                        player.getRepresentationNoPing() + " revoked **Scheming** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             } else {
                 game.setStoredValue("schemingFactions", game.getStoredValue("schemingFactions") + faction + "_");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " added scheming to "
+                        player.getRepresentationNoPing() + " allowed **Scheming** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             }
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
                     buttons.add(Buttons.red(
                             "yssarilbtStep2_scheming_" + p2.getFaction(),
-                            "Remove Scheming From " + p2.getFactionNameOrColor(),
+                            "Revoke Scheming For " + p2.getFactionNameOrColor(),
                             p2.fogSafeEmoji()));
                 } else {
                     buttons.add(Buttons.green(
                             "yssarilbtStep2_scheming_" + p2.getFaction(),
-                            "Add Scheming To " + p2.getFactionNameOrColor(),
+                            "Allow Scheming For " + p2.getFactionNameOrColor(),
                             p2.fogSafeEmoji()));
                 }
             }
@@ -1859,25 +1832,25 @@ public class ButtonHelperAbilities {
                         game.getStoredValue("stalltacticsFactions").replace(faction, ""));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " removed stall tactics from "
+                        player.getRepresentationNoPing() + " revoked **Stall Tactics** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             } else {
                 game.setStoredValue(
                         "stalltacticsFactions", game.getStoredValue("stalltacticsFactions") + faction + "_");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " added stall tactics to "
+                        player.getRepresentationNoPing() + " allowed **Stall Tactics** for "
                                 + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
             }
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
                     buttons.add(Buttons.red(
                             "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                            "Remove Stall Tactics From " + p2.getFactionNameOrColor()));
+                            "Revoke Stall Tactics For " + p2.getFactionNameOrColor()));
                 } else {
                     buttons.add(Buttons.green(
                             "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                            "Add Stall Tactics To " + p2.getFactionNameOrColor()));
+                            "Allow Stall Tactics For " + p2.getFactionNameOrColor()));
                 }
             }
         }
@@ -1934,13 +1907,13 @@ public class ButtonHelperAbilities {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationNoPing()
-                            + " will get pinged about pillage on their own trade transactions in future pillage opportunities.");
+                            + " will get pinged about **Pillage** on their own trade transactions in future **Pillage** opportunities.");
         } else {
             game.setStoredValue("willPillageOwnTransactions" + player.getFaction(), "no");
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
-                            + " will NOT get pinged about pillage on their own trade transactions in future pillage opportunities.");
+                            + " will __not__ get pinged **Pillage** pillage on their own trade transactions in future **Pillage** opportunities.");
         }
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
@@ -2298,7 +2271,7 @@ public class ButtonHelperAbilities {
             successMessage = player.getRepresentationUnfogged() + " spent 1 strategy token ("
                     + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Starforge");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Star Forge");
         } else {
             player.addExhaustedRelic("emelpar");
             successMessage =
@@ -2544,7 +2517,7 @@ public class ButtonHelperAbilities {
                     event.getMessageChannel(),
                     player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                             + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
-        } else if (RandomHelper.isOneInX(100) && !colour.isEmpty() && "infantry".equals(unit)) {
+        } else if (RandomHelper.isOneInX(40) && !colour.isEmpty() && "infantry".equals(unit)) {
             String poem = "";
             switch (ThreadLocalRandom.current().nextInt(20)) {
                 case 0:

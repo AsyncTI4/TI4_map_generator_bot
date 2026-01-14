@@ -167,8 +167,8 @@ public class Player extends PlayerProperties {
                 MessageHelper.sendMessageToChannel(
                         getCorrectChannel(),
                         getRepresentationNoPing()
-                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is "
-                                + planet + ".");
+                                + " seems to have planets that don't exist. Try removing them with `/planet remove`. The planet ID is `"
+                                + planet + "`.");
             } else {
                 if (game.getPlanetsInfo().get(planet).isSpaceStation()) {
                     return true;
@@ -874,13 +874,19 @@ public class Player extends PlayerProperties {
             return Collections.emptyList();
         }
         List<String> cards = new ArrayList<>(actionCards.keySet());
-        if (hasPlanet("garbozia")) {
-            game.getDiscardACStatus().entrySet().stream()
-                    .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
-                    .map(Entry::getKey)
-                    .forEach(cards::add);
-        }
+        cards.addAll(getGarboziableActionCards());
         return cards;
+    }
+
+    @NotNull
+    public List<String> getGarboziableActionCards() {
+        if (!hasPlanet("garbozia")) {
+            return Collections.emptyList();
+        }
+        return game.getDiscardACStatus().entrySet().stream()
+                .filter(entry -> entry.getValue() == ActionCardHelper.ACStatus.garbozia)
+                .map(Entry::getKey)
+                .toList();
     }
 
     public Map<String, Integer> getEvents() {
@@ -2150,7 +2156,8 @@ public class Player extends PlayerProperties {
                 }
                 MessageHelper.sendMessageToChannel(
                         holder.getCorrectChannel(),
-                        holder.getRepresentation() + " everyone has reacted to the splice.");
+                        holder.getRepresentation() + ", everyone has reacted to the **" + Helper.getSCName(sc, game)
+                                + "** splice.");
                 if (holder.isNpc()) {
                     ButtonHelperTwilightsFall.startSplice(game, holder, "startSplice_" + sc, null);
                 }
@@ -2175,7 +2182,7 @@ public class Player extends PlayerProperties {
                 }
                 game.setStoredValue("fleetLogWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                String message = p2.getRepresentation() + " Use buttons to end turn or do another action.";
+                String message = p2.getRepresentation() + ", please end turn or do another action.";
                 List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(p2, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, systemButtons);
             }
@@ -2341,17 +2348,18 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasTechReady(String techID) {
-        return hasTech(techID) && !getExhaustedTechs().contains(techID);
+        return hasTech(techID)
+                && !getExhaustedTechs().contains(techID)
+                && !getExhaustedTechs().contains("tf-" + techID);
     }
 
     public boolean controlsMecatol(boolean includeAlliance) {
-
         if (game.isOrdinianC1Mode()) {
             Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(game);
             return p2 != null && p2.getFaction().equalsIgnoreCase(getFaction());
         }
-        if (includeAlliance) return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
-        return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
+        if (includeAlliance) return CollectionUtils.containsAny(getPlanetsAllianceMode(), game.mecatols());
+        return CollectionUtils.containsAny(getPlanets(), game.mecatols());
     }
 
     public boolean isPlayerMemberOfAlliance(Player player2) {
