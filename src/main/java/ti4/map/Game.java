@@ -2663,7 +2663,7 @@ public class Game extends GameProperties {
     }
 
     // Don't shuffle back cards with a status
-    private void reshuffleActionCardDiscard() {
+    private boolean reshuffleActionCardDiscard() {
         List<String> acsToShuffle = getDiscardActionCards().keySet().stream()
                 .filter(ac -> getDiscardACStatus().get(ac) == null)
                 .toList();
@@ -2671,7 +2671,7 @@ public class Game extends GameProperties {
         if (acsToShuffle.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     getActionsChannel(), "Unable to reshuffle the AC deck because the discard pile is empty.");
-            return;
+            return false;
         }
 
         getActionCards().addAll(acsToShuffle);
@@ -2687,6 +2687,7 @@ public class Game extends GameProperties {
             msg += "The shuffled cards are:\n" + names;
         }
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
+        return true;
     }
 
     @Nullable
@@ -2703,8 +2704,8 @@ public class Game extends GameProperties {
             return player.getActionCards();
         }
 
-        if (hasReshuffableActionCards()) {
-            reshuffleActionCardDiscard();
+        boolean reshuffled = reshuffleActionCardDiscard();
+        if (reshuffled) {
             return drawActionCard(userID);
         }
 
@@ -2987,18 +2988,13 @@ public class Game extends GameProperties {
             return id;
         }
 
-        if (hasReshuffableActionCards()) {
-            reshuffleActionCardDiscard();
+        boolean reshuffled = reshuffleActionCardDiscard();
+        if (reshuffled) {
             return drawActionCardAndDiscard();
         }
 
         MessageHelper.sendMessageToChannel(getActionsChannel(), "Unable to draw an action card.");
         return null;
-    }
-
-    private boolean hasReshuffableActionCards() {
-        return getDiscardActionCards().keySet().stream()
-                .anyMatch(ac -> getDiscardACStatus().get(ac) == null);
     }
 
     public void checkSOLimit(Player player) {
