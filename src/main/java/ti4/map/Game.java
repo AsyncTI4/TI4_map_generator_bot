@@ -2703,12 +2703,11 @@ public class Game extends GameProperties {
             return player.getActionCards();
         }
 
-        boolean isDiscardPileEmpty = getDiscardActionCards().keySet().stream()
-            .noneMatch(ac -> getDiscardACStatus().get(ac) == null);
-        if (!isDiscardPileEmpty) {
+        if (!hasReshuffableActionCards()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);
         }
+        
         MessageHelper.sendMessageToChannel(getActionsChannel(), "Unable to draw an action card.");
         return null;
     }
@@ -2988,15 +2987,19 @@ public class Game extends GameProperties {
             return id;
         }
 
-        boolean isDiscardPileEmpty = getDiscardActionCards().keySet().stream()
-            .noneMatch(ac -> getDiscardACStatus().get(ac) == null);
-        if (!isDiscardPileEmpty) {
+        if (!hasReshuffableActionCards()) {
             reshuffleActionCardDiscard();
             return drawActionCardAndDiscard();
         }
+
         MessageHelper.sendMessageToChannel(getActionsChannel(),
             "Unable to draw an action card.");
         return null;
+    }
+
+    private boolean hasReshuffableActionCards() {
+        return getDiscardActionCards().keySet().stream()
+            .anyMatch(ac -> getDiscardACStatus().get(ac) == null);
     }
 
     public void checkSOLimit(Player player) {
