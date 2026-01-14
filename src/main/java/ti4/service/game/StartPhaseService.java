@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.ActionCardDrawQueueHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -793,6 +794,14 @@ public class StartPhaseService {
         }
         String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
+        if (ActionCardDrawQueueHelper.shouldQueueStatusPhaseDraws(game)) {
+            List<Player> order = Helper.getSpeakerOrFullPriorityOrder(game);
+            ActionCardDrawQueueHelper.initializeQueue(game, order, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX);
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(),
+                    "### " + game.getPing()
+                            + " the action card deck is low; status phase action card draws will be queued in speaker order.");
+        }
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.ActionCard);
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));
