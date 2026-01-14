@@ -473,8 +473,8 @@
         "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry on its planet if it was a ground force.",
         "tfAbilityText": "You may exhaust this card, if you do, that player may place up to 2 fighters from their reinforcements in that unit's system.",
         "unlockCondition": "Always Unlocked",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/yinagent.png?raw=true",
-        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/yinagent_back.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/yinagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/yinagent_back.png?raw=true",
         "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/splitting_genome.png?raw=true",
         "source": "pok"
     },
