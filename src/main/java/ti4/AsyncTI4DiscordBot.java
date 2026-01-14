@@ -6,6 +6,7 @@ import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
+
 @SpringBootApplication
 public class AsyncTI4DiscordBot {
 
