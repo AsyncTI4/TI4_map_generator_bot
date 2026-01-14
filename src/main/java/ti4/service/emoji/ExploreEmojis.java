@@ -17,7 +17,8 @@ public enum ExploreEmojis implements TI4Emoji {
     // Other
     dmz,
     Relic,
-    LinkGet;
+    LinkGet,
+    SilverFlame;
 
     public static TI4Emoji getTraitEmoji(String type) {
         return switch (type.toLowerCase()) {

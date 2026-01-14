@@ -43,6 +43,7 @@
     {
         "id": "oceanbound",
         "name": "Oceanbound",
+        "shortName": "Ocean\nbound",
         "faction": "deepwrought",
         "permanentEffect": "Any time you have more ocean cards than there are planets that contain your coexisting units, discard ocean cards until you do not.",
         "window": "When your units begin coexisting on a planet",
@@ -66,6 +67,7 @@
     {
         "id": "miniaturization",
         "name": "Miniaturization",
+        "shortName": "Miniatur\n-ization",
         "faction": "ralnel",
         "permanentEffect": "Your structures can be transported by any ship; this does not require or count against capacity. While your structures are in the space area, they cannot use their unit abilities.",
         "window": "At the end of your tactical actions",
@@ -82,6 +84,7 @@
     {
         "id": "plotsplots",
         "name": "Plots Within Plots",
+        "shrinkName": true,
         "faction": "firmament",
         "permanentEffect": "You can score secret objectives already scored by other players if you fulfill their requirements; this does not count against your secret objective limit or the number you can score in a round.",
         "window": "When you score another player's secret objective",
@@ -91,7 +94,7 @@
     {
         "id": "puppetsoftheblade",
         "name": "Puppets of the Blade",
-        "shortName": "Puppet Soft\nHe Blade",
+        "shortName": "Puppets of\nthe Blade",
         "faction": "firmament",
         "window": "If you have at least 1 plot card in your play area, gain the following ability:",
         "windowEffect": "ACTION: Purge The Firmament's faction sheet, leaders, planet cards, and promissory note. Then, gain all of the faction components for The Obsidian.",
@@ -107,7 +110,7 @@
     {
         "id": "bladesorchestra",
         "name": "The Blade's Orchestra",
-        "shortName": "Blade's\nOrchestra",
+        "shortName": "The Blade's\nOrchestra",
         "faction": "obsidian",
         "window": "When this faction comes into play",
         "windowEffect": "flip your home system, double-sided faction components, and all of your in-play plot cards. Then, ready Cronos Hollow and Tallin Hollow if you control them.",
@@ -116,6 +119,7 @@
     {
         "id": "marionettes",
         "name": "Marionettes",
+        "shortName": "Mario\n-nettes",
         "faction": "obsidian",
         "permanentEffect": "The player or players whose control tokens are on each plot card are the puppeted players for that plot.",
         "source": "thunders_edge"

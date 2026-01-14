@@ -230,7 +230,7 @@ public class Helper {
         if (player.isNpc()) {
             return false;
         }
-        if (player.hasAbility("nomadic")) {
+        if (player.hasAbility("nomadic") || player.hasTech("tf-nomadic")) {
             return true;
         }
         if (player.hasAbility("mobile_command")
@@ -241,7 +241,10 @@ public class Helper {
         Tile hs = player.getHomeSystemTile();
         if (hs != null) {
             for (Planet planet : hs.getPlanetUnitHolders()) {
-                if (!player.getPlanets().contains(planet.getName())) {
+                if (planet.isSpaceStation()) {
+                    continue;
+                }
+                if (!player.getPlanetsForScoring(false).contains(planet)) {
                     return false;
                 }
             }
@@ -1333,9 +1336,16 @@ public class Helper {
                     if (game.isFowMode()) {
                         faction = "someone";
                     }
-                    msg.append("> Used ")
-                            .append(faction)
-                            .append("'s Commander Discount ")
+                    msg.append("> Used Aello Discount ")
+                            .append(
+                                    "deepwrought".equals(faction)
+                                            ? ""
+                                            : " (from "
+                                                    + ("someone".equals(faction)
+                                                            ? "someone"
+                                                            : game.getPlayerFromColorOrFaction(faction)
+                                                                    .getRepresentationNoPing())
+                                                    + ") ")
                             .append(MiscEmojis.Resources_1)
                             .append("\n");
                     res += 1;
@@ -1534,7 +1544,7 @@ public class Helper {
             if (solBtLimit > 0) {
                 msg.append("Producing a total of ")
                         .append(unitCount)
-                        .append(" units (Bellum Gloriosum limit is ")
+                        .append(" units (_Bellum Gloriosum_ limit is ")
                         .append(solBtLimit)
                         .append(")")
                         .append(" for a total cost of ")
@@ -1543,7 +1553,7 @@ public class Helper {
                         .append(cost == 1 ? "" : "s")
                         .append(".");
                 if (solBtLimit < unitCount) {
-                    msg.append("\n### Warning! Exceeding Bellum Gloriosum limit of ")
+                    msg.append("\n### Warning! Exceeding _Bellum Gloriosum_ limit of ")
                             .append(solBtLimit)
                             .append("!");
                 }
@@ -1723,7 +1733,7 @@ public class Helper {
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }
-        if (Constants.MECATOLS.contains(planet) && player.hasIIHQ() && player.controlsMecatol(true)) {
+        if (game.mecatols().contains(planet) && player.hasIIHQ() && player.controlsMecatol(true)) {
             productionValueTotal += 3;
             planetUnitVal = 3;
         }
@@ -2241,33 +2251,34 @@ public class Helper {
                         "Use Self-Assembly Routines",
                         TechEmojis.WarfareTech));
             }
-            if (player.ownsUnit("greentf_mech")) {
-                greenMechd = true;
-                for (String pp : player.getPlanets()) {
-                    if (game.getTileFromPlanet(pp) == null) {
-                        continue;
-                    }
-                    Button mfButton = Buttons.green(
-                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
-                            "Produce Mech on " + getPlanetRepresentation(pp, game),
-                            UnitEmojis.mech);
-                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
-                        mfButton = Buttons.gray(
-                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
-                                "Produce Mech on " + getPlanetRepresentation(pp, game),
-                                UnitEmojis.mech);
-                    }
-                    if (resourcelimit > 1) {
-                        unitButtons.add(mfButton);
-                    }
-                }
-            }
+
             if (ActionCardHelper.playerHasWarMachine(player)) {
                 ActionCardHelper.sendActionCardInfo(game, player, event);
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         player.getRepresentation()
                                 + ", a reminder that you have _War Machine_, and this is the window for it.");
+            }
+        }
+        if (player.ownsUnit("greentf_mech") && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
+            greenMechd = true;
+            for (String pp : player.getPlanets()) {
+                if (game.getTileFromPlanet(pp) == null) {
+                    continue;
+                }
+                Button mfButton = Buttons.green(
+                        "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
+                        "Produce Mech on " + getPlanetRepresentation(pp, game),
+                        UnitEmojis.mech);
+                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                    mfButton = Buttons.gray(
+                            "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
+                            "Produce Mech on " + getPlanetRepresentation(pp, game),
+                            UnitEmojis.mech);
+                }
+                if (resourcelimit > 1) {
+                    unitButtons.add(mfButton);
+                }
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -3353,11 +3364,7 @@ public class Helper {
                 continue;
             }
             UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
-            if (unitCounts.containsKey(ut)) {
-                unitCounts.put(ut, unitCounts.get(ut) + count);
-            } else {
-                unitCounts.put(ut, count);
-            }
+            unitCounts.merge(ut, count, Integer::sum);
         }
         return unitCounts;
     }

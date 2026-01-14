@@ -100,29 +100,29 @@ public class ComponentActionHelper {
             compButtons.add(tButton);
         }
 
-        BreakthroughModel bt = p1.getBreakthroughModel();
-        if (bt != null && bt.getText().contains("ACTION:")) {
-            if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                boolean validAction =
-                        switch (bt.getAlias()) {
-                            case "arborecbt" ->
-                                game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                            case "crimsonbt" ->
-                                game.getTileMap().values().stream().anyMatch(Tile.tileHasBreach());
-                            case "mahactbt" -> !p1.getTechs().isEmpty();
-                            case "saarbt" ->
-                                game.getTileMap().values().stream()
-                                        .filter(Tile::isAsteroidField)
-                                        .anyMatch(Tile.tileHasPlayerShips(p1));
-                            case "deepwroughtbt" -> true;
-                            default -> true;
-                        };
+        for (BreakthroughModel bt : p1.getBreakthroughModels()) {
+            if (bt != null && bt.getText().contains("ACTION:")) {
+                if (p1.hasReadyBreakthrough(bt.getAlias())) {
+                    boolean validAction =
+                            switch (bt.getAlias()) {
+                                case "arborecbt" ->
+                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                                case "crimsonbt" -> true;
+                                case "mahactbt" -> !p1.getTechs().isEmpty();
+                                case "saarbt" ->
+                                    game.getTileMap().values().stream()
+                                            .filter(Tile::isAsteroidField)
+                                            .anyMatch(Tile.tileHasPlayerShips(p1));
+                                case "deepwroughtbt" -> true;
+                                default -> true;
+                            };
 
-                if (validAction) {
-                    TI4Emoji btEmoji = bt.getFactionEmoji();
-                    Button btButton = Buttons.green(
-                            finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
-                    compButtons.add(btButton);
+                    if (validAction) {
+                        TI4Emoji btEmoji = bt.getFactionEmoji();
+                        Button btButton = Buttons.green(
+                                finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
+                        compButtons.add(btButton);
+                    }
                 }
             }
         }
@@ -180,7 +180,7 @@ public class ComponentActionHelper {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Crimson Agent",
+                                    "Use " + leaderName + " as Rebellion Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
@@ -344,7 +344,7 @@ public class ComponentActionHelper {
                                 .isEmpty()
                         || game.isTwilightsFallMode())) {
             Button abilityButton =
-                    Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", FactionEmojis.Muaat);
+                    Buttons.green(finChecker + prefix + "ability_starForge", "Star Forge", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("meditation")
@@ -457,6 +457,7 @@ public class ComponentActionHelper {
         // Generic
         Button genButton = Buttons.gray(finChecker + prefix + "generic_", "Generic Component Action");
         compButtons.add(genButton);
+        compButtons.add(Buttons.red("deleteButtons", "Cancel"));
 
         return compButtons;
     }
@@ -840,7 +841,7 @@ public class ComponentActionHelper {
                         if (led != null) {
                             MessageHelper.sendMessageToChannelWithEmbed(
                                     game.getActionsChannel(),
-                                    game.getPing() + " this is the next commander on top of the mercenary pile.",
+                                    game.getPing() + ", this is the next commander on top of the mercenary pile.",
                                     led.getRepresentationEmbed());
                         }
                     }
@@ -1004,7 +1005,7 @@ public class ComponentActionHelper {
             List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    "Use buttons to gain a command token from Endurance Steroids.",
+                    "Use buttons to gain a command token from _Endurance Steroids_.",
                     buttons2);
         } else if ("the_incursion_gate".equalsIgnoreCase(relicID)) {
             player.addExhaustedRelic(relicID);
@@ -1014,7 +1015,7 @@ public class ComponentActionHelper {
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though",
+                    "Ha! As if I'd automate something like this. Please resolve manually. Here's some exhaust buttons though.",
                     buttons);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
@@ -1053,7 +1054,7 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
-                message = player.getRepresentationUnfogged() + " Your trade goods increased from " + oldTg + " -> "
+                message = player.getRepresentationUnfogged() + ", your trade goods increased from " + oldTg + " -> "
                         + player.getTg() + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);

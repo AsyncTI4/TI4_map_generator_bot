@@ -31,6 +31,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
@@ -149,8 +150,8 @@ public class MapGenerator implements AutoCloseable {
         }
         int otherObjCount = revealedObjectives.size() - stage1PublicObjCount - stage2PublicObjCount;
         otherObjCount = Math.max(Objective.retrieveCustom(game).size(), otherObjCount);
-        stage1PublicObjCount += game.getPublicObjectives1Peakable().size();
-        stage2PublicObjCount += game.getPublicObjectives2Peakable().size();
+        stage1PublicObjCount += game.getPublicObjectives1Peekable().size();
+        stage2PublicObjCount += game.getPublicObjectives2Peekable().size();
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
@@ -518,14 +519,44 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
         }
 
-        // GAME FUN NAME
-        deltaY = 35;
         deltaY = 35;
         y += 40; // needed for ghost HS on br
+
+        String server;
+        if (game.getGuild() == null) {
+            server = "asyncti_icon_nothing";
+        } else {
+            switch (game.getGuild().getId()) {
+                case "943410040369479690" -> server = "asyncti_icon_hub";
+                case "1176104225932058694" -> server = "asyncti_icon_warsuntzu";
+                case "1145823841227112598" -> server = "asyncti_icon_dreadnot";
+                case "1250131684393881610" -> server = "asyncti_icon_tommerhawk";
+                case "1312882116597518416" -> server = "asyncti_icon_dudersdomain";
+                case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
+                case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
+                case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
+                case "1410728648817770526" -> server = "asyncti_icon_shipflag";
+                case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
+                case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
+                case "1434632452097446040" -> server = "asyncti_icon_tournaments";
+                case "1458845770672377989" -> server = "asyncti_icon_planetaryducksystem";
+                case "1458844879709929532" -> server = "asyncti_icon_stroatymcstroatface";
+                case "1458845518393246032" -> server = "asyncti_icon_dannelscampground";
+                // fog of war?
+                // megagames?
+                default -> server = "asyncti_icon_unknown";
+            }
+        }
+        String serverPath = ResourceHelper.getResourceFromFolder("server_icons/", server + ".png");
+        int serverSize = 96;
+        BufferedImage serverImage = ImageHelper.readScaled(serverPath, serverSize, serverSize);
+        graphics.drawImage(serverImage, x, y - 3 * serverSize / 4, null);
+
+        // GAME FUN NAME
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), landscapeShift, y);
-        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName());
+        graphics.drawString(game.getCustomName(), landscapeShift + 4 * serverSize / 3, y);
+        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName()) + 5 * serverSize / 3;
 
         // STRATEGY CARDS
         coord = drawStrategyCards(new Point(x, y));
@@ -930,7 +961,12 @@ public class MapGenerator implements AutoCloseable {
         addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
 
-        drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+        drawPAImageScaled(
+                x,
+                y,
+                game.isTwilightsFallMode() ? "cardback_action_tf.jpg" : "cardback_action.jpg",
+                cardWidth,
+                cardHeight);
         DrawingUtil.superDrawString(
                 graphics,
                 Integer.toString(game.getActionCards().size()),
@@ -1024,7 +1060,8 @@ public class MapGenerator implements AutoCloseable {
         addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
 
-        drawPAImageScaled(x, y, "cardback_agenda.png", cardWidth, cardHeight);
+        drawPAImageScaled(
+                x, y, game.isTwilightsFallMode() ? "cardback_edict.jpg" : "cardback_agenda.png", cardWidth, cardHeight);
         DrawingUtil.superDrawString(
                 graphics,
                 Integer.toString(game.getAgendaDeckSize()),
@@ -1038,6 +1075,82 @@ public class MapGenerator implements AutoCloseable {
         overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
         addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
+
+        if (game.isTwilightsFallMode()) {
+            int cardCount, fullDeck;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "ability", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("techs_tf").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_tf_ability.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Ability Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "units", 100, true)
+                    .size();
+            fullDeck = Mapper.getUnits().size();
+            drawPAImageScaled(x, y, "cardback_unit_upgrade.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Unit Upgrade Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "genome", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("tf_genome").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_genome.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Genome Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "paradigm", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("tf_paradigm").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_paradigm.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Paradigm Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+        }
 
         return x;
     }

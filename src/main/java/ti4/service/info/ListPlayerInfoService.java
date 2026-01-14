@@ -26,6 +26,9 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.TileEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
@@ -214,6 +217,10 @@ public class ListPlayerInfoService {
             resources += influence;
             influence += planet.getResources();
         }
+        if (player.hasUnlockedBreakthrough("xxchabt")) {
+            resources = Math.max(resources, influence);
+            influence = Math.max(resources, influence);
+        }
         if (resources > 0) {
             ObjectiveResult resourceResult = backtrack(
                     planets,
@@ -323,12 +330,14 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
+                boolean scored = false;
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
                             || game.didPlayerScoreThisAlready(
                                     player.getUserID(),
                                     Mapper.getSecretObjectivesJustNames().get(objID))) {
-                        representation.append("✅  ");
+                        representation.append("✅");
+                        scored = true;
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
                             representation
@@ -338,21 +347,31 @@ public class ListPlayerInfoService {
                                     .append(getObjectiveThreshold(objID, game))
                                     .append(")  ");
                         } else {
-                            representation.append("0/1  ");
+                            representation.append("0/1");
                         }
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
                             && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
-                        representation.append("✅  ");
+                        representation.append("✅");
+                        scored = true;
                     } else {
                         representation
                                 .append(getPlayerProgressOnObjective(objID, game, player))
                                 .append("/")
                                 .append(getObjectiveThreshold(objID, game))
-                                .append("  ");
+                                .append("");
                     }
                 }
+
+                if (!scored && !player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
+                    if (player.getFaction().equals(game.getStoredValue("silverFlamed"))) {
+                        representation.append(ExploreEmojis.SilverFlame);
+                    } else if (!Helper.canPlayerScorePOs(game, player)) {
+                        representation.append(TileEmojis.TileGreenBack);
+                    }
+                }
+                representation.append(UnitEmojis.Blank).append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -368,7 +387,8 @@ public class ListPlayerInfoService {
                         .append(player.getSoScored())
                         .append("/")
                         .append(player.getMaxSOCount())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -382,7 +402,10 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1  ");
+                        .append("/1 ")
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
+                ;
             }
         }
         return representation.toString();
@@ -441,7 +464,8 @@ public class ListPlayerInfoService {
                         .append(player.getTotalVictoryPoints())
                         .append("/")
                         .append(game.getVp())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -457,7 +481,8 @@ public class ListPlayerInfoService {
                 int aboveN = 0;
                 for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanetsForScoring(false).size();
-                    int p2count = p2.getPlanetsForScoring(false).size();
+                    int p2count = p2.getPlanetsForScoring(false).size()
+                            - game.getPlanetsPlayerIsCoexistingOn(p2).size();
                     if (p1count > p2count) {
                         aboveN++;
                     }
@@ -478,7 +503,8 @@ public class ListPlayerInfoService {
             case "make_history", "become_legend", "become_legend_omegaphase" -> {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
+                    boolean tileCounts =
+                            tile.isMecatol(game) || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tileCounts) {
                         counter++;
                     }
@@ -701,7 +727,7 @@ public class ListPlayerInfoService {
                         Units.UnitType.Warsun,
                         Units.UnitType.Lady,
                         Units.UnitType.Celagrom)) {
-                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
+                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol(game)) {
                         count++;
                     }
                 }
@@ -855,7 +881,7 @@ public class ListPlayerInfoService {
             }
             case "ose" -> {
                 Tile mecatol = game.getMecatolTile();
-                boolean controlsMecatol = player.getPlanets().stream().anyMatch(Constants.MECATOLS::contains);
+                boolean controlsMecatol = player.getPlanets().stream().anyMatch(game.mecatols()::contains);
                 if (!FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {

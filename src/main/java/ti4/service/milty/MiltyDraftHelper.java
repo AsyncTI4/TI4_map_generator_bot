@@ -364,6 +364,13 @@ public class MiltyDraftHelper {
         }
     }
 
+    public static void addDraftTile(MiltyDraftManager manager, String tileID) {
+        TileModel model = TileHelper.getTileById(tileID);
+        if (model == null) return;
+        MiltyDraftTile draftTile = getDraftTileFromModel(model);
+        manager.addDraftTile(draftTile);
+    }
+
     private static boolean isInvalid(TileModel tileModel) {
         TileModel.TileBack back = tileModel.getTileBack();
         if (back != TileBack.RED && back != TileBack.BLUE) {
@@ -436,17 +443,16 @@ public class MiltyDraftHelper {
     }
 
     // TODO (Jazz): add map template
-    public static List<MiltyDraftSlice> parseSlicesFromString(
-            String sliceString, List<ComponentSource> allowedSources) {
+    public static List<MiltyDraftSlice> parseSlices(String input, List<ComponentSource> sources) throws Exception {
         try {
-            sliceString = sliceString.replace("|", ";");
+            input = input.replace("|", ";");
             MiltyDraftManager manager = new MiltyDraftManager();
-            manager.init(allowedSources);
-            manager.loadSlicesFromString(sliceString);
+            manager.init(sources);
+            manager.loadSlicesFromString(input);
             return manager.getSlices();
         } catch (Exception e) {
             BotLogger.error("invalid slice string", e);
-            return null;
+            throw e;
         }
     }
 }

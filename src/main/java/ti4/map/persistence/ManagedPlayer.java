@@ -20,7 +20,7 @@ public class ManagedPlayer {
         games.add(game);
     }
 
-    public synchronized void addOrReplaceGame(ManagedGame game, Player player) {
+    synchronized void addOrReplaceGame(ManagedGame game, Player player) {
         if (!player.getUserID().equals(id)) {
             throw new IllegalArgumentException("Player " + player.getUserID() + " attempted merge with " + id);
         }

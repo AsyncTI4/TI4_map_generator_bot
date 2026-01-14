@@ -36,7 +36,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveEngineer(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("engineerACSplice", "take_remove_remove");
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(),
+                player.getCorrectChannel(),
                 player.getRepresentation()
                         + " added 2 more cards to the splice. You should be prompted to discard 2 cards from the splice after choosing yours.");
         ButtonHelper.deleteMessage(event);
@@ -193,7 +193,7 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String relic = buttonID.split("_")[2];
         p2.removeRelic(relic);
-        RelicHelper.resolveRelicLossEffects(event, game, player, relic);
+        RelicHelper.resolveRelicLossEffects(game, player, relic);
         String msg = player.getRepresentation() + " has chosen for _"
                 + Mapper.getRelic(relic).getName() + "_, owned by " + p2.getRepresentation() + ", to be _Unravel_'d.";
         if (p2 == player) {
@@ -395,20 +395,18 @@ public class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             String faction = tech.getFaction().get();
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         for (String leaderID : player.getLeaderIDs()) {
             LeaderModel lead = Mapper.getLeader(leaderID);
             String faction = lead.getFaction();
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         for (String unit : player.getUnitsOwned()) {
             UnitModel unitM = Mapper.getUnit(unit);
@@ -419,11 +417,10 @@ public class ButtonHelperTwilightsFallActionCards {
             if (faction.equalsIgnoreCase(player.getFaction())) {
                 continue;
             }
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         int max = 0;
         String bestFaction = "";
@@ -631,7 +628,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     }
                 }
                 player.addOwnedUnitByID(card);
-                found = "_" + Mapper.getUnit(card).getAutoCompleteName() + "_. It has been automatically gained.";
+                found = "" + Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
                 break;
             }
         }
@@ -675,7 +672,8 @@ public class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("resolveConverge")
     public static void resolveConverge(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue(player.getFaction() + "graviton", "true");
-        String msg = player.getRepresentation() + " will auto target non-fighter ships and/or mechs in auto assigment.";
+        String msg = "Hits that " + player.getRepresentation()
+                + " produces will auto target non-fighter ships and/or mechs in the auto hit assignment.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }

@@ -42,22 +42,10 @@ public class SabotageService {
             "tf-shatter2");
 
     public static boolean couldFeasiblySabotage(Player player, Game game) {
-        if (player.isNpc()) {
-            return false;
-        }
+        if (player.isNpc()) return false;
 
         if (couldUseInstinctTraining(player) || couldUseWatcherMech(player, game) || couldUseTriune(player, game)) {
             return true;
-        }
-
-        if (player.getAcCount() == 0) {
-            return false;
-        }
-
-        if (allSabotagesAreDiscarded(game, player)
-                || isAcd2AndAllSabotagesAreDiscarded(game, player)
-                || isTwilightFallAndAllShattersAreDiscarded(game, player)) {
-            return false;
         }
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -65,10 +53,21 @@ public class SabotageService {
             return false;
         }
 
-        return !player.isPassed()
-                || game.getActivePlayer() == null
-                || (!game.getActivePlayer().hasTech("tp")
-                        && !game.getActivePlayer().hasTech("tf-crafty"));
+        if (isAffectedByTransparasteel(player, game)) return false;
+
+        if (playerHasSabotage(player)) return true;
+
+        if (player.getAcCount() == 0) return false;
+
+        if (game.isAcd2()) return !allAcd2SabotagesAreDiscarded(game, player);
+        if (game.isTwilightsFallMode()) return !allShattersAreDiscarded(game, player);
+        return !allSabotagesAreDiscarded(game, player);
+    }
+
+    private static boolean isAffectedByTransparasteel(Player player, Game game) {
+        if (!player.isPassed() || game.getActivePlayer() == null) return false;
+
+        return game.getActivePlayer().hasTech("tp") || game.getActivePlayer().hasTech("tf-crafty");
     }
 
     public static boolean couldUseInstinctTraining(Player player) {
@@ -102,14 +101,12 @@ public class SabotageService {
     }
 
     public static boolean isSaboAllowed(Game game, Player player) {
-        if (isTwilightFallAndAllShattersAreDiscarded(game, player)
-                || allSabotagesAreDiscarded(game, player)
-                || isAcd2AndAllSabotagesAreDiscarded(game, player)) {
-            return false;
-        }
+        if (game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) return false;
+        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) return false;
+        if (allSabotagesAreDiscarded(game, player)) return false;
+
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
-            GMService.logPlayerActivity(
-                    game, player, "Sabotage not allowed due to Last Bastion commander.", null, true);
+            GMService.logPlayerActivity(game, player, "Sabotage not allowed due to Nip and Tuck.", null, true);
             if (!game.isFowMode()) {
                 return false;
             }
@@ -134,17 +131,22 @@ public class SabotageService {
     }
 
     public static String noSaboReason(Game game, Player player) {
-        if (isTwilightFallAndAllShattersAreDiscarded(game, player)) {
+        if (game.isTwilightsFallMode() && allShattersAreDiscarded(game, player)) {
             return "All _Shatter_ cards are in the discard.";
-        } else if (allSabotagesAreDiscarded(game, player) || isAcd2AndAllSabotagesAreDiscarded(game, player)) {
+        }
+
+        if ((game.isAcd2() && allAcd2SabotagesAreDiscarded(game, player)) || allSabotagesAreDiscarded(game, player)) {
             return "All _Sabotages_ are in the discard.";
         }
+
+        String playerName = game.isFowMode() ? "Player" : player.getRepresentationNoPing();
         if (game.playerHasLeaderUnlockedOrAlliance(player, "bastioncommander")) {
             LeaderModel nipAndTuck = Mapper.getLeader("bastioncommander");
-            return "Player has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation();
+            return playerName + " has access to the Last Bastion commander, " + nipAndTuck.getNameRepresentation()
+                    + ".";
         }
         if (player.hasTech("tf-biosyntheticsynergy")) {
-            return "Player has Bio Synthetic Synergy.";
+            return playerName + " has _Bio Synthetic Synergy_.";
         }
         if (player.hasTech("tp")
                 && game.getActivePlayerID() != null
@@ -153,11 +155,11 @@ public class SabotageService {
                 if (p2 == player) continue;
                 if (!p2.isPassed()) return null;
             }
-            return "Player has " + FactionEmojis.Yssaril
+            return playerName + " has " + FactionEmojis.Yssaril
                     + " _Transparasteel Plating_, and all other players have passed.";
         }
         if (player.hasTech("baarvag")) {
-            return "Player has Unyielding Will and thus their ACs cannot be canceled.";
+            return playerName + " has _Unyielding Will_ and, thus their action cards cannot be cancelled.";
         }
         return null;
     }
@@ -166,14 +168,12 @@ public class SabotageService {
         return SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean isTwilightFallAndAllShattersAreDiscarded(Game game, Player player) {
-        return game.isTwilightsFallMode()
-                && SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+    private static boolean allShattersAreDiscarded(Game game, Player player) {
+        return SHATTER_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
-    private static boolean isAcd2AndAllSabotagesAreDiscarded(Game game, Player player) {
-        return game.isAcd2()
-                && ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
+    private static boolean allAcd2SabotagesAreDiscarded(Game game, Player player) {
+        return ACD2_SABOTAGE_CARD_ALIASES.stream().allMatch(alias -> isActionCardNotPlayable(game, player, alias));
     }
 
     private static boolean isActionCardNotPlayable(Game game, Player player, String acAlias) {

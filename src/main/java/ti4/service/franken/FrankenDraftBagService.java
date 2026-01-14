@@ -110,12 +110,13 @@ public class FrankenDraftBagService {
                 embeds.add(Mapper.getTech("antimatter").getRepresentationEmbed());
 
                 String msg = player.getRepresentation()
-                        + " You should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted. Instead of keeping 1 of those, you can instead use these buttons to take one of the two following technologies instead.";
+                        + ", you should only keep 2 abilities, 1 genome, and 1 unit out of those you drafted."
+                        + " Instead of keeping one (or two) of those, you may use these buttons to take one (or two) of these generic technologies.";
                 MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), msg, embeds);
                 buttons.add(Buttons.green("getTech_wavelength__noPay__comp", "Select Wavelength"));
                 buttons.add(Buttons.green("getTech_antimatter__noPay__comp", "Select Antimatter"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Tech", buttons);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Get Technology", buttons);
             }
             MessageEmbed embed = player.getRepresentationEmbed();
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
@@ -208,7 +209,7 @@ public class FrankenDraftBagService {
         List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
-        Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
+        Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables, game);
         for (String line : bagStringLines) {
             MessageHelper.sendMessageToChannel(bagChannel, line);
         }
@@ -270,13 +271,14 @@ public class FrankenDraftBagService {
         updateDraftStatusMessage(game);
     }
 
-    private static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
+    private static Set<String> getCurrentBagRepresentation(
+            List<DraftItem> draftables, List<DraftItem> undraftables, Game game) {
         Set<String> bagRepresentationLines = new LinkedHashSet<>();
         StringBuilder sb = new StringBuilder("# __Draftable:__\n");
 
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
         for (DraftItem item : draftables) {
-            String nextItemDescrption = buildItemDescription(item);
+            String nextItemDescrption = buildItemDescription(item, game);
             if (sb.length() + nextItemDescrption.length() > 2000) { // Split to max 2000 message lines
                 bagRepresentationLines.add(sb.toString());
                 sb = new StringBuilder(nextItemDescrption);
@@ -350,19 +352,19 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder();
         DraftBag currentBag = player.getDraftQueue();
         for (DraftItem item : currentBag.Contents) {
-            sb.append(buildItemDescription(item));
+            sb.append(buildItemDescription(item, player.getGame()));
             sb.append("\n");
         }
 
         return sb.toString();
     }
 
-    private static String buildItemDescription(DraftItem item) {
+    private static String buildItemDescription(DraftItem item, Game game) {
         StringBuilder sb = new StringBuilder();
         try {
             sb.append("### ").append(item.getItemEmoji()).append(" ");
             sb.append(item.getShortDescription()).append("\n> ");
-            sb.append(item.getLongDescription());
+            sb.append(item.getLongDescription(game));
         } catch (Exception e) {
             sb.append("ERROR BUILDING DESCRIPTION FOR ").append(item.getAlias());
         }
@@ -445,7 +447,7 @@ public class FrankenDraftBagService {
             sb.append("\n> ").append(player.getRepresentationNoPing());
             index++;
         }
-        if (skipped) {
+        if (skipped && !game.isTwilightsFallMode()) {
             sb.append(
                     "\nSome players were skipped. Please confirm they are set up as an empty franken shell faction before proceeding with the draft");
         }

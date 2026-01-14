@@ -1,1 +1,17 @@
-{"id":"98","name":"Garbozia","aliases":["te09","garbozia","garbage","sig01"],"imagePath":"98_Garbozia.png","planets":["garbozia"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"thunders_edge"}
+{
+    "id": "98",
+    "name": "Garbozia",
+    "aliases": [
+        "te09",
+        "garbozia",
+        "garbage",
+        "sig01"
+    ],
+    "imagePath": "98_Garbozia.png",
+    "planets": [
+        "garbozia"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "thunders_edge"
+}

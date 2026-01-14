@@ -316,17 +316,18 @@ public class EdictPhaseHandler {
                             "Assign " + Mapper.getTech(tech).getName()));
                     embeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                 }
-                msg += "\n\n" + game.getSpeaker().getRepresentation()
-                        + " needs to assign the first ability to the player resolving the edict, then that player does the rest.";
+                msg += "\n\n" + game.getSpeaker().getRepresentation() + " needs to assign the first ability to "
+                        + (buttonID.contains("_orangetf") ? "Radiant Aur" : "the tyrant")
+                        + ", then that player assigns the rest.";
             }
             case "tf-foretell" -> {
                 int loc = 1;
-                for (String objective1 : game.getPublicObjectives1Peakable()) {
+                for (String objective1 : game.getPublicObjectives1Peekable()) {
                     buttons.add(Buttons.green("foretellPeak_1_" + loc, "Stage 1, Position " + loc));
                     loc++;
                 }
                 loc = 1;
-                for (String objective1 : game.getPublicObjectives2Peakable()) {
+                for (String objective1 : game.getPublicObjectives2Peekable()) {
                     buttons.add(Buttons.blue("foretellPeak_2_" + loc, "Stage 2, Position " + loc));
                     loc++;
                 }

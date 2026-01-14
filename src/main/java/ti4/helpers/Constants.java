@@ -137,6 +137,7 @@ public class Constants {
     public static final String SHOW_GEARS = "show_gears";
     public static final String SHOW_BANNERS = "show_banners";
     public static final String SHOW_HEX_BORDERS = "show_hex_borders";
+    public static final String VOLTRON_STYLE = "voltron_style";
     public static final String HOMEBREW_MODE = "homebrew_mode";
     public static final String UNDO_BUTTON = "undo_button";
     public static final String FAST_SC_FOLLOW = "fast_sc_follow";
@@ -1197,6 +1198,7 @@ public class Constants {
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String DRAFT_MODE = "draft_mode";
     public static final String BAN_LIST = "ban_list";
+    public static final String BOT_ALL_REACTS = "bot_all_reacts";
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String BOT_COLOR_REACTS = "bot_color_reacts";
     public static final String BOT_STRAT_REACTS = "bot_strat_reacts";
@@ -1351,6 +1353,7 @@ public class Constants {
     public static final String OBSERVER = "observer";
     public static final String REMOVE_TITLE = "remove_title";
     public static final String EDIT_TRACK_RECORD = "edit_track_record";
+    public static final String SET_STATS_TRACKED_USER = "set_stats_tracked_user";
     public static final String TITLE = "title";
     public static final String ADD_REMOVE = "add_remove";
 

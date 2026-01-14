@@ -42,7 +42,7 @@ class RunAgainstSpecificGame extends Subcommand {
     }
 
     private static boolean makeChanges(Game game) {
-        game.setCreationDateTime(1765323420000L);
-        return true;
+        // do something
+        return false;
     }
 }

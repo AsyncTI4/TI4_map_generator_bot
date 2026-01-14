@@ -55,6 +55,28 @@ class MiltyDraftButtonHandlers {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
             first = false;
         }
+        if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
+            List<MessageEmbed> teEmbeds = new ArrayList<>();
+            for (FactionModel faction : displayFactions) {
+                String btId = faction.getID() + "bt";
+                if (btId.contains("keleres")) {
+                    btId = "keleresbt";
+                }
+                if (Mapper.getBreakthrough(btId) != null) {
+                    teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
+                }
+            }
+            first = true;
+            for (MessageEmbed e : teEmbeds) {
+                String message = "";
+                if (first) {
+                    message =
+                            player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.";
+                }
+                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
+                first = false;
+            }
+        }
     }
 
     @ButtonHandler("draftPresetKeleres_")

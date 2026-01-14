@@ -68,7 +68,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 2 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -91,8 +91,7 @@ public class AddPlanetService {
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
 
-        List<String> mecatols = Constants.MECATOLS;
-        if (mecatols.contains(planet) && player.hasIIHQ()) {
+        if (game.mecatols().contains(planet) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -200,15 +199,15 @@ public class AddPlanetService {
                     }
                     if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
-                                + " lost the planet of "
+                                + " lost control of "
                                 + Mapper.getPlanet(planet).getName()
                                 + " (and could perhaps resolve some applicable ability).";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                         if (game.isFowMode() && player_.isRealPlayer()) {
                             MessageHelper.sendMessageToChannel(
                                     player_.getPrivateChannel(),
-                                    player_.getRepresentationUnfogged() + ", you lost the planet of "
-                                            + Mapper.getPlanet(planet).getName());
+                                    player_.getRepresentationUnfogged() + ", you lost control of "
+                                            + Mapper.getPlanet(planet).getName() + ".");
                         }
                         if (player_.isRealPlayer()
                                 && player_.getPlanetsAllianceMode().isEmpty()
@@ -334,9 +333,9 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
             unitHolder.removeToken("token_relictoken.png");
             if (!alreadyOwned) {
-                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw a relic");
+                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw A Relic");
                 String message = player.getRepresentation()
-                        + " has gained control of a planet which allows them to draw a relic!\nUse the button AFTER you have resolved ALL ground combats:";
+                        + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
         }
@@ -385,17 +384,18 @@ public class AddPlanetService {
                 && !doubleCheck
                 && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove CC"));
-            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Tech"));
+            buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove Command Token"));
+            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Technology"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
 
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " is resolving the zealots breakthrough to either research a tech or remove the command token from the system.");
+                            + " is resolving _Rhodun's Reliquary_ to either research a technology or remove the command token from the system.");
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " choose whether you want to research a tech (you need the pre-requistites) or remove the command token from the system",
+                            + ", please choose whether you want to __research__ a technology or remove the command token from the system (or neither).",
                     buttons);
         }
 
@@ -609,7 +609,7 @@ public class AddPlanetService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
-        if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
+        if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
         if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {

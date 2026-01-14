@@ -23,6 +23,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String permanentEffect;
     private String window;
     private String windowEffect;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
     private String homebrewReplacesID;

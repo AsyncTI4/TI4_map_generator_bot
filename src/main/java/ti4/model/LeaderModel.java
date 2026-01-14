@@ -23,9 +23,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String type;
     private String faction;
     private String name;
-    private String tfName;
     private String shortName;
     private Boolean shrinkName;
+    private String tfName;
+    private String tfShortName;
+    private Boolean tfShrinkName;
     private String title;
     private String tfTitle;
     private String abilityName;
@@ -36,6 +38,8 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String unlockCondition;
     private String flavourText;
     private String imageURL;
+    private String imageBackURL;
+    private String tfImageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
     private String homebrewReplacesID;
@@ -82,6 +86,14 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             return tfName;
         }
         return name;
+    }
+
+    public String getTFShortName() {
+        return Optional.ofNullable(tfShortName).orElse(getTFNameIfAble());
+    }
+
+    public boolean getTFShrinkName() {
+        return Optional.ofNullable(tfShrinkName).orElse(false);
     }
 
     public String getLeaderPositionAndFaction() {
@@ -175,9 +187,17 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         // TITLE
         String title_name_component = "";
         String title_subtitle_component = "";
-        if ("agent".equals(type) && useTwilightsFallText) {
-            title_name_component = getTFName().orElse(name);
-            title_subtitle_component = getTFTitle().orElse(tfTitle);
+        if (useTwilightsFallText) {
+            if (getTFName().isPresent() && !getTFName().get().isBlank()) {
+                title_name_component = getTFName().get();
+            } else {
+                title_name_component = name;
+            }
+            if (getTFTitle().isPresent() && !getTFTitle().get().isBlank()) {
+                title_subtitle_component = getTFTitle().get();
+            } else {
+                title_subtitle_component = title;
+            }
         } else {
             title_name_component = name;
             title_subtitle_component = title;

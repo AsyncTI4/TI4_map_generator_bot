@@ -139,11 +139,13 @@ public class PlayHeroService {
                 player.setPassed(false);
                 String prefix = player.getFinsFactionCheckerPrefix();
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green(prefix + "gain_CC", "Gain 2 CCs"));
-                buttons.add(Buttons.green(prefix + "drawActionCards_1", "Draw 1 AC"));
+                buttons.add(Buttons.green(prefix + "gain_CC", "Gain 2 Command Tokens"));
+                buttons.add(Buttons.green(prefix + "drawActionCards_1", "Draw 1 Action Card"));
                 buttons.add(Buttons.DONE_DELETE_BUTTONS);
                 MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(), "Use buttons to gain 2 CCs then draw 1 action card:", buttons);
+                        player.getCorrectChannel(),
+                        "Use these buttons to gain 2 command tokens, then draw 1 action card.",
+                        buttons);
             }
             case "obsidianhero" -> {
                 player.clearExhaustedPlanets(false);
@@ -155,7 +157,8 @@ public class PlayHeroService {
                 ActionCardHelper.sendPlotCardInfo(game, player);
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged() + ", select a plot from cards info to put into play.");
+                        player.getRepresentationUnfogged()
+                                + ", please choose a Plot car in your `#cards-info` thread to put into play.");
             }
             case "deepwroughthero" -> {
                 List<Button> buttons = new ArrayList<>();
@@ -172,7 +175,8 @@ public class PlayHeroService {
                 }
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        player.getRepresentationUnfogged() + ", select a tech you would like to purge.",
+                        player.getRepresentationUnfogged()
+                                + ", please choose a technology you wish to purge from the universe.",
                         buttons);
             }
             case "titanshero" -> {

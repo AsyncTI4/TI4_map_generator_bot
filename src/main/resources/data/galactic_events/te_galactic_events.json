@@ -9,7 +9,7 @@
     {
         "alias": "call_of_the_void",
         "name": "Call of the Void",
-        "text": "After you move 1 or more units into the active system, if that system is in the fracture, gain 1 command token.\n- When you activate a system in the Fracture, apply +1 to the move values of each of your ships.",
+        "text": "After you move 1 or more units into the active system, if that system is in The Fracture, gain 1 command token.\n- When you activate a system in The Fracture, apply +1 to the move values of each of your ships.",
         "complexity": 1,
         "flavorText": "This place... it is a graveyard. I can't see it but I can feel it. Souls all around me, yelling, screaming at me to leave. But I can't leave. Not yet. Maybe not ever. There is something here, I know it. I can find what happened here, I can. - Last log of Kel Zin, explorer",
         "source": "thunders_edge"
@@ -73,7 +73,7 @@
     },
     {
         "alias": "wild_wild_galaxy",
-        "name": "Wild Wild Galaxy",
+        "name": "Wild, Wild Galaxy",
         "text": "Action cards are adjusted as follows:\n> - Direct hit: Can be used against mechs.\n> - Flank Speed: Applies +2 move instead of +1.\n> - Maneuvering Jets: Cancels all SPACE CANNON hits\n> - Morale Boost: Applies +2 to die rolls instead of +1\n> - Sabotage: Also take the canceled action card\n> - Shields Holding: Can be used in ground combat\n> - Skilled Retreat: Does not place a command token\n> - War Machine: Reduces cost by 5 instead of 1\n> - Diplomatic Pressure: Player must give 3 notes\n- Additionally, Stellar Converter and Nova Seed can be used against any planets and systems.",
         "complexity": 3,
         "source": "thunders_edge"
@@ -116,7 +116,7 @@
     {
         "alias": "mobilization",
         "name": "Rapid Mobilization",
-        "text": "- After setup, put the Fracture into play. Then, each player simultaneously resolves the following effects in order:\n> - Place 1 infantry onto each planet adjacent to your home system (or the creuss gate/sorrow); do not explore those planets. Then, ready each of those planets.\n> - Place 1 space dock on any planet you control and place your flagship and 3 fighters in its system.\n> - Gain your breakthrough.\n> - Research 1 technology; if you are the Nomad player, research 1 additional technology.",
+        "text": "- After setup, put The Fracture into play. Then, each player simultaneously resolves the following effects in order:\n> - Place 1 infantry onto each planet adjacent to your home system (or the creuss gate/sorrow); do not explore those planets. Then, ready each of those planets.\n> - Place 1 space dock on any planet you control and place your flagship and 3 fighters in its system.\n> - Gain your breakthrough.\n> - Research 1 technology; if you are the Nomad player, research 1 additional technology.",
         "complexity": 1,
         "source": "thunders_edge"
     },

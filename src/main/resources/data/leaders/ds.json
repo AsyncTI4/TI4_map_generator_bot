@@ -382,8 +382,8 @@
         "type": "agent",
         "name": "Garstil",
         "title": "Recruitment Officer",
-        "abilityWindow": "When a player produces 1 or more infantry",
-        "abilityText": "You may exhaust this card. If you do, up to 3 of those units do not count against their PRODUCTION limit.",
+        "abilityWindow": "When a player draws a card",
+        "abilityText": "You may exhaust this card to allow that player to place that card on the bottom of corresponding deck and draw another card from the top of that deck instead. If that player is another player, gain 1 commodity.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -404,8 +404,8 @@
         "type": "agent",
         "name": "Zhroth Khuvad",
         "title": "Khuvad Arms C.E.O.",
-        "abilityWindow": "After a player activates a non-home system that contains another player’s units",
-        "abilityText": "You may exhaust this card to apply +2 to the move value of 1 of the active player's ships during this tactical action.",
+        "abilityWindow": "After a system is activated",
+        "abilityText": "You may exhaust this card to allow the active player to gain 1 non-faction unit upgrade technology until the end of this tactical action. At the end of this tactical action, they must return that card to their technology deck.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -823,8 +823,8 @@
         "type": "commander",
         "name": "Reides Lupaat",
         "title": "Gifted Telepath",
-        "abilityWindow": "During your turn",
-        "abilityText": "For each common deck, you may spend 1 trade good to look at the top card of that deck",
+        "abilityWindow": "Once during each of your turns",
+        "abilityText": "You may look at the top card of 1 non-objective common deck; you may spend 1 trade good or 1 commodity to place that card on the bottom of that deck.",
         "unlockCondition": "Lose control of a planet.",
         "source": "ds"
     },
@@ -857,8 +857,8 @@
         "name": "Baird Feraux",
         "title": "Reserved Strategist",
         "abilityWindow": "During each round of combat:",
-        "abilityText": "If your opponent controls more units participating in that combat than you, one of your units may roll 1 additional combat die",
-        "unlockCondition": "Gain a second Code card",
+        "abilityText": "One of your units may reroll 1 of its combat dice; if your opponent controls more units participating in that combat than you, that unit may roll 1 additional combat die instead",
+        "unlockCondition": "Have a Code card",
         "source": "ds"
     },
     {
@@ -1336,7 +1336,7 @@
         "title": "Shield of Qhet",
         "abilityName": "Logistical Supremacy - War Unbound",
         "abilityWindow": "ACTION:",
-        "abilityText": " Place this card near the game board; until the end of this game round, after you win a combat, you may remove 1 of your command tokens from the active system or draw 1 action card.At the end of this game round, purge this card.",
+        "abilityText": " Place this card near the game board; until the end of this game round, after you win a combat, you may remove 1 of your command tokens from the active system. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
@@ -1372,7 +1372,7 @@
         "title": " Concordat Marshall",
         "abilityName": "Concord Renewed - Galactic Outreach",
         "abilityWindow": "ACTION:",
-        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player gains 2 command tokens.",
+        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player draws 1 secret objective.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

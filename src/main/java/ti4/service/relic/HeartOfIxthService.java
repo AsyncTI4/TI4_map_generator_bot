@@ -60,8 +60,8 @@ public class HeartOfIxthService {
             Button goodHeart = good.withCustomId(good.getCustomId() + "_heart");
             Button badHeart = bad.withCustomId(bad.getCustomId() + "_heart");
             if (rollingPlayer.is(heart)) {
-                goodHeart = goodHeart.withLabel(good.getLabel() + " [Exhaust 🩷]");
-                badHeart = badHeart.withLabel(bad.getLabel() + " [Exhaust 🩷]");
+                goodHeart = goodHeart.withLabel(good.getLabel() + " [Exhaust Heart of Ixth]");
+                badHeart = badHeart.withLabel(bad.getLabel() + " [Exhaust Heart of Ixth]");
             }
             if (result.eligibleForHeartPlus()) buttons.add(goodHeart);
             if (result.eligibleForHeartMinus()) buttons.add(badHeart);
@@ -78,7 +78,7 @@ public class HeartOfIxthService {
                 if (game.getStoredValue("heartWarnedThisTurn").isBlank()) {
                     String warning = "### ATTENTION " + rollingPlayer.getRepresentation() + ":\n";
                     warning += heart.getRepresentation()
-                            + " has access to Heart of Ixth and is able to change the outcome of your die roll. ";
+                            + " has access to _Heart of Ixth_ and is able to change the outcome of your die roll. ";
                     warning +=
                             "Check with this player before resolving to make sure you choose the appropriate result.";
                     game.setStoredValue("heartWarnedThisTurn", "y");
@@ -98,7 +98,7 @@ public class HeartOfIxthService {
 
         Player heart = getHeartOfIxthPlayer(game, false);
         if (wait && heart != null && !player.is(heart)) {
-            String msg = heart.getRepresentation() + " still needs to decide on " + rep();
+            String msg = heart.getRepresentation() + " still needs to decide on " + rep() + ".";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             return true;
         }

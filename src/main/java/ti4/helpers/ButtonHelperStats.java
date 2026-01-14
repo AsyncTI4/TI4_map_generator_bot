@@ -49,22 +49,22 @@ public class ButtonHelperStats {
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "Converted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good"
+            message = "onverted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good"
                     + (amt == 1 ? "" : "s") + ".";
         } else if (player.getCommodities() == 1) {
-            message = "Converted their last remaining commodity (less than " + amt + ") into 1 trade good.";
+            message = "onverted their last remaining commodity (less than " + amt + ") into 1 trade good.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt
+            message = "onverted their " + player.getCommodities() + " remaining commodities (less than " + amt
                     + ") into " + player.getCommodities() + " trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }
-        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, "C" + message);
 
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " c" + message);
 
         if (deleteMsg) ButtonHelper.deleteMessage(event);
     }

@@ -45,8 +45,7 @@ import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
 
-    @ButtonHandler("doneWithTacticalAction")
-    public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+    public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
@@ -104,29 +103,34 @@ public class ButtonHelperTacticalAction {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
             }
+            if (!game.isAbsolMode()
+                    && player.getRelics().contains("emphidia")
+                    && !player.getExhaustedRelics().contains("emphidia")) {
+                String message = player.getRepresentation()
+                        + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
+                List<Button> systemButtons2 = new ArrayList<>();
+                systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+            }
+            if (game.isWarfareAction()) {
+                Button redistro = Buttons.blue(
+                        player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
+                String warfareDone = player.getRepresentationUnfogged()
+                        + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
+            }
+            ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         }
+    }
 
-        if (!game.isAbsolMode()
-                && player.getRelics().contains("emphidia")
-                && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation()
-                    + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
-            List<Button> systemButtons2 = new ArrayList<>();
-            systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-        }
+    @ButtonHandler("doneWithTacticalAction")
+    public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+        endOfTacticalActionThings(player, game, event);
+
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
         }
-        if (game.isWarfareAction()) {
-            Button redistro = Buttons.blue(
-                    player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
-            String warfareDone = player.getRepresentationUnfogged()
-                    + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
-        }
 
-        resetStoredValuesForTacticalAction(game);
         game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
@@ -137,6 +141,7 @@ public class ButtonHelperTacticalAction {
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
         ButtonHelper.deleteMessage(event);
+        player.resetOlradinPolicyFlags();
     }
 
     @ButtonHandler("tacticalActionBuild_")
@@ -168,7 +173,8 @@ public class ButtonHelperTacticalAction {
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
                         .contains(game.getTileByPosition(pos))) {
             String msg = player.getRepresentation()
-                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+                    + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                    + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
@@ -219,7 +225,7 @@ public class ButtonHelperTacticalAction {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation()
-                                    + " use this button to resolve the ability of your yssaril infantry.",
+                                    + " use this button to resolve the ability of your Guild Agents.",
                             buttons);
                 }
             }
@@ -236,12 +242,12 @@ public class ButtonHelperTacticalAction {
 
         if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.getPosition().contains("frac")) {
             String msg = player.getRepresentation()
-                    + " you should gain 1 command token due to moving in the fracture while the Call of the Void Galactic Event is in play.";
+                    + " you should gain 1 command token due to moving in The Fracture while the _Call of the Void_ galactic event is in play.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String trueIdentity = player.getRepresentationUnfogged();
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
-                    + ". Use buttons to gain 1 command tokens.";
+                    + ". Use these buttons to gain 1 command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
@@ -594,7 +600,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + ", you can use this button to place command tokens down via Argent breakthrough ability.",
+                            + ", you can use this button to place command tokens down via _Wing Transfer_.",
                     button2);
         }
 
@@ -737,7 +743,7 @@ public class ButtonHelperTacticalAction {
         }
         if (player.hasRelic("absol_plenaryorbital")
                 && !tile.isHomeSystem(game)
-                && !tile.isMecatol()
+                && !tile.isMecatol(game)
                 && !player.hasUnit("plenaryorbital")) {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, tile, player);
             if (!buttons4.isEmpty()) {

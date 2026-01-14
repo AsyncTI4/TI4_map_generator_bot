@@ -4,10 +4,13 @@
         "faction": "bastion",
         "type": "agent",
         "name": "Dame Briar",
+        "shortName": "Dame\nBriar",
         "title": "Bastion Valiant",
         "abilityWindow": "When a player's unit is destroyed",
         "abilityText": "You may exhaust this card to galvanize another of that player's units in the destroyed unit's system.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastionagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastionagent.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -19,6 +22,8 @@
         "abilityWindow": "At any time",
         "abilityText": "Your action cards cannot be canceled by \"Sabotage\" action cards. The Nekro Virus cannot place assimilator tokens on your components.",
         "unlockCondition": "There are 3 galvanized units on the game board",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastioncommander.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastioncommander.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -26,7 +31,9 @@
         "faction": "bastion",
         "type": "hero",
         "name": "Lyra Keen",
+        "shortName": "Lyra\nKeen",
         "tfName": "Intelligence Unshackled",
+        "tfShrinkName": true,
         "title": "Shield of the Reef",
         "tfTitle": "Bastion Paradigm",
         "abilityName": "Entity 4X41A \"Apollo\" - Intelligence Unshackled",
@@ -35,6 +42,9 @@
         "abilityText": "You may purge this card to roll 1 die for each unit in its system that belongs to another player; if the result is equal to or greater than the galvanized unit's combat value, destroy that unit.",
         "tfAbilityText": "You may purge this card to designate that unit as a catalyst: roll 1 die for each other player's unit in the system. For each result equal to or greater than the catalyst's combat value, destroy that unit.",
         "unlockCondition": "Have 3 scored objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastionhero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/bastionhero.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/bastion_paradigm.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -46,6 +56,8 @@
         "abilityWindow": "When another player researches a technology",
         "abilityText": "You may exhaust this card to allow that player to ignore 1 prerequisite; if they do, you may place 1 infantry from your reinforcements into coexistence on a non-home planet they control.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughtagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughtagent.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -57,6 +69,8 @@
         "abilityWindow": "When another player spends resources to research a technology",
         "abilityText": "That player may reduce the cost by 1; if they do, gain 1 commodity or convert 1 of your commodities to a trade good.",
         "unlockCondition": "Have an ocean card in play.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughtcommander.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughtcommander.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -64,11 +78,14 @@
         "faction": "deepwrought",
         "type": "hero",
         "name": "Ta Zern",
+        "shortName": "Ta\nZern",
         "title": "Conclave Founder",
         "abilityName": "Wave Function Collapse - The Laws Unwritten",
         "abilityWindow": "ACTION:",
         "abilityText": "Purge this card and a non-unit upgrade technology you own or from your deck; then, purge all cards with the same name owned by other players and in other players' decks. Then, each player that purged a technology they owned researches another technology.",
         "unlockCondition": "Have 3 scored objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughthero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/deepwroughthero.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -76,12 +93,16 @@
         "faction": "crimson",
         "type": "agent",
         "name": "Ahk Ravin",
+        "shortName": "Ahk\nRavin",
         "tfName": "Breach Genome",
         "title": "Forlorn Shadow",
         "tfTitle": "Instability",
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card to choose 1 player. That player may swap the position of 2 of their ships in any systems; they may transport units when they swap. [Note: async has decided that a swap is likely to be a move and thus will obey anomaly movement restrictions.]",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsonagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsonagent.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/breach_genome.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -89,10 +110,13 @@
         "faction": "crimson",
         "type": "commander",
         "name": "Ahk Siever",
+        "shortName": "Ahk\nSiever",
         "title": "Wistful Soul",
         "abilityWindow": "At the end of a combat between any players:",
         "abilityText": "Gain 1 commodity or convert 1 of your commodities to a trade good.",
         "unlockCondition": "Place a breach token in a system that contains another player's unit.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsoncommander.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsoncommander.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -100,13 +124,17 @@
         "faction": "crimson",
         "type": "hero",
         "name": "Homesick Phantom",
-        "tfName": "",
+        "tfName": "Dimensional Reflection",
+        "tfShrinkName": true,
         "title": "Wayward Riftwalker",
         "tfTitle": "",
         "abilityName": "Fragment Reality - Dimensional Reflection",
         "abilityWindow": "When you produce ships",
         "abilityText": "You may place any of those ships onto this card. At the start of a space combat, you may purge this card to place all ships from this card into the active system.",
         "unlockCondition": "Have 3 scored objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsonhero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/crimsonhero.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/rebellion_paradigm.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -114,12 +142,16 @@
         "faction": "ralnel",
         "type": "agent",
         "name": "Kan Kip Rel",
+        "shortName": "Kan\nKip Rel",
         "tfName": "Courier Genome",
         "title": "Courier Prime",
         "tfTitle": "Reliability",
         "abilityWindow": "ACTION:",
         "abilityText": "Exhaust this card and draw 2 action cards; give 1 of those cards to another player.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/ralnelagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/ralnelagent.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/courier_genome.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -131,6 +163,8 @@
         "abilityWindow": "When you declare a retreat",
         "abilityText": "Immediately retreat up to 2 of your ships from the active system to an adjacent system that does not contain another player's ships. Place a command token from your reinforcements into that system.",
         "unlockCondition": "Be the last person to pass during the Action Phase",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/ralnelcommander.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/ralnelcommander.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -138,13 +172,17 @@
         "faction": "ralnel",
         "type": "hero",
         "name": "Director Nel",
-        "tfName": "",
+        "tfName": "Limit Break",
+        "tfShortName": "Limit\nBreak",
         "title": "Acquisitive Mind",
         "tfTitle": "",
         "abilityName": "Signal Intrusion - Limit Break",
         "abilityWindow": "After the last player passes",
         "abilityText": "You may choose to no longer be passed; if you do, gain 2 command tokens, draw 1 action card, and purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/ralnelhero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/ralnelhero.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/paradigm/ralnel_paradigm.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -152,14 +190,14 @@
         "faction": "xxcha",
         "type": "hero",
         "name": "Xxekir Grom",
-        "tfName": "",
         "title": "The Council's Heart",
-        "tfTitle": "",
         "abilityName": "Planetary Defense Nexus - Aegis",
         "abilityWindow": "ACTION:",
         "abilityText": "Place any combination of up to 4 PDS or mechs onto planets you control; ready each planet that you place a unit on. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "homebrewReplacesID": "xxchahero",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/xxchahero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/xxchahero.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -167,12 +205,15 @@
         "faction": "naalu",
         "type": "agent",
         "name": "Z'eu",
-        "tfName": "",
+        "tfName": "Limit Genome",
         "title": "Agent of the Nefishh",
         "tfTitle": "",
         "abilityWindow": "After any player's command token is placed in a system:",
         "abilityText": "You may exhaust this card to return that token to that player's reinforcements.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/naaluagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/naaluagent.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/limit_genome.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -180,12 +221,16 @@
         "faction": "firmament",
         "type": "agent",
         "name": "Myru Vos",
-        "tfName": "",
+        "shortName": "Myru\nVos",
+        "tfName": "Mirror Genome",
         "title": "The Hungry Shadow",
         "tfTitle": "",
         "abilityWindow": "When a player moves ships",
         "abilityText": "You may exhaust this card; if you do, SPACE CANNON cannot be used against those ships. If they are not transporting units, they can also move through other players' ships.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/firmamentagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/firmamentagent.png?raw=true",
+        "tfImageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/genome/mirror_genome.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -193,12 +238,12 @@
         "faction": "firmament",
         "type": "commander",
         "name": "Captain Aroz",
-        "tfName": "",
         "title": "The Black Flag",
-        "tfTitle": "",
         "abilityWindow": "At any time",
         "abilityText": "You can treat planets in systems that contain your ships as if they were controlled by you for the purpose of scoring secret objectives.",
         "unlockCondition": "Have a plot card in play",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/firmamentcommander.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/firmamentcommander.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -206,13 +251,13 @@
         "faction": "firmament",
         "type": "hero",
         "name": "Sharsiss",
-        "tfName": "",
         "title": "The Coiling Void",
-        "tfTitle": "",
         "abilityName": "The Blade Beckons - Knife in the Back",
         "abilityWindow": "ACTION:",
         "abilityText": "Place 1 of your plot cards in play with any other player's control token on it. Then, you may place any player's control token on 1 of your in-play plot cards; one plot cannot have two of the same player's tokens. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/firmamenthero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/firmamenthero.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -220,12 +265,12 @@
         "faction": "obsidian",
         "type": "agent",
         "name": "Vos Hollow",
-        "tfName": "",
         "title": "Hunger Burning",
-        "tfTitle": "",
         "abilityWindow": "When a player's ship is destroyed during any combat",
         "abilityText": "You may exhaust this card; if you do, that player's opponent must destroy 1 of their ships of the same type in the active system.",
         "unlockCondition": "Always Unlocked",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/obsidianagent.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/obsidianagent.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -233,12 +278,12 @@
         "faction": "obsidian",
         "type": "commander",
         "name": "Aroz Hollow",
-        "tfName": "",
         "title": "Broken Standard",
-        "tfTitle": "",
         "abilityWindow": "At any time",
-        "abilityText": "Apply +1 to the result of each of your units' combat rolls in the Fracture.",
-        "unlockCondition": "Have units in the Fracture.",
+        "abilityText": "Apply +1 to the result of each of your units' combat rolls in The Fracture.",
+        "unlockCondition": "Have units in The Fracture.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/obsidiancommander.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/obsidiancommander.png?raw=true",
         "source": "thunders_edge"
     },
     {
@@ -246,13 +291,13 @@
         "faction": "obsidian",
         "type": "hero",
         "name": "Sharsiss Hollow",
-        "tfName": "",
         "title": "Sanity Snapped",
-        "tfTitle": "",
         "abilityName": "The Blade Revealed - Eternity's End",
         "abilityWindow": "ACTION:",
         "abilityText": "Ready all of your planets. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/obsidianhero.png?raw=true",
+        "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/te/obsidianhero.png?raw=true",
         "source": "thunders_edge"
     }
 ]

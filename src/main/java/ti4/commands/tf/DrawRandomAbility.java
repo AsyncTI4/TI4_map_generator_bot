@@ -11,7 +11,7 @@ import ti4.map.Player;
 class DrawRandomAbility extends GameStateSubcommand {
 
     DrawRandomAbility() {
-        super(Constants.DRAW_RANDOM_ABILITY, "Draw a random TF Ability", true, true);
+        super(Constants.DRAW_RANDOM_ABILITY, "Draw a random Twilight's Fall ability splice card", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
                         .setAutoComplete(true));

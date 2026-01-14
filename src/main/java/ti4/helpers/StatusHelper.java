@@ -102,6 +102,38 @@ public class StatusHelper {
                 String msg = player.getRepresentation()
                         + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            } else {
+                var userSettings = UserSettingsManager.get(player.getUserID());
+                if (userSettings.getSandbagPref().contains("bot")) {
+                    String message = player.getRepresentationNoPing()
+                            + ", the bot will auto pass on scoring a secret objective this round for you (if you're still unable to score one when scoring occurs)."
+                            + " Click this button to change it and do it manually."
+                            + " You will be asked every round like this when you pass early, so no decision is final.";
+                    buttons.add(Buttons.gray("sandbagPref_manual", "Manually Say No Scoring"));
+                    buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                } else {
+                    String message = player.getRepresentationNoPing()
+                            + ", the bot will let you manually decide whether to score a secret objective this round."
+                            + " Click this button to change it and auto pass on scoring this round (if you still have no secrets to score when scoring occurs)."
+                            + " You will be asked every round like this when you pass early, so no decision is final.";
+                    buttons.add(Buttons.green("sandbagPref_bot", "Auto Say No Scoring"));
+                    buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                }
+            }
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (!game.getStoredValue("ralnelHero").isEmpty()) {
+                    String presetRalnelHero =
+                            "You have Director Nel, the Ral Nel hero, unlocked. You can use the preset button to automatically use your hero when the last player passes."
+                                    + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                    List<Button> ralnelHeroButtons = new ArrayList<>();
+                    ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
+                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+                }
             }
         }
     }
@@ -183,7 +215,7 @@ public class StatusHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + " , please choose if you want to use _Radical Advancement_.",
+                                + " , please choose if you wish to use _Radical Advancement_.",
                         buttons);
             }
             if (player.hasTech("radical")) {
@@ -584,7 +616,7 @@ public class StatusHelper {
             TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
             String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
                     + parasiteModel.getNameRepresentation() + ".";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), parasiteMsg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
         }
     }
 
@@ -602,7 +634,7 @@ public class StatusHelper {
             if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                     List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
-                    String msg = player.getRepresentation() + " Use buttons to revive infantry. You have "
+                    String msg = player.getRepresentation() + ", please use these buttons to revive infantry. You have "
                             + player.getStasisInfantry() + " infantry left to revive.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 } else {
@@ -627,7 +659,7 @@ public class StatusHelper {
 
                     int remaining = game.changeCommsOnPlanet(1, planet.getName());
 
-                    String msg = "A commodity was placed on the Monument to the Ages at " + planet.getName() + ".";
+                    String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
                 }
             }

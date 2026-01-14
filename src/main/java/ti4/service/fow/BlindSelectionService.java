@@ -160,7 +160,7 @@ public class BlindSelectionService {
                 Buttons.red("blindSelection~MDL_" + encodedButtonPrefix + "_" + type, "Change Selection"));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                player.getRepresentation() + ", Please select the target:",
+                player.getRepresentation() + ", please choose the target.",
                 chooseTargetButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);

@@ -237,9 +237,10 @@ public class ExploreService {
             player.setBreakthroughExhausted("kolleccbt", kolleccbt);
             MessageHelper.sendMessageToChannel(
                     (MessageChannel) event.getChannel(),
-                    player.getRepresentation() + " has exhausted Kollecct Breakthrough to explore the discard pile of "
+                    player.getRepresentation()
+                            + " has exhausted _The Collector's Museum_ to explore from the discard pile of "
                             + drawColor + " on " + planetName
-                            + ". Not yet implemented fully. Use /explore shuffle_back_into_deck and then /explore use to resolve. (and then maybe shuffle back into deck again).");
+                            + ". Not yet implemented fully. Please use `/explore shuffle_back_into_deck` and then `/explore use` to resolve (and then maybe `/explore shuffle_back_into_deck` back into deck again).");
             return;
         }
         String cardID = game.drawExplore(drawColor);
@@ -491,27 +492,53 @@ public class ExploreService {
                         }
                     }
 
+                    AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
+                    tile.addToken(attachmentFilename, planetID);
+                    message = "Attachment _" + aModel.getName() + "_ added to "
+                            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     if (attachment.equals(Constants.DMZ)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                         UnitHolder planetUnitHolder = unitHolders.get(planetID);
                         UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                        for (UnitKey key : planetUnitHolder.getUnitKeys()) {
-                            int amt = planetUnitHolder.getUnitCount(key);
-                            var removed = planetUnitHolder.removeUnit(key, amt);
-                            if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
-                                    .contains(key.getUnitType())) {
-                                spaceUnitHolder.addUnitsWithStates(key, removed);
+                        for (Player p2 : game.getPlayers().values()) {
+                            String groundForces = "";
+                            String structures = "";
+                            for (UnitKey key : planetUnitHolder.getUnitKeys()) {
+                                if (!p2.getColor().equals(key.getColor())) continue;
+                                int amt = planetUnitHolder.getUnitCount(key);
+                                var removed = planetUnitHolder.removeUnit(key, amt);
+                                if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
+                                        .contains(key.getUnitType())) {
+                                    spaceUnitHolder.addUnitsWithStates(key, removed);
+                                    groundForces +=
+                                            key.unitEmoji().emojiString().repeat(amt);
+                                } else {
+                                    structures += key.unitEmoji().emojiString().repeat(amt);
+                                }
+                            }
+                            if (!groundForces.isEmpty()) {
+                                message += "\n" + p2.getRepresentationUnfogged() + ", your " + groundForces
+                                        + " have been yote into space" + (structures.isEmpty() ? "." : "");
+                            }
+                            if (!structures.isEmpty()) {
+                                message += (groundForces.isEmpty()
+                                                ? "\n" + p2.getRepresentationUnfogged() + ", "
+                                                : ", and ")
+                                        + "your " + structures + " have been yote into the shadow realm.";
+                                if (!game.isFowMode()) {
+                                    DisasterWatchHelper.sendMessageInDisasterWatch(
+                                            game,
+                                            "\\> \"" + structures + "⁉️" + UnitEmojis.Blank
+                                                    + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
+                                                    + p2.getRepresentation() + ", in " + game.getName() + ".");
+                                }
                             }
                         }
                     }
 
-                    tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
-                    AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
-                    message = "Attachment _" + aModel.getName() + "_ added to "
-                            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
                     ButtonHelper.checkFleetAndCapacity(player, game, tile);
                 }
@@ -555,7 +582,9 @@ public class ExploreService {
                         Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
-                        if (!game.isFowMode() && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                        if (!game.isFowMode()
+                                && FoWHelper.playerHasShipsInSystem(player, tile)
+                                && tile.getPlanetUnitHolders().size() == 1) {
                             if (game.getRevealedPublicObjectives().containsKey("deep_space")
                                     && !game.didPlayerScoreThisAlready(player.getUserID(), "deep_space")) {
                                 DisasterWatchHelper.sendMessageInDisasterWatch(

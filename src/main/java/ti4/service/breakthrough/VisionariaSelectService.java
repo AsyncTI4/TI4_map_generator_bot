@@ -83,7 +83,7 @@ public class VisionariaSelectService {
 
     @ButtonHandler("declineVisionaria")
     private void declineVisionaria(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = "declined to use Visionaria Select.";
+        String msg = "declined to use _Visionaria Select_.";
         respondToVisionaria(event, game, player);
         ReactionService.addReaction(event, player.getGame(), player, msg);
     }
@@ -150,6 +150,15 @@ public class VisionariaSelectService {
         if (!readyToMoveOn(game)) return;
 
         Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    "Could not find active player when trying to move on after _Visionaria Select_.");
+            game.removeStoredValue("endTurnAfterVisionaria");
+            game.removeStoredValue("fleetLogAfterVisionaria");
+            game.removeStoredValue("VisionariaResponded");
+            return;
+        }
         if (game.getStoredValue("endTurnAfterVisionaria").equals(activePlayer.getFaction())) {
             EndTurnService.endTurnAndUpdateMap(null, game, activePlayer);
 

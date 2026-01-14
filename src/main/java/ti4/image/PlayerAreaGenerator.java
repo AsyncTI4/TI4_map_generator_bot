@@ -797,7 +797,7 @@ class PlayerAreaGenerator {
                     .sum();
             if (totGalvanized > maxGalvanizeTokens) {
                 String msg = player.getRepresentation()
-                        + " there are too many Galvanized units on the board. Please review and resolve manually.";
+                        + ", there are too many Galvanized units on the board. Please review and resolve manually.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             return displayRemainingFactionTokens(
@@ -1330,19 +1330,20 @@ class PlayerAreaGenerator {
             }
 
             LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-            if ("yssarilagent".equalsIgnoreCase(leader.getId())) {
+            boolean shrink = game.isTwilightsFallMode() ? leaderModel.getTFShrinkName() : leaderModel.getShrinkName();
+            String name = game.isTwilightsFallMode() ? leaderModel.getTFShortName() : leaderModel.getShortName();
+
+            if ("yssarilagent".equalsIgnoreCase(leader.getId()) && !game.isTwilightsFallMode()) {
                 DrawingUtil.drawTextVertically(
                         g2, "Clever, Clever".toUpperCase(), x + deltaX + 8, y + 30, Storage.getFont14(), true);
                 DrawingUtil.drawTextVertically(
                         g2, "Ssruu".toUpperCase(), x + deltaX + 23, y + 30, Storage.getFont18(), true);
-            } else if (leaderModel.getShrinkName()) {
+            } else if (shrink) {
                 g2.setFont(Storage.getFont16());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(
-                        g2, leaderModel.getShortName(), x + deltaX + 9, y + 30, 120, true);
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, name, x + deltaX + 9, y + 30, 120, true);
             } else {
                 g2.setFont(Storage.getFont18());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(
-                        g2, leaderModel.getShortName(), x + deltaX + 7, y + 30, 120, true);
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, name, x + deltaX + 7, y + 30, 120, true);
             }
 
             deltaX += 48;

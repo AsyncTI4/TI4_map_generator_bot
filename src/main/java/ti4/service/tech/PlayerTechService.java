@@ -228,7 +228,7 @@ public class PlayerTechService {
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)
                             && !tile.isHomeSystem(game)
-                            && !tile.isMecatol()) {
+                            && !tile.isMecatol(game)) {
                         tiles.add(tile);
                     }
                 }
@@ -379,7 +379,7 @@ public class PlayerTechService {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydag" -> {
-                deleteIfButtonEvent(event);
+                deleteTheOneButtonIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
@@ -389,7 +389,6 @@ public class PlayerTechService {
                         "Please choose the planets you wish to exhaust to pay the required "
                                 + player.getPlanetsAllianceMode().size() + " influence.",
                         buttons);
-                sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydab" -> {
                 game.setDominusOrb(true);
@@ -449,7 +448,7 @@ public class PlayerTechService {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "lgf" -> { // Lazax Gate Folding
-                if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), Constants.MECATOLS)) {
+                if (CollectionUtils.containsAny(player.getPlanetsAllianceMode(), game.mecatols())) {
                     deleteIfButtonEvent(event);
                     AddUnitService.addUnits(event, game.getMecatolTile(), game, player.getColor(), "inf mr");
                     MessageHelper.sendMessageToChannel(
@@ -701,7 +700,7 @@ public class PlayerTechService {
                                     : nextPlayer.getRepresentationNoPing();
                     int numUnpassed = -2;
                     boolean anyPassed = false;
-                    for (Player p2 : game.getPlayers().values()) {
+                    for (Player p2 : game.getRealPlayers()) {
                         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                         anyPassed |= p2.isPassed() || p2.isEliminated();
                     }
@@ -755,7 +754,7 @@ public class PlayerTechService {
                 game.setStoredValue(player.getFaction() + "singularityTechs", prev + techID);
                 if (player.getSingularityTechs().size() > player.getSingularities()) {
                     String msg = player.getRepresentation()
-                            + " you have more copied techs than you have singularities, please remove a copied tech with the buttons";
+                            + " you have more copied abilities than you have Singularities. Please remove a copied ability with these buttons.";
                     List<Button> buttons = new ArrayList<>();
                     for (String tech : player.getSingularityTechs()) {
                         buttons.add(Buttons.gray(

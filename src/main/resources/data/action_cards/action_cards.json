@@ -152,7 +152,8 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "dh2",
@@ -162,7 +163,8 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "dh3",
@@ -172,7 +174,8 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "dh4",
@@ -182,7 +185,8 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "disable",
@@ -286,7 +290,8 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "Mendosa smirked. \"Don't ye fret now, girl. It sounds like ye've got somewhere ta be in a hurry, and it just se happens that I ken get ye there right quick.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "fs2",
@@ -296,7 +301,8 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "There was a low-pitched hum throughout the station and the gigantic, bulky constructions on the hull spat blue flame. Massive ion thrusters! So this was how the Saar moved the damned things.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "fs3",
@@ -306,7 +312,8 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "Mendosa grinned at the young Mentak pilot's astonishment. \"Mobility-the Clan's greatest strength. Ye'd be amazed at how fast this thing ken go.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "fs4",
@@ -316,7 +323,8 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "automationID": "flank_speed",
         "flavorText": "With a sound like thunder and a flash of neon blue light, the thrusters accelerated full bore, nearly knocking Suffi off her feet.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "f_researched",
@@ -526,7 +534,8 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "Something was wrong. T'esla sensed a flicker of movement on the planet's surface, followed by a faint glint of light. Reflexively, she veered her fighter to the side - an action that saved her life.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mjets2",
@@ -535,7 +544,8 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "The fighter's thrusted boosted her just out of the cannon's firing solution, and a metal slug the size of a building rocketed past her crystalline ship.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mjets3",
@@ -544,7 +554,8 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "T'esla breathed a sigh of relief as the massive slug disappeared into the distance. A touch slower and she would have been annihilated.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mjets4",
@@ -553,7 +564,8 @@
         "window": "Before you assign hits produced by another player's SPACE CANNON roll",
         "text": "Cancel 1 hit.",
         "flavorText": "The flickering red warning lights on her control panel reflected in her scales as she regained her composure. \"Well,\" she said aloud. \"Zat was close.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mining_initiative",
@@ -571,7 +583,8 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "Harrugh stood before his warriors, searching for the words that would express the pride that swelled within him.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mb2",
@@ -580,7 +593,8 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "We have done the impossible. I am proud to call you my brothers. My equals. My betters. Harrugh's whiskers bristled with energy as he spoke.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mb3",
@@ -589,7 +603,8 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "Today we turn these invaders to ash and take back what is ours! Harrugh paused, noting the murmurs of approval rippling through the ranks.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "mb4",
@@ -598,7 +613,8 @@
         "window": "At the start of a combat round",
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "The whispering gradually died down and his warriors watched Harrugh expectantly. Every muscle in his body tensed, and he thrust his gyro-spear skyward. \"For Kenara!\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "parley",
@@ -744,7 +760,8 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "T'ro stared unflinching at the incoming barrage through the bridge's observation deck. The shield would hold.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "sh2",
@@ -753,7 +770,8 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "The blast from the enemy's main cannon slammed into the space in front of the warship, splitting into two streams across the bow.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "sh3",
@@ -762,7 +780,8 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "The ship's shields sizzled and sparked but remained active despite the heavy assault.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "sh4",
@@ -771,7 +790,8 @@
         "window": "Before you assign hits to your ships during a space combat",
         "text": "Cancel up to 2 hits.",
         "flavorText": "As the assault died down and it became clear that the ship sustained no major damage, T'ro clicked his mandibles in anticipation. \"Return fire!\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "jamming",
@@ -790,7 +810,8 @@
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "In an instant, the Sol fleet vanished from the Barony's scanners.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "s_retreat2",
@@ -800,7 +821,8 @@
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "The Creuss fleet was gone. No trace remained of their passage.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "s_retreat3",
@@ -810,7 +832,8 @@
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "T'ro gave the order, and the entire fleet withdrew without question.",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "s_retreat4",
@@ -820,7 +843,8 @@
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships. The space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "automationID": "skilled_retreat",
         "flavorText": "We have no choice, captain. Ciel looked nervous.\"We must retreat.\"",
-        "source": "base"
+        "source": "base",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "spy",
@@ -1167,7 +1191,8 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "This would take weeks to replace if you had run it backwards, Varish called as she rotated the massive capacitor bank. \"Okay, fire it up.\"",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "war_machine2",
@@ -1177,7 +1202,8 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "The station vibrated as the device sputtered to life, emitting a high-pitched buzz to Varish's ears. \"Micro-wormholes are cycling at 19 kilohertz,\" Cole read. \"The entropic field tap's stable.\"",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "war_machine3",
@@ -1187,7 +1213,8 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "The station's production facilities spooled up to new intensities, lights flaring as the assembly line drones increased their speeds to keep up.",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "war_machine4",
@@ -1197,7 +1224,8 @@
         "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
         "automationID": "war_machine",
         "flavorText": "Varish, let the Commanders know they can contact the Tetrarchy. Tell them the fighter squadron assembly will be done ahead of schedule, and under budget.",
-        "source": "codex1"
+        "source": "codex1",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "arch_expedition",
@@ -1293,7 +1321,8 @@
         "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
         "automationID": "diplo_pressure",
         "flavorText": "The Arborec emissary leaned close, and Brother Milor flinched at the faint whiff of decay. \"You do not understand,\" Dirzuga Ohao rasped. \"You must support this measure.\"",
-        "source": "pok"
+        "source": "pok",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "dp2",
@@ -1303,7 +1332,8 @@
         "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
         "automationID": "diplo_pressure",
         "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
-        "source": "pok"
+        "source": "pok",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "dp3",
@@ -1313,7 +1343,8 @@
         "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
         "automationID": "diplo_pressure",
         "flavorText": "It would be unfortunate, the Arborec Dirzuga said, \"if your supplies of diraxium were to dry up. How would your fleet defend you if we stopped supplying its fuel?\"",
-        "source": "pok"
+        "source": "pok",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "dp4",
@@ -1322,8 +1353,9 @@
         "window": "When an agenda is revealed",
         "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
         "automationID": "diplo_pressure",
-        "flavorText": "Damn you! Brother MIlor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
-        "source": "pok"
+        "flavorText": "Damn you! Brother Milor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
+        "source": "pok",
+        "affectedByWildWildGalaxy": true
     },
     {
         "alias": "divert_funding",

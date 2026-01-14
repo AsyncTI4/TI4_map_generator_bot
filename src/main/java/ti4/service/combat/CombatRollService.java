@@ -1,7 +1,6 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +24,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CombatMessageHelper;
 import ti4.helpers.CombatModHelper;
@@ -297,7 +297,7 @@ public class CombatRollService {
                 && opponent.hasTech("proxima")
                 && h > 0) {
             if (opponent.hasTech("tf-proxima") && h > 0) {
-                message += "\nProxima canceled 1 hit automatically";
+                message += "\n_Proxima Targeting VI_ canceled 1 hit automatically.";
                 h--;
             } else {
                 if (!bombardPlanet.isEmpty()) {
@@ -305,7 +305,7 @@ public class CombatRollService {
                     if (planet != null && planet.getGalvanizedUnitCount(player.getColorID()) > 0) {
                         int oldH = h;
                         h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                        message += "\nProxima canceled " + (oldH - h) + " hit(s) automatically";
+                        message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit(s) automatically.";
                     }
                 }
             }
@@ -677,7 +677,7 @@ public class CombatRollService {
                 && player.ownsUnit("naaz_voltron")
                 && "space".equalsIgnoreCase(unitHolder.getName())
                 && unitHolder.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
-            result = "Repaired the Naaz Rohka Supermech at start of this combat round with its ability.\n" + result;
+            result = "The Eidolon Maximum self-repaired at the start of this combat round.\n" + result;
             activeSystem.removeUnitDamage(
                     unitHolder.getName(), Mapper.getUnitKey(AliasHandler.resolveUnit("mf"), player.getColorID()), 1);
         }
@@ -712,13 +712,13 @@ public class CombatRollService {
                 }
             }
             if (player.hasTech("tf-supercharge")) {
-                resultBuilder.append("Applied +2 to the rolls of 1 unit via supercharge\n");
+                resultBuilder.append("Applied +2 to the rolls of 1 unit with _Supercharge_.\n");
                 letnevBTBoost = 2;
             } else {
                 resultBuilder
                         .append("Applied +")
                         .append(letnevBTBoost)
-                        .append(" to the rolls of 1 unit via letnev breakthrough\n");
+                        .append(" to the rolls of 1 unit with _Gravleash Maneuvers_.\n");
             }
         }
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
@@ -872,12 +872,12 @@ public class CombatRollService {
                 }
                 if ("belkosea_mech".equalsIgnoreCase(unitModel.getId())) {
                     if (hitRolls > 0) {
-                        player.setCommodities(player.getCommodities() + hitRolls);
-                        ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
+                        ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
                         MessageHelper.sendMessageToChannel(
                                 event.getMessageChannel(),
-                                player.getRepresentation() + " gained " + hitRolls + " commodit"
-                                        + (hitRolls == 1 ? "y" : "ies") + " due to their Uzean Wardog mech ability.");
+                                player.getRepresentation() + " please gain or convert 1 commodity a total of "
+                                        + hitRolls + " time" + (hitRolls == 1 ? "" : "s")
+                                        + " due to your Uzean Wardog mech ability.");
                     }
                 }
                 int misses = numRolls - hitRolls;
@@ -935,6 +935,9 @@ public class CombatRollService {
                 resultBuilder.append(unitRoll);
                 List<DiceHelper.Die> resultRolls2 = new ArrayList<>();
                 int numMisses = numRolls - hitRolls;
+                if (player.ownsUnit("tf-justicerrail") && rollType == CombatRollType.SpaceCannonOffence) {
+                    game.setStoredValue(player.getFaction() + "graviton", "yes");
+                }
                 if ((game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
                                 || player.hasTech("tf-tacticalbrilliance"))
                         && rollType != CombatRollType.combatround
@@ -1372,6 +1375,7 @@ public class CombatRollService {
 
     private static Map<UnitModel, Integer> getUnitsInSpaceCannonDefence(
             Planet planet, Player player, GenericInteractionCreateEvent event) {
+        Game game = player.getGame();
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -1396,7 +1400,7 @@ public class CombatRollService {
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
-        if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasIIHQ()) {
+        if (player.controlsMecatol(true) && game.mecatols().contains(planet.getName()) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -1458,7 +1462,7 @@ public class CombatRollService {
 
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet planet) {
-                if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasIIHQ()) {
+                if (player.controlsMecatol(true) && game.mecatols().contains(planet.getName()) && player.hasIIHQ()) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
                     planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());

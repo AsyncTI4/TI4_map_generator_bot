@@ -1,6 +1,5 @@
 package ti4.commands.custom;
 
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -25,13 +24,20 @@ class RevealSpecificStage1 extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Map.Entry<String, Integer> objective =
-                game.revealSpecificStage1(event.getOption(Constants.PO_ID).getAsString());
-        if (objective == null) {
+        String objectiveId = event.getOption(Constants.PO_ID).getAsString();
+        PublicObjectiveModel po = Mapper.getPublicObjective(objectiveId);
+        if (po == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Public objective with id " + objectiveId + " does not exist.");
+            return;
+        }
+
+        boolean revealed = game.revealSpecificStage1(objectiveId);
+        if (!revealed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective not found.");
             return;
         }
-        PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
+
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
         event.getChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin()

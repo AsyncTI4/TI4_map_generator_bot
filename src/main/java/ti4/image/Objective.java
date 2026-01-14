@@ -137,9 +137,9 @@ public record Objective(
         Integer index = 1;
 
         if (type == Type.Stage1) {
-            inputList = game.getPublicObjectives1Peakable();
+            inputList = game.getPublicObjectives1Peekable();
         } else {
-            inputList = game.getPublicObjectives2Peakable();
+            inputList = game.getPublicObjectives2Peekable();
         }
 
         for (String key : inputList) {

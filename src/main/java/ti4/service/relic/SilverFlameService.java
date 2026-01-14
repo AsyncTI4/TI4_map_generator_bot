@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -16,6 +17,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -29,6 +31,7 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.async.DrumrollService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.DiceEmojis;
 import ti4.service.emoji.TileEmojis;
 import ti4.service.map.AddTileService;
 import ti4.service.map.FractureService;
@@ -62,12 +65,15 @@ public class SilverFlameService {
     private void silverFlameDrumroll(Game game, Player flamePlayer, int target) {
         String gameName = game.getName();
         String watchPartyMsg =
-                flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + ".";
-        watchPartyMsg += "! They are at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp() + " VP!";
+                flamePlayer.getRepresentation() + " is rolling for _The Silver Flame_ in " + gameName + "!";
+        watchPartyMsg += " They are currently at " + flamePlayer.getTotalVictoryPoints() + "/" + game.getVp()
+                + " victory points";
+        watchPartyMsg +=
+                (flamePlayer.getTotalVictoryPoints() + 1 == game.getVp()) ? "; this is for all the marbles." : ".";
         if (flamePlayer.hasRelicReady("heartofixth")) {
-            watchPartyMsg += " They have the Heart of Ixth, so only need to roll a 9!";
+            watchPartyMsg += " They have the _Heart of Ixth_, so only need to roll a 9!";
         } else if (HeartOfIxthService.isHeartAvailable(game)) {
-            watchPartyMsg += " Somebody else has the Heart of Ixth though! 😱";
+            watchPartyMsg += " Somebody else has the _Heart of Ixth_ though! 😱";
         }
         DisasterWatchHelper.postTileInFlameWatch(game, null, flamePlayer.getHomeSystemTile(), 0, watchPartyMsg);
 
@@ -83,8 +89,18 @@ public class SilverFlameService {
     private void resolveSilverFlameRoll(Game game, Player flamePlayer, int target) {
         Die result = new Die(target);
 
-        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled a " + result.getResult() + " for " + rep()
-                + "! " + result.getGreenDieIfSuccessOrRedDieIfFailure();
+        String dice;
+        if (flamePlayer.hasRelicReady("heartofixth") && result.getResult() == 9) {
+            dice = DiceEmojis.d10blue_9.toString();
+        } else if (HeartOfIxthService.isHeartAvailable(game)
+                && !flamePlayer.hasRelicReady("heartofixth")
+                && result.getResult() >= 9) {
+            dice = DiceEmojis.getGrayDieEmoji(result.getResult());
+        } else {
+            dice = result.getGreenDieIfSuccessOrRedDieIfFailure();
+        }
+
+        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for " + rep() + "! ";
         DisasterWatchHelper.sendMessageInFlameWatch(game, resultMsg);
         resultMsg += "\nUse the button%s to resolve:";
         List<Button> buttons = silverFlameResolveButtons(game, flamePlayer, result);
@@ -108,12 +124,12 @@ public class SilverFlameService {
         String message = null;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
-            message = player.getRepresentation() + " scored '" + flame + "'";
+            message = player.getRepresentation() + " scored \"" + flame + "\".";
         } else {
             id = game.addCustomPO(flame, 1);
             game.scorePublicObjective(player.getUserID(), id);
-            message = "Custom PO '" + flame + "' has been added.";
-            message += "\n" + player.getRepresentation() + " scored '" + flame + "'";
+            message = "Custom PO \"" + flame + "\" has been added.";
+            message += "\n" + player.getRepresentation() + " scored \"" + flame + "\".";
         }
         Helper.checkEndGame(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -166,14 +182,20 @@ public class SilverFlameService {
         String message = "## " + rep() + " was used to purge the " + player.fogSafeEmoji() + " home system in "
                 + game.getName() + ".";
 
-        message += "\n" + purgedUnitList;
-        DisasterWatchHelper.postTileInFlameWatch(game, event, homeSystem, 0, message);
+        if (!allUnitsCount.isEmpty()) {
+            message += "\n" + purgedUnitList;
+        }
+        DisasterWatchHelper.sendMessageInFlameWatch(game, message);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
         // remove all planets
+        boolean controlsAPlanet = false;
         for (Planet planet : homeSystem.getPlanetUnitHolders()) {
             for (Player p : game.getRealPlayers()) {
                 if (p.hasPlanet(planet.getName())) p.removePlanet(buttonID);
+            }
+            if (!planet.isSpaceStation() && player.getPlanetsForScoring(false).contains(planet)) {
+                controlsAPlanet = true;
             }
         }
 
@@ -186,5 +208,50 @@ public class SilverFlameService {
             FractureService.spawnIngressTokens(null, game, player, null);
         }
         ButtonHelper.deleteMessage(event);
+
+        if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {
+            List<Button> scoreButtons = new ArrayList<>();
+            String ffcc = player.finChecker();
+            scoreButtons.add(Buttons.green(
+                    ffcc + "scoreSilverFlameBAM", "Score Become A Martyr", CardEmojis.SecretObjectiveAlt));
+            scoreButtons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    "You have _Become A Martyr_, and have just catastrophically lost control of a planet in your home system. "
+                            + "Do you wish to score this secret objective?",
+                    scoreButtons);
+        }
+    }
+
+    @ButtonHandler("scoreSilverFlameBAM")
+    private void scoreSilverFlameBAM(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Map<String, Integer> secretObjectives = player.getSecrets();
+        Integer idValue = null;
+        if (secretObjectives != null && !secretObjectives.isEmpty()) {
+            for (Map.Entry<String, Integer> so : secretObjectives.entrySet()) {
+                if ("bam".equals(so.getKey())) {
+                    idValue = so.getValue();
+                    break;
+                }
+            }
+        }
+        if (idValue == null) {
+            MessageHelper.sendEphemeralMessageToEventChannel(
+                    event, "Could not find _Become A Martyr_; please score manually.");
+            return;
+        }
+        MessageChannel channel = game.isFowMode() ? player.getCardsInfoThread() : game.getMainGameChannel();
+        SecretObjectiveHelper.scoreSO(event, game, player, idValue, channel);
+        if (!game.isFowMode() && (player.getTotalVictoryPoints() == game.getVp())) {
+            DisasterWatchHelper.sendMessageInFlameWatch(
+                    game,
+                    "### Just According to _Keikaku_ - " + player.getRepresentation() + " has won " + game.getName()
+                            + " by scoring _Become A Martyr_.");
+        } else if (!game.isFowMode()) {
+            DisasterWatchHelper.sendMessageInFlameWatch(
+                    game,
+                    "### Every _Silver Flame_ has a silver lining; " + player.getRepresentation()
+                            + " has scored _Become A Martyr_ in " + game.getName() + ".");
+        }
     }
 }

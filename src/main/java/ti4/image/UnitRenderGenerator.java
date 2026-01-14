@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
@@ -35,6 +36,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
+import ti4.settings.users.UserSettingsManager;
 
 class UnitRenderGenerator {
 
@@ -128,6 +130,14 @@ class UnitRenderGenerator {
             if (shouldSkipInvalidUnit(unitKey)) continue;
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
 
+            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+            if (player == null) {
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
+                continue;
+            }
+
             if (displayType
                     == DisplayType
                             .unlocked) { // diplay type = unlocked hides locked units (could be written in a single
@@ -140,15 +150,9 @@ class UnitRenderGenerator {
                         .flatMap(str -> Stream.of(str.replace(".png", "").replace("command_", "")))
                         .toList();
                 if (tileCCsColorIDs.contains(unitEntryColorID)) continue;
+                if (player.isPassed() || player.isNeutral()) continue;
             }
 
-            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-            if (player == null) {
-                MessageHelper.sendMessageToChannel(
-                        game.getMainGameChannel(),
-                        "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
-                continue;
-            }
             int unitCount = unitHolder.getUnitCount(unitKey);
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);
@@ -218,9 +222,11 @@ class UnitRenderGenerator {
                         .computeIfAbsent(unitId, k -> new ArrayList<>())
                         .add(new Point(imageX, imageY));
 
-                if (containsDMZ
-                        || (isSpace && unitModel.getIsPlanetOnly())
-                        || (!isSpace && unitModel.getIsSpaceOnly())) {
+                boolean wrongPlace = containsDMZ;
+                wrongPlace |= isSpace && unitModel.getIsPlanetOnly();
+                wrongPlace |= !isSpace && unitModel.getIsSpaceOnly();
+                wrongPlace &= !unitModel.getIsStructure() || !player.hasAbility("miniaturization");
+                if (wrongPlace) {
                     String badPath = resourceHelper.getPositionFile(
                             "badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
                     BufferedImage badPositionImage =
@@ -256,8 +262,8 @@ class UnitRenderGenerator {
                 }
 
                 // INFORMATIONAL DECALS
-                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
                 optionallyDrawMechTearDecal(unitKey, imageX, imageY);
+                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
                 optionallyDrawWarsunCrackDecal(unitKey, imageX, imageY);
 
                 // UNIT TAGS
@@ -328,8 +334,143 @@ class UnitRenderGenerator {
     private void optionallyDrawEidolonMaximumDecal(UnitKey unitKey, int imageX, int imageY) {
         UnitModel model = game.getUnitFromUnitKey(unitKey);
         if (model == null || !"naaz_voltron".equals(model.getAlias())) return;
-        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile("Voltron.png"));
-        tileGraphics.drawImage(voltron, imageX, imageY, null);
+        String style = "eyes";
+        Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+        if (player != null) {
+            style = UserSettingsManager.get(player.getUserID()).getVoltronStyle();
+        }
+
+        if ("minis".equals(style)) {
+            BufferedImage unitImage = ImageHelper.readScaled(getUnitPath(unitKey), 0.5f);
+            double angle = 2 * Math.PI * ThreadLocalRandom.current().nextDouble();
+            for (int i = 0; i < 3; i++) {
+                double radius = 12 * ThreadLocalRandom.current().nextDouble() + 22;
+                tileGraphics.drawImage(
+                        unitImage,
+                        (int) (imageX + radius * Math.cos(angle) + 11.5),
+                        (int) (imageY + radius * Math.sin(angle) + 11.5),
+                        null);
+                angle += (4 * Math.PI / 9)
+                        * (ThreadLocalRandom.current().nextDouble()
+                                + ThreadLocalRandom.current().nextDouble()
+                                + ThreadLocalRandom.current().nextDouble());
+            }
+            return;
+        }
+
+        String imagePath;
+        switch (style) {
+            case "arms":
+                imagePath = "voltron_arms.png";
+                if (RandomHelper.isOneInX(20)) {
+                    imagePath = "voltron_arms_pose.png";
+                }
+                break;
+            case "link":
+                imagePath = "voltron_link.png";
+                break;
+            case "saiyan":
+                imagePath = "voltron_saiyan.png";
+                if (Set.of(
+                                "red",
+                                "splitred",
+                                "mgm",
+                                "rby",
+                                "rst",
+                                "bld",
+                                "splitbld",
+                                "pld",
+                                "tan",
+                                "splittan",
+                                "cpr",
+                                "chk",
+                                "splitchk",
+                                "bwn",
+                                "pch",
+                                "org",
+                                "splitorg",
+                                "wsp",
+                                "gld",
+                                "splitgld",
+                                "spr",
+                                "ylw",
+                                "splitylw")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_saiyan_cyan.png";
+                }
+                break;
+            case "at_field":
+                imagePath = "voltron_at_field.png";
+                if (Set.of("tan", "splittan", "cpr", "chk", "splitchk", "bwn", "pch", "org", "splitorg")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_at_field_magenta.png";
+                }
+                break;
+            case "nyan":
+                imagePath = "voltron_nyan.png";
+                break;
+            case "royal":
+                imagePath = "voltron_royal.png";
+                break;
+            case "fancy":
+                imagePath = "voltron_fancy.png";
+                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_fancy_red.png";
+                }
+                break;
+            case "baba":
+                imagePath = "voltron_baba.png";
+                break;
+            case "lightning":
+                imagePath = "voltron_lightning.png";
+                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_lightning_yellow.png";
+                }
+                break;
+            case "epaulettes":
+                imagePath = "voltron_epaulettes.png";
+                break;
+            case "lion":
+                imagePath = "voltron_lion.png";
+                break;
+            case "panther":
+                imagePath = "voltron_panther.png";
+                break;
+            case "eyes":
+            default:
+                imagePath = "voltron_eyes.png";
+                if (Set.of(
+                                "red",
+                                "splitred",
+                                "mgm",
+                                "rby",
+                                "rst",
+                                "bld",
+                                "splitbld",
+                                "pld",
+                                "tan",
+                                "splittan",
+                                "cpr",
+                                "chk",
+                                "splitchk",
+                                "bwn",
+                                "pch",
+                                "org",
+                                "splitorg",
+                                "wsp",
+                                "gld",
+                                "splitgld",
+                                "spr",
+                                "ylw",
+                                "splitylw")
+                        .contains(unitKey.getColor())) {
+                    imagePath = "voltron_eyes_blue.png";
+                }
+        }
+        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile(imagePath));
+        tileGraphics.drawImage(voltron, imageX - 22, imageY - 22, null);
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {

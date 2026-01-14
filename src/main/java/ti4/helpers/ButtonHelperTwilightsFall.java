@@ -515,7 +515,7 @@ public class ButtonHelperTwilightsFall {
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
-            if (player2 == startPlayer || game.isFowMode()) {
+            if (player2 == startPlayer || game.isFowMode() || game.isVeiledHeartMode()) {
                 continue;
             }
             game.setStoredValue(player2.getFaction() + "splicequeue", "");
@@ -553,7 +553,7 @@ public class ButtonHelperTwilightsFall {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " unfortunately, there are no more splice cards remaining."
+                    player.getRepresentation() + ", unfortunately, there are no more splice cards remaining."
                             + " Please reimburse yourself any costs associated with the splice, using the `/player cc` command."
                             + " Same for anyone else after you in the splice.");
         } else {
@@ -819,7 +819,7 @@ public class ButtonHelperTwilightsFall {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationNoPing()
-                                    + " has taken a secret card. They may put it into play with a button in their cards info.");
+                                    + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
                 }
                 if (!buttonID.contains("spoof_")) {
                     triggerYellowUnits(game, player);
@@ -1179,7 +1179,7 @@ public class ButtonHelperTwilightsFall {
                     "radAdvancementStep2_" + tech,
                     "Discard " + Mapper.getTech(tech).getName()));
         }
-        String msg = player.getRepresentation() + ", use these buttons to discard a card.";
+        String msg = player.getRepresentation() + ", use these buttons to discard an ability card.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -1187,7 +1187,6 @@ public class ButtonHelperTwilightsFall {
     public static void radAdvancementStep2(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
 
         String cardID = buttonID.split("_")[1];
-        player.removeTech(cardID);
         MessageHelper.sendMessageToChannelWithEmbed(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " has lost the ability: "
@@ -1214,12 +1213,13 @@ public class ButtonHelperTwilightsFall {
             embeds.add(Mapper.getTech(card).getRepresentationEmbed());
             if (Mapper.getTech(card).getFirstType() == type) {
                 player.addTech(card);
-                found = Mapper.getTech(card).getAutoCompleteName() + "\nIt has been automatically gained.";
+                found = Mapper.getTech(card).getRepresentation(false) + "\nIt has been automatically gained.";
                 break;
             }
         }
         String msg = player.getRepresentation() + " searched through the following cards and found: " + found;
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), msg, embeds);
+        player.removeTech(cardID);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1402,7 +1402,7 @@ public class ButtonHelperTwilightsFall {
                                     player.getCorrectChannel(),
                                     player.getRepresentation() + " you automatically lost the "
                                             + u.getNameRepresentation()
-                                            + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, plase click the green button.",
+                                            + " unit upgrade. If you would like to keep it and lose the newly acquired unit upgrade, please click the green button.",
                                     buttons);
                         }
                         player.removeOwnedUnitByID(u.getId());
@@ -1427,7 +1427,7 @@ public class ButtonHelperTwilightsFall {
         if (buttonID.contains("pinktfmech")) {
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + " Remove the Mech",
+                    player.getRepresentation() + ", please remove a mech.",
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech", true));
         }
     }
