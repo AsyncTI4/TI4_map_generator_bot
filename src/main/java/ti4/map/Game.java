@@ -2698,7 +2698,7 @@ public class Game extends GameProperties {
 
     @NotNull
     public Map<String, Integer> drawActionCard(Player player) {
-        if (getActionCards().isEmpty()) {
+        if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             if (player.hasAbility("deceive")) {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
