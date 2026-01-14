@@ -1395,14 +1395,14 @@ public class ButtonHelperHeroes {
                     finChecker + "cabalHeroTile_" + tile.getPosition(),
                     "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        if (!game.isTwilightsFallMode()) {
-            empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles [Experimental]"));
-        }
+        empties.add(Buttons.red(
+                finChecker + "cabalHeroAll",
+                "Resolve " + (game.isTwilightsFallMode() ? "Paradigm" : "Hero") + " For All Tiles [Experimental]"));
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
 
-    @ButtonHandler("cabalHeroAll_")
+    @ButtonHandler("cabalHeroAll")
     public static void resolveCabalHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         boolean tf = game.isTwilightsFallMode();
         List<Tile> tiles = new ArrayList<>();
