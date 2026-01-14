@@ -188,14 +188,14 @@ class WeirdGameSetup extends GameStateSubcommand {
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
     static boolean setGameMode(
-        GenericInteractionCreateEvent event,
-        Game game,
-        boolean baseGameMode,
-        boolean absolMode,
-        boolean miltyModMode,
-        boolean discordantStarsMode,
-        boolean isTIGLGame,
-        boolean votcMode) {
+            GenericInteractionCreateEvent event,
+            Game game,
+            boolean baseGameMode,
+            boolean absolMode,
+            boolean miltyModMode,
+            boolean discordantStarsMode,
+            boolean isTIGLGame,
+            boolean votcMode) {
         if (isTIGLGame
                 && (baseGameMode
                         || absolMode
@@ -213,9 +213,9 @@ class WeirdGameSetup extends GameStateSubcommand {
             return true;
         }
 
-      game.setCompetitiveTIGLGame(false);
+        game.setCompetitiveTIGLGame(false);
 
-      if (miltyModMode && !baseGameMode) {
+        if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Milty Mod Mode can only be combined with No Expansion Mode. Please set the game to No Expansion Mode first.");
