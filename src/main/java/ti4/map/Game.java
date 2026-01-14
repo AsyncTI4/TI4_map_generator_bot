@@ -2663,10 +2663,17 @@ public class Game extends GameProperties {
     }
 
     // Don't shuffle back cards with a status
-    private void reshuffleActionCardDiscard() {
+    private boolean reshuffleActionCardDiscard() {
         List<String> acsToShuffle = getDiscardActionCards().keySet().stream()
                 .filter(ac -> getDiscardACStatus().get(ac) == null)
                 .toList();
+
+        if (acsToShuffle.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    getActionsChannel(), "Unable to reshuffle the AC deck because the discard pile is empty.");
+            return false;
+        }
+
         getActionCards().addAll(acsToShuffle);
         String names = acsToShuffle.stream()
                 .map(ac -> Mapper.getActionCard(ac).getName())
@@ -2680,25 +2687,36 @@ public class Game extends GameProperties {
             msg += "The shuffled cards are:\n" + names;
         }
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
+        return true;
     }
 
-    @Nullable
+    @NotNull
     public Map<String, Integer> drawActionCard(String userID) {
+        Player player = getPlayer(userID);
+        return drawActionCard(player);
+    }
+
+    @NotNull
+    public Map<String, Integer> drawActionCard(Player player) {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
-            Player player = getPlayer(userID);
             if (player.hasAbility("deceive")) {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
-                return null;
+            } else {
+                getActionCards().remove(id);
+                player.setActionCard(id);
             }
-            getActionCards().remove(id);
-            player.setActionCard(id);
             return player.getActionCards();
-        } else if (!getDiscardActionCards().isEmpty()) {
-            reshuffleActionCardDiscard();
-            return drawActionCard(userID);
         }
-        return null;
+
+        boolean reshuffled = reshuffleActionCardDiscard();
+        if (reshuffled) {
+            return drawActionCard(player);
+        }
+
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
+        return player.getActionCards();
     }
 
     @Nullable
@@ -2974,10 +2992,16 @@ public class Game extends GameProperties {
             getActionCards().remove(id);
             setDiscardActionCard(id, null);
             return id;
-        } else {
-            reshuffleActionCardDiscard();
+        }
+
+        boolean reshuffled = reshuffleActionCardDiscard();
+        if (reshuffled) {
             return drawActionCardAndDiscard();
         }
+
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
+        return null;
     }
 
     public void checkSOLimit(Player player) {
