@@ -1114,7 +1114,7 @@
         "name": "Arbitration",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet that contains ground forces and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
+        "text": "Choose 1 non-home planet that contains units and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
@@ -1195,8 +1195,8 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
-        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets that player controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
-        "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
+        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded the rebels. \"Spit that mercy in their face.\"",
         "source": "action_deck_2"
     },
     {
@@ -1213,7 +1213,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
     },
@@ -1222,7 +1222,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
     },
@@ -1231,7 +1231,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
     },
@@ -1240,7 +1240,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
@@ -1267,7 +1267,7 @@
         "name": "Settlers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet controlled by another player that contains their ground forces. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
+        "text": "Choose 1 non-home planet controlled by another player that contains units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
         "flavorText": "Willard grumbled as another frigate shuttled toward the ocean-cities. They would soon be outnumbered.",
         "source": "action_deck_2"
     },
