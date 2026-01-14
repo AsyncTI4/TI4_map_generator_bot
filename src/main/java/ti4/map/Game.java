@@ -2690,27 +2690,33 @@ public class Game extends GameProperties {
         return true;
     }
 
-    @Nullable
+    @NotNull
     public Map<String, Integer> drawActionCard(String userID) {
-        if (!getActionCards().isEmpty()) {
+        Player player = getPlayer(userID);
+        return drawActionCard(player);
+    }
+
+    @NotNull
+    public Map<String, Integer> drawActionCard(Player player) {
+        if (getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
-            Player player = getPlayer(userID);
             if (player.hasAbility("deceive")) {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
-                return null;
+            } else {
+                getActionCards().remove(id);
+                player.setActionCard(id);
             }
-            getActionCards().remove(id);
-            player.setActionCard(id);
             return player.getActionCards();
         }
 
         boolean reshuffled = reshuffleActionCardDiscard();
         if (reshuffled) {
-            return drawActionCard(userID);
+            return drawActionCard(player);
         }
 
-        MessageHelper.sendMessageToChannel(getActionsChannel(), "Unable to draw an action card.");
-        return null;
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
+        return player.getActionCards();
     }
 
     @Nullable
@@ -2993,7 +2999,8 @@ public class Game extends GameProperties {
             return drawActionCardAndDiscard();
         }
 
-        MessageHelper.sendMessageToChannel(getActionsChannel(), "Unable to draw an action card.");
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty");
         return null;
     }
 
