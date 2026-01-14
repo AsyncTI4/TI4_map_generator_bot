@@ -3000,7 +3000,7 @@ public class Game extends GameProperties {
         }
 
         MessageHelper.sendMessageToChannel(
-                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty");
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
         return null;
     }
 
