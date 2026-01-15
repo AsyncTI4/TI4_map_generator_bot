@@ -1016,7 +1016,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getPlagueTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("plagueStep2_" + p2.getFaction(), p2.getFactionNameOrColor());
+                Button button = Buttons.gray(
+                        "plagueStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
