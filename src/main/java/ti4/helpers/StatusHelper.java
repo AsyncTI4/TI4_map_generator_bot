@@ -705,17 +705,17 @@ public class StatusHelper {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged()
-                                    + " You have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
-                                    + " Scepter of Emelpar has been exhausted and you have been given +2 command tokens in your strategy pool.");
+                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
                     player.setStrategicCC(player.getStrategicCC() + 2);
                     player.addExhaustedRelic("scepter");
                     player.addExhaustedRelic("absol_scepter");
-                } else {
+                } else if (player.getStrategicCC() > 0) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged()
-                                    + " You have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
-                                    + " You have been given +1 command tokens in your strategy pool.");
+                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " You have been given net +1 command tokens in your strategy pool.");
                     player.setStrategicCC(player.getStrategicCC() + 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
                 }
