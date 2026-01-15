@@ -307,7 +307,7 @@ public class ButtonHelper {
                     (totalAmount <= 10
                                     ? UnitEmojis.infantry.toString().repeat(totalAmount)
                                     : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be able to place all of these units on a planet with your spacedocks at the beginning of your turn.");
+                            + " died and auto-revived. You will be able to place all of these units on a planet with your space docks at the beginning of your turn.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
@@ -629,7 +629,7 @@ public class ButtonHelper {
                 if (game.getTileFromPlanet(planet) != null) {
                     buttons.add(Buttons.green(
                             "statusInfRevival_" + planet + "_1",
-                            "Place 1 infantry on " + Helper.getPlanetRepresentation(planet, game)));
+                            "Place 1 Infantry On " + Helper.getPlanetRepresentation(planet, game)));
                 }
             }
         }
@@ -640,11 +640,11 @@ public class ButtonHelper {
                         && game.getUnitHolderFromPlanet(planet).getUnitCount(UnitType.Spacedock, player) > 0) {
                     buttons.add(Buttons.green(
                             "statusInfRevival_" + planet + "_1",
-                            "Place 1 infantry on " + Helper.getPlanetRepresentation(planet, game)));
+                            "Place 1 Infantry On " + Helper.getPlanetRepresentation(planet, game)));
                     if (infCount > 1) {
                         buttons.add(Buttons.green(
                                 "statusInfRevival_" + planet + "_" + infCount,
-                                "Place " + infCount + "infantry on " + Helper.getPlanetRepresentation(planet, game)));
+                                "Place " + infCount + " Infantry On " + Helper.getPlanetRepresentation(planet, game)));
                     }
                 }
             }

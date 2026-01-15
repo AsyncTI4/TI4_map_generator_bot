@@ -1016,7 +1016,7 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getPlagueTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("plagueStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray("plagueStep2_" + p2.getFaction(), p2.getFactionNameOrColor());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -2420,15 +2420,20 @@ public class ButtonHelperActionCards {
                 hits = (amount + 1) / 2;
                 msg = new StringBuilder(hits + " infantry were killed.");
             } else {
-
+                boolean nice = (amount == 2);
                 for (int x = 0; x < amount; x++) {
                     Die d1 = new Die(6);
-                    msg.append(d1.getResult()).append(", ");
+                    msg.append(d1.getRedDieIfSuccessOrGrayDieIfFailure());
                     if (d1.isSuccess()) {
                         hits++;
                     }
+                    if (x == 0) nice &= (d1.getResult() == 6);
+                    if (x == 1) nice &= (d1.getResult() == 9);
                 }
-                msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+                msg.append(nice ? " (nice)" : "")
+                        .append(".\n Total hits were ")
+                        .append(hits)
+                        .append(".");
             }
             UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
             DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);

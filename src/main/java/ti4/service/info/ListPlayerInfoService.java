@@ -330,12 +330,14 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
+                boolean scored = false;
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
                             || game.didPlayerScoreThisAlready(
                                     player.getUserID(),
                                     Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅");
+                        scored = true;
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
                             representation
@@ -352,6 +354,7 @@ public class ListPlayerInfoService {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
                             && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
                         representation.append("✅");
+                        scored = true;
                     } else {
                         representation
                                 .append(getPlayerProgressOnObjective(objID, game, player))
@@ -361,7 +364,7 @@ public class ListPlayerInfoService {
                     }
                 }
 
-                if (!player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
+                if (!scored && !player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
                     if (player.getFaction().equals(game.getStoredValue("silverFlamed"))) {
                         representation.append(ExploreEmojis.SilverFlame);
                     } else if (!Helper.canPlayerScorePOs(game, player)) {
