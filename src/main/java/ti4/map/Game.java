@@ -2670,7 +2670,7 @@ public class Game extends GameProperties {
 
         if (acsToShuffle.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    getActionsChannel(), "Unable to reshuffle the AC deck because the discard pile is empty.");
+                    getActionsChannel(), "Unable to reshuffle the action card deck because the discard pile is empty.");
             return false;
         }
 

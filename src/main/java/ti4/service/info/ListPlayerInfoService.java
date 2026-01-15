@@ -331,6 +331,9 @@ public class ListPlayerInfoService {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
                 boolean scored = false;
+                int progress = getPlayerProgressOnObjective(objID, game, player);
+                int threshold = getObjectiveThreshold(objID, game);
+
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
                             || game.didPlayerScoreThisAlready(
@@ -339,13 +342,13 @@ public class ListPlayerInfoService {
                         representation.append("✅");
                         scored = true;
                     } else {
-                        if (getObjectiveThreshold(objID, game) > 0) {
+                        if (threshold > 0) {
                             representation
                                     .append(" (")
-                                    .append(getPlayerProgressOnObjective(objID, game, player))
+                                    .append(progress)
                                     .append("/")
-                                    .append(getObjectiveThreshold(objID, game))
-                                    .append(")  ");
+                                    .append(threshold)
+                                    .append(progress >= threshold ? "#" : "");
                         } else {
                             representation.append("0/1");
                         }
@@ -357,10 +360,10 @@ public class ListPlayerInfoService {
                         scored = true;
                     } else {
                         representation
-                                .append(getPlayerProgressOnObjective(objID, game, player))
+                                .append(progress)
                                 .append("/")
-                                .append(getObjectiveThreshold(objID, game))
-                                .append("");
+                                .append(threshold)
+                                .append(progress >= threshold ? "#" : "");
                     }
                 }
 
