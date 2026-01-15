@@ -1,0 +1,38 @@
+[
+    {
+        "alias": "erockbt",
+        "name": "Erock",
+        "shortName": "Erock",
+        "faction": "erock",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "At the start of space combat in a system you may produce one unit in the system with a cost of x or less. X is the number of space docks of your on the the game board. When producing units you may exhaust this card reduce the cost of one unit by one for that production.",
+        "source": "nomadfalcon"
+    },
+    {
+        "alias": "councilorsbt",
+        "name": "Councilors",
+        "shortName": "Councilors",
+        "faction": "councilors",
+        "synergy": [
+            "WARFARE",
+            "BIOTIC"
+        ],
+        "text": "Whenever a law is put into play you may place one infantry on one planet with another players units those units are coexisting. For every planet you coexist with increase the influence value of your home system by one. Action: exahst this card look at the top 4 cards of the agenda deck and place one on your faction sheet. Put the rest on the bottome of the deck in any order. ",
+        "source": "nomadfalcon"
+    },
+    {
+        "alias": "explanetarybt",
+        "name": "Explanetary",
+        "shortName": "Explanetary",
+        "faction": "explanetary",
+        "synergy": [
+            "BIOTIC",
+            "PROPULSION"
+        ],
+        "text": "Technology specialty planets can not be used with your synergyAction: Exhaust this card - Ready one of your technology specialty planets. If you do choose on player to place one infantry on the planet and coexist on it.players who coexisst on planets you control may ignore the prerquisite of the specilty on the planet, All of your technology specialty planets in which you coexist with gain + 1 rescource",
+        "source": "nomadfalcon"
+    }
+]

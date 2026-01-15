@@ -471,7 +471,7 @@ public class StartTurnService {
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
             if (player.hasLeaderUnlocked("ralnelhero")) {
-                if (!game.getStoredValue("ralnelHero").isEmpty()) {
+                if (game.getStoredValue("ralnelHero").isEmpty()) {
                     String presetRalnelHero =
                             "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
                                     + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."

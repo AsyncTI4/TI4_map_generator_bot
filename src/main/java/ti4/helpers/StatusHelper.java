@@ -123,7 +123,7 @@ public class StatusHelper {
                 }
             }
             if (player.hasLeaderUnlocked("ralnelhero")) {
-                if (!game.getStoredValue("ralnelHero").isEmpty()) {
+                if (game.getStoredValue("ralnelHero").isEmpty()) {
                     String presetRalnelHero =
                             "You have Director Nel, the Ral Nel hero, unlocked. You can use the preset button to automatically use your hero when the last player passes."
                                     + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
@@ -701,8 +701,25 @@ public class StatusHelper {
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
             if (game.isTwilightsFallMode() && techs == 0) {
-                techs++;
-                buttons.add(Buttons.blue("redistributeCCButtons", "Gain 2 Command Tokens (And Spend 1 From Strategy)"));
+                if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter")) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + " You have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " Scepter of Emelpar has been exhausted and you have been given +2 command tokens in your strategy pool.");
+                    player.setStrategicCC(player.getStrategicCC() + 2);
+                    player.addExhaustedRelic("scepter");
+                    player.addExhaustedRelic("absol_scepter");
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + " You have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " You have been given +1 command tokens in your strategy pool.");
+                    player.setStrategicCC(player.getStrategicCC() + 1);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+                }
+                return;
             }
             String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
