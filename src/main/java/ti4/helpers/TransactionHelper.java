@@ -1615,10 +1615,10 @@ public class TransactionHelper {
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         goAgainButtons.add(done);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
+            MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                        p1.getCardsInfoThread(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
             }
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
@@ -1633,7 +1633,7 @@ public class TransactionHelper {
             }
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        game.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                        p1.getCardsInfoThread(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
             }
         }
     }

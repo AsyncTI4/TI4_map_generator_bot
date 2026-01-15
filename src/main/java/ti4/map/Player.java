@@ -1534,7 +1534,9 @@ public class Player extends PlayerProperties {
     }
 
     public void addExhaustedRelic(String relicID) {
-        getExhaustedRelics().add(relicID);
+        if (getRelics().contains(relicID)) {
+            getExhaustedRelics().add(relicID);
+        }
     }
 
     public void removeExhaustedRelic(String relicID) {

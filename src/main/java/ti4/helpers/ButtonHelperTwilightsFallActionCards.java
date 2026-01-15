@@ -136,7 +136,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveReverseTF(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("reverseSpliceOrder", "True");
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(), player.getRepresentation() + " has reversed the order of the ɘɔilqƨ.");
+                player.getCorrectChannel(), player.getRepresentation() + " has reversed the order of the ɘɔilqƨ.");
         ButtonHelper.deleteMessage(event);
     }
 
