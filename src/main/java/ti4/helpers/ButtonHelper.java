@@ -226,6 +226,33 @@ public class ButtonHelper {
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
+        Game game = player.getGame();
+        if (game.isTwilightsFallMode()
+                && game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()) != null) {
+            Tile tile = game.getTileByPosition(game.getActiveSystem());
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.ownsUnit("tf-vortexer")) {
+                    for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
+                        if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
+                            MessageHelper.sendMessageToChannel(
+                                    player.getCorrectChannel(),
+                                    (totalAmount <= 10
+                                                    ? UnitEmojis.infantry
+                                                            .toString()
+                                                            .repeat(totalAmount)
+                                                    : UnitEmojis.infantry + "×" + totalAmount)
+                                            + " died and were captured by "
+                                            + p2.getFactionEmoji()
+                                            + p2.getFaction()
+                                            + "'s Vortexer.");
+                            ButtonHelperFactionSpecific.cabalEatsUnit(player, game, p2, totalAmount, "infantry", null);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         if (player.getUnitsOwned().contains("pharadn_infantry")
                 || player.getUnitsOwned().contains("pharadn_infantry2")) {
             MessageHelper.sendMessageToChannel(
@@ -236,7 +263,6 @@ public class ButtonHelper {
                             + " died and were captured.");
             AddUnitService.addUnits(
                     null, player.getNomboxTile(), player.getGame(), player.getColor(), totalAmount + " infantry");
-            Game game = player.getGame();
             if (game.getPhaseOfGame().contains("action")
                     && totalAmount > 1
                     && player.hasUnit("pharadn_mech")
@@ -1034,16 +1060,10 @@ public class ButtonHelper {
         goAgainButtons.add(done);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something In Return"));
         if (game.isFowMode() || !game.isNewTransactionMethod()) {
-            if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getPrivateChannel(), ident + ", use buttons to complete transaction.", goAgainButtons);
-                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
-            } else {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message2);
-                MessageHelper.sendMessageToChannelWithButtons(
-                        game.getMainGameChannel(), ident + ", use buttons to complete transaction.", goAgainButtons);
-            }
+            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message2);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p1.getCardsInfoThread(), ident + ", use buttons to complete transaction.", goAgainButtons);
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
             deleteMessage(event);
         }
     }

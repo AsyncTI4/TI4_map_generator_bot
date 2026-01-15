@@ -343,8 +343,8 @@ public class ButtonHelperModifyUnits {
             }
         }
         Map<String, String> unitTypes = new LinkedHashMap<>();
-        unitTypes.put("fighter", UnitEmojis.fighter.toString());
         unitTypes.put("infantry", UnitEmojis.infantry.toString());
+        unitTypes.put("fighter", UnitEmojis.fighter.toString());
         unitTypes.put("pds", UnitEmojis.pds.toString());
         for (Map.Entry<String, String> entry : unitTypes.entrySet()) {
             String unitType = entry.getKey();

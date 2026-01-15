@@ -564,7 +564,7 @@ public class ButtonHelperActionCards {
         boolean nekro = ButtonHelper.doesPlayerHaveFSHere(
                 "nekro_flagship", player, game.getTileByPosition(game.getActiveSystem()));
         String msg = player.getRepresentationNoPing()
-                + ", please choose the recently deceased ship that you wish to have been _Courageous To The End_.";
+                + ", please choose the recently deceased ship that you wish to roll dice.";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), msg, getCourageousOptions(player, game, nekro, "courageous"));
         ButtonHelper.deleteMessage(event);
@@ -576,8 +576,8 @@ public class ButtonHelperActionCards {
         String numHit = buttonID.split("_")[2];
         String type = buttonID.split("_")[3];
         String msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
-                + ", which hits on a " + numHit + ", to have been _Courageous To The End_.";
-        if (game.isTwilightsFallMode()) {
+                + ", which hits on a " + numHit + ", to roll dice.";
+        if (game.isTwilightsFallMode() && "courageous".equalsIgnoreCase(type)) {
             msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
                     + ", which hits on a " + numHit + ", to have been the target of the _Valiant Genome_.";
         }
@@ -2863,6 +2863,7 @@ public class ButtonHelperActionCards {
     public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveTwin_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        boolean found = false;
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
@@ -2874,7 +2875,27 @@ public class ButtonHelperActionCards {
                             event.getChannel(), "No such action card ID found, please retry.");
                     return;
                 }
+                found = true;
                 ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+            }
+        }
+        if (!found) {
+            acStrings = new ArrayList<>(game.getPurgedActionCards().keySet());
+            for (String acStringID : acStrings) {
+                ActionCardModel actionCard = Mapper.getActionCard(acStringID);
+                String actionCardTitle = actionCard.getName();
+                if (acName.equalsIgnoreCase(actionCardTitle)) {
+                    boolean picked = game.pickActionCardFromPurged(
+                            player.getUserID(), game.getPurgedActionCards().get(acStringID));
+                    if (!picked) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "No such action card ID found, please retry.");
+                        return;
+                    }
+                    found = true;
+                    ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+                    game.setPurgedActionCard(acStringID);
+                }
             }
         }
         ButtonHelper.deleteMessage(event);

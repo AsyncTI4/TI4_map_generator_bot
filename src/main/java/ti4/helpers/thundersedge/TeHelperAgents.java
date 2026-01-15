@@ -227,7 +227,7 @@ public class TeHelperAgents {
 
     public static void serveNaaluAgentButtons(Game game, Player player, Tile tile, Player p2) {
         // Not allowed in fow if you can't see the tile
-        if (game.isFowMode() && tile.hasFog(player)) return;
+        if (game.isFowMode() && tile.hasFog(player) && p2 != player) return;
         if (!player.hasUnexhaustedLeader("naaluagent-te")) return;
 
         List<Button> buttons = new ArrayList<>();

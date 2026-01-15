@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.awt.Point;
@@ -3093,7 +3093,7 @@ public class Game extends GameProperties {
         if (status != null) getDiscardACStatus().put(id, status);
     }
 
-    private void setPurgedActionCard(String id) {
+    public void setPurgedActionCard(String id) {
         setDiscardActionCard(id, ACStatus.purged);
     }
 
