@@ -1622,7 +1622,9 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getCardsInfoThread(), ident + ", use these buttons to complete the transaction.", goAgainButtons);
+                        p1.getCardsInfoThread(),
+                        ident + ", use these buttons to complete the transaction.",
+                        goAgainButtons);
             }
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
@@ -1637,7 +1639,9 @@ public class TransactionHelper {
             }
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getCardsInfoThread(), ident + ", use these buttons to complete the transaction.", goAgainButtons);
+                        p1.getCardsInfoThread(),
+                        ident + ", use these buttons to complete the transaction.",
+                        goAgainButtons);
             }
         }
     }

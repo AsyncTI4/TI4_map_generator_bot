@@ -276,6 +276,7 @@ public class ListPlayerInfoService {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
+            msg.append("### Public Objectives ");
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
                     msg.append(representScoring(game, id, x)).append("\n\n");
@@ -381,7 +382,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representSecrets(Game game) {
-        StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
+        StringBuilder representation = new StringBuilder("### Scored Secret Objective Count\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
@@ -398,7 +399,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representSupports(Game game) {
-        StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("### _Supports For The Thrones_ Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
@@ -429,7 +430,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTransferablePoints(Game game) {
-        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
+        StringBuilder representation = new StringBuilder("### Transferable Victory Points");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
                 String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
@@ -458,7 +459,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTotalVPs(Game game) {
-        StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("## Total Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
