@@ -2007,7 +2007,44 @@ public class ButtonHelperAbilities {
         oceanBoundCheck(game);
     }
 
+    public static void readyBannerHalls(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasUnlockedBreakthrough("kjalengardbt")) {
+                boolean readied = false;
+                List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
+                for (String planet : exhaustedPlanets) {
+                    if (planet.contains("bannerhall")) {
+                        readied = true;
+                        player.refreshPlanet(planet);
+                    }
+                }
+                if (readied) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " your bannerhall cards have been readied via your breakthrough ability. This may be a bit earlier than technically correct, but should be alright for most interactions. If the combat ends in a draw, please exhaust the bannerhalls. Remember this should proc a max of once per action.");
+                }
+            }
+        }
+    }
+
     public static void oceanBoundCheck(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasUnlockedBreakthrough("kjalengardbt")) {
+                int bannerHalls =
+                        3 - ButtonHelperAgents.getGloryTokensLeft(game).size();
+                for (int x = 1; x <= bannerHalls; x++) {
+                    String oceanName = "bannerhall" + x;
+                    if (!player.getPlanets().contains(oceanName)) {
+                        player.addPlanet(oceanName);
+                        player.exhaustPlanet(oceanName);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + " you have been given a bannerhall!");
+                    }
+                }
+            }
+        }
         Player player = Helper.getPlayerFromAbility(game, "oceanbound");
         if (player != null) {
             List<String> oceans = player.getOceans();
