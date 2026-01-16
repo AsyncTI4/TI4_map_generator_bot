@@ -50,7 +50,7 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
-        "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
+        "flavorText": "Brother Milor shook his head. \"The Brotherhood cannot support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
         "source": "voices_of_the_council"
     },
     {

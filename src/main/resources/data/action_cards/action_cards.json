@@ -1331,7 +1331,7 @@
         "window": "When an agenda is revealed",
         "text": "Choose another player. That player must give you 1 promissory note from their hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
         "automationID": "diplo_pressure",
-        "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
+        "flavorText": "Brother Milor shook his head. \"The Brotherhood cannot support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
         "source": "pok",
         "affectedByWildWildGalaxy": true
     },
