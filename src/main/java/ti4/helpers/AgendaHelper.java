@@ -4175,7 +4175,7 @@ public class AgendaHelper {
         StringBuilder sb = new StringBuilder("# Vote Count");
         if (!hideTotalVotes) sb.append("\nTotal votes: ").append(votes);
         int itemNo = 1;
-         // ensure correct numbering if message is broken into multiple chunks - haven't tested the threshold
+        // ensure correct numbering if message is broken into multiple chunks - haven't tested the threshold
         String format = orderList.size() > 12 ? "\n`%d.` " : "\n%d. ";
         for (Player player : orderList) {
             sb.append(String.format(format, itemNo));
