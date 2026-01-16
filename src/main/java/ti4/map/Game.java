@@ -4006,6 +4006,9 @@ public class Game extends GameProperties {
             planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
             planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
             planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+            planets.put("bannerhall1", new Planet("bannerhall1", new Point(0, 0)));
+            planets.put("bannerhall2", new Planet("bannerhall2", new Point(0, 0)));
+            planets.put("bannerhall3", new Planet("bannerhall3", new Point(0, 0)));
             planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
             planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
             planets.put("triad", new Planet("triad", new Point(0, 0)));

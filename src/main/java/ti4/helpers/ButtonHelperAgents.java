@@ -2577,6 +2577,7 @@ public class ButtonHelperAgents {
         space.addToken(gloryTokens.getFirst());
 
         String msg = player.getFactionEmoji() + " added a **Glory** token to " + tile.getRepresentation();
+        ButtonHelperAbilities.oceanBoundCheck(game);
         CommanderUnlockCheckService.checkPlayer(player, "kjalengard");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);
