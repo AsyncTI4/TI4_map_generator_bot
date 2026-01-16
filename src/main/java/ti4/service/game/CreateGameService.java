@@ -114,7 +114,7 @@ public class CreateGameService {
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                    "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return null;
         }
 

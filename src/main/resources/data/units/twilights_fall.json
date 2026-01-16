@@ -453,6 +453,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
+        "isSpaceOnly": false,
         "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. This unit can be committed during an invasion; either return it to the space area or replace it with 1 infantry at the end of combat."
     },
     {
@@ -491,6 +492,8 @@
         "capacityValue": 5,
         "moveValue": 2,
         "isStructure": true,
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
         "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
     },
     {
