@@ -276,7 +276,7 @@ public class ListPlayerInfoService {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
-            msg.append("### Public Objectives ");
+            msg.append("### Public Objectives\n");
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
                     msg.append(representScoring(game, id, x)).append("\n\n");

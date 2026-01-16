@@ -49,7 +49,7 @@ class CreateFoWGameButton extends Subcommand {
         Guild guild = CreateFoWGameService.findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "All FoW Server are full. Can not host a new game - please contact @Bothelper to resolve.");
+                    event, "All FoW Server are full. Cannot host a new game - please contact @Bothelper to resolve.");
             return;
         }
 

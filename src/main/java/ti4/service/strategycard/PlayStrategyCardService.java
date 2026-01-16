@@ -140,16 +140,17 @@ public class PlayStrategyCardService {
                     String num2 = sc + "";
                     num2 = num2.substring(num2.length() - 1);
                     if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
-                        gamePing.append(p2.getRepresentation()).append(" ");
+                        gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
                         playersToFollow.add(p2);
                     }
                 }
             }
         }
         if (!gamePing.isEmpty()) {
-            message.append(gamePing).append("\n");
+            message.append(gamePing).append(", please indicate your choice with these buttons.");
+        } else {
+            message.append("Please indicate your choice with these buttons.");
         }
-        message.append("Indicate your choice by pressing a button below.");
 
         for (Player player2 : playersToFollow) {
             if (winnuHero) {
@@ -765,7 +766,7 @@ public class PlayStrategyCardService {
     public static void handleSOQueueing(Game game, boolean winnuHero) {
         if (winnuHero) {
             String message =
-                    "### No queuing will occur if secrets are drawn off of this. Handle timing yourselves if relevant";
+                    "### No queuing will occur if secrets are drawn off of this. Handle timing yourselves if relevant.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             return;
         }

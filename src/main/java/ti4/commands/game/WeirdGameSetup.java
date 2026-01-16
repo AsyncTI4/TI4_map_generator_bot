@@ -134,7 +134,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (game.isCompetitiveTIGLGame()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+                        "TIGL Games cannot be mixed with other game modes. Priority Track is unchanged.");
             } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
@@ -206,7 +206,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                         || game.isCommunityMode()
                         || votcMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+                    event.getMessageChannel(), "TIGL Games cannot be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             TIGLHelper.initializeTIGLGame(game);

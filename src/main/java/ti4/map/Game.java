@@ -460,7 +460,7 @@ public class Game extends GameProperties {
             return distanceTool;
         }
         if (getMapTemplateID() == null) {
-            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool can not be created.");
+            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool cannot be created.");
             return null;
         }
         distanceTool = new DistanceTool(this);
