@@ -4057,12 +4057,12 @@ public class AgendaHelper {
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
 
-        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
-        String revealMessage = game.getPing() + "\nAn agenda has been revealed";
-        MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
             BannerGenerator.drawAgendaBanner(aCount, game);
         }
+        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
+        String revealMessage = game.getPing() + ", an agenda has been revealed.";
+        MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
 
@@ -4172,15 +4172,15 @@ public class AgendaHelper {
         }
         boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES);
         boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
-        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + (hideTotalVotes ? "???" : votes));
-        sb.append("):__**\n");
+        StringBuilder sb = new StringBuilder("# Vote Count");
+        if (!hideTotalVotes) sb.append("\nTotal votes: ").append(votes);
         int itemNo = 1;
+        String format = orderList.size() > 12 ? "\n`%d.` " : "\n%d. ";
         for (Player player : orderList) {
-            sb.append("`").append(itemNo).append(".` ");
+            sb.append(String.format(format, itemNo));
             sb.append(hideVoteOrder ? "???" : player.getRepresentation(false, false));
             if (player.getUserID().equals(game.getSpeakerUserID())) sb.append(MiscEmojis.SpeakerToken);
             sb.append(getPlayerVoteText(game, player));
-            sb.append("\n");
             itemNo++;
         }
         MessageHelper.sendMessageToChannel(channel, sb.toString());
