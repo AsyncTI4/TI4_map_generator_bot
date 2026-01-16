@@ -761,7 +761,10 @@ public class ButtonHelper {
     public static String playerHasDMZPlanet(Player player, Game game) {
         String dmzPlanet = "no";
         for (String planet : player.getPlanets()) {
-            if (planet.contains("custodia") || planet.contains("ghoti") || planet.startsWith("ocean")) {
+            if (planet.contains("custodia")
+                    || planet.contains("ghoti")
+                    || planet.startsWith("ocean")
+                    || planet.startsWith("bannerhall")) {
                 continue;
             }
             Planet p = game.getPlanetsInfo().get(planet);
@@ -1991,7 +1994,18 @@ public class ButtonHelper {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         if (tile == null) {
             List<String> fakePlanets = new ArrayList<>(List.of(
-                    "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
+                    "custodiavigilia",
+                    "ghoti",
+                    "ocean1",
+                    "ocean2",
+                    "ocean3",
+                    "ocean4",
+                    "ocean5",
+                    "triad",
+                    "grove",
+                    "bannerhall1",
+                    "bannerhall2",
+                    "bannerhall3"));
             if (!fakePlanets.contains(planetName))
                 BotLogger.warning(
                         new LogOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
@@ -5872,7 +5886,10 @@ public class ButtonHelper {
     public static void resolveTransitDiodesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
-            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti") || planet.contains("ocean")) {
+            if (planet.toLowerCase().contains("custodia")
+                    || planet.contains("ghoti")
+                    || planet.contains("ocean")
+                    || planet.contains("bannerhall")) {
                 continue;
             }
             if (game.getUnitHolderFromPlanet(planet) == null
@@ -7880,7 +7897,18 @@ public class ButtonHelper {
 
     public static Tile getTileOfPlanetWithNoTrait(Player player, Game game) {
         List<String> fakePlanets = new ArrayList<>(List.of(
-                "custodiavigilia", "ghoti", "ocean1", "ocean2", "ocean3", "ocean4", "ocean5", "triad", "grove"));
+                "custodiavigilia",
+                "ghoti",
+                "ocean1",
+                "ocean2",
+                "ocean3",
+                "ocean4",
+                "ocean5",
+                "triad",
+                "grove",
+                "bannerhall1",
+                "bannerhall2",
+                "bannerhall3"));
         List<String> ignoredPlanets = new ArrayList<>(game.mecatols());
         ignoredPlanets.addAll(fakePlanets);
 
@@ -8228,8 +8256,12 @@ public class ButtonHelper {
 
     private static List<Button> getAssignSpeakerButtons(Game game) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeakerUserID())) {
+        List<Player> players = new ArrayList<>(game.getRealPlayers());
+        if (game.isFowMode()) {
+            Collections.shuffle(players);
+        }
+        for (Player player : players) {
+            if (game.isFowMode() || !player.getUserID().equals(game.getSpeakerUserID())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
                     Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmojiOrColor());
