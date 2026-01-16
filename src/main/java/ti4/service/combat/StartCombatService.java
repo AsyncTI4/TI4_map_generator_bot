@@ -1957,6 +1957,9 @@ public class StartCombatService {
                     if (p == p1) {
                         otherP = p2;
                     }
+                    if (game.isFowMode() && p == p2) {
+                        continue;
+                    }
                     // Sol Commander
                     if (p != game.getActivePlayer()
                             && game.playerHasLeaderUnlockedOrAlliance(p, "solcommander")

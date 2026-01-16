@@ -846,6 +846,7 @@ public class CombatRollService {
                 if (rollType == CombatRollType.combatround
                         && gloryHolder != null
                         && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                    ButtonHelperAbilities.readyBannerHalls(game);
                     for (DiceHelper.Die die : resultRolls) {
                         if (die.getResult() > 9) {
                             hitRolls += 1;

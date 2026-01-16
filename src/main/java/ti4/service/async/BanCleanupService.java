@@ -28,6 +28,7 @@ public class BanCleanupService {
     private static final List<String> BOT_QUESTION_CHANNEL_NAMES = List.of(
             "bot-questions-and-support-and-feedback",
             "bot-questions-and-feedback",
+            "bot-questions",
             "bot-questions-and-discussion",
             "bot-questions-and-discussions");
 

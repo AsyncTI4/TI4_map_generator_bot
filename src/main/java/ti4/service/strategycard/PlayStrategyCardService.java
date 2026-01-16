@@ -37,7 +37,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.breakthrough.MindsieveService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -930,26 +929,21 @@ public class PlayStrategyCardService {
 
     public static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            if (!player.isSpeaker()) {
+        List<Player> players = new ArrayList<>(game.getRealPlayers());
+        if (game.isFowMode()) {
+            Collections.shuffle(players);
+        }
+        for (Player player : players) {
+            if (!player.isSpeaker() || game.isFowMode()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
-                    Button button;
-                    if (!game.isFowMode()) {
-                        button = Buttons.gray(
-                                politicsHolder.getFinsFactionCheckerPrefix()
-                                        + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
-                                        + faction,
-                                " ",
-                                player.getFactionEmoji());
-                    } else {
-                        button = Buttons.gray(
-                                politicsHolder.getFinsFactionCheckerPrefix()
-                                        + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
-                                        + faction,
-                                player.getColor(),
-                                ColorEmojis.getColorEmoji(player.getColor()));
-                    }
+                    Button button = Buttons.gray(
+                            politicsHolder.getFinsFactionCheckerPrefix()
+                                    + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
+                                    + faction,
+                            " ",
+                            player.getFactionEmojiOrColor());
+
                     assignSpeakerButtons.add(button);
                 }
             }

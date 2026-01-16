@@ -1621,30 +1621,16 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("assignSpeaker_")
-    public static void assignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = substringAfter(buttonID, "assignSpeaker_");
-        game.setStoredValue("hasntSetSpeaker", "");
-        if (!game.isFowMode()) {
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.getFaction().equals(faction)) {
-                    game.setSpeakerUserID(player_.getUserID());
-                    String message = MiscEmojis.SpeakerToken + " Speaker has been assigned to "
-                            + player_.getRepresentation(false, true) + ".";
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    if (!game.isFowMode()) {
-                        ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
-                    }
-                }
-            }
-        }
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("assignSpeaker_")
     @ButtonHandler(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)
     public static void sc3AssignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
         faction = faction.replace("assignSpeaker_", "");
+        Player newSpeaker = game.getPlayerFromColorOrFaction(faction);
+        if (newSpeaker.isSpeaker()) {
+            String message = "That player is already speaker";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            return;
+        }
         game.setStoredValue("hasntSetSpeaker", "");
         for (Player player_ : game.getPlayers().values()) {
             if (player_.getFaction().equals(faction)) {

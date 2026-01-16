@@ -1021,7 +1021,9 @@ public class FoWHelper {
         // get players adjacent
         for (Player player_ : game.getRealPlayers()) {
 
-            if (message.toLowerCase().contains(player_.getColor().toLowerCase())) {
+            if (message.toLowerCase().contains(player_.getColor().toLowerCase())
+                    && !message.toLowerCase()
+                            .contains("split" + player_.getColor().toLowerCase())) {
                 continue; // skip pinging players if their color is mentioned in the message
             }
             if (getTilePositionsToShow(game, player_).contains(position)) {
