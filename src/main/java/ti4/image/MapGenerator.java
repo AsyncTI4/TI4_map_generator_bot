@@ -2277,6 +2277,7 @@ public class MapGenerator implements AutoCloseable {
             y += ObjectiveBox.getVerticalSpacing();
         }
 
+        maxY = Math.max(y, maxY);
         return maxY + 15;
     }
 

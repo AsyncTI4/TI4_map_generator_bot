@@ -90,21 +90,27 @@ public class SilverFlameService {
         Die result = new Die(target);
 
         String dice;
+        boolean definitePoint = false;
         if (flamePlayer.hasRelicReady("heartofixth") && result.getResult() == 9) {
             dice = DiceEmojis.d10blue_9.toString();
+            definitePoint = true;
         } else if (HeartOfIxthService.isHeartAvailable(game)
                 && !flamePlayer.hasRelicReady("heartofixth")
                 && result.getResult() >= 9) {
             dice = DiceEmojis.getGrayDieEmoji(result.getResult());
         } else {
             dice = result.getGreenDieIfSuccessOrRedDieIfFailure();
+            definitePoint = result.getResult() == 10;
         }
 
-        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for " + rep() + "! ";
+        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for _The Silver Flame_! ";
+        if (definitePoint && (flamePlayer.getTotalVictoryPoints() + 1 == game.getVp())) {
+            resultMsg += "\nEnjoy all the marbles.";
+        }
         DisasterWatchHelper.sendMessageInFlameWatch(game, resultMsg);
-        resultMsg += "\nUse the button%s to resolve:";
+        resultMsg += "\nPlease resolve with %s.";
         List<Button> buttons = silverFlameResolveButtons(game, flamePlayer, result);
-        resultMsg = String.format(resultMsg, buttons.size() > 1 ? "s" : "");
+        resultMsg = String.format(resultMsg, buttons.size() == 1 ? "this button" : "these buttons");
 
         MessageHelper.sendMessageToChannelWithButtons(flamePlayer.getCorrectChannel(), resultMsg, buttons);
     }

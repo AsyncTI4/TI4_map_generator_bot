@@ -1095,7 +1095,7 @@
         "abilityWindow": "At the end of the status phase:",
         "abilityText": "You may force each other player to give you 1 promissory note from their hand. If you do, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/naaluhero.png?raw=true",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/pok/heroes/naaluhero.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/codex/naaluhero_back.png?raw=true",
         "source": "pok"
     },
