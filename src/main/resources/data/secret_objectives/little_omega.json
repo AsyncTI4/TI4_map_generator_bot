@@ -35,7 +35,8 @@
     "alias": "uam_little_omega",
     "name": "Unveil a Masterpiece ω",
     "phase": "Action",
-    "text": "Win a space combat in a system that contains your flagship or war sun. [Note: Your flagship must be in the system at the end of the combat.]",
+    "text": "Win a space combat in a system that contains your flagship or war sun.",
+    "notes": "Your flagship must be in the system at the end of the combat.",
     "points": 1,
     "source": "little_omega"
   },
@@ -51,7 +52,8 @@
     "alias": "dsat_little_omega",
     "name": "Defy Space and Time ω",
     "phase": "Status",
-    "text": "Have ships in systems that contain 3 different types of wormholes. [Note: This does not require you to have ships in 3 systems, if the systems contain multiple wormholes.]",
+    "text": "Have ships in systems that contain 3 different types of wormholes.",
+    "notes": "This does not require you to have ships in 3 systems, if the systems contain multiple wormholes.",
     "points": 1,
     "source": "little_omega"
   },

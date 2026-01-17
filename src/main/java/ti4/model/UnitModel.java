@@ -64,6 +64,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isSpaceOnly;
     private Boolean isPlanetOnly;
     private String ability;
+    private String notes;
     private String flavourText;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
@@ -153,7 +154,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
-        if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
+        if (notes != null) {
+            eb.addField("Ability:", getAbility().orElse("") + "\n-# [" + notes + "]", false);
+        } else if (getAbility().isPresent()) {
+            eb.addField("Ability:", getAbility().get(), false);
+        }
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
         // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 

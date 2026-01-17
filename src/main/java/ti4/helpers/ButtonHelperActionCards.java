@@ -2416,6 +2416,7 @@ public class ButtonHelperActionCards {
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         int hits = 0;
+        UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.infantry + " rolled ");
             if (game.isTwilightsFallMode()) {
@@ -2437,13 +2438,9 @@ public class ButtonHelperActionCards {
                         .append(hits)
                         .append(".");
             }
-            UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
-            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
-            if (hits > 0) {
-                if (p2.hasAbility("data_recovery")) {
-                    ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
-                }
+            if (hits > 0 && p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
             }
         }
         String adjective = "";
@@ -2476,6 +2473,7 @@ public class ButtonHelperActionCards {
                             + p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
                             + adjective + " _Plague_ and you lost " + hits + " infantry.");
         }
+        DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
     }
 
     @ButtonHandler("micrometeoroidStormStep3_")
