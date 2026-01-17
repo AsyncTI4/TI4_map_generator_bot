@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Nullable;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -1460,6 +1461,19 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             return;
         }
+        if ((scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")
+                        || "Tyrannus".equalsIgnoreCase(scModel.getName()))
+                && ActionCardDrawQueueHelper.isQueueActive(game, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX)) {
+            Player scHolder = Helper.getPlayerWithThisSC(game, scNum);
+            List<Player> order = PlayStrategyCardService.getPlayersInFollowOrder(game, scHolder);
+            ActionCardDrawQueueHelper.markPlayerResolved(
+                    game, player, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX);
+            ActionCardDrawQueueHelper.resolveQueue(
+                    game,
+                    order,
+                    ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX,
+                    queuedPlayer -> resolvePoliticsActionCardDraw(game, queuedPlayer, scModel, null));
+        }
         if ("pok8imperial".equals(scModel.getBotSCAutomationID())) { // HANDLE SO QUEUEING
             String key = "queueToDrawSOs";
             if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
@@ -1578,6 +1592,29 @@ public class ButtonHelperSCs {
                 ? "drew 3 action cards (**Scheming**) - please discard 1 action card from your hand."
                 : "drew 2 action cards.";
         int count = hasSchemingAbility ? 3 : 2;
+        if (shouldQueuePoliticsDraw(game, scModel, count)) {
+            Player scHolder = Helper.getPlayerWithThisSC(game, scModel.getInitiative());
+            List<Player> order = PlayStrategyCardService.getPlayersInFollowOrder(game, scHolder);
+            if (!ActionCardDrawQueueHelper.isQueueActive(game, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX)) {
+                ActionCardDrawQueueHelper.initializeQueue(
+                        game, order, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX);
+            }
+            Player nextPlayer = ActionCardDrawQueueHelper.getNextBlockedPlayer(
+                    game, order, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX);
+            if (nextPlayer != null && nextPlayer != player) {
+                ActionCardDrawQueueHelper.enqueuePlayer(game, player, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX);
+                String queueMessage =
+                        " wishes to draw action cards but has people ahead of them in speaker order who need to resolve first."
+                                + " They have been queued and will automatically draw when everyone ahead is clear."
+                                + " They may cancel this by hitting \"Not Following\".";
+                if (!game.isFowMode()) {
+                    queueMessage += "\n" + nextPlayer.getRepresentationUnfogged()
+                            + " is the one the game is currently waiting on.";
+                }
+                ReactionService.addReaction(event, game, player, queueMessage);
+                return;
+            }
+        }
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
@@ -1616,6 +1653,86 @@ public class ButtonHelperSCs {
                             buttons2);
                 }
             }
+        }
+        if (scModel != null
+                && ActionCardDrawQueueHelper.isQueueActive(game, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX)) {
+            Player scHolder = Helper.getPlayerWithThisSC(game, scModel.getInitiative());
+            List<Player> order = PlayStrategyCardService.getPlayersInFollowOrder(game, scHolder);
+            ActionCardDrawQueueHelper.markPlayerResolved(
+                    game, player, ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX);
+            ActionCardDrawQueueHelper.resolveQueue(
+                    game,
+                    order,
+                    ActionCardDrawQueueHelper.POLITICS_QUEUE_SUFFIX,
+                    queuedPlayer -> resolvePoliticsActionCardDraw(game, queuedPlayer, scModel, null));
+        }
+    }
+
+    private static boolean shouldQueuePoliticsDraw(Game game, StrategyCardModel scModel, int count) {
+        if (scModel == null) {
+            return false;
+        }
+        int available = ActionCardDrawQueueHelper.getAvailableActionCardCount(game);
+        return count > available;
+    }
+
+    private static void resolvePoliticsActionCardDraw(
+            Game game, Player player, StrategyCardModel scModel, @Nullable ButtonInteractionEvent event) {
+        boolean hasSchemingAbility = player.hasAbility("scheming");
+        String message = hasSchemingAbility
+                ? "drew 3 action cards (**Scheming**) - please discard 1 action card from your hand."
+                : "drew 2 action cards.";
+        int count = hasSchemingAbility ? 3 : 2;
+        if (player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
+        } else {
+            for (int i = 0; i < count; i++) {
+                game.drawActionCard(player.getUserID());
+            }
+            if (event == null) {
+                ActionCardHelper.sendActionCardInfo(game, player);
+            } else {
+                ActionCardHelper.sendActionCardInfo(game, player, event);
+            }
+            ButtonHelper.checkACLimit(game, player);
+        }
+
+        if (event == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
+        } else {
+            ReactionService.addReaction(event, game, player, message);
+        }
+        if (hasSchemingAbility) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " use buttons to discard",
+                    ActionCardHelper.getDiscardActionCardButtons(player, false));
+        }
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+        if (player.hasAbility("contagion") && event != null) {
+            List<Button> buttons2 = ButtonHelperAbilities.getKyroContagionButtons(
+                    game, player, event, player.getFinsFactionCheckerPrefix());
+            if (!buttons2.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + ", please resolve **Contagion**.",
+                        buttons2);
+
+                if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1711997257707L))
+                        > 0) {
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(),
+                            player.getRepresentationUnfogged()
+                                    + ", please resolve **Contagion** again (on a different planet).",
+                            buttons2);
+                }
+            }
+        }
+        if (event == null && player.hasAbility("contagion")) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + ", please resolve **Contagion**.");
         }
     }
 
