@@ -1627,8 +1627,7 @@ public class UnfiledButtonHandlers {
         faction = faction.replace("assignSpeaker_", "");
         Player newSpeaker = game.getPlayerFromColorOrFaction(faction);
         if (newSpeaker.isSpeaker()) {
-            String message = "That player is already speaker";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "That player is already speaker.");
             return;
         }
         game.setStoredValue("hasntSetSpeaker", "");

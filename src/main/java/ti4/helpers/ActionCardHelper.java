@@ -345,6 +345,9 @@ public class ActionCardHelper {
                         .append(": ")
                         .append(actionCard.getText())
                         .append("\n");
+                if (actionCard.getNotes() != null) {
+                    sb.append("> -# ").append(actionCard.getNotes()).append("\n");
+                }
             }
         }
         return sb.toString();
