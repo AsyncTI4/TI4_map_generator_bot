@@ -243,7 +243,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card may discard this card after performing an action to remove 1 of their command counters from the game board and return it to their reinforcements - then they may perform 1 additional action.",
         "text2": "",
-        "mapText": "Discard this card after performing an action to return 1 of your command counters from the game board to your reinforcements. then you may perform 1 additional action.",
+        "mapText": "Discard this card after performing an action to remove 1 of your command counters from the game board, then you may perform 1 additional action.",
         "source": "base"
     },
     {
