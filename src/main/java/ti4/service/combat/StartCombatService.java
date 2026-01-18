@@ -1318,6 +1318,33 @@ public class StartCombatService {
                     FactionEmojis.mortheus));
         }
 
+        if (p1.hasTechReady("dihmohnbt") && isSpaceCombat) {
+            if (p1.hasReadyBreakthrough("dihmohnbt")) {
+                buttons.add(Buttons.green(
+                        p1.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
+                        "Place Frontier Token (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            } else {
+                buttons.add(Buttons.green(
+                        p1.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
+                        "Produce 1 non-fighter (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            }
+        }
+        if (p2.hasUnlockedBreakthrough("dihmohnbt") && isSpaceCombat && !game.isFowMode()) {
+            if (p2.hasReadyBreakthrough("dihmohnbt")) {
+                buttons.add(Buttons.green(
+                        p2.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
+                        "Place Frontier Token (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            } else {
+                buttons.add(Buttons.green(
+                        p2.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
+                        "Produce 1 non-fighter (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            }
+        }
+
         for (Player agentHolder : game.getRealPlayers()) {
             String finChecker = "FFCC_" + agentHolder.getFaction() + "_";
 
@@ -1777,6 +1804,17 @@ public class StartCombatService {
                 addForesightButton.accept(p2);
             }
             addForesightButton.accept(p1);
+
+            Consumer<Player> addGheminaButton = (player) -> {
+                if (player.hasReadyBreakthrough("gheminabt")) {
+                    buttons.add(Buttons.red(
+                            "retreat_" + pos + "_gheminabt", "Retreat (Exhaust Ghemina BT)", FactionEmojis.ghemina));
+                }
+            };
+            if (!game.isFowMode()) {
+                addGheminaButton.accept(p2);
+            }
+            addGheminaButton.accept(p1);
         }
 
         boolean gheminaCommanderApplicable = false;
@@ -1859,7 +1897,7 @@ public class StartCombatService {
                     "Purge Rebellion Hero",
                     FactionEmojis.Crimson));
         }
-        if (p1.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
+        if (p1.hasLeaderUnlocked("bastionhero")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "purgeBastionHero_" + tile.getPosition(),

@@ -2636,7 +2636,7 @@ public class ButtonHelperHeroes {
                     game.getMainGameChannel(),
                     game.getPing()
                             + ", only the _Overrule_ player resolves the strategy card. Other players cannot perform the secondary."
-                            + (sc == 5
+                            + (sc == 5 && !game.isFowMode()
                                     ? "\n" + player.getRepresentationUnfogged()
                                             + ", you __cannot__ replenish other players' commodities."
                                     : ""));

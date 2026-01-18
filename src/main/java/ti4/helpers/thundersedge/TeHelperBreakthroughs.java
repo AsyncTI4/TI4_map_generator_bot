@@ -27,6 +27,8 @@ public class TeHelperBreakthroughs {
             case "bentorbt" -> DSHelperBreakthroughs.bentorBTStep1(game, player);
             case "kolumebt" -> DSHelperBreakthroughs.kolumeBTStep1(game, player);
             case "nokarbt" -> TeHelperActionCards.beginPirates(game, player, "resolveNokarBt", 0, false);
+            case "dihmohnbt" -> DSHelperBreakthroughs.dihmohnBTExhaust(game, player);
+            case "cheiranbt" -> DSHelperBreakthroughs.cheiranBTExhaust(game, player);
             default -> {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),

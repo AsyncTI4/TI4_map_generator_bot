@@ -492,7 +492,7 @@ public class AgendaHelper {
                 continue;
             }
             List<String> whens = getPossibleWhenNames(player);
-            StringBuilder msg = new StringBuilder(player.getRepresentation()
+            StringBuilder msg = new StringBuilder(player.getRepresentation(true, true)
                     + " now is the time to decide whether or not you will play a \"when\". If you do,"
                     + " the bot will queue your \"when\" to play in the proper order (after those before you in speaker order decline). You may currently"
                     + " play " + whens.size() + " \"when\"" + (whens.size() == 1 ? "" : "s") + ".");
@@ -847,7 +847,7 @@ public class AgendaHelper {
                 buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<String> afters = getPossibleAfterNames(player);
-        StringBuilder msg = new StringBuilder(player.getRepresentation()
+        StringBuilder msg = new StringBuilder(player.getRepresentation(true, true)
                 + " now is the time to decide whether or not you will play an \"after\". If you do,"
                 + " the bot will queue your after to play in the proper order (after those before you in speaker order decline). You may currently"
                 + " play " + afters.size() + " \"after\"" + (afters.size() == 1 ? "" : "s") + ".");

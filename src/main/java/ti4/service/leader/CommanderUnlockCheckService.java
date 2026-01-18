@@ -235,6 +235,11 @@ public class CommanderUnlockCheckService {
             case "sol" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
+                                    || game.getUnitHolderFromPlanet(planet).isFake())) {
+                        continue;
+                    }
                     resources += Helper.getPlanetResources(planet, game);
                 }
                 if (resources > 11) {
@@ -244,6 +249,11 @@ public class CommanderUnlockCheckService {
             case "xxcha" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
+                    if (game.getUnitHolderFromPlanet(planet) != null
+                            && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
+                                    || game.getUnitHolderFromPlanet(planet).isFake())) {
+                        continue;
+                    }
                     resources += Helper.getPlanetInfluence(planet, game);
                 }
                 if (resources > 11) {
