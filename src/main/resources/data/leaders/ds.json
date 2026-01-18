@@ -416,7 +416,7 @@
         "name": "Maertin Donaais",
         "title": "Esteemed Philanthropist",
         "abilityWindow": "When another player gains any number of commodities",
-        "abilityText": "You may exhaust this card to gain an equal number of commodities and convert that player's commodities to trade goods.",
+        "abilityText": "After a player gains commodities, you may exhaust this card to convert that player's commodities to trade goods; if that player was another player, gain 2 commodities or draw 1 action card.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -1336,7 +1336,7 @@
         "title": "Shield of Qhet",
         "abilityName": "Logistical Supremacy - War Unbound",
         "abilityWindow": "ACTION:",
-        "abilityText": " Place this card near the game board; until the end of this game round, after you win a combat, you may remove 1 of your command tokens from the active system. At the end of this game round, purge this card.",
+        "abilityText": " Place this card near the game board; until the end of this game round, when you win a combat, if your opponent has a control token on your faction sheet, remove 1 of your command tokens from the active system, if able. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
@@ -1372,7 +1372,7 @@
         "title": " Concordat Marshall",
         "abilityName": "Concord Renewed - Galactic Outreach",
         "abilityWindow": "ACTION:",
-        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player draws 1 secret objective.",
+        "abilityText": "Attach this card to a revealed objective. The players with the fewest victory points may score this objective without fulfilling its requirements; after a player scores this objective, the Toldar player draws 1 secret objective.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

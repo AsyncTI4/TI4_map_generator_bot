@@ -4268,6 +4268,7 @@ public class ButtonHelper {
                 "garbozia", // Thunders Edge
                 "faunus",
                 "ordinian",
+                "uikos",
                 "industrex");
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
@@ -4329,7 +4330,6 @@ public class ButtonHelper {
                 "emelpar",
                 "echo",
                 "domna",
-                "uikos",
                 "illusion", // Other
                 "phantasm");
         for (String planet : implementedLegendaryPlanets) {
