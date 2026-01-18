@@ -81,6 +81,11 @@ public class ButtonHelperModifyUnits {
         }
         if (game.getActiveSystem() != null
                 && game.getTileByPosition(game.getActiveSystem()) != null
+                && ButtonHelper.isTileSmothered(game, game.getTileByPosition(game.getActiveSystem()), player)) {
+            return 0;
+        }
+        if (game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar(game)
                 && !player.hasUnlockedBreakthrough("nivynbt")) {
             return 0;

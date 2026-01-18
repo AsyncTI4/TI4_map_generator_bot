@@ -46,7 +46,10 @@ public class TeHelperGeneral {
             for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
                 UnitHolder uH = game.getUnitHolderFromPlanet(planet);
                 boolean otherPresent = false;
-                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                for (Player p2 : game.getRealPlayersNNeutral()) {
+                    if (p2 == player) {
+                        continue;
+                    }
                     if (FoWHelper.playerHasUnitsOnPlanet(p2, uH)) {
                         otherPresent = true;
                         break;
