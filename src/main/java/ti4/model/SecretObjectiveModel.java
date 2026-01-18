@@ -17,6 +17,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     private String name;
     private String phase;
     private String text;
+    private String notes;
     private int points;
     private String homebrewReplacesID;
     private String imageURL;
@@ -84,6 +85,9 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

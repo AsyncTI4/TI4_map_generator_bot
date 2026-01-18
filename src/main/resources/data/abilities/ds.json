@@ -212,7 +212,8 @@
         "name": "Diplomats",
         "faction": "freesystems",
         "window": "Once per action",
-        "windowEffect": "You may exhaust 1 uncontrolled planet's planet card that is on the game board to spend its resources or influence.[Note: this can be used during other players actions as well as your own]",
+        "windowEffect": "You may exhaust 1 uncontrolled planet's planet card that is on the game board to spend its resources or influence.",
+        "notes": "This may be used during other players actions as well as your own.",
         "source": "ds"
     },
     {
@@ -242,7 +243,8 @@
         "id": "the_lady_and_the_lord",
         "name": "The Lady & The Lord",
         "faction": "ghemina",
-        "permanentEffect": "During setup, place the Lord flagship token in your reinforcements and place the additional Ghemina Hero next to your faction sheet. The Lord flagship token is a second flagship unit with the abilities and attributes listed on the Lord flagship card. You have 2 Heroes.[Note: In async, this ability has been changed to bestowing the Lady, with the Lord being the default flagship. This only affects franken]",
+        "permanentEffect": "During setup, place the Lord flagship token in your reinforcements and place the additional Ghemina Hero next to your faction sheet. The Lord flagship token is a second flagship unit with the abilities and attributes listed on the Lord flagship card. You have 2 Heroes.",
+        "notes": "In async, this ability has been changed to bestowing the Lady, with the Lord being the default flagship. This only affects Franken.",
         "source": "ds"
     },
     {
@@ -451,7 +453,8 @@
         "id": "plague_reservoir",
         "name": "Plague Reservoir",
         "faction": "kyro",
-        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.[Note: designer intent seems to be that during invasion should refer to immediately after the space cannon defense window (this is the same as when ground combat normally starts)]",
+        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.",
+        "notes": "Designer intent seems to be that \"during invasion\" should refer to immediately after the space cannon defense window (this is the same as when ground combat normally starts).",
         "source": "ds"
     },
     {
@@ -710,7 +713,8 @@
         "id": "binding_debts",
         "name": "Binding Debts",
         "faction": "vaden",
-        "permanentEffect": "Other players may place their control tokens on your faction sheet at any time. [Note: when you have this ability, you cannot use normal debt, as this ability utilizes the bot's debt system. Track normal debt manually if at all.]",
+        "permanentEffect": "Other players may place their control tokens on your faction sheet at any time.",
+        "notes": "When you have this ability, you cannot use normal async debt, as this ability utilizes the bot's debt system. Track normal debt manually (if at all).",
         "window": "At the start of the status phase",
         "windowEffect": "Each of your neighbors may give you 1 trade good to remove up to 2 of their control tokens from your faction sheet.",
         "source": "ds"
@@ -760,7 +764,8 @@
         "id": "corporate_entity",
         "name": "Corporate Entity",
         "faction": "veldyr",
-        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives. [Note: they still count towards strengthen bonds and betray a friend, as they are promissory notes]",
+        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives.",
+        "notes": "They still count towards _Strengthen Bonds_ and _Betray A Friend_, as they are promissory notes.",
         "source": "ds"
     },
     {
@@ -875,7 +880,8 @@
         "id": "tempest_squads",
         "name": "Tempest Squads",
         "faction": "qhet",
-        "permanentEffect": "While you are the active player, 2 infantry in the active system do not count against your ships’ capacity. [Note: think of this as sort of like a mild Sardakk hero]",
+        "permanentEffect": "While you are the active player, 2 infantry in the active system do not count against your ships’ capacity.",
+        "notes": "Think of this as sort of like a mild N'orr hero.",
         "source": "ds"
     },
     {
@@ -897,7 +903,8 @@
         "id": "living_metals",
         "name": "Living Metals",
         "faction": "atokera",
-        "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control. [Note: protects against ixthian] ",
+        "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control.",
+        "notes": "Protects against _Ixthian Artefact_.",
         "source": "ds"
     },
     {
@@ -960,7 +967,8 @@
         "id": "thwart",
         "name": "Thwart (2 Dishonor)",
         "faction": "toldar",
-        "permanentEffect": "When you would gain 1 or more commodities or trade goods, instead take them from any combination of your neighbors, if able. [Note: not automated, have your neighbors subtract with /player stats]",
+        "permanentEffect": "When you would gain 1 or more commodities or trade goods, instead take them from any combination of your neighbors, if able.",
+        "notes": "Not automated, have your neighbors subtract with `/player stats`.",
         "source": "ds"
     },
     {
@@ -974,7 +982,8 @@
         "id": "scourge",
         "name": "Scourge (8 Dishonor)",
         "faction": "toldar",
-        "permanentEffect": "Purge your promissory notes [Note: even ones in other players hands/play areas]; you cannot gain honor. You treat scored secret objectives as public objectives, instead of public objectives.",
+        "permanentEffect": "Purge your promissory notes; you cannot gain honor. You treat scored secret objectives as public objectives, instead of public objectives.",
+        "notes": "This also purges promissory notes in other players' play areas and hands.",
         "source": "ds"
     }
 ]

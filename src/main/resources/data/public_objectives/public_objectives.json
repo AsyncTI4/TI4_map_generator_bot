@@ -123,7 +123,8 @@
         "alias": "infrastructure",
         "name": "Improve Infrastructure",
         "phase": "Status",
-        "text": "Have [your] structures on 3 planets outside of your home system.",
+        "text": "Have structures on 3 planets outside of your home system.",
+        "notes": "Other players' structures coexisting on your planets do not count.",
         "points": 1,
         "source": "pok"
     },
@@ -139,7 +140,8 @@
         "alias": "outer_rim",
         "name": "Populate the Outer Rim",
         "phase": "Status",
-        "text": "Have units in 3 systems on the edge of the game board other than your home system.[Note: Mallice and The Fracture count as on the edge]",
+        "text": "Have units in 3 systems on the edge of the game board other than your home system.",
+        "notes": "The Wormhole Nexus and The Fracture are on the edge.",
         "points": 1,
         "source": "pok"
     },
@@ -275,7 +277,8 @@
         "alias": "control_borderlands",
         "name": "Control the Borderlands",
         "phase": "Status",
-        "text": "Have units in 5 systems on the edge of the game board other than your home system. [Note: Mallice and The Fracture count as on the edge]",
+        "text": "Have units in 5 systems on the edge of the game board other than your home system.",
+        "notes": "The Wormhole Nexus and The Fracture are on the edge.",
         "points": 2,
         "source": "pok"
     },
@@ -299,7 +302,8 @@
         "alias": "protect_border",
         "name": "Protect the Border",
         "phase": "Status",
-        "text": "Have [your] structures on 5 planets outside of your home system.",
+        "text": "Have structures on 5 planets outside of your home system.",
+        "notes": "Other players' structures coexisting on your planets do not count.",
         "points": 2,
         "source": "pok"
     },
@@ -315,7 +319,8 @@
         "alias": "distant_lands",
         "name": "Rule Distant Lands",
         "phase": "Status",
-        "text": "Control 2 planets that are each in or adjacent to a different, other player's home system. [Note: The two planets need to be next to or in TWO separate players HS.]",
+        "text": "Control 2 planets that are each in or adjacent to a different, other player's home system.",
+        "notes": "The two planets need to be next to or in TWO separate players' home systems.",
         "points": 2,
         "source": "pok"
     },

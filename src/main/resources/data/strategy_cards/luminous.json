@@ -138,8 +138,9 @@
             "You may perform the secondary ability of an exhausted strategy card, spending tokens from your reinforcements."
         ],
         "secondaryTexts": [
-            "Resolve this ability as if it were instead the ability of any one exhuasted strategy card [Note this does not trigger abilities that effect the secondary of other strategy cards]."
+            "Resolve this ability as if it were instead the ability of any one exhuasted strategy card."
         ],
+        "notes": "The secondary ability does not trigger abilities that effect the secondary of other strategy cards.",
         "imageFileName": "luminous_9",
         "colourHexCode": "#3f05ab",
         "source": "other"
