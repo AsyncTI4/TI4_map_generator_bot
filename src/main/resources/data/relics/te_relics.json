@@ -42,7 +42,8 @@
     {
         "alias": "thesilverflame",
         "name": "The Silver Flame",
-        "text": "The Silver Flame may be exchanged as part of a transaction.\n> ACTION: Roll 1 die and purge this card; if the result is a 10, gain 1 victory point. Otherwise, purge your home system and all units in it; you cannot score public objectives. Put The Fracture into play if it is not already. [Note: Per Dane, you can score become a martyr off of this, and Saar can still score public objectives]",
+        "text": "The Silver Flame may be exchanged as part of a transaction.\n> ACTION: Roll 1 die and purge this card; if the result is a 10, gain 1 victory point. Otherwise, purge your home system and all units in it; you cannot score public objectives. Put The Fracture into play if it is not already.",
+        "notes": "If your home system is purged, you may score _Become A Martyr_. Saar can still score public objectives with a purged home system because of NOMADIC.",
         "flavourText": "Shen're Ix Ianovar. The flame beyond time and space.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/te/thesilverflame.png?raw=true",
         "source": "thunders_edge"

@@ -433,12 +433,10 @@ public class TransactionHelper {
             "A Picture Of A Sandwich",
             "Thoughtful Advice About Your Current Situation",
             "Zip; Zilch; Nada",
-            "Approximately "
-                    + String.format(
-                            "%,d",
-                            5 * ThreadLocalRandom.current().nextInt(200, 2000)
-                                    + ThreadLocalRandom.current().nextInt(1, 5))
-                    + " Unique Snow Globes",
+            String.format(
+                    "Approximately %,d Unique Snow Globes",
+                    5 * ThreadLocalRandom.current().nextInt(200, 2000)
+                            + ThreadLocalRandom.current().nextInt(1, 5)),
             "Forgiveness For Future Mistakes (Terms And Conditions Apply)",
             "A Token Labelled \"Traid Gud\"",
             "A Hill Of Beans",
@@ -490,7 +488,7 @@ public class TransactionHelper {
             "A Creepy Doll",
             "A Ziploc Bag Of Ranch Dressing",
             "Nothing. And Furthermore, Carthage Must Be Destroyed!",
-            "All Of The Goulash",
+            "All The Goulash",
             "Waldo's Location",
             "A Billet Of Ea-nāṣir's Finest Copper",
             "All The Silver In Fort Knox",
@@ -502,7 +500,7 @@ public class TransactionHelper {
             "An Inanimate Carbon Rod",
             "A Set Of Left-Handed Sarween Tools",
             "A Bridge That's For Sale",
-            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!",
+            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // For that thing that I want, yes indeed!",
             "The Chameleon's Dish",
             "The Sound Of One Hand Clapping",
             "An Unpaired Sock",
@@ -521,7 +519,7 @@ public class TransactionHelper {
             "A Succulent Chinese Meal?",
             "The Cheap Plastic Imitation Of The Amulet Of Yendor",
             "A Millstone",
-            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 3) + ": A Goat!",
+            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 4) + ": A Goat!",
             "A Runcible Spoon",
             "_Nullam Rem Natam_",
             "A Jubba Cloak",
@@ -537,7 +535,13 @@ public class TransactionHelper {
             "Emotional Support For The Throne",
             "My Frayed Agreement",
             "A Rock-Shaped Rock",
-            "Not Attacking You Through The Samekh Wormhole");
+            "Not Attacking You Through The Samekh Wormhole",
+            "A Thneed",
+            "Smashing That Like Button",
+            "A Sickle Of Leather",
+            "A Fish's Bicycle",
+            "One Red Paperclip",
+            "ACME Bird Seed");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
@@ -1622,7 +1626,9 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getCardsInfoThread(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                        p1.getCardsInfoThread(),
+                        ident + ", use these buttons to complete the transaction.",
+                        goAgainButtons);
             }
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
@@ -1637,7 +1643,9 @@ public class TransactionHelper {
             }
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getCardsInfoThread(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                        p1.getCardsInfoThread(),
+                        ident + ", use these buttons to complete the transaction.",
+                        goAgainButtons);
             }
         }
     }

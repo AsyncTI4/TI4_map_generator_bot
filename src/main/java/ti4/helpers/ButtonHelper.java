@@ -242,10 +242,10 @@ public class ButtonHelper {
                                                             .toString()
                                                             .repeat(totalAmount)
                                                     : UnitEmojis.infantry + "×" + totalAmount)
-                                            + " died and were captured by "
+                                            + " died and were captured by a "
                                             + p2.getFactionEmoji()
                                             + p2.getFaction()
-                                            + "'s Vortexer.");
+                                            + " Vortexer.");
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, p2, totalAmount, "infantry", null);
                             break;
                         }

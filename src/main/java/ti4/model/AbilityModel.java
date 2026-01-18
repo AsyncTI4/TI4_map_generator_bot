@@ -23,6 +23,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String permanentEffect;
     private String window;
     private String windowEffect;
+    private String notes;
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
@@ -81,13 +82,23 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         String title = getFactionEmoji() + " __**" + name + "**__" + source.emoji();
         eb.setTitle(title);
 
+        String description = "";
         // DESCRIPTION
-        if (getPermanentEffect().isPresent())
-            eb.setDescription(getPermanentEffect().get());
+        if (getPermanentEffect().isPresent()) {
+            description += getPermanentEffect().get();
+        }
 
         // FIELDS
-        if (getWindow().isPresent())
-            eb.addField(getWindow().get(), getWindowEffect().orElse(""), false);
+        if (getWindow().isPresent()) {
+            if (!description.isEmpty()) description += "\n\n";
+            description += getWindow().get() + "\n" + getWindowEffect().orElse("");
+        }
+
+        if (notes != null) {
+            description += "\n-# [" + notes + "]";
+        }
+
+        eb.setDescription(description);
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

@@ -23,7 +23,8 @@
         "name": "Gravity Wave",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Remove all your non-infantry units from this system and place them in any adjacent system that does not contain other players' ships. Then place a Gravity Rift token in this system. [Note: Infantry will not survive.]",
+        "text": "Remove all your non-infantry units from this system and place them in any adjacent system that does not contain other players' ships. Then place a Gravity Rift token in this system.",
+        "notes": "Infantry will not survive.",
         "flavorText": "*Gravity twisted violently, ejecting vessels into nearby space.*",
         "source": "fowplus"
     },

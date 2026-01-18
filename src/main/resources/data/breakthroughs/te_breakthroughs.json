@@ -47,7 +47,8 @@
             "PROPULSION",
             "WARFARE"
         ],
-        "text": "Before you roll [combat] dice during space combat, apply +X to the results of 1 of your ship's rolls, where X is the number of ship types you have in the combat.\nDuring movement, your non-fighter ships' move values are equal to the highest move value amongst moving ships in the system they started in.",
+        "text": "Before you roll dice during space combat, apply +X to the results of 1 of your ship's rolls, where X is the number of ship types you have in the combat.\nDuring movement, your non-fighter ships' move values are equal to the highest move value amongst moving ships in the system they started in.",
+        "notes": "The +X applies only to combat rolls, not to unit ability rolls.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/letnevbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -307,7 +308,7 @@
             "PROPULSION",
             "BIOTIC"
         ],
-        "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.\nEidolon Maximum: [Combat 4 (x4), Move 3, Sustain Damage] This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area. [Note: this unit can be direct hit while fighting on the ground or in space.]",
+        "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.\nEidolon Maximum: [Combat 4 (x4), Move 3, Sustain Damage] This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/naazbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -333,7 +334,8 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
-        "text": "ACTION: Exhaust this card to allow each other player to spend 3 trade goods and give you 1 promissory note. Each player that does may research a non-faction, non-unit upgrade technology. You also gain each technology researched in this way. [Note: the trade good cost cannot be reduced by Aello, who only reduces resource costs.]",
+        "text": "ACTION: Exhaust this card to allow each other player to spend 3 trade goods and give you 1 promissory note. Each player that does may research a non-faction, non-unit upgrade technology. You also gain each technology researched in this way.",
+        "notes": "The trade good cost cannot be reduced by Aello, who only reduces resource costs.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/deepwroughtbt.png?raw=true",
         "source": "thunders_edge"
     },
