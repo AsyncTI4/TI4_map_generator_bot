@@ -888,6 +888,7 @@
         "abilityName": "Singularity Reactor: Changing the Ways",
         "abilityWindow": "ACTION:",
         "abilityText": "Swap the positions of any 2 systems that contain wormholes or your units, other than the Creuss system and the wormhole nexus. Then, purge this card. [Note: Cannot be used on irregularly sized tiles like Creuxx or The Fracture.]",
+        "tfAbilityText": "Swap the positions of any 2 non-Fracture systems that contain wormholes or your units, other than the Creuss system, Ahk Creuxx system, or the wormhole nexus.",
         "unlockCondition": "Have 3 scored objectives.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/pok/heroes/ghosthero.png?raw=true",
         "imageBackURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/leaders/pok/heroes/ghosthero_back.png?raw=true",
