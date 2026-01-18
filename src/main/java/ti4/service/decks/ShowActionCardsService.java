@@ -141,7 +141,7 @@ public class ShowActionCardsService {
                     Mapper.getActionCard(acEntryList.getValue().getFirst().getKey());
             sb.append(model.getRepresentationJustText());
             if (model.getNotes() != null) {
-                sb.append("\n> -# ").append(model.getNotes());
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
             }
         }
         return sb.toString();
@@ -206,7 +206,7 @@ public class ShowActionCardsService {
             ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
             sb.append(model.getRepresentationJustText());
             if (model.getNotes() != null) {
-                sb.append("\n> -# ").append(model.getNotes());
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
             }
         }
         return sb.toString();

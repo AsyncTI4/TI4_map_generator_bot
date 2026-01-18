@@ -19,6 +19,7 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String text;
+    private String notes;
     private String mapText;
     private Integer complexity;
     private String errata;
@@ -90,6 +91,9 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
             String arg = getText().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }
+        if (notes != null) {
+            sb.append("\n> -# [").append(notes).append("]");
+        }
 
         return sb.toString();
     }
@@ -105,6 +109,9 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb);
 
         eb.setDescription(getText());
+        if (notes != null) {
+            eb.setDescription(getText() + "\n-# [" + notes + "]");
+        }
 
         eb.setColor(Color.black);
         if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);

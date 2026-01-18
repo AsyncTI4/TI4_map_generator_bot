@@ -20,6 +20,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private String name;
     private String phase;
     private String text;
+    private String notes;
     private Integer points;
     private String homebrewReplacesID;
     private String imageURL;
@@ -66,6 +67,9 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

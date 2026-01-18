@@ -1359,7 +1359,7 @@ public class ButtonHelperAgents {
                     player.getFactionEmoji() + " landed 1 extra infantry on "
                             + Helper.getPlanetRepresentation(planet, game) + " using " + ssruuClever
                             + "Jgin Faru, the Dih-Mohn" + ssruuSlash
-                            + " agent [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent].");
+                            + " agent.\n-# You must have committed another unit to this planet before you get this infantry. Please do this if you have not already done so.");
         }
         if ("tnelisagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever

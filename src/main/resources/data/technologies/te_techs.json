@@ -8,7 +8,8 @@
         ],
         "requirements": "R",
         "faction": "bastion",
-        "text": "Cancel 1 hit produced by BOMBARDMENT rolls made against your ground forces for each of your galvanized units present [on the planet]. \nAt the start of a round of ground combat, you may resolve BOMBARDMENT 8 (x3) against your opponent's ground forces; if you do, make an identical roll against your ground forces.",
+        "text": "Cancel 1 hit produced by BOMBARDMENT rolls made against your ground forces for each of your galvanized units present. \nAt the start of a round of ground combat, you may resolve BOMBARDMENT 8 (x3) against your opponent's ground forces; if you do, make an identical roll against your ground forces.",
+        "notes": "The galvanized units must be present on the planet where the BOMBARDMENT is being resolved.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/proxima.jpg?raw=true",
         "source": "thunders_edge"
     },

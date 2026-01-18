@@ -77,7 +77,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         if (notes == null) {
             eb.setDescription("\n***" + window + ":***\n" + text);
         } else {
-            eb.setDescription("\n***" + window + ":***\n" + text + "\n-# " + notes);
+            eb.setDescription("\n***" + window + ":***\n" + text + "\n-# [" + notes + "]");
         }
 
         // FLAVOUR TEXT

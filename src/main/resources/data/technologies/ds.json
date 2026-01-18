@@ -148,7 +148,8 @@
         "requirements": "YY",
         "faction": "dihmohn",
         "source": "ds",
-        "text": "When you explore a planet, you may produce 1 ship in that planet's system.\nACTION: Exhaust this card and 1 planet you control to explore that planet.\n[Note: this cannot produce ships if enemy ships are present]",
+        "text": "When you explore a planet, you may produce 1 ship in that planet's system.\nACTION: Exhaust this card and 1 planet you control to explore that planet.",
+        "notes": "This cannot produce ships if enemy ships are present.",
         "shortName": "Impress.\nPrograms",
         "shrinkName": false,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/impressment_programs.jpg?raw=true"
@@ -376,7 +377,8 @@
         "requirements": "YY",
         "faction": "kollecc",
         "source": "ds",
-        "text": "ACTION: Exhaust this card to choose 1 of your neighbors that has 1 or more relic fragments. That player gains 2 trade goods and must give you 1 of those relic fragments of your choice. [Note the neighbor requirement]",
+        "text": "ACTION: Exhaust this card to choose 1 of your neighbors that has 1 or more relic fragments. That player gains 2 trade goods and must give you 1 of those relic fragments of your choice.",
+        "notes": "Neighbors.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/seeker_drones.jpg?raw=true"
     },
     {
@@ -554,7 +556,8 @@
         "faction": "mirveda",
         "baseUpgrade": "pds2",
         "source": "ds",
-        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.[Note: this unit cannot fire into adjacent systems by itself. Needs Mirveda commander. Also note that if it is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot PDS.]",
+        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.",
+        "notes": "This unit cannot fire into adjacent systems by itself; it needs the Mirveda commander. Also, if it is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot SPACE CANNON.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/gauss_cannon_2.jpg?raw=true"
     },
     {
@@ -618,7 +621,8 @@
         "requirements": "BRY",
         "faction": "nivyn",
         "source": "ds",
-        "text": "Cost 2, Combat 4\nSUSTAIN DAMAGE\nAfter a system is activated, you may have this unit become damaged to place or move the Wound token into this system. [Note: this system refers to the system the mech is in. It does not refer to the active system]",
+        "text": "Cost 2, Combat 4\nSUSTAIN DAMAGE\nAfter a system is activated, you may have this unit become damaged to place or move the Wound token into this system.",
+        "notes": "\"This system\" refers to the system the mech is in. It does not refer to the active system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/voidflare_warden_2.jpg?raw=true"
     },
     {
@@ -954,7 +958,8 @@
         "requirements": "YYY",
         "faction": "atokera",
         "source": "ds",
-        "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action. [Note: not currently automated by the bot]"
+        "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action.",
+        "notes": "Not currently automated by the bot."
     },
     {
         "alias": "dsbelky",
