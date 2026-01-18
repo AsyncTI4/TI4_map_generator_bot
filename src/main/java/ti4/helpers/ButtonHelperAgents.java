@@ -494,10 +494,17 @@ public class ButtonHelperAgents {
                     + Helper.getPlanetRepresentation(planetRemoval, game) + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
         }
+
         List<RemoveUnitService.RemovedUnit> removedUnits = RemoveUnitService.removeUnits(
                 event, tileRemoval, game, player.getColor(), unit + " " + removalLocation);
+        if (buttonID.contains("lizhobt")) {
+            ButtonHelper.deleteMessage(event);
+            message += " They used the Lizho Breakthrough to do this.";
+            game.setStoredValue("coexistFlag", "yes");
+        }
         AddUnitService.addUnits(
                 event, tileDestination, game, player.getColor(), unit + " " + planetDestination, removedUnits);
+        game.removeStoredValue("coexistFlag");
         if ("mech".equalsIgnoreCase(unit)) {
             if (uH.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);

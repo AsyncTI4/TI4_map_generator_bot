@@ -74,6 +74,7 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
@@ -1822,6 +1823,16 @@ public class UnfiledButtonHandlers {
                 player.setStrategicCC(player.getStrategicCC() - 1);
             }
             skilled = true;
+        }
+
+        if (buttonID.contains("gheminabt")) {
+            String btID = "gheminabt";
+            Player p1 = player;
+            BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+            p1.getBreakthroughExhausted().put(btID, true);
+            String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_ to immediately retreat.";
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
         }
         {
             String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
