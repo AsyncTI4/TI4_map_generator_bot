@@ -230,7 +230,8 @@
         ],
         "requirements": "RR",
         "source": "base",
-        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round. [Note: this only occurs after the normal assign hits step in a combat round, which occurs after both sides roll combat dice. It occurs even if the opponent rolled no hits.]",
+        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round.",
+        "notes": "This only occurs after the normal assign hits step in a combat round, which occurs after both sides roll combat dice. It occurs even if the opponent rolled no hits.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/duranium_armor.png?raw=true",
         "initials": "DA"
     },
@@ -1069,7 +1070,8 @@
         "requirements": "Y",
         "faction": "keleres",
         "source": "pok",
-        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\n\n[Custodia Vigilia is a 2/3 legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Custodians VP using Imperial Primary.]",
+        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.",
+        "notes": "Custodia Vigilia is a 2r/3i legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Mexatol Rex VP using Imperial Primary.",
         "shortName": "I.I.H.Q. Mod-\nernization",
         "shrinkName": true,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/iihq_modernization.jpg?raw=true"

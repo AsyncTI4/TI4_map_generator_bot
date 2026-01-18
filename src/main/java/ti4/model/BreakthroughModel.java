@@ -26,6 +26,7 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
     private List<TechnologyType> synergy;
     private String faction;
     private String text;
+    private String notes;
     private String homebrewReplacesID;
     private String imageURL;
     private ComponentSource source;
@@ -59,7 +60,12 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
     public String getRepresentation(boolean includeCardText) {
         StringBuilder sb = new StringBuilder(getNameRepresentation());
-        if (includeCardText) sb.append("\n> ").append(text);
+        if (includeCardText) {
+            sb.append("\n> ").append(text);
+            if (notes != null) {
+                sb.append("\n> -# [").append(notes).append("]");
+            }
+        }
         return sb.toString();
     }
 
@@ -75,6 +81,9 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
 
         // DESCRIPTION
         String description = "SYNERGY: " + getSynergyEmojis() + "\n" + text;
+        if (notes != null) {
+            description += "\n-# [" + notes + "]";
+        }
         eb.setDescription(description);
 
         // FOOTER

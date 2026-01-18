@@ -34,7 +34,9 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     private String abilityWindow;
     private String tfAbilityWindow;
     private String abilityText;
+    private String notes;
     private String tfAbilityText;
+    private String tfNotes;
     private String unlockCondition;
     private String flavourText;
     private String imageURL;
@@ -227,6 +229,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
                 useTwilightsFallText ? getTFAbilityWindow().orElse(this.abilityWindow) : this.abilityWindow;
         String fieldTitle = abilityName + "\n**" + abilityWindow + "**";
         String fieldContent = useTwilightsFallText ? getTFAbilityText().orElse(abilityText) : abilityText;
+        if (useTwilightsFallText && (tfNotes != null)) {
+            fieldContent += "\n-# [" + tfNotes + "]";
+        } else if (!useTwilightsFallText && (notes != null)) {
+            fieldContent += "\n-# [" + notes + "]";
+        }
         eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 

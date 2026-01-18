@@ -1438,7 +1438,11 @@ public class Helper {
                         .append(discount)
                         .append("\n");
             }
-            msg.append("for a total spend of ").append(res).append(" resources.");
+            msg.append("for a total spend of ")
+                    .append(res)
+                    .append(" resource")
+                    .append(res == 1 ? "" : "s")
+                    .append(".");
 
             if (!game.getStoredValue("producedUnitCostFor" + player.getFaction())
                     .isEmpty()) {
@@ -1451,11 +1455,17 @@ public class Helper {
         } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
             msg.append("for a total spend of ").append(inf).append(" influence.");
         } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
-            msg.append("for a total spend of ").append(res).append(" resources (counting influence as resources).");
+            msg.append("for a total spend of ")
+                    .append(res)
+                    .append(" resource")
+                    .append(res == 1 ? "" : "s")
+                    .append(" (counting influence as resources).");
         } else {
             msg.append("for a total spend of ")
                     .append(res)
-                    .append(" resources or ")
+                    .append(" resource")
+                    .append(res == 1 ? "" : "s")
+                    .append(" or ")
                     .append(inf)
                     .append(" influence.");
         }

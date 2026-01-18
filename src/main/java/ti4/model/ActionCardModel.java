@@ -19,6 +19,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String phase;
     private String window;
     private String text;
+    private String notes;
     private String flavorText;
     private String imageURL;
     private String automationID;
@@ -73,7 +74,11 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title);
 
         // DESCRIPTION
-        eb.setDescription("\n***" + window + ":***\n" + text);
+        if (notes == null) {
+            eb.setDescription("\n***" + window + ":***\n" + text);
+        } else {
+            eb.setDescription("\n***" + window + ":***\n" + text + "\n-# [" + notes + "]");
+        }
 
         // FLAVOUR TEXT
         if (includeFlavourText && getFlavorText().isPresent())

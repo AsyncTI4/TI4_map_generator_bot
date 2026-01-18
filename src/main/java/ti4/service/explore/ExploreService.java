@@ -116,9 +116,57 @@ public class ExploreService {
             ExploreModel exploreModelH = Mapper.getExplore(cardIDH);
             ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
 
+            String indefiniteArticleC;
+            String exploreNameC = exploreModelC.getName();
+            if ("Freelancers".equalsIgnoreCase(exploreNameC)
+                    || "Local Fabricators".equalsIgnoreCase(exploreNameC)
+                    || "mirage".equalsIgnoreCase(cardIDC)) {
+                indefiniteArticleC = "";
+            } else if ("dmz".equalsIgnoreCase(cardIDC) || "toe".equalsIgnoreCase(cardIDC)) {
+                indefiniteArticleC = "the ";
+            } else if ("ls".equalsIgnoreCase(cardIDC)) {
+                indefiniteArticleC = "some ";
+            } else if ("aeiou".indexOf(exploreNameC.toLowerCase().charAt(0)) >= 0) {
+                indefiniteArticleC = "an ";
+            } else {
+                indefiniteArticleC = "a ";
+            }
+
+            String indefiniteArticleH;
+            String exploreNameH = exploreModelH.getName();
+            if ("Freelancers".equalsIgnoreCase(exploreNameH)
+                    || "Local Fabricators".equalsIgnoreCase(exploreNameH)
+                    || "mirage".equalsIgnoreCase(cardIDH)) {
+                indefiniteArticleH = "";
+            } else if ("dmz".equalsIgnoreCase(cardIDH) || "toe".equalsIgnoreCase(cardIDH)) {
+                indefiniteArticleH = "the ";
+            } else if ("ls".equalsIgnoreCase(cardIDH)) {
+                indefiniteArticleH = "some ";
+            } else if ("aeiou".indexOf(exploreNameH.toLowerCase().charAt(0)) >= 0) {
+                indefiniteArticleH = "an ";
+            } else {
+                indefiniteArticleH = "a ";
+            }
+
+            String indefiniteArticleI;
+            String exploreNameI = exploreModelI.getName();
+            if ("Freelancers".equalsIgnoreCase(exploreNameI)
+                    || "Local Fabricators".equalsIgnoreCase(exploreNameI)
+                    || "mirage".equalsIgnoreCase(cardIDI)) {
+                indefiniteArticleI = "";
+            } else if ("dmz".equalsIgnoreCase(cardIDI) || "toe".equalsIgnoreCase(cardIDI)) {
+                indefiniteArticleI = "the ";
+            } else if ("ls".equalsIgnoreCase(cardIDI)) {
+                indefiniteArticleI = "some ";
+            } else if ("aeiou".indexOf(exploreNameI.toLowerCase().charAt(0)) >= 0) {
+                indefiniteArticleI = "an ";
+            } else {
+                indefiniteArticleI = "a ";
+            }
+
             String reportMessage = player.getFactionEmoji() + " explored " + MiscEmojis.LegendaryPlanet
-                    + "Bozgarbia ability and found a _"
-                    + exploreModelC.getName() + "_, _" + exploreModelH.getName() + "_ and a _" + exploreModelI.getName()
+                    + "Bozgarbia ability and found " + indefiniteArticleC + "_" + exploreNameC + "_, "
+                    + indefiniteArticleH + "_" + exploreNameH + "_ and " + indefiniteArticleI + "_" + exploreNameI
                     + "_.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
@@ -190,15 +238,57 @@ public class ExploreService {
                     ExploreModel exploreModel1 = Mapper.getExplore(cardID1);
                     ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
 
+                    String indefiniteArticle1;
+                    String exploreName1 = exploreModel1.getName();
+                    if ("Freelancers".equalsIgnoreCase(exploreName1)
+                            || "Local Fabricators".equalsIgnoreCase(exploreName1)
+                            || "mirage".equalsIgnoreCase(cardID1)) {
+                        indefiniteArticle1 = "";
+                    } else if ("dmz".equalsIgnoreCase(cardID1) || "toe".equalsIgnoreCase(cardID1)) {
+                        indefiniteArticle1 = "the ";
+                    } else if ("ls".equalsIgnoreCase(cardID1)) {
+                        indefiniteArticle1 = "some ";
+                    } else if ("aeiou".indexOf(exploreName1.toLowerCase().charAt(0)) >= 0) {
+                        indefiniteArticle1 = "an ";
+                    } else {
+                        indefiniteArticle1 = "a ";
+                    }
+
+                    String indefiniteArticle2;
+                    String exploreName2 = exploreModel2.getName();
+                    if ("Freelancers".equalsIgnoreCase(exploreName2)
+                            || "Local Fabricators".equalsIgnoreCase(exploreName2)
+                            || "mirage".equalsIgnoreCase(cardID2)) {
+                        indefiniteArticle2 = "";
+                    } else if ("dmz".equalsIgnoreCase(cardID2) || "toe".equalsIgnoreCase(cardID2)) {
+                        indefiniteArticle2 = "the ";
+                    } else if ("ls".equalsIgnoreCase(cardID2)) {
+                        indefiniteArticle2 = "some ";
+                    } else if ("aeiou".indexOf(exploreName2.toLowerCase().charAt(0)) >= 0) {
+                        indefiniteArticle2 = "an ";
+                    } else {
+                        indefiniteArticle2 = "a ";
+                    }
+
                     // Report to common channel
                     String reportMessage = player.getFactionEmoji() + " used their " + FactionEmojis.Naaz
-                            + "**Distant Suns** ability and found a _"
-                            + exploreModel1.getName() + "_ and a _" + exploreModel2.getName() + "_ on "
+                            + "**Distant Suns** ability and found " + indefiniteArticle1 + "_" + exploreName1
+                            + "_ and " + indefiniteArticle2 + "_" + exploreName2 + "_ on "
                             + Helper.getPlanetRepresentationPlusEmoji(planetName) + ".";
+
+                    if (exploreName1.equals(exploreName2)) {
+                        reportMessage += " Auto-resolving.";
+                    }
+
                     if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
                     } else {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
+                    }
+
+                    if (exploreName1.equals(exploreName2)) {
+                        resolveExploreAuto(event, player, cardID1, planetName, game);
+                        return;
                     }
 
                     Button resolveExplore1 = Buttons.green(
@@ -390,6 +480,15 @@ public class ExploreService {
         }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void resolveExploreAuto(
+            GenericInteractionCreateEvent event, Player player, String cardID, String planetName, Game game) {
+        Tile tile = game.getTileFromPlanet(planetName);
+        String tileName = tile == null ? "no tile" : tile.getPosition();
+        String messageText = player.getRepresentationNoPing() + " \"chose\" to resolve _"
+                + Mapper.getExplore(cardID).getName() + "_.";
+        resolveExplore(event, cardID, tile, planetName, messageText, player, game);
     }
 
     public static void resolveExplore(
@@ -1304,7 +1403,7 @@ public class ExploreService {
                             && !"frontier"
                                     .equalsIgnoreCase(
                                             entry.getValue().getFirst().getType())) {
-                        sb.append(" [ATTACHMENT]");
+                        sb.append(" ").append(ExploreEmojis.Chevrons);
                     }
                 }
                 if (showPercents && ids.size() > 1) {

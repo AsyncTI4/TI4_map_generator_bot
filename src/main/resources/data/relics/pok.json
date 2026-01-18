@@ -34,7 +34,8 @@
     {
         "alias": "stellarconverter",
         "name": "Stellar Converter",
-        "text": "ACTION: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card. [Note: You cannot choose a planet that you control]",
+        "text": "ACTION: Choose 1 non-home, non-legendary planet other than Mecatol Rex in a system that is adjacent to 1 or more of your units that have BOMBARDMENT, destroy all units on that planet and purge its attachments and its planet card. Then, place the destroyed planet token on that planet and purge this card.",
+        "notes": "You cannot explode a planet that you control.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/stellar_converter.jpg?raw=true",
         "source": "pok",
         "flavourText": "*A power great enough to envelop a star, such that its energies might be concentrated… and scattered.*"

@@ -276,6 +276,7 @@ public class ListPlayerInfoService {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
+            msg.append("### Public Objectives\n");
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
                     msg.append(representScoring(game, id, x)).append("\n\n");
@@ -331,6 +332,9 @@ public class ListPlayerInfoService {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
                 boolean scored = false;
+                int progress = getPlayerProgressOnObjective(objID, game, player);
+                int threshold = getObjectiveThreshold(objID, game);
+
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
                             || game.didPlayerScoreThisAlready(
@@ -339,13 +343,13 @@ public class ListPlayerInfoService {
                         representation.append("✅");
                         scored = true;
                     } else {
-                        if (getObjectiveThreshold(objID, game) > 0) {
+                        if (threshold > 0) {
                             representation
                                     .append(" (")
-                                    .append(getPlayerProgressOnObjective(objID, game, player))
+                                    .append(progress)
                                     .append("/")
-                                    .append(getObjectiveThreshold(objID, game))
-                                    .append(")  ");
+                                    .append(threshold)
+                                    .append(progress >= threshold ? "#" : "");
                         } else {
                             representation.append("0/1");
                         }
@@ -357,10 +361,10 @@ public class ListPlayerInfoService {
                         scored = true;
                     } else {
                         representation
-                                .append(getPlayerProgressOnObjective(objID, game, player))
+                                .append(progress)
                                 .append("/")
-                                .append(getObjectiveThreshold(objID, game))
-                                .append("");
+                                .append(threshold)
+                                .append(progress >= threshold ? "#" : "");
                     }
                 }
 
@@ -378,7 +382,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representSecrets(Game game) {
-        StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
+        StringBuilder representation = new StringBuilder("### Scored Secret Objective Count\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
@@ -395,7 +399,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representSupports(Game game) {
-        StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("### _Supports For The Thrones_ Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
@@ -426,7 +430,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTransferablePoints(Game game) {
-        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
+        StringBuilder representation = new StringBuilder("### Transferable Victory Points");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
                 String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
@@ -455,7 +459,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTotalVPs(Game game) {
-        StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("## Total Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation

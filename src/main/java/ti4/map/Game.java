@@ -460,7 +460,7 @@ public class Game extends GameProperties {
             return distanceTool;
         }
         if (getMapTemplateID() == null) {
-            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool can not be created.");
+            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool cannot be created.");
             return null;
         }
         distanceTool = new DistanceTool(this);
@@ -2670,7 +2670,7 @@ public class Game extends GameProperties {
 
         if (acsToShuffle.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    getActionsChannel(), "Unable to reshuffle the AC deck because the discard pile is empty.");
+                    getActionsChannel(), "Unable to reshuffle the action card deck because the discard pile is empty.");
             return false;
         }
 

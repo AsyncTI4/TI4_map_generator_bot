@@ -15,6 +15,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -136,8 +137,12 @@ public class ShowActionCardsService {
             sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
-            sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey())
-                    .getRepresentationJustText());
+            ActionCardModel model =
+                    Mapper.getActionCard(acEntryList.getValue().getFirst().getKey());
+            sb.append(model.getRepresentationJustText());
+            if (model.getNotes() != null) {
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
+            }
         }
         return sb.toString();
     }
@@ -198,7 +203,11 @@ public class ShowActionCardsService {
             index++;
             sb.append(CardEmojis.ActionCard.toString().repeat(entry.getValue().size()));
             sb.append(" _").append(entry.getKey()).append("_\n> ");
-            sb.append(Mapper.getActionCard(entry.getValue().getFirst()).getRepresentationJustText());
+            ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
+            sb.append(model.getRepresentationJustText());
+            if (model.getNotes() != null) {
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
+            }
         }
         return sb.toString();
     }

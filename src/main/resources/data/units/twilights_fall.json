@@ -195,7 +195,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "Once per action, after you move an infantry into a system that contains another player's units, you may look at that player's action cards and take 1 of them. [Note: in async, and with Dane's assent, this ability was modified to trigger only once per action]"
+        "ability": "Once per action, after you move an infantry into a system that contains another player's units, you may look at that player's action cards and take 1 of them.",
+        "notes": "In async, and with Dane's assent, this ability was modified to trigger only once per action, regardless of the number of Guild Agents moved."
     },
     {
         "id": "tf-lataniwarrior",
@@ -225,7 +226,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Keep this card in your play area [it acts in addition to your normal mech card]; the COST of your mechs is reduced by 1."
+        "ability": "Keep this card in your play area; the COST of your mechs is reduced by 1.",
+        "notes": "This adds to, and does not replace, your mech card; you may have other mech unit upgrades."
     },
     {
         "id": "tf-eidolonterminus",
@@ -241,7 +243,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Keep this card in your play area [it acts in addition to your normal mech card]; the COMBAT value of your mechs is reduced by 1."
+        "ability": "Keep this card in your play area; the COMBAT value of your mechs is reduced by 1.",
+        "notes": "This adds to, and does not replace, your mech card; you may have other mech unit upgrades. Reducing the combat value means lowering the dice threshold."
     },
     {
         "id": "tf-eidolonlandwaster",
@@ -257,7 +260,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isGroundForce": true,
-        "ability": "Keep this card in your play area [it acts in addition to your normal mech card]; your mechs roll 1 additional die during combat."
+        "ability": "Keep this card in your play area; your mechs roll 1 additional die during combat.",
+        "notes": "This adds to, and does not replace, your mech card; you may have other mech unit upgrades."
     },
     {
         "id": "tf-heltitan",
@@ -453,6 +457,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
+        "isSpaceOnly": false,
         "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. This unit can be committed during an invasion; either return it to the space area or replace it with 1 infantry at the end of combat."
     },
     {
@@ -467,7 +472,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control. [Note: abilities that remove and then place will not trigger this ability.]"
+        "ability": "After this unit is destroyed or removed, place the unit on this card. At the start of the status phase, place each unit that is on this card on a planet you control.",
+        "notes": "Abilities that remove and then place infantry will not trigger this ability."
     },
     {
         "id": "tf-productionbiomes",
@@ -491,6 +497,8 @@
         "capacityValue": 5,
         "moveValue": 2,
         "isStructure": true,
+        "isPlanetOnly": false,
+        "isSpaceOnly": true,
         "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
     },
     {
@@ -540,7 +548,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Keep this card in your play area [it acts in addition to your normal flagship]; decrease the combat value of your flagship by 1, increase the number of combat dice it rolls by 1, increase its move value by 1, and increase its capacity by 2."
+        "ability": "Keep this card in your play area; decrease the combat value of your flagship by 1, increase the number of combat dice it rolls by 1, increase its move value by 1, and increase its capacity by 2.",
+        "notes": "This adds to, and does not replace, your flagship on your King sheet. Reducing the combat value means lowering the dice threshold."
     },
     {
         "id": "blacktf_mech",

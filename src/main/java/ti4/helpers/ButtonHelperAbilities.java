@@ -2022,7 +2022,10 @@ public class ButtonHelperAbilities {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation()
-                                    + " your bannerhall cards have been readied via your breakthrough ability. This may be a bit earlier than technically correct, but should be alright for most interactions. If the combat ends in a draw, please exhaust the bannerhalls. Remember this should proc a max of once per action.");
+                                    + " your Bannerhall cards have been readied via your breakthrough ability."
+                                    + " This may be a bit earlier than technically correct, but should be alright for most interactions."
+                                    + " If the combat ends in a draw, please exhaust the Bannerhalls."
+                                    + " Remember this should trigger a max of once per action.");
                 }
             }
         }
@@ -2040,7 +2043,7 @@ public class ButtonHelperAbilities {
                         player.exhaustPlanet(oceanName);
                         MessageHelper.sendMessageToChannel(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " you have been given a bannerhall!");
+                                player.getRepresentation() + ", you have gained a Bannerhall.");
                     }
                 }
             }

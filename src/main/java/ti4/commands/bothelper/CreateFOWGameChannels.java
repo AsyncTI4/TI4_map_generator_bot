@@ -48,7 +48,7 @@ class CreateFOWGameChannels extends Subcommand {
         if (!CreateFoWGameService.serverCanHostNewGame(guild, members.size() + 1)) {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                    "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return;
         }
 

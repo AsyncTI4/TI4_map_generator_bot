@@ -44,14 +44,15 @@
         "name": "Genophage",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard 1 of your neighbor's genomes. [Reminder: in TF an agent is called a genome]",
+        "text": "Discard 1 of your neighbor's genomes.",
         "source": "twilights_fall"
     },
     {
         "alias": "tf-engineer",
         "name": "Engineer",
         "phase": "Action",
-        "window": "When you draw cards for a splice that you initiated [Note: in async, play this before starting the splice]",
+        "window": "When you draw cards for a splice that you initiated.",
+        "notes": "In Async, please play this before you initiate the splice.",
         "text": "Add 2 additional cards to the splice; after you choose your card, choose and discard 2 of the spliced cards before passing them to the next player.",
         "source": "twilights_fall"
     },
@@ -171,7 +172,8 @@
         "alias": "tf-reverse",
         "name": "Reverse",
         "phase": "Action",
-        "window": "When a splice begins [Note: in async, play this before the splice begins]",
+        "window": "When a splice begins",
+        "notes": "In Async, please play this before you initiate the splice.",
         "text": "Reverse the order the spliced cards are passed.",
         "source": "twilights_fall"
     },
@@ -341,7 +343,8 @@
         "name": "Starflare",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system. [Note: cannot be played if there is no supernova on the board. In such a case, consider getting table permission to purge this AC and draw a new one.]",
+        "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system.",
+        "notes": "This cannot be played if there is no supernovae on the game board. In such a case, consider getting table permission to purge this action card and draw a replacement.",
         "source": "twilights_fall"
     },
     {
