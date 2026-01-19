@@ -1277,7 +1277,7 @@ public class ButtonHelperHeroes {
             String msg = p2.getRepresentationUnfogged() + ", "
                     + Mapper.getTech(techID).getName() + " was purged with _Wave Function Collapse_.";
             if (p2.getTechs().contains(techID)) {
-                msg += " You can now research a replacement technology.";
+                msg += " You can (and must) now research a replacement technology.";
                 ButtonHelperActionCards.resolveResearch(game, p2, event);
             }
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
