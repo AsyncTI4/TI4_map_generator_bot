@@ -251,7 +251,7 @@ public class SilverFlameService {
         if (!game.isFowMode() && (player.getTotalVictoryPoints() == game.getVp())) {
             DisasterWatchHelper.sendMessageInFlameWatch(
                     game,
-                    "### All According to _Keikaku_ - " + player.getRepresentation() + " has won " + game.getName()
+                    "### Just According to _Keikaku_ - " + player.getRepresentation() + " has won " + game.getName()
                             + " by scoring _Become A Martyr_.");
         } else if (!game.isFowMode()) {
             DisasterWatchHelper.sendMessageInFlameWatch(

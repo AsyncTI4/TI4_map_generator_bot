@@ -75,7 +75,8 @@ public enum ColorEmojis implements TI4Emoji {
     riftset,
     nightmare,
     dawn,
-    aberration; //
+    aberration,
+    jade; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
@@ -162,6 +163,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "nm", "nightmare" -> nightmare + "**Nightmare**";
             case "dw", "dawn" -> dawn + "**Dawn**";
             case "abr", "aberration" -> aberration + "**Aberration**";
+            case "jad", "jade" -> jade + "**Jade**";
             default -> null;
         };
     }
@@ -238,6 +240,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "dw", "dawn" -> dawn;
             case "nm", "nightmare" -> nightmare;
             case "abr", "aberration" -> aberration;
+            case "jad", "jade" -> jade;
 
             default -> TI4Emoji.getRandomGoodDog();
         };

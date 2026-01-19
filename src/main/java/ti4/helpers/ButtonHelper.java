@@ -1555,7 +1555,7 @@ public class ButtonHelper {
         if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the _Quietus_ (the Rebellion flagship) is in an active Breach.");
+                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the Quietus (the Rebellion flagship) is in an active Breach.");
         }
 
         if (!game.isFowMode()) {
@@ -5030,7 +5030,7 @@ public class ButtonHelper {
                 if (FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planet)) {
                     buttons.add(Buttons.green(
                             "lizhoBtStep1_" + planet.getName(),
-                            "Coexist on " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                            "Coexist On " + Helper.getPlanetRepresentation(planet.getName(), game)));
                 }
             }
             if (buttons.size() > 0) {
@@ -5038,7 +5038,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " you can use your breakthrough to move 1 infantry on the game board into coexistence on one of the planets in the active system",
+                                + ", you may use _Professional Intrigue_ to move 1 infantry on the game board into coexistence on one of the planets in the active system.",
                         buttons);
             }
         }
