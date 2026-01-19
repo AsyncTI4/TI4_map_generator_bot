@@ -1274,13 +1274,14 @@ public class ButtonHelperHeroes {
                         + Mapper.getTech(techID).getName()
                         + " with _Wave Function Collapse_. Those who owned this can now research a replacement technology.");
         for (Player p2 : game.getRealPlayers()) {
+            String msg = p2.getRepresentationUnfogged() + ", "
+                    + Mapper.getTech(techID).getName() + " was purged with _Wave Function Collapse_.";
             if (p2.getTechs().contains(techID)) {
+                msg += " You can now research a replacement technology.";
                 ButtonHelperActionCards.resolveResearch(game, p2, event);
             }
-            p2.purgeTech(techID);
-            String msg = p2.getRepresentationUnfogged() + " purged "
-                    + Mapper.getTech(techID).getName();
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
+            p2.purgeTech(techID);
         }
 
         ButtonHelper.deleteMessage(event);

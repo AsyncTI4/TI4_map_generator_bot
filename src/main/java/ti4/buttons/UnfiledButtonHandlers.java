@@ -2587,6 +2587,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (game.isFowMode()) {
                     game.setStoredValue("fowStatusDone", "");
+                    StatusCleanupService.returnEndStatusPNs(game);
                 }
             }
             case "redistributeCCButtons" -> {
