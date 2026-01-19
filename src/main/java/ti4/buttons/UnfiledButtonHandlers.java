@@ -1868,6 +1868,7 @@ public class UnfiledButtonHandlers {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
                         + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");
         String message =
