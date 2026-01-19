@@ -1623,14 +1623,16 @@ public class TransactionHelper {
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         goAgainButtons.add(done);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
+            if (!message2.isEmpty()) {
+                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
+            }
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         p1.getCardsInfoThread(),
                         ident + ", use these buttons to complete the transaction.",
                         goAgainButtons);
             }
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {

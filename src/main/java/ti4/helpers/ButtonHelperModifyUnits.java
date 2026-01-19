@@ -1425,7 +1425,7 @@ public class ButtonHelperModifyUnits {
             }
             UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
 
-            String prettyName = unitModel.getName();
+            String prettyName = game.isFowMode() ? unitModel.getBaseType() : unitModel.getName();
             String unitName = unitKey.unitName();
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
@@ -1470,8 +1470,8 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation()
-                + ", one of your units has been assigned a hit"
+        String msg = player.getRepresentationUnfogged()
+                + ", one of your " + unit + " units has been assigned a hit"
                 + ("magen".equals(source) ? " with _Magen Defense Grid_" : "")
                 + ("ruthless".equals(source) ? " by **Ruthless**" : "")
                 + ". Please either cancel the hit somehow, or accept the loss of the unit.";

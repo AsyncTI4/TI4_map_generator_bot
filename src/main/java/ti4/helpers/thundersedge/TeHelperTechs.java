@@ -372,8 +372,12 @@ public class TeHelperTechs {
         String msg = game.getPing() + " the " + buttonID.split("_")[1]
                 + " agenda has been revealed with _Executive Order_. ";
 
-        msg += player.getRepresentation()
-                + " has been temporarily made speaker to simulate the effect of the technology.";
+        if (game.isFowMode()) {
+            msg += "Speaker has been temporarily changed to simulate the effect of the technology.";
+        } else {
+            msg += player.getRepresentation()
+                    + " has been temporarily made speaker to simulate the effect of the technology.";
+        }
         game.setStoredValue("oldSpeakerExecutiveOrder", game.getSpeakerUserID());
         game.setSpeaker(player);
 

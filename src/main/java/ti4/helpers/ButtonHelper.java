@@ -1970,9 +1970,12 @@ public class ButtonHelper {
                         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                         if (game.isFowMode()) {
                             MessageHelper.sendMessageToChannel(
-                                    channel,
-                                    player.getFactionEmoji() + " returned _" + pnModel.getName() + "_ to "
-                                            + nonActivePlayer.getFactionEmoji() + ".");
+                                    player.getCorrectChannel(),
+                                    player.getRepresentationUnfogged() + " returned _" + pnModel.getName() + "_");
+                            MessageHelper.sendMessageToChannel(
+                                    nonActivePlayer.getCorrectChannel(),
+                                    nonActivePlayer.getRepresentationUnfogged() + ", your _" + pnModel.getName()
+                                            + "_ was returned.");
                         } else {
                             MessageHelper.sendMessageToChannel(
                                     channel,
