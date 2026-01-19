@@ -16,12 +16,14 @@ import ti4.service.map.SpinService;
 import ti4.service.map.SpinService.AutoTrigger;
 import ti4.service.map.SpinService.Direction;
 import ti4.service.map.SpinService.SpinSetting;
+import ti4.service.map.SpinService.ToSpin;
 
 class AddSpinSetting extends GameStateSubcommand {
     private static final String RING = "ring";
     private static final String DIRECTION = "direction";
     private static final String STEPS = "steps";
     private static final String AUTO_TRIGGER = "auto_trigger";
+    private static final String TOSPIN = "to_spin";
 
     public AddSpinSetting() {
         super(Constants.SPIN_ADD, "Add a spin setting.", true, true);
@@ -32,14 +34,15 @@ class AddSpinSetting extends GameStateSubcommand {
                         OptionType.STRING, STEPS, "Number of steps to spin (separate multiple by comma to randomize)")
                 .setRequired(true));
         addOptions(new OptionData(
-                        OptionType.STRING, Constants.POSITION, "Center position from where to spin (default 000)")
-                .setRequired(false));
+                OptionType.STRING, Constants.POSITION, "Center position from where to spin (default 000)"));
         addOptions(new OptionData(
-                        OptionType.STRING,
-                        AUTO_TRIGGER,
-                        "When to auto-trigger: " + String.join("|", AutoTrigger.valuesAsStringList())
-                                + " (default: STATUS")
-                .setRequired(false));
+                OptionType.STRING,
+                AUTO_TRIGGER,
+                "When to auto-trigger: " + String.join("|", AutoTrigger.valuesAsStringList()) + " (default: STATUS)"));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                TOSPIN,
+                "What to spin: " + String.join("|", ToSpin.valuesAsStringList()) + " (default: ALL)"));
     }
 
     @Override
@@ -69,11 +72,16 @@ class AddSpinSetting extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Invalid trigger");
             return;
         }
+        ToSpin tomove = ToSpin.fromString(event.getOption(TOSPIN, "ALL", OptionMapping::getAsString));
+        if (tomove == null) {
+            MessageHelper.replyToMessage(event, "Invalid option for to_spin");
+            return;
+        }
 
         List<Integer> ringNumbers = ringInput.stream().map(Integer::parseInt).toList();
         List<Integer> stepsNumbers = stepsInput.stream().map(Integer::parseInt).toList();
 
-        SpinSetting newSetting = new SpinSetting(position, ringNumbers, direction, stepsNumbers, trigger, game);
+        SpinSetting newSetting = new SpinSetting(position, ringNumbers, direction, stepsNumbers, trigger, tomove, game);
         if (!newSetting.isValid()) {
             MessageHelper.replyToMessage(event, "Invalid spin setting parameters.");
             return;
