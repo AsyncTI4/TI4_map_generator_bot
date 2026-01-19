@@ -1126,7 +1126,7 @@
         "name": "Arbitration",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet that contains units and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
+        "text": "Choose 1 non-home planet that contains ground forces and another player that does not control that planet. That player places 1 infantry from their reinforcements into coexistence on that planet.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
@@ -1149,12 +1149,21 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "invasion",
+        "name": "Invasion",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Put The Fracture into play if it is not already. Then, place 1 neutral cruiser and 2 neutral fighters in a non-home system that contains an ingress token; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "A fleet screamed from the void and encircled Faunus, trapping Brother Omar and his scientists. Omar grinned. \"Do not fear, brothers. This is but one more test.\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "opportunists",
         "name": "Opportunists",
         "phase": "Action",
         "window": "After you lose a space combat",
         "text": "Place 1 neutral cruiser and 2 neutral destroyers in that system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
@@ -1207,9 +1216,8 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
-        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system.",
-        "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
-        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded the rebels. \"Spit that mercy in their face.\"",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
+        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded her crew. \"Spit that mercy in their face.\"",
         "source": "action_deck_2"
     },
     {
@@ -1255,15 +1263,6 @@
         "window": "At the start of your turn",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "scavenged_fleet",
-        "name": "Scavenged Fleet",
-        "phase": "Any",
-        "window": "After 1 or more of a player's ships are destroyed",
-        "text": "Place matching neutral ships in a non-home system that contains no non-neutral ships.",
-        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
