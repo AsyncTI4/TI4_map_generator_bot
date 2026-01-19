@@ -191,5 +191,13 @@
         "textColor": "black",
         "primaryColor": { "red": 212, "green": 43, "blue": 75 },
         "hue": "RED"
+    },
+    {
+        "alias": "jad",
+        "name": "jade",
+        "aliases": ["jad"],
+        "textColor": "black",
+        "primaryColor": { "red": 35, "green": 200, "blue": 49 },
+        "hue": "GREEN"
     }
 ]
