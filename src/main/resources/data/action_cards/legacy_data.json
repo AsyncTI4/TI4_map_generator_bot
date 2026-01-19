@@ -1500,5 +1500,14 @@
         "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "deprecated"
+    },
+    {
+        "alias": "scavenged_fleet",
+        "name": "Scavenged Fleet",
+        "phase": "Any",
+        "window": "After 1 or more of a player's ships are destroyed",
+        "text": "Place matching neutral ships in a non-home system that contains no non-neutral ships.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
+        "source": "deprecated"
     }
 ]
