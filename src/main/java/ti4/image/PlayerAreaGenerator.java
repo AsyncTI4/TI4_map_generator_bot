@@ -423,7 +423,7 @@ class PlayerAreaGenerator {
         }
 
         // Cards
-        String acImage = "pa_cardbacks_ac.png";
+        String acImage = game.isTwilightsFallMode() ? "pa_cardbacks_ac_tf.png" : "pa_cardbacks_ac.png";
         String soImage = "pa_cardbacks_so.png";
         String pnImage = "pa_cardbacks_pn.png";
         String tradeGoodImage = game.isNomadCoin() ? "pa_cardbacks_nomadcoin.png" : "pa_cardbacks_tradegoods.png";
@@ -439,18 +439,23 @@ class PlayerAreaGenerator {
                 g2, Integer.toString(player.getAcCount()), (int) card.getCenterX(), y + 75);
         DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
 
-        card = drawPAImage(x + 280, y, pnImage);
-        DrawingUtil.superDrawStringCenteredDefault(
-                g2, Integer.toString(player.getPnCount()), (int) card.getCenterX(), y + 75);
-        DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
+        int xOffset = 0;
+        if (game.isTwilightsFallMode()) {
+            xOffset = 65;
+        } else {
+            card = drawPAImage(x + 280, y, pnImage);
+            DrawingUtil.superDrawStringCenteredDefault(
+                    g2, Integer.toString(player.getPnCount()), (int) card.getCenterX(), y + 75);
+            DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
+        }
 
         // Trade Goods
-        card = drawPAImage(x + 345, y, tradeGoodImage);
+        card = drawPAImage(x + 345 - xOffset, y, tradeGoodImage);
         DrawingUtil.superDrawStringCenteredDefault(
                 g2, Integer.toString(player.getTg()), (int) card.getCenterX(), y + 75);
 
         // Comms
-        card = drawPAImage(x + 410, y, commoditiesImage);
+        card = drawPAImage(x + 410 - xOffset, y, commoditiesImage);
         String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
         DrawingUtil.superDrawStringCenteredDefault(g2, comms, (int) card.getCenterX(), y + 75);
 
@@ -460,18 +465,18 @@ class PlayerAreaGenerator {
         String urfImage = "pa_fragment_urf.png";
         String irfImage = "pa_fragment_irf.png";
         int xDelta = 0;
-        xDelta = drawFrags(y, x, 0, urf, urfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, urf, urfImage, xDelta);
         xDelta += 25;
-        xDelta = drawFrags(y, x, 0, irf, irfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, irf, irfImage, xDelta);
 
         int xDelta2 = 0;
         int hrf = player.getHrf();
         int crf = player.getCrf();
         String hrfImage = "pa_fragment_hrf.png";
         String crfImage = "pa_fragment_crf.png";
-        xDelta2 = drawFrags(y + 73, x, 0, hrf, hrfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, hrf, hrfImage, xDelta2);
         xDelta2 += 25;
-        xDelta2 = drawFrags(y + 73, x, 0, crf, crfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, crf, crfImage, xDelta2);
 
         xDelta = x + 600;
         // xDelta = x + 550 + Math.max(xDelta, xDelta2); DISABLE AUTO-SCALE BASED ON
@@ -708,18 +713,18 @@ class PlayerAreaGenerator {
     }
 
     private int valefarZTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.hasReadyBreakthrough("nekrobt")) {
-            String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
-            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            int maxTokens = 7;
-            List<Point> points = new ArrayList<>();
-            IntStream.range(0, maxTokens).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
-
-            int tokensUsed =
-                    Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size();
-            return displayRemainingFactionTokens(points, bufferedImage, 7 - tokensUsed, xDeltaFromRightSide, yDelta);
+        if (!player.hasReadyBreakthrough("nekrobt")) {
+            return xDeltaFromRightSide;
         }
-        return xDeltaFromRightSide;
+        String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
+        BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+        int tokensUsed =
+                Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size();
+        int tokenCount = game.getPlayers().size() - 1 - tokensUsed;
+        List<Point> points = new ArrayList<>();
+        IntStream.range(0, tokenCount).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
+
+        return displayRemainingFactionTokens(points, bufferedImage, tokenCount, xDeltaFromRightSide, yDelta);
     }
 
     private int sleeperTokens(Player player, int xDeltaFromRightSide, int yDelta) {
