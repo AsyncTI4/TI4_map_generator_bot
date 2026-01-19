@@ -720,7 +720,7 @@ class PlayerAreaGenerator {
         BufferedImage bufferedImage = ImageHelper.read(tokenFile);
         int tokensUsed =
                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size();
-        int tokenCount = game.getPlayers().size() - 1 - tokensUsed;
+        int tokenCount = game.getRealPlayers().size() - 1 - tokensUsed;
         List<Point> points = new ArrayList<>();
         IntStream.range(0, tokenCount).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
 
