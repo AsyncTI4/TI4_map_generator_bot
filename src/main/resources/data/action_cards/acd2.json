@@ -1216,7 +1216,8 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
-        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units.",
+        "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
         "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded her crew. \"Spit that mercy in their face.\"",
         "source": "action_deck_2"
     },
