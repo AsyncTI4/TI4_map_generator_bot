@@ -754,7 +754,7 @@ public class StatusHelper {
                     if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
                         String genesisMessage = player.getRepresentationUnfogged()
-                                + ", 1 infantry was added to the space area of the _Genesis_ (the Sol flagship) automatically.";
+                                + ", 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), genesisMessage);
                     }
                 }

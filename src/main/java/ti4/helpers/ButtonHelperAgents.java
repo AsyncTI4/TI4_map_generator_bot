@@ -485,7 +485,7 @@ public class ButtonHelperAgents {
         String message;
         String removalLocation = planetRemoval;
         if ("space".equalsIgnoreCase(planetRemoval)) {
-            message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from space area of "
+            message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from the space area of "
                     + tileRemoval.getRepresentation() + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
             removalLocation = "";
@@ -499,7 +499,7 @@ public class ButtonHelperAgents {
                 event, tileRemoval, game, player.getColor(), unit + " " + removalLocation);
         if (buttonID.contains("lizhobt")) {
             ButtonHelper.deleteMessage(event);
-            message += " They used the Lizho Breakthrough to do this.";
+            message += " into coexistence. They used _Professional Intrigue_ to do this";
             game.setStoredValue("coexistFlag", "yes");
         }
         AddUnitService.addUnits(
@@ -522,7 +522,7 @@ public class ButtonHelperAgents {
         if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
     }
 
     private static void addArgentAgentButtons(Tile tile, Player player, Game game) {

@@ -46,7 +46,7 @@ public class DSHelperBreakthroughs {
     }
 
     public static void cheiranBTExhaust(Game game, Player p1) {
-        String message = p1.getRepresentation() + " please choose which system the ship you wish to replace is in.";
+        String message = p1.getRepresentation() + ", please choose which system the ship you wish to replace is in.";
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -66,7 +66,7 @@ public class DSHelperBreakthroughs {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " is discarding an action card to move 1 ship (possibly transporting) to an adjacent system with no other player ships.");
+                        + " is discarding an action card to move 1 ship (possibly transporting) to an adjacent system containing no other players' ships.");
         ButtonHelperAgents.moveShipToAdjacentSystemStep2(game, player, event, buttonID + "_hero");
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
                 event, "Discard an Action Card", ActionCardHelper.getDiscardActionCardButtons(player, false));
@@ -127,7 +127,7 @@ public class DSHelperBreakthroughs {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
-                player.getRepresentationUnfogged() + ", please choose which unit you'd like to replace.",
+                player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -145,7 +145,7 @@ public class DSHelperBreakthroughs {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
         var parsedUnit = new ParsedUnit(unitKey);
         RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-        String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " was removed by "
+        String msg = "A " + (damaged ? "damaged " : "") + unitKey.unitEmoji() + " was removed by "
                 + player.getFactionEmoji()
                 + ". Units costing up to its cost can now be placed in the space area.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -172,14 +172,14 @@ public class DSHelperBreakthroughs {
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                         + "_infantry_lizhobt",
-                                "Move Infantry from " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
+                                "Move Infantry From " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     } else {
 
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
                                         + "_infantry_lizhobt",
-                                "Move Infantry from Space of " + tile.getPosition() + " To "
+                                "Move Infantry From Space of " + tile.getPosition() + " To "
                                         + Helper.getPlanetRepresentation(planetName, game)));
                     }
                 }
@@ -208,7 +208,7 @@ public class DSHelperBreakthroughs {
                 MessageHelper.sendMessageToChannel(
                         event.getChannel(),
                         p1.getFactionEmoji()
-                                + " is using their breakthrough to produce 1 non-fighter ship (they can do this once per combat).");
+                                + " is using _Exodus Engineering_ to produce 1 non-fighter ship (they may do this once per combat).");
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
         }

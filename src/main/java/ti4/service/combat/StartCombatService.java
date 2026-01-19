@@ -592,13 +592,13 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player2.getRepresentation()
-                            + ", you are affected by the _Quietus_ (the Rebellion flagship), and your units will have lost all unit abilities.");
+                            + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
         if (TeHelperUnits.affectedByQuietus(game, player1, tile)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player1.getRepresentation()
-                            + ", you are affected by the _Quietus_ (the Rebellion flagship), and your units will have lost all unit abilities.");
+                            + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
 
         if (tile.isHomeSystem(game)
@@ -1327,7 +1327,7 @@ public class StartCombatService {
             } else {
                 buttons.add(Buttons.green(
                         p1.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
-                        "Produce 1 non-fighter (Upon Destroy)",
+                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
                         FactionEmojis.dihmohn));
             }
         }
@@ -1340,7 +1340,7 @@ public class StartCombatService {
             } else {
                 buttons.add(Buttons.green(
                         p2.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
-                        "Produce 1 non-fighter (Upon Destroy)",
+                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
                         FactionEmojis.dihmohn));
             }
         }
@@ -1808,7 +1808,7 @@ public class StartCombatService {
             Consumer<Player> addGheminaButton = (player) -> {
                 if (player.hasReadyBreakthrough("gheminabt")) {
                     buttons.add(Buttons.red(
-                            "retreat_" + pos + "_gheminabt", "Retreat (Exhaust Ghemina BT)", FactionEmojis.ghemina));
+                            "retreat_" + pos + "_gheminabt", "Retreat With Ghemina Breakthrough", FactionEmojis.ghemina));
                 }
             };
             if (!game.isFowMode()) {
