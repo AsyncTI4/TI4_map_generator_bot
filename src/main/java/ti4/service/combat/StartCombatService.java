@@ -1808,7 +1808,9 @@ public class StartCombatService {
             Consumer<Player> addGheminaButton = (player) -> {
                 if (player.hasReadyBreakthrough("gheminabt")) {
                     buttons.add(Buttons.red(
-                            "retreat_" + pos + "_gheminabt", "Retreat With Ghemina Breakthrough", FactionEmojis.ghemina));
+                            "retreat_" + pos + "_gheminabt",
+                            "Retreat With Ghemina Breakthrough",
+                            FactionEmojis.ghemina));
                 }
             };
             if (!game.isFowMode()) {
