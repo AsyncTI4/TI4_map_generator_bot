@@ -423,6 +423,12 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
+            case Constants.TECH_TYPE_AND_UNIT_UPGRADES -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var values = List.of("cybernetic", "biotic", "warfare", "propulsion", "unitupgrade");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
             case Constants.SPECIFIC_PHASE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 var phases = List.of(
