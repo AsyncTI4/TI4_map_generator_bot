@@ -92,12 +92,12 @@ public enum CardEmojis implements TI4Emoji {
     sc_8_5, // Imperial
 
     // Twilight's Fall decks
-    TF_Ability,
-    TF_Action,
-    TF_Edict,
-    TF_Genome,
-    TF_Paradigm,
-    TF_Unit_Uprade,
+    TF_Ability_Card,
+    TF_Action_Card,
+    TF_Edict_Card,
+    TF_Genome_Card,
+    TF_Paradigm_Card,
+    TF_Unit_Uprade_Card,
 
     // Twilight's Fall Strategy Card Pings
     // Lux
@@ -446,7 +446,7 @@ public enum CardEmojis implements TI4Emoji {
 
     public static TI4Emoji getACEmoji(Game game) {
         if (game != null && game.isTwilightsFallMode()) {
-            return TF_Action;
+            return TF_Action_Card;
         }
         return ActionCard;
     }
