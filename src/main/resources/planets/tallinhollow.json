@@ -1,1 +1,29 @@
-{"id":"tallinhollow","tileId":"96b","name":"Tallin Hollow","shortName":"Tallin H.","shrinkNamePNAttach":true,"aliases":["tallinh","thollow","th","tallinhollow"],"resources":3,"influence":0,"factionHomeworld":"obsidian","planetTypes":["FACTION"],"planetLayout":{"unitHolderName":"tallinhollow","resourcesLocation":"TopLeft","centerPosition":{"x":225.0,"y":205.0}},"source":"thunders_edge"}
+{
+    "id": "tallinhollow",
+    "tileId": "96b",
+    "name": "Tallin Hollow",
+    "shortName": "Tallin H.",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "tallinh",
+        "thollow",
+        "th",
+        "tallinhollow"
+    ],
+    "resources": 3,
+    "influence": 0,
+    "factionHomeworld": "obsidian",
+    "planetTypes": [
+        "FACTION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "tallinhollow",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 227,
+            "y": 201
+        }
+    },
+    "contrastColor": "orange",
+    "source": "thunders_edge"
+}

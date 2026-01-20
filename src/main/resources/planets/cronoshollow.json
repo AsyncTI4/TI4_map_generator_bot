@@ -1,1 +1,28 @@
-{"id":"cronoshollow","tileId":"96b","name":"Cronos Hollow","shortName":"Cronos H.","shrinkNamePNAttach":true,"aliases":["cronosh","chollow","ch","cronoshollow"],"resources":3,"influence":0,"factionHomeworld":"obsidian","planetTypes":["FACTION"],"planetLayout":{"unitHolderName":"cronoshollow","resourcesLocation":"TopLeft","centerPosition":{"x":135.0,"y":85.0}},"source":"thunders_edge"}
+{
+    "id": "cronoshollow",
+    "tileId": "96b",
+    "name": "Cronos Hollow",
+    "shortName": "Cronos H.",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "cronosh",
+        "chollow",
+        "ch",
+        "cronoshollow"
+    ],
+    "resources": 3,
+    "influence": 0,
+    "factionHomeworld": "obsidian",
+    "planetTypes": [
+        "FACTION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "cronoshollow",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135,
+            "y": 82
+        }
+    },
+    "source": "thunders_edge"
+}

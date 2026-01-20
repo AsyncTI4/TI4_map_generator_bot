@@ -19,9 +19,10 @@
         "unitHolderName": "tiamat",
         "resourcesLocation": "TopLeft",
         "centerPosition": {
-            "x": 135.0,
-            "y": 85.0
+            "x": 136.0,
+            "y": 89.0
         }
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

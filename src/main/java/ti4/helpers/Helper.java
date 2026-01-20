@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +47,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.thundersedge.TeHelperUnits;
+import ti4.image.ImageHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -63,11 +65,13 @@ import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
 import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 import ti4.model.TechnologyModel;
+import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -518,16 +522,51 @@ public class Helper {
     }
 
     public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
-        Point tokenPlanetPos = Constants.TOKEN_PLANET_POSITION;
-        Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
-
-        Point position = new Point(tokenPlanetPos);
-        if (tile.getTileModel().getNumPlanets() == 3) position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
-        position.translate(offset.x, offset.y);
-        if (tokenID.toLowerCase().contains("thundersedge")) {
-            return Constants.SPACE_CENTER_POSITION;
+        TokenModel token = Mapper.getToken(tokenID);
+        PlanetModel planet = token == null ? null : Mapper.getPlanet(token.getTokenPlanetName());
+        Integer planetX = null;
+        Integer planetY = null;
+        if (planet != null
+                && planet.getPlanetLayout() != null
+                && planet.getPlanetLayout().getCenterPosition() != null) {
+            planetX = planet.getPlanetLayout().getCenterPosition().x;
+            planetY = planet.getPlanetLayout().getCenterPosition().y;
         }
-        return position;
+
+        String tokenPath = token == null ? null : token.getImagePath();
+        BufferedImage tokenImage = ImageHelper.read(ResourceHelper.getInstance().getAttachmentFile(tokenPath));
+        Integer imageX = null;
+        Integer imageY = null;
+        if (tokenImage != null) {
+            imageX = (tokenImage.getWidth() / 2);
+            imageY = (tokenImage.getHeight() / 2);
+        }
+
+        Point initial = new Point(Constants.TOKEN_PLANET_POSITION);
+        if (tokenID.toLowerCase().contains("thundersedge")) {
+            initial = new Point(Constants.SPACE_CENTER_POSITION);
+        }
+        if (tile.getTileModel().getNumPlanets() == 3) {
+            initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        }
+
+        if (imageX != null && imageY != null && planetX != null && planetY != null) {
+            return new Point(initial.x - imageX + planetX, initial.y - imageY + planetY);
+        }
+
+        return initial;
+    }
+
+    public static Point getTokenPlanetCenterOfImage(Tile tile, String tokenID) {
+
+        Point initial = new Point(Constants.TOKEN_PLANET_POSITION);
+        if (tokenID.toLowerCase().contains("thundersedge")) {
+            initial = new Point(Constants.SPACE_CENTER_POSITION);
+        }
+        if (tile.getTileModel().getNumPlanets() == 3) {
+            initial = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        }
+        return initial;
     }
 
     public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {

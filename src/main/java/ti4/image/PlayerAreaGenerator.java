@@ -3070,6 +3070,11 @@ class PlayerAreaGenerator {
                     && player.getPurgedTechs().contains(unit.getRequiredTechId().get());
             Point unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
             if (unit.getFaction().isPresent()) {
+                if (game.isTwilightsFallMode() && !unit.getFaction().get().endsWith("tf")) {
+                    Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+                    UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                    drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+                }
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent()
                         || unit.getUpgradesToUnitId().isPresent();
                 boolean corsair = "mentak_cruiser3".equals(unit.getAlias());
