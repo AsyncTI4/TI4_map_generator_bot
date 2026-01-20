@@ -64,7 +64,7 @@ public class TeHelperAgents {
                 .toList();
         for (String ac : newACs) {
             ActionCardModel model = Mapper.getActionCard(ac);
-            buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.ActionCard));
+            buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.getACEmoji(game)));
         }
 
         String msg = player.getRepresentation(true, true)

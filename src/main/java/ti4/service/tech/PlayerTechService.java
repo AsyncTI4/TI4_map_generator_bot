@@ -262,7 +262,7 @@ public class PlayerTechService {
                 Button draw2ACButton = Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "draw2 AC",
                         "Draw 2 Action Cards",
-                        CardEmojis.ActionCard);
+                        CardEmojis.getACEmoji(game));
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 // sendNextActionButtonsIfButtonEvent(event, game, player);
             }

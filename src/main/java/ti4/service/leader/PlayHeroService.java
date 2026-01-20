@@ -692,7 +692,7 @@ public class PlayHeroService {
                 acButtons.add(Buttons.gray(
                         "yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(),
                         acName,
-                        CardEmojis.ActionCard));
+                        CardEmojis.getACEmoji(yssaril)));
             }
         }
         return acButtons;
@@ -731,7 +731,7 @@ public class PlayHeroService {
                         .append("> `")
                         .append(String.format("%02d", index))
                         .append(".` ")
-                        .append(CardEmojis.ActionCard)
+                        .append(CardEmojis.getACEmoji(game))
                         .append(" ")
                         .append(acName)
                         .append("\n");
@@ -754,7 +754,7 @@ public class PlayHeroService {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentation() + " uses Harka Leeds, the Keleres (Mentak) hero, to reveal "
-                        + CardEmojis.ActionCard + "action cards, until drawing 3 component action cards.\n");
+                        + CardEmojis.getACEmoji(game) + "action cards, until drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(

@@ -905,7 +905,7 @@ public class PlayStrategyCardService {
     private static List<Button> getLuminous2Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo A System");
-        Button draw1AC = Buttons.gray("lumiACdraw", "Draw 1 Action Card", CardEmojis.ActionCard);
+        Button draw1AC = Buttons.gray("lumiACdraw", "Draw 1 Action Card", CardEmojis.getACEmoji(player));
         Button refreshButton = Buttons.gray("exploreAPlanet", "Explore a planet");
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, draw1AC, refreshButton, noFollowButton);

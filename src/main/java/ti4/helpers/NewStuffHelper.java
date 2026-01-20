@@ -164,7 +164,7 @@ public class NewStuffHelper {
         game.getDiscardActionCards().keySet().stream()
                 .filter(integer -> allowedStatus.contains(status.getOrDefault(integer, null)))
                 .map(integer -> Map.entry(integer, Mapper.getActionCard(integer).getName()))
-                .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.ActionCard))
+                .map(e -> Buttons.green(pre + e.getKey(), e.getValue(), CardEmojis.getACEmoji(game)))
                 .forEach(allButtons::add);
         return allButtons;
     }

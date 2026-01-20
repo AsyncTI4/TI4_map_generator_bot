@@ -779,7 +779,7 @@ public class UnfiledButtonHandlers {
             }
             case "absol_pa" -> { // Absol's Psychoarcheology
                 List<Button> absolPAButtons = new ArrayList<>();
-                absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.ActionCard));
+                absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.getACEmoji(game)));
                 for (String planetID : player.getReadiedPlanets()) {
                     Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
                     if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
