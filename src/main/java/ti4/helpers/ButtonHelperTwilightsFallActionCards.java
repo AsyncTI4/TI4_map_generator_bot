@@ -248,7 +248,7 @@ public class ButtonHelperTwilightsFallActionCards {
             }
             buttons.add(Buttons.gray(
                     p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability,
-                    tech.getAutoCompleteName()));
+                    tech.getName()));
         }
         String msg = p2.getRepresentationUnfogged() + ", please choose the ability you wish to give to "
                 + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation()) + ".";
@@ -291,7 +291,7 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
-            buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
+            buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
         String msg = player.getRepresentation() + ", please choose the ability you wish to try to steal.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -306,7 +306,7 @@ public class ButtonHelperTwilightsFallActionCards {
         TechnologyModel tech1 = Mapper.getTech(ability1);
         buttons.add(Buttons.gray(
                 p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability1,
-                "Give" + tech1.getAutoCompleteName()));
+                "Give" + tech1.getName()));
         buttons.add(Buttons.gray(
                 p2.getFinsFactionCheckerPrefix() + "poisonHeroStep4_" + player.getFaction(), "Give 2 Abilities"));
         String msg = p2.getRepresentation()
@@ -332,7 +332,7 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
-            buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
+            buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
         String msg = player.getRepresentation() + ", please choose the ability you wish to lose.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -352,8 +352,8 @@ public class ButtonHelperTwilightsFallActionCards {
             if (p2.getSingularityTechs().contains(ability)) {
                 continue;
             }
-            buttons.add(Buttons.gray(
-                    "transposeStep4_" + p2.getFaction() + "_" + ability1 + "_" + ability, tech.getAutoCompleteName()));
+            buttons.add(
+                    Buttons.gray("transposeStep4_" + p2.getFaction() + "_" + ability1 + "_" + ability, tech.getName()));
         }
         String msg = player.getRepresentation() + ", please choose the ability you wish to steal.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
@@ -372,11 +372,10 @@ public class ButtonHelperTwilightsFallActionCards {
         player.addTech(ability2);
         p2.addTech(ability1);
 
-        String msg =
-                player.getRepresentationUnfogged() + " choose to exchange _" + tech1.getAutoCompleteName() + "_ with _"
-                        + tech2.getAutoCompleteName() + "_ via a _Transpose_ with " + p2.getFactionNameOrColor() + ".";
-        String msg2 = p2.getRepresentationUnfogged() + ", you exchanged _" + tech2.getAutoCompleteName() + "_ for _"
-                + tech1.getAutoCompleteName() + "_ via a _Transpose_ with "
+        String msg = player.getRepresentationUnfogged() + " choose to exchange _" + tech1.getName() + "_ with _"
+                + tech2.getName() + "_ via a _Transpose_ with " + p2.getFactionNameOrColor() + ".";
+        String msg2 = p2.getRepresentationUnfogged() + ", you exchanged _" + tech2.getName() + "_ for _"
+                + tech1.getName() + "_ via a _Transpose_ with "
                 + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getFactionNameOrColor()) + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -485,10 +484,10 @@ public class ButtonHelperTwilightsFallActionCards {
         game.setStoredValue("purgedAbilities", game.getStoredValue("purgedAbilities") + "_" + agent);
         TechnologyModel lead = Mapper.getTech(agent);
         p2.removeTech(agent);
-        String msg = player.getRepresentation() + " has chosen to purge _" + lead.getAutoCompleteName() + "_ from "
+        String msg = player.getRepresentation() + " has chosen to purge " + lead.getNameRepresentation() + " from "
                 + p2.getFactionNameOrColor() + ".";
-        String msg2 = p2.getRepresentation() + ", you lost _" + lead.getAutoCompleteName()
-                + "_ to _The Laws Unwritten_ by " + player.getFactionNameOrColor() + "; it has been purged.";
+        String msg2 = p2.getRepresentation() + ", you lost " + lead.getNameRepresentation()
+                + " to _The Laws Unwritten_ by " + player.getFactionNameOrColor() + "; it has been purged.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -504,7 +503,7 @@ public class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             LeaderModel lead = Mapper.getLeader(agent);
-            buttons.add(Buttons.gray("genophageStep3_" + p2.getFaction() + "_" + agent, lead.getAutoCompleteName()));
+            buttons.add(Buttons.gray("genophageStep3_" + p2.getFaction() + "_" + agent, lead.getName()));
         }
         String msg =
                 player.getRepresentation() + ", please choose the genome of your neighbor that you wish to remove.";
@@ -518,9 +517,9 @@ public class ButtonHelperTwilightsFallActionCards {
         String agent = buttonID.split("_")[2];
         LeaderModel lead = Mapper.getLeader(agent);
         p2.removeLeader(agent);
-        String msg = player.getRepresentation() + " has chosen to remove _" + lead.getAutoCompleteName() + "_ from "
+        String msg = player.getRepresentation() + " has chosen to remove _" + lead.getNameRepresentation() + "_ from "
                 + p2.getFactionNameOrColor() + ".";
-        String msg2 = p2.getRepresentation() + ", you lost _" + lead.getAutoCompleteName() + "_ to a _Genophage_ by "
+        String msg2 = p2.getRepresentation() + ", you lost _" + lead.getNameRepresentation() + "_ to a _Genophage_ by "
                 + player.getFactionNameOrColor() + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
