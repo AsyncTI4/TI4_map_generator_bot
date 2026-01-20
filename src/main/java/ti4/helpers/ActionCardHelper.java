@@ -261,7 +261,7 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets"));
+        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
         return buttons;
     }
 
@@ -1243,7 +1243,7 @@ public class ActionCardHelper {
             }
 
             if ("summit".equals(automationID)) {
-                codedButtons.add(Buttons.green("resolveSummit", buttonLabel));
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSummit", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 

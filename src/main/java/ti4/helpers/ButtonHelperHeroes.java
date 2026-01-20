@@ -1053,7 +1053,7 @@ public class ButtonHelperHeroes {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) {
                     continue;
                 }
@@ -1068,7 +1068,7 @@ public class ButtonHelperHeroes {
                     if (amountFF > 0) {
                         DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), amountFF + " ff", false);
                     }
-                    if (amountFF + amountInf > 0) {
+                    if (amountFF + amountInf > 0 && p2.isRealPlayer()) {
                         MessageHelper.sendMessageToChannel(
                                 p2.getCardsInfoThread(),
                                 p2.getRepresentation()

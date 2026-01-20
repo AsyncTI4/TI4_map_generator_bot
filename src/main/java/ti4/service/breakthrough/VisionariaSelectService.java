@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -181,6 +182,7 @@ public class VisionariaSelectService {
             // DWS Copy Tech
             if (!deepwrought.hasTech(techID)) {
                 deepwrought.addTech(techID);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(deepwrought, techID, game);
                 String dwsMsg = deepwrought.getRepresentationUnfogged() + " also acquired "
                         + techM.getRepresentation(false) + " due to _" + visionariaName() + "_.";
                 MessageHelper.sendMessageToChannel(deepwrought.getCorrectChannel(), dwsMsg);
