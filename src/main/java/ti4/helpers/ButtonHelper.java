@@ -1308,6 +1308,28 @@ public class ButtonHelper {
 
     @ButtonHandler("drawStatusACs")
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
+        if (ActionCardDrawQueueHelper.shouldQueueStatusPhaseDraws(game)
+                && !ActionCardDrawQueueHelper.isQueueActive(game, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX)) {
+            List<Player> order = Helper.getSpeakerOrFullPriorityOrder(game);
+            ActionCardDrawQueueHelper.initializeQueue(game, order, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX);
+        }
+        if (ActionCardDrawQueueHelper.isQueueActive(game, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX)) {
+            List<Player> order = Helper.getSpeakerOrFullPriorityOrder(game);
+            Player nextPlayer =
+                    ActionCardDrawQueueHelper.getNextBlockedPlayer(game, order, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX);
+            if (nextPlayer != null && nextPlayer != player) {
+                ActionCardDrawQueueHelper.enqueuePlayer(game, player, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX);
+                String message =
+                        " wishes to draw their status phase action cards but has players ahead of them in speaker order who need to resolve first."
+                                + " They have been queued and will automatically draw when everyone ahead is clear.";
+                if (!game.isFowMode()) {
+                    message += "\n" + nextPlayer.getRepresentationUnfogged()
+                            + " is the one the game is currently waiting on.";
+                }
+                ReactionService.addReaction(event, game, player, message);
+                return;
+            }
+        }
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
             ReactionService.addReaction(
                     event,
@@ -1318,6 +1340,23 @@ public class ButtonHelper {
                     "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
             return;
         }
+        resolveStatusActionCardDraw(game, player, event);
+        finalizeStatusActionCardDraw(game, player);
+        if (ActionCardDrawQueueHelper.isQueueActive(game, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX)) {
+            List<Player> order = Helper.getSpeakerOrFullPriorityOrder(game);
+            ActionCardDrawQueueHelper.markPlayerResolved(game, player, ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX);
+            ActionCardDrawQueueHelper.resolveQueue(
+                    game,
+                    order,
+                    ActionCardDrawQueueHelper.STATUS_QUEUE_SUFFIX,
+                    queuedPlayer -> {
+                        resolveStatusActionCardDraw(game, queuedPlayer, null);
+                        finalizeStatusActionCardDraw(game, queuedPlayer);
+                    });
+        }
+    }
+
+    private static void resolveStatusActionCardDraw(Game game, Player player, @Nullable ButtonInteractionEvent event) {
         String message = "";
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
@@ -1370,7 +1409,9 @@ public class ButtonHelper {
                 for (String col : colorsCoexisting) {
                     Player p2 = game.getPlayerFromColorOrFaction(col);
                     if (player == p2) {
-                    } else if (player == titans && !seenColors.contains(col)) {
+                        continue;
+                    }
+                    if (player == titans && !seenColors.contains(col)) {
                         slumberBonus++;
                         seenColors.add(col);
                         game.drawActionCard(player.getUserID());
@@ -1415,7 +1456,11 @@ public class ButtonHelper {
             message = " drew " + amount + " action card" + (amount == 1 ? "" : "s") + "." + message;
         }
 
-        ActionCardHelper.sendActionCardInfo(game, player, event);
+        if (event == null) {
+            ActionCardHelper.sendActionCardInfo(game, player);
+        } else {
+            ActionCardHelper.sendActionCardInfo(game, player, event);
+        }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(
@@ -1424,8 +1469,15 @@ public class ButtonHelper {
                     ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
-        ReactionService.addReaction(event, game, player, true, false, message);
+        if (event == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + message);
+        } else {
+            ReactionService.addReaction(event, game, player, true, false, message);
+        }
         checkACLimit(game, player);
+    }
+
+    private static void finalizeStatusActionCardDraw(Game game, Player player) {
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
