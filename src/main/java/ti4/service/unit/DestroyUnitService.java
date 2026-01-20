@@ -173,9 +173,7 @@ public class DestroyUnitService {
             capturing.addAll(devours);
         }
 
-        if (game.isTwilightsFallMode()
-                && (unit.unitKey().getUnitType() == UnitType.Infantry
-                        || unit.unitKey().getUnitType() == UnitType.Fighter)) {
+        if (game.isTwilightsFallMode() && (unit.unitKey().getUnitType() == UnitType.Fighter)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos :

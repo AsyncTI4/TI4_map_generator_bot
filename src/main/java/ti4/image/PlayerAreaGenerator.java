@@ -2470,6 +2470,9 @@ class PlayerAreaGenerator {
         Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             TechnologyModel techModel = Mapper.getTech(tech);
+            if (techModel == null) {
+                continue;
+            }
             String techType = techModel.getFirstType().toString();
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techType = game.getStoredValue("colorChange" + tech);
