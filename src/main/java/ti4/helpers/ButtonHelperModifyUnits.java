@@ -857,11 +857,14 @@ public class ButtonHelperModifyUnits {
                             || type == UnitType.Fighter
                             || type == UnitType.Infantry
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
+                        String location = " In Space";
+                        if (uH instanceof Planet p) {
+                            location = " On " + p.getPlanetModel().getName();
+                        }
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                         + uH.getName() + "_" + player.getColor(),
-                                type.humanReadableName() + " from " + tile.getRepresentationForButtons() + " "
-                                        + ("space".equals(uH.getName()) ? "in Space" : "on " + uH.getProperName())));
+                                type.humanReadableName() + " from " + tile.getRepresentationForButtons() + location));
                     }
                 }
             }

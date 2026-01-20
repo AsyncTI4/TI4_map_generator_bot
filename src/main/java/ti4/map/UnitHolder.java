@@ -48,13 +48,6 @@ public abstract class UnitHolder {
         return name;
     }
 
-    public String getProperName() {
-        if (this instanceof Planet p) {
-            return p.getPlanetModel().getName();
-        }
-        return getName();
-    }
-
     @JsonCreator
     protected UnitHolder(
             @JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
