@@ -410,7 +410,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.",
+                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.\n\n## Reminder that you cannot double up on one plot using this ability, so you can do this a max of 5 times, once for each plot (probably a max of 3 times if you're using the firmament hero and promissory note as well).",
                 buttons);
     }
 

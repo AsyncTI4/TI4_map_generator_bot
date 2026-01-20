@@ -7936,7 +7936,12 @@ public class ButtonHelper {
                 youCanSpend
                         .append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game))
                         .append(", ");
-                resourcesAvailable += planet.getResources();
+
+                if (player.hasUnlockedBreakthrough("xxchabt")) {
+                    resourcesAvailable += Math.max(planet.getResources(), planet.getInfluence());
+                } else {
+                    resourcesAvailable += planet.getResources();
+                }
                 resourcesAvailable += player.hasLeaderUnlocked("xxchahero") ? planet.getInfluence() : 0;
             }
         }
@@ -7985,6 +7990,10 @@ public class ButtonHelper {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander") || player.hasTech("tf-abundance")) {
                 youCanSpend.append(" You also have Titans commander.");
                 resourcesAvailable += 1;
+            }
+            if (player.hasUnexhaustedLeader("winnuagent")) {
+                youCanSpend.append(" You also have Winnu agent.");
+                resourcesAvailable += 2;
             }
             youCanSpend
                     .append(" As such, you may spend up to ")

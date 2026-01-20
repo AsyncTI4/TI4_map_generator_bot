@@ -2383,7 +2383,8 @@ public class ButtonHelperAbilities {
                     String planet2 = planetUnit2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!player.getPlanetsAllianceMode().contains(planet2)
-                            && !planetRepresentation2.contains("Mecatol")
+                            && (!planetRepresentation2.contains("Mecatol")
+                                    || (game.isTwilightsFallMode() && game.doesSomeoneControlRex()))
                             && (planetUnit2.getUnits() == null
                                     || planetUnit2.getUnits().isEmpty())
                             && !planetsChecked.contains(planet2)) {

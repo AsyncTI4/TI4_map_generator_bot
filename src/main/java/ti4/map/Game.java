@@ -1793,6 +1793,16 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public boolean doesSomeoneControlRex() {
+        boolean custodiansTaken = false;
+        for (Player p : getRealPlayersNDummies()) {
+            if (p.controlsMecatol(false)) {
+                return true;
+            }
+        }
+        return custodiansTaken;
+    }
+
     public boolean isCustodiansScored() {
         boolean custodiansTaken = false;
         if (isOrdinianC1Mode()) {

@@ -540,6 +540,9 @@ public class DiscordantStarsHelper {
                 .toList();
         for (String planetId : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetId);
+            if (planet == null) {
+                continue;
+            }
             int mechsOnPlanet = planet.getUnitCount(UnitType.Mech, player);
             if (mechsOnPlanet == 0) {
                 continue;
