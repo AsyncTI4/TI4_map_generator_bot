@@ -14,8 +14,8 @@
         "unitHolderName": "mrte",
         "resourcesLocation": "BottomLeft",
         "extraIcons": 1,
-        "centerPosition": { "x": 170.0, "y": 150.0 },
-        "planetRadius": 120
+        "centerPosition": { "x": 170.0, "y": 148.0 },
+        "planetRadius": 114
     },
     "flavourText": "*Once a splendid place, now a sad devasted wasteland. Only the radiation-shielded Mecatol city, the seat of the powerful Galactic Council, remains habitable.*",
     "source": "thunders_edge"

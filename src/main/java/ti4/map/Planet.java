@@ -41,6 +41,7 @@ public class Planet extends UnitHolder {
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
     private String contrastColor;
+    private float radius;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -72,6 +73,7 @@ public class Planet extends UnitHolder {
                         .toList());
             }
             if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
+            radius = planetInfo.getRadius();
         }
         resetOriginalPlanetResInf();
     }
@@ -405,5 +407,9 @@ public class Planet extends UnitHolder {
 
     public String getContrastColor() {
         return contrastColor;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }

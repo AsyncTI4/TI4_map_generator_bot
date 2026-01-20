@@ -22,10 +22,11 @@
         "resourcesLocation": "BottomLeft",
         "extraIcons": 1,
         "centerPosition": {
-            "x": 62,
-            "y": 60
+            "x": 71,
+            "y": 70
         },
-        "planetRadius": 30
+        "planetRadius": 65.0
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

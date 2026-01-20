@@ -1,1 +1,23 @@
-{"id":"tallin","tileId":"96a","name":"Tallin","aliases":["tallin"],"resources":1,"influence":2,"factionHomeworld":"firmament","planetTypes":["FACTION"],"planetLayout":{"unitHolderName":"tallin","resourcesLocation":"TopLeft","centerPosition":{"x":225.0,"y":205.0}},"source":"thunders_edge"}
+{
+    "id": "tallin",
+    "tileId": "96a",
+    "name": "Tallin",
+    "aliases": [
+        "tallin"
+    ],
+    "resources": 1,
+    "influence": 2,
+    "factionHomeworld": "firmament",
+    "planetTypes": [
+        "FACTION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "tallin",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 227,
+            "y": 201
+        }
+    },
+    "source": "thunders_edge"
+}
