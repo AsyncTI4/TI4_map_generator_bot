@@ -5,6 +5,7 @@ import java.util.Objects;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.model.AbilityModel;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
@@ -94,13 +95,19 @@ public class TwilightsFallInfoHelper {
             homeInfo.append("> ").append(ability).append(System.lineSeparator());
         }
         if (homeTile.getAliases().contains("creussgate")) {
-            homeInfo.append(
-                            "> **Echo of Sacrifice**: During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.")
+            AbilityModel ability = Mapper.getAbility("echo_of_sacrifice");
+            homeInfo.append("> **")
+                    .append(ability.getName())
+                    .append("**: ")
+                    .append(ability.getPermanentEffect().orElse("(missing ability text)"))
                     .append(System.lineSeparator());
         }
         if (homeTile.getAliases().contains("crimsongate")) {
-            homeInfo.append(
-                            "> **Echo of Divergence**: During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.")
+            AbilityModel ability = Mapper.getAbility("echo_of_divergence");
+            homeInfo.append("> **")
+                    .append(ability.getName())
+                    .append("**: ")
+                    .append(ability.getPermanentEffect().orElse("(missing ability text)"))
                     .append(System.lineSeparator());
         }
 

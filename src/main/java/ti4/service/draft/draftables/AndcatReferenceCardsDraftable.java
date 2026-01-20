@@ -593,7 +593,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                         Constants.jabberwockyPing()
                                 + " Could not find a seat choice for player " + player.getUserID()
                                 + " despite drafting for Seat, which should not happen. Is there some other way the players are being assigned seats?");
-                return;
+                throw new IllegalStateException(
+                        "No seat choice found for player " + player.getUserID() + " despite drafting for Seat.");
             }
             DraftChoice seatChoice = seatChoices.getFirst();
             Integer seatNumber = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
