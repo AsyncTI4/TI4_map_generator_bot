@@ -44,7 +44,7 @@ public class TwilightsFallInfoHelper {
         if (includeUnits) {
             setupInfo
                     .append("> Starting Units: ")
-                    .append(Helper.getUnitListEmojis(faction.getStartingFleet()))
+                    .append(Helper.getOrderedUnitListEmojis(faction.getStartingFleet(), true))
                     .append(System.lineSeparator());
         }
 
@@ -92,6 +92,16 @@ public class TwilightsFallInfoHelper {
                 .toList();
         for (String ability : legendaryAbilities) {
             homeInfo.append("> ").append(ability).append(System.lineSeparator());
+        }
+        if (homeTile.getAliases().contains("creussgate")) {
+            homeInfo.append(
+                            "> **Echo of Sacrifice**: During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.")
+                    .append(System.lineSeparator());
+        }
+        if (homeTile.getAliases().contains("crimsongate")) {
+            homeInfo.append(
+                            "> **Echo of Divergence**: During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.")
+                    .append(System.lineSeparator());
         }
 
         return homeInfo.toString();
