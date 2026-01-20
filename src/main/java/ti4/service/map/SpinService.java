@@ -181,8 +181,8 @@ public class SpinService {
             sb.append(center);
             sb.append(OPTION_SEPARATOR);
             sb.append(trigger.toString());
-            sb.append(OPTION_SEPARATOR);
-            sb.append(toSpin.toString());
+            // sb.append(OPTION_SEPARATOR);
+            // sb.append(toSpin.toString());
             return sb.toString();
         }
 
