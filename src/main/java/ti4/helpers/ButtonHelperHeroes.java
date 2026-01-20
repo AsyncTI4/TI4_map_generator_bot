@@ -2483,6 +2483,7 @@ public class ButtonHelperHeroes {
         if (player != player2) {
             StartCombatService.startSpaceCombat(game, player, player2, tile2, event, "-benediction");
         }
+        game.setActiveSystem(pos2);
     }
 
     @ButtonHandler("creussHeroStep1_")
