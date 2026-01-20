@@ -256,7 +256,7 @@ public class TransactionHelper {
                             case "generic" ->
                                 trans.append(amountToTransact)
                                         .append(" ")
-                                        .append(CardEmojis.ActionCard)
+                                        .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
@@ -270,7 +270,7 @@ public class TransactionHelper {
                                         acID = ac.getKey();
                                     }
                                 }
-                                trans.append(CardEmojis.ActionCard);
+                                trans.append(CardEmojis.getACEmoji(game));
                                 if (!hidePrivateCardText) {
                                     trans.append(" _")
                                             .append(Mapper.getActionCard(acID).getName())

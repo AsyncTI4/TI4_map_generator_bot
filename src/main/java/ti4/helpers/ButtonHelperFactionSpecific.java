@@ -87,7 +87,7 @@ public class ButtonHelperFactionSpecific {
         String prefix = player.getFinsFactionCheckerPrefix() + "c4redtech_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(prefix + "pds", "Place a PDS", UnitEmojis.pds));
-        buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.ActionCard));
+        buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.getACEmoji(player)));
         buttons.add(Buttons.red(prefix + "repair", "Repair units", "💥"));
         return buttons;
     }
@@ -410,7 +410,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.\n\n## Reminder that you cannot double up on one plot using this ability, so you can do this a max of 5 times, once for each plot (probably a max of 3 times if you're using the firmament hero and promissory note as well).",
+                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.\n\n## Reminder that you cannot double up on one Plot using this ability, so you can do this a maximum of 5 times, once for each Plot (probably a maximum of 3 times if you're using Sharsiss and _Black Ops_ as well).",
                 buttons);
     }
 

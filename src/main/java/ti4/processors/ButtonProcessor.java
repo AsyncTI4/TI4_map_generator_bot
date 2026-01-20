@@ -151,7 +151,11 @@ public class ButtonProcessor {
                 // Don't add anymore cases - use @ButtonHandler
                 case "refreshInfoButtons" ->
                     MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
+                            event.getChannel(),
+                            null,
+                            (game != null && game.isTwilightsFallMode())
+                                    ? Buttons.REFRESH_INFO_BUTTONS_TF
+                                    : Buttons.REFRESH_INFO_BUTTONS);
                 case "factionEmbedRefresh" ->
                     MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                             player.getCardsInfoThread(),

@@ -33,7 +33,7 @@ public class EdictPhaseHandler {
 
     private final List<Button> edictBlessButtons = Arrays.asList(
             Buttons.green("blessBoonTg", "Gain 3 Trade Goods"),
-            Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard),
+            Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.TF_Action_Card),
             Buttons.blue("redistributeCCButtons", "Gain 1 Command Token"));
 
     @ButtonHandler("edictPhase")

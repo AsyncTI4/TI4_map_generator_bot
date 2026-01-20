@@ -7995,7 +7995,10 @@ public class ButtonHelper {
                 resourcesAvailable += 1;
             }
             if (player.hasUnexhaustedLeader("winnuagent")) {
-                youCanSpend.append(" You also have Winnu agent.");
+                youCanSpend.append(
+                        " You also have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Berekar Berekon, the Winnu "
+                                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril " : "") + "agent.");
                 resourcesAvailable += 2;
             }
             youCanSpend

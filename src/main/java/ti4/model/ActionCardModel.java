@@ -33,7 +33,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation(Game game) {
-        return CardEmojis.ActionCard + (isWild(game) ? "" + CardEmojis.Event : "") + "_" + name + "_";
+        return CardEmojis.getACEmoji(game) + (isWild(game) ? "" + CardEmojis.Event : "") + "_" + name + "_";
     }
 
     public String getNameRepresentation() {
@@ -69,8 +69,8 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = CardEmojis.ActionCard + (isWild(game) ? "" + CardEmojis.Event : "") + "__**" + name + "**__"
-                + source.emoji();
+        String title = CardEmojis.getACEmoji(game) + (isWild(game) ? "" + CardEmojis.Event : "") + "__**" + name
+                + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION

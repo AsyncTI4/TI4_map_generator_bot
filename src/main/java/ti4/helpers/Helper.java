@@ -1396,7 +1396,7 @@ public class Helper {
                 }
                 if (thing.contains("warmachine")) {
                     msg.append("> Used _War Machine_ ")
-                            .append(CardEmojis.ActionCard)
+                            .append(CardEmojis.getACEmoji(game))
                             .append("\n");
                     res += 1;
                     if (game.isWildWildGalaxyMode()) {
@@ -1404,8 +1404,8 @@ public class Helper {
                     }
                 }
                 if (thing.contains("manifest")) {
-                    msg.append("> Used Manifest for 3r")
-                            .append(CardEmojis.ActionCard)
+                    msg.append("> Used _Manifest_ for 3 resources")
+                            .append(CardEmojis.getACEmoji(game))
                             .append("\n");
                     res += 3;
                 }

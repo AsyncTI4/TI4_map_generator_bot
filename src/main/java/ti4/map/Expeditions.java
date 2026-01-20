@@ -144,14 +144,14 @@ public class Expeditions {
     }
 
     @JsonIgnore
-    private TI4Emoji getExpeditionEmoji(String expeditionID) {
+    private TI4Emoji getExpeditionEmoji(String expeditionID, Game game) {
         return switch (expeditionID) {
             case "techSkip" -> TechEmojis.PropulsionTech;
             case "tradeGoods" -> MiscEmojis.tg;
             case "fiveRes" -> MiscEmojis.Resources_5;
             case "fiveInf" -> MiscEmojis.Influence_5;
             case "secret" -> CardEmojis.SecretObjective;
-            case "actionCards" -> CardEmojis.ActionCard;
+            case "actionCards" -> CardEmojis.getACEmoji(game);
             default -> null;
         };
     }
@@ -173,7 +173,7 @@ public class Expeditions {
     public String printExpeditionInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder("Thunder's Edge Expedition Status:");
         for (Entry<String, String> exp : expeditionFactions.entrySet()) {
-            sb.append("\n> ").append(getExpeditionEmoji(exp.getKey()));
+            sb.append("\n> ").append(getExpeditionEmoji(exp.getKey(), game));
             sb.append(" ").append(playerInfo(game, player, exp.getValue()));
         }
         return sb.toString();
@@ -187,7 +187,7 @@ public class Expeditions {
             if (exp.getValue() != null) continue;
             String id = prefix + "TEexpedition_" + exp.getKey();
             String msg = getExpeditionMessage(exp.getKey());
-            buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey())));
+            buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey(), player.getGame())));
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return buttons;
