@@ -38,8 +38,8 @@ public class DataSkimmerService {
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(finChecker + "dataSkimmer_page0", "Use Data Skimmer", FactionEmojis.Ralnel));
-        buttons.add(
-                Buttons.red(finChecker + "discardDataSkimmer", "Discard Cards on Data Skimmer", CardEmojis.ActionCard));
+        buttons.add(Buttons.red(
+                finChecker + "discardDataSkimmer", "Discard Cards on Data Skimmer", CardEmojis.getACEmoji(game)));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 
         String message = "Use these buttons to interact with _Data Skimmer_.";
@@ -64,7 +64,7 @@ public class DataSkimmerService {
             String key = entry.getKey();
             ActionCardModel acModel = entry.getValue();
             int acNum = game.getDiscardActionCards().get(key);
-            Button pick = Buttons.green(buttonPrefix + "draw" + acNum, acModel.getName(), CardEmojis.ActionCard);
+            Button pick = Buttons.green(buttonPrefix + "draw" + acNum, acModel.getName(), CardEmojis.getACEmoji(game));
             pickButtons.add(pick);
         });
         return pickButtons;

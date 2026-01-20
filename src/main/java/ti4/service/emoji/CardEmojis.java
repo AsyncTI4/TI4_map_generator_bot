@@ -1,5 +1,8 @@
 package ti4.service.emoji;
 
+import ti4.map.Game;
+import ti4.map.Player;
+
 public enum CardEmojis implements TI4Emoji {
     // Cards base
     ActionCard,
@@ -87,6 +90,14 @@ public enum CardEmojis implements TI4Emoji {
     sc_8_3,
     sc_8_4,
     sc_8_5, // Imperial
+
+    // Twilight's Fall decks
+    TF_Ability,
+    TF_Action,
+    TF_Edict,
+    TF_Genome,
+    TF_Paradigm,
+    TF_Unit_Uprade,
 
     // Twilight's Fall Strategy Card Pings
     // Lux
@@ -431,6 +442,20 @@ public enum CardEmojis implements TI4Emoji {
                 .appendCodePoint(0x2060)
                 .append(tf_8_5);
         return sb.toString();
+    }
+
+    public static TI4Emoji getACEmoji(Game game) {
+        if (game != null && game.isTwilightsFallMode()) {
+            return TF_Action;
+        }
+        return ActionCard;
+    }
+
+    public static TI4Emoji getACEmoji(Player player) {
+        if (player != null) {
+            return getACEmoji(player.getGame());
+        }
+        return ActionCard;
     }
 
     @Override

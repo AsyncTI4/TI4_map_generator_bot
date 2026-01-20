@@ -41,6 +41,7 @@ public class Buttons {
     public static final Button POST_NOTEPAD = blue("notepadPost", "Post Notes");
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
     private static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
+    private static final Button REFRESH_AC_INFO_TF = green("refreshACInfo", "Action Card Info", CardEmojis.TF_Action);
     private static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
     private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
@@ -68,6 +69,16 @@ public class Buttons {
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
             REFRESH_AC_INFO,
             REFRESH_PN_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
+    public static final List<Button> REFRESH_INFO_BUTTONS_TF = List.of(
+            REFRESH_AC_INFO,
             REFRESH_SO_INFO,
             REFRESH_ABILITY_INFO,
             REFRESH_RELIC_INFO,

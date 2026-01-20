@@ -24,7 +24,7 @@ public class PlayerPreferenceHelper {
     @ButtonHandler(value = "offerPlayerPref", save = false)
     public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.ActionCard));
+        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.getACEmoji(player)));
         buttons.add(Buttons.gray("playerPref_afkTimes", "AFK Times"));
         buttons.add(Buttons.gray("playerPref_tacticalAction", "Distance-Based Tactical Action Preference"));
         buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Auto No Whens/Afters React", CardEmojis.Agenda));
