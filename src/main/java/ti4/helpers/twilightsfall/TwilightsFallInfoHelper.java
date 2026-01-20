@@ -5,6 +5,7 @@ import java.util.Objects;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.model.AbilityModel;
 import ti4.model.FactionModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
@@ -44,7 +45,7 @@ public class TwilightsFallInfoHelper {
         if (includeUnits) {
             setupInfo
                     .append("> Starting Units: ")
-                    .append(Helper.getUnitListEmojis(faction.getStartingFleet()))
+                    .append(Helper.getOrderedUnitListEmojis(faction.getStartingFleet(), true))
                     .append(System.lineSeparator());
         }
 
@@ -92,6 +93,22 @@ public class TwilightsFallInfoHelper {
                 .toList();
         for (String ability : legendaryAbilities) {
             homeInfo.append("> ").append(ability).append(System.lineSeparator());
+        }
+        if (homeTile.getAliases().contains("creussgate")) {
+            AbilityModel ability = Mapper.getAbility("echo_of_sacrifice");
+            homeInfo.append("> **")
+                    .append(ability.getName())
+                    .append("**: ")
+                    .append(ability.getPermanentEffect().orElse("(missing ability text)"))
+                    .append(System.lineSeparator());
+        }
+        if (homeTile.getAliases().contains("crimsongate")) {
+            AbilityModel ability = Mapper.getAbility("echo_of_divergence");
+            homeInfo.append("> **")
+                    .append(ability.getName())
+                    .append("**: ")
+                    .append(ability.getPermanentEffect().orElse("(missing ability text)"))
+                    .append(System.lineSeparator());
         }
 
         return homeInfo.toString();
