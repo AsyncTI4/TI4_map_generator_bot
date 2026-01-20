@@ -313,7 +313,7 @@ class FrankenButtonHandler {
                         }
                         FrankenDraftBagService.passBags(game);
                         passCounter++;
-                        if (passCounter > game.getRealPlayers().size()) {
+                        if (passCounter > game.getRealPlayers().size() * 2) {
                             MessageHelper.sendMessageToChannel(
                                     game.getActionsChannel(),
                                     game.getPing()

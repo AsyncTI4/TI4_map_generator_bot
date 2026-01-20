@@ -3555,6 +3555,18 @@ public class UnfiledButtonHandlers {
     public static void nekroTechExhaust(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentationUnfogged() + ", please choose the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        List<Button> dwsCommanders = game.getPlayers().values().stream()
+                .filter(p1 -> p1 != player)
+                .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
+                .map(p1 -> Buttons.gray(
+                        "useDwsDiscount_" + p1.getFaction(),
+                        "Use Aello Discount, Generating Money For "
+                                + (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, p1, player)
+                                        ? p1.getFaction()
+                                        : "Somebody"),
+                        p1.getFactionEmoji()))
+                .toList();
+        buttons.addAll(dwsCommanders);
         Button doneExhausting = Buttons.red("deleteButtons_technology", "Done Exhausting Planets");
         buttons.add(doneExhausting);
         if (!game.isFowMode()) {
