@@ -518,7 +518,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         playerSetupState.setSetSpeaker(speakerPosition == 1);
         String homeTilePosition =
                 MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
-        if (shouldAlsoSetSeat(draftManager)) {
+        if (isSourceOfSeat(draftManager)) {
             playerSetupState.setPositionHS(homeTilePosition);
         }
 
@@ -561,23 +561,48 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return (Player player) -> doPostSetupWork(draftManager, player, updatedPackage);
     }
 
+    // What is this method for? Setup tasks which require a Player reference.
+    // Once a draft finishes, things happen in this order:
+    // onDraftEnd(): Trigger card-picking, which needs to finish before setupPlayer() is called
+    // setupPlayer(): Sets up the player's home system tile and player order (tasks which DON'T require a Player
+    // reference)
+    // Then the player setup service is invoked, which sets up faction and game state for start (setting up Player
+    // objects)
+    // doPostSetupWork(): Gives player their home system planets and units (tasks which require a Player reference)
     private void doPostSetupWork(DraftManager draftManager, Player player, ReferenceCardPackage refPackage) {
 
         Game game = draftManager.getGame();
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
 
-        // If not setting seat, Speaker Order needs to be set via Priority Track
-        if (!shouldAlsoSetSeat(draftManager)) {
+        String homeTilePosition = null;
+        if (isSourceOfSeat(draftManager)) {
+            // Get the HS tile from speaker order
+            homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
+        } else {
             if (game.getPriorityTrackMode() == PriorityTrackMode.NONE) {
                 game.setPriorityTrackMode(PriorityTrackMode.THIS_ROUND_ONLY);
             }
+            // If not setting seat, Speaker Order needs to be set via Priority Track
             PriorityTrackHelper.AssignPlayerToPriority(draftManager.getGame(), player, speakerPosition);
+
+            List<DraftChoice> seatChoices = draftManager.getPlayerPicks(player.getUserID(), SeatDraftable.TYPE);
+            if (seatChoices.isEmpty()) {
+                BotLogger.error(
+                        new LogOrigin(game),
+                        Constants.jabberwockyPing()
+                                + " Could not find a seat choice for player " + player.getUserID()
+                                + " despite drafting for Seat, which should not happen. Is there some other way the players are being assigned seats?");
+                throw new IllegalStateException(
+                        "No seat choice found for player " + player.getUserID() + " despite drafting for Seat.");
+            }
+            DraftChoice seatChoice = seatChoices.getFirst();
+            Integer seatNumber = SeatDraftable.getSeatNumberFromChoiceKey(seatChoice.getChoiceKey());
+
+            // Get the HS tile from selected seat
+            homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(seatNumber, game.getMapTemplateID());
         }
 
-        // Get the HS tile
-        String homeTilePosition =
-                MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
         Tile hsTile = game.getTileByPosition(homeTilePosition);
 
         // Add home system extra tiles if needed
@@ -648,7 +673,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         return playerStates.stream().map(Entry::getKey).toList();
     }
 
-    private boolean shouldAlsoSetSeat(DraftManager draftManager) {
+    private boolean isSourceOfSeat(DraftManager draftManager) {
         return draftManager.getDraftables().stream().noneMatch(d -> d instanceof SeatDraftable);
     }
 

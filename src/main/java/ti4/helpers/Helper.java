@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3336,46 +3337,71 @@ public class Helper {
         String[] units = unitList.split(",");
         StringBuilder sb = new StringBuilder();
         for (String desc : units) {
-            String[] split = desc.trim().split(" ");
-            String alias;
-            int count;
-            if (StringUtils.isNumeric(split[0])) {
-                count = Integer.parseInt(split[0]);
-                alias = split[1];
-            } else {
-                count = 1;
-                alias = split[0];
-            }
-            if (alias.isEmpty()) {
+            UnitTypeAndCount utc = parseUnitTypeAndCount(desc);
+            if (utc == null) {
                 continue;
             }
-            UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
-            sb.append(StringUtils.repeat(ut.getUnitTypeEmoji().toString(), count));
+            sb.append(StringUtils.repeat(utc.unitType().getUnitTypeEmoji().toString(), utc.count()));
         }
         return sb.toString();
+    }
+
+    public static String getOrderedUnitListEmojis(String unitList, boolean descending) {
+        List<Map.Entry<UnitType, Integer>> entries = getUnitListEntries(unitList);
+        entries.sort(Comparator.comparing(e -> e.getKey()));
+        if (descending) {
+            Collections.reverse(entries);
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<UnitType, Integer> entry : entries) {
+            sb.append(StringUtils.repeat(entry.getKey().getUnitTypeEmoji().toString(), entry.getValue()));
+        }
+        return sb.toString();
+    }
+
+    public static List<Map.Entry<UnitType, Integer>> getUnitListEntries(String unitList) {
+        Map<UnitType, Integer> unitCounts = new HashMap<>();
+        String[] units = unitList.split(",");
+        for (String desc : units) {
+            UnitTypeAndCount utc = parseUnitTypeAndCount(desc);
+            if (utc == null) {
+                continue;
+            }
+            unitCounts.merge(utc.unitType(), utc.count(), Integer::sum);
+        }
+        return new ArrayList<>(unitCounts.entrySet());
     }
 
     public static Map<UnitType, Integer> getUnitList(String unitList) {
         Map<UnitType, Integer> unitCounts = new HashMap<>();
         String[] units = unitList.split(",");
-        StringBuilder sb = new StringBuilder();
         for (String desc : units) {
-            String[] split = desc.trim().split(" ");
-            String alias;
-            int count;
-            if (StringUtils.isNumeric(split[0])) {
-                count = Integer.parseInt(split[0]);
-                alias = split[1];
-            } else {
-                count = 1;
-                alias = split[0];
-            }
-            if (alias.isEmpty()) {
+            UnitTypeAndCount utc = parseUnitTypeAndCount(desc);
+            if (utc == null) {
                 continue;
             }
-            UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
-            unitCounts.merge(ut, count, Integer::sum);
+            unitCounts.merge(utc.unitType(), utc.count(), Integer::sum);
         }
         return unitCounts;
+    }
+
+    private record UnitTypeAndCount(UnitType unitType, int count) {}
+
+    private static UnitTypeAndCount parseUnitTypeAndCount(String desc) {
+        String[] split = desc.trim().split(" ");
+        String alias;
+        int count;
+        if (StringUtils.isNumeric(split[0])) {
+            count = Integer.parseInt(split[0]);
+            alias = split[1];
+        } else {
+            count = 1;
+            alias = split[0];
+        }
+        if (alias.isEmpty()) {
+            return null;
+        }
+        UnitType ut = Units.findUnitType(AliasHandler.resolveUnit(alias));
+        return new UnitTypeAndCount(ut, count);
     }
 }
