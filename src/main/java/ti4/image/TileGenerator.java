@@ -1725,12 +1725,15 @@ public class TileGenerator {
                     continue;
                 }
                 float scale = 0.85f;
-                if (unitHolder instanceof Planet planetHolder) {
-                    scale = planetHolder.getRadius() / 65.0f;
-                }
                 if (tokenID.contains(Constants.DMZ_LARGE)) {
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 65.0f;
+                    }
                     scale *= 0.35f;
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 65.0f;
+                    }
                     scale *= 1.55f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didn't previous get changed for custodians

@@ -6705,7 +6705,8 @@ public class ButtonHelper {
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
-        List<Integer> emojiNum = new ArrayList<>(List.of(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+        List<Integer> emojiNum = new ArrayList<>(
+                List.of(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26));
         Collections.shuffle(emojiNum);
         List<String> colors =
                 new ArrayList<>(List.of("black", "green", "purple", "orange", "pink", "yellow", "red", "blue"));
@@ -6727,7 +6728,7 @@ public class ButtonHelper {
         Collections.shuffle(colors);
         for (int i = 0; i < players.size() && i < 12; i++) {
             MiltyService.secondHalfOfPlayerSetup(
-                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "20" + (i + 1), event, false);
+                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "" + (i + 201), event, false);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
