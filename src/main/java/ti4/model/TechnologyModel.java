@@ -181,6 +181,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 return "warfarebiotic";
             }
         }
+        if ("wavelength".equals(alias) || "antimatter".equals(alias)) {
+            return "tf_generic";
+        }
         return getType().toString();
     }
 
