@@ -1708,6 +1708,7 @@ public class TileGenerator {
             String tokenPath =
                     switch (StringUtils.defaultString(planetHolder.getContrastColor())) {
                         case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+                        case "test" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_test.png");
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
             float scale = planetHolder.getRadius() / 58.0f;
