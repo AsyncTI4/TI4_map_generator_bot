@@ -541,7 +541,8 @@ public class TransactionHelper {
             "A Sickle Of Leather",
             "A Fish's Bicycle",
             "One Red Paperclip",
-            "ACME Bird Seed");
+            "ACME Bird Seed",
+            "Your Choice Of Mountain Dew Or Crab Juice");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
