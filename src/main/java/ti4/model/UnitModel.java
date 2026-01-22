@@ -36,6 +36,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String upgradesToUnitId;
     private String requiredTechId;
     private String faction;
+    private Boolean isUpgrade;
     private List<String> eligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
@@ -534,6 +535,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getUpgradesToUnitId() {
         return Optional.ofNullable(upgradesToUnitId);
+    }
+
+    public boolean getIsUpgrade() {
+        if (isUpgrade != null) {
+            return isUpgrade;
+        }
+        return upgradesFromUnitId != null;
     }
 
     public Optional<String> getRequiredTechId() {

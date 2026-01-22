@@ -1158,6 +1158,15 @@ public class MapGenerator implements AutoCloseable {
             overlayText = cardCount + "/" + fullDeck + " cards in the deck";
             addWebsiteOverlay("Paradigm Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
+
+            if (game.getTyrantUserID().isEmpty()) {
+                String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+                if (tyrantFile != null) {
+                    BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
+                    graphics.drawImage(bufferedImage, x + 15, y - 13, null);
+                }
+                x += 200;
+            }
         }
 
         return x;
