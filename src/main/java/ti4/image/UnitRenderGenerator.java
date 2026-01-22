@@ -371,6 +371,7 @@ class UnitRenderGenerator {
                 break;
             case "saiyan":
                 imagePath = "voltron_saiyan.png";
+                // if red/orange/yellow
                 if (Set.of(
                                 "red",
                                 "splitred",
@@ -380,6 +381,7 @@ class UnitRenderGenerator {
                                 "bld",
                                 "splitbld",
                                 "pld",
+                                "cnb",
                                 "tan",
                                 "splittan",
                                 "cpr",
@@ -394,13 +396,15 @@ class UnitRenderGenerator {
                                 "splitgld",
                                 "spr",
                                 "ylw",
-                                "splitylw")
+                                "splitylw",
+                                "beg")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_saiyan_cyan.png";
                 }
                 break;
             case "at_field":
                 imagePath = "voltron_at_field.png";
+                // if orange
                 if (Set.of("tan", "splittan", "cpr", "chk", "splitchk", "bwn", "pch", "org", "splitorg")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_at_field_magenta.png";
@@ -414,7 +418,19 @@ class UnitRenderGenerator {
                 break;
             case "fancy":
                 imagePath = "voltron_fancy.png";
-                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                // if blue
+                if (Set.of(
+                                "tea",
+                                "splittea",
+                                "gcr",
+                                "eth",
+                                "nvy",
+                                "splitnvy",
+                                "blu",
+                                "splitblu",
+                                "ptr",
+                                "splitptr",
+                                "azr")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_fancy_red.png";
                 }
@@ -424,7 +440,19 @@ class UnitRenderGenerator {
                 break;
             case "lightning":
                 imagePath = "voltron_lightning.png";
-                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                // if blue
+                if (Set.of(
+                                "tea",
+                                "splittea",
+                                "gcr",
+                                "eth",
+                                "nvy",
+                                "splitnvy",
+                                "blu",
+                                "splitblu",
+                                "ptr",
+                                "splitptr",
+                                "azr")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_lightning_yellow.png";
                 }
@@ -441,6 +469,7 @@ class UnitRenderGenerator {
             case "eyes":
             default:
                 imagePath = "voltron_eyes.png";
+                // if red/orange/yellow
                 if (Set.of(
                                 "red",
                                 "splitred",
@@ -450,6 +479,7 @@ class UnitRenderGenerator {
                                 "bld",
                                 "splitbld",
                                 "pld",
+                                "cnb",
                                 "tan",
                                 "splittan",
                                 "cpr",
@@ -464,7 +494,8 @@ class UnitRenderGenerator {
                                 "splitgld",
                                 "spr",
                                 "ylw",
-                                "splitylw")
+                                "splitylw",
+                                "beg")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_eyes_blue.png";
                 }
