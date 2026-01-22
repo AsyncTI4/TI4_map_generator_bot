@@ -643,11 +643,11 @@ class PlayerAreaGenerator {
                 graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
             }
         }
-        if (player.getUserID().equals(game.getTyrantUserID())) {
+        if (player.isTyrant()) {
             xDeltaFromRightSide += 200;
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
-            if (speakerFile != null) {
-                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
+            String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+            if (tyrantFile != null) {
+                BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
                 graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
             }
         }
@@ -3000,6 +3000,16 @@ class PlayerAreaGenerator {
             }
         }
 
+        // draw non-tech upgrades e.g. NRA Voltron, TF splice units
+        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
+        for (UnitModel unit : playerUnitModels) {
+            if (unit.getIsUpgrade() && !unit.getRequiredTechId().isPresent()) {
+                Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+            }
+        }
+
         UnitModel flagship = player.getUnitByBaseType("flagship");
         if (flagship != null && flagship.getId().startsWith("sigma_")) {
             Point unitOffset = getUnitTechOffsets(flagship.getAsyncId(), false);
@@ -3060,7 +3070,6 @@ class PlayerAreaGenerator {
         }
 
         // Add the blank warsun if player has no warsun
-        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         if (player.getUnitsByAsyncID("ws").isEmpty()) {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }
@@ -3069,35 +3078,19 @@ class PlayerAreaGenerator {
             boolean isPurged = unit.getRequiredTechId().isPresent()
                     && player.getPurgedTechs().contains(unit.getRequiredTechId().get());
             Point unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
+            Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
             if (unit.getFaction().isPresent()) {
-                if (game.isTwilightsFallMode() && !unit.getFaction().get().endsWith("tf")) {
-                    Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
-                    UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
-                    drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
-                }
-                boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent()
-                        || unit.getUpgradesToUnitId().isPresent();
-                boolean corsair = "mentak_cruiser3".equals(unit.getAlias());
-                if (game.isFrankenGame()
-                        || game.isTwilightsFallMode()
-                        || corsair
-                        || unitHasUpgrade
-                        || "echoes".equals(player.getFactionModel().getAlias())) {
-                    // Always paint the faction icon in franken
-                    drawFactionIconImage(
-                            graphics,
-                            unit.getFaction().get().toLowerCase(),
-                            deltaX + x + unitFactionOffset.x,
-                            y + unitFactionOffset.y,
-                            32,
-                            32);
-                }
-                if ("naaz_voltron".equals(unit.getAlias())) {
-                    // paint the special voltron decal
-                    BufferedImage voltronDecal =
-                            ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
-                    graphics.drawImage(voltronDecal, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
-                }
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                drawFactionIconImage(
+                        graphics,
+                        unit.getFaction().get().toLowerCase(),
+                        deltaX + x + unitFactionOffset.x,
+                        y + unitFactionOffset.y,
+                        32,
+                        32);
+                UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
+                        unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
+
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
@@ -3107,6 +3100,7 @@ class PlayerAreaGenerator {
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
                         Point offs = new Point(unitFactionOffset.x - 20, unitFactionOffset.y - 20);
                         for (String fsFaction : flagships) {
+                            if (fsFaction.equals(player.getFaction())) continue;
                             drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
                             offs.translate(15, 12);
                         }
