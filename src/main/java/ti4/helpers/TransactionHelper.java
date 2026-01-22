@@ -542,7 +542,43 @@ public class TransactionHelper {
             "A Fish's Bicycle",
             "One Red Paperclip",
             "ACME Bird Seed",
-            "Your Choice Of Mountain Dew Or Crab Juice");
+            "Your Choice Of Mountain Dew Or Crab Juice",
+            // generates a Sidereal Confluence trade offer in the form of
+            // "Two Food/Life Support Cubes And One Biotechnology Cube"
+            String.format(String.format(
+                    String.format(
+                            "%s And %s",
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            },
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            }),
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Food/Life Support";
+                        case 1 -> "Culture";
+                        default -> "Industry";
+                    },
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Information";
+                        case 1 -> "Biotechnology";
+                        default -> "Power/Electrical";
+                    })),
+            "The Golden Skull of Rauhl",
+            "An Inverted Jenny Postage Stamp",
+            "A Flanian Pobble Bead");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
