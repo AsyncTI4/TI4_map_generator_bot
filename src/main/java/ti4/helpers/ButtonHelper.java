@@ -230,7 +230,6 @@ public class ButtonHelper {
                                     : UnitEmojis.infantry + "×" + totalAmount)
                             + " died and auto-revived. You will be prompted to place them on a planets you control at the start of the status phase.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
-            return;
         }
         Game game = player.getGame();
         if (game.isTwilightsFallMode()

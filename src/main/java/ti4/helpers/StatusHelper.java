@@ -701,15 +701,15 @@ public class StatusHelper {
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
             if (game.isTwilightsFallMode() && techs == 0) {
-                if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter")) {
+                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged()
                                     + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
                                     + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
                     player.setStrategicCC(player.getStrategicCC() + 2);
-                    player.addExhaustedRelic("scepter");
-                    player.addExhaustedRelic("absol_scepter");
+                    player.addExhaustedRelic("emelpar");
+                    player.addExhaustedRelic("absol_emelpar");
                 } else if (player.getStrategicCC() > 0) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
@@ -725,7 +725,7 @@ public class StatusHelper {
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
             scarMessage +=
                     "You currently have " + ccs + " command token" + (ccs == 1 ? "" : "s") + " in your strategy pool.";
-            if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
+            if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
                 scarMessage += "You also have the _" + RelicHelper.sillySpelling()
                         + "_ available to exhaust (this will be spent first).";
             for (int i = 0; i < techs && i < entry.getValue(); i++) {
