@@ -32,13 +32,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -721,8 +719,7 @@ class PlayerAreaGenerator {
         String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
         BufferedImage bufferedImage = ImageHelper.read(tokenFile);
         int tokensUsed = Math.min(
-                    7,
-                Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size());
+                7, Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size());
         int tokenCount = game.getRealPlayers().size() - 1 - tokensUsed;
         List<Point> points = new ArrayList<>();
         IntStream.range(0, tokenCount).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
