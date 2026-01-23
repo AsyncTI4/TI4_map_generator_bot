@@ -39,7 +39,7 @@ public class VisionariaSelectService {
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         String message = game.getPing() + " - " + visionariaName() + " breakthrough was exhausted"
                 + (!game.isFowMode() ? " by " + player.getRepresentationNoPing() : "") + ".";
-        message += "\n> Use the buttons to research, or decline.";
+        message += "\n> Use the buttons to research non-faction, non-unit upgrade technology, or decline.";
         message +=
                 "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a promissory note of your choice.";
 

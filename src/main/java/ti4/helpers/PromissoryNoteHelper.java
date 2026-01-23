@@ -702,7 +702,7 @@ public class PromissoryNoteHelper {
         String promissoryNoteId = promissoryNotes.getFirst();
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, sourcePlayer, targetPlayer, CardEmojis.ActionCard + " Action Card", null);
+                    game, event, sourcePlayer, targetPlayer, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
 
         sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));

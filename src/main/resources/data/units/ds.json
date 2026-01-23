@@ -233,6 +233,7 @@
         "name": "Tribune",
         "source": "ds",
         "faction": "kortali",
+        "isUpgrade": true,
         "moveValue": 2,
         "capacityValue": 1,
         "capacityUsed": 1,
@@ -1620,6 +1621,7 @@
         "name": "Terrafactory III",
         "source": "ds",
         "faction": "rohdhna",
+        "isUpgrade": true,
         "moveValue": 2,
         "productionValue": 7,
         "capacityValue": 8,
@@ -1633,8 +1635,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit is also a station with a resource value of 2. When you would exhaust this station’s planet card, this unit becomes damaged instead.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/terrafactory_2.jpg?raw=true"
+        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit is also a station with a resource value of 2. When you would exhaust this station’s planet card, this unit becomes damaged instead."
     },
     {
         "id": "rohdhna_flagship",

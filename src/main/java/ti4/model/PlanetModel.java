@@ -36,6 +36,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private Boolean shrinkNamePNAttach;
     private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
+    private Float radius;
     private int resources;
     private int influence;
     private String factionHomeworld;
@@ -107,6 +108,19 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             return planetLayout.getCenterPosition();
         }
         return null;
+    }
+
+    public float getRadius() {
+        if (radius != null) {
+            return radius;
+        }
+        if (planetLayout != null && planetLayout.getPlanetRadius() != null) {
+            return 1.0f * planetLayout.getPlanetRadius();
+        }
+        if (legendaryAbilityName != null) {
+            return 95.0f;
+        }
+        return 55.0f;
     }
 
     @Deprecated

@@ -44,7 +44,8 @@
         "name": "Genophage",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard 1 of your neighbor's genomes. [Reminder: in TF an agent is called a genome]",
+        "text": "Discard 1 of your neighbor's genomes.",
+        "notes": "\"Genome\" is what Twilight's Fall calls the agentesque splice cards.",
         "source": "twilights_fall"
     },
     {

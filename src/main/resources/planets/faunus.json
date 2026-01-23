@@ -2,20 +2,31 @@
     "id": "faunus",
     "tileId": "97",
     "name": "Faunus",
-    "aliases": ["faunus", "fanus"],
+    "aliases": [
+        "faunus",
+        "fanus"
+    ],
     "resources": 1,
     "influence": 3,
-    "planetTypes": ["INDUSTRIAL"],
-    "techSpecialties": ["BIOTIC"],
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "techSpecialties": [
+        "BIOTIC"
+    ],
     "legendaryAbilityName": "Maxis Central Control",
     "legendaryAbilityText": "You may exhaust this card when you pass to gain control of a non-home, non-legendary planet that contains no units and has no attachments.",
     "legendaryAbilityFlavourText": "The Maxis order has agents and scientists embedded in research teams all across the galaxy.",
     "planetLayout": {
         "unitHolderName": "faunus",
         "resourcesLocation": "BottomLeft",
-        "centerPosition": { "x": 170.0, "y": 150.0 },
+        "centerPosition": {
+            "x": 172,
+            "y": 147
+        },
         "extraIcons": 2,
         "planetRadius": 95
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

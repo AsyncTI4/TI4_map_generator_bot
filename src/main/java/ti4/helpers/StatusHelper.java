@@ -669,7 +669,7 @@ public class StatusHelper {
     public static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
-            if (t.getTileModel().isScar()) {
+            if (t.isScar()) {
                 for (Player p : game.getRealPlayers()) {
                     if (Tile.tileHasPlayerShips(p).test(t)) {
                         scars.put(p, scars.getOrDefault(p, 0) + 1);
@@ -754,7 +754,7 @@ public class StatusHelper {
                     if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
                         String genesisMessage = player.getRepresentationUnfogged()
-                                + ", 1 infantry was added to the space area of the _Genesis_ (the Sol flagship) automatically.";
+                                + ", 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), genesisMessage);
                     }
                 }

@@ -93,9 +93,9 @@ public class TransactionGenerator {
                 || p2.hasTech("tf-guildships")) {
             x += emojiSize + 5;
             drawEmojiWithCenteredInt(
-                    g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
+                    g2, CardEmojis.getACEmoji(p1), p1.getActionCards().size(), x, y);
             drawEmojiWithCenteredInt(
-                    g2, CardEmojis.ActionCard, p2.getActionCards().size(), width - x - emojiSize, y);
+                    g2, CardEmojis.getACEmoji(p2), p2.getActionCards().size(), width - x - emojiSize, y);
         }
 
         // Second Line, Frags
@@ -193,7 +193,7 @@ public class TransactionGenerator {
                     }
                     case "ACs" -> {
                         Integer amt = amountToTransact == 1 ? null : amountToTransact;
-                        drawEmojiWithCenteredInt(g2, CardEmojis.ActionCard, amt, emojiX, emojiRow);
+                        drawEmojiWithCenteredInt(g2, CardEmojis.getACEmoji(game), amt, emojiX, emojiRow);
                         if (!skipYShift) y += 55;
                     }
                     case "PNs" -> {

@@ -349,6 +349,7 @@
             "arbitration",
             "bounty",
             "flawless_strategy",
+            "invasion",
             "opportunists",
             "overthrow1",
             "overthrow2",
@@ -361,7 +362,6 @@
             "sacrifice2",
             "sacrifice3",
             "sacrifice4",
-            "scavenged_fleet",
             "settlements",
             "settlers",
             "strategic_focus"
@@ -500,6 +500,7 @@
             "arbitration",
             "bounty",
             "flawless_strategy",
+            "invasion",
             "opportunists",
             "overthrow1",
             "overthrow2",
@@ -512,7 +513,6 @@
             "sacrifice2",
             "sacrifice3",
             "sacrifice4",
-            "scavenged_fleet",
             "settlements",
             "settlers",
             "strategic_focus"

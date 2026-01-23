@@ -18,9 +18,10 @@
         "unitHolderName": "luthieniv",
         "resourcesLocation": "TopLeft",
         "centerPosition": {
-            "x": 223,
-            "y": 225
+            "x": 224,
+            "y": 231
         }
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

@@ -32,11 +32,13 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -423,7 +425,7 @@ class PlayerAreaGenerator {
         }
 
         // Cards
-        String acImage = "pa_cardbacks_ac.png";
+        String acImage = game.isTwilightsFallMode() ? "pa_cardbacks_ac_tf.png" : "pa_cardbacks_ac.png";
         String soImage = "pa_cardbacks_so.png";
         String pnImage = "pa_cardbacks_pn.png";
         String tradeGoodImage = game.isNomadCoin() ? "pa_cardbacks_nomadcoin.png" : "pa_cardbacks_tradegoods.png";
@@ -439,18 +441,23 @@ class PlayerAreaGenerator {
                 g2, Integer.toString(player.getAcCount()), (int) card.getCenterX(), y + 75);
         DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
 
-        card = drawPAImage(x + 280, y, pnImage);
-        DrawingUtil.superDrawStringCenteredDefault(
-                g2, Integer.toString(player.getPnCount()), (int) card.getCenterX(), y + 75);
-        DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
+        int xOffset = 0;
+        if (game.isTwilightsFallMode()) {
+            xOffset = 65;
+        } else {
+            card = drawPAImage(x + 280, y, pnImage);
+            DrawingUtil.superDrawStringCenteredDefault(
+                    g2, Integer.toString(player.getPnCount()), (int) card.getCenterX(), y + 75);
+            DrawingUtil.drawRectWithTwoColorGradient(g2, Color.black, null, card);
+        }
 
         // Trade Goods
-        card = drawPAImage(x + 345, y, tradeGoodImage);
+        card = drawPAImage(x + 345 - xOffset, y, tradeGoodImage);
         DrawingUtil.superDrawStringCenteredDefault(
                 g2, Integer.toString(player.getTg()), (int) card.getCenterX(), y + 75);
 
         // Comms
-        card = drawPAImage(x + 410, y, commoditiesImage);
+        card = drawPAImage(x + 410 - xOffset, y, commoditiesImage);
         String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
         DrawingUtil.superDrawStringCenteredDefault(g2, comms, (int) card.getCenterX(), y + 75);
 
@@ -460,18 +467,18 @@ class PlayerAreaGenerator {
         String urfImage = "pa_fragment_urf.png";
         String irfImage = "pa_fragment_irf.png";
         int xDelta = 0;
-        xDelta = drawFrags(y, x, 0, urf, urfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, urf, urfImage, xDelta);
         xDelta += 25;
-        xDelta = drawFrags(y, x, 0, irf, irfImage, xDelta);
+        xDelta = drawFrags(y, x - xOffset, 0, irf, irfImage, xDelta);
 
         int xDelta2 = 0;
         int hrf = player.getHrf();
         int crf = player.getCrf();
         String hrfImage = "pa_fragment_hrf.png";
         String crfImage = "pa_fragment_crf.png";
-        xDelta2 = drawFrags(y + 73, x, 0, hrf, hrfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, hrf, hrfImage, xDelta2);
         xDelta2 += 25;
-        xDelta2 = drawFrags(y + 73, x, 0, crf, crfImage, xDelta2);
+        xDelta2 = drawFrags(y + 73, x - xOffset, 0, crf, crfImage, xDelta2);
 
         xDelta = x + 600;
         // xDelta = x + 550 + Math.max(xDelta, xDelta2); DISABLE AUTO-SCALE BASED ON
@@ -638,11 +645,11 @@ class PlayerAreaGenerator {
                 graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
             }
         }
-        if (player.getUserID().equals(game.getTyrantUserID())) {
+        if (player.isTyrant()) {
             xDeltaFromRightSide += 200;
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
-            if (speakerFile != null) {
-                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
+            String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+            if (tyrantFile != null) {
+                BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
                 graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
             }
         }
@@ -708,19 +715,19 @@ class PlayerAreaGenerator {
     }
 
     private int valefarZTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.hasReadyBreakthrough("nekrobt")) {
-            String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
-            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            int maxTokens = 7;
-            List<Point> points = new ArrayList<>();
-            IntStream.range(0, maxTokens).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
-
-            int tokensUsed = Math.min(
-                    7,
-                    Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size());
-            return displayRemainingFactionTokens(points, bufferedImage, 7 - tokensUsed, xDeltaFromRightSide, yDelta);
+        if (!player.hasReadyBreakthrough("nekrobt")) {
+            return xDeltaFromRightSide;
         }
-        return xDeltaFromRightSide;
+        String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
+        BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+        int tokensUsed = Math.min(
+                    7,
+                Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size());
+        int tokenCount = game.getRealPlayers().size() - 1 - tokensUsed;
+        List<Point> points = new ArrayList<>();
+        IntStream.range(0, tokenCount).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
+
+        return displayRemainingFactionTokens(points, bufferedImage, tokenCount, xDeltaFromRightSide, yDelta);
     }
 
     private int sleeperTokens(Player player, int xDeltaFromRightSide, int yDelta) {
@@ -2996,6 +3003,16 @@ class PlayerAreaGenerator {
             }
         }
 
+        // draw non-tech upgrades e.g. NRA Voltron, TF splice units
+        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
+        for (UnitModel unit : playerUnitModels) {
+            if (unit.getIsUpgrade() && !unit.getRequiredTechId().isPresent()) {
+                Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+            }
+        }
+
         UnitModel flagship = player.getUnitByBaseType("flagship");
         if (flagship != null && flagship.getId().startsWith("sigma_")) {
             Point unitOffset = getUnitTechOffsets(flagship.getAsyncId(), false);
@@ -3056,7 +3073,6 @@ class PlayerAreaGenerator {
         }
 
         // Add the blank warsun if player has no warsun
-        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         if (player.getUnitsByAsyncID("ws").isEmpty()) {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }
@@ -3065,30 +3081,19 @@ class PlayerAreaGenerator {
             boolean isPurged = unit.getRequiredTechId().isPresent()
                     && player.getPurgedTechs().contains(unit.getRequiredTechId().get());
             Point unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
+            Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
             if (unit.getFaction().isPresent()) {
-                boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent()
-                        || unit.getUpgradesToUnitId().isPresent();
-                boolean corsair = "mentak_cruiser3".equals(unit.getAlias());
-                if (game.isFrankenGame()
-                        || game.isTwilightsFallMode()
-                        || corsair
-                        || unitHasUpgrade
-                        || "echoes".equals(player.getFactionModel().getAlias())) {
-                    // Always paint the faction icon in franken
-                    drawFactionIconImage(
-                            graphics,
-                            unit.getFaction().get().toLowerCase(),
-                            deltaX + x + unitFactionOffset.x,
-                            y + unitFactionOffset.y,
-                            32,
-                            32);
-                }
-                if ("naaz_voltron".equals(unit.getAlias())) {
-                    // paint the special voltron decal
-                    BufferedImage voltronDecal =
-                            ImageHelper.read(ResourceHelper.getInstance().getDecalFile("Voltron.png"));
-                    graphics.drawImage(voltronDecal, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, null);
-                }
+                UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+                drawFactionIconImage(
+                        graphics,
+                        unit.getFaction().get().toLowerCase(),
+                        deltaX + x + unitFactionOffset.x,
+                        y + unitFactionOffset.y,
+                        32,
+                        32);
+                UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
+                        unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
+
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
@@ -3098,6 +3103,7 @@ class PlayerAreaGenerator {
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
                         Point offs = new Point(unitFactionOffset.x - 20, unitFactionOffset.y - 20);
                         for (String fsFaction : flagships) {
+                            if (fsFaction.equals(player.getFaction())) continue;
                             drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
                             offs.translate(15, 12);
                         }

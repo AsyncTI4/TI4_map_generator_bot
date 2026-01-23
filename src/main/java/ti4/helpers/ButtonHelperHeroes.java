@@ -1274,13 +1274,14 @@ public class ButtonHelperHeroes {
                         + Mapper.getTech(techID).getName()
                         + " with _Wave Function Collapse_. Those who owned this can now research a replacement technology.");
         for (Player p2 : game.getRealPlayers()) {
+            String msg = p2.getRepresentationUnfogged() + ", "
+                    + Mapper.getTech(techID).getName() + " was purged with _Wave Function Collapse_.";
             if (p2.getTechs().contains(techID)) {
+                msg += " You can (and must) now research a replacement technology.";
                 ButtonHelperActionCards.resolveResearch(game, p2, event);
             }
-            p2.purgeTech(techID);
-            String msg = p2.getRepresentationUnfogged() + " purged "
-                    + Mapper.getTech(techID).getName();
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
+            p2.purgeTech(techID);
         }
 
         ButtonHelper.deleteMessage(event);
@@ -2773,7 +2774,7 @@ public class ButtonHelperHeroes {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             scButtons.add(Buttons.green("construction_spacedock", "Place 1 Space Dock", UnitEmojis.spacedock));
@@ -2803,7 +2804,7 @@ public class ButtonHelperHeroes {
 
         scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
 
-        scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+        scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
 
         scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
         scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
@@ -2840,7 +2841,7 @@ public class ButtonHelperHeroes {
         }
         ButtonHelper.deleteMessage(event);
         acButtons.add(Buttons.green(
-                "takeAC_" + acID + "_" + player.getFaction(), "Take " + buttonLabel, CardEmojis.ActionCard));
+                "takeAC_" + acID + "_" + player.getFaction(), "Take " + buttonLabel, CardEmojis.getACEmoji(game)));
         acButtons.add(Buttons.red(
                 "yssarilHeroRejection_" + player.getFaction(), "Reject " + buttonLabel + " and Force Discard"));
         String message = yssaril.getRepresentationUnfogged() + " " + offerName + " has offered you the action card "

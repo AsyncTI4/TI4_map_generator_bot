@@ -256,7 +256,7 @@ public class TransactionHelper {
                             case "generic" ->
                                 trans.append(amountToTransact)
                                         .append(" ")
-                                        .append(CardEmojis.ActionCard)
+                                        .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
@@ -270,7 +270,7 @@ public class TransactionHelper {
                                         acID = ac.getKey();
                                     }
                                 }
-                                trans.append(CardEmojis.ActionCard);
+                                trans.append(CardEmojis.getACEmoji(game));
                                 if (!hidePrivateCardText) {
                                     trans.append(" _")
                                             .append(Mapper.getActionCard(acID).getName())
@@ -541,7 +541,44 @@ public class TransactionHelper {
             "A Sickle Of Leather",
             "A Fish's Bicycle",
             "One Red Paperclip",
-            "ACME Bird Seed");
+            "ACME Bird Seed",
+            "Your Choice Of Mountain Dew Or Crab Juice",
+            // generates a Sidereal Confluence trade offer in the form of
+            // "Two Food/Life Support Cubes And One Biotechnology Cube"
+            String.format(String.format(
+                    String.format(
+                            "%s And %s",
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            },
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            }),
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Food/Life Support";
+                        case 1 -> "Culture";
+                        default -> "Industry";
+                    },
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Information";
+                        case 1 -> "Biotechnology";
+                        default -> "Power/Electrical";
+                    })),
+            "The Golden Skull of Rauhl",
+            "An Inverted Jenny Postage Stamp",
+            "A Flanian Pobble Bead");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
@@ -1623,14 +1660,16 @@ public class TransactionHelper {
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         goAgainButtons.add(done);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
+            if (!message2.isEmpty()) {
+                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
+            }
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         p1.getCardsInfoThread(),
                         ident + ", use these buttons to complete the transaction.",
                         goAgainButtons);
             }
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {

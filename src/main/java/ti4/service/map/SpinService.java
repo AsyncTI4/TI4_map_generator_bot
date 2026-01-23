@@ -51,15 +51,42 @@ public class SpinService {
         STRATEGY("start of Strategy"),
         NO("Never");
 
-        private final String description;
+        private final String displayName;
 
-        AutoTrigger(String description) {
-            this.description = description;
+        AutoTrigger(String displayName) {
+            this.displayName = displayName;
         }
 
         public static AutoTrigger fromString(String trigger) {
             try {
                 return AutoTrigger.valueOf(trigger.toUpperCase());
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        public static List<String> valuesAsStringList() {
+            return List.of(values()).stream().map(v -> v.toString()).collect(Collectors.toList());
+        }
+    }
+
+    public enum ToSpin {
+        ALL("All");
+        // PLANETS("Movable Planets"),
+        // BORDERS("Border Tokens"),
+        // UNITS("Units in Space"),
+        // WORMHOLES("Wormhole Tokens"),
+        // ANOMALIES("Anomaly Tokens");
+
+        public final String displayName;
+
+        ToSpin(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public static ToSpin fromString(String toSpin) {
+            try {
+                return ToSpin.valueOf(toSpin.toUpperCase());
             } catch (Exception e) {
                 return null;
             }
@@ -77,6 +104,7 @@ public class SpinService {
         private Direction direction;
         private List<Integer> steps;
         private AutoTrigger trigger;
+        private ToSpin toSpin;
 
         public SpinSetting(
                 String center,
@@ -84,13 +112,14 @@ public class SpinService {
                 Direction direction,
                 List<Integer> steps,
                 AutoTrigger trigger,
+                ToSpin toSpin,
                 Game game) {
             this.center = center;
             this.ring = ring;
             this.direction = direction;
             this.steps = steps;
             this.trigger = trigger;
-
+            this.toSpin = toSpin;
             if (game != null) {
                 this.id = String.valueOf(
                         ((game.getName() + toString()).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
@@ -104,6 +133,7 @@ public class SpinService {
             Direction direction = null;
             String center = "000";
             AutoTrigger trigger = AutoTrigger.STATUS;
+            ToSpin toSpin = ToSpin.ALL;
             try {
                 ring = List.of(parts[0].split(LIST_SEPARATOR)).stream()
                         .map(Integer::parseInt)
@@ -121,6 +151,11 @@ public class SpinService {
                     trigger = null;
                     trigger = AutoTrigger.valueOf(parts[4]);
                 }
+
+                if (parts.length > 5) {
+                    toSpin = null;
+                    toSpin = ToSpin.valueOf(parts[5]);
+                }
             } catch (Exception e) {
                 BotLogger.error(
                         new LogOrigin(game),
@@ -128,11 +163,12 @@ public class SpinService {
                         e);
             }
 
-            return new SpinSetting(center, ring, direction, steps, trigger, game);
+            return new SpinSetting(center, ring, direction, steps, trigger, toSpin, game);
         }
 
-        // ring:direction:steps:center:trigger
-        // 1,2:CW:1,2:000:STATUS = ring 1 or 2 clockwise 1 or 2 steps with center at 000 auto-triggering in status phase
+        // ring:direction:steps:center:trigger:toSpin
+        // 1,2:CW:1,2:000:STATUS:ALL = all of ring 1 or 2 clockwise 1 or 2 steps with center at 000 auto-triggering in
+        // status phase
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
@@ -145,6 +181,8 @@ public class SpinService {
             sb.append(center);
             sb.append(OPTION_SEPARATOR);
             sb.append(trigger.toString());
+            // sb.append(OPTION_SEPARATOR);
+            // sb.append(toSpin.toString());
             return sb.toString();
         }
 
@@ -153,6 +191,9 @@ public class SpinService {
             if (id != null) {
                 sb.append("(").append(id).append(") ");
             }
+            sb.append("**");
+            sb.append(toSpin.displayName);
+            sb.append("** of ");
             sb.append("Ring **");
             sb.append(ring.stream().map(String::valueOf).collect(Collectors.joining(" or ")));
             sb.append("** of **");
@@ -164,7 +205,7 @@ public class SpinService {
             sb.append("** steps");
             if (!forExecution) {
                 sb.append(" auto-triggering **");
-                sb.append(trigger.description);
+                sb.append(trigger.displayName);
                 sb.append("**");
             }
             sb.append(".");

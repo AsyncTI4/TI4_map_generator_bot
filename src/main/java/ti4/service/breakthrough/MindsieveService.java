@@ -47,23 +47,28 @@ public class MindsieveService {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (!canUseMindsieve(naalu, primary, scModel)) return;
 
-        StringBuilder msg = new StringBuilder(naalu.getRepresentation()).append(" since you have ");
-        msg.append(mindsieve()).append(" you are able to send a promissory note to ");
-        msg.append(primary.getColorIfCanSeeStats(naalu)).append(" instead of spending a command token.");
-        msg.append(" If you would like to do so, choose which promissory note to send by clicking a button:");
+        StringBuilder msg = new StringBuilder(naalu.getRepresentation())
+                .append(" since you have ")
+                .append(mindsieve())
+                .append(" you may send a promissory note to ")
+                .append(primary.getColorIfCanSeeStats(naalu))
+                .append(" instead of spending a command token to follow **")
+                .append(scModel.getName())
+                .append("**. If you wish to do so, please choose which promissory note to send.");
 
         List<Button> buttons = new ArrayList<>();
         for (String pn : naalu.getPromissoryNotes().keySet()) {
             PromissoryNoteModel model = Mapper.getPromissoryNote(pn);
             if (naalu.getPromissoryNotesInPlayArea().contains(pn)) continue;
             if ("Alliance".equals(model.getName()) && primary.hasAbility("hubris")) {
-                String fmt = "\n-# > - Since they %s, you cannot send them your _Alliance_ promissory note.";
+                String fmt = "\n-# Since they %s, you cannot send them your _Alliance_ promissory note.";
                 String reason = game.isFrankenGame() ? "have the **Hubris** ability" : "are playing Mahact";
                 msg.append(String.format(fmt, game.isFowMode() ? "[REDACTED]" : reason));
                 continue;
             }
             Player owner = game.getPNOwner(pn);
-            buttons.add(Buttons.green("mindsieveFollow_" + sc + "_" + pn, model.getName(), owner.fogSafeEmoji()));
+            buttons.add(
+                    Buttons.green("mindsieveFollow_" + sc + "_" + pn, "Send " + model.getName(), owner.fogSafeEmoji()));
         }
         buttons.add(
                 Buttons.DONE_DELETE_BUTTONS.withLabel("Decline Mindsieve").withEmoji(FactionEmojis.Naalu.asEmoji()));

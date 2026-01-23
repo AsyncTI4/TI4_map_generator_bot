@@ -148,7 +148,7 @@ public class ActionCardHelper {
             if (status == ACStatus.garbozia) {
                 String id = Constants.AC_PLAY_FROM_HAND + ident;
                 String label = Mapper.getActionCard(card.getKey()).getName();
-                buttons.add(Buttons.red(id, label, CardEmojis.ActionCard));
+                buttons.add(Buttons.red(id, label, CardEmojis.getACEmoji(game)));
             }
         }
         return buttons;
@@ -334,7 +334,7 @@ public class ActionCardHelper {
             if (actionCard == null) {
                 sb.append("Something broke here");
             } else {
-                sb.append(CardEmojis.ActionCard)
+                sb.append(CardEmojis.getACEmoji(game))
                         .append(actionCard.isWild(game) ? CardEmojis.Event : "")
                         .append(" _")
                         .append(actionCard.getName())
@@ -366,7 +366,7 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
                 acButtons.add(Buttons.red(
-                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.getACEmoji(game)));
             }
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -443,7 +443,9 @@ public class ActionCardHelper {
                 String actionCardWindow = actionCard.getWindow();
                 if ("action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + acName,
+                            CardEmojis.getACEmoji(player)));
                 }
             }
         }
@@ -488,7 +490,9 @@ public class ActionCardHelper {
                         || actionCardWindow.contains("roll")
                         || actionCardWindow.contains("hit")) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + acName,
+                            CardEmojis.getACEmoji(player)));
                 }
             }
         }
@@ -523,7 +527,9 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
                 acButtons.add(Buttons.blue(
-                        "ac_discard_from_hand_" + value + suffix, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                        "ac_discard_from_hand_" + value + suffix,
+                        "(" + value + ") " + acName,
+                        CardEmojis.getACEmoji(player)));
             }
         }
         return acButtons;
@@ -537,8 +543,8 @@ public class ActionCardHelper {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                acButtons.add(
-                        Buttons.red("takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.ActionCard));
+                acButtons.add(Buttons.red(
+                        "takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.getACEmoji(player)));
             }
         }
         return acButtons;
@@ -1691,11 +1697,11 @@ public class ActionCardHelper {
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.ActionCard + ": _"
-                    + actionCardTitle + "_.";
+            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.getACEmoji(game)
+                    + ": _" + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(
-                    player, game, "Played action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.");
+                    player, game, "Played action card " + CardEmojis.getACEmoji(game) + ": _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray(
@@ -1758,7 +1764,7 @@ public class ActionCardHelper {
             for (String name : cardNames) {
                 String id = reversePrefix + name;
                 String label = "Reverse Engineer " + name;
-                reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                reverseButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
                 if (actionCards.size() == 1) msg.append(name).append(".");
             }
 
@@ -1800,7 +1806,7 @@ public class ActionCardHelper {
                 String id = twinningPrefix + model.getName();
                 String label = "Twin " + model.getName();
                 lastCardName = model.getName();
-                twinningButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                twinningButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
             }
 
             if (!twinningButtons.isEmpty()) {
@@ -1926,7 +1932,7 @@ public class ActionCardHelper {
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, player, player_, CardEmojis.ActionCard + " Action Card", null);
+                    game, event, player, player_, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);

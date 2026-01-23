@@ -209,18 +209,21 @@ public class LoreService {
     }
 
     @ButtonHandler("gmLore")
-    private static void showLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void showLoreButtons(GenericInteractionCreateEvent event, String buttonID, Game game) {
         String page = StringUtils.substringAfter(buttonID, "page");
         int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);
         List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
 
         if (StringUtils.isBlank(page)) {
-            event.getChannel()
+            event.getMessageChannel()
                     .sendMessage("### Lore Management")
                     .setComponents(buttons)
                     .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
-            event.getHook().editOriginalComponents(buttons).queue(Consumers.nop(), BotLogger::catchRestError);
+            ((ButtonInteractionEvent) event)
+                    .getHook()
+                    .editOriginalComponents(buttons)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -586,9 +589,7 @@ public class LoreService {
     }
 
     private static boolean hasLoreToShow(Game game, String target, TRIGGER trigger) {
-        return game.isFowMode()
-                && getGameLore(game).containsKey(target)
-                && getGameLore(game).get(target).trigger == trigger;
+        return getGameLore(game).containsKey(target) && getGameLore(game).get(target).trigger == trigger;
     }
 
     public static void showSystemLore(Player player, Game game, String position, TRIGGER trigger) {
@@ -638,11 +639,11 @@ public class LoreService {
         String who = player.getRepresentation() + " ";
         switch (loreEntry.receiver) {
             case CURRENT:
-                channels.put(player.getPrivateChannel(), player.getRepresentationUnfogged());
+                channels.put(player.getCorrectChannel(), player.getRepresentationUnfogged());
                 break;
             case ADJACENT:
                 for (Player p : FoWHelper.getAdjacentPlayers(game, position, false)) {
-                    channels.put(p.getPrivateChannel(), p.getRepresentationUnfogged());
+                    channels.put(p.getCorrectChannel(), p.getRepresentationUnfogged());
                 }
                 break;
             case ALL:

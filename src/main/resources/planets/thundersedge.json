@@ -19,13 +19,14 @@
     "legendaryAbilityFlavourText": "Heirarch online. State your request.",
     "planetLayout": {
         "unitHolderName": "thundersedge",
-        "resourcesLocation": "BottomLeft",
+        "resourcesLocation": "BottomRight",
         "extraIcons": 1,
         "centerPosition": {
-            "x": 62,
-            "y": 60
+            "x": 89,
+            "y": 77
         },
-        "planetRadius": 30
+        "planetRadius": 65.0
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }
