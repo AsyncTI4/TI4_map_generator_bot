@@ -11,7 +11,7 @@ public class PlanetLayoutModel {
     private String unitHolderName;
     private ResInfLocation resourcesLocation;
     private Point centerPosition; // px
-    private Integer planetRadius = 55;
+    private Integer planetRadius;
     private Integer extraIcons = 0;
 
     public enum ResInfLocation {
@@ -37,8 +37,12 @@ public class PlanetLayoutModel {
 
     private Point polarToCartesian(double thetaDegrees, double radius, boolean offsetFromCenter) {
         double theta = Math.toRadians(-1 * thetaDegrees);
-        int x = Math.clamp(Math.round(Math.cos(theta) * radius), -2 * planetRadius, 2 * planetRadius);
-        int y = Math.clamp(Math.round(Math.sin(theta) * radius), -2 * planetRadius, 2 * planetRadius);
+        int rad = 55;
+        if (planetRadius != null) {
+            rad = planetRadius;
+        }
+        int x = Math.clamp(Math.round(Math.cos(theta) * radius), -2 * rad, 2 * rad);
+        int y = Math.clamp(Math.round(Math.sin(theta) * radius), -2 * rad, 2 * rad);
         Point p = new Point(x, y);
         if (offsetFromCenter) p.translate(centerPosition.x, centerPosition.y);
         return p;
@@ -65,10 +69,15 @@ public class PlanetLayoutModel {
                     case BottomLeft, TopRight -> 25.0;
                     case BottomRight, TopLeft -> -25.0;
                 };
-        if (planetRadius > 110) deltaTheta /= 2;
+
+        int rad = 55;
+        if (planetRadius != null) {
+            rad = planetRadius;
+        }
+        if (rad > 110) deltaTheta /= 2;
 
         for (int i = 0; i < distinctAttachments; i++) {
-            points.add(polarToCartesian(theta, planetRadius + 5, true));
+            points.add(polarToCartesian(theta, rad + 5, true));
             theta += deltaTheta;
         }
         return points;
@@ -81,7 +90,12 @@ public class PlanetLayoutModel {
                     case BottomLeft, TopRight -> -30.0;
                     case BottomRight, TopLeft -> 30.0;
                 };
-        if (planetRadius > 110) deltaTheta /= 2;
+
+        int rad = 55;
+        if (planetRadius != null) {
+            rad = planetRadius;
+        }
+        if (rad > 110) deltaTheta /= 2;
 
         double adjustment = icons * deltaTheta;
         double theta =
@@ -94,7 +108,7 @@ public class PlanetLayoutModel {
                         + adjustment
                         + (deltaTheta * index);
 
-        return polarToCartesian(theta, planetRadius + 8, true);
+        return polarToCartesian(theta, rad + 8, true);
     }
 
     private Point getSpaceDockOffset() {

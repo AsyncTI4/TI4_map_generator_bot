@@ -793,7 +793,7 @@ public class StartPhaseService {
         }
         String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
-        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.ActionCard);
+        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));
         Button yssarilPolicy = null;

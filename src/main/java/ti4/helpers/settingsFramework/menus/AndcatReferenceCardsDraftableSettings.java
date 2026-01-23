@@ -122,7 +122,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
                 switch (action) {
                     case "presetPackages~MDL" -> getPresetPackagesFromUser(event);
                     case "presetPackages" -> setPresetPackages(event);
-                    default -> "Unknown action: " + action;
+                    default -> null;
                 };
 
         return (error == null ? "success" : error);

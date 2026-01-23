@@ -110,13 +110,13 @@ public class PassService {
         if ("yes".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction()))) {
             for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
                 if ("pe".equals(so.getKey())) {
-                    boolean wongame = SecretObjectiveHelper.scoreSO(
+                    boolean wonGame = SecretObjectiveHelper.scoreSO(
                             event,
                             game,
                             player,
                             so.getValue(),
                             (game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel()));
-                    if (wongame) {
+                    if (wonGame) {
                         return;
                     }
 

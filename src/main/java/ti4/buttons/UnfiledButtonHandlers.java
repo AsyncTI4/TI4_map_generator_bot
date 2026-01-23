@@ -779,7 +779,7 @@ public class UnfiledButtonHandlers {
             }
             case "absol_pa" -> { // Absol's Psychoarcheology
                 List<Button> absolPAButtons = new ArrayList<>();
-                absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.ActionCard));
+                absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.getACEmoji(game)));
                 for (String planetID : player.getReadiedPlanets()) {
                     Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
                     if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
@@ -1868,6 +1868,7 @@ public class UnfiledButtonHandlers {
                 event.getMessageChannel(),
                 player.getRepresentationNoPing() + " retreated all units in space to "
                         + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        LoreService.showSystemLore(player, game, pos2, LoreService.TRIGGER.CONTROLLED);
         FOWCombatThreadMirroring.mirrorMessage(
                 event, game, player.getRepresentationNoPing() + " retreated all units in space.");
         String message =
@@ -2587,6 +2588,7 @@ public class UnfiledButtonHandlers {
                 }
                 if (game.isFowMode()) {
                     game.setStoredValue("fowStatusDone", "");
+                    StatusCleanupService.returnEndStatusPNs(game);
                 }
             }
             case "redistributeCCButtons" -> {

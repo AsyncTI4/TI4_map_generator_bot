@@ -1554,7 +1554,7 @@ public class ButtonHelper {
         if (!game.isFowMode() && TeHelperUnits.affectedByQuietus(game, player, activeSystem)) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the _Quietus_ (the Rebellion flagship) is in an active Breach.");
+                    "### Friendly reminder that all unit abilities (SUSTAIN DAMAGE, PRODUCTION, SPACE CANNON, etc.) are turned off for other players in systems with active Breaches while the Quietus (the Rebellion flagship) is in an active Breach.");
         }
 
         if (!game.isFowMode()) {
@@ -1969,9 +1969,12 @@ public class ButtonHelper {
                         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
                         if (game.isFowMode()) {
                             MessageHelper.sendMessageToChannel(
-                                    channel,
-                                    player.getFactionEmoji() + " returned _" + pnModel.getName() + "_ to "
-                                            + nonActivePlayer.getFactionEmoji() + ".");
+                                    player.getCorrectChannel(),
+                                    player.getRepresentationUnfogged() + " returned _" + pnModel.getName() + "_");
+                            MessageHelper.sendMessageToChannel(
+                                    nonActivePlayer.getCorrectChannel(),
+                                    nonActivePlayer.getRepresentationUnfogged() + ", your _" + pnModel.getName()
+                                            + "_ was returned.");
                         } else {
                             MessageHelper.sendMessageToChannel(
                                     channel,
@@ -5029,7 +5032,7 @@ public class ButtonHelper {
                 if (FoWHelper.otherPlayersHaveUnitsOnPlanet(player, planet)) {
                     buttons.add(Buttons.green(
                             "lizhoBtStep1_" + planet.getName(),
-                            "Coexist on " + Helper.getPlanetRepresentation(planet.getName(), game)));
+                            "Coexist On " + Helper.getPlanetRepresentation(planet.getName(), game)));
                 }
             }
             if (buttons.size() > 0) {
@@ -5037,7 +5040,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " you can use your breakthrough to move 1 infantry on the game board into coexistence on one of the planets in the active system",
+                                + ", you may use _Professional Intrigue_ to move 1 infantry on the game board into coexistence on one of the planets in the active system.",
                         buttons);
             }
         }
@@ -6701,7 +6704,8 @@ public class ButtonHelper {
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
-        List<Integer> emojiNum = new ArrayList<>(List.of(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+        List<Integer> emojiNum = new ArrayList<>(
+                List.of(3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26));
         Collections.shuffle(emojiNum);
         List<String> colors =
                 new ArrayList<>(List.of("black", "green", "purple", "orange", "pink", "yellow", "red", "blue"));
@@ -6723,7 +6727,7 @@ public class ButtonHelper {
         Collections.shuffle(colors);
         for (int i = 0; i < players.size() && i < 12; i++) {
             MiltyService.secondHalfOfPlayerSetup(
-                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "20" + (i + 1), event, false);
+                    players.get(i), game, colors.get(i), "franken" + emojiNum.get(i), "" + (i + 201), event, false);
         }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
@@ -7991,7 +7995,10 @@ public class ButtonHelper {
                 resourcesAvailable += 1;
             }
             if (player.hasUnexhaustedLeader("winnuagent")) {
-                youCanSpend.append(" You also have Winnu agent.");
+                youCanSpend.append(
+                        " You also have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Berekar Berekon, the Winnu "
+                                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril " : "") + "agent.");
                 resourcesAvailable += 2;
             }
             youCanSpend

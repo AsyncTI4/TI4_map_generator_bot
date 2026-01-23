@@ -750,9 +750,8 @@ public class ButtonHelperTwilightsFall {
 
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " has chosen to get a generic technology instead of splicing. The technology is _"
-                            + Mapper.getTech(cardID).getName() + "_.",
+                    player.getRepresentation() + " has chosen to get the _"
+                            + Mapper.getTech(cardID).getName() + "_ generic ability instead of splicing.",
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
         } else {
@@ -781,16 +780,16 @@ public class ButtonHelperTwilightsFall {
                         player.addTech(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " has spliced in the ability: "
-                                        + Mapper.getTech(cardID).getName(),
+                                player.getRepresentation() + " has spliced in the _"
+                                        + Mapper.getTech(cardID).getName() + "_ ability.",
                                 Mapper.getTech(cardID).getRepresentationEmbed());
                     }
                     if ("genome".equalsIgnoreCase(type)) {
                         player.addLeader(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " has spliced in the genome: "
-                                        + Mapper.getLeader(cardID).getTFNameIfAble(),
+                                player.getRepresentation() + " has spliced in the "
+                                        + Mapper.getLeader(cardID).getTFNameIfAble() + " genome.",
                                 Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                     }
                     if ("units".equalsIgnoreCase(type)) {
@@ -808,8 +807,8 @@ public class ButtonHelperTwilightsFall {
                         player.addOwnedUnitByID(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " has spliced in the unit upgrade: "
-                                        + Mapper.getUnit(cardID).getName(),
+                                player.getRepresentation() + " has spliced in the "
+                                        + Mapper.getUnit(cardID).getName() + " unit upgrade.",
                                 Mapper.getUnit(cardID).getRepresentationEmbed());
                     }
                 } else {
@@ -819,7 +818,7 @@ public class ButtonHelperTwilightsFall {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationNoPing()
-                                    + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
+                                    + " has spliced in a secret card. They may put it into play with a button in their `#cards-info` thread.");
                 }
                 if (!buttonID.contains("spoof_")) {
                     triggerYellowUnits(game, player);
@@ -844,7 +843,7 @@ public class ButtonHelperTwilightsFall {
                 }
             } else {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), game.getPing() + ", the splice is complete.");
+                        game.getMainGameChannel(), game.getPing() + ", the splice is complete.");
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                     Player p2 = game.getActivePlayer();
                     if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {

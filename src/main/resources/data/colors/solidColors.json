@@ -191,5 +191,45 @@
         "textColor": "black",
         "primaryColor": { "red": 212, "green": 43, "blue": 75 },
         "hue": "RED"
+    },
+    {
+        "alias": "jad",
+        "name": "jade",
+        "aliases": ["jad"],
+        "textColor": "black",
+        "primaryColor": { "red": 35, "green": 200, "blue": 49 },
+        "hue": "GREEN"
+    },
+    {
+        "alias": "azr",
+        "name": "azure",
+        "aliases": ["azure", "azr"],
+        "textColor": "black",
+        "primaryColor": { "red": 139, "green": 190, "blue": 241 },
+        "hue": "BLUE"
+    },
+    {
+        "alias": "cnb",
+        "name": "cinnabar",
+        "aliases": ["cinnabar", "cnb"],
+        "textColor": "black",
+        "primaryColor": { "red": 241, "green": 156, "blue": 139 },
+        "hue": "RED"
+    },
+    {
+        "alias": "vdg",
+        "name": "verdigris",
+        "aliases": ["verdigris", "vdg"],
+        "textColor": "black",
+        "primaryColor": { "red": 109, "green": 211, "blue": 206 },
+        "hue": "GREEN"
+    },
+    {
+        "alias": "beg",
+        "name": "beige",
+        "aliases": ["beg", "beige"],
+        "textColor": "black",
+        "primaryColor": { "red": 189, "green": 197, "blue": 133 },
+        "hue": "YELLOW"
     }
 ]

@@ -1,1 +1,29 @@
-{"id":"tempesta","tileId":"100","name":"Tempesta","aliases":["tempest","tempesta"],"resources":1,"influence":1,"planetTypes":["HAZARDOUS"],"techSpecialties":["PROPULSION"],"legendaryAbilityName":"Ionian Fuel Refinery","legendaryAbilityText":"You may exhaust this card after you activate a system to apply +1 to the move value of 1 of your ships during this tactical action.","legendaryAbilityFlavourText":"The exotic matter of the rings is found nowhere else in the galaxy.","planetLayout":{"unitHolderName":"tempesta","resourcesLocation":"BottomLeft","centerPosition":{"x":170.0,"y":150.0}},"source":"thunders_edge"}
+{
+    "id": "tempesta",
+    "tileId": "100",
+    "name": "Tempesta",
+    "aliases": [
+        "tempest",
+        "tempesta"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "techSpecialties": [
+        "PROPULSION"
+    ],
+    "legendaryAbilityName": "Ionian Fuel Refinery",
+    "legendaryAbilityText": "You may exhaust this card after you activate a system to apply +1 to the move value of 1 of your ships during this tactical action.",
+    "legendaryAbilityFlavourText": "The exotic matter of the rings is found nowhere else in the galaxy.",
+    "planetLayout": {
+        "unitHolderName": "tempesta",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171,
+            "y": 146
+        }
+    },
+    "source": "thunders_edge"
+}

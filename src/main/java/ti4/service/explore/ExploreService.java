@@ -873,7 +873,9 @@ public class ExploreService {
                         + player.getActionCards().size() + " action card"
                         + (player.getActionCards().size() == 1 ? "" : "s") + ".";
                 Button getACButton = Buttons.green(
-                        "comm_for_AC", "Spend 1 Trade Good or 1 Commodity For 1 Action Card", CardEmojis.ActionCard);
+                        "comm_for_AC",
+                        "Spend 1 Trade Good or 1 Commodity For 1 Action Card",
+                        CardEmojis.getACEmoji(game));
                 Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", MiscEmojis.comm);
                 List<Button> buttons = List.of(getACButton, getCommButton);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);

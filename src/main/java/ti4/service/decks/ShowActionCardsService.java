@@ -134,7 +134,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append("\n").append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
+            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
             ActionCardModel model =
@@ -201,7 +201,9 @@ public class ShowActionCardsService {
         for (Map.Entry<String, List<String>> entry : displayOrder) {
             sb.append("\n").append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(entry.getValue().size()));
+            sb.append(CardEmojis.getACEmoji(game)
+                    .toString()
+                    .repeat(entry.getValue().size()));
             sb.append(" _").append(entry.getKey()).append("_\n> ");
             ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
             sb.append(model.getRepresentationJustText());

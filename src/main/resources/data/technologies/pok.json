@@ -615,6 +615,8 @@
     {
         "alias": "vax",
         "name": "Valefar Assimilator X",
+        "shortName": "Valefar X\nAssimilator",
+        "shrinkName": true,
         "types": [
             "NONE"
         ],
@@ -921,12 +923,14 @@
     {
         "alias": "vay",
         "name": "Valefar Assimilator Y",
+        "shortName": "Valefar Y\nAssimilator",
+        "shrinkName": true,
         "types": [
             "NONE"
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you would gain another players technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
+        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/valefar_assimilator_y.jpg?raw=true"
     },
     {
