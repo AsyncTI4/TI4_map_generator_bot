@@ -2844,7 +2844,8 @@ public class UnfiledButtonHandlers {
                     player.getRepresentation() + ", don't press buttons that aren't meant for you.");
             return;
         }
-        String msg = ", your opponent has declared they are ready to roll combat dice if you are.";
+        String msg =
+                ", your opponent has declared they have no more abilities to resolve at this step and are ready to proceed to dice rolling when you are.";
         if (player == p1 || player.getAllianceMembers().contains(p1.getFaction())) {
             msg = p2.getRepresentation(false, true) + msg;
         } else {
