@@ -13,14 +13,33 @@ import ti4.service.option.GameOptionService;
 
 class GameOptionButtonHandler {
 
-    @ButtonHandler("enableAidReacts")
-    public static void enableAidReact(ButtonInteractionEvent event, Game game) {
-        game.setBotFactionReacts(true);
-        game.setBotStratReacts(true);
+    @ButtonHandler("enableAidReacts_")
+    public static void enableAidReact(ButtonInteractionEvent event, Game game, String buttonID) {
+        String value = buttonID.replace("enableAidReacts_", "");
+        String message = "[Error]";
+        switch (value) {
+            case "faction":
+                game.setBotFactionReacts(true);
+                message = "Faction";
+                break;
+            case "colour":
+                game.setBotColorReacts(true);
+                message = "Colour";
+                break;
+            case "strategy":
+                game.setBotStratReacts(true);
+                message = "Strategy card";
+                break;
+            case "all":
+                game.setBotFactionReacts(true);
+                game.setBotColorReacts(true);
+                game.setBotStratReacts(true);
+                message = "Faction, colour and strategy card";
+                break;
+        }
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                "Faction reaction icons have been enabled. Use `/game options` to change this.");
-        ButtonHelper.deleteMessage(event);
+                message + " reaction icons have been enabled. Use `/game options` to change this.");
     }
 
     @ButtonHandler("disableAidReacts")
@@ -28,9 +47,7 @@ class GameOptionButtonHandler {
         game.setBotFactionReacts(false);
         game.setBotStratReacts(false);
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(),
-                "Faction reaction icons have been disabled. Use `/game options` to change this.");
-        ButtonHelper.deleteMessage(event);
+                event.getMessageChannel(), "Reaction icons have been disabled. Use `/game options` to change this.");
     }
 
     @ButtonHandler("showHexBorders_")

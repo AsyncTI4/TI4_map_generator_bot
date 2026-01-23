@@ -108,7 +108,7 @@ public class ShowActionCardsService {
     public static String acDiscardText(
             boolean fullText, List<Entry<String, Integer>> discards, String title, Game game) {
         if (fullText) return actionCardListFullText(discards, title, game);
-        return discardListCondensed(discards, title);
+        return discardListCondensed(discards, title, game);
     }
 
     private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title, Game game) {
@@ -147,7 +147,7 @@ public class ShowActionCardsService {
         return sb.toString();
     }
 
-    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
+    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title, Game game) {
         // Set up the entry list
         List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
         Collections.reverse(aclist);
@@ -169,7 +169,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append("\n").append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
+            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));
         }

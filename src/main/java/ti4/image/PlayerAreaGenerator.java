@@ -2916,7 +2916,7 @@ class PlayerAreaGenerator {
                 return new Point(151, 67);
             }
             case "ff" -> {
-                if (getFactionIconOffset) return new Point(5, 72);
+                if (getFactionIconOffset) return new Point(7, 72);
                 return new Point(7, 59);
             }
             case "dn" -> {
@@ -2948,7 +2948,7 @@ class PlayerAreaGenerator {
                 return new Point(47, 2);
             }
             case "mf" -> {
-                if (getFactionIconOffset) return new Point(5, 110);
+                if (getFactionIconOffset) return new Point(9, 110);
                 return new Point(3, 102);
             }
             default -> {
@@ -3003,7 +3003,12 @@ class PlayerAreaGenerator {
         // draw non-tech upgrades e.g. NRA Voltron, TF splice units
         List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         for (UnitModel unit : playerUnitModels) {
-            if (unit.getIsUpgrade() && !unit.getRequiredTechId().isPresent()) {
+            boolean drawUpgradeWithoutTech =
+                    unit.getIsUpgrade() && !unit.getRequiredTechId().isPresent();
+            drawUpgradeWithoutTech |= "fs".equals(unit.getAsyncId())
+                    && player.hasUnlockedBreakthrough("nekrobt")
+                    && !game.getStoredValue("valefarZ").isEmpty();
+            if (drawUpgradeWithoutTech) {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
@@ -3081,36 +3086,37 @@ class PlayerAreaGenerator {
             Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
             if (unit.getFaction().isPresent()) {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
-                drawFactionIconImage(
-                        graphics,
-                        unit.getFaction().get().toLowerCase(),
-                        deltaX + x + unitFactionOffset.x,
-                        y + unitFactionOffset.y,
-                        32,
-                        32);
-                UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
-                        unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
+                Point specialOffset = new Point(0, 0);
 
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
                         List<String> flagships = new ArrayList<>();
-                        flagships.add(unitFaction);
                         flagships.addAll(
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
                         Point offs = new Point(unitFactionOffset.x - 20, unitFactionOffset.y - 20);
                         for (String fsFaction : flagships) {
-                            if (fsFaction.equals(player.getFaction())) continue;
                             drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
                             offs.translate(15, 12);
                         }
                     } else if (game.getStoredValue("valefarZ").contains(unitFaction)) {
+                        specialOffset = new Point(-20, -20);
                         String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
                         BufferedImage valefarZ = ImageHelper.read(tokenFile);
                         graphics.drawImage(
                                 valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
                     }
                 }
+
+                drawFactionIconImage(
+                        graphics,
+                        unit.getFaction().get().toLowerCase(),
+                        deltaX + x + unitFactionOffset.x + specialOffset.x,
+                        y + unitFactionOffset.y + specialOffset.y,
+                        32,
+                        32);
+                UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
+                        unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
             }
             if (isPurged) {
                 DrawingUtil.drawRedX(
