@@ -147,11 +147,19 @@ public class StartPhaseService {
     public static List<Button> getQueueSCPickButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        Set<Integer> alreadyPicked = new HashSet<>();
+        for (Player p : game.getRealPlayers()) {
+            if (p.getSCs() != null) {
+                alreadyPicked.addAll(p.getSCs());
+            }
+        }
         boolean hasQueue = false;
         for (int x = 1; x < 9; x++) {
             String num = x + "";
             if (alreadyQueued.contains(num)) {
                 hasQueue = true;
+                continue;
+            } else if (alreadyPicked.contains(x)) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
@@ -169,7 +177,7 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you are #" + number
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + ", you are #" + number
                 + " pick in this Strategy Phase and so can queue " + number + " strategy cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
