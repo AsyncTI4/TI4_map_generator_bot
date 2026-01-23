@@ -5,8 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.persistence.GameManager;
-import ti4.service.game.GameNameService;
+import ti4.message.MessageHelper;
 
 class EditStoredValue extends GameStateSubcommand {
 
@@ -22,10 +21,13 @@ class EditStoredValue extends GameStateSubcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        String gameName = GameNameService.getGameName(event);
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        Game game = getGame();
         game.setStoredValue(
                 event.getOption("stored_key").getAsString(),
-                event.getOption("stored_value").getAsString());
+                event.getOption("stored_value").getAsString().trim());
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "Edited \"" + event.getOption("stored_key").getAsString() + "\" to \""
+                        + event.getOption("stored_value").getAsString().trim() + "\"");
     }
 }
