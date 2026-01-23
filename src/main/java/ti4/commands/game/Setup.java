@@ -8,6 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
 class Setup extends GameStateSubcommand {
 
@@ -115,6 +116,14 @@ class Setup extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     "Something went wrong and the game modes could not be set, please see error above.");
+        }
+        if (customGameName == null
+                && pingHours == null
+                && scCountPerPlayer == null
+                && maxSOCount == null
+                && vpOption == null
+                && playerCount == null) {
+            CreateGameService.presentSetupToPlayers(game);
         }
     }
 
