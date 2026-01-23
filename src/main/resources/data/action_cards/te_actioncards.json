@@ -14,6 +14,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose another player. You and that player may agree to place 1 infantry from each of your reinforcements into coexistence on a planet the other player controls that contains their ground forces; if no agreement is reached, you each discard 1 token from your fleet pool.",
+        "notes": "This card targets two planets, one owned by each player, which the other player will place a unit on.",
         "flavorText": "Madness. Magmus thought to himself. A city. Under water. Absurd.",
         "source": "thunders_edge"
     },
@@ -41,7 +42,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Spend 2 trade goods to place 2 neutral infantry on any non-home planet that contains no units; if that planet was owned by another player, they return its planet card to the planet card deck.",
-        "notes": "This cannot be used to target your own planets.",
+        "notes": "This cannot be used to target your own planets or the DMZ.",
         "flavorText": "\"Just sign right 'ere - yep, right below the smeared blood. You got it, champ, get at 'em.\"",
         "source": "thunders_edge"
     },

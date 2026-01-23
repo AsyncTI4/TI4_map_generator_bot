@@ -715,8 +715,9 @@ class PlayerAreaGenerator {
             List<Point> points = new ArrayList<>();
             IntStream.range(0, maxTokens).forEach(i -> points.add(new Point(i * 35, 25 * ((i + 1) % 2))));
 
-            int tokensUsed =
-                    Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size();
+            int tokensUsed = Math.min(
+                    7,
+                    Arrays.asList(game.getStoredValue("valefarZ").split("\\|")).size());
             return displayRemainingFactionTokens(points, bufferedImage, 7 - tokensUsed, xDeltaFromRightSide, yDelta);
         }
         return xDeltaFromRightSide;
