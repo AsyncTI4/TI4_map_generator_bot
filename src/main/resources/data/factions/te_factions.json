@@ -198,6 +198,7 @@
     {
         "alias": "crimson",
         "factionName": "The Crimson Rebellion",
+        "shortName": "Rebellion",
         "homeSystem": "94",
         "startingFleet": "4 inf a, sd a, 3 ff, pds a, cv, 2 dd",
         "commodities": 2,
@@ -251,6 +252,7 @@
     {
         "alias": "ralnel",
         "factionName": "The Ral Nel Consortium",
+        "shortName": "Ral Nel",
         "homeSystem": "93",
         "startingFleet": "2 inf m, 2 inf r, cv, 2 ff, dn, pds r, pds m, dd, sd m",
         "commodities": 4,
