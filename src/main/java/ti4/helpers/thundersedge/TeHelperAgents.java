@@ -259,8 +259,11 @@ public class TeHelperAgents {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " exhausted Z'eu ΩΩ to remove the just-placed command token from "
-                                + tile.getRepresentationForButtons() + ".");
+                        player.getRepresentation() + " exhausted "
+                                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Z'eu ΩΩ, the Naalu" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                                + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
+                                + ".");
                 RemoveCommandCounterService.fromTile(event, p3, tile);
             });
             for (Player p2 : game.getRealPlayers()) {
@@ -280,7 +283,7 @@ public class TeHelperAgents {
                                 "Exhaust Temporal Command Suite to Ready Naalu Agent"));
                         buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                         msg = p2.getRepresentationUnfogged()
-                                + " you have the opportunity to exhaust _Temporal Command Suite_ to ready Z'eu, and potentially resolve a transaction.";
+                                + ", you have the opportunity to exhaust _Temporal Command Suite_ to ready Z'eu ΩΩ, and potentially resolve a transaction.";
                     }
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
                 }

@@ -1524,6 +1524,48 @@ class PlayerAreaGenerator {
                 addedAbilities = true;
             }
         }
+
+        List<String> singularities = player.getSingularityTechs();
+        if (!singularities.isEmpty()) {
+            String initials = (player.hasTech("tf-singularityx") ? "X" : "")
+                    + (player.hasTech("tf-singularityy") ? "Y" : "")
+                    + (player.hasTech("tf-singularityz") ? "Z" : "");
+            if (singularities.size() > initials.length()) {
+                initials += "Q".repeat(singularities.size() - initials.length());
+            }
+            List<String> exhaustedTechs = player.getExhaustedTechs();
+            for (int t = 0; t < singularities.size(); t++) {
+                String tech = singularities.get(t);
+                boolean isExhausted = exhaustedTechs.contains(
+                        "tf-singularity" + initials.toLowerCase().charAt(t));
+                drawPAImage(x + deltaX, y, "pa_tech_techicons_tf_generic_" + (isExhausted ? "exh" : "rdy") + ".png");
+                TechnologyModel techModel = Mapper.getTech(tech);
+                Color foreground = isExhausted ? Color.GRAY : Color.WHITE;
+                graphics.setFont(Storage.getFont48());
+                int offset = 20 - graphics.getFontMetrics().stringWidth(initials.substring(t, t + 1)) / 2;
+                graphics.setColor(Color.BLACK);
+                for (int i = -2; i <= 2; i++) {
+                    for (int j = -2; j <= 2; j++) {
+                        graphics.drawString(initials.substring(t, t + 1), x + i + deltaX + offset, y + j + 148);
+                    }
+                }
+                graphics.setColor(foreground);
+                graphics.drawString(initials.substring(t, t + 1), x + deltaX + offset, y + 148);
+                if (techModel.getShrinkName()) {
+                    graphics.setFont(Storage.getFont16());
+                    DrawingUtil.drawOneOrTwoLinesOfTextVertically(
+                            graphics, techModel.getShortName(), x + deltaX + 9, y + 116, 116);
+                } else {
+                    graphics.setFont(Storage.getFont18());
+                    DrawingUtil.drawOneOrTwoLinesOfTextVertically(
+                            graphics, techModel.getShortName(), x + deltaX + 7, y + 116, 116);
+                }
+                drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
+                deltaX += 48;
+            }
+            addedAbilities = true;
+        }
+
         return x + deltaX + (addedAbilities ? 20 : 0);
     }
 
@@ -3078,6 +3120,16 @@ class PlayerAreaGenerator {
         if (player.getUnitsByAsyncID("ws").isEmpty()) {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }
+
+        int tfMechCount = 0;
+        int tfMechIndex = 0;
+        if (game.isTwilightsFallMode()) {
+            for (UnitModel unit : playerUnitModels) {
+                if ("mf".equals(unit.getAsyncId())) {
+                    tfMechCount++;
+                }
+            }
+        }
         // Add faction icons on top of upgraded or upgradable units
         for (UnitModel unit : playerUnitModels) {
             boolean isPurged = unit.getRequiredTechId().isPresent()
@@ -3086,7 +3138,6 @@ class PlayerAreaGenerator {
             Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
             if (unit.getFaction().isPresent()) {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
-                Point specialOffset = new Point(0, 0);
 
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
@@ -3100,19 +3151,37 @@ class PlayerAreaGenerator {
                             offs.translate(15, 12);
                         }
                     } else if (game.getStoredValue("valefarZ").contains(unitFaction)) {
-                        specialOffset = new Point(-20, -20);
                         String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
                         BufferedImage valefarZ = ImageHelper.read(tokenFile);
                         graphics.drawImage(
                                 valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
+                        unitFactionOffset.translate(-20, -20);
+                    } else if ("tf-echoofascension".equals(unit.getAlias())) {
+                        unitFactionOffset.translate(-20, -20);
+                    }
+                }
+
+                if ("mf".equals(unit.getAsyncId()) && game.isTwilightsFallMode() && tfMechCount >= 2) {
+                    if (unit.getAlias().endsWith("tf_mech")) {
+                        unitFactionOffset.translate(-12, 12);
+                    } else {
+                        tfMechIndex++;
+                        switch (10 * tfMechCount + tfMechIndex) {
+                            case 21 -> unitFactionOffset.translate(12, -12);
+                            case 31 -> unitFactionOffset.translate(0, -22);
+                            case 32 -> unitFactionOffset.translate(22, 0);
+                            case 41 -> unitFactionOffset.translate(-12, -12);
+                            case 42 -> unitFactionOffset.translate(12, -12);
+                            case 43 -> unitFactionOffset.translate(12, 12);
+                        }
                     }
                 }
 
                 drawFactionIconImage(
                         graphics,
                         unit.getFaction().get().toLowerCase(),
-                        deltaX + x + unitFactionOffset.x + specialOffset.x,
-                        y + unitFactionOffset.y + specialOffset.y,
+                        deltaX + x + unitFactionOffset.x,
+                        y + unitFactionOffset.y,
                         32,
                         32);
                 UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
