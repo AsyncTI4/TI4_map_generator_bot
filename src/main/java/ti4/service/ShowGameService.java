@@ -36,7 +36,12 @@ public class ShowGameService {
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         boolean shouldPersistMessageId = displayType == DisplayType.all && !game.isFowMode();
         Consumer<Message> persistMessageId = shouldPersistMessageId
-                ? msg -> SpringContext.getBean(GameImageService.class).saveDiscordMessageId(game, msg.getIdLong(), msg.getGuild().getIdLong(), msg.getChannel().getIdLong())
+                ? msg -> SpringContext.getBean(GameImageService.class)
+                        .saveDiscordMessageId(
+                                game,
+                                msg.getIdLong(),
+                                msg.getGuild().getIdLong(),
+                                msg.getChannel().getIdLong())
                 : null;
         MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
             if (includeButtons(displayType)) {

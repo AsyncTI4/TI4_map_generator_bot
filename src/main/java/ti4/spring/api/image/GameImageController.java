@@ -42,7 +42,7 @@ public class GameImageController {
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
         Long messageId = gameImageService.getLatestDiscordMessageId(gameName);
         Long channelId = gameImageService.getLatestDiscordChannelId(gameName);
-        
+
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
             return ResponseEntity.notFound().build();
         }
@@ -50,8 +50,10 @@ public class GameImageController {
         try {
             // Fetch the message from Discord to get the attachment URL using the channel
             // The channel could be a TextChannel or ThreadChannel
-            Message message = JdaService.jda.getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
-                    .retrieveMessageById(messageId).complete();
+            Message message = JdaService.jda
+                    .getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
+                    .retrieveMessageById(messageId)
+                    .complete();
             if (message == null || message.getAttachments().isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
@@ -59,7 +61,8 @@ public class GameImageController {
             String attachmentUrl = message.getAttachments().getFirst().getUrl();
             return ResponseEntity.ok(attachmentUrl);
         } catch (Exception e) {
-            BotLogger.error("Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName, e);
+            BotLogger.error(
+                    "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName, e);
             return ResponseEntity.notFound().build();
         }
     }

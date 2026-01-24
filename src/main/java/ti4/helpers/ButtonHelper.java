@@ -16,12 +16,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
@@ -135,9 +135,9 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
-import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.spring.api.image.GameImageService;
 import ti4.spring.context.SpringContext;
+import ti4.website.AsyncTi4WebsiteHelper;
 
 @UtilityClass
 public class ButtonHelper {
@@ -2289,7 +2289,11 @@ public class ButtonHelper {
             Consumer<Message> persistMessageId = msg -> {
                 if (savedMessageId.compareAndSet(false, true)) {
                     SpringContext.getBean(GameImageService.class)
-                            .saveDiscordMessageId(game, msg.getIdLong(), msg.getGuild().getIdLong(), msg.getChannel().getIdLong());
+                            .saveDiscordMessageId(
+                                    game,
+                                    msg.getIdLong(),
+                                    msg.getGuild().getIdLong(),
+                                    msg.getChannel().getIdLong());
                 }
             };
             if (!game.isFowMode()) {

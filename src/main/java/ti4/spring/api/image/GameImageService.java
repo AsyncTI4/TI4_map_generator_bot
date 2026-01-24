@@ -26,19 +26,28 @@ public class GameImageService {
     @Nullable
     public Long getLatestDiscordMessageId(String gameName) {
         if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository.findById(gameName).map(MapImageData::getLatestDiscordMessageId).orElse(null);
+        return mapImageDataRepository
+                .findById(gameName)
+                .map(MapImageData::getLatestDiscordMessageId)
+                .orElse(null);
     }
 
     @Nullable
     public Long getLatestDiscordGuildId(String gameName) {
         if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository.findById(gameName).map(MapImageData::getLatestDiscordGuildId).orElse(null);
+        return mapImageDataRepository
+                .findById(gameName)
+                .map(MapImageData::getLatestDiscordGuildId)
+                .orElse(null);
     }
 
     @Nullable
     public Long getLatestDiscordChannelId(String gameName) {
         if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository.findById(gameName).map(MapImageData::getLatestDiscordChannelId).orElse(null);
+        return mapImageDataRepository
+                .findById(gameName)
+                .map(MapImageData::getLatestDiscordChannelId)
+                .orElse(null);
     }
 
     public void saveMapImageName(Game game, String mapImageName) {
@@ -58,6 +67,8 @@ public class GameImageService {
     }
 
     private MapImageData loadOrCreate(String gameName) {
-        return mapImageDataRepository.findById(gameName).orElseGet(() -> new MapImageData(gameName, null, null, null, null));
+        return mapImageDataRepository
+                .findById(gameName)
+                .orElseGet(() -> new MapImageData(gameName, null, null, null, null));
     }
 }
