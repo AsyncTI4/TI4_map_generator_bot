@@ -1,8 +1,10 @@
 package ti4.service;
 
 import java.util.List;
+import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -17,6 +19,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
+import ti4.spring.api.image.GameImageService;
+import ti4.spring.context.SpringContext;
 
 @UtilityClass
 public class ShowGameService {
@@ -30,16 +34,20 @@ public class ShowGameService {
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+        boolean shouldPersistMessageId = displayType == DisplayType.all && !game.isFowMode();
+        Consumer<Message> persistMessageId = shouldPersistMessageId
+                ? msg -> SpringContext.getBean(GameImageService.class).saveDiscordMessageId(game, msg.getIdLong(), msg.getGuild().getIdLong(), msg.getChannel().getIdLong())
+                : null;
         MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = Buttons.mapImageButtons(game);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
-                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons, game);
+                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons, game, persistMessageId);
             } else {
                 MessageChannel channel = sendMessage(game, event);
-                MessageHelper.sendFileUploadToChannel(channel, fileUpload);
+                MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
             }
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 buttonEvent.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
