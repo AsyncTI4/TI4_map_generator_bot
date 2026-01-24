@@ -545,7 +545,7 @@ class PlayerAreaGenerator {
             xDelta = factionTechInfo(player, xDelta, yPlayArea);
         }
 
-        if (!player.getAbilities().isEmpty()) {
+        if (!player.getAbilities().isEmpty() || !player.getSingularityTechs().isEmpty()) {
             xDelta = abilityInfo(player, xDelta, yPlayArea);
         }
 
@@ -1536,8 +1536,9 @@ class PlayerAreaGenerator {
             List<String> exhaustedTechs = player.getExhaustedTechs();
             for (int t = 0; t < singularities.size(); t++) {
                 String tech = singularities.get(t);
-                boolean isExhausted = exhaustedTechs.contains(
-                        "tf-singularity" + initials.toLowerCase().charAt(t));
+                boolean isExhausted = exhaustedTechs.contains(tech)
+                        || exhaustedTechs.contains(
+                                "tf-singularity" + initials.toLowerCase().charAt(t));
                 drawPAImage(x + deltaX, y, "pa_tech_techicons_tf_generic_" + (isExhausted ? "exh" : "rdy") + ".png");
                 TechnologyModel techModel = Mapper.getTech(tech);
                 Color foreground = isExhausted ? Color.GRAY : Color.WHITE;
@@ -2682,6 +2683,9 @@ class PlayerAreaGenerator {
         List<String> zealotsTechs =
                 Arrays.asList(game.getStoredValue("zealotsHeroTechs").split("-"));
         for (String tech : techs) {
+            if (player.getSingularityTechs().contains(tech)) {
+                continue;
+            }
             boolean isExhausted = exhaustedTechs.contains(tech);
             boolean isPurged = player.getPurgedTechs().contains(tech);
             String techStatus = isExhausted ? "_exh.png" : "_rdy.png";
@@ -2719,9 +2723,6 @@ class PlayerAreaGenerator {
                     drawFactionIconImage(graphics, "redcreuss", x + deltaX - 1, y + 108, 42, 42);
                 } else {
                     String faction = techModel.getFaction().get();
-                    if (player.getSingularityTechs().contains(tech)) {
-                        faction = "nekro";
-                    }
                     drawFactionIconImage(graphics, faction, x + deltaX - 1, y + 108, 42, 42);
                 }
             } else {
@@ -3145,19 +3146,28 @@ class PlayerAreaGenerator {
                         List<String> flagships = new ArrayList<>();
                         flagships.addAll(
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
-                        Point offs = new Point(unitFactionOffset.x - 20, unitFactionOffset.y - 20);
+                        Point offs = new Point(unitFactionOffset.x - 24, unitFactionOffset.y - 24);
+                        if (flagships.size() > 1) {
+                            offs.translate(0, -8);
+                            unitFactionOffset.translate(0, 8);
+                        }
                         for (String fsFaction : flagships) {
                             drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
-                            offs.translate(15, 12);
+                            Player p2 = game.getPlayerFromColorOrFaction(fsFaction);
+                            UnitModel otherFlagship = (p2 == null ? null : p2.getUnitByBaseType("flagship"));
+                            if (otherFlagship != null) {
+                                addWebsiteOverlay(otherFlagship, deltaX + x + offs.x, y + offs.y, 32, 32);
+                            }
+                            offs.translate(16, 8);
                         }
                     } else if (game.getStoredValue("valefarZ").contains(unitFaction)) {
                         String tokenFile = ResourceHelper.getResourceFromFolder("extra/", "marker_valefarZ.png");
                         BufferedImage valefarZ = ImageHelper.read(tokenFile);
                         graphics.drawImage(
                                 valefarZ, deltaX + x + unitFactionOffset.x - 10, y + unitFactionOffset.y + 10, null);
-                        unitFactionOffset.translate(-20, -20);
+                        unitFactionOffset.translate(-24, -24);
                     } else if ("tf-echoofascension".equals(unit.getAlias())) {
-                        unitFactionOffset.translate(-20, -20);
+                        unitFactionOffset.translate(-24, -24);
                     }
                 }
 
@@ -3168,8 +3178,8 @@ class PlayerAreaGenerator {
                         tfMechIndex++;
                         switch (10 * tfMechCount + tfMechIndex) {
                             case 21 -> unitFactionOffset.translate(12, -12);
-                            case 31 -> unitFactionOffset.translate(0, -22);
-                            case 32 -> unitFactionOffset.translate(22, 0);
+                            case 31 -> unitFactionOffset.translate(-4, -16);
+                            case 32 -> unitFactionOffset.translate(16, 4);
                             case 41 -> unitFactionOffset.translate(-12, -12);
                             case 42 -> unitFactionOffset.translate(12, -12);
                             case 43 -> unitFactionOffset.translate(12, 12);
