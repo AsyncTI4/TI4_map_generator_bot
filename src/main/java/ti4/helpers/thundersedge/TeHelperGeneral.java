@@ -27,6 +27,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.relic.TriadService;
 import ti4.service.tech.BastionTechService;
@@ -158,6 +159,10 @@ public class TeHelperGeneral {
                 String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player)
                         + " and added " + most + " " + p2.getRepresentation() + " infantry.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                CommanderUnlockCheckService.checkPlayer(
+                        p2, "arborec", "sol", "ghost", "naalu", "sardakk", "xxcha", "cabal");
+                CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
+                CommanderUnlockCheckService.checkPlayer(p2, "cymiae", "kyro", "nivyn");
             }
         }
 

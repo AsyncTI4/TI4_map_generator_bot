@@ -71,7 +71,7 @@
         "name": "The Dragon, Freed",
         "source": "twilights_fall",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/tf-dragonfreed.png?raw=true",
-        "faction": "firmament",
+        "faction": "obsidian",
         "isUpgrade": true,
         "moveValue": 2,
         "capacityValue": 6,
