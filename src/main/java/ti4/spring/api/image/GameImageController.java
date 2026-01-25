@@ -2,8 +2,8 @@ package ti4.spring.api.image;
 
 import static software.amazon.awssdk.utils.StringUtils.isBlank;
 
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,32 +39,46 @@ public class GameImageController {
 
     @SetupRequestContext(false)
     @GetMapping("/image/attachment-url")
-    public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
+    public CompletableFuture<ResponseEntity<String>> getAttachmentUrl(@PathVariable String gameName) {
         Long messageId = gameImageService.getLatestDiscordMessageId(gameName);
         Long channelId = gameImageService.getLatestDiscordChannelId(gameName);
 
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
-            return ResponseEntity.notFound().build();
+            return CompletableFuture.completedFuture(ResponseEntity.notFound().build());
         }
+
+        CompletableFuture<ResponseEntity<String>> future = new CompletableFuture<>();
 
         try {
             // Fetch the message from Discord to get the attachment URL using the channel
             // The channel could be a TextChannel or ThreadChannel
-            Message message = JdaService.jda
+            JdaService.jda
                     .getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
                     .retrieveMessageById(messageId)
-                    .complete();
-            if (message == null || message.getAttachments().isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            String attachmentUrl = message.getAttachments().getFirst().getUrl();
-            return ResponseEntity.ok(attachmentUrl);
+                    .queue(
+                            message -> {
+                                if (message == null || message.getAttachments().isEmpty()) {
+                                    future.complete(ResponseEntity.notFound().build());
+                                } else {
+                                    String attachmentUrl =
+                                            message.getAttachments().getFirst().getUrl();
+                                    future.complete(ResponseEntity.ok(attachmentUrl));
+                                }
+                            },
+                            error -> {
+                                BotLogger.error(
+                                        "Failed to fetch message " + messageId + " from channel " + channelId
+                                                + " for game " + gameName,
+                                        error);
+                                future.complete(ResponseEntity.notFound().build());
+                            });
         } catch (Exception e) {
             BotLogger.error(
                     "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName, e);
-            return ResponseEntity.notFound().build();
+            future.complete(ResponseEntity.notFound().build());
         }
+
+        return future;
     }
 
     @SetupRequestContext(save = false)
