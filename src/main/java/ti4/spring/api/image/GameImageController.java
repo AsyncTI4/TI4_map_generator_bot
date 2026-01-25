@@ -52,9 +52,14 @@ public class GameImageController {
         try {
             // Fetch the message from Discord to get the attachment URL using the channel
             // The channel could be a TextChannel or ThreadChannel
-            JdaService.jda
-                    .getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
-                    .retrieveMessageById(messageId)
+            var channel = JdaService.jda.getChannelById(
+                    net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId);
+            if (channel == null) {
+                future.complete(ResponseEntity.notFound().build());
+                return future;
+            }
+
+            channel.retrieveMessageById(messageId)
                     .queue(
                             message -> {
                                 if (message == null || message.getAttachments().isEmpty()) {
