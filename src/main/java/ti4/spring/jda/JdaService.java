@@ -344,7 +344,7 @@ public class JdaService {
         try {
             return initGuild(guildID, addToNewGameServerList);
         } catch (Throwable t) {
-            BotLogger.critical("Failed to initialize guild " + guildID + ". Aborting.", t);
+            BotLogger.critical("Failed to initialize guild " + guildID + ". Skipping.", t);
             return null;
         }
     }
