@@ -29,7 +29,7 @@ public class GameNameService {
     }
 
     @NotNull
-    public static String getGameNameFromChannel(Channel channel) {
+    public static String getGameNameFromChannel(@NotNull Channel channel) {
         String gameName = getGameNameFromChannelName(channel.getName());
         if (GameManager.isValid(gameName)) {
             return gameName;
