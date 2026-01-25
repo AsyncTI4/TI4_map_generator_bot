@@ -1377,6 +1377,7 @@ public class Constants {
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
+    public static final String UPLOAD_RECENT_GAME_STATS = "upload_recent_game_stats";
 
     public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";
     public static final String HELIOS_ATTACHMENT_2 = "attachment_helios2.png";
