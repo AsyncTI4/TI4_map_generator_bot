@@ -38,6 +38,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenMapBuildContextHelper;
 import ti4.service.milty.MiltyDraftHelper;
@@ -1105,10 +1106,16 @@ public class ButtonHelperTwilightsFall {
         }
         if (!game.getStoredValue("engineerACSplice").startsWith("remove")) {
             if (!player.hasTech("wavelength")) {
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + prefix + "wavelength", "Wavelength"));
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + prefix + "wavelength",
+                        "Wavelength",
+                        TechEmojis.GenericTF));
             }
             if (!player.hasTech("antimatter")) {
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + prefix + "antimatter", "Antimatter"));
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + prefix + "antimatter",
+                        "Antimatter",
+                        TechEmojis.GenericTF));
             }
         }
         return buttons;
