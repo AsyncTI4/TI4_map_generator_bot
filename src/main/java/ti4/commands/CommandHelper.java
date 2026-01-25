@@ -46,8 +46,10 @@ public class CommandHelper {
     }
 
     static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
-        checkChannel &= !hasRole(event, JdaService.adminRoles);
-        checkPlayer &= !hasRole(event, JdaService.adminRoles);
+        if (hasRole(event, JdaService.adminRoles)) {
+            checkChannel = false;
+            checkPlayer = false;
+        }
 
         var gameName = GameNameService.getGameName(event);
         var managedGame = GameManager.getManagedGame(gameName);
