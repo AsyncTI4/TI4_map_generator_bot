@@ -155,6 +155,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithButtons(
             MessageChannel channel, String messageText, List<Button> buttons) {
+        if (channel == null) return;
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (GameManager.isValid(gameName)
                 && buttons instanceof ArrayList
@@ -721,7 +722,7 @@ public class MessageHelper {
         if (player != null && player.getUser() != null && player.getUser().isBot() && !game.isCommunityMode()) {
             return true;
         }
-        return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
+        return sendPrivateMessageToPlayer(player, game, null, messageText, null, null);
     }
 
     /**

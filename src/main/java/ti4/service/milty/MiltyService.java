@@ -415,7 +415,6 @@ public class MiltyService {
         }
 
         if (!"techs_tf".equals(game.getTechnologyDeckID())) {
-
             Map<String, TechnologyModel> techReplacements =
                     Mapper.getHomebrewTechReplaceMap(game.getTechnologyDeckID());
             List<String> playerTechs = new ArrayList<>(player.getTechs());
@@ -484,7 +483,7 @@ public class MiltyService {
         // SEND STUFF
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, factionModel.getFactionSheetMessage());
         AbilityInfoService.sendAbilityInfo(player, event);
-        TechInfoService.sendTechInfo(game, player, event);
+        TechInfoService.sendTechInfo(player, event);
         if (!game.getStoredValue("useOldPok").isEmpty() && player.hasLeader("naaluagent-te")) {
             player.removeLeader("naaluagent-te");
             player.addLeader("naaluagent");
