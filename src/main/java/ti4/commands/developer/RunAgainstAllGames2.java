@@ -21,6 +21,9 @@ class RunAgainstAllGames2 extends Subcommand {
 
         List<String> mismatchedGames = new ArrayList<>();
         GamesPage.consumeAllGames(game -> {
+            if (game.isHasEnded() && !game.getWinner().isPresent()) {
+                return;
+            }
             int playerCountForMap = game.getPlayerCountForMap();
             int realPlayerCount = game.getRealPlayers().size();
             if (playerCountForMap != realPlayerCount) {
