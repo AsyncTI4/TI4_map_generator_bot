@@ -3,13 +3,13 @@ package ti4.spring.api.image;
 import static software.amazon.awssdk.utils.StringUtils.isBlank;
 
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
@@ -39,32 +39,53 @@ public class GameImageController {
 
     @SetupRequestContext(false)
     @GetMapping("/image/attachment-url")
-    public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
+    public DeferredResult<ResponseEntity<String>> getAttachmentUrl(@PathVariable String gameName) {
+        DeferredResult<ResponseEntity<String>> deferredResult = new DeferredResult<>();
+
         Long messageId = gameImageService.getLatestDiscordMessageId(gameName);
         Long channelId = gameImageService.getLatestDiscordChannelId(gameName);
 
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
-            return ResponseEntity.notFound().build();
+            deferredResult.setResult(ResponseEntity.notFound().build());
+            return deferredResult;
         }
 
         try {
-            // Fetch the message from Discord to get the attachment URL using the channel
+            // Fetch the message from Discord asynchronously to avoid blocking the HTTP request thread
             // The channel could be a TextChannel or ThreadChannel
-            Message message = JdaService.jda
+            JdaService.jda
                     .getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
                     .retrieveMessageById(messageId)
-                    .complete();
-            if (message == null || message.getAttachments().isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            String attachmentUrl = message.getAttachments().getFirst().getUrl();
-            return ResponseEntity.ok(attachmentUrl);
+                    .queue(
+                            message -> {
+                                // Success callback
+                                if (message == null || message.getAttachments().isEmpty()) {
+                                    deferredResult.setResult(
+                                            ResponseEntity.notFound().build());
+                                } else {
+                                    String attachmentUrl =
+                                            message.getAttachments().getFirst().getUrl();
+                                    deferredResult.setResult(ResponseEntity.ok(attachmentUrl));
+                                }
+                            },
+                            error -> {
+                                // Error callback
+                                BotLogger.error(
+                                        "Failed to fetch message " + messageId + " from channel " + channelId
+                                                + " for game " + gameName,
+                                        error);
+                                deferredResult.setResult(
+                                        ResponseEntity.notFound().build());
+                            });
         } catch (Exception e) {
             BotLogger.error(
-                    "Failed to fetch message " + messageId + " from channel " + channelId + " for game " + gameName, e);
-            return ResponseEntity.notFound().build();
+                    "Failed to initiate message fetch for message " + messageId + " from channel " + channelId
+                            + " for game " + gameName,
+                    e);
+            deferredResult.setResult(ResponseEntity.notFound().build());
         }
+
+        return deferredResult;
     }
 
     @SetupRequestContext(save = false)
