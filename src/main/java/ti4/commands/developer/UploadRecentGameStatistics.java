@@ -1,6 +1,5 @@
 package ti4.commands.developer;
 
-import java.io.IOException;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
@@ -20,7 +19,7 @@ class UploadRecentGameStatistics extends Subcommand {
             GameStatisticsUploadService.uploadRecentStats();
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Triggered upload of recently changed game statistics.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.error("Failed to upload recently changed game statistics.", e);
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Failed to upload recently changed game statistics.");
