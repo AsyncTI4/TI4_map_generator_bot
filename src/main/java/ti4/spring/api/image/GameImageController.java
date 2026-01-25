@@ -53,9 +53,14 @@ public class GameImageController {
         try {
             // Fetch the message from Discord asynchronously to avoid blocking the HTTP request thread
             // The channel could be a TextChannel or ThreadChannel
-            JdaService.jda
-                    .getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
-                    .retrieveMessageById(messageId)
+            var channel = JdaService.jda.getChannelById(
+                    net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId);
+            if (channel == null) {
+                deferredResult.setResult(ResponseEntity.notFound().build());
+                return deferredResult;
+            }
+
+            channel.retrieveMessageById(messageId)
                     .queue(
                             message -> {
                                 // Success callback
@@ -63,8 +68,8 @@ public class GameImageController {
                                     deferredResult.setResult(
                                             ResponseEntity.notFound().build());
                                 } else {
-                                    var attachments = message.getAttachments();
-                                    String attachmentUrl = attachments.get(0).getUrl();
+                                    String attachmentUrl =
+                                            message.getAttachments().get(0).getUrl();
                                     deferredResult.setResult(ResponseEntity.ok(attachmentUrl));
                                 }
                             },
