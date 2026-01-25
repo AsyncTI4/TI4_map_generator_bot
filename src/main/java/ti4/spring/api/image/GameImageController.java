@@ -63,8 +63,8 @@ public class GameImageController {
                                     deferredResult.setResult(
                                             ResponseEntity.notFound().build());
                                 } else {
-                                    String attachmentUrl =
-                                            message.getAttachments().getFirst().getUrl();
+                                    var attachments = message.getAttachments();
+                                    String attachmentUrl = attachments.get(0).getUrl();
                                     deferredResult.setResult(ResponseEntity.ok(attachmentUrl));
                                 }
                             },
@@ -79,8 +79,8 @@ public class GameImageController {
                             });
         } catch (Exception e) {
             BotLogger.error(
-                    "Failed to initiate message fetch for message " + messageId + " from channel " + channelId
-                            + " for game " + gameName,
+                    "Exception occurred while setting up Discord message retrieval for message " + messageId
+                            + " from channel " + channelId + " for game " + gameName,
                     e);
             deferredResult.setResult(ResponseEntity.notFound().build());
         }
