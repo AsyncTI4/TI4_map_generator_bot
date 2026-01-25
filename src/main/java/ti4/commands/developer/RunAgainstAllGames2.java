@@ -24,16 +24,16 @@ class RunAgainstAllGames2 extends Subcommand {
             int playerCountForMap = game.getPlayerCountForMap();
             int realPlayerCount = game.getRealPlayers().size();
             if (playerCountForMap != realPlayerCount) {
-                mismatchedGames.add(game.getName() + " (player count: " + playerCountForMap
-                        + ", real player count: " + realPlayerCount + ")");
+                mismatchedGames.add(game.getName() + " (player count: " + playerCountForMap + ", real player count: "
+                        + realPlayerCount + ")");
             }
         });
 
         if (mismatchedGames.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games with mismatched player counts found.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Games with mismatched player counts:\n"
-                    + String.join("\n", mismatchedGames));
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Games with mismatched player counts:\n" + String.join("\n", mismatchedGames));
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
         BotLogger.info("Found " + mismatchedGames.size() + " games with mismatched player counts out of "
