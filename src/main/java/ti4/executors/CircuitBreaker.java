@@ -65,10 +65,16 @@ public class CircuitBreaker {
         BotLogger.info("Circuit breaker manually opened for " + seconds + " seconds.");
     }
 
+    public static synchronized void closeNow() {
+        reset();
+        BotLogger.info("Circuit breaker manually closed.");
+    }
+
     private static synchronized void reset() {
         thresholdCount = 0;
         open = false;
         openReasons.clear();
+        closeDateTime = null;
     }
 
     private static synchronized void resetThreshold() {

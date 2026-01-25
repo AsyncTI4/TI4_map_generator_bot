@@ -16,6 +16,7 @@ public class DeveloperCommand implements ParentCommand {
                     new SetGlobalSetting(),
                     new RunManualDataMigration(),
                     new GiveTheBotABreather(),
+                    new CloseCircuitBreaker(),
                     new ButtonProcessingStatistics(),
                     new CacheStatistics(),
                     new RestoreGame(),
