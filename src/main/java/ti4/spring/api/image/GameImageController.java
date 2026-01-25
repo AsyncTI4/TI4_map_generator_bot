@@ -62,7 +62,7 @@ public class GameImageController {
             channel.retrieveMessageById(messageId)
                     .queue(
                             message -> {
-                                if (message == null || message.getAttachments().isEmpty()) {
+                                if (message.getAttachments().isEmpty()) {
                                     future.complete(ResponseEntity.notFound().build());
                                 } else {
                                     String attachmentUrl =
