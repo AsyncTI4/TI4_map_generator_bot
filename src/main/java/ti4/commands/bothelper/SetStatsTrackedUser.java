@@ -15,6 +15,7 @@ class SetStatsTrackedUser extends GameStateSubcommand {
 
     SetStatsTrackedUser() {
         super(Constants.SET_STATS_TRACKED_USER, "Set stats tracking user for a player.", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Player faction or color")
                 .setRequired(true)
                 .setAutoComplete(true));
