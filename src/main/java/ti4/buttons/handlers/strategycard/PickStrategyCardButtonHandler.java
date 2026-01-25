@@ -257,11 +257,11 @@ public class PickStrategyCardButtonHandler {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                            + " from picking " + Helper.getSCName(scPicked, game) + ".");
+                            + " from picking **" + Helper.getSCName(scPicked, game) + "**.");
             if (game.isFowMode()) {
-                String messageToSend =
-                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
-                                + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game) + ".";
+                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
+                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking **"
+                        + Helper.getSCName(scPicked, game) + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
