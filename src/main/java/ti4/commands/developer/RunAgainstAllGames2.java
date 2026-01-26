@@ -37,9 +37,12 @@ class RunAgainstAllGames2 extends Subcommand {
                         .count();
                 if (playerCountForMap != homeSystemCount) {
                     StringBuilder entry = new StringBuilder(game.getName())
-                            .append(" (player count: ").append(playerCountForMap)
-                            .append(", real player count: ").append(realPlayerCount)
-                            .append(", home systems: ").append(homeSystemCount)
+                            .append(" (player count: ")
+                            .append(playerCountForMap)
+                            .append(", real player count: ")
+                            .append(realPlayerCount)
+                            .append(", home systems: ")
+                            .append(homeSystemCount)
                             .append(") HS: PC difference");
                     if (realPlayerCount == homeSystemCount) {
                         entry.append(", RPC match");
@@ -56,7 +59,8 @@ class RunAgainstAllGames2 extends Subcommand {
                     event.getChannel(), "Games with mismatched player counts:\n" + String.join("\n", mismatchedGames));
         }
         if (homeSystemMismatches.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No games with mismatched home system counts found.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "No games with mismatched home system counts found.");
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
