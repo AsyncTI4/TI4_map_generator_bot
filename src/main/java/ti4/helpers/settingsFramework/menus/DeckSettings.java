@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
@@ -46,7 +47,7 @@ public class DeckSettings extends SettingsMenu {
         return choice;
     }
 
-    DeckSettings(JsonNode json, SettingsMenu parent, Game game) {
+    DeckSettings(JsonNode json, SettingsMenu parent, @NotNull Game game) {
         super(
                 "decks",
                 "Card Decks",
