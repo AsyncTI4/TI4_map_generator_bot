@@ -8,13 +8,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.function.Consumers;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -803,6 +805,9 @@ public class ButtonHelperModifyUnits {
                                 .append("\n");
                     }
                 }
+            }
+            if(!player.isActivePlayer() && !game.isFowMode() && event != null && game.getActivePlayer() != null && player.isRealPlayer() && game.getStoredValue("mahactHeroTarget").isEmpty()){
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getActivePlayer() +" your opponent has finished assigning hits.");
             }
         }
 
@@ -1917,6 +1922,15 @@ public class ButtonHelperModifyUnits {
                         && game.getScPlayed().containsKey(sc)) {
                     hasConstruction = true;
                     break;
+                }
+            }
+            for (Player p2 : game.getRealPlayers()) {
+                for (Integer sc : p2.getSCs()) {
+                    StrategyCardModel scModel =
+                            game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
+                        hasConstruction = true;
+                    }
                 }
             }
             if ("te".equalsIgnoreCase(game.getStrategyCardSet().getAlias()) || game.isTwilightsFallMode()) {

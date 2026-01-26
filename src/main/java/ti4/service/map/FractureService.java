@@ -33,7 +33,8 @@ import ti4.service.unit.AddUnitService;
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-        return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
+
+        return game.getTileFromPlanet("styx") != null || Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
                 .allMatch(pos -> game.getTileByPosition(pos) != null);
     }
 

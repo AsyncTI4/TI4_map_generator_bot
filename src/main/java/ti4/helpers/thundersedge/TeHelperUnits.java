@@ -334,7 +334,7 @@ public class TeHelperUnits {
                 String msg = player.getRepresentationUnfogged() + ", you have " + icono.getNameRepresentation()
                         + ", and somebody just drew a relic.";
                 msg += " You may use the buttons to DEPLOY 1 Iconoclast onto a planet you control:";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
     }
