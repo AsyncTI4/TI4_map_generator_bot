@@ -702,7 +702,7 @@ public class Tile {
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
             Tile tile = game.getTileByPosition(position_);
-            if (tile == null || "silver_flame".equals(tile.getTileID())) {
+            if (tile == null || "silver_flame".equals(tile.tileID)) {
                 return true;
             }
         }

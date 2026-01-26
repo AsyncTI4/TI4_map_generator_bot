@@ -111,7 +111,7 @@ public abstract class BagDraft {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
                 setPlayerReadyToPass(p, true);
                 MessageHelper.sendMessageToChannel(
-                        this.findExistingBagChannel(p),
+                        findExistingBagChannel(p),
                         "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
                 MessageHelper.sendMessageToChannel(
                         p.getCardsInfoThread(),
@@ -120,23 +120,19 @@ public abstract class BagDraft {
                 FrankenDraftBagService.displayPlayerHand(owner, p);
             } else {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
-                    List<DraftItem> draftableItems = new ArrayList<>();
-                    draftableItems.addAll(draftableItemsInBag(p));
+                    List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
-                    this.findExistingBagChannel(p)
-                            .getHistory()
-                            .retrievePast(100)
-                            .queue(m -> {
-                                if (!m.isEmpty()) {
-                                    this.findExistingBagChannel(p)
-                                            .deleteMessages(m)
-                                            .queue(Consumers.nop(), BotLogger::catchRestError);
-                                }
-                            });
+                    findExistingBagChannel(p).getHistory().retrievePast(100).queue(m -> {
+                        if (!m.isEmpty()) {
+                            findExistingBagChannel(p)
+                                    .deleteMessages(m)
+                                    .queue(Consumers.nop(), BotLogger::catchRestError);
+                        }
+                    });
                     p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);
                     MessageHelper.sendMessageToChannel(
-                            this.findExistingBagChannel(p),
+                            findExistingBagChannel(p),
                             "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
                     MessageHelper.sendMessageToChannel(
                             p.getCardsInfoThread(),
@@ -154,8 +150,7 @@ public abstract class BagDraft {
     }
 
     public List<DraftItem> draftableItemsInBag(Player player) {
-        ArrayList<DraftItem> draftableItems = new ArrayList<>();
-        draftableItems.addAll(player.getCurrentDraftBag().Contents.stream()
+        ArrayList<DraftItem> draftableItems = new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
         return draftableItems;
@@ -356,8 +351,9 @@ public abstract class BagDraft {
                     .append(owner.getFrankenBagSize())
                     .append(")");
             if (player.isReadyToPassBag()) {
-                sb.append(" (passing a bag of size "
-                        + player.getCurrentDraftBag().Contents.size() + ")");
+                sb.append(" (passing a bag of size ")
+                        .append(player.getCurrentDraftBag().Contents.size())
+                        .append(")");
             }
             sb.append("\n");
         }

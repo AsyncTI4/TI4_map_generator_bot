@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -144,7 +146,7 @@ public class ButtonHelper {
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 
@@ -1505,10 +1507,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
-            return true;
-        }
-        return false;
+        return TeHelperUnits.affectedByQuietus(game, player, tile);
     }
 
     public static int resolveOnActivationEnemyAbilities(
@@ -1683,7 +1682,8 @@ public class ButtonHelper {
             String fincheckerForNonActive = "FFCC_" + nonActivePlayer.getFaction() + "_";
             String ident = nonActivePlayer.getRepresentationUnfogged();
             // eres
-            if (nonActivePlayer.hasTech("ers") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            if (nonActivePlayer.hasTech("ers")
+                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _E-Res Siphons_.");
@@ -1732,7 +1732,7 @@ public class ButtonHelper {
             }
             // neuroglaive
             boolean hasNg = nonActivePlayer.hasTech("ng") || nonActivePlayer.hasTech("absol_ng");
-            if (hasNg && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            if (hasNg && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _Neuroglaive_.");
@@ -1813,7 +1813,7 @@ public class ButtonHelper {
             }
 
             if (nonActivePlayer.hasAbility("survivalinstinct")
-                    && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
                 Player ralnel = nonActivePlayer;
                 List<Button> buttons =
                         TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);
@@ -2283,37 +2283,30 @@ public class ButtonHelper {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
-            boolean foundSomething = false;
-            List<Button> buttonsWeb = Buttons.mapImageButtons(game);
-            AtomicBoolean savedMessageId = new AtomicBoolean(false);
-            Consumer<Message> persistMessageId = msg -> {
-                if (savedMessageId.compareAndSet(false, true)) {
-                    SpringContext.getBean(GameImageService.class)
-                            .saveDiscordMessageId(
-                                    game,
-                                    msg.getIdLong(),
-                                    msg.getGuild().getIdLong(),
-                                    msg.getChannel().getIdLong());
-                }
-            };
-            if (!game.isFowMode()) {
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        foundSomething = true;
-                        sendFileWithCorrectButtons(
-                                threadChannel_, fileUpload, message, buttonsWeb, game, persistMessageId);
-                    }
-                }
-            } else {
+            if (game.isFowMode()) {
                 if (!event.getMessageChannel().getName().contains("announcements")) {
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
                 }
-                foundSomething = true;
+                return;
             }
-            if (!foundSomething) {
-                sendFileWithCorrectButtons(
-                        event.getMessageChannel(), fileUpload, message, buttonsWeb, game, persistMessageId);
+
+            List<Button> buttonsWeb = Buttons.mapImageButtons(game);
+            Consumer<Message> persistMessageId = msg -> SpringContext.getBean(GameImageService.class)
+                    .saveDiscordMessageId(
+                            game,
+                            msg.getIdLong(),
+                            msg.getGuild().getIdLong(),
+                            msg.getChannel().getIdLong());
+
+            for (ThreadChannel thread : threadChannels) {
+                if (threadName.equals(thread.getName())) {
+                    sendFileWithCorrectButtons(thread, fileUpload, message, buttonsWeb, game, persistMessageId);
+                    return;
+                }
             }
+
+            sendFileWithCorrectButtons(
+                    event.getMessageChannel(), fileUpload, message, buttonsWeb, game, persistMessageId);
         });
     }
 
@@ -2936,7 +2929,7 @@ public class ButtonHelper {
                     finChecker + "replaceSleeperWith_pds_" + planet, "Replace Sleeper on " + planet + " With 1 PDS."));
             if (getNumberOfUnitsOnTheBoard(game, player, "mech") < 4
                     && player.hasUnit("titans_mech")
-                    && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+                    && !isLawInPlay(game, "articles_war")) {
                 planetsWithSleepers.add(Buttons.green(
                         finChecker + "replaceSleeperWith_mech_" + planet,
                         "Replace Sleeper on " + planet + " With 1 Mech & Infantry."));
@@ -4375,8 +4368,8 @@ public class ButtonHelper {
 
             if (player.hasPlanet(planet)
                     && !player.getExhaustedPlanetsAbilities().contains(planet)) {
-                if (planet.equalsIgnoreCase("mrte")
-                        && player.getSecretsUnscored().size() < 1) {
+                if ("mrte".equalsIgnoreCase(planet)
+                        && player.getSecretsUnscored().isEmpty()) {
                     continue;
                 }
                 String id = player.finChecker() + "planetAbilityExhaust_" + planet;
@@ -4872,9 +4865,11 @@ public class ButtonHelper {
         List<Button> ringButtons = new ArrayList<>();
         Tile centerTile = game.getTileByPosition("000");
         if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game)) {
-            Button rex =
-                    Buttons.green(finChecker + "ringTile_000", centerTile.getRepresentationForButtons(game, player));
             if (!CommandCounterHelper.hasCC(player, centerTile)) {
+                Button rex = Buttons.green(
+                        finChecker + "ringTile_000",
+                        centerTile.getRepresentationForButtons(game, player),
+                        centerTile.getTileEmoji(player));
                 ringButtons.add(rex);
             }
         }
@@ -5062,7 +5057,7 @@ public class ButtonHelper {
                             "Coexist On " + Helper.getPlanetRepresentation(planet.getName(), game)));
                 }
             }
-            if (buttons.size() > 0) {
+            if (!buttons.isEmpty()) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
@@ -5656,7 +5651,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (player.hasUnlockedBreakthrough("augersbt") && buttons.size() > 0) {
+        if (player.hasUnlockedBreakthrough("augersbt") && !buttons.isEmpty()) {
             buttons.add(Buttons.green(
                     "draw_1_ACDelete", "Draw 1 Action Card Instead With Breakthrough", FactionEmojis.augers));
         }
@@ -8022,10 +8017,12 @@ public class ButtonHelper {
                 resourcesAvailable += 1;
             }
             if (player.hasUnexhaustedLeader("winnuagent")) {
-                youCanSpend.append(
-                        " You also have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                                + "Berekar Berekon, the Winnu "
-                                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril " : "") + "agent.");
+                youCanSpend
+                        .append(" You also have ")
+                        .append(player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        .append("Berekar Berekon, the Winnu ")
+                        .append(player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril " : "")
+                        .append("agent.");
                 resourcesAvailable += 2;
             }
             youCanSpend

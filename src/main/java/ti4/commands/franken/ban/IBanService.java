@@ -1,4 +1,4 @@
-package ti4.commands.franken.Ban;
+package ti4.commands.franken.ban;
 
 import ti4.map.Game;
 import ti4.service.franken.FrankenBanList;

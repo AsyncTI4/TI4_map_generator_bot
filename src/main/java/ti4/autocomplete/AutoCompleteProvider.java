@@ -887,7 +887,7 @@ public class AutoCompleteProvider {
                         .map(bt -> new Command.Choice(bt.getAutoCompleteName(game), bt.getAlias()))
                         .collect(Collectors.toList());
                 if (addAllOpt) {
-                    options.add(0, new Command.Choice("all", "all"));
+                    options.addFirst(new Command.Choice("all", "all"));
                 }
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }

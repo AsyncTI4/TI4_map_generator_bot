@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -162,7 +163,7 @@ public class BreakthroughCommandHelper {
     public static void unlockAllBreakthroughs(Game game, Player player) {
         List<String> lockedBtIDs = player.getBreakthroughUnlocked().entrySet().stream()
                 .filter(e -> !e.getValue())
-                .map(e -> e.getKey())
+                .map(Map.Entry::getKey)
                 .toList();
         if (!lockedBtIDs.isEmpty()) {
             unlockBreakthroughs(game, player, lockedBtIDs);
@@ -292,6 +293,16 @@ public class BreakthroughCommandHelper {
                         player.addOwnedUnitByID("naaz_voltron");
                         player.removeOwnedUnitByID("naaz_mech");
                         player.removeOwnedUnitByID("naaz_mech_space");
+                    }
+                } else {
+                    player.setBreakthroughActive(btID, false);
+                    String message =
+                            player.getRepresentation() + " deactivated their _" + bt.getName() + "_ breakthrough.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
+                        player.removeOwnedUnitByID("naaz_voltron");
+                        player.addOwnedUnitByID("naaz_mech");
+                        player.addOwnedUnitByID("naaz_mech_space");
                     }
                 }
             } else {

@@ -1,4 +1,4 @@
-package ti4.commands.franken.Ban;
+package ti4.commands.franken.ban;
 
 import java.util.HashMap;
 import java.util.List;

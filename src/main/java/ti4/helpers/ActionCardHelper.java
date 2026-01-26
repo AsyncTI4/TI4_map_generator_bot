@@ -43,6 +43,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
@@ -390,7 +391,7 @@ public class ActionCardHelper {
         List<String> prePlayable = List.of(
                 "coup",
                 "crisis",
-                "stasis",
+                "tf-stasis",
                 "extremeduress",
                 "disgrace",
                 "special_session",
@@ -1050,6 +1051,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(),
                         buttonLabel));
+                if (player.hasTechReady("gls")) {
+                    codedButtons.add(Buttons.gray(
+                            "exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
                         introMsg

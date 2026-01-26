@@ -1030,8 +1030,8 @@ public class Player extends PlayerProperties {
 
     private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
-        if ("naaz_voltron".equals(unit.getAlias())) // Always, ALWAYS use voltron, if available
-        score += 99;
+
+        if ("naaz_voltron".equals(unit.getAlias())) score += 99; // ALWAYS use voltron, if available
         // if ("mentak_cruiser3".equals(unit.getAlias())) // Always, ALWAYS use corsair, if available
         // score += 99;
 

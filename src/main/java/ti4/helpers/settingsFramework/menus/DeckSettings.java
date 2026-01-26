@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
@@ -47,7 +47,7 @@ public class DeckSettings extends SettingsMenu {
         return choice;
     }
 
-    DeckSettings(JsonNode json, SettingsMenu parent, Optional<Game> game) {
+    DeckSettings(JsonNode json, SettingsMenu parent, @NotNull Game game) {
         super(
                 "decks",
                 "Card Decks",
@@ -55,21 +55,21 @@ public class DeckSettings extends SettingsMenu {
                 parent);
 
         // Get default deck IDs for this game
-        String defaultStage1 = game.map(Game::getStage1PublicDeckID).orElse("public_stage_1_objectives_pok");
-        String defaultStage2 = game.map(Game::getStage2PublicDeckID).orElse("public_stage_2_objectives_pok");
-        String defaultSecret = game.map(Game::getSoDeckID).orElse("secret_objectives_pok");
-        String defaultACdeck = game.map(Game::getAcDeckID).orElse("action_cards_pok");
-        String defaultAgendas = game.map(Game::getAgendaDeckID).orElse("agendas_pok");
-        String defaultTechs = game.map(Game::getTechnologyDeckID).orElse("techs_pok_c4");
-        String defaultRelics = game.map(Game::getRelicDeckID).orElse("relics_pok_te");
-        String defaultExplores = game.map(Game::getExplorationDeckID).orElse("explores_pok");
-        String defaultSCs = game.map(Game::getScSetID).orElse("te");
+        String defaultStage1 = game.getStage1PublicDeckID();
+        String defaultStage2 = game.getStage2PublicDeckID();
+        String defaultSecret = game.getSoDeckID();
+        String defaultAcDeck = game.getAcDeckID();
+        String defaultAgendas = game.getAgendaDeckID();
+        String defaultTechs = game.getTechnologyDeckID();
+        String defaultRelics = game.getRelicDeckID();
+        String defaultExplores = game.getExplorationDeckID();
+        String defaultSCs = game.getScSetID();
 
         // Initialize deck settings to default values
         stage1 = deckChoice("Stg1Deck", defaultStage1, DeckModel.DeckType.PUBLIC_STAGE_1_OBJECTIVE);
         stage2 = deckChoice("Stg2Deck", defaultStage2, DeckModel.DeckType.PUBLIC_STAGE_2_OBJECTIVE);
         secrets = deckChoice("SecretDeck", defaultSecret, DeckModel.DeckType.SECRET_OBJECTIVE);
-        actionCards = deckChoice("ACs", defaultACdeck, DeckModel.DeckType.ACTION_CARD);
+        actionCards = deckChoice("ACs", defaultAcDeck, DeckModel.DeckType.ACTION_CARD);
         agendas = deckChoice("Agendas", defaultAgendas, DeckModel.DeckType.AGENDA);
         techs = deckChoice("Techs", defaultTechs, DeckModel.DeckType.TECHNOLOGY);
         relics = deckChoice("Relics", defaultRelics, DeckModel.DeckType.RELIC);

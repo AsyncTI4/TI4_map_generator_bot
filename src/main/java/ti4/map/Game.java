@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.awt.Point;
@@ -4675,8 +4675,7 @@ public class Game extends GameProperties {
     }
 
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
-        if (player.hasTheZeroToken()) // naalu 0 token ability
-        scText = "0/" + scText;
+        if (player.hasTheZeroToken()) scText = "0/" + scText; // naalu 0 token ability
         if (player.hasAbility("patience")) {
             scText = "9/" + scText;
         }

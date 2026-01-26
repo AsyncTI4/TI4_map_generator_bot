@@ -1,4 +1,4 @@
-package ti4.commands.franken.Ban;
+package ti4.commands.franken.ban;
 
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
