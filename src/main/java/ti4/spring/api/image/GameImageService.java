@@ -26,9 +26,9 @@ public class GameImageService {
     public String getLatestMapImageName(String gameName) {
         if (!GameManager.isValid(gameName)) return null;
         return mapImageDataRepository
-            .findById(gameName)
-            .map(MapImageData::getLatestMapImageName)
-            .orElse(null);
+                .findById(gameName)
+                .map(MapImageData::getLatestMapImageName)
+                .orElse(null);
     }
 
     public void saveMapImageName(Game game, String mapImageName) {
