@@ -602,8 +602,8 @@ public class ExploreService {
                         UnitHolder planetUnitHolder = unitHolders.get(planetID);
                         UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                         for (Player p2 : game.getPlayers().values()) {
-                            StringBuilder groundForces = new StringBuilder();
-                            StringBuilder structures = new StringBuilder();
+                            List<String> groundForces = new ArrayList<>();
+                            List<String> structures = new ArrayList<>();
                             for (UnitKey key : planetUnitHolder.getUnitKeys()) {
                                 if (!p2.getColor().equals(key.getColor())) continue;
                                 int amt = planetUnitHolder.getUnitCount(key);
@@ -611,33 +611,37 @@ public class ExploreService {
                                 if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
                                         .contains(key.getUnitType())) {
                                     spaceUnitHolder.addUnitsWithStates(key, removed);
-                                    groundForces.append(
-                                            key.unitEmoji().emojiString().repeat(amt));
+                                    groundForces.addAll(Collections.nCopies(
+                                            amt, key.unitEmoji().emojiString()));
                                 } else {
-                                    structures.append(
-                                            key.unitEmoji().emojiString().repeat(amt));
+                                    structures.addAll(Collections.nCopies(
+                                            amt, key.unitEmoji().emojiString()));
                                 }
                             }
-                            if (groundForces.length() > 0) {
+                            if (!groundForces.isEmpty()) {
                                 message.append("\n")
                                         .append(p2.getRepresentationUnfogged())
                                         .append(", your ")
-                                        .append(groundForces)
-                                        .append(" have been yote into space")
-                                        .append((structures.length() == 0) ? "." : "");
+                                        .append(String.join("", groundForces))
+                                        .append(" ")
+                                        .append(groundForces.size() == 1 ? "has" : "have")
+                                        .append(" been yote into space")
+                                        .append(structures.isEmpty() ? "." : "");
                             }
-                            if (structures.length() > 0) {
+                            if (!structures.isEmpty()) {
                                 message.append(
-                                                (groundForces.length() == 0)
+                                                groundForces.isEmpty()
                                                         ? "\n" + p2.getRepresentationUnfogged() + ", "
                                                         : ", and ")
                                         .append("your ")
-                                        .append(structures)
-                                        .append(" have been yote into the shadow realm.");
+                                        .append(String.join("", structures))
+                                        .append(" ")
+                                        .append(structures.size() == 1 ? "has" : "have")
+                                        .append(" been yote into the shadow realm.");
                                 if (!game.isFowMode()) {
                                     DisasterWatchHelper.sendMessageInDisasterWatch(
                                             game,
-                                            "\\> \"" + structures + "⁉️" + UnitEmojis.Blank
+                                            "\\> \"" + String.join("", structures) + "⁉️" + UnitEmojis.Blank
                                                     + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
                                                     + p2.getRepresentation() + ", in " + game.getName() + ".");
                                 }

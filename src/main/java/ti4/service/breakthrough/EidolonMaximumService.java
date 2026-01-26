@@ -2,6 +2,7 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -105,19 +106,24 @@ public class EidolonMaximumService {
                     uh.removeUnit(mech, uh.getUnitCount(mech));
                 }
             }
-            String message = """
-                -# Ready to form Voltron!
-                -# Activate interlocks!
-                -# Dyna-therms connected.\
 
-                -# Infra-cells up!
-                -# Mega-thrusters are go!
-                -# Let's go, Voltron Force!\
-
-                -# Form feet and legs!
-                -# Form arms and body!
-                -# And I'll form the head!""";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            List<String> quotes = new ArrayList<>(List.of(
+                    "> Ready to form Voltron!",
+                    "> Activate interlocks!",
+                    "> Dyna-therms connected.",
+                    "> Infra-cells up!",
+                    "> Mega-thrusters are go!",
+                    "> Let's go, Voltron Force!",
+                    "> Form feet and legs!",
+                    "> Form arms and body!",
+                    "> And I'll form the head!"));
+            for (String message : quotes) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception ignored) {
+                }
+            }
             BreakthroughCommandHelper.activateBreakthrough(event, player, "naazbt");
         });
         ButtonHelper.deleteMessage(event);

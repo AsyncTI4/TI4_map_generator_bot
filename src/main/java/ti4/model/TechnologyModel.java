@@ -45,6 +45,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         CYBERNETIC,
         WARFARE,
         UNITUPGRADE,
+        GENERICTF,
         NONE;
 
         public String toString() {
@@ -58,6 +59,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 case WARFARE -> TechEmojis.WarfareTech.toString();
                 case BIOTIC -> TechEmojis.BioticTech.toString();
                 case UNITUPGRADE -> TechEmojis.UnitUpgradeTech.toString();
+                case GENERICTF -> TechEmojis.GenericTF.toString();
                 case NONE -> "";
             };
         }
@@ -69,6 +71,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 case WARFARE -> "Warfare";
                 case BIOTIC -> "Biotic";
                 case UNITUPGRADE -> "Unit Upgrade";
+                case GENERICTF -> "Generic (TF)";
                 case NONE -> "<None>";
             };
         }
@@ -180,9 +183,6 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
             } else if (isDualWarfareBiotic()) {
                 return "warfarebiotic";
             }
-        }
-        if ("wavelength".equals(alias) || "antimatter".equals(alias)) {
-            return "tf_generic";
         }
         return getType().toString();
     }
@@ -404,6 +404,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         default -> output.append(UnitEmojis.flagship);
                     }
                 }
+                case GENERICTF -> output.append(TechEmojis.GenericTF);
                 default -> {}
             }
             if (single) return output.toString();

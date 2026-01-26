@@ -4865,9 +4865,11 @@ public class ButtonHelper {
         List<Button> ringButtons = new ArrayList<>();
         Tile centerTile = game.getTileByPosition("000");
         if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game)) {
-            Button rex =
-                    Buttons.green(finChecker + "ringTile_000", centerTile.getRepresentationForButtons(game, player));
             if (!CommandCounterHelper.hasCC(player, centerTile)) {
+                Button rex = Buttons.green(
+                        finChecker + "ringTile_000",
+                        centerTile.getRepresentationForButtons(game, player),
+                        centerTile.getTileEmoji(player));
                 ringButtons.add(rex);
             }
         }
