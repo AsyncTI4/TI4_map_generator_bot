@@ -602,8 +602,8 @@ public class ExploreService {
                         UnitHolder planetUnitHolder = unitHolders.get(planetID);
                         UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
                         for (Player p2 : game.getPlayers().values()) {
-                            String groundForces = "";
-                            String structures = "";
+                            List<String> groundForces = new ArrayList<>();
+                            List<String> structures = new ArrayList<>();
                             for (UnitKey key : planetUnitHolder.getUnitKeys()) {
                                 if (!p2.getColor().equals(key.getColor())) continue;
                                 int amt = planetUnitHolder.getUnitCount(key);
@@ -611,25 +611,30 @@ public class ExploreService {
                                 if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
                                         .contains(key.getUnitType())) {
                                     spaceUnitHolder.addUnitsWithStates(key, removed);
-                                    groundForces +=
-                                            key.unitEmoji().emojiString().repeat(amt);
+                                    groundForces.addAll(Collections.nCopies(
+                                            amt, key.unitEmoji().emojiString()));
                                 } else {
-                                    structures += key.unitEmoji().emojiString().repeat(amt);
+                                    structures.addAll(Collections.nCopies(
+                                            amt, key.unitEmoji().emojiString()));
                                 }
                             }
                             if (!groundForces.isEmpty()) {
-                                message += "\n" + p2.getRepresentationUnfogged() + ", your " + groundForces
-                                        + " have been yote into space" + (structures.isEmpty() ? "." : "");
+                                message += "\n" + p2.getRepresentationUnfogged() + ", your "
+                                        + String.join("", groundForces) + " "
+                                        + (groundForces.size() == 1 ? "has" : "have") + " been yote into space"
+                                        + (structures.isEmpty() ? "." : "");
                             }
                             if (!structures.isEmpty()) {
                                 message += (groundForces.isEmpty()
                                                 ? "\n" + p2.getRepresentationUnfogged() + ", "
                                                 : ", and ")
-                                        + "your " + structures + " have been yote into the shadow realm.";
+                                        + "your " + String.join("", structures) + " "
+                                        + (structures.size() == 1 ? "has" : "have")
+                                        + " been yote into the shadow realm.";
                                 if (!game.isFowMode()) {
                                     DisasterWatchHelper.sendMessageInDisasterWatch(
                                             game,
-                                            "\\> \"" + structures + "⁉️" + UnitEmojis.Blank
+                                            "\\> \"" + String.join("", structures) + "⁉️" + UnitEmojis.Blank
                                                     + "🇾​🇪​🇪​🇹‼️\"\n\\- _Demilitarized Zone_, to "
                                                     + p2.getRepresentation() + ", in " + game.getName() + ".");
                                 }
