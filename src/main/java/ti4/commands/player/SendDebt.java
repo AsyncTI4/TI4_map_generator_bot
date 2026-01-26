@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
@@ -45,14 +46,12 @@ class SendDebt extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
-        String pool = event.getOption(Constants.DEBT_POOL).getAsString();
-        if (pool == null) {
-            pool = Constants.DEBT_DEFAULT_POOL;
-        }
-        SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
+        String pool = event.getOption(Constants.DEBT_POOL, Constants.DEBT_DEFAULT_POOL, OptionMapping::getAsString);
+        SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend, pool);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");
         String debtMsg = sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt token"
-                + (debtCountToSend == 1 ? "" : "s") + " to " + receivingPlayer.getRepresentation() + ".";
+                + (debtCountToSend == 1 ? "" : "s") + " to " + receivingPlayer.getRepresentation() + ", for their "
+                + pool + " pool.";
         MessageHelper.sendMessageToChannel(sendingPlayer.getCorrectChannel(), debtMsg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(receivingPlayer.getPrivateChannel(), debtMsg);

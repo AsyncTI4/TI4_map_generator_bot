@@ -810,6 +810,17 @@ class GameLoadService {
                     game.setMinimumTIGLRankAtGameStart(rank);
                 }
                 case Constants.PRIORITY_TRACK_MODE -> game.setPriorityTrackMode(PriorityTrackMode.parse(info));
+                case Constants.DEBT_POOL -> {
+                    StringTokenizer actionCardToken = new StringTokenizer(info, ";");
+                    Map<String, String> cards = new LinkedHashMap<>();
+                    while (actionCardToken.hasMoreTokens()) {
+                        StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                        String id = cardInfo.nextToken();
+                        String value = cardInfo.nextToken();
+                        cards.put(id.replace("_", " "), value);
+                    }
+                    game.setAllDebtPoolIcons(cards);
+                }
             }
         }
     }

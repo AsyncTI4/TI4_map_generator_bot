@@ -1175,12 +1175,12 @@ public class AutoCompleteProvider {
                 }
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
-            case Constants.DEBT_COUNT -> {
+            case Constants.DEBT_POOL -> {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> pools = new HashSet<>();
-                pools.add(Constants.DEBT_DEFAULT_POOL);
+                pools.add(Constants.DEBT_DEFAULT_POOL.toLowerCase());
                 for (Player player : game.getRealPlayers()) {
                     pools.addAll(player.getAllDebtTokens().keySet());
                 }

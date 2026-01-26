@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.transaction;
 
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -34,29 +34,29 @@ class ChangeDebtIcon extends GameStateSubcommand {
             pool = Constants.DEBT_DEFAULT_POOL;
         }
 
-        Emoji factionEmoji = Emoji.fromFormatted(pool);
+        Emoji factionEmoji = Emoji.fromFormatted(icon);
         if (!(factionEmoji instanceof CustomEmoji || factionEmoji instanceof UnicodeEmoji)) {
             MessageHelper.sendMessageToEventChannel(event, pool + " is not a supported emoji. Resetting to default.");
-            game.setDebtPoolIcon(pool, null);
+            game.clearDebtPoolIcon(pool);
             return;
         }
         if ((factionEmoji instanceof UnicodeEmoji)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentationUnfogged() + " is setting the " + pool + " icon to " + pool + ".");
-            game.setDebtPoolIcon(pool, pool);
+                    event, player.getRepresentationUnfogged() + " is setting the " + pool + " icon to " + icon + ".");
+            game.setDebtPoolIcon(pool, icon);
             return;
         }
         if ((factionEmoji instanceof CustomEmoji)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentationUnfogged() + " is setting the " + pool + " icon to " + pool + ".");
-            game.setDebtPoolIcon(pool, pool);
+                    event, player.getRepresentationUnfogged() + " is setting the " + pool + " icon to " + icon + ".");
+            game.setDebtPoolIcon(pool, icon);
             return;
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
                 "The bot cannot load " + pool
                         + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
-        game.setDebtPoolIcon(pool, null);
+        game.clearDebtPoolIcon(pool);
     }
 
     @Override

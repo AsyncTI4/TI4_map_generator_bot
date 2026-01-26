@@ -531,9 +531,8 @@ class PlayerAreaGenerator {
             xDelta = leaderInfo(player, xDelta, yPlayArea, game);
         }
 
-        if (player.getDebtTokens().values().stream().anyMatch(i -> i > 0)) {
-            xDelta = debtInfo(player, xDelta, yPlayArea, game);
-        }
+        // if (player.getAllDebtTokens().values().values().stream().anyMatch(i -> i > 0))
+        xDelta = debtInfo(player, xDelta, yPlayArea, game);
 
         if (!player.getRelics().isEmpty()) {
             xDelta = relicInfo(player, xDelta, yPlayArea);
@@ -1411,12 +1410,11 @@ class PlayerAreaGenerator {
 
             String bankSource = game.getDebtPoolIcon(pool.getKey());
             if (bankSource == null) {
-                if (Constants.DEBT_DEFAULT_POOL.equals(pool)) {
+                if (Constants.DEBT_DEFAULT_POOL.equalsIgnoreCase(pool.getKey())) {
                     bankSource = "pa_debtaccount.png";
                     drawPAImage(x, y, bankSource);
                 } else {
                     bankSource = TI4Emoji.getRandomizedEmoji(0, null).toString();
-                    game.setDebtPoolIcon(pool.getKey(), bankSource);
                 }
             }
 
@@ -1441,8 +1439,6 @@ class PlayerAreaGenerator {
                 }
                 g2.drawImage(bankImage, x + 20, y + 15, null);
             }
-
-            DrawingUtil.drawTextVertically(g2, pool.getKey(), x, y + 150, Storage.getFont16());
 
             int deltaX = 24;
 
@@ -1490,6 +1486,7 @@ class PlayerAreaGenerator {
             deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
             graphics.setColor(Color.WHITE);
             graphics.drawRect(x - 2, y - 2, deltaX, 152);
+            DrawingUtil.drawTextVertically(g2, pool.getKey().toUpperCase(), x + 3, y + 148, Storage.getFont18());
             x += deltaX + 10;
         }
 

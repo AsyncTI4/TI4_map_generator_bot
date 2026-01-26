@@ -4916,11 +4916,23 @@ public class Game extends GameProperties {
         return strategyCardManager.addTradeGoods(strategyCard, tradeGoodCount);
     }
 
+    public void setAllDebtPoolIcons(Map<String, String> debtPoolIcons) {
+        this.debtPoolIcons = debtPoolIcons;
+    }
+
+    public Map<String, String> getAllDebtPoolIcons() {
+        return debtPoolIcons;
+    }
+
     public void setDebtPoolIcon(String pool, String icon) {
-        debtPoolIcons.put(pool, icon);
+        debtPoolIcons.put(pool.toLowerCase(), icon);
     }
 
     public String getDebtPoolIcon(String pool) {
-        return debtPoolIcons.getOrDefault(pool, null);
+        return debtPoolIcons.getOrDefault(pool.toLowerCase(), null);
+    }
+
+    public void clearDebtPoolIcon(String pool) {
+        debtPoolIcons.remove(pool.toLowerCase());
     }
 }

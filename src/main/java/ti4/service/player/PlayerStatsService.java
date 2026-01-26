@@ -53,7 +53,7 @@ public class PlayerStatsService {
         sb.append("> Unfollowed Strategy Cards: `")
                 .append(player.getUnfollowedSCs())
                 .append("`\n");
-        sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
+        sb.append("> Debt: `").append(player.getAllDebtTokens()).append("`\n");
         sb.append("> Speaker: `")
                 .append(game.getSpeakerUserID().equals(player.getUserID()))
                 .append("`\n");

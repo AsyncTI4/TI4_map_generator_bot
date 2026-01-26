@@ -2870,7 +2870,11 @@ public class Player extends PlayerProperties {
     }
 
     public Map<String, Integer> getDebtTokens(String pool) {
-        return debtTokens.get(pool.toLowerCase());
+        Map<String, Integer> tokens = debtTokens.get(pool.toLowerCase());
+        if (tokens == null) {
+            return new LinkedHashMap<String, Integer>();
+        }
+        return tokens;
     }
 
     public void setDebtTokens(Map<String, Integer> debtTokens) {

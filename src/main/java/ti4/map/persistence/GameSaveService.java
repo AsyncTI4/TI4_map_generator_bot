@@ -714,6 +714,17 @@ class GameSaveService {
         writer.write(Constants.PRIORITY_TRACK_MODE + " " + game.getPriorityTrackMode());
         writer.write(System.lineSeparator());
 
+        sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : game.getAllDebtPoolIcons().entrySet()) {
+            if (entry.getValue() == null) continue;
+            sb.append(entry.getKey().replace(" ", "_"))
+                    .append(",")
+                    .append(entry.getValue())
+                    .append(";");
+        }
+        writer.write(Constants.DEBT_POOL + " " + sb);
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -934,11 +945,11 @@ class GameSaveService {
                     player.getAllDebtTokens().entrySet()) {
                 writer.write(Constants.DEBT + "2 " + entry.getKey().replace(" ", "_") + "|"
                         + getStringRepresentationOfMap(entry.getValue()));
+                writer.write(System.lineSeparator());
             }
 
             // old spot
 
-            writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());

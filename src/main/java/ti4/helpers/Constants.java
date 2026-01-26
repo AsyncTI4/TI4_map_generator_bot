@@ -1536,6 +1536,7 @@ public class Constants {
     public static final String SECONDS = "seconds";
     public static final String MOVE_TILE = "move_tile";
     public static final String TRANSACTION = "transaction";
+    public static final String TRANSACTION_START = "transaction_start";
     public static final String ALL = "ALL";
     public static final String COEXIST = "coexist";
 }
