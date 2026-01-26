@@ -226,6 +226,8 @@ public class Game extends GameProperties {
     @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
 
+    private Map<String, String> debtPoolIcons = new HashMap<>();
+
     public Game() {
         long currentTimeMillis = System.currentTimeMillis();
         setCreationDate(Helper.getDateRepresentation(currentTimeMillis));
@@ -4912,5 +4914,13 @@ public class Game extends GameProperties {
 
     public int addTradeGoodsToStrategyCard(int strategyCard, int tradeGoodCount) {
         return strategyCardManager.addTradeGoods(strategyCard, tradeGoodCount);
+    }
+
+    public void setDebtPoolIcon(String pool, String icon) {
+        debtPoolIcons.put(pool, icon);
+    }
+
+    public String getDebtPoolIcon(String pool) {
+        return debtPoolIcons.getOrDefault(pool, null);
     }
 }

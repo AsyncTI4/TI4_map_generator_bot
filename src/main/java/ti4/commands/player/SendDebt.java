@@ -26,6 +26,8 @@ class SendDebt extends GameStateSubcommand {
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color sending the debt token")
                 .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.DEBT_POOL, "Which debt pool to send to")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -42,6 +44,10 @@ class SendDebt extends GameStateSubcommand {
         if (receivingPlayer == null) {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
+        }
+        String pool = event.getOption(Constants.DEBT_POOL).getAsString();
+        if (pool == null) {
+            pool = Constants.DEBT_DEFAULT_POOL;
         }
         SendDebtService.sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
         CommanderUnlockCheckService.checkPlayer(receivingPlayer, "vaden");

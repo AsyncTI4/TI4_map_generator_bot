@@ -930,7 +930,11 @@ class GameSaveService {
             writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
+            for (Map.Entry<String, Map<String, Integer>> entry :
+                    player.getAllDebtTokens().entrySet()) {
+                writer.write(Constants.DEBT + "2 " + entry.getKey().replace(" ", "_") + "|"
+                        + getStringRepresentationOfMap(entry.getValue()));
+            }
 
             // old spot
 

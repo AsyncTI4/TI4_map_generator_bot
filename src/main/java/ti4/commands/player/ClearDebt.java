@@ -24,6 +24,8 @@ class ClearDebt extends GameStateSubcommand {
                 .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color clearing the debt")
                 .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.DEBT_POOL, "Which debt pool to send to")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -41,13 +43,17 @@ class ClearDebt extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
+        String pool = event.getOption(Constants.DEBT_POOL).getAsString();
+        if (pool == null) {
+            pool = Constants.DEBT_DEFAULT_POOL;
+        }
 
-        if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor())) {
-            MessageHelper.sendMessageToEventChannel(event, "You cannot clear more debt tokens than you have");
+        if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor(), pool)) {
+            MessageHelper.sendMessageToEventChannel(event, "You cannot clear more debt tokens than you have.");
             return;
         }
 
-        clearingPlayer.clearDebt(clearedPlayer, debtCountToClear);
+        clearingPlayer.clearDebt(clearedPlayer, debtCountToClear, pool);
         MessageHelper.sendMessageToChannel(
                 clearingPlayer.getCorrectChannel(),
                 clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt token"
