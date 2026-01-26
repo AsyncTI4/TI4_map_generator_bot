@@ -15,38 +15,10 @@ public class GameImageService {
     private final MapImageDataRepository mapImageDataRepository;
 
     @Nullable
-    public String getLatestMapImageName(String gameName) {
+    MapImageData getLatestMapImageData(String gameName) {
         if (!GameManager.isValid(gameName)) return null;
         return mapImageDataRepository
                 .findById(gameName)
-                .map(MapImageData::getLatestMapImageName)
-                .orElse(null);
-    }
-
-    @Nullable
-    public Long getLatestDiscordMessageId(String gameName) {
-        if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository
-                .findById(gameName)
-                .map(MapImageData::getLatestDiscordMessageId)
-                .orElse(null);
-    }
-
-    @Nullable
-    public Long getLatestDiscordGuildId(String gameName) {
-        if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository
-                .findById(gameName)
-                .map(MapImageData::getLatestDiscordGuildId)
-                .orElse(null);
-    }
-
-    @Nullable
-    public Long getLatestDiscordChannelId(String gameName) {
-        if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository
-                .findById(gameName)
-                .map(MapImageData::getLatestDiscordChannelId)
                 .orElse(null);
     }
 

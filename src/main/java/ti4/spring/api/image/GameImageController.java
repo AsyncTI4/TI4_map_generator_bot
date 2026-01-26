@@ -4,6 +4,7 @@ import static software.amazon.awssdk.utils.StringUtils.isBlank;
 
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,18 +41,21 @@ public class GameImageController {
     @SetupRequestContext(false)
     @GetMapping("/image/attachment-url")
     public ResponseEntity<String> getAttachmentUrl(@PathVariable String gameName) {
-        Long messageId = gameImageService.getLatestDiscordMessageId(gameName);
-        Long channelId = gameImageService.getLatestDiscordChannelId(gameName);
+        MapImageData mapImageData = gameImageService.getLatestMapImageData(gameName);
+        if (mapImageData == null) return ResponseEntity.notFound().build();
+
+        Long messageId = mapImageData.getLatestDiscordMessageId();
+        Long channelId = mapImageData.getLatestDiscordChannelId();
 
         if (messageId == null || messageId == 0 || channelId == null || channelId == 0) {
             return ResponseEntity.notFound().build();
         }
 
         try {
-            // Fetch the message from Discord to get the attachment URL using the channel
-            // The channel could be a TextChannel or ThreadChannel
+            // Fetch the message from Discord to get the attachment URL using the channel.
+            // The channel could be a TextChannel or ThreadChannel.
             Message message = JdaService.jda
-                    .getChannelById(net.dv8tion.jda.api.entities.channel.middleman.MessageChannel.class, channelId)
+                    .getChannelById(MessageChannel.class, channelId)
                     .retrieveMessageById(messageId)
                     .complete();
             if (message == null || message.getAttachments().isEmpty()) {

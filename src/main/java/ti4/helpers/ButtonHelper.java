@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,7 +19,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -144,7 +146,7 @@ public class ButtonHelper {
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 
@@ -1505,10 +1507,7 @@ public class ButtonHelper {
                 }
             }
         }
-        if (TeHelperUnits.affectedByQuietus(game, player, tile)) {
-            return true;
-        }
-        return false;
+      return TeHelperUnits.affectedByQuietus(game, player, tile);
     }
 
     public static int resolveOnActivationEnemyAbilities(
@@ -2285,16 +2284,13 @@ public class ButtonHelper {
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
             List<Button> buttonsWeb = Buttons.mapImageButtons(game);
-            AtomicBoolean savedMessageId = new AtomicBoolean(false);
             Consumer<Message> persistMessageId = msg -> {
-                if (savedMessageId.compareAndSet(false, true)) {
-                    SpringContext.getBean(GameImageService.class)
-                            .saveDiscordMessageId(
-                                    game,
-                                    msg.getIdLong(),
-                                    msg.getGuild().getIdLong(),
-                                    msg.getChannel().getIdLong());
-                }
+                SpringContext.getBean(GameImageService.class)
+                    .saveDiscordMessageId(
+                        game,
+                        msg.getIdLong(),
+                        msg.getGuild().getIdLong(),
+                        msg.getChannel().getIdLong());
             };
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
@@ -2936,7 +2932,7 @@ public class ButtonHelper {
                     finChecker + "replaceSleeperWith_pds_" + planet, "Replace Sleeper on " + planet + " With 1 PDS."));
             if (getNumberOfUnitsOnTheBoard(game, player, "mech") < 4
                     && player.hasUnit("titans_mech")
-                    && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+                    && !isLawInPlay(game, "articles_war")) {
                 planetsWithSleepers.add(Buttons.green(
                         finChecker + "replaceSleeperWith_mech_" + planet,
                         "Replace Sleeper on " + planet + " With 1 Mech & Infantry."));
@@ -4375,7 +4371,7 @@ public class ButtonHelper {
 
             if (player.hasPlanet(planet)
                     && !player.getExhaustedPlanetsAbilities().contains(planet)) {
-                if (planet.equalsIgnoreCase("mrte")
+                if ("mrte".equalsIgnoreCase(planet)
                         && player.getSecretsUnscored().size() < 1) {
                     continue;
                 }

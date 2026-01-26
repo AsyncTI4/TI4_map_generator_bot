@@ -359,12 +359,7 @@ public class MessageHelper {
             return;
         }
         channel.sendFiles(fileUpload)
-                .queue(
-                        msg -> {
-                            if (onSuccess != null) {
-                                onSuccess.accept(msg);
-                            }
-                        },
+                .queue(onSuccess,
                         error -> BotLogger.error(
                                 getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error),
                                 error));
