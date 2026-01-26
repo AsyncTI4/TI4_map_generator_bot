@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -133,6 +135,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.spring.api.image.GameImageService;
+import ti4.spring.context.SpringContext;
 import ti4.website.AsyncTi4WebsiteHelper;
 
 @UtilityClass
@@ -2281,11 +2285,23 @@ public class ButtonHelper {
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
             List<Button> buttonsWeb = Buttons.mapImageButtons(game);
+            AtomicBoolean savedMessageId = new AtomicBoolean(false);
+            Consumer<Message> persistMessageId = msg -> {
+                if (savedMessageId.compareAndSet(false, true)) {
+                    SpringContext.getBean(GameImageService.class)
+                            .saveDiscordMessageId(
+                                    game,
+                                    msg.getIdLong(),
+                                    msg.getGuild().getIdLong(),
+                                    msg.getChannel().getIdLong());
+                }
+            };
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         foundSomething = true;
-                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb, game);
+                        sendFileWithCorrectButtons(
+                                threadChannel_, fileUpload, message, buttonsWeb, game, persistMessageId);
                     }
                 }
             } else {
@@ -2295,17 +2311,28 @@ public class ButtonHelper {
                 foundSomething = true;
             }
             if (!foundSomething) {
-                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb, game);
+                sendFileWithCorrectButtons(
+                        event.getMessageChannel(), fileUpload, message, buttonsWeb, game, persistMessageId);
             }
         });
     }
 
     public static void sendFileWithCorrectButtons(
             MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons, Game game) {
+        sendFileWithCorrectButtons(channel, fileUpload, message, buttons, game, null);
+    }
+
+    public static void sendFileWithCorrectButtons(
+            MessageChannel channel,
+            FileUpload fileUpload,
+            String message,
+            List<Button> buttons,
+            Game game,
+            @Nullable Consumer<Message> onSuccess) {
         if (!AsyncTi4WebsiteHelper.uploadsEnabled() || game.isFowMode()) {
-            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons, onSuccess);
         } else {
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons, onSuccess);
         }
     }
 
