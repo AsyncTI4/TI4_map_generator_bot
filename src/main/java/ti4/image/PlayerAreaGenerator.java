@@ -2229,10 +2229,28 @@ class PlayerAreaGenerator {
                 Point p2 = PositionMapper.getTilePosition(tile2.getPosition());
                 if (p1 == null || p2 == null) return Comparator.nullsLast(null).compare(p1, p2);
 
-                int distance1 = ((homePosition.x - p1.x) * (homePosition.x - p1.x)
-                        + (homePosition.y - p1.y) * (homePosition.y - p1.y));
-                int distance2 = ((homePosition.x - p2.x) * (homePosition.x - p2.x)
-                        + (homePosition.y - p2.y) * (homePosition.y - p2.y));
+                int distance1, distance2;
+                if (homeTile.getPosition().equals(tile1.getPosition())) {
+                    distance1 = 0;
+                } else if (tile1.getPosition().contains("frac")) {
+                    distance1 = "styx".equals(planet1) ? 9000 : 8000;
+                } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile1.getPosition())) {
+                    distance1 = 7000;
+                } else {
+                    distance1 = ((homePosition.x - p1.x) * (homePosition.x - p1.x)
+                            + (homePosition.y - p1.y) * (homePosition.y - p1.y));
+                }
+                if (homeTile.getPosition().equals(tile2.getPosition())) {
+                    distance2 = 0;
+                } else if (tile2.getPosition().contains("frac")) {
+                    distance2 = "styx".equals(planet2) ? 9000 : 8000;
+                } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile2.getPosition())) {
+                    distance2 = 7000;
+                } else {
+                    distance2 = ((homePosition.x - p2.x) * (homePosition.x - p2.x)
+                            + (homePosition.y - p2.y) * (homePosition.y - p2.y));
+                }
+
                 if (distance1 != distance2) {
                     return distance1 - distance2;
                 }
