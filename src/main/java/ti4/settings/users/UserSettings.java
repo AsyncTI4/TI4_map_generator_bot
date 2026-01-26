@@ -73,8 +73,7 @@ public class UserSettings {
             newActiveHours.append(hour).append(";");
             x++;
         }
-        newActiveHours = new StringBuilder(newActiveHours.substring(0, newActiveHours.length() - 1));
-        activeHours = newActiveHours.toString();
+        activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
     public boolean enoughHeatData() {

@@ -605,9 +605,6 @@ public class Helper {
         return (year2 - year1) * 365 + (month2 - month1) * 30 + (day2 - day1);
     }
 
-    /**
-     * @deprecated - Use  instead
-     */
     @Deprecated
     public static String getSCName(int sc, Game game) {
         if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
