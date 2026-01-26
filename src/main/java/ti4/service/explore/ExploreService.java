@@ -619,18 +619,25 @@ public class ExploreService {
                                 }
                             }
                             if (!groundForces.isEmpty()) {
-                                message += "\n" + p2.getRepresentationUnfogged() + ", your "
-                                        + String.join("", groundForces) + " "
-                                        + (groundForces.size() == 1 ? "has" : "have") + " been yote into space"
-                                        + (structures.isEmpty() ? "." : "");
+                                message.append("\n")
+                                        .append(p2.getRepresentationUnfogged())
+                                        .append(", your ")
+                                        .append(String.join("", groundForces))
+                                        .append(" ")
+                                        .append(groundForces.size() == 1 ? "has" : "have")
+                                        .append(" been yote into space")
+                                        .append(structures.isEmpty() ? "." : "");
                             }
                             if (!structures.isEmpty()) {
-                                message += (groundForces.isEmpty()
-                                                ? "\n" + p2.getRepresentationUnfogged() + ", "
-                                                : ", and ")
-                                        + "your " + String.join("", structures) + " "
-                                        + (structures.size() == 1 ? "has" : "have")
-                                        + " been yote into the shadow realm.";
+                                message.append(
+                                                groundForces.isEmpty()
+                                                        ? "\n" + p2.getRepresentationUnfogged() + ", "
+                                                        : ", and ")
+                                        .append("your ")
+                                        .append(String.join("", structures))
+                                        .append(" ")
+                                        .append(structures.size() == 1 ? "has" : "have")
+                                        .append(" been yote into the shadow realm.");
                                 if (!game.isFowMode()) {
                                     DisasterWatchHelper.sendMessageInDisasterWatch(
                                             game,

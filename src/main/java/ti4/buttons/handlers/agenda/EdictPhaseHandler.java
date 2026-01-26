@@ -43,6 +43,14 @@ public class EdictPhaseHandler {
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> embeds = new ArrayList<>();
         Player tyrant = game.getTyrant();
+        if (tyrant == null) {
+            Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase");
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    "There is no Tyrant, and so there can be no Edict Phase.",
+                    proceedToStrategyPhase);
+            return;
+        }
         for (int x = 0; x < 3; x++) {
             AgendaModel edict = Mapper.getAgenda(edicts.get(x));
             buttons.add(Buttons.green(
