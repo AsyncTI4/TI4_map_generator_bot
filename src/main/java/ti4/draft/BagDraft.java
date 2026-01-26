@@ -123,16 +123,13 @@ public abstract class BagDraft {
                     List<DraftItem> draftableItems = new ArrayList<>();
                     draftableItems.addAll(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
-                    findExistingBagChannel(p)
-                            .getHistory()
-                            .retrievePast(100)
-                            .queue(m -> {
-                                if (!m.isEmpty()) {
-                                    findExistingBagChannel(p)
-                                            .deleteMessages(m)
-                                            .queue(Consumers.nop(), BotLogger::catchRestError);
-                                }
-                            });
+                    findExistingBagChannel(p).getHistory().retrievePast(100).queue(m -> {
+                        if (!m.isEmpty()) {
+                            findExistingBagChannel(p)
+                                    .deleteMessages(m)
+                                    .queue(Consumers.nop(), BotLogger::catchRestError);
+                        }
+                    });
                     p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);
                     MessageHelper.sendMessageToChannel(

@@ -121,8 +121,7 @@ public class SpinService {
             this.trigger = trigger;
             this.toSpin = toSpin;
             if (game != null) {
-                id = String.valueOf(
-                        ((game.getName() + this).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
+                id = String.valueOf(((game.getName() + this).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
             }
         }
 
@@ -171,15 +170,15 @@ public class SpinService {
         // status phase
         @Override
         public String toString() {
-          String sb = ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR)) +
-              OPTION_SEPARATOR +
-              direction.toString() +
-              OPTION_SEPARATOR +
-              steps.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR)) +
-              OPTION_SEPARATOR +
-              center +
-              OPTION_SEPARATOR +
-              trigger.toString();
+            String sb = ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+                    + OPTION_SEPARATOR
+                    + direction.toString()
+                    + OPTION_SEPARATOR
+                    + steps.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+                    + OPTION_SEPARATOR
+                    + center
+                    + OPTION_SEPARATOR
+                    + trigger.toString();
             // sb.append(OPTION_SEPARATOR);
             // sb.append(toSpin.toString());
             return sb;
@@ -266,7 +265,7 @@ public class SpinService {
             }
 
             // Max ring check
-          return maxRing() <= MAX_RING_TO_SPIN;
+            return maxRing() <= MAX_RING_TO_SPIN;
         }
     }
 

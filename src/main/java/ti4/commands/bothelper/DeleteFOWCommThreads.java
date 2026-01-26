@@ -25,7 +25,7 @@ class DeleteFOWCommThreads extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
-      if (!"YES".equals(option.getAsString())) {
+        if (!"YES".equals(option.getAsString())) {
             MessageHelper.replyToMessage(
                     event,
                     "Must confirm with `YES`"

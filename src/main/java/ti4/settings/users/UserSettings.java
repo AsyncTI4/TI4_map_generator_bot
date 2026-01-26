@@ -78,7 +78,7 @@ public class UserSettings {
     }
 
     public boolean enoughHeatData() {
-      return amountOfHeatData() > 150;
+        return amountOfHeatData() > 150;
     }
 
     public int amountOfHeatData() {

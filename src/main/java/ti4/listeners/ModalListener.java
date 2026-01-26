@@ -101,12 +101,12 @@ public class ModalListener extends ListenerAdapter {
     }
 
     public static String getModalDebugText(ModalInteractionEvent event) {
-      // for (ModalMapping field : event.getValues()) {
+        // for (ModalMapping field : event.getValues()) {
         //     output.append("\n> Field: ")
         //             .append(field.getCustomId())
         //             .append(" => ")
         //             .append(field.getAsString());
         // }
-      return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
+        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
     }
 }

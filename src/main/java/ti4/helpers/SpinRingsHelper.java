@@ -59,7 +59,7 @@ public class SpinRingsHelper {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof Hex h)) return false;
-          return q == h.q && r == h.r;
+            return q == h.q && r == h.r;
         }
 
         @Override
@@ -281,9 +281,10 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
 
-      String sb = "# " + randomStatusMessage() + "\n-# " + spunMessage(1, Direction.CW, 1, null, game.isFowMode()) +
-          "\n-# " + spunMessage(2, Direction.CCW, 2, null, game.isFowMode()) +
-          "\n-# " + spunMessage(3, Direction.CW, 3, null, game.isFowMode());
+        String sb = "# " + randomStatusMessage() + "\n-# " + spunMessage(1, Direction.CW, 1, null, game.isFowMode())
+                + "\n-# "
+                + spunMessage(2, Direction.CCW, 2, null, game.isFowMode()) + "\n-# "
+                + spunMessage(3, Direction.CW, 3, null, game.isFowMode());
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb);
     }
 
