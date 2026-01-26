@@ -115,11 +115,10 @@ public class CommanderUnlockCheckService {
                 }
                 shouldBeUnlocked = (influence >= 12);
             }
-            case "yssaril" -> {
+            case "yssaril" ->
                 shouldBeUnlocked = (player.getActionCards().size() > 7
                         || (player.getExhaustedTechs().contains("mi")
                                 && player.getActionCards().size() >= 7));
-            }
             case "letnev", "muaat", "winnu", "yin" -> shouldBeUnlocked = true;
 
             // PoK

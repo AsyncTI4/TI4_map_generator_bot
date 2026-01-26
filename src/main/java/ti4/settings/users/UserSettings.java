@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -64,24 +64,20 @@ public class UserSettings {
             activeHours = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
         }
         int x = 0;
-        String newActiveHours = "";
+        StringBuilder newActiveHours = new StringBuilder();
         for (String hourStr : activeHours.split(";")) {
             int hour = Integer.parseInt(hourStr);
             if (x == utcHour) {
                 hour++;
             }
-            newActiveHours += hour + ";";
+            newActiveHours.append(hour).append(";");
             x++;
         }
-        newActiveHours = newActiveHours.substring(0, newActiveHours.length() - 1);
-        activeHours = newActiveHours;
+        activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
     public boolean enoughHeatData() {
-        if (amountOfHeatData() > 150) {
-            return true;
-        }
-        return false;
+        return amountOfHeatData() > 150;
     }
 
     public int amountOfHeatData() {
@@ -120,7 +116,7 @@ public class UserSettings {
             } else {
                 // End of a range
                 if (rangeStart != -1) {
-                    if (result.length() > 0) {
+                    if (!result.isEmpty()) {
                         result.append(", ");
                     }
                     if (rangeStart == hour - 1) {
@@ -135,7 +131,7 @@ public class UserSettings {
             }
         }
         if (rangeStart != -1) {
-            if (result.length() > 0) {
+            if (!result.isEmpty()) {
                 result.append(", ");
             }
             if (rangeStart == 23) {
@@ -145,7 +141,7 @@ public class UserSettings {
             }
         }
 
-        return result.length() == 0 ? "No active hours" : result.toString();
+        return result.isEmpty() ? "No active hours" : result.toString();
     }
 
     @JsonGetter("myDateTime")

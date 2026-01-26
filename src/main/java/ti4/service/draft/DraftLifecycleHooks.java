@@ -8,9 +8,9 @@ import ti4.map.Player;
  * should allow draft components to do extra work and control the flow
  * as needed, hopefully without being overbearing. More hooks should
  * be added only as really needed, and with default noop implementations.
- *
+ * <p>
  * The draft manager is responsible for checking and progressing through the lifecycle.
- *
+ * <p>
  * Draft stages:
  * 1. Initialization - Draftables generate their choices, etc.
  * 2. Drafting - Players make choices from draftables.

@@ -14,6 +14,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -201,6 +202,7 @@ public class ButtonHelperTwilightsFallActionCards {
                 FractureService.spawnFracture(event, game);
                 FractureService.spawnIngressTokens(event, game, player, null);
             }
+            TeHelperTechs.initializePlanesplitterStep1(game, player);
         } else {
             Integer poIndex =
                     game.addCustomPO("Unravel " + Mapper.getRelic(relic).getName(), 1);
@@ -423,11 +425,11 @@ public class ButtonHelperTwilightsFallActionCards {
         }
         int max = 0;
         String bestFaction = "";
-        for (String k : factions.keySet()) {
-            Integer v = factions.get(k);
+        for (Map.Entry<String, Integer> entry : factions.entrySet()) {
+            Integer v = entry.getValue();
             if (v > max) {
                 max = v;
-                bestFaction = k;
+                bestFaction = entry.getKey();
             }
         }
 
@@ -627,7 +629,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     }
                 }
                 player.addOwnedUnitByID(card);
-                found = "" + Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
+                found = Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
                 break;
             }
         }

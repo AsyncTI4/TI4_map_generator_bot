@@ -262,6 +262,9 @@ public class TeHelperTechs {
         //     return;
         // }
         if (event == null) {
+            if (game.isTwilightsFallMode()) {
+                message = "Please choose a system to add an Ingress token into.";
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
             return;
         }
@@ -295,9 +298,17 @@ public class TeHelperTechs {
             }
         } else {
             Set<String> adjTilePositions = new HashSet<>();
-            ButtonHelper.getTilesWithShipsInTheSystem(player, game)
-                    .forEach(tile -> adjTilePositions.addAll(
-                            FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)));
+            if (game.isTwilightsFallMode()) {
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                        adjTilePositions.add(tile.getPosition());
+                    }
+                }
+            } else {
+                ButtonHelper.getTilesWithShipsInTheSystem(player, game)
+                        .forEach(tile -> adjTilePositions.addAll(
+                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)));
+            }
 
             adjTilePositions.stream()
                     .map(game::getTileByPosition)
@@ -336,6 +347,9 @@ public class TeHelperTechs {
     private static void initializePlanesplitterStep2(Game game, Player player, ButtonInteractionEvent event) {
         // ACTION: Exhaust this card to place or move an ingress token into a system that contains or is adjacent to
         // your ships.
+        if (game.isTwilightsFallMode()) {
+            return;
+        }
         handlePlanesplitterStep2(game, player, event, "planesplitterStep2_page0");
     }
 

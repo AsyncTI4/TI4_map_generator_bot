@@ -278,7 +278,7 @@ public class MessageHelper {
                                 String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
 
                                 if (!po.isEmpty() && !so.isEmpty()) {
-                                    if (scored.length() == 0) {
+                                    if (scored.isEmpty()) {
                                         scored = new StringBuilder(player.getFaction());
                                     } else {
                                         scored.append("_").append(player.getFaction());
@@ -360,11 +360,7 @@ public class MessageHelper {
         }
         channel.sendFiles(fileUpload)
                 .queue(
-                        msg -> {
-                            if (onSuccess != null) {
-                                onSuccess.accept(msg);
-                            }
-                        },
+                        onSuccess,
                         error -> BotLogger.error(
                                 getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error),
                                 error));

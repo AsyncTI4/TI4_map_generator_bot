@@ -204,7 +204,7 @@
         "name": "Spoils of War",
         "faction": "lanefir",
         "color": "",
-        "playArea": true,
+        "playArea": false,
         "playImmediately": false,
         "source": "ds",
         "text": "After you win a combat: Place this card face-up in your play area to explore 1 planet you control.\nAt the start of the Lanefir player's turn, return this card to the Lanefir player."
