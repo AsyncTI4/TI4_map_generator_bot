@@ -18,6 +18,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String shortName;
     private Boolean shrinkName;
     private String text;
+    private String notes;
     private String flavourText;
     private String flavourTextFormatted;
     private Boolean isFakeRelic;
@@ -87,6 +88,9 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title.toString(), null);
 
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
         if (includeFlavourText && flavourText != null) eb.addField("", flavourText, false);
 
         // Colour

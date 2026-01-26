@@ -482,7 +482,10 @@ public class StartCombatService {
                 for (Player player : game.getRealPlayersNDummies()) {
                     if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(uH, player)) {
                         if (playersWithGF.isEmpty()
-                                || !playersWithGF.get(0).getAllianceMembers().contains(player.getFaction())) {
+                                || !playersWithGF
+                                        .getFirst()
+                                        .getAllianceMembers()
+                                        .contains(player.getFaction())) {
                             playersWithGF.add(player);
                         }
                     }
@@ -592,13 +595,13 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player2.getRepresentation()
-                            + ", you are affected by the _Quietus_ (the Rebellion flagship), and your units will have lost all unit abilities.");
+                            + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
         if (TeHelperUnits.affectedByQuietus(game, player1, tile)) {
             MessageHelper.sendMessageToChannel(
                     threadChannel,
                     player1.getRepresentation()
-                            + ", you are affected by the _Quietus_ (the Rebellion flagship), and your units will have lost all unit abilities.");
+                            + ", you are affected by the Quietus (the Rebellion flagship), and your units will have lost all unit abilities.");
         }
 
         if (tile.isHomeSystem(game)
@@ -1256,7 +1259,7 @@ public class StartCombatService {
                     p2.dummyPlayerSpoof() + "getDamageButtons_" + pos + "_" + groundOrSpace + "combat",
                     "Assign Hits For Dummy"));
         }
-        buttons.add(Buttons.gray("checkCombatACs", "Check Combat Action Cards", CardEmojis.ActionCard));
+        buttons.add(Buttons.gray("checkCombatACs", "Check Combat Action Cards", CardEmojis.getACEmoji(game)));
         buttons.add(Buttons.green("getRepairButtons_" + pos, "Repair Damage"));
         buttons.add(Buttons.blue(
                 "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
@@ -1316,6 +1319,33 @@ public class StartCombatService {
                     p2.getFinsFactionCheckerPrefix() + "exhaustTech_dsmortr",
                     "Exhaust Fractal Plating (Upon Destroy)",
                     FactionEmojis.mortheus));
+        }
+
+        if (p1.hasTechReady("dihmohnbt") && isSpaceCombat) {
+            if (p1.hasReadyBreakthrough("dihmohnbt")) {
+                buttons.add(Buttons.green(
+                        p1.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
+                        "Place Frontier Token (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            } else {
+                buttons.add(Buttons.green(
+                        p1.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
+                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            }
+        }
+        if (p2.hasUnlockedBreakthrough("dihmohnbt") && isSpaceCombat && !game.isFowMode()) {
+            if (p2.hasReadyBreakthrough("dihmohnbt")) {
+                buttons.add(Buttons.green(
+                        p2.getFinsFactionCheckerPrefix() + "exhaustBT_dihmohnbt_" + tile.getPosition(),
+                        "Place Frontier Token (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            } else {
+                buttons.add(Buttons.green(
+                        p2.getFinsFactionCheckerPrefix() + "readyBT_dihmohnbt_" + tile.getPosition(),
+                        "Produce 1 Non-Fighter Ship (Upon Destroy)",
+                        FactionEmojis.dihmohn));
+            }
         }
 
         for (Player agentHolder : game.getRealPlayers()) {
@@ -1777,6 +1807,19 @@ public class StartCombatService {
                 addForesightButton.accept(p2);
             }
             addForesightButton.accept(p1);
+
+            Consumer<Player> addGheminaButton = (player) -> {
+                if (player.hasReadyBreakthrough("gheminabt")) {
+                    buttons.add(Buttons.red(
+                            "retreat_" + pos + "_gheminabt",
+                            "Retreat With Ghemina Breakthrough",
+                            FactionEmojis.ghemina));
+                }
+            };
+            if (!game.isFowMode()) {
+                addGheminaButton.accept(p2);
+            }
+            addGheminaButton.accept(p1);
         }
 
         boolean gheminaCommanderApplicable = false;
@@ -1859,7 +1902,7 @@ public class StartCombatService {
                     "Purge Rebellion Hero",
                     FactionEmojis.Crimson));
         }
-        if (p1.hasLeaderUnlocked("bastionhero") && !game.isFowMode()) {
+        if (p1.hasLeaderUnlocked("bastionhero")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
                     finChecker + "purgeBastionHero_" + tile.getPosition(),
@@ -1956,6 +1999,9 @@ public class StartCombatService {
                     Player otherP = p1;
                     if (p == p1) {
                         otherP = p2;
+                    }
+                    if (game.isFowMode() && p == p2) {
+                        continue;
                     }
                     // Sol Commander
                     if (p != game.getActivePlayer()

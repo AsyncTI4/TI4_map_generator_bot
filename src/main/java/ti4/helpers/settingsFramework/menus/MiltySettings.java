@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -40,7 +41,7 @@ public class MiltySettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public MiltySettings(Game game, JsonNode json) {
+    public MiltySettings(@NotNull Game game, JsonNode json) {
         super("main", "Draft Settings", "Edit draft settings, then start the draft!", null);
         this.game = game;
 

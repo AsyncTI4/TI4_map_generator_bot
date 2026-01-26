@@ -36,6 +36,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private Boolean shrinkNamePNAttach;
     private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
+    private Float radius;
     private int resources;
     private int influence;
     private String factionHomeworld;
@@ -45,6 +46,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private List<TechSpecialtyModel.TechSpecialty> techSpecialties;
     private String legendaryAbilityName;
     private String legendaryAbilityText;
+    private String legendaryNotes;
     private String legendaryAbilityFlavourText;
     private String basicAbilityText;
     private String flavourText;
@@ -108,6 +110,19 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return null;
     }
 
+    public float getRadius() {
+        if (radius != null) {
+            return radius;
+        }
+        if (planetLayout != null && planetLayout.getPlanetRadius() != null) {
+            return 1.0f * planetLayout.getPlanetRadius();
+        }
+        if (legendaryAbilityName != null) {
+            return 95.0f;
+        }
+        return 55.0f;
+    }
+
     @Deprecated
     public PlanetTypeModel.PlanetType getPlanetType() {
         if (planetType != null) {
@@ -158,8 +173,14 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (basicAbilityText != null) eb.addField("Ability:", basicAbilityText, false);
-        if (legendaryAbilityName != null)
+        if ((legendaryAbilityName != null) && (legendaryNotes != null)) {
+            eb.addField(
+                    MiscEmojis.LegendaryPlanet + legendaryAbilityName,
+                    legendaryAbilityText + "\n-# [" + legendaryNotes + "]",
+                    false);
+        } else if (legendaryAbilityName != null) {
             eb.addField(MiscEmojis.LegendaryPlanet + legendaryAbilityName, legendaryAbilityText, false);
+        }
         if (legendaryAbilityFlavourText != null) eb.addField("", legendaryAbilityFlavourText, false);
         if (flavourText != null) eb.addField("", flavourText, false);
 
@@ -184,6 +205,9 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         eb.setColor(Color.black);
 
         eb.setDescription(legendaryAbilityText);
+        if (legendaryNotes != null) {
+            eb.setDescription(legendaryAbilityText + "\n-# [" + legendaryNotes + "]");
+        }
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
         return eb.build();
     }

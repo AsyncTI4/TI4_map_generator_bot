@@ -256,7 +256,7 @@ public class TransactionHelper {
                             case "generic" ->
                                 trans.append(amountToTransact)
                                         .append(" ")
-                                        .append(CardEmojis.ActionCard)
+                                        .append(CardEmojis.getACEmoji(game))
                                         .append(" to be specified by player");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
@@ -270,7 +270,7 @@ public class TransactionHelper {
                                         acID = ac.getKey();
                                     }
                                 }
-                                trans.append(CardEmojis.ActionCard);
+                                trans.append(CardEmojis.getACEmoji(game));
                                 if (!hidePrivateCardText) {
                                     trans.append(" _")
                                             .append(Mapper.getActionCard(acID).getName())
@@ -433,12 +433,10 @@ public class TransactionHelper {
             "A Picture Of A Sandwich",
             "Thoughtful Advice About Your Current Situation",
             "Zip; Zilch; Nada",
-            "Approximately "
-                    + String.format(
-                            "%,d",
-                            5 * ThreadLocalRandom.current().nextInt(200, 2000)
-                                    + ThreadLocalRandom.current().nextInt(1, 5))
-                    + " Unique Snow Globes",
+            String.format(
+                    "Approximately %,d Unique Snow Globes",
+                    5 * ThreadLocalRandom.current().nextInt(200, 2000)
+                            + ThreadLocalRandom.current().nextInt(1, 5)),
             "Forgiveness For Future Mistakes (Terms And Conditions Apply)",
             "A Token Labelled \"Traid Gud\"",
             "A Hill Of Beans",
@@ -490,7 +488,7 @@ public class TransactionHelper {
             "A Creepy Doll",
             "A Ziploc Bag Of Ranch Dressing",
             "Nothing. And Furthermore, Carthage Must Be Destroyed!",
-            "All Of The Goulash",
+            "All The Goulash",
             "Waldo's Location",
             "A Billet Of Ea-nāṣir's Finest Copper",
             "All The Silver In Fort Knox",
@@ -502,7 +500,7 @@ public class TransactionHelper {
             "An Inanimate Carbon Rod",
             "A Set Of Left-Handed Sarween Tools",
             "A Bridge That's For Sale",
-            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!",
+            "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // For that thing that I want, yes indeed!",
             "The Chameleon's Dish",
             "The Sound Of One Hand Clapping",
             "An Unpaired Sock",
@@ -521,7 +519,7 @@ public class TransactionHelper {
             "A Succulent Chinese Meal?",
             "The Cheap Plastic Imitation Of The Amulet Of Yendor",
             "A Millstone",
-            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 3) + ": A Goat!",
+            "Behind Door #" + ThreadLocalRandom.current().nextInt(1, 4) + ": A Goat!",
             "A Runcible Spoon",
             "_Nullam Rem Natam_",
             "A Jubba Cloak",
@@ -537,7 +535,50 @@ public class TransactionHelper {
             "Emotional Support For The Throne",
             "My Frayed Agreement",
             "A Rock-Shaped Rock",
-            "Not Attacking You Through The Samekh Wormhole");
+            "Not Attacking You Through The Samekh Wormhole",
+            "A Thneed",
+            "Smashing That Like Button",
+            "A Sickle Of Leather",
+            "A Fish's Bicycle",
+            "One Red Paperclip",
+            "ACME Bird Seed",
+            "Your Choice Of Mountain Dew Or Crab Juice",
+            // generates a Sidereal Confluence trade offer in the form of
+            // "Two Food/Life Support Cubes And One Biotechnology Cube"
+            String.format(String.format(
+                    String.format(
+                            "%s And %s",
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            },
+                            switch (Math.min(
+                                    ThreadLocalRandom.current().nextInt(5),
+                                    ThreadLocalRandom.current().nextInt(5))) {
+                                case 0 -> "One %s Cube";
+                                case 1 -> "Two %s Cubes";
+                                case 2 -> "Three %s Cubes";
+                                case 3 -> "Four %s Cubes";
+                                default -> "Five %s Cubes";
+                            }),
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Food/Life Support";
+                        case 1 -> "Culture";
+                        default -> "Industry";
+                    },
+                    switch (ThreadLocalRandom.current().nextInt(3)) {
+                        case 0 -> "Information";
+                        case 1 -> "Biotechnology";
+                        default -> "Power/Electrical";
+                    })),
+            "The Golden Skull of Rauhl",
+            "An Inverted Jenny Postage Stamp",
+            "A Flanian Pobble Bead");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
@@ -1619,12 +1660,10 @@ public class TransactionHelper {
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect Something in Return"));
         goAgainButtons.add(done);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
-            if (oldWay) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            if (!message2.isEmpty()) {
+                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
             }
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {
@@ -1635,10 +1674,12 @@ public class TransactionHelper {
                             || message2.toLowerCase().contains("support"))) {
                 MessageHelper.sendMessageToChannel(channel, message2);
             }
-            if (oldWay) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        game.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
-            }
+        }
+        if (oldWay) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p1.getCardsInfoThread(),
+                    ident + ", use these buttons to complete the transaction.",
+                    goAgainButtons);
         }
     }
 
@@ -1666,7 +1707,7 @@ public class TransactionHelper {
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append("## " + player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
+        sb.append("## ").append(player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
         if (!canTheseTwoTransact(game, player, player2)) {
             sb.append("you cannot transact with ")
                     .append(player2.getRepresentation(false, false))
@@ -1770,7 +1811,7 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
-        if (blackMarket && p1.getSecretsUnscored().size() > 0) {
+        if (blackMarket && !p1.getSecretsUnscored().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
         }

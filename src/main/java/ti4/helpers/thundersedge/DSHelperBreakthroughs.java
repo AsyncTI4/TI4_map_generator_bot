@@ -2,26 +2,235 @@ package ti4.helpers.thundersedge;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.commands.tokens.AddTokenCommand;
+import ti4.helpers.ActionCardHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.BreakthroughModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.model.UnitModel;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
 
 public class DSHelperBreakthroughs {
     // @ButtonHandler("componentActionRes_")
+
+    public static void dihmohnBTExhaust(Game game, Player p1) {
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        AddTokenCommand.addToken(null, tile, Constants.FRONTIER, game);
+        MessageHelper.sendMessageToChannel(
+                p1.getCorrectChannel(), "Added a frontier token to " + tile.getRepresentationForButtons());
+    }
+
+    public static void cheiranBTExhaust(Game game, Player p1) {
+        String message = p1.getRepresentation() + ", please choose which system the ship you wish to replace is in.";
+        String finChecker = "FFCC_" + p1.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
+            if (FoWHelper.playerHasShipsInSystem(p1, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                Button validTile = Buttons.green(
+                        finChecker + "cheiranBTIn_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, p1));
+                buttons.add(validTile);
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                p1.getCorrectChannel(), p1.getRepresentationUnfogged() + message, buttons);
+    }
+
+    @ButtonHandler("useVaylerianBT_")
+    public static void useVaylerianBT(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation()
+                        + " is discarding an action card to move 1 ship (possibly transporting) to an adjacent system containing no other players' ships.");
+        ButtonHelperAgents.moveShipToAdjacentSystemStep2(game, player, event, buttonID + "_hero");
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(
+                event, "Discard an Action Card", ActionCardHelper.getDiscardActionCardButtons(player, false));
+    }
+
+    @ButtonHandler("cheiranBTIn_")
+    public static void cheiranBTIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
+        Tile tile = game.getTileByPosition(pos);
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        Set<UnitType> allowedUnits = Set.of(
+                UnitType.Destroyer,
+                UnitType.Cruiser,
+                UnitType.Carrier,
+                UnitType.Dreadnought,
+                UnitType.Flagship,
+                UnitType.Warsun);
+
+        List<Button> buttons = new ArrayList<>();
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            UnitHolder unitHolder = entry.getValue();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet) continue;
+
+            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
+            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+                UnitKey unitKey = unitEntry.getKey();
+                if (!player.unitBelongsToPlayer(unitKey)) continue;
+
+                if (!allowedUnits.contains(unitKey.getUnitType())) {
+                    continue;
+                }
+
+                UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+                String prettyName = unitModel == null ? unitKey.getUnitType().humanReadableName() : unitModel.getName();
+                String unitName = unitKey.unitName();
+                int totalUnits = unitEntry.getValue();
+                int damagedUnits = 0;
+
+                if (unitHolder.getUnitDamage() != null) {
+                    damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
+                }
+
+                for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
+                    String buttonID2 = finChecker + "cheiranBTOn_" + tile.getPosition() + "_" + unitName + "damaged";
+                    Button validTile2 = Buttons.red(buttonID2, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
+                    buttons.add(validTile2);
+                }
+                totalUnits -= damagedUnits;
+                for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                    Button validTile2 = Buttons.red(
+                            finChecker + "cheiranBTOn_" + tile.getPosition() + "_" + unitName,
+                            "Remove " + x + " " + prettyName,
+                            unitKey.unitEmoji());
+                    buttons.add(validTile2);
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.",
+                buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("cheiranBTOn_")
+    public static void cheiranBTOn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(pos);
+        boolean damaged = false;
+        if (unit.contains("damaged")) {
+            unit = unit.replace("damaged", "");
+            damaged = true;
+        }
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
+        var parsedUnit = new ParsedUnit(unitKey);
+        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+        String msg = "A " + (damaged ? "damaged " : "") + unitKey.unitEmoji() + " was removed by "
+                + player.getFactionEmoji()
+                + ". Units costing up to its cost can now be placed in the space area.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        List<Button> buttons =
+                Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
+        String message = player.getRepresentation() + ", use these buttons to place units. ";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("lizhoBtStep1")
+    public static void lizhoBtStep1(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = new ArrayList<>();
+        String planetName = buttonID.split("_")[1];
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                if (uH.getName().equalsIgnoreCase(planetName)) {
+                    continue;
+                }
+                if (uH.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+                    if (uH instanceof Planet) {
+                        buttons.add(Buttons.green(
+                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
+                                        + "_infantry_lizhobt",
+                                "Move Infantry From " + Helper.getPlanetRepresentation(uH.getName(), game) + " to "
+                                        + Helper.getPlanetRepresentation(planetName, game)));
+                    } else {
+
+                        buttons.add(Buttons.green(
+                                "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName()
+                                        + "_infantry_lizhobt",
+                                "Move Infantry From Space of " + tile.getPosition() + " To "
+                                        + Helper.getPlanetRepresentation(planetName, game)));
+                    }
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(), "Choose an infantry to move into coexistence.", buttons);
+    }
+
+    @ButtonHandler("readyBT")
+    public static void readyBT(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
+        ButtonHelper.deleteTheOneButton(event);
+        String btID = buttonID.split("_")[1];
+        BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+        p1.getBreakthroughExhausted().put(btID, false);
+        String message = p1.getRepresentation() + " readied _" + btModel.getName() + "_.";
+        MessageHelper.sendMessageToChannelWithEmbed(p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
+        if ("dihmohnbt".equalsIgnoreCase(btID)) {
+            Tile tile = game.getTileByPosition(game.getActiveSystem());
+            if (tile != null) {
+                List<Button> buttons =
+                        Helper.getPlaceUnitButtons(event, p1, game, tile, "sling", "placeOneNDone_dontskip");
+                String message2 = p1.getRepresentation()
+                        + ", please use these buttons to produce 1 non-fighter ship\n> "
+                        + ButtonHelper.getListOfStuffAvailableToSpend(p1, game);
+                MessageHelper.sendMessageToChannel(
+                        event.getChannel(),
+                        p1.getFactionEmoji()
+                                + " is using _Exodus Engineering_ to produce 1 non-fighter ship (they may do this once per combat).");
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            }
+        }
+    }
+
+    @ButtonHandler("exhaustBT")
+    public static void exhaustBT(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
+        ButtonHelper.deleteTheOneButton(event);
+        String btID = buttonID.split("_")[1];
+        BreakthroughModel btModel = Mapper.getBreakthrough(btID);
+        p1.getBreakthroughExhausted().put(btID, true);
+        String message = p1.getRepresentation() + " exhausted _" + btModel.getName() + "_.";
+        MessageHelper.sendMessageToChannelWithEmbed(p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
+        boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
+
+        if (!implemented) {
+            String unimplemented =
+                    "IDK how to do this yet. " + Constants.jazzPing() + " please implement this breakthrough.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
+        }
+    }
+
     public static void edynBTStep1(Game game, Player p1) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(p1)) {
@@ -255,7 +464,7 @@ public class DSHelperBreakthroughs {
     public static void edynbtSelect(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p1.getSecretsUnscored().size() > 0) {
+        if (!p1.getSecretsUnscored().isEmpty()) {
             for (String soID : p1.getSecretsUnscored().keySet()) {
                 buttons.add(Buttons.blue(
                         p1.getFinsFactionCheckerPrefix() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
@@ -286,7 +495,7 @@ public class DSHelperBreakthroughs {
                     p1.getFactionNameOrColor() + " has shown you the secret objective: " + so.getName() + ".",
                     so.getRepresentationEmbed());
         }
-        if (p2.getSecretsUnscored().size() > 0) {
+        if (!p2.getSecretsUnscored().isEmpty()) {
             buttons.add(Buttons.green(
                     "edynbtFinal_showSecret_" + p1.getFaction(),
                     "Show Random Secret Objective to " + p1.getFactionNameOrColor()));
@@ -308,7 +517,7 @@ public class DSHelperBreakthroughs {
         if ("showSecret".equals(action)) {
             List<String> unscoredSOs = new ArrayList<>(p1.getSecretsUnscored().keySet());
             Collections.shuffle(unscoredSOs);
-            String randomSOID = unscoredSOs.get(0);
+            String randomSOID = unscoredSOs.getFirst();
             SecretObjectiveModel so = Mapper.getSecretObjective(randomSOID);
             if (so != null) {
                 MessageHelper.sendMessageToChannelWithEmbed(

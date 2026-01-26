@@ -48,11 +48,11 @@ public class SilverFlameService {
     }
 
     private List<Button> silverFlameResolveButtons(Game game, Player player, Die resultDie) {
-        List<Button> resolveButtons = new ArrayList<>();
         String ffcc = player.finChecker();
         Button good = Buttons.green(ffcc + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
         Button bad = Buttons.red(ffcc + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
-        resolveButtons.addAll(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
+        List<Button> resolveButtons =
+                new ArrayList<>(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
 
         // TODO: other mykomentori related buttons
         // if (player.getPromissoryNotesInPlayArea().contains("dspnmyko") &&
@@ -90,21 +90,27 @@ public class SilverFlameService {
         Die result = new Die(target);
 
         String dice;
+        boolean definitePoint = false;
         if (flamePlayer.hasRelicReady("heartofixth") && result.getResult() == 9) {
             dice = DiceEmojis.d10blue_9.toString();
+            definitePoint = true;
         } else if (HeartOfIxthService.isHeartAvailable(game)
                 && !flamePlayer.hasRelicReady("heartofixth")
                 && result.getResult() >= 9) {
             dice = DiceEmojis.getGrayDieEmoji(result.getResult());
         } else {
             dice = result.getGreenDieIfSuccessOrRedDieIfFailure();
+            definitePoint = result.getResult() == 10;
         }
 
-        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for " + rep() + "! ";
+        String resultMsg = "## " + flamePlayer.getRepresentation() + " rolled " + dice + " for _The Silver Flame_! ";
+        if (definitePoint && (flamePlayer.getTotalVictoryPoints() + 1 == game.getVp())) {
+            resultMsg += "\nEnjoy all the marbles.";
+        }
         DisasterWatchHelper.sendMessageInFlameWatch(game, resultMsg);
-        resultMsg += "\nUse the button%s to resolve:";
+        resultMsg += "\nPlease resolve with %s.";
         List<Button> buttons = silverFlameResolveButtons(game, flamePlayer, result);
-        resultMsg = String.format(resultMsg, buttons.size() > 1 ? "s" : "");
+        resultMsg = String.format(resultMsg, buttons.size() == 1 ? "this button" : "these buttons");
 
         MessageHelper.sendMessageToChannelWithButtons(flamePlayer.getCorrectChannel(), resultMsg, buttons);
     }
@@ -121,7 +127,7 @@ public class SilverFlameService {
         String flame = "The Silver Flame";
         Integer id = game.getRevealedPublicObjectives().getOrDefault(flame, null);
 
-        String message = null;
+        String message;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
             message = player.getRepresentation() + " scored \"" + flame + "\".";

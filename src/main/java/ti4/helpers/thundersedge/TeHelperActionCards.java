@@ -152,7 +152,7 @@ public class TeHelperActionCards {
             }
         }
         String message = player.getRepresentationUnfogged()
-                + ", please tell the bot which two of your neighbor did the transaction.";
+                + ", please tell the bot which two of your neighbors did the transaction.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -288,7 +288,7 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));

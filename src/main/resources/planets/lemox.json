@@ -1,1 +1,23 @@
-{"id":"lemox","tileId":"116","name":"Lemox","aliases":["lemox","lenox"],"resources":0,"influence":3,"planetTypes":["INDUSTRIAL"],"planetLayout":{"unitHolderName":"lemox","resourcesLocation":"BottomLeft","centerPosition":{"x":170.0,"y":150.0}},"source":"thunders_edge"}
+{
+    "id": "lemox",
+    "tileId": "116",
+    "name": "Lemox",
+    "aliases": [
+        "lemox",
+        "lenox"
+    ],
+    "resources": 0,
+    "influence": 3,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "lemox",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 171,
+            "y": 150
+        }
+    },
+    "source": "thunders_edge"
+}

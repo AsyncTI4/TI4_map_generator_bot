@@ -244,7 +244,7 @@ public abstract class UnitHolder {
         return unitsByState.entrySet().stream()
                 .filter(e -> getTotalUnitCount(e.getValue()) > 0)
                 .map(Entry::getKey)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Deprecated

@@ -107,7 +107,7 @@ class Info extends GameStateSubcommand {
                 .append("\n");
         sb.append("Decks: ").append("\n");
         sb.append("- ")
-                .append(CardEmojis.ActionCard)
+                .append(CardEmojis.getACEmoji(game))
                 .append("Action Card Deck: `")
                 .append(game.getAcDeckID())
                 .append("` ")

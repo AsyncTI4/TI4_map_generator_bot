@@ -32,6 +32,7 @@ import ti4.map.Tile;
 import ti4.map.persistence.GameManager;
 import ti4.message.logging.BotLogger;
 import ti4.service.game.GameNameService;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class CommandHelper {
@@ -45,6 +46,11 @@ public class CommandHelper {
     }
 
     static boolean acceptIfValidGame(SlashCommandInteractionEvent event, boolean checkChannel, boolean checkPlayer) {
+        if (hasRole(event, JdaService.adminRoles)) {
+            checkChannel = false;
+            checkPlayer = false;
+        }
+
         var gameName = GameNameService.getGameName(event);
         var managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {

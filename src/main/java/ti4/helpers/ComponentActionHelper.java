@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -43,6 +44,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
+@UtilityClass
 public class ComponentActionHelper {
 
     public static List<Button> getAllPossibleCompButtons(Game game, Player p1, GenericInteractionCreateEvent event) {
@@ -1032,7 +1034,43 @@ public class ComponentActionHelper {
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
-            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
+            case "enigmaticdevice" -> {
+                if (game.isTwilightsFallMode()) {
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+                    Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+                    buttons.add(DoneExhausting);
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Use this to spend 6 resources.", buttons);
+                    List<String> factionTechs = new ArrayList<>();
+                    factionTechs.add("antimatter");
+                    factionTechs.add("wavelength");
+                    player.getTechs().forEach(factionTechs::remove);
+                    buttons = new ArrayList<>(factionTechs.stream()
+                            .map(tech -> {
+                                TechnologyModel model = Mapper.getTech(tech);
+                                return Buttons.green(
+                                        player.getFinsFactionCheckerPrefix() + "getTech_" + tech + "__noPay",
+                                        model.getName(),
+                                        model.getCondensedReqsEmojis(true));
+                            })
+                            .toList());
+
+                    if (buttons.isEmpty()) {
+                        buttons = ButtonHelper.getGainCCButtons(player);
+                        String message2 = player.getRepresentation()
+                                + ", you would research one of your faction tech, but because you have them both, you instead gain 2 command tokens."
+                                + " Your current command tokens are " + player.getCCRepresentation()
+                                + ". Use buttons to gain command tokens.";
+                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                    } else {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(), "Gain one of your faction tech.", buttons);
+                    }
+                } else {
+                    ButtonHelperActionCards.resolveResearch(game, player, event);
+                }
+            }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" ->
                 ButtonHelperRelics.offerNanoforgeButtons(player, game, event);

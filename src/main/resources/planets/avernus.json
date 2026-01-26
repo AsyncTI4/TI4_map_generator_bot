@@ -19,10 +19,10 @@
         "unitHolderName": "avernus",
         "resourcesLocation": "BottomRight",
         "centerPosition": {
-            "x": 90,
-            "y": 67
+            "x": 92,
+            "y": 66
         },
-        "planetRadius": 45,
+        "planetRadius": 60,
         "extraIcons": 1
     },
     "source": "thunders_edge"

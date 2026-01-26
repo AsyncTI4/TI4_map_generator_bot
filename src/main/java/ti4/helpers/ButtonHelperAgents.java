@@ -485,7 +485,7 @@ public class ButtonHelperAgents {
         String message;
         String removalLocation = planetRemoval;
         if ("space".equalsIgnoreCase(planetRemoval)) {
-            message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from space area of "
+            message = player.getFactionEmojiOrColor() + " moved 1 " + unit + " from the space area of "
                     + tileRemoval.getRepresentation() + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
             removalLocation = "";
@@ -494,10 +494,17 @@ public class ButtonHelperAgents {
                     + Helper.getPlanetRepresentation(planetRemoval, game) + " to "
                     + Helper.getPlanetRepresentation(planetDestination, game);
         }
+
         List<RemoveUnitService.RemovedUnit> removedUnits = RemoveUnitService.removeUnits(
                 event, tileRemoval, game, player.getColor(), unit + " " + removalLocation);
+        if (buttonID.contains("lizhobt")) {
+            ButtonHelper.deleteMessage(event);
+            message += " into coexistence. They used _Professional Intrigue_ to do this";
+            game.setStoredValue("coexistFlag", "yes");
+        }
         AddUnitService.addUnits(
                 event, tileDestination, game, player.getColor(), unit + " " + planetDestination, removedUnits);
+        game.removeStoredValue("coexistFlag");
         if ("mech".equalsIgnoreCase(unit)) {
             if (uH.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
                 ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
@@ -515,7 +522,7 @@ public class ButtonHelperAgents {
         if (tileDestination != null && tileDestination.getPosition().startsWith("frac")) {
             CommanderUnlockCheckService.checkPlayer(player, "obsidian");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
     }
 
     private static void addArgentAgentButtons(Tile tile, Player player, Game game) {
@@ -1359,7 +1366,7 @@ public class ButtonHelperAgents {
                     player.getFactionEmoji() + " landed 1 extra infantry on "
                             + Helper.getPlanetRepresentation(planet, game) + " using " + ssruuClever
                             + "Jgin Faru, the Dih-Mohn" + ssruuSlash
-                            + " agent [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent].");
+                            + " agent.\n-# You must have committed another unit to this planet before you get this infantry. Please do this if you have not already done so.");
         }
         if ("tnelisagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
@@ -2577,6 +2584,7 @@ public class ButtonHelperAgents {
         space.addToken(gloryTokens.getFirst());
 
         String msg = player.getFactionEmoji() + " added a **Glory** token to " + tile.getRepresentation();
+        ButtonHelperAbilities.oceanBoundCheck(game);
         CommanderUnlockCheckService.checkPlayer(player, "kjalengard");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);

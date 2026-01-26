@@ -17,7 +17,7 @@ public class RepositoryDispatchEvent {
     private final RespositoryDispatchClientPayload payload;
 
     /**
-     * https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
+     * <a href="https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event">...</a>
      *
      * @param eventType - can be anything, as long as it's caught on github actions side
      */

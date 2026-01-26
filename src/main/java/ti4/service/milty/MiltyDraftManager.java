@@ -607,7 +607,7 @@ public class MiltyDraftManager {
     }
 
     private void loadSliceFromString(String str, int index) throws Exception {
-        List<String> tiles = Arrays.asList(str.split(","));
+        String[] tiles = str.split(",");
         List<MiltyDraftTile> draftTiles = new ArrayList<>();
         for (String id : tiles) {
             MiltyDraftTile tile = findTile(id);

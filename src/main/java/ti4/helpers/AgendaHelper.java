@@ -262,8 +262,7 @@ public class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
         }
-        ArrayList<String> acIDs = new ArrayList<>();
-        acIDs.addAll(player.getActionCards().keySet());
+        ArrayList<String> acIDs = new ArrayList<>(player.getActionCards().keySet());
         if (player.hasPlanet("garbozia")) {
             acIDs.addAll(
                     ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet());
@@ -492,7 +491,7 @@ public class AgendaHelper {
                 continue;
             }
             List<String> whens = getPossibleWhenNames(player);
-            StringBuilder msg = new StringBuilder(player.getRepresentation()
+            StringBuilder msg = new StringBuilder(player.getRepresentation(true, true)
                     + " now is the time to decide whether or not you will play a \"when\". If you do,"
                     + " the bot will queue your \"when\" to play in the proper order (after those before you in speaker order decline). You may currently"
                     + " play " + whens.size() + " \"when\"" + (whens.size() == 1 ? "" : "s") + ".");
@@ -847,7 +846,7 @@ public class AgendaHelper {
                 buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<String> afters = getPossibleAfterNames(player);
-        StringBuilder msg = new StringBuilder(player.getRepresentation()
+        StringBuilder msg = new StringBuilder(player.getRepresentation(true, true)
                 + " now is the time to decide whether or not you will play an \"after\". If you do,"
                 + " the bot will queue your after to play in the proper order (after those before you in speaker order decline). You may currently"
                 + " play " + afters.size() + " \"after\"" + (afters.size() == 1 ? "" : "s") + ".");
@@ -4057,12 +4056,12 @@ public class AgendaHelper {
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
 
-        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
-        String revealMessage = game.getPing() + "\nAn agenda has been revealed";
-        MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
             BannerGenerator.drawAgendaBanner(aCount, game);
         }
+        MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
+        String revealMessage = game.getPing() + ", an agenda has been revealed.";
+        MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
 
         AutoPingMetadataManager.setupAutoPing(game.getName());
 
@@ -4172,15 +4171,16 @@ public class AgendaHelper {
         }
         boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES);
         boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
-        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + (hideTotalVotes ? "???" : votes));
-        sb.append("):__**\n");
+        StringBuilder sb = new StringBuilder("# Vote Count");
+        if (!hideTotalVotes) sb.append("\nTotal votes: ").append(votes);
         int itemNo = 1;
+        // ensure correct numbering if message is broken into multiple chunks - haven't tested the threshold
+        String format = orderList.size() > 12 ? "\n`%d.` " : "\n%d. ";
         for (Player player : orderList) {
-            sb.append("`").append(itemNo).append(".` ");
+            sb.append(String.format(format, itemNo));
             sb.append(hideVoteOrder ? "???" : player.getRepresentation(false, false));
             if (player.getUserID().equals(game.getSpeakerUserID())) sb.append(MiscEmojis.SpeakerToken);
             sb.append(getPlayerVoteText(game, player));
-            sb.append("\n");
             itemNo++;
         }
         MessageHelper.sendMessageToChannel(channel, sb.toString());

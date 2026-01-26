@@ -460,7 +460,7 @@ public class Game extends GameProperties {
             return distanceTool;
         }
         if (getMapTemplateID() == null) {
-            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool can not be created.");
+            BotLogger.warning(new LogOrigin(this), "Map template ID is null, distance tool cannot be created.");
             return null;
         }
         distanceTool = new DistanceTool(this);
@@ -1793,6 +1793,16 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public boolean doesSomeoneControlRex() {
+        boolean custodiansTaken = false;
+        for (Player p : getRealPlayersNDummies()) {
+            if (p.controlsMecatol(false)) {
+                return true;
+            }
+        }
+        return custodiansTaken;
+    }
+
     public boolean isCustodiansScored() {
         boolean custodiansTaken = false;
         if (isOrdinianC1Mode()) {
@@ -2663,10 +2673,17 @@ public class Game extends GameProperties {
     }
 
     // Don't shuffle back cards with a status
-    private void reshuffleActionCardDiscard() {
+    private boolean reshuffleActionCardDiscard() {
         List<String> acsToShuffle = getDiscardActionCards().keySet().stream()
                 .filter(ac -> getDiscardACStatus().get(ac) == null)
                 .toList();
+
+        if (acsToShuffle.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    getActionsChannel(), "Unable to reshuffle the action card deck because the discard pile is empty.");
+            return false;
+        }
+
         getActionCards().addAll(acsToShuffle);
         String names = acsToShuffle.stream()
                 .map(ac -> Mapper.getActionCard(ac).getName())
@@ -2680,25 +2697,36 @@ public class Game extends GameProperties {
             msg += "The shuffled cards are:\n" + names;
         }
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
+        return true;
     }
 
-    @Nullable
+    @NotNull
     public Map<String, Integer> drawActionCard(String userID) {
+        Player player = getPlayer(userID);
+        return drawActionCard(player);
+    }
+
+    @NotNull
+    public Map<String, Integer> drawActionCard(Player player) {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
-            Player player = getPlayer(userID);
             if (player.hasAbility("deceive")) {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
-                return null;
+            } else {
+                getActionCards().remove(id);
+                player.setActionCard(id);
             }
-            getActionCards().remove(id);
-            player.setActionCard(id);
             return player.getActionCards();
-        } else if (!getDiscardActionCards().isEmpty()) {
-            reshuffleActionCardDiscard();
-            return drawActionCard(userID);
         }
-        return null;
+
+        boolean reshuffled = reshuffleActionCardDiscard();
+        if (reshuffled) {
+            return drawActionCard(player);
+        }
+
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
+        return player.getActionCards();
     }
 
     @Nullable
@@ -2974,10 +3002,16 @@ public class Game extends GameProperties {
             getActionCards().remove(id);
             setDiscardActionCard(id, null);
             return id;
-        } else {
-            reshuffleActionCardDiscard();
+        }
+
+        boolean reshuffled = reshuffleActionCardDiscard();
+        if (reshuffled) {
             return drawActionCardAndDiscard();
         }
+
+        MessageHelper.sendMessageToChannel(
+                getActionsChannel(), "Unable to draw an action card: both the deck and discard pile are empty.");
+        return null;
     }
 
     public void checkSOLimit(Player player) {
@@ -3069,7 +3103,7 @@ public class Game extends GameProperties {
         if (status != null) getDiscardACStatus().put(id, status);
     }
 
-    private void setPurgedActionCard(String id) {
+    public void setPurgedActionCard(String id) {
         setDiscardActionCard(id, ACStatus.purged);
     }
 
@@ -3982,6 +4016,9 @@ public class Game extends GameProperties {
             planets.put("ocean1", new Planet("ocean1", new Point(0, 0)));
             planets.put("ocean2", new Planet("ocean2", new Point(0, 0)));
             planets.put("ocean3", new Planet("ocean3", new Point(0, 0)));
+            planets.put("bannerhall1", new Planet("bannerhall1", new Point(0, 0)));
+            planets.put("bannerhall2", new Planet("bannerhall2", new Point(0, 0)));
+            planets.put("bannerhall3", new Planet("bannerhall3", new Point(0, 0)));
             planets.put("ocean4", new Planet("ocean4", new Point(0, 0)));
             planets.put("ocean5", new Planet("ocean5", new Point(0, 0)));
             planets.put("triad", new Planet("triad", new Point(0, 0)));
@@ -4636,8 +4673,7 @@ public class Game extends GameProperties {
     }
 
     public String getSCNumberIfNaaluInPlay(Player player, String scText) {
-        if (player.hasTheZeroToken()) // naalu 0 token ability
-        scText = "0/" + scText;
+        if (player.hasTheZeroToken()) scText = "0/" + scText; // naalu 0 token ability
         if (player.hasAbility("patience")) {
             scText = "9/" + scText;
         }

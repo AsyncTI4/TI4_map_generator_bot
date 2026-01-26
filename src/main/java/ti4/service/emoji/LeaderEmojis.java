@@ -270,21 +270,27 @@ public enum LeaderEmojis implements TI4Emoji {
         }
 
         return switch (leader.toLowerCase()) {
-            case "naaluagent-te" -> NaaluAgent;
+            // Codex Updates
             case "xxchahero-te" -> XxchaHero;
+            case "naaluagent-te" -> NaaluAgent;
+
+            // TF Genomes
             case "experimentalagent" -> JolNarAgent;
             case "hyperagent" -> MentakAgent;
             case "researchagent" -> DeepwroughtAgent;
             case "valiantagent" -> BastionAgent;
+
+            // TF Paradigms
             case "brilliancehero" -> JolNarHero;
             case "devourhero" -> NekroHero;
+            case "eternityhero" -> ObsidianHero;
+            case "eventhero" -> CabalHero;
+            case "forgehero" -> NaazHero;
+            case "lawshero" -> DeepwroughtHero;
+            case "poisonhero" -> NaaluHero;
             case "voicehero" -> XxchaHero;
             case "witchinghero" -> KeleresHeroOdlynn;
-            case "forgehero" -> NaazHero;
-            case "poisonhero" -> NaaluHero;
-            case "eternityhero" -> ObsidianHero;
-            case "lawshero" -> DeepwroughtHero;
-            case "eventhero" -> CabalHero;
+
             default -> TI4Emoji.getRandomGoodDog(leader.toLowerCase());
         };
     }

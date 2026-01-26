@@ -2,6 +2,7 @@
     {
         "alias": "redtf",
         "factionName": "The Ruby Monarch",
+        "shortName": "Ruby Monarch",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 2,
@@ -32,6 +33,7 @@
     {
         "alias": "orangetf",
         "factionName": "Radiant Aur",
+        "shortName": "Radiant Aur",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 4,
@@ -62,6 +64,7 @@
     {
         "alias": "yellowtf",
         "factionName": "Avarice Rex",
+        "shortName": "Avarice Rex",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 6,
@@ -92,6 +95,7 @@
     {
         "alias": "greentf",
         "factionName": "Il Sai Lakoe, Herald of Thorns",
+        "shortName": "Il Sai Lakoe",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 3,
@@ -122,6 +126,7 @@
     {
         "alias": "bluetf",
         "factionName": "The Saint of Swords",
+        "shortName": "Saint of Swords",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 3,
@@ -152,6 +157,7 @@
     {
         "alias": "purpletf",
         "factionName": "Il Na Viroset",
+        "shortName": "Il Na Viroset",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 4,
@@ -182,6 +188,7 @@
     {
         "alias": "pinktf",
         "factionName": "El Nen Janovet",
+        "shortName": "El Nen Janovet",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 3,
@@ -212,6 +219,7 @@
     {
         "alias": "blacktf",
         "factionName": "A Sickening Lurch",
+        "shortName": "Sickening Lurch",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 2,

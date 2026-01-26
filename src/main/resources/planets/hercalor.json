@@ -1,1 +1,24 @@
-{"id":"hercalor","tileId":"107","name":"Hercalor","aliases":["hercalor","hercolor","hercolour"],"resources":1,"influence":0,"planetTypes":["INDUSTRIAL"],"planetLayout":{"unitHolderName":"hercalor","resourcesLocation":"BottomRight","centerPosition":{"x":200.0,"y":210.0}},"source":"thunders_edge"}
+{
+    "id": "hercalor",
+    "tileId": "107",
+    "name": "Hercalor",
+    "aliases": [
+        "hercalor",
+        "hercolor",
+        "hercolour"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "planetLayout": {
+        "unitHolderName": "hercalor",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": {
+            "x": 204,
+            "y": 208
+        }
+    },
+    "source": "thunders_edge"
+}

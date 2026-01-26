@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -564,7 +565,7 @@ public class ButtonHelperActionCards {
         boolean nekro = ButtonHelper.doesPlayerHaveFSHere(
                 "nekro_flagship", player, game.getTileByPosition(game.getActiveSystem()));
         String msg = player.getRepresentationNoPing()
-                + ", please choose the recently deceased ship that you wish to have been _Courageous To The End_.";
+                + ", please choose the recently deceased ship that you wish to roll dice.";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(), msg, getCourageousOptions(player, game, nekro, "courageous"));
         ButtonHelper.deleteMessage(event);
@@ -576,8 +577,8 @@ public class ButtonHelperActionCards {
         String numHit = buttonID.split("_")[2];
         String type = buttonID.split("_")[3];
         String msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
-                + ", which hits on a " + numHit + ", to have been _Courageous To The End_.";
-        if (game.isTwilightsFallMode()) {
+                + ", which hits on a " + numHit + ", to roll dice.";
+        if (game.isTwilightsFallMode() && "courageous".equalsIgnoreCase(type)) {
             msg = player.getRepresentationNoPing() + " has chosen the recently deceased " + baseType
                     + ", which hits on a " + numHit + ", to have been the target of the _Valiant Genome_.";
         }
@@ -1016,7 +1017,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getPlagueTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("plagueStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "plagueStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1678,6 +1680,23 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    private static final List<String> assassinateMessages = Arrays.asList(
+            ", your representatives got sent to the headsman.",
+            ", your representatives (all of them) fell out of some windows.",
+            ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.",
+            ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".",
+            ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).",
+            ", your representatives have followed in a great tradition, and so have been stabbed 23 times.",
+            ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.",
+            ", your representatives has discovered that the phrase \"cut-throat politics\" is quite literal on Mecatol Rex.",
+            ", your representatives have met with some fellow ambassadors. Sorry, I meant to say \"met with some grisly ends\".",
+            ", your representatives were up to date on their vaccinations, which is very prudent on an ecumenopolis such as Mecatol Rex. However, they were not up to date on their antidotes, which is very imprudent on an ecumenopolis such as Mecatol Rex.",
+            ", say what you like about your representatives' ability to negotiate with diplomats, but their ability to negotiate with hitmen ~~is~~ was severely lacking.",
+            ", your representatives could negotiate a treaty, but they could not negotiate a dark alley.",
+            ", your representatives may have had diplomatic immunity, but they lacked poison immunity.",
+            ", you may wish to make a recommendation to your representatives that they wear body armour in addition to ceremonial robes. Well, a recommendation to your __next__ representatives, at least.",
+            ", your representatives finally achieved scheduling an item on the agenda of the Galactic Council, albeit in the form of a moment of silence in honour of their passing.");
+
     @ButtonHandler("assRepsStep2_")
     public static void resolveAssRepsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -1687,28 +1706,11 @@ public class ButtonHelperActionCards {
                 player.getFactionEmojiOrColor()
                         + " successfully assassinated all the representatives of "
                         + p2.getFactionEmojiOrColor() + ".");
-        String message =
-                switch (ThreadLocalRandom.current().nextInt(10)) {
-                    case 1 -> ", your representatives (all of them) fell out of some windows.";
-                    case 2 ->
-                        ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
-                    case 3 ->
-                        ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".";
-                    case 4 ->
-                        ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
-                    case 5 ->
-                        ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
-                    case 6 ->
-                        ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
-                    case 7 ->
-                        ", your representatives has discovered that the phrase \"cut-throat politics\" is quite literal on Mecatol Rex.";
-                    case 8 ->
-                        ", your representatives have met with some fellow ambassadors. Sorry, I meant to say \"met with some grisly ends\".";
-                    case 9 ->
-                        ", your representatives were up to date on their vaccinations, which is very prudent on an ecumenopolis such as Mecatol Rex. However, they were not up to date on their antidotes, which is very imprudent on an ecumenopolis such as Mecatol Rex.";
-                    default -> ", your representatives got sent to the headsman.";
-                };
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + message);
+
+        MessageHelper.sendMessageToChannel(
+                p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged()
+                        + assassinateMessages.get(ThreadLocalRandom.current().nextInt(0, assassinateMessages.size())));
         game.setStoredValue("AssassinatedReps", game.getStoredValue("AssassinatedReps") + p2.getFaction());
         game.setStoredValue("preVoting" + p2.getFaction(), "");
     }
@@ -2414,29 +2416,31 @@ public class ButtonHelperActionCards {
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         int hits = 0;
+        UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.infantry + " rolled ");
             if (game.isTwilightsFallMode()) {
                 hits = (amount + 1) / 2;
                 msg = new StringBuilder(hits + " infantry were killed.");
             } else {
-
+                boolean nice = (amount == 2);
                 for (int x = 0; x < amount; x++) {
                     Die d1 = new Die(6);
-                    msg.append(d1.getResult()).append(", ");
+                    msg.append(d1.getRedDieIfSuccessOrGrayDieIfFailure());
                     if (d1.isSuccess()) {
                         hits++;
                     }
+                    if (x == 0) nice &= (d1.getResult() == 6);
+                    if (x == 1) nice &= (d1.getResult() == 9);
                 }
-                msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
+                msg.append(nice ? " (nice)" : "")
+                        .append(".\n Total hits were ")
+                        .append(hits)
+                        .append(".");
             }
-            UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
-            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
-            if (hits > 0) {
-                if (p2.hasAbility("data_recovery")) {
-                    ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
-                }
+            if (hits > 0 && p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
             }
         }
         String adjective = "";
@@ -2469,6 +2473,7 @@ public class ButtonHelperActionCards {
                             + p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
                             + adjective + " _Plague_ and you lost " + hits + " infantry.");
         }
+        DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
     }
 
     @ButtonHandler("micrometeoroidStormStep3_")
@@ -2858,6 +2863,7 @@ public class ButtonHelperActionCards {
     public static void resolveTwinning(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveTwin_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
+        boolean found = false;
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
             String actionCardTitle = actionCard.getName();
@@ -2869,7 +2875,27 @@ public class ButtonHelperActionCards {
                             event.getChannel(), "No such action card ID found, please retry.");
                     return;
                 }
+                found = true;
                 ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+            }
+        }
+        if (!found) {
+            acStrings = new ArrayList<>(game.getPurgedActionCards().keySet());
+            for (String acStringID : acStrings) {
+                ActionCardModel actionCard = Mapper.getActionCard(acStringID);
+                String actionCardTitle = actionCard.getName();
+                if (acName.equalsIgnoreCase(actionCardTitle)) {
+                    boolean picked = game.pickActionCardFromPurged(
+                            player.getUserID(), game.getPurgedActionCards().get(acStringID));
+                    if (!picked) {
+                        MessageHelper.sendMessageToChannel(
+                                event.getChannel(), "No such action card ID found, please retry.");
+                        return;
+                    }
+                    found = true;
+                    ActionCardHelper.playAC(event, game, player, acStringID, player.getCorrectChannel());
+                    game.setPurgedActionCard(acStringID);
+                }
             }
         }
         ButtonHelper.deleteMessage(event);
@@ -2934,7 +2960,7 @@ public class ButtonHelperActionCards {
         StringBuilder bestPlanet = new StringBuilder();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count && !p.getName().equalsIgnoreCase("triad")) {
+            if (p != null && p.getResources() > count && !"triad".equalsIgnoreCase(p.getName())) {
                 count = p.getResources();
                 bestPlanet = new StringBuilder(planet);
             } else if (p != null

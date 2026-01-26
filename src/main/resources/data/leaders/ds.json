@@ -273,7 +273,8 @@
         "name": "Suldhan Wraeg",
         "title": "Shrouded Advisor",
         "abilityWindow": "When a player would use 1 unit's non-PRODUCTION unit ability in a system that contains or is adjacent to an anomaly:",
-        "abilityText": "You may exhaust this card to prevent that unit from using that unit ability. [Note: Mech and flagship powers are not unit abilities]",
+        "abilityText": "You may exhaust this card to prevent that unit from using that unit ability.",
+        "notes": "Mech and flagship powers are not unit abilities.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -415,8 +416,8 @@
         "type": "agent",
         "name": "Maertin Donaais",
         "title": "Esteemed Philanthropist",
-        "abilityWindow": "When another player gains any number of commodities",
-        "abilityText": "You may exhaust this card to gain an equal number of commodities and convert that player's commodities to trade goods.",
+        "abilityWindow": "After a player gains commodities",
+        "abilityText": "You may exhaust this card to convert that player's commodities to trade goods; if that player was another player, gain 2 commodities or draw 1 action card.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -438,7 +439,8 @@
         "name": "Magruda",
         "title": "Orator",
         "abilityWindow": "When a player exhausts a planet during the agenda phase",
-        "abilityText": "Exhaust this card to allow that player to treat the combined value of that planet's resources and influence as if it were resources or influence. Then, ready that planet. [Note: not automated in the bot yet. You can add votes with the modify votes button before final submission, and ready planet and exhaust agent with slash commands]",
+        "abilityText": "Exhaust this card to allow that player to treat the combined value of that planet's resources and influence as if it were resources or influence. Then, ready that planet.",
+        "notes": "Not automated in the bot yet. You can add votes with the modify votes button before final submission, and ready planet and exhaust agent with slash commands.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -670,7 +672,8 @@
         "name": "Hkot Tokal",
         "title": "Crystal Druid",
         "abilityWindow": "At the start of invasion in a system that contains 1 or more planets:",
-        "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system. [Note: this occurs even if you control all planets in the system]",
+        "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system.",
+        "notes": "This occurs even if you control all planets in the system.",
         "unlockCondition": "Win a ground combat on a planet you do not control.",
         "source": "ds"
     },
@@ -680,8 +683,9 @@
         "type": "commander",
         "name": "Assault Machina",
         "title": "Delta Shield",
-        "abilityWindow": "During movement [Note: any movement, not only the movement step]",
-        "abilityText": "For each infantry you transport, you may replace that unit with 1 fighter. \n\n [Note: not reliant on the first half of this ability] You may use the SPACE CANNON of 1 of your units against ships that are adjacent to that unit's system.",
+        "abilityWindow": "During movement",
+        "notes": "This triggers from any movement, not only the movement step. The SPACE CANNON ability may be used independent of the infantry/fighter ability.",
+        "abilityText": "For each infantry you transport, you may replace that unit with 1 fighter.\n\nYou may use the SPACE CANNON of 1 of your units against ships that are adjacent to that unit's system.",
         "unlockCondition": "Own 2 unit upgrade technologies.",
         "source": "ds"
     },
@@ -715,7 +719,8 @@
         "title": "High Inquisitor",
         "abilityWindow": "During combat:",
         "abilityText": "When 1 or more of your damaged units make a combat roll, up to 2 of those units may roll an additional combat die.",
-        "unlockCondition": "Have units in 2 different non-home anomalies. [Note, different means different types of anomaly, i.e. cannot be unlockeed via 2 asteroid fields]",
+        "unlockCondition": "Have units in 2 different non-home anomalies.",
+        "notes": "\"Different\" means different types of anomaly, e.g. cannot be unlocked via two asteroid fields.",
         "source": "ds"
     },
     {
@@ -1336,7 +1341,7 @@
         "title": "Shield of Qhet",
         "abilityName": "Logistical Supremacy - War Unbound",
         "abilityWindow": "ACTION:",
-        "abilityText": " Place this card near the game board; until the end of this game round, after you win a combat, you may remove 1 of your command tokens from the active system. At the end of this game round, purge this card.",
+        "abilityText": " Place this card near the game board; until the end of this game round, when you win a combat, if your opponent has a control token on your faction sheet, remove 1 of your command tokens from the active system, if able. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
@@ -1348,7 +1353,8 @@
         "title": "The Reaper",
         "abilityName": " Ace of Aces - Inspirational Pilot",
         "abilityWindow": "At the start of combat",
-        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters’ ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card. [Note: this hero does not purge]",
+        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters’ ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card.",
+        "notes": "This hero does not purge.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
@@ -1372,7 +1378,7 @@
         "title": " Concordat Marshall",
         "abilityName": "Concord Renewed - Galactic Outreach",
         "abilityWindow": "ACTION:",
-        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player draws 1 secret objective.",
+        "abilityText": "Attach this card to a revealed objective. The players with the fewest victory points may score this objective without fulfilling its requirements; after a player scores this objective, the Toldar player draws 1 secret objective.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

@@ -413,7 +413,8 @@
         "name": "Strategic Withdrawal",
         "phase": "Action",
         "window": "After you move ships into a system other than the active system",
-        "text": "Remove any of your command tokens from that system. [Note: 'Into' specifically refers to a destination system, not systems you move 'through'.]",
+        "text": "Remove any of your command tokens from that system.",
+        "notes": "\"Into\" specifically refers to a destination system, not systems you move \"through\".",
         "flavorText": "The skirmish was merely a ploy to draw them out. The Memoria was already far out of reach, rendezvousing with the rear fleet, poised to strike at their true target.",
         "source": "deprecated"
     },
@@ -467,7 +468,8 @@
         "name": "Grand Operation",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport ground forces during this movement.]",
+        "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system.",
+        "notes": "You may transport ground forces during this movement.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished for her, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "deprecated"
     },
@@ -476,7 +478,8 @@
         "name": "Continuous Barrage",
         "phase": "Action",
         "window": "At the end of a round of space combat",
-        "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units. [Note: This AFB still only targets fighters.]",
+        "text": "Your units in the active system use their ANTI-FIGHTER BARRAGE abilities against your opponent's units.",
+        "notes": "This AFB still only targets fighters.",
         "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire! Fire until not but dust remains!\"",
         "source": "deprecated"
     },
@@ -503,7 +506,8 @@
         "name": "Custodian Support",
         "phase": "Action",
         "window": "Action",
-        "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, gain 2 commodities. [Note: You cannot play this card if you would not otherwise be eligible to pass.]",
+        "text": "Pass. Then, you may immediately score 1 of your unscored secret objectives if you fulfill its requirements and you were the first player to pass during this game round; otherwise, gain 2 commodities.",
+        "notes": "You cannot play this card if you would not otherwise be eligible to pass.",
         "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, disguised under the pretense of tradition.",
         "source": "deprecated"
     },
@@ -765,7 +769,8 @@
         "name": "Boarding Torpedoes",
         "phase": "Action",
         "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
-        "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+        "text": "Replace that ship with a matching ship from your reinforcements.",
+        "notes": "SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
         "source": "deprecated"
     },
@@ -857,7 +862,8 @@
         "name": "Smuggler Routes",
         "phase": "Action",
         "window": "Action",
-        "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action. [Note: You can transport units during this movement.]",
+        "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action.",
+        "notes": "You can transport units during this movement.",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
         "source": "deprecated"
     },
@@ -966,7 +972,8 @@
         "name": "Early Voting",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome.",
+        "notes": "This ability works like Argent ZEAL. Argent votes before the chosen player.",
         "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
         "source": "deprecated"
     },
@@ -1065,7 +1072,8 @@
         "name": "Miraculous Escape",
         "phase": "Any",
         "window": "When 1 of your units would be destroyed",
-        "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
+        "text": "That unit is not destroyed instead.",
+        "notes": "Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.",
         "flavorText": "The Memoria was known for miraculously surviving perilous situations, but Omar could not believe that it had managed to escape the Van Hauge. He was certain now - this 'Nomad' was not playing by the rules.",
         "source": "deprecated"
     },
@@ -1315,7 +1323,8 @@
         "name": "Settlement",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "notes": "You may commit to the same or different planets, like Yin Hero.",
         "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
         "source": "deprecated"
     },
@@ -1342,7 +1351,8 @@
         "name": "False Manifest",
         "phase": "Action",
         "window": "When another player gains 3 or more trade goods",
-        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
+        "notes": "This works at any time such a quantity could be PILLAGE'd. The additional trade good gained does not open another PILLAGE window.",
         "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
         "source": "deprecated"
     },
@@ -1450,7 +1460,8 @@
         "name": "Rapid Fulfillment",
         "phase": "Action",
         "window": "After a player activates a system that contains your units",
-        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less. [Note: This transaction does not require you to be neighbors or count towards your transaction limit.]",
+        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less.",
+        "notes": "This transaction does not require you to be neighbors or count towards your transaction limit.",
         "flavorText": "\"Money can't buy true happiness, huh?\" Tai said smugly as he appraised their new ship.",
         "source": "deprecated"
     },
@@ -1488,6 +1499,15 @@
         "window": "When a public objective is revealed",
         "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "Just as the charges went public, over half of the Council's staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "scavenged_fleet",
+        "name": "Scavenged Fleet",
+        "phase": "Any",
+        "window": "After 1 or more of a player's ships are destroyed",
+        "text": "Place matching neutral ships in a non-home system that contains no non-neutral ships.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "deprecated"
     }
 ]

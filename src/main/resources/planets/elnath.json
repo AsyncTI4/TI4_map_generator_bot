@@ -1,1 +1,24 @@
-{"id":"elnath","tileId":"110","name":"El'Nath","aliases":["elnath","el'nath"],"resources":2,"influence":0,"planetTypes":["HAZARDOUS"],"planetLayout":{"unitHolderName":"elnath","resourcesLocation":"BottomLeft","centerPosition":{"x":90,"y":135}},"source":"thunders_edge"}
+{
+    "id": "elnath",
+    "tileId": "110",
+    "name": "El'Nath",
+    "aliases": [
+        "elnath",
+        "el'nath"
+    ],
+    "resources": 2,
+    "influence": 0,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "planetLayout": {
+        "unitHolderName": "elnath",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 87,
+            "y": 138
+        }
+    },
+    "contrastColor": "orange",
+    "source": "thunders_edge"
+}

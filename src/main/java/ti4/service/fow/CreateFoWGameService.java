@@ -125,7 +125,7 @@ public class CreateFoWGameService {
         Guild guild = findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(
-                    event, "All FoW Servers are full. Can not host a new game - please contact @Bothelper.");
+                    event, "All FoW Servers are full. Cannot host a new game - please contact @Bothelper.");
             return;
         }
 

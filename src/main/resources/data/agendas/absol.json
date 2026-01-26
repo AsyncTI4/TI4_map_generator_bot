@@ -130,7 +130,8 @@
         "name": "Discretionary Spending",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: All players gain trade goods equal to the number of planets they control.\nThe player who cast the most votes \"For\" replenishes their commodities.\nIn voting order, each player may spend any number of trade goods as follows, with the given costs (they cannot choose the same system or planet more than once):\n- use the PRODUCTION ability of their units in any system (Cost)\n- research up to 2 technologies (4 each)\n- place 1 structure on a planet they control (3)\n- draw 1 action card (1)\n- explore a planet they control or a frontier token in a system that contains their ships (1) [Note: You cannot explore the same planet multiple times]",
+        "text1": "For: All players gain trade goods equal to the number of planets they control.\nThe player who cast the most votes \"For\" replenishes their commodities.\nIn voting order, each player may spend any number of trade goods as follows, with the given costs (they cannot choose the same system or planet more than once):\n- use the PRODUCTION ability of their units in any system (Cost)\n- research up to 2 technologies (4 each)\n- place 1 structure on a planet they control (3)\n- draw 1 action card (1)\n- explore a planet they control or a frontier token in a system that contains their ships (1)",
+        "notes": "You cannot explore the same planet multiple times with the \"For\".",
         "text2": "Against: All players except the player who cast the most votes \"Against\" lose half of their trade goods (rounded up).",
         "source": "absol"
     },
