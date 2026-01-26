@@ -20,6 +20,7 @@ class RunAgainstAllGames2 extends Subcommand {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
         List<String> mismatchedGames = new ArrayList<>();
+        List<String> homeSystemMismatches = new ArrayList<>();
         GamesPage.consumeAllGames(game -> {
             if (game.isHasEnded() && game.getWinner().isEmpty()) {
                 return;
@@ -30,6 +31,22 @@ class RunAgainstAllGames2 extends Subcommand {
                 mismatchedGames.add(game.getName() + " (player count: " + playerCountForMap + ", real player count: "
                         + realPlayerCount + ")");
             }
+            if (!game.isMinorFactionsMode()) {
+                long homeSystemCount = game.getTileMap().values().stream()
+                        .filter(tile -> tile.isHomeSystem())
+                        .count();
+                if (playerCountForMap != homeSystemCount) {
+                    StringBuilder entry = new StringBuilder(game.getName())
+                            .append(" (player count: ").append(playerCountForMap)
+                            .append(", real player count: ").append(realPlayerCount)
+                            .append(", home systems: ").append(homeSystemCount)
+                            .append(") HS: PC difference");
+                    if (realPlayerCount == homeSystemCount) {
+                        entry.append(", RPC match");
+                    }
+                    homeSystemMismatches.add(entry.toString());
+                }
+            }
         });
 
         if (mismatchedGames.isEmpty()) {
@@ -38,8 +55,18 @@ class RunAgainstAllGames2 extends Subcommand {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(), "Games with mismatched player counts:\n" + String.join("\n", mismatchedGames));
         }
+        if (homeSystemMismatches.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No games with mismatched home system counts found.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Games with player count vs home system differences:\n" + String.join("\n", homeSystemMismatches));
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
         BotLogger.info("Found " + mismatchedGames.size() + " games with mismatched player counts out of "
                 + GameManager.getGameCount() + " games: " + String.join(", ", mismatchedGames));
+        BotLogger.info("Found " + homeSystemMismatches.size()
+                + " games with player count vs home system differences out of " + GameManager.getGameCount()
+                + " games: " + String.join(", ", homeSystemMismatches));
     }
 }
