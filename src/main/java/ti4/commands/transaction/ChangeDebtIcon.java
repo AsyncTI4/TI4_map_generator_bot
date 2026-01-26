@@ -36,8 +36,13 @@ class ChangeDebtIcon extends GameStateSubcommand {
 
         Emoji factionEmoji = Emoji.fromFormatted(icon);
         if (!(factionEmoji instanceof CustomEmoji || factionEmoji instanceof UnicodeEmoji)) {
-            MessageHelper.sendMessageToEventChannel(event, icon + " is not a supported emoji. Resetting to default.");
-            game.clearDebtPoolIcon(pool);
+            if (Constants.DEBT_DEFAULT_POOL.equals(pool)) {
+                MessageHelper.sendMessageToEventChannel(
+                        event, icon + " is not a supported emoji. Resetting to default.");
+                game.clearDebtPoolIcon(pool);
+            } else {
+                MessageHelper.sendMessageToEventChannel(event, icon + " is not a supported emoji. No change made.");
+            }
             return;
         }
         if ((factionEmoji instanceof UnicodeEmoji)) {
@@ -58,7 +63,18 @@ class ChangeDebtIcon extends GameStateSubcommand {
                 event,
                 "The bot cannot load " + icon
                         + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
-        game.clearDebtPoolIcon(pool);
+        if (Constants.DEBT_DEFAULT_POOL.equals(pool)) {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "The bot cannot load " + icon
+                            + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
+            game.clearDebtPoolIcon(pool);
+        } else {
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "The bot cannot load " + icon
+                            + ". Please use a custom emoji from one of the bot servers. No change made.");
+        }
     }
 
     @Override
