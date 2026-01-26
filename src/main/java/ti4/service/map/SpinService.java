@@ -39,7 +39,7 @@ public class SpinService {
 
         public static Direction fromString(String dir) {
             try {
-                return Direction.valueOf(dir.toUpperCase());
+                return valueOf(dir.toUpperCase());
             } catch (Exception e) {
                 return null;
             }
@@ -59,7 +59,7 @@ public class SpinService {
 
         public static AutoTrigger fromString(String trigger) {
             try {
-                return AutoTrigger.valueOf(trigger.toUpperCase());
+                return valueOf(trigger.toUpperCase());
             } catch (Exception e) {
                 return null;
             }
@@ -86,7 +86,7 @@ public class SpinService {
 
         public static ToSpin fromString(String toSpin) {
             try {
-                return ToSpin.valueOf(toSpin.toUpperCase());
+                return valueOf(toSpin.toUpperCase());
             } catch (Exception e) {
                 return null;
             }
@@ -99,12 +99,12 @@ public class SpinService {
 
     public class SpinSetting {
         private String id;
-        private String center;
-        private List<Integer> ring;
-        private Direction direction;
-        private List<Integer> steps;
-        private AutoTrigger trigger;
-        private ToSpin toSpin;
+        private final String center;
+        private final List<Integer> ring;
+        private final Direction direction;
+        private final List<Integer> steps;
+        private final AutoTrigger trigger;
+        private final ToSpin toSpin;
 
         public SpinSetting(
                 String center,
@@ -121,8 +121,7 @@ public class SpinService {
             this.trigger = trigger;
             this.toSpin = toSpin;
             if (game != null) {
-                this.id = String.valueOf(
-                        ((game.getName() + toString()).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
+                id = String.valueOf(((game.getName() + this).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
             }
         }
 
@@ -171,19 +170,18 @@ public class SpinService {
         // status phase
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR)));
-            sb.append(OPTION_SEPARATOR);
-            sb.append(direction.toString());
-            sb.append(OPTION_SEPARATOR);
-            sb.append(steps.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR)));
-            sb.append(OPTION_SEPARATOR);
-            sb.append(center);
-            sb.append(OPTION_SEPARATOR);
-            sb.append(trigger.toString());
+            String sb = ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+                    + OPTION_SEPARATOR
+                    + direction.toString()
+                    + OPTION_SEPARATOR
+                    + steps.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+                    + OPTION_SEPARATOR
+                    + center
+                    + OPTION_SEPARATOR
+                    + trigger.toString();
             // sb.append(OPTION_SEPARATOR);
             // sb.append(toSpin.toString());
-            return sb.toString();
+            return sb;
         }
 
         public String getRepresentation(boolean forExecution) {
@@ -267,10 +265,7 @@ public class SpinService {
             }
 
             // Max ring check
-            if (maxRing() > MAX_RING_TO_SPIN) {
-                return false;
-            }
-            return true;
+            return maxRing() <= MAX_RING_TO_SPIN;
         }
     }
 
@@ -340,7 +335,7 @@ public class SpinService {
     public static void executeSpinsForTrigger(Game game, AutoTrigger trigger) {
         List<SpinSetting> settingsToExecute = new ArrayList<>();
         getSpinSettings(game).stream()
-                .filter(setting -> trigger.equals(setting.trigger()))
+                .filter(setting -> trigger == setting.trigger())
                 .forEach(settingsToExecute::add);
         if (!settingsToExecute.isEmpty()) {
             executeSpinSettings(game, settingsToExecute);

@@ -2960,7 +2960,7 @@ public class ButtonHelperActionCards {
         StringBuilder bestPlanet = new StringBuilder();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count && !p.getName().equalsIgnoreCase("triad")) {
+            if (p != null && p.getResources() > count && !"triad".equalsIgnoreCase(p.getName())) {
                 count = p.getResources();
                 bestPlanet = new StringBuilder(planet);
             } else if (p != null

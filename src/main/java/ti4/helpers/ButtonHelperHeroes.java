@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2929,8 +2931,7 @@ public class ButtonHelperHeroes {
         } else {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder instanceof Planet) {
-                        Planet planet = (Planet) unitHolder;
+                    if (unitHolder instanceof Planet planet) {
                         if (planet.isSpaceStation()) {
                             continue;
                         }
