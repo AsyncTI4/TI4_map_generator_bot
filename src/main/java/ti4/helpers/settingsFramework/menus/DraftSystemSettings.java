@@ -161,7 +161,7 @@ public class DraftSystemSettings extends SettingsMenu {
     protected List<Button> specialButtons() {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
-        if (preset.equals("Twilights Fall (Andcat Draft)")) {
+        if ("Twilights Fall (Andcat Draft)".equals(preset)) {
             buttons.add(Buttons.blue(prefix + "tfTourney", "TF Tourney Prelims", MiscEmojis.tf_ability));
         }
         buttons.add(Buttons.green(prefix + "startSetup", "Start Draft!"));

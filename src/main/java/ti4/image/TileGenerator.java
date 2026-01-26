@@ -1116,10 +1116,9 @@ public class TileGenerator {
                 tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
 
                 for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (!(uh instanceof Planet)) {
+                    if (!(uh instanceof Planet planet)) {
                         continue;
                     }
-                    Planet planet = (Planet) uh;
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
                     if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
@@ -1948,10 +1947,7 @@ public class TileGenerator {
         if (tokenPath.contains("token_ion")) {
             return true;
         }
-        if (tokenPath.contains("token_wh")) {
-            return true;
-        }
-        return false;
+        return tokenPath.contains("token_wh");
     }
 
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {

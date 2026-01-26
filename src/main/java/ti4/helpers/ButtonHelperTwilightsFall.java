@@ -66,8 +66,8 @@ public class ButtonHelperTwilightsFall {
                 }
                 List<String> cards = getSpliceCards(game);
                 boolean held = !cards.contains(spliceCard)
-                        && !spliceCard.equalsIgnoreCase("antimatter")
-                        && !spliceCard.equalsIgnoreCase("wavelength");
+                        && !"antimatter".equalsIgnoreCase(spliceCard)
+                        && !"wavelength".equalsIgnoreCase(spliceCard);
                 if (held) continue;
                 unpickedSpliceCard = spliceCard;
                 break;
@@ -123,7 +123,7 @@ public class ButtonHelperTwilightsFall {
                 String type = game.getStoredValue("spliceType");
                 String spliceEmoji = null;
                 String name = "";
-                if (cardID.equalsIgnoreCase("wavelength") || cardID.equalsIgnoreCase("antimatter")) {
+                if ("wavelength".equalsIgnoreCase(cardID) || "antimatter".equalsIgnoreCase(cardID)) {
                     name = Mapper.getTech(cardID).getName();
                     String faction = player.getFaction();
                     spliceEmoji = Mapper.getFaction(faction).getFactionEmoji();

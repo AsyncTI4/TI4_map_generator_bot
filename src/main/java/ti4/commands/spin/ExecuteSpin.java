@@ -59,7 +59,7 @@ class ExecuteSpin extends GameStateSubcommand {
             AutoTrigger autoTrigger = AutoTrigger.fromString(trigger);
             if (autoTrigger != null) {
                 spinSettings.stream()
-                        .filter(setting -> autoTrigger.equals(setting.trigger()))
+                        .filter(setting -> autoTrigger == setting.trigger())
                         .forEach(settingsToExecute::add);
             } else {
                 spinSettings.stream()

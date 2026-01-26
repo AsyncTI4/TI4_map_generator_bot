@@ -405,8 +405,8 @@ public class SliceDraftableSettings extends SettingsMenu {
         if (event instanceof ModalInteractionEvent modalEvent) {
             String sliceString = modalEvent.getValue("sliceString").getAsString();
             String mapString = modalEvent.getValue("mapString").getAsString();
-            String sliceStringError = this.getNucleusSettings().setPresetSlices(sliceString);
-            String mapStringError = this.getNucleusSettings().setPresetMapString(mapString);
+            String sliceStringError = nucleusSettings.setPresetSlices(sliceString);
+            String mapStringError = nucleusSettings.setPresetMapString(mapString);
             if (sliceStringError == null && mapStringError == null) {
                 return null;
             }
