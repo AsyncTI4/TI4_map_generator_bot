@@ -1116,10 +1116,9 @@ public class TileGenerator {
                 tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
 
                 for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (!(uh instanceof Planet)) {
+                    if (!(uh instanceof Planet planet)) {
                         continue;
                     }
-                    Planet planet = (Planet) uh;
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
                     if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
@@ -1613,9 +1612,12 @@ public class TileGenerator {
         if (position == null) return position;
         if (Constants.TOKEN_PLANETS.contains(planet.getName())) {
             Point centerPosition = planet.getHolderCenterPosition(tile);
-            Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
+            int radius = 55;
+            if (planet instanceof Planet p) {
+                radius = (int) p.getRadius();
+            }
             position = new Point(position);
-            position.translate(centerPosition.x - offset.x, centerPosition.y - offset.y);
+            position.translate(centerPosition.x - radius, centerPosition.y - radius);
         }
         return position;
     }
@@ -1705,21 +1707,10 @@ public class TileGenerator {
             String tokenPath =
                     switch (StringUtils.defaultString(planetHolder.getContrastColor())) {
                         case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+                        case "test" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_test.png");
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
-            float scale = 0.95f;
-            List<String> smallLegendaries = List.of(
-                    "mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "industrex", "thundersedge");
-            if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
-                    && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                scale = 1.65f;
-            }
-            if ("elysium".equalsIgnoreCase(unitHolder.getName()) || "magna".equalsIgnoreCase(unitHolder.getName())) {
-                scale = 1.65f;
-            }
-            if (Constants.MECATOLS.contains(unitHolder.getName())) {
-                scale = 1.9f;
-            }
+            float scale = planetHolder.getRadius() / 58.0f;
             tokenImage = ImageHelper.readScaled(tokenPath, scale);
             Point position = new Point(
                     centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
@@ -1734,30 +1725,20 @@ public class TileGenerator {
                     continue;
                 }
                 float scale = 0.85f;
-                List<String> smallLegendaries =
-                        List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "thundersedge");
-                boolean isLegendary = Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null;
-                if (tokenPath.contains(Constants.DMZ_LARGE)) {
-                    scale = 0.3f;
-                    if (isLegendary
-                            && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                        scale = 0.53f;
+                if (tokenID.contains(Constants.DMZ_LARGE)) {
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 65.0f;
                     }
-                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
-                        scale = 0.50f;
-                    }
-                    if (Constants.MECATOLS.contains(unitHolder.getName())) {
-                        scale = 0.61f;
-                    }
+                    scale *= 0.35f;
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                    scale = 1.32f;
-                    if (isLegendary
-                            && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                        scale = 2.33f;
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 65.0f;
                     }
+                    scale *= 1.55f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didn't previous get changed for custodians
                 }
+
                 tokenImage = ImageHelper.readScaled(tokenPath, scale);
                 if (tokenImage == null) continue;
                 Point position = new Point(
@@ -1818,17 +1799,8 @@ public class TileGenerator {
                             null);
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
-                    List<String> smallLegendaries =
-                            List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "thundersedge");
-                    if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
-                            && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                        scale = 0.53f;
-                    }
-                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
-                        scale = 0.50f;
-                    }
-                    if (Constants.MECATOLS.contains(unitHolder.getName())) {
-                        scale = 0.61f;
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 184.0f;
                     }
                     tokenImage = ImageHelper.readScaled(tokenPath, scale);
                     tileGraphics.drawImage(
@@ -1975,10 +1947,7 @@ public class TileGenerator {
         if (tokenPath.contains("token_ion")) {
             return true;
         }
-        if (tokenPath.contains("token_wh")) {
-            return true;
-        }
-        return false;
+        return tokenPath.contains("token_wh");
     }
 
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
@@ -2024,7 +1993,7 @@ public class TileGenerator {
 
             boolean isTokenPlanet = Constants.TOKEN_PLANETS.contains(tokenName);
             if (isTokenPlanet) {
-                Point tokenCenter = Helper.getTokenPlanetCenterPosition(tile, tokenName);
+                Point tokenCenter = Helper.getTokenPlanetCenterOfImage(tile, tokenName);
                 int tokenX = tokenCenter.x - (tokenImage.getWidth() / 2);
                 int tokenY = tokenCenter.y - (tokenImage.getHeight() / 2);
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + tokenX, TILE_PADDING + tokenY, null);

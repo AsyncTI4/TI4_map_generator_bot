@@ -74,9 +74,7 @@ public class TeHelperCommanders {
         String pos = game.getActiveSystem();
         Tile tile = game.getTileByPosition(pos);
 
-        List<Button> buttons = new ArrayList<>();
-        buttons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Remove");
-        return buttons;
+        return ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Remove");
     }
 
     @ButtonHandler("moveOjzRetreatS1_")

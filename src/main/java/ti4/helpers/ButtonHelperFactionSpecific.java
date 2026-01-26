@@ -87,7 +87,7 @@ public class ButtonHelperFactionSpecific {
         String prefix = player.getFinsFactionCheckerPrefix() + "c4redtech_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(prefix + "pds", "Place a PDS", UnitEmojis.pds));
-        buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.ActionCard));
+        buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.getACEmoji(player)));
         buttons.add(Buttons.red(prefix + "repair", "Repair units", "💥"));
         return buttons;
     }
@@ -410,7 +410,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 player.getCardsInfoThread(),
                 player.getRepresentation()
-                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.",
+                        + ", please choose the secret you wish to score. The bot has not verified that you can score these, so double check.\n\n## Reminder that you cannot double up on one Plot using this ability, so you can do this a maximum of 5 times, once for each Plot (probably a maximum of 3 times if you're using Sharsiss and _Black Ops_ as well).",
                 buttons);
     }
 
@@ -438,8 +438,8 @@ public class ButtonHelperFactionSpecific {
     public static void resolveSolBtBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         player.addSpentThing(buttonID);
         String pos = buttonID.split("_")[1];
-        List<Button> buttons;
-        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
+        List<Button> buttons =
+                Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "solBtBuild", "place");
         String message = player.getRepresentation() + ", use these buttons to produce units. ";
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
@@ -2142,7 +2142,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getRepresentation()
-                        + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
+                        + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
@@ -2943,7 +2943,8 @@ public class ButtonHelperFactionSpecific {
                 .flatMap(uh -> uh.getUnits().entrySet().stream()
                         .filter(e -> e.getValue() > 0)
                         .map(Map.Entry::getKey))
-                .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID()))
+                .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID())
+                        && !player.getColorID().equalsIgnoreCase(unitKey.getColorID()))
                 .collect(Collectors.toSet());
         return availableUnits.stream()
                 .filter(unitKey -> vortexButtonAvailable(game, unitKey))

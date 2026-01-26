@@ -15,6 +15,7 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -107,7 +108,7 @@ public class ShowActionCardsService {
     public static String acDiscardText(
             boolean fullText, List<Entry<String, Integer>> discards, String title, Game game) {
         if (fullText) return actionCardListFullText(discards, title, game);
-        return discardListCondensed(discards, title);
+        return discardListCondensed(discards, title, game);
     }
 
     private static String actionCardListFullText(List<Map.Entry<String, Integer>> discards, String title, Game game) {
@@ -133,16 +134,20 @@ public class ShowActionCardsService {
                     .toList();
             sb.append("\n").append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
+            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_ ");
             sb.append(String.join(", ", ids)).append("\n> ");
-            sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey())
-                    .getRepresentationJustText());
+            ActionCardModel model =
+                    Mapper.getActionCard(acEntryList.getValue().getFirst().getKey());
+            sb.append(model.getRepresentationJustText());
+            if (model.getNotes() != null) {
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
+            }
         }
         return sb.toString();
     }
 
-    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title) {
+    private static String discardListCondensed(List<Map.Entry<String, Integer>> discards, String title, Game game) {
         // Set up the entry list
         List<Map.Entry<String, Integer>> aclist = new ArrayList<>(discards);
         Collections.reverse(aclist);
@@ -164,7 +169,7 @@ public class ShowActionCardsService {
                     .toList();
             sb.append("\n").append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(ids.size()));
+            sb.append(CardEmojis.getACEmoji(game).toString().repeat(ids.size()));
             sb.append(" _").append(acEntryList.getKey()).append("_");
             sb.append(String.join(", ", ids));
         }
@@ -196,9 +201,15 @@ public class ShowActionCardsService {
         for (Map.Entry<String, List<String>> entry : displayOrder) {
             sb.append("\n").append(index).append("\\. ");
             index++;
-            sb.append(CardEmojis.ActionCard.toString().repeat(entry.getValue().size()));
+            sb.append(CardEmojis.getACEmoji(game)
+                    .toString()
+                    .repeat(entry.getValue().size()));
             sb.append(" _").append(entry.getKey()).append("_\n> ");
-            sb.append(Mapper.getActionCard(entry.getValue().getFirst()).getRepresentationJustText());
+            ActionCardModel model = Mapper.getActionCard(entry.getValue().getFirst());
+            sb.append(model.getRepresentationJustText());
+            if (model.getNotes() != null) {
+                sb.append("\n> -# [").append(model.getNotes()).append("]");
+            }
         }
         return sb.toString();
     }

@@ -61,7 +61,7 @@
         "shortName": "Wave-\nlength",
         "initials": "WL",
         "types": [
-            "NONE"
+            "GENERICTF"
         ],
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/wavelength.png?raw=true",
         "source": "twilights_fall",
@@ -73,7 +73,7 @@
         "shortName": "Anti-\nmatter",
         "initials": "AM",
         "types": [
-            "NONE"
+            "GENERICTF"
         ],
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/antimatter.png?raw=true",
         "source": "twilights_fall",
@@ -640,7 +640,8 @@
         "types": [
             "CYBERNETIC"
         ],
-        "text": "After any player's genome becomes exhausted: You may spend 1 command token from any pool to ready that genome; if you ready another player's genome you may perform a transaction with that player. [Note: Cost changed from 3 influence to 1 command token, to combat infinite loops and with Dane's assent.)",
+        "text": "After any player's genome becomes exhausted: You may spend 1 command token from any pool to ready that genome; if you ready another player's genome you may perform a transaction with that player.",
+        "notes": "Cost changed from 3 influence to 1 command token, to combat infinite loops and with Dane's assent.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/ability/tf-tcs.png?raw=true",
         "source": "twilights_fall",
         "faction": "nomad"

@@ -16,11 +16,12 @@
     "legendaryAbilityFlavourText": "A shard of a greater whole, a part of a grand effort.",
     "planetLayout": {
         "unitHolderName": "ordinian",
-        "resourcesLocation": "TopLeft",
+        "resourcesLocation": "BottomLeft",
         "centerPosition": {
             "x": 135.0,
-            "y": 85.0
-        }
+            "y": 94.0
+        },
+        "planetRadius": 55.0
     },
     "source": "thunders_edge"
 }

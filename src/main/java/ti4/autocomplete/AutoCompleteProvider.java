@@ -887,7 +887,7 @@ public class AutoCompleteProvider {
                         .map(bt -> new Command.Choice(bt.getAutoCompleteName(game), bt.getAlias()))
                         .collect(Collectors.toList());
                 if (addAllOpt) {
-                    options.add(0, new Command.Choice("all", "all"));
+                    options.addFirst(new Command.Choice("all", "all"));
                 }
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -1545,7 +1545,7 @@ public class AutoCompleteProvider {
         if (!optionName.equals(Constants.EXPLORE_CARD_ID)) return;
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode()) {
-            event.replyChoice("You can not see the autocomplete in Fog of War", "[error]")
+            event.replyChoice("You cannot see the autocomplete in Fog of War", "[error]")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }

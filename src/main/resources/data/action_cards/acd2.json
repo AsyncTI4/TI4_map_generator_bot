@@ -13,7 +13,8 @@
         "name": "Ancient Trade Routes",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. Then, you may perform a transaction with each of those players. [Note: This transaction does not require you to be neighbors or count towards your transaction limit.]",
+        "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. Then, you may perform a transaction with each of those players.",
+        "notes": "This transaction does not require you to be neighbors or count towards your transaction limit.",
         "flavorText": "\"Stationmaster,\" Kier said nervously, \"these routes have been dead for centuries.\" Artuno smirked. \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
         "source": "action_deck_2"
     },
@@ -67,7 +68,8 @@
         "name": "Boarding Party",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
-        "text": "Place 1 damaged ship of that type from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+        "text": "Place 1 damaged ship of that type from your reinforcements in the active system.",
+        "notes": "If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
         "source": "action_deck_2"
     },
@@ -309,7 +311,8 @@
         "name": "Smuggler Routes",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action. [Note: You can transport units during this movement.]",
+        "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action.",
+        "notes": "You can transport units during this movement.",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
         "source": "action_deck_2"
     },
@@ -318,7 +321,8 @@
         "name": "Efficiency Initiative",
         "phase": "Action",
         "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods. [Note: These trade goods are available to be spent during this PRODUCTION.]",
+        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
+        "notes": "These trade goods are available to be spent during this PRODUCTION.",
         "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
         "source": "action_deck_2"
     },
@@ -354,7 +358,8 @@
         "name": "Freedom Fighters",
         "phase": "Action",
         "window": "After you commit units to land on a non-home planet in the active system",
-        "text": "Place up to 1 infantry from your reinforcements on each planet in that system. [Note: These infantry cannot be targeted by PDS.]",
+        "text": "Place up to 1 infantry from your reinforcements on each planet in that system.",
+        "notes": "These infantry cannot be targeted by PDS.",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
@@ -417,7 +422,8 @@
         "name": "Ixthian Gift",
         "phase": "Action",
         "window": "At the end of a turn during which you resolved a transaction with a player",
-        "text": "Commit 1 infantry from your reinforcements to a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
+        "text": "Commit 1 infantry from your reinforcements to a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat.",
+        "notes": "This does not trigger PDS.",
         "flavorText": "Unlenn had rarely felt so smug after extorting his enemy. However, as he turned to the Mahact emissary, he grew cold—she was smiling.",
         "source": "action_deck_2"
     },
@@ -480,7 +486,8 @@
         "name": "Miracle",
         "phase": "Any",
         "window": "When 1 of your units would be destroyed",
-        "text": "That unit is not destroyed instead. [Note: Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.]",
+        "text": "That unit is not destroyed instead.",
+        "notes": "Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.",
         "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he'd been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
         "source": "action_deck_2"
     },
@@ -831,7 +838,8 @@
         "name": "Swindle",
         "phase": "Action",
         "window": "When another player gains 3 or more trade goods",
-        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods. [Note: This works at any time such a quantity could be Pillaged. The additional trade good gained does not open another Pillage window.]",
+        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
+        "notes": "This works at any time such a quantity could be PILLAGE'd. The additional trade good gained does not open another PILLAGE window.",
         "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
         "source": "action_deck_2"
     },
@@ -1034,7 +1042,8 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching.",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
@@ -1044,7 +1053,8 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching.",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
@@ -1054,7 +1064,8 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching.",
         "automationID": "side_project",
         "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
@@ -1064,7 +1075,8 @@
         "name": "Side Project",
         "phase": "Action",
         "window": "When you research a technology",
-        "text": "Gain a technology that has no prerequisites. [Note: This may be used as a prerequisite of the technology you are researching.]",
+        "text": "Gain a technology that has no prerequisites.",
+        "notes": "This may be used as a prerequisite of the technology you are researching.",
         "automationID": "side_project",
         "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"
@@ -1137,12 +1149,21 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "invasion",
+        "name": "Invasion",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Put The Fracture into play if it is not already. Then, place 1 neutral cruiser and 2 neutral fighters in a non-home system that contains an ingress token; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "A fleet screamed from the void and encircled Faunus, trapping Brother Omar and his scientists. Omar grinned. \"Do not fear, brothers. This is but one more test.\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "opportunists",
         "name": "Opportunists",
         "phase": "Action",
         "window": "After you lose a space combat",
         "text": "Place 1 neutral cruiser and 2 neutral destroyers in that system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
@@ -1195,8 +1216,9 @@
         "name": "Refugees",
         "phase": "Action",
         "window": "After another player gains control of a planet you control",
-        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets that player controls outside of their home system. [Note: You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.]",
-        "flavorText": "Beneath the desert, an impossible warren held the echoes of the once-great Lazax Empire. Nearly a century later, their eyes still shone with the pain of defeat.",
+        "text": "Place up to 2 infantry from your reinforcements into coexistence on any planets outside of that player's home system that contain their units.",
+        "notes": "You can commit both to 1 planet, or 1 to 2 different planets, like Yin Hero.",
+        "flavorText": "\"Our survival hinged on the line they drew between slaughter and genocide,\" Su'la reminded her crew. \"Spit that mercy in their face.\"",
         "source": "action_deck_2"
     },
     {
@@ -1213,7 +1235,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
     },
@@ -1222,7 +1244,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
     },
@@ -1231,7 +1253,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
     },
@@ -1240,17 +1262,8 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Destroy 1 of your units to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that unit's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "scavenged_fleet",
-        "name": "Scavenged Fleet",
-        "phase": "Any",
-        "window": "After 1 or more of a player's ships are destroyed",
-        "text": "Place matching neutral ships in a non-home system that contains no non-neutral ships.",
-        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
@@ -1258,7 +1271,8 @@
         "name": "Settlements",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome. [Note: You can commit to the same or different planets, like Yin Hero.]",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 infantry from your reinforcements into coexistence on any non-home planets controlled by players that voted for that outcome.",
+        "notes": "You can commit to the same or different planets, like Yin Hero.",
         "flavorText": "Quann's great ocean was everything Carinna had hoped. Could they not see its worth?",
         "source": "action_deck_2"
     },
@@ -1267,7 +1281,7 @@
         "name": "Settlers",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Choose 1 non-home planet controlled by another player that contains their ground forces. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
+        "text": "Choose 1 non-home planet controlled by another player that contains units. That player may allow you to place 2 infantry from your reinforcements into coexistence on that planet. If they do not, exhaust that planet and destroy up to 2 units on it.",
         "flavorText": "Willard grumbled as another frigate shuttled toward the ocean-cities. They would soon be outnumbered.",
         "source": "action_deck_2"
     },

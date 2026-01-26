@@ -99,7 +99,7 @@ class ServerGameStats extends Subcommand {
         if (activeThreadChannels.isEmpty()) {
             return "no active threads";
         }
-        ThreadChannel oldestThread = activeThreadChannels.get(0);
+        ThreadChannel oldestThread = activeThreadChannels.getFirst();
         OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(oldestThread.getLatestMessageIdLong());
         Duration duration = Duration.between(latestActivityTime, OffsetDateTime.now());
         return "oldest active thread is %,d hours old".formatted(duration.toHours());

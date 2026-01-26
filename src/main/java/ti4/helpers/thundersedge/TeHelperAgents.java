@@ -64,7 +64,7 @@ public class TeHelperAgents {
                 .toList();
         for (String ac : newACs) {
             ActionCardModel model = Mapper.getActionCard(ac);
-            buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.ActionCard));
+            buttons.add(Buttons.red("handleRalNelAgent_" + ac, model.getName(), CardEmojis.getACEmoji(game)));
         }
 
         String msg = player.getRepresentation(true, true)
@@ -227,7 +227,7 @@ public class TeHelperAgents {
 
     public static void serveNaaluAgentButtons(Game game, Player player, Tile tile, Player p2) {
         // Not allowed in fow if you can't see the tile
-        if (game.isFowMode() && tile.hasFog(player)) return;
+        if (game.isFowMode() && tile.hasFog(player) && p2 != player) return;
         if (!player.hasUnexhaustedLeader("naaluagent-te")) return;
 
         List<Button> buttons = new ArrayList<>();
@@ -259,8 +259,11 @@ public class TeHelperAgents {
                 ExhaustLeaderService.exhaustLeader(game, player, zeu);
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + " exhausted Z'eu ΩΩ to remove the just-placed command token from "
-                                + tile.getRepresentationForButtons() + ".");
+                        player.getRepresentation() + " exhausted "
+                                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                                + "Z'eu ΩΩ, the Naalu" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                                + " to remove the just-placed command token from " + tile.getRepresentationForButtons()
+                                + ".");
                 RemoveCommandCounterService.fromTile(event, p3, tile);
             });
             for (Player p2 : game.getRealPlayers()) {
@@ -280,7 +283,7 @@ public class TeHelperAgents {
                                 "Exhaust Temporal Command Suite to Ready Naalu Agent"));
                         buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                         msg = p2.getRepresentationUnfogged()
-                                + " you have the opportunity to exhaust _Temporal Command Suite_ to ready Z'eu, and potentially resolve a transaction.";
+                                + ", you have the opportunity to exhaust _Temporal Command Suite_ to ready Z'eu ΩΩ, and potentially resolve a transaction.";
                     }
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
                 }

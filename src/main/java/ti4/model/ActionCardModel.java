@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +19,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String phase;
     private String window;
     private String text;
+    private String notes;
     private String flavorText;
     private String imageURL;
     private String automationID;
@@ -32,7 +33,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation(Game game) {
-        return CardEmojis.ActionCard + (isWild(game) ? "" + CardEmojis.Event : "") + "_" + name + "_";
+        return CardEmojis.getACEmoji(game) + (isWild(game) ? "" + CardEmojis.Event : "") + "_" + name + "_";
     }
 
     public String getNameRepresentation() {
@@ -68,12 +69,16 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = CardEmojis.ActionCard + (isWild(game) ? "" + CardEmojis.Event : "") + "__**" + name + "**__"
-                + source.emoji();
+        String title = CardEmojis.getACEmoji(game) + (isWild(game) ? "" + CardEmojis.Event : "") + "__**" + name
+                + "**__" + source.emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
-        eb.setDescription("\n***" + window + ":***\n" + text);
+        if (notes == null) {
+            eb.setDescription("\n***" + window + ":***\n" + text);
+        } else {
+            eb.setDescription("\n***" + window + ":***\n" + text + "\n-# [" + notes + "]");
+        }
 
         // FLAVOUR TEXT
         if (includeFlavourText && getFlavorText().isPresent())
@@ -104,8 +109,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean isWild(Game game) {
-        return (game != null)
-                && Optional.ofNullable(affectedByWildWildGalaxy).orElse(false)
-                && game.isWildWildGalaxyMode();
+        return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode();
     }
 }

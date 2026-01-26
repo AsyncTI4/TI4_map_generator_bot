@@ -66,7 +66,7 @@ public class ListTechService {
             TechnologyModel model = Mapper.getTech(tech);
 
             String error = null;
-            boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
+            boolean scepter = player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
             if (player.getStrategicCC() < 1 && !scepter) {
                 error = player.getRepresentation()
                         + ", you seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";

@@ -107,8 +107,7 @@ public class VoidTetherService {
         if (!empyrean.hasUnlockedBreakthrough("empyreanbt")) return;
         String finChecker = empyrean.finChecker();
 
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(getRemoveVoidTetherButtons(game, empyrean, null));
+        List<Button> buttons = new ArrayList<>(getRemoveVoidTetherButtons(game, empyrean, null));
         buttons.add(Buttons.blue(finChecker + "addVoidTetherStep1", "Add Void Tether", FactionEmojis.Empyrean));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
 

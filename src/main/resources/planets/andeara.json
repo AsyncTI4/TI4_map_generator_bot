@@ -10,7 +10,7 @@
     "planetLayout": {
         "unitHolderName": "andeara",
         "resourcesLocation": "TopLeft",
-        "centerPosition": { "x": 135.0, "y": 85.0 },
+        "centerPosition": { "x": 136.0, "y": 89.0 },
         "extraIcons": 1
     },
     "source": "thunders_edge"

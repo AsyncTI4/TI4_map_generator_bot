@@ -122,7 +122,7 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
                 switch (action) {
                     case "presetPackages~MDL" -> getPresetPackagesFromUser(event);
                     case "presetPackages" -> setPresetPackages(event);
-                    default -> "Unknown action: " + action;
+                    default -> null;
                 };
 
         return (error == null ? "success" : error);
@@ -254,7 +254,8 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
                 factionsInPackage.add(faction);
             }
             ReferenceCardPackage refPackage =
-                    new ReferenceCardPackage(packageKey++, factionsInPackage, null, null, null, null);
+                    new ReferenceCardPackage(packageKey, factionsInPackage, null, null, null, null);
+            packageKey++;
             parsedPackages.add(refPackage);
         }
 

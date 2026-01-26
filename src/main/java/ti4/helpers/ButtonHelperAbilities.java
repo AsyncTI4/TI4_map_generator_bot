@@ -2007,7 +2007,47 @@ public class ButtonHelperAbilities {
         oceanBoundCheck(game);
     }
 
+    public static void readyBannerHalls(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasUnlockedBreakthrough("kjalengardbt")) {
+                boolean readied = false;
+                List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
+                for (String planet : exhaustedPlanets) {
+                    if (planet.contains("bannerhall")) {
+                        readied = true;
+                        player.refreshPlanet(planet);
+                    }
+                }
+                if (readied) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentation()
+                                    + " your Bannerhall cards have been readied via your breakthrough ability."
+                                    + " This may be a bit earlier than technically correct, but should be alright for most interactions."
+                                    + " If the combat ends in a draw, please exhaust the Bannerhalls."
+                                    + " Remember this should trigger a max of once per action.");
+                }
+            }
+        }
+    }
+
     public static void oceanBoundCheck(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasUnlockedBreakthrough("kjalengardbt")) {
+                int bannerHalls =
+                        3 - ButtonHelperAgents.getGloryTokensLeft(game).size();
+                for (int x = 1; x <= bannerHalls; x++) {
+                    String oceanName = "bannerhall" + x;
+                    if (!player.getPlanets().contains(oceanName)) {
+                        player.addPlanet(oceanName);
+                        player.exhaustPlanet(oceanName);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(),
+                                player.getRepresentation() + ", you have gained a Bannerhall.");
+                    }
+                }
+            }
+        }
         Player player = Helper.getPlayerFromAbility(game, "oceanbound");
         if (player != null) {
             List<String> oceans = player.getOceans();
@@ -2343,7 +2383,8 @@ public class ButtonHelperAbilities {
                     String planet2 = planetUnit2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!player.getPlanetsAllianceMode().contains(planet2)
-                            && !planetRepresentation2.contains("Mecatol")
+                            && (!planetRepresentation2.contains("Mecatol")
+                                    || (game.isTwilightsFallMode() && game.doesSomeoneControlRex()))
                             && (planetUnit2.getUnits() == null
                                     || planetUnit2.getUnits().isEmpty())
                             && !planetsChecked.contains(planet2)) {

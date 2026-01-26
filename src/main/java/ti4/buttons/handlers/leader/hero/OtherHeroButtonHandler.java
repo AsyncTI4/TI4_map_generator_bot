@@ -248,7 +248,7 @@ class OtherHeroButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 msg,
-                ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
+                ButtonHelperActionCards.getCourageousOptions(player, game, true, "Bastion Hero"));
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 

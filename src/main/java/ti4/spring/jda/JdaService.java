@@ -157,8 +157,9 @@ public class JdaService {
         BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
-        } catch (InterruptedException e) {
-            BotLogger.error("Error waiting for bot to get ready", e);
+        } catch (Throwable t) {
+            BotLogger.critical("Error waiting for bot to get ready", t);
+            return;
         }
 
         jda.getPresence()
@@ -168,105 +169,103 @@ public class JdaService {
 
         // Primary HUB Server
         guildPrimaryID = args[2];
-        initGuild(args[2], false);
+        tryToInitGuild(args[2], false);
+
+        if (guildPrimary == null) {
+            BotLogger.critical("Failed to start the bot on the primary guild. Aborting.");
+            return;
+        }
 
         // Community Plays TI
         if (args.length >= 4) {
-            guildCommunityPlays = initGuild(args[3], false);
+            guildCommunityPlays = tryToInitGuild(args[3], false);
         }
 
         // Async: FOW Chapter
         if (args.length >= 5) {
-            guildFogOfWar = initGuild(args[4], false);
+            guildFogOfWar = tryToInitGuild(args[4], false);
             if (guildFogOfWar != null) fowServers.add(guildFogOfWar);
         }
 
         // Async: Stroter's Paradise
         if (args.length >= 6) {
-            guildSecondary = initGuild(args[5], true);
+            guildSecondary = tryToInitGuild(args[5], true);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
-            guildTertiary = initGuild(args[6], true);
+            guildTertiary = tryToInitGuild(args[6], true);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
-            guildQuaternary = initGuild(args[7], true);
+            guildQuaternary = tryToInitGuild(args[7], true);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
-            guildQuinary = initGuild(args[8], true);
+            guildQuinary = tryToInitGuild(args[8], true);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
-            guildSenary = initGuild(args[9], true);
+            guildSenary = tryToInitGuild(args[9], true);
         }
 
         // Async: Duder's Domain
         if (args.length >= 11) {
-            guildSeptenary = initGuild(args[10], true);
+            guildSeptenary = tryToInitGuild(args[10], true);
         }
 
         // Async: What's up Dock
         if (args.length >= 12) {
-            guildOctonary = initGuild(args[11], true);
+            guildOctonary = tryToInitGuild(args[11], true);
         }
 
         // Async: Megagame server
         if (args.length >= 13) {
-            guildMegagame = initGuild(args[12], false);
+            guildMegagame = tryToInitGuild(args[12], false);
         }
 
         // Async: Ship Flag
         if (args.length >= 14) {
-            guildNonary = initGuild(args[13], true);
+            guildNonary = tryToInitGuild(args[13], true);
         }
 
         // Async: FOW Chapter Secondary
         if (args.length >= 15) {
-            guildFogOfWarSecondary = initGuild(args[14], false);
+            guildFogOfWarSecondary = tryToInitGuild(args[14], false);
             if (guildFogOfWarSecondary != null) fowServers.add(guildFogOfWarSecondary);
         }
 
         // Async: Tournament Server 1
         if (args.length >= 16) {
-            guildTourney = initGuild(args[15], false);
+            guildTourney = tryToInitGuild(args[15], false);
         }
 
         // Async: Great Carrier Reef
         if (args.length >= 17) {
-            guildDecenary = initGuild(args[16], true);
+            guildDecenary = tryToInitGuild(args[16], true);
         }
 
         // Async: PDStrians
         if (args.length >= 18) {
-            guildUndenary = initGuild(args[17], true);
+            guildUndenary = tryToInitGuild(args[17], true);
         }
 
         // Async: Stroaty McStroatface
         if (args.length >= 19) {
-            guildDuodenary = initGuild(args[18], true);
+            guildDuodenary = tryToInitGuild(args[18], true);
         }
 
         // Async: Planetary Duck System
         if (args.length >= 20) {
-            guildTredenary = initGuild(args[19], true);
+            guildTredenary = tryToInitGuild(args[19], true);
         }
 
         // Async: Dannel's Camp Ground
         if (args.length >= 21) {
-            guildQuadrodenary = initGuild(args[20], true);
-        }
-
-        if (guildPrimary == null || guilds.isEmpty()) {
-            BotLogger.info("Failed to start the bot on the primary guild. Aborting.");
-            BotLogger.warning("Failed to start the bot on the primary guild. Aborting.");
-            BotLogger.error("Failed to start the bot on the primary guild. Aborting.");
-            return;
+            guildQuadrodenary = tryToInitGuild(args[20], true);
         }
 
         BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
@@ -339,6 +338,15 @@ public class JdaService {
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         BotLogger.info("BOT IS READY TO RECEIVE COMMANDS");
         updatePresence();
+    }
+
+    private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {
+        try {
+            return initGuild(guildID, addToNewGameServerList);
+        } catch (Throwable t) {
+            BotLogger.critical("Failed to initialize guild " + guildID + ". Skipping.", t);
+            return null;
+        }
     }
 
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {

@@ -52,7 +52,7 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
 
         doAction(player, techIDs, event);
 
-        TechInfoService.sendTechInfo(getGame(), player, event);
+        TechInfoService.sendTechInfo(player, event);
     }
 
     protected abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);

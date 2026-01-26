@@ -14,6 +14,7 @@ public class Stickers {
             case "hopesend" -> HopesEnd;
             case "mallice", "lockedmallice" -> Mallice;
             case "mr" -> Mecatol;
+            case "mrte" -> Mecatol;
             case "mirage" -> Mirage;
             case "primor" -> Primor;
             case "semlore" -> SemLore;

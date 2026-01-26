@@ -155,7 +155,7 @@ class UnitRenderGenerator {
 
             int unitCount = unitHolder.getUnitCount(unitKey);
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
-            String unitPath = getUnitPath(unitKey);
+            String unitPath = getUnitPath(unitKey, game);
 
             unitTypeCounts.putIfAbsent(unitKey.getUnitType(), 0);
 
@@ -263,7 +263,7 @@ class UnitRenderGenerator {
 
                 // INFORMATIONAL DECALS
                 optionallyDrawMechTearDecal(unitKey, imageX, imageY);
-                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY);
+                optionallyDrawEidolonMaximumDecal(unitKey, imageX, imageY, tileGraphics, game);
                 optionallyDrawWarsunCrackDecal(unitKey, imageX, imageY);
 
                 // UNIT TAGS
@@ -331,7 +331,8 @@ class UnitRenderGenerator {
         tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
     }
 
-    private void optionallyDrawEidolonMaximumDecal(UnitKey unitKey, int imageX, int imageY) {
+    public static void optionallyDrawEidolonMaximumDecal(
+            UnitKey unitKey, int imageX, int imageY, Graphics graphics, Game game) {
         UnitModel model = game.getUnitFromUnitKey(unitKey);
         if (model == null || !"naaz_voltron".equals(model.getAlias())) return;
         String style = "eyes";
@@ -341,11 +342,11 @@ class UnitRenderGenerator {
         }
 
         if ("minis".equals(style)) {
-            BufferedImage unitImage = ImageHelper.readScaled(getUnitPath(unitKey), 0.5f);
+            BufferedImage unitImage = ImageHelper.readScaled(getUnitPath(unitKey, game), 0.5f);
             double angle = 2 * Math.PI * ThreadLocalRandom.current().nextDouble();
             for (int i = 0; i < 3; i++) {
                 double radius = 12 * ThreadLocalRandom.current().nextDouble() + 22;
-                tileGraphics.drawImage(
+                graphics.drawImage(
                         unitImage,
                         (int) (imageX + radius * Math.cos(angle) + 11.5),
                         (int) (imageY + radius * Math.sin(angle) + 11.5),
@@ -371,6 +372,7 @@ class UnitRenderGenerator {
                 break;
             case "saiyan":
                 imagePath = "voltron_saiyan.png";
+                // if red/orange/yellow
                 if (Set.of(
                                 "red",
                                 "splitred",
@@ -380,6 +382,7 @@ class UnitRenderGenerator {
                                 "bld",
                                 "splitbld",
                                 "pld",
+                                "cnb",
                                 "tan",
                                 "splittan",
                                 "cpr",
@@ -394,13 +397,15 @@ class UnitRenderGenerator {
                                 "splitgld",
                                 "spr",
                                 "ylw",
-                                "splitylw")
+                                "splitylw",
+                                "beg")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_saiyan_cyan.png";
                 }
                 break;
             case "at_field":
                 imagePath = "voltron_at_field.png";
+                // if orange
                 if (Set.of("tan", "splittan", "cpr", "chk", "splitchk", "bwn", "pch", "org", "splitorg")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_at_field_magenta.png";
@@ -414,7 +419,19 @@ class UnitRenderGenerator {
                 break;
             case "fancy":
                 imagePath = "voltron_fancy.png";
-                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                // if blue
+                if (Set.of(
+                                "tea",
+                                "splittea",
+                                "gcr",
+                                "eth",
+                                "nvy",
+                                "splitnvy",
+                                "blu",
+                                "splitblu",
+                                "ptr",
+                                "splitptr",
+                                "azr")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_fancy_red.png";
                 }
@@ -424,7 +441,19 @@ class UnitRenderGenerator {
                 break;
             case "lightning":
                 imagePath = "voltron_lightning.png";
-                if (Set.of("tea", "splittea", "gcr", "eth", "nvy", "splitnvy", "blu", "splitblu", "ptr", "splitptr")
+                // if blue
+                if (Set.of(
+                                "tea",
+                                "splittea",
+                                "gcr",
+                                "eth",
+                                "nvy",
+                                "splitnvy",
+                                "blu",
+                                "splitblu",
+                                "ptr",
+                                "splitptr",
+                                "azr")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_lightning_yellow.png";
                 }
@@ -441,6 +470,7 @@ class UnitRenderGenerator {
             case "eyes":
             default:
                 imagePath = "voltron_eyes.png";
+                // if red/orange/yellow
                 if (Set.of(
                                 "red",
                                 "splitred",
@@ -450,6 +480,7 @@ class UnitRenderGenerator {
                                 "bld",
                                 "splitbld",
                                 "pld",
+                                "cnb",
                                 "tan",
                                 "splittan",
                                 "cpr",
@@ -464,13 +495,14 @@ class UnitRenderGenerator {
                                 "splitgld",
                                 "spr",
                                 "ylw",
-                                "splitylw")
+                                "splitylw",
+                                "beg")
                         .contains(unitKey.getColor())) {
                     imagePath = "voltron_eyes_blue.png";
                 }
         }
-        BufferedImage voltron = ImageHelper.read(resourceHelper.getDecalFile(imagePath));
-        tileGraphics.drawImage(voltron, imageX - 22, imageY - 22, null);
+        BufferedImage voltron = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(imagePath));
+        graphics.drawImage(voltron, imageX - 22, imageY - 22, null);
     }
 
     private void drawUnitTags(UnitKey unitKey, Player player, ImagePosition imagePos, int iteration) {
@@ -659,8 +691,8 @@ class UnitRenderGenerator {
         return !ctx.showJail && !unitKey.getColorID().equals(colorID);
     }
 
-    private String getUnitPath(UnitKey unitKey) {
-        String unitPath = resourceHelper.getUnitFile(unitKey);
+    private static String getUnitPath(UnitKey unitKey, Game game) {
+        String unitPath = ResourceHelper.getInstance().getUnitFile(unitKey);
         if (unitPath == null) return null;
 
         // Handle bulk unit replacements
@@ -681,7 +713,7 @@ class UnitRenderGenerator {
                 boolean hasM2Tech = game.getPNOwner("cavalry") != null
                         && game.getPNOwner("cavalry").hasTech("m2");
                 String version = hasM2Tech ? "Memoria_2.png" : "Memoria_1.png";
-                yield resourceHelper.getUnitFile(version);
+                yield ResourceHelper.getInstance().getUnitFile(version);
             }
             default -> unitPath;
         };

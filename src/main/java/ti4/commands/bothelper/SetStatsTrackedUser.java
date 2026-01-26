@@ -19,6 +19,7 @@ class SetStatsTrackedUser extends GameStateSubcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.USER, "User to track stats for").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
     @Override

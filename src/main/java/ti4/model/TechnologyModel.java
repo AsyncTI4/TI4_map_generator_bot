@@ -32,6 +32,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String faction;
     private String baseUpgrade;
     private String text;
+    private String notes;
     private String homebrewReplacesID;
     private String imageURL;
     private ComponentSource source;
@@ -44,6 +45,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         CYBERNETIC,
         WARFARE,
         UNITUPGRADE,
+        GENERICTF,
         NONE;
 
         public String toString() {
@@ -57,6 +59,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 case WARFARE -> TechEmojis.WarfareTech.toString();
                 case BIOTIC -> TechEmojis.BioticTech.toString();
                 case UNITUPGRADE -> TechEmojis.UnitUpgradeTech.toString();
+                case GENERICTF -> TechEmojis.GenericTF.toString();
                 case NONE -> "";
             };
         }
@@ -68,6 +71,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                 case WARFARE -> "Warfare";
                 case BIOTIC -> "Biotic";
                 case UNITUPGRADE -> "Unit Upgrade";
+                case GENERICTF -> "Generic (TF)";
                 case NONE -> "<None>";
             };
         }
@@ -262,7 +266,12 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji).append("_").append(techName).append("_").append(factionEmoji);
         sb.append(source.emoji());
-        if (includeCardText) sb.append("\n").append("> ").append(text).append("\n");
+        if (includeCardText) {
+            sb.append("\n> ").append(text.replace("\n", "\n> ")).append("\n");
+            if (notes != null) {
+                sb.append("> -# [").append(notes.replace("\n", "\n> -# ")).append("]\n");
+            }
+        }
         return sb.toString();
     }
 
@@ -286,9 +295,13 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
 
         // DESCRIPTION
         StringBuilder description = new StringBuilder();
-        if (includeRequirements)
+        if (includeRequirements) {
             description.append("*Requirements: ").append(getRequirementsEmoji()).append("*\n");
+        }
         description.append(text);
+        if (notes != null) {
+            description.append("\n-# [").append(notes.replace("\n", "\n-# ")).append("]\n");
+        }
         eb.setDescription(description.toString());
 
         // FOOTER
@@ -391,6 +404,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
                         default -> output.append(UnitEmojis.flagship);
                     }
                 }
+                case GENERICTF -> output.append(TechEmojis.GenericTF);
                 default -> {}
             }
             if (single) return output.toString();

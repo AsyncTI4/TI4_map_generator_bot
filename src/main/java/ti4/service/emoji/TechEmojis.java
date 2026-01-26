@@ -36,6 +36,8 @@ public enum TechEmojis implements TI4Emoji {
     UnitUpgradeTech,
     UnitTechSkip,
     NonUnitTechSkip,
+    GenericTF,
+
     SynergyPropulsionLeft,
     SynergyPropulsionRight, //
     SynergyBioticLeft,

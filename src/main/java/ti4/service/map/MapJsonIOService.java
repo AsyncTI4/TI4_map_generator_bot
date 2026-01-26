@@ -257,7 +257,7 @@ public class MapJsonIOService {
         if (tileIO.getBorderAnomalies() == null) return;
 
         for (BorderAnomalyIO anomalyIO : tileIO.getBorderAnomalies()) {
-            BorderAnomalyModel.BorderAnomalyType anomalyType = null;
+            BorderAnomalyModel.BorderAnomalyType anomalyType;
             try {
                 anomalyType = BorderAnomalyModel.BorderAnomalyType.valueOf(
                         anomalyIO.getType().toUpperCase());

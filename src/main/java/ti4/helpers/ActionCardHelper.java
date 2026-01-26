@@ -43,6 +43,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
@@ -148,7 +149,7 @@ public class ActionCardHelper {
             if (status == ACStatus.garbozia) {
                 String id = Constants.AC_PLAY_FROM_HAND + ident;
                 String label = Mapper.getActionCard(card.getKey()).getName();
-                buttons.add(Buttons.red(id, label, CardEmojis.ActionCard));
+                buttons.add(Buttons.red(id, label, CardEmojis.getACEmoji(game)));
             }
         }
         return buttons;
@@ -261,7 +262,7 @@ public class ActionCardHelper {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets"));
+        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
         return buttons;
     }
 
@@ -334,7 +335,7 @@ public class ActionCardHelper {
             if (actionCard == null) {
                 sb.append("Something broke here");
             } else {
-                sb.append(CardEmojis.ActionCard)
+                sb.append(CardEmojis.getACEmoji(game))
                         .append(actionCard.isWild(game) ? CardEmojis.Event : "")
                         .append(" _")
                         .append(actionCard.getName())
@@ -345,6 +346,9 @@ public class ActionCardHelper {
                         .append(": ")
                         .append(actionCard.getText())
                         .append("\n");
+                if (actionCard.getNotes() != null) {
+                    sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
+                }
             }
         }
         return sb.toString();
@@ -363,7 +367,7 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
                 acButtons.add(Buttons.red(
-                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.getACEmoji(game)));
             }
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -387,7 +391,7 @@ public class ActionCardHelper {
         List<String> prePlayable = List.of(
                 "coup",
                 "crisis",
-                "stasis",
+                "tf-stasis",
                 "extremeduress",
                 "disgrace",
                 "special_session",
@@ -440,7 +444,9 @@ public class ActionCardHelper {
                 String actionCardWindow = actionCard.getWindow();
                 if ("action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + acName,
+                            CardEmojis.getACEmoji(player)));
                 }
             }
         }
@@ -485,7 +491,9 @@ public class ActionCardHelper {
                         || actionCardWindow.contains("roll")
                         || actionCardWindow.contains("hit")) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + acName,
+                            CardEmojis.getACEmoji(player)));
                 }
             }
         }
@@ -520,7 +528,9 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
                 acButtons.add(Buttons.blue(
-                        "ac_discard_from_hand_" + value + suffix, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                        "ac_discard_from_hand_" + value + suffix,
+                        "(" + value + ") " + acName,
+                        CardEmojis.getACEmoji(player)));
             }
         }
         return acButtons;
@@ -534,8 +544,8 @@ public class ActionCardHelper {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                acButtons.add(
-                        Buttons.red("takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.ActionCard));
+                acButtons.add(Buttons.red(
+                        "takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.getACEmoji(player)));
             }
         }
         return acButtons;
@@ -1041,6 +1051,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(),
                         buttonLabel));
+                if (player.hasTechReady("gls")) {
+                    codedButtons.add(Buttons.gray(
+                            "exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
                         introMsg
@@ -1240,7 +1254,7 @@ public class ActionCardHelper {
             }
 
             if ("summit".equals(automationID)) {
-                codedButtons.add(Buttons.green("resolveSummit", buttonLabel));
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSummit", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1688,11 +1702,11 @@ public class ActionCardHelper {
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.ActionCard + ": _"
-                    + actionCardTitle + "_.";
+            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.getACEmoji(game)
+                    + ": _" + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(
-                    player, game, "Played action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.");
+                    player, game, "Played action card " + CardEmojis.getACEmoji(game) + ": _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray(
@@ -1755,7 +1769,7 @@ public class ActionCardHelper {
             for (String name : cardNames) {
                 String id = reversePrefix + name;
                 String label = "Reverse Engineer " + name;
-                reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                reverseButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
                 if (actionCards.size() == 1) msg.append(name).append(".");
             }
 
@@ -1797,7 +1811,7 @@ public class ActionCardHelper {
                 String id = twinningPrefix + model.getName();
                 String label = "Twin " + model.getName();
                 lastCardName = model.getName();
-                twinningButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
+                twinningButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
             }
 
             if (!twinningButtons.isEmpty()) {
@@ -1923,7 +1937,7 @@ public class ActionCardHelper {
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, player, player_, CardEmojis.ActionCard + " Action Card", null);
+                    game, event, player, player_, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);

@@ -20,7 +20,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
 
-    public WeirdGameSetup() {
+    WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
@@ -134,7 +134,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (game.isCompetitiveTIGLGame()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+                        "TIGL Games cannot be mixed with other game modes. Priority Track is unchanged.");
             } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
@@ -187,7 +187,7 @@ class WeirdGameSetup extends GameStateSubcommand {
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
-    public static boolean setGameMode(
+    static boolean setGameMode(
             GenericInteractionCreateEvent event,
             Game game,
             boolean baseGameMode,
@@ -206,15 +206,14 @@ class WeirdGameSetup extends GameStateSubcommand {
                         || game.isCommunityMode()
                         || votcMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+                    event.getMessageChannel(), "TIGL Games cannot be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             TIGLHelper.initializeTIGLGame(game);
             return true;
         }
-        if (!isTIGLGame) {
-            game.setCompetitiveTIGLGame(false);
-        }
+
+        game.setCompetitiveTIGLGame(false);
 
         if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(

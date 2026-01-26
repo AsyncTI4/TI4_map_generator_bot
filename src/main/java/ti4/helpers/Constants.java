@@ -396,9 +396,8 @@ public class Constants {
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172, 150);
-    public static final Point TOKEN_PLANET_POSITION = new Point(172, 33); // 55, 5
-    public static final Point TOKEN_PLANET_CENTER_OFFSET = new Point(71, 59);
-    public static final Point MIRAGE_TRIPLE_POSITION = new Point(38, 178);
+    public static final Point TOKEN_PLANET_POSITION = new Point(244, 100); // 55, 5
+    public static final Point MIRAGE_TRIPLE_POSITION = new Point(110, 245);
     public static final String SLEEPER = "sleeper";
     public static final String DMZ = "dmz";
     public static final String DMZ_LARGE = "dmz_large";
@@ -1378,6 +1377,7 @@ public class Constants {
     public static final String RUN_MANUAL_DATA_MIGRATION = "run_manual_data_migration";
     public static final String CRON_NAME = "cron_name";
     public static final String RUN_CRON = "run_cron";
+    public static final String UPLOAD_RECENT_GAME_STATS = "upload_recent_game_stats";
 
     public static final String HELIOS_ATTACHMENT_1 = "attachment_helios1.png";
     public static final String HELIOS_ATTACHMENT_2 = "attachment_helios2.png";

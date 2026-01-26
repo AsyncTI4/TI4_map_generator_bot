@@ -38,6 +38,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.draft.DraftTileManager;
 import ti4.service.draft.MantisMapBuildContext;
 import ti4.service.draft.MantisMapBuildService;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 import ti4.service.franken.FrankenMapBuildContextHelper;
 import ti4.service.milty.MiltyDraftHelper;
@@ -65,8 +66,8 @@ public class ButtonHelperTwilightsFall {
                 }
                 List<String> cards = getSpliceCards(game);
                 boolean held = !cards.contains(spliceCard)
-                        && !spliceCard.equalsIgnoreCase("antimatter")
-                        && !spliceCard.equalsIgnoreCase("wavelength");
+                        && !"antimatter".equalsIgnoreCase(spliceCard)
+                        && !"wavelength".equalsIgnoreCase(spliceCard);
                 if (held) continue;
                 unpickedSpliceCard = spliceCard;
                 break;
@@ -122,7 +123,7 @@ public class ButtonHelperTwilightsFall {
                 String type = game.getStoredValue("spliceType");
                 String spliceEmoji = null;
                 String name = "";
-                if (cardID.equalsIgnoreCase("wavelength") || cardID.equalsIgnoreCase("antimatter")) {
+                if ("wavelength".equalsIgnoreCase(cardID) || "antimatter".equalsIgnoreCase(cardID)) {
                     name = Mapper.getTech(cardID).getName();
                     String faction = player.getFaction();
                     spliceEmoji = Mapper.getFaction(faction).getFactionEmoji();
@@ -750,9 +751,8 @@ public class ButtonHelperTwilightsFall {
 
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + " has chosen to get a generic technology instead of splicing. The technology is _"
-                            + Mapper.getTech(cardID).getName() + "_.",
+                    player.getRepresentation() + " has chosen to get the _"
+                            + Mapper.getTech(cardID).getName() + "_ generic ability instead of splicing.",
                     Mapper.getTech(cardID).getRepresentationEmbed());
             triggerYellowUnits(game, player);
         } else {
@@ -781,16 +781,16 @@ public class ButtonHelperTwilightsFall {
                         player.addTech(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " has spliced in the ability: "
-                                        + Mapper.getTech(cardID).getName(),
+                                player.getRepresentation() + " has spliced in the _"
+                                        + Mapper.getTech(cardID).getName() + "_ ability.",
                                 Mapper.getTech(cardID).getRepresentationEmbed());
                     }
                     if ("genome".equalsIgnoreCase(type)) {
                         player.addLeader(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " has spliced in the genome: "
-                                        + Mapper.getLeader(cardID).getTFNameIfAble(),
+                                player.getRepresentation() + " has spliced in the "
+                                        + Mapper.getLeader(cardID).getTFNameIfAble() + " genome.",
                                 Mapper.getLeader(cardID).getRepresentationEmbed(false, true, false, false, true));
                     }
                     if ("units".equalsIgnoreCase(type)) {
@@ -808,8 +808,8 @@ public class ButtonHelperTwilightsFall {
                         player.addOwnedUnitByID(cardID);
                         MessageHelper.sendMessageToChannelWithEmbed(
                                 player.getCorrectChannel(),
-                                player.getRepresentation() + " has spliced in the unit upgrade: "
-                                        + Mapper.getUnit(cardID).getName(),
+                                player.getRepresentation() + " has spliced in the "
+                                        + Mapper.getUnit(cardID).getName() + " unit upgrade.",
                                 Mapper.getUnit(cardID).getRepresentationEmbed());
                     }
                 } else {
@@ -819,7 +819,7 @@ public class ButtonHelperTwilightsFall {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationNoPing()
-                                    + " has taken a secret card. They may put it into play with a button in their `#cards-info` thread.");
+                                    + " has spliced in a secret card. They may put it into play with a button in their `#cards-info` thread.");
                 }
                 if (!buttonID.contains("spoof_")) {
                     triggerYellowUnits(game, player);
@@ -844,7 +844,7 @@ public class ButtonHelperTwilightsFall {
                 }
             } else {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), game.getPing() + ", the splice is complete.");
+                        game.getMainGameChannel(), game.getPing() + ", the splice is complete.");
                 if (!game.getStoredValue("endTurnWhenSpliceEnds").isEmpty()) {
                     Player p2 = game.getActivePlayer();
                     if (game.getStoredValue("endTurnWhenSpliceEnds").contains(p2.getFaction())) {
@@ -893,7 +893,7 @@ public class ButtonHelperTwilightsFall {
                 }
             }
         }
-        if (buttons.size() > 0) {
+        if (!buttons.isEmpty()) {
             buttons.add(Buttons.red("deleteButtons", "Done"));
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(),
@@ -1106,10 +1106,16 @@ public class ButtonHelperTwilightsFall {
         }
         if (!game.getStoredValue("engineerACSplice").startsWith("remove")) {
             if (!player.hasTech("wavelength")) {
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + prefix + "wavelength", "Wavelength"));
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + prefix + "wavelength",
+                        "Wavelength",
+                        TechEmojis.GenericTF));
             }
             if (!player.hasTech("antimatter")) {
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + prefix + "antimatter", "Antimatter"));
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + prefix + "antimatter",
+                        "Antimatter",
+                        TechEmojis.GenericTF));
             }
         }
         return buttons;

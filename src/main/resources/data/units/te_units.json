@@ -83,7 +83,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship can move through systems that contain your units, even if other players' units are present; if it would, apply +1 to its move value for each of those systems. [note: other players' units do not need to be present for the speed boost to apply.]"
+        "ability": "This ship can move through systems that contain your units, even if other players' units are present; if it would, apply +1 to its move value for each of those systems.",
+        "notes": "Other players' units do not need to be present for the speed boost to apply."
     },
     {
         "id": "deepwrought_mech",
@@ -327,6 +328,7 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/te/faction/naaz_voltron.jpg?raw=true",
         "source": "thunders_edge",
         "faction": "naaz",
+        "isUpgrade": true,
         "moveValue": 3,
         "combatHitsOn": 4,
         "combatDieCount": 4,
@@ -346,6 +348,7 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/te/faction/mentak_cruiser3.jpg?raw=true",
         "source": "thunders_edge",
         "faction": "mentak",
+        "isUpgrade": true,
         "moveValue": 3,
         "capacityValue": 2,
         "capacityUsed": 1,

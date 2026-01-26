@@ -81,6 +81,11 @@ public class ButtonHelperModifyUnits {
         }
         if (game.getActiveSystem() != null
                 && game.getTileByPosition(game.getActiveSystem()) != null
+                && ButtonHelper.isTileSmothered(game, game.getTileByPosition(game.getActiveSystem()), player)) {
+            return 0;
+        }
+        if (game.getActiveSystem() != null
+                && game.getTileByPosition(game.getActiveSystem()) != null
                 && game.getTileByPosition(game.getActiveSystem()).isScar(game)
                 && !player.hasUnlockedBreakthrough("nivynbt")) {
             return 0;
@@ -343,8 +348,8 @@ public class ButtonHelperModifyUnits {
             }
         }
         Map<String, String> unitTypes = new LinkedHashMap<>();
-        unitTypes.put("fighter", UnitEmojis.fighter.toString());
         unitTypes.put("infantry", UnitEmojis.infantry.toString());
+        unitTypes.put("fighter", UnitEmojis.fighter.toString());
         unitTypes.put("pds", UnitEmojis.pds.toString());
         for (Map.Entry<String, String> entry : unitTypes.entrySet()) {
             String unitType = entry.getKey();
@@ -852,13 +857,14 @@ public class ButtonHelperModifyUnits {
                             || type == UnitType.Fighter
                             || type == UnitType.Infantry
                             || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
+                        String location = " In Space";
+                        if (uH instanceof Planet p) {
+                            location = " On " + p.getPlanetModel().getName();
+                        }
                         buttons.add(Buttons.red(
                                 "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
                                         + uH.getName() + "_" + player.getColor(),
-                                type.humanReadableName() + " from " + tile.getRepresentationForButtons() + " "
-                                        + ("space".equals(uH.getName())
-                                                ? "in Space"
-                                                : "on " + StringUtils.capitalize(uH.getName()))));
+                                type.humanReadableName() + " from " + tile.getRepresentationForButtons() + location));
                     }
                 }
             }
@@ -1420,7 +1426,7 @@ public class ButtonHelperModifyUnits {
             }
             UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
 
-            String prettyName = unitModel.getName();
+            String prettyName = game.isFowMode() ? unitModel.getBaseType() : unitModel.getName();
             String unitName = unitKey.unitName();
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
@@ -1465,8 +1471,8 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation()
-                + ", one of your units has been assigned a hit"
+        String msg = player.getRepresentationUnfogged()
+                + ", one of your " + unit + " units has been assigned a hit"
                 + ("magen".equals(source) ? " with _Magen Defense Grid_" : "")
                 + ("ruthless".equals(source) ? " by **Ruthless**" : "")
                 + ". Please either cancel the hit somehow, or accept the loss of the unit.";

@@ -14,7 +14,8 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose another player. You and that player may agree to place 1 infantry from each of your reinforcements into coexistence on a planet the other player controls that contains their ground forces; if no agreement is reached, you each discard 1 token from your fleet pool.",
-        "flavorText": "Madness. *Magmus thought to himself. A city. Under water.* Absurd",
+        "notes": "This card targets two planets, one owned by each player, which the other player will place a unit on.",
+        "flavorText": "Madness. Magmus thought to himself. A city. Under water. Absurd.",
         "source": "thunders_edge"
     },
     {
@@ -40,7 +41,8 @@
         "name": "Mercenary Contract",
         "phase": "Action",
         "window": "Action",
-        "text": "Spend 2 trade goods to place 2 neutral infantry on any non-home planet that contains no units; if that planet was owned by another player, they return its planet card to the planet card deck. [Note: You cannot target your own planets with this.]",
+        "text": "Spend 2 trade goods to place 2 neutral infantry on any non-home planet that contains no units; if that planet was owned by another player, they return its planet card to the planet card deck.",
+        "notes": "This cannot be used to target your own planets or the DMZ.",
         "flavorText": "\"Just sign right 'ere - yep, right below the smeared blood. You got it, champ, get at 'em.\"",
         "source": "thunders_edge"
     },
@@ -49,7 +51,8 @@
         "name": "Strategize",
         "phase": "Action",
         "window": "Action",
-        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing Leadership. You do not have to declare what you are researching until after all players have chosen not to cancel this ability.]",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card.",
+        "notes": "When resolving the chosen secondary ability, you must still spend the strategy token, except for Leadership. You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the secondary ability.",
         "flavorText": "Kyver stared Mathis in the eye, unblinking. For a time, neither made a move. The greens and browns of Kyver's eyes were impassive. They betrayed nothing of his intent. Nothing of his past or his future. They were but windows to the wild, unforgiving jungles of Retillion.",
         "source": "thunders_edge"
     },
@@ -58,7 +61,8 @@
         "name": "Strategize",
         "phase": "Action",
         "window": "Action",
-        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing Leadership. You do not have to declare what you are researching until after all players have chosen not to cancel this ability.]",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card.",
+        "notes": "When resolving the chosen secondary ability, you must still spend the strategy token, except for Leadership. You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the secondary ability.",
         "flavorText": "Sweat dripped down Mathis' brow. To show weakness now would mean defeat. Death would be preferable to that. But then, as if the divine providence of the Lazax were within her, she saw something she had overlooked. An opening! Her hand darted forward as she made her play. She smirked.",
         "source": "thunders_edge"
     },
@@ -67,7 +71,8 @@
         "name": "Strategize",
         "phase": "Action",
         "window": "Action",
-        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing Leadership. You do not have to declare what you are researching until after all players have chosen not to cancel this ability.]",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card.",
+        "notes": "When resolving the chosen secondary ability, you must still spend the strategy token, except for Leadership. You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the secondary ability.",
         "flavorText": "Strategy. What meaning could be derived from the word, what flesh could be sucked clean off its bones? There was a spark, almost like remembering, but it faded. Violently.",
         "source": "thunders_edge"
     },
@@ -76,7 +81,8 @@
         "name": "Strategize",
         "phase": "Action",
         "window": "Action",
-        "text": "Perform the secondary ability of any readied or unchosen strategy card. [Note: You still need to pay the token from strategy unless choosing Leadership. You do not have to declare what you are researching until after all players have chosen not to cancel this ability.]",
+        "text": "Perform the secondary ability of any readied or unchosen strategy card.",
+        "notes": "When resolving the chosen secondary ability, you must still spend the strategy token, except for Leadership. You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the secondary ability.",
         "flavorText": "No, there would be no strategy here, only hunger. Life, blood, love, life, fear, fear, fear. Let the ants mill about with their strategies. No strategy would avail them today.",
         "source": "thunders_edge"
     },
@@ -85,7 +91,8 @@
         "name": "Rescue",
         "phase": "Action",
         "window": "After a player moves ships into a system that contains your ships",
-        "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens. [Note: you can transport with this]",
+        "text": "You may move 1 of your ships into the active system from any system that does not contain one of your command tokens.",
+        "notes": "If the target ship has a capacity value, it may transport fighters and ground forces.",
         "flavorText": "\"Hold on...\" Tuck pleaded. \"We are coming. Hold on, please...\"",
         "source": "thunders_edge"
     },
@@ -175,7 +182,8 @@
         "name": "Overrule",
         "phase": "Action",
         "window": "Action",
-        "text": "Perform the primary ability of a readied or unchosen strategy card. [Note: cannot allow others to refresh off of trade, as that would be them resolving the secondary, which is not enabled by this card]",
+        "text": "Perform the primary ability of a readied or unchosen strategy card.",
+        "notes": "You must declare which strategy card you are choosing before the Sabo window, but need not declare how you will resolve the primary ability. If you choose Trade, you cannot choose other players to resolve the secondary ability.",
         "flavorText": "Treilla absentmindedly smiled a sickly sweet smile at the newly promoted commander. With any luck, he'd be dead or demoted within a day or two.",
         "source": "thunders_edge"
     }

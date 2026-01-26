@@ -1,6 +1,6 @@
 package ti4.listeners.annotations;
 
-import static org.reflections.scanners.Scanners.SubTypes;
+import static org.reflections.scanners.Scanners.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -180,7 +180,7 @@ public class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions and feedback channel. It will probably require a code change.")
+                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
@@ -189,7 +189,7 @@ public class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions and feedback channel. It will probably require a code change.")
+                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }

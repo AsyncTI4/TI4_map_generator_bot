@@ -1,8 +1,10 @@
 package ti4.helpers.thundersedge;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,17 +12,22 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.helpers.BreakthroughHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.BreakthroughModel;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.breakthrough.DataSkimmerService;
@@ -156,7 +163,7 @@ public class BreakthroughCommandHelper {
     public static void unlockAllBreakthroughs(Game game, Player player) {
         List<String> lockedBtIDs = player.getBreakthroughUnlocked().entrySet().stream()
                 .filter(e -> !e.getValue())
-                .map(e -> e.getKey())
+                .map(Map.Entry::getKey)
                 .toList();
         if (!lockedBtIDs.isEmpty()) {
             unlockBreakthroughs(game, player, lockedBtIDs);
@@ -287,11 +294,27 @@ public class BreakthroughCommandHelper {
                         player.removeOwnedUnitByID("naaz_mech");
                         player.removeOwnedUnitByID("naaz_mech_space");
                     }
+                } else {
+                    player.setBreakthroughActive(btID, false);
+                    String message =
+                            player.getRepresentation() + " deactivated their _" + bt.getName() + "_ breakthrough.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
+                        player.removeOwnedUnitByID("naaz_voltron");
+                        player.addOwnedUnitByID("naaz_mech");
+                        player.addOwnedUnitByID("naaz_mech_space");
+                    }
                 }
             } else {
                 switch (btID) {
                     case "ralnelbt" -> DataSkimmerService.fixDataSkimmer(player.getGame(), player);
                     case "empyreanbt" -> VoidTetherService.fixVoidTether(player.getGame(), player);
+                    case "nekrobt" -> {
+                        Game game = player.getGame();
+                        List<Button> buttons = getNekroBtFixButtons(game, player);
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(), "Use these buttons to fix the breakthrough", buttons);
+                    }
                     default -> {
                         String msg = player.getRepresentation() + " could not activate their _" + bt.getName()
                                 + "_ breakthrough.";
@@ -300,6 +323,51 @@ public class BreakthroughCommandHelper {
                 }
             }
         });
+    }
+
+    @ButtonHandler("removeNekroToken_")
+    public static void removeNekroToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String f2 = buttonID.split("_")[1];
+        game.setStoredValue("valefarZ", game.getStoredValue("valefarZ").replace(f2 + "|", ""));
+        List<Button> buttons = getNekroBtFixButtons(game, player);
+        event.getMessage()
+                .editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully removed a token");
+    }
+
+    @ButtonHandler("addNekroToken_")
+    public static void addNekroToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String f2 = buttonID.split("_")[1];
+        game.setStoredValue("valefarZ", game.getStoredValue("valefarZ") + f2 + "|");
+        List<Button> buttons = getNekroBtFixButtons(game, player);
+        event.getMessage()
+                .editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully added a token");
+    }
+
+    public static List<Button> getNekroBtFixButtons(Game game, Player player) {
+        List<String> factionsWithToken =
+                Arrays.asList(game.getStoredValue("valefarZ").split("\\|"));
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            if (factionsWithToken.contains(p2.getFaction())) {
+                buttons.add(Buttons.red(
+                        "removeNekroToken_" + p2.getFaction(),
+                        "Remove " + p2.getFactionNameOrColor() + " Token",
+                        p2.getFactionEmojiOrColor()));
+            } else {
+                buttons.add(Buttons.green(
+                        "addNekroToken_" + p2.getFaction(),
+                        "Add " + p2.getFactionNameOrColor() + " Token",
+                        p2.getFactionEmojiOrColor()));
+            }
+        }
+        buttons.add(Buttons.gray("deleteButtons", "Done Resolving"));
+        return buttons;
     }
 
     public static void activateBreakthrough(GenericInteractionCreateEvent event, Player player, String... btIDs) {

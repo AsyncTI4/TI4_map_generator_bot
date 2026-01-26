@@ -653,26 +653,34 @@ public class MapGenerator implements AutoCloseable {
         int boxHeight = 140;
         int boxWidth = 150;
         int boxBuffer = -1;
-        if (game.getVp() > 14) {
-            boxWidth = 2250 / (game.getVp() + 1);
+
+        int pinkLimit = 0;
+        if (game.isLiberationC4Mode()) pinkLimit = 12;
+        if (game.isAllianceMode()) pinkLimit = 14;
+        int greyLimit = game.getRealPlayers().stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(0);
+        if (game.getVp() > 14 || pinkLimit > 14 || greyLimit > 14) {
+            boxWidth = 2250 / (1 + Math.max(game.getVp(), Math.max(pinkLimit, greyLimit)));
         }
-        if (game.isLiberationC4Mode()) {
-            for (int i = game.getVp() + 1; i <= 12; i++) {
-                graphics.setColor(Color.WHITE);
-                Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-                DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
-                g2.setColor(Color.PINK);
-                g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-            }
-        } else if (game.isAllianceMode()) {
-            for (int i = game.getVp() + 1; i <= 14; i++) {
-                graphics.setColor(Color.WHITE);
-                Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-                DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
-                g2.setColor(Color.PINK);
-                g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-            }
+
+        for (int i = 1 + Math.max(game.getVp(), pinkLimit); i <= greyLimit; i++) {
+            graphics.setColor(Color.WHITE);
+            Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            g2.setColor(Color.GRAY);
+            g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
         }
+
+        for (int i = game.getVp() + 1; i <= pinkLimit; i++) {
+            graphics.setColor(Color.WHITE);
+            Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            g2.setColor(Color.PINK);
+            g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+        }
+
         for (int i = 0; i <= game.getVp(); i++) {
             graphics.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
@@ -1150,6 +1158,15 @@ public class MapGenerator implements AutoCloseable {
             overlayText = cardCount + "/" + fullDeck + " cards in the deck";
             addWebsiteOverlay("Paradigm Deck", overlayText, x, y, cardWidth, cardHeight);
             x += horSpacing;
+
+            if (game.getTyrantUserID().isEmpty()) {
+                String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+                if (tyrantFile != null) {
+                    BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
+                    graphics.drawImage(bufferedImage, x + 15, y - 13, null);
+                }
+                x += 200;
+            }
         }
 
         return x;
@@ -2269,6 +2286,7 @@ public class MapGenerator implements AutoCloseable {
             y += ObjectiveBox.getVerticalSpacing();
         }
 
+        maxY = Math.max(y, maxY);
         return maxY + 15;
     }
 

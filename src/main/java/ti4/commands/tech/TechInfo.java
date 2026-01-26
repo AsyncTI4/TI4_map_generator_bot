@@ -7,12 +7,12 @@ import ti4.service.info.TechInfoService;
 
 class TechInfo extends GameStateSubcommand {
 
-    public TechInfo() {
+    TechInfo() {
         super(Constants.INFO, "Send technology information to your #cards-info thread", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        TechInfoService.sendTechInfo(getGame(), getPlayer(), event);
+        TechInfoService.sendTechInfo(getPlayer(), event);
     }
 }

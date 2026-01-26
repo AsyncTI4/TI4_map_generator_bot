@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -155,6 +156,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithButtons(
             MessageChannel channel, String messageText, List<Button> buttons) {
+        if (channel == null) return;
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (GameManager.isValid(gameName)
                 && buttons instanceof ArrayList
@@ -276,7 +278,7 @@ public class MessageHelper {
                                 String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
 
                                 if (!po.isEmpty() && !so.isEmpty()) {
-                                    if (scored.length() == 0) {
+                                    if (scored.isEmpty()) {
                                         scored = new StringBuilder(player.getFaction());
                                     } else {
                                         scored.append("_").append(player.getFaction());
@@ -347,13 +349,18 @@ public class MessageHelper {
     }
 
     public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
+        sendFileUploadToChannel(channel, fileUpload, null);
+    }
+
+    public static void sendFileUploadToChannel(
+            MessageChannel channel, FileUpload fileUpload, @Nullable Consumer<Message> onSuccess) {
         if (fileUpload == null) {
             BotLogger.error("FileUpload null");
             return;
         }
         channel.sendFiles(fileUpload)
                 .queue(
-                        null,
+                        onSuccess,
                         error -> BotLogger.error(
                                 getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error),
                                 error));
@@ -381,6 +388,15 @@ public class MessageHelper {
 
     public static void sendFileToChannelAndAddLinkToButtons(
             MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
+        sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons, null);
+    }
+
+    public static void sendFileToChannelAndAddLinkToButtons(
+            MessageChannel channel,
+            FileUpload fileUpload,
+            String message,
+            List<Button> buttons,
+            @Nullable Consumer<Message> onSuccess) {
         if (fileUpload == null) {
             BotLogger.error("FileUpload null");
             return;
@@ -389,6 +405,9 @@ public class MessageHelper {
         channel.sendFiles(fileUpload)
                 .queue(
                         msg -> {
+                            if (onSuccess != null) {
+                                onSuccess.accept(msg);
+                            }
                             String link = msg.getAttachments().getFirst().getUrl();
                             realButtons.add(Button.link(link, "Open in browser"));
                             realButtons.addAll(buttons);
@@ -399,7 +418,16 @@ public class MessageHelper {
 
     public static void sendFileToChannelWithButtonsAfter(
             MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
-        sendFileUploadToChannel(channel, fileUpload);
+        sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons, null);
+    }
+
+    public static void sendFileToChannelWithButtonsAfter(
+            MessageChannel channel,
+            FileUpload fileUpload,
+            String message,
+            List<Button> buttons,
+            @Nullable Consumer<Message> onSuccess) {
+        sendFileUploadToChannel(channel, fileUpload, onSuccess);
         splitAndSent(message, channel, null, buttons);
     }
 
@@ -721,7 +749,7 @@ public class MessageHelper {
         if (player != null && player.getUser() != null && player.getUser().isBot() && !game.isCommunityMode()) {
             return true;
         }
-        return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
+        return sendPrivateMessageToPlayer(player, game, null, messageText, null, null);
     }
 
     /**
