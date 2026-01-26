@@ -2943,7 +2943,8 @@ public class ButtonHelperFactionSpecific {
                 .flatMap(uh -> uh.getUnits().entrySet().stream()
                         .filter(e -> e.getValue() > 0)
                         .map(Map.Entry::getKey))
-                .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID()))
+                .filter(unitKey -> !colorsBlockading.contains(unitKey.getColorID())
+                        && !player.getColorID().equalsIgnoreCase(unitKey.getColorID()))
                 .collect(Collectors.toSet());
         return availableUnits.stream()
                 .filter(unitKey -> vortexButtonAvailable(game, unitKey))

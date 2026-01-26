@@ -293,6 +293,16 @@ public class BreakthroughCommandHelper {
                         player.removeOwnedUnitByID("naaz_mech");
                         player.removeOwnedUnitByID("naaz_mech_space");
                     }
+                } else {
+                    player.setBreakthroughActive(btID, false);
+                    String message =
+                            player.getRepresentation() + " deactivated their _" + bt.getName() + "_ breakthrough.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                    if ("naazbt".equalsIgnoreCase(bt.getAlias())) {
+                        player.removeOwnedUnitByID("naaz_voltron");
+                        player.addOwnedUnitByID("naaz_mech");
+                        player.addOwnedUnitByID("naaz_mech_space");
+                    }
                 }
             } else {
                 switch (btID) {

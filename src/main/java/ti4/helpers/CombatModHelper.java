@@ -17,7 +17,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
-import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -453,11 +452,13 @@ public class CombatModHelper {
             }
             case "galvanized" -> {
                 if (tile != null) {
-                    UnitHolder uh = getCorrectUnitHolder(unitsByQuantity, tile, opponent);
-                    for (UnitKey uk :
-                            uh.getUnitsByStateForPlayer(player.getColorID()).keySet()) {
-                        if (uh.getGalvanizedUnitCount(uk) > 0) {
-                            meetsCondition = true;
+                    for (UnitHolder uh : tile.getUnitHolders().values()) {
+                        // UnitHolder uh = getCorrectUnitHolder(unitsByQuantity, tile, opponent);
+                        for (UnitKey uk :
+                                uh.getUnitsByStateForPlayer(player.getColorID()).keySet()) {
+                            if (uh.getGalvanizedUnitCount(uk) > 0) {
+                                meetsCondition = true;
+                            }
                         }
                     }
                 }
@@ -732,7 +733,7 @@ public class CombatModHelper {
                 case "opponent_sftt" -> scalingCount = getOpponentSfttCount(opponent);
                 case "nonhome_system_with_planet" -> scalingCount = getSystemsWithControlledPlanets(game, player);
                 case "galvanized_unit_count" ->
-                    scalingCount = getGalvanizedUnitCount(game, activeSystem, origUnit, player);
+                    scalingCount = getGalvanizedUnitCount(game, unitHolder, origUnit, player);
                 case "unique_ships" -> scalingCount = getUniqueNonFighterShipCount(game, activeSystem, player);
                 case Constants.MOD_OPPONENT_UNIT_TECH -> {
                     if (opponent != null) {
@@ -799,16 +800,21 @@ public class CombatModHelper {
         return count;
     }
 
-    public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {
+    // public static int getGalvanizedUnitCount(Game game, Tile activeSystem, UnitModel origUnit, Player player) {
+    //     UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
+    //     UnitHolder space = activeSystem.getSpaceUnitHolder();
+    //     if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
+    //         for (Planet planet : activeSystem.getPlanetUnitHolders()) {
+    //             if (planet.getUnitCount(uk) > 0) {
+    //                 space = planet;
+    //             }
+    //         }
+    //     }
+    //     return space.getGalvanizedUnitCount(uk);
+    // }
+
+    public static int getGalvanizedUnitCount(Game game, UnitHolder uH, UnitModel origUnit, Player player) {
         UnitKey uk = Units.getUnitKey(origUnit.getUnitType(), player.getColorID());
-        UnitHolder space = activeSystem.getSpaceUnitHolder();
-        if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
-            for (Planet planet : activeSystem.getPlanetUnitHolders()) {
-                if (planet.getUnitCount(uk) > 0) {
-                    space = planet;
-                }
-            }
-        }
-        return space.getGalvanizedUnitCount(uk);
+        return uH.getGalvanizedUnitCount(uk);
     }
 }
