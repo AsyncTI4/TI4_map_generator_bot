@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -108,7 +107,7 @@ public class GameSettings extends SettingsMenu {
         }
 
         bpp = mapTemplate.getValue().bluePerPlayer();
-        decks = new DeckSettings(json, this, Optional.ofNullable(game));
+        decks = new DeckSettings(json, this, game);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------

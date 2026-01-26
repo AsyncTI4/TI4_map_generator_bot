@@ -163,12 +163,12 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isScar() {
-        return Optional.of(isScar).orElse(false);
+        return isScar;
     }
 
     @JsonIgnore
     public boolean isAnomaly() {
-        return asteroidField || gravityRift || nebula || supernova || isScar();
+        return asteroidField || gravityRift || nebula || supernova || isScar;
     }
 
     @JsonIgnore

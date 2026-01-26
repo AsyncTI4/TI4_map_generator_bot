@@ -109,6 +109,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean isWild(Game game) {
-        return (game != null) && Optional.of(affectedByWildWildGalaxy).orElse(false) && game.isWildWildGalaxyMode();
+        return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode();
     }
 }
