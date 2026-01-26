@@ -5,8 +5,8 @@ import static software.amazon.awssdk.utils.StringUtils.isBlank;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 
