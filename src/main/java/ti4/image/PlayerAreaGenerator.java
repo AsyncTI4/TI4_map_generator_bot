@@ -1539,7 +1539,7 @@ class PlayerAreaGenerator {
                 boolean isExhausted = exhaustedTechs.contains(tech)
                         || exhaustedTechs.contains(
                                 "tf-singularity" + initials.toLowerCase().charAt(t));
-                drawPAImage(x + deltaX, y, "pa_tech_techicons_tf_generic_" + (isExhausted ? "exh" : "rdy") + ".png");
+                drawPAImage(x + deltaX, y, "pa_tech_techicons_generictf_" + (isExhausted ? "exh" : "rdy") + ".png");
                 TechnologyModel techModel = Mapper.getTech(tech);
                 Color foreground = isExhausted ? Color.GRAY : Color.WHITE;
                 graphics.setFont(Storage.getFont48());
@@ -2548,7 +2548,7 @@ class PlayerAreaGenerator {
 
         int deltaX = 0;
         if (game.isTwilightsFallMode()) {
-            deltaX = techField(x, y, techsFiltered.get("none"), exhaustedTechs, deltaX, player);
+            deltaX = techField(x, y, techsFiltered.get("generictf"), exhaustedTechs, deltaX, player);
         }
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, deltaX, player);
