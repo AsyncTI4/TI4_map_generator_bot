@@ -1664,12 +1664,6 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), message2);
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), "**🤝 Transaction:** " + message2);
             }
-            if (oldWay) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getCardsInfoThread(),
-                        ident + ", use these buttons to complete the transaction.",
-                        goAgainButtons);
-            }
         } else {
             TextChannel channel = game.getMainGameChannel();
             if ("pbd1000".equalsIgnoreCase(game.getName())) {
@@ -1680,12 +1674,12 @@ public class TransactionHelper {
                             || message2.toLowerCase().contains("support"))) {
                 MessageHelper.sendMessageToChannel(channel, message2);
             }
-            if (oldWay) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p1.getCardsInfoThread(),
-                        ident + ", use these buttons to complete the transaction.",
-                        goAgainButtons);
-            }
+        }
+        if (oldWay) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    p1.getCardsInfoThread(),
+                    ident + ", use these buttons to complete the transaction.",
+                    goAgainButtons);
         }
     }
 
@@ -1713,7 +1707,7 @@ public class TransactionHelper {
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append("## " + player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
+        sb.append("## ").append(player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
         if (!canTheseTwoTransact(game, player, player2)) {
             sb.append("you cannot transact with ")
                     .append(player2.getRepresentation(false, false))
@@ -1817,7 +1811,7 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
-        if (blackMarket && p1.getSecretsUnscored().size() > 0) {
+        if (blackMarket && !p1.getSecretsUnscored().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
         }

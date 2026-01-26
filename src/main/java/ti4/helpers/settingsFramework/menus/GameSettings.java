@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -14,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
@@ -55,16 +55,16 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public GameSettings(Game game, JsonNode json, SettingsMenu parent) {
+    GameSettings(@NotNull Game game, JsonNode json, SettingsMenu parent) {
         super("game", "General Game Settings", "Adjust settings for the game such as point total", parent);
 
         // Initialize Settings to default values
-        int defaultVP = game == null ? 10 : game.getVp();
+        int defaultVP = game.getVp();
         pointTotal = new IntegerSetting("Points", "Point Total", defaultVP, 1, 20, 1);
         stage1s = new IntegerSetting("Stage1s", "number of Stage 1 public objectives", 5, 1, 20, 1);
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
-        boolean defaultTigl = game != null && game.isCompetitiveTIGLGame();
+        boolean defaultTigl = game.isCompetitiveTIGLGame();
         tigl = new BooleanSetting("TIGL", "TIGL Game", defaultTigl);
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
         mapTemplate = new ChoiceSetting<>("Template", "Map Template", "6pStandard");
@@ -108,7 +108,7 @@ public class GameSettings extends SettingsMenu {
         }
 
         bpp = mapTemplate.getValue().bluePerPlayer();
-        decks = new DeckSettings(json, this, Optional.ofNullable(game));
+        decks = new DeckSettings(json, this, game);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------

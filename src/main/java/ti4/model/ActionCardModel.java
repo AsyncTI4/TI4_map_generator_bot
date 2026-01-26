@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -109,8 +109,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean isWild(Game game) {
-        return (game != null)
-                && Optional.ofNullable(affectedByWildWildGalaxy).orElse(false)
-                && game.isWildWildGalaxyMode();
+        return (game != null) && affectedByWildWildGalaxy && game.isWildWildGalaxyMode();
     }
 }

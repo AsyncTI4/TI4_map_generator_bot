@@ -464,7 +464,7 @@ public class DSHelperBreakthroughs {
     public static void edynbtSelect(Game game, Player p1, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p1.getSecretsUnscored().size() > 0) {
+        if (!p1.getSecretsUnscored().isEmpty()) {
             for (String soID : p1.getSecretsUnscored().keySet()) {
                 buttons.add(Buttons.blue(
                         p1.getFinsFactionCheckerPrefix() + "edynbtTarget_" + p2.getFaction() + "_" + soID,
@@ -495,7 +495,7 @@ public class DSHelperBreakthroughs {
                     p1.getFactionNameOrColor() + " has shown you the secret objective: " + so.getName() + ".",
                     so.getRepresentationEmbed());
         }
-        if (p2.getSecretsUnscored().size() > 0) {
+        if (!p2.getSecretsUnscored().isEmpty()) {
             buttons.add(Buttons.green(
                     "edynbtFinal_showSecret_" + p1.getFaction(),
                     "Show Random Secret Objective to " + p1.getFactionNameOrColor()));
@@ -517,7 +517,7 @@ public class DSHelperBreakthroughs {
         if ("showSecret".equals(action)) {
             List<String> unscoredSOs = new ArrayList<>(p1.getSecretsUnscored().keySet());
             Collections.shuffle(unscoredSOs);
-            String randomSOID = unscoredSOs.get(0);
+            String randomSOID = unscoredSOs.getFirst();
             SecretObjectiveModel so = Mapper.getSecretObjective(randomSOID);
             if (so != null) {
                 MessageHelper.sendMessageToChannelWithEmbed(

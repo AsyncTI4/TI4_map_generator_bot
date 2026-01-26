@@ -19,9 +19,4 @@ class BreakthroughReady extends GameStateSubcommand {
         List<String> ids = BreakthroughCommandHelper.getBreakthroughsFromEvent(event, getPlayer());
         BreakthroughCommandHelper.readyBreakthroughs(getPlayer(), ids);
     }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return false;
-    }
 }

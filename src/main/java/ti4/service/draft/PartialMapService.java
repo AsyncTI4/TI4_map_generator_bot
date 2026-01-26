@@ -2,6 +2,7 @@ package ti4.service.draft;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.AliasHandler;
@@ -115,7 +116,7 @@ public class PartialMapService {
                     continue;
                 }
 
-                if (templateTile.getPlayerNumber() != position) {
+                if (!Objects.equals(templateTile.getPlayerNumber(), position)) {
                     // Doesn't pertain to this player
                     continue;
                 }

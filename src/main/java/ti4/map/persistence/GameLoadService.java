@@ -986,21 +986,15 @@ class GameLoadService {
                     player.getBreakthroughTGs().put(bt, stuff);
                 }
                 // END DELETE
-                case Constants.BREAKTHROUGHS -> {
-                    player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
-                }
-                case Constants.BREAKTHROUGH_EXH_MAP -> {
+                case Constants.BREAKTHROUGHS -> player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH_MAP ->
                     player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));
-                }
-                case Constants.BREAKTHROUGH_UNL_MAP -> {
+                case Constants.BREAKTHROUGH_UNL_MAP ->
                     player.setBreakthroughUnlocked(getParsedStrBoolMap(tokenizer.nextToken()));
-                }
-                case Constants.BREAKTHROUGH_ACTV_MAP -> {
+                case Constants.BREAKTHROUGH_ACTV_MAP ->
                     player.setBreakthroughActive(getParsedStrBoolMap(tokenizer.nextToken()));
-                }
-                case Constants.BREAKTHROUGH_TGS_MAP -> {
+                case Constants.BREAKTHROUGH_TGS_MAP ->
                     player.setBreakthroughTGs(getParsedStrIntMap(tokenizer.nextToken()));
-                }
                 case Constants.STRATEGY_CARD ->
                     player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream()
                             .map(Integer::valueOf)

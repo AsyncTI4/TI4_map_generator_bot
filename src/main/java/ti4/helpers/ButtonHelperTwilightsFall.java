@@ -893,7 +893,7 @@ public class ButtonHelperTwilightsFall {
                 }
             }
         }
-        if (buttons.size() > 0) {
+        if (!buttons.isEmpty()) {
             buttons.add(Buttons.red("deleteButtons", "Done"));
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                     player.getCardsInfoThread(),

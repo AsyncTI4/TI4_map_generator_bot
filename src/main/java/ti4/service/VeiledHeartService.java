@@ -106,11 +106,8 @@ public class VeiledHeartService {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> {
-            VeiledCardType.fromCard(card).ifPresent(type -> {
-                veiledCardsByType.get(type).add(card);
-            });
-        });
+        getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
+                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 
@@ -165,18 +162,16 @@ public class VeiledHeartService {
         Stream.of(VeiledCardAction.values())
                 .filter(action -> actionString.equalsIgnoreCase(action.toString()))
                 .findAny()
-                .ifPresent(action -> {
-                    Stream.of(VeiledCardType.values())
-                            .filter(type -> typeString.equalsIgnoreCase(type.toString()))
-                            .findAny()
-                            .ifPresent(type -> {
-                                if (card.isEmpty()) {
-                                    sendVeiledButtons(action, type, player);
-                                } else {
-                                    doAction(action, type, player, card);
-                                }
-                            });
-                });
+                .ifPresent(action -> Stream.of(VeiledCardType.values())
+                        .filter(type -> typeString.equalsIgnoreCase(type.toString()))
+                        .findAny()
+                        .ifPresent(type -> {
+                            if (card.isEmpty()) {
+                                sendVeiledButtons(action, type, player);
+                            } else {
+                                doAction(action, type, player, card);
+                            }
+                        }));
         ButtonHelper.deleteMessage(event);
     }
 

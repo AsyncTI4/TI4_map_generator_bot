@@ -121,11 +121,11 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // First add powerful factions
         for (int i = 0; i < buildPackages; i++) {
             packages.add(new ArrayList<>());
-            packages.get(i).add(strongFactions.remove(0));
+            packages.get(i).add(strongFactions.removeFirst());
         }
         // Then add weak factions
         for (int i = 0; i < buildPackages; i++) {
-            packages.get(i).add(weakFactions.remove(0));
+            packages.get(i).add(weakFactions.removeFirst());
         }
         // Then mix ALL remaining factions together
         List<String> remainingFactions = new ArrayList<>();
@@ -138,7 +138,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         // We only need to finish numPackages
         for (int i = 0; i < numPackages; i++) {
             List<String> currentPackage = packages.get(i);
-            currentPackage.add(remainingFactions.remove(0));
+            currentPackage.add(remainingFactions.removeFirst());
             currentPackage.sort((p1, p2) -> {
                 FactionModel f1 = Mapper.getFaction(p1);
                 FactionModel f2 = Mapper.getFaction(p2);
@@ -438,7 +438,8 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         SourceSettings sourceSettings = draftSystemSettings.getSourceSettings();
 
         // Use preset packages when provided
-        if (settings.getParsedPackages() != null && settings.getParsedPackages().size() > 0) {
+        if (settings.getParsedPackages() != null
+                && !settings.getParsedPackages().isEmpty()) {
             referenceCardPackages.clear();
             for (ReferenceCardPackage refPackage : settings.getParsedPackages()) {
                 referenceCardPackages.put(refPackage.key(), refPackage);
@@ -715,6 +716,6 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
                 .filter(f -> !f.getAlias().contains("keleres"))
                 .collect(Collectors.toList());
         Collections.shuffle(availableFactions);
-        return availableFactions.isEmpty() ? null : availableFactions.get(0);
+        return availableFactions.isEmpty() ? null : availableFactions.getFirst();
     }
 }

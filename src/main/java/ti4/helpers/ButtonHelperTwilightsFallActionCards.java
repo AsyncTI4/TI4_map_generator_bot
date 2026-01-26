@@ -425,11 +425,11 @@ public class ButtonHelperTwilightsFallActionCards {
         }
         int max = 0;
         String bestFaction = "";
-        for (String k : factions.keySet()) {
-            Integer v = factions.get(k);
+        for (Map.Entry<String, Integer> entry : factions.entrySet()) {
+            Integer v = entry.getValue();
             if (v > max) {
                 max = v;
-                bestFaction = k;
+                bestFaction = entry.getKey();
             }
         }
 

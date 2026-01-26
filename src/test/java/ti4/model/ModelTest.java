@@ -11,7 +11,7 @@ public abstract class ModelTest<T extends ModelInterface> extends BaseTi4Test {
 
     public List<T> getModelList() {
         return getModels().values().stream()
-                .sorted(Comparator.comparing(model -> model.getAlias()))
+                .sorted(Comparator.comparing(ModelInterface::getAlias))
                 .toList();
     }
 
