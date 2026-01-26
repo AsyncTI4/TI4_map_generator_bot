@@ -2282,20 +2282,20 @@ public class ButtonHelper {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
-            List<Button> buttonsWeb = Buttons.mapImageButtons(game);
-            Consumer<Message> persistMessageId = msg -> SpringContext.getBean(GameImageService.class)
-                    .saveDiscordMessageId(
-                            game,
-                            msg.getIdLong(),
-                            msg.getGuild().getIdLong(),
-                            msg.getChannel().getIdLong());
-
             if (game.isFowMode()) {
                 if (!event.getMessageChannel().getName().contains("announcements")) {
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
                 }
                 return;
             }
+
+            List<Button> buttonsWeb = Buttons.mapImageButtons(game);
+            Consumer<Message> persistMessageId = msg -> SpringContext.getBean(GameImageService.class)
+                .saveDiscordMessageId(
+                    game,
+                    msg.getIdLong(),
+                    msg.getGuild().getIdLong(),
+                    msg.getChannel().getIdLong());
 
             for (ThreadChannel thread : threadChannels) {
                 if (threadName.equals(thread.getName())) {
