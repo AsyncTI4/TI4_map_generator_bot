@@ -163,7 +163,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isScar() {
-        return Optional.ofNullable(isScar).orElse(false);
+        return Optional.of(isScar).orElse(false);
     }
 
     @JsonIgnore

@@ -128,7 +128,7 @@ public class PlayerTechService {
             if (singularity) {
                 List<String> singularityTechs = player.getSingularityTechs();
                 if (!singularityTechs.isEmpty()) {
-                    newestTech = singularityTechs.get(singularityTechs.size() - 1);
+                    newestTech = singularityTechs.getLast();
                 }
             } else {
                 for (String nekroTech : player.getTechs()) {

@@ -105,9 +105,18 @@ public class EidolonMaximumService {
                     uh.removeUnit(mech, uh.getUnitCount(mech));
                 }
             }
-            String message = "-# Ready to form Voltron!\n-# Activate interlocks!\n-# Dyna-therms connected."
-                    + "\n-# Infra-cells up!\n-# Mega-thrusters are go!\n-# Let's go, Voltron Force!"
-                    + "\n-# Form feet and legs!\n-# Form arms and body!\n-# And I'll form the head!";
+            String message = """
+                -# Ready to form Voltron!
+                -# Activate interlocks!
+                -# Dyna-therms connected.\
+
+                -# Infra-cells up!
+                -# Mega-thrusters are go!
+                -# Let's go, Voltron Force!\
+
+                -# Form feet and legs!
+                -# Form arms and body!
+                -# And I'll form the head!""";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             BreakthroughCommandHelper.activateBreakthrough(event, player, "naazbt");
         });

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Use this annotation for potentially duplicated parameter types, because annotation handler cannot read the parameter names
  * <p>
- * It is technically possible to get the parameter names by updating the compiler settings {@link https://stackoverflow.com/questions/2237803/can-i-obtain-method-parameter-name-using-java-reflection}
+ * It is technically possible to get the parameter names by updating the compiler settings {@link <a href="https://stackoverflow.com/questions/2237803/can-i-obtain-method-parameter-name-using-java-reflection">...</a>}
  */
 @Documented
 @Retention(RUNTIME)

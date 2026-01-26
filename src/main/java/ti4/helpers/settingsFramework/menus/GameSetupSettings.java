@@ -92,7 +92,7 @@ public class GameSetupSettings extends SettingsMenu {
             gamePlayers.initialize(json.get("gamePlayers"));
         }
 
-        decks = new DeckSettings(json, this, Optional.ofNullable(game));
+        decks = new DeckSettings(json, this, Optional.of(game));
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------

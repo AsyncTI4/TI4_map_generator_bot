@@ -48,11 +48,11 @@ public class SilverFlameService {
     }
 
     private List<Button> silverFlameResolveButtons(Game game, Player player, Die resultDie) {
-        List<Button> resolveButtons = new ArrayList<>();
         String ffcc = player.finChecker();
         Button good = Buttons.green(ffcc + "resolveSilverFlamePoint", "Gain 1 Victory Point", CardEmojis.Public1alt);
         Button bad = Buttons.red(ffcc + "resolveSilverFlamePurge", "Purge your Home System", TileEmojis.TileRedBack);
-        resolveButtons.addAll(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
+        List<Button> resolveButtons =
+                new ArrayList<>(HeartOfIxthService.makeHeartOfIxthButtons(game, player, good, bad, resultDie));
 
         // TODO: other mykomentori related buttons
         // if (player.getPromissoryNotesInPlayArea().contains("dspnmyko") &&
@@ -127,7 +127,7 @@ public class SilverFlameService {
         String flame = "The Silver Flame";
         Integer id = game.getRevealedPublicObjectives().getOrDefault(flame, null);
 
-        String message = null;
+        String message;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
             message = player.getRepresentation() + " scored \"" + flame + "\".";

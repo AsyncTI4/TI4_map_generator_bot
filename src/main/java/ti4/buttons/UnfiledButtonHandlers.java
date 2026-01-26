@@ -1,6 +1,8 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -2071,7 +2073,7 @@ public class UnfiledButtonHandlers {
                     }
                 }
                 if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
-                    if (malevolency && player.getMahactCC().size() > 0) {
+                    if (malevolency && !player.getMahactCC().isEmpty()) {
                         malevolency = false;
                         MahactTokenService.removeFleetCC(game, player, "due to _Malevolency_");
                     }
@@ -2356,13 +2358,13 @@ public class UnfiledButtonHandlers {
             if (buttonID.contains("tacticalAction")
                     && game.getStoredValue("ASN" + player.getFaction()).isEmpty()) {
                 ButtonHelperTacticalAction.endOfTacticalActionThings(player, game, event);
-                List<Button> systemButtons2 = new ArrayList<>();
+                List<Button> systemButtons2;
                 if (player.hasUnexhaustedLeader("sardakkagent")) {
                     String message = player.getRepresentationUnfogged() + ", you may use "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "T'ro, the N'orr" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                             + " agent.";
-                    systemButtons2.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
+                    systemButtons2 = new ArrayList<>(ButtonHelperAgents.getSardakkAgentButtons(game));
                     systemButtons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
@@ -3450,7 +3452,7 @@ public class UnfiledButtonHandlers {
                     malevolency = true;
                 }
             }
-            if (malevolency && player.getMahactCC().size() > 0) {
+            if (malevolency && !player.getMahactCC().isEmpty()) {
                 malevolency = false;
                 mahactMalev = true;
             }
@@ -3487,7 +3489,7 @@ public class UnfiledButtonHandlers {
                                 + ", heads up, the bot thinks you should gain " + (properGain == 1 ? "only " : "")
                                 + properGain + " command token"
                                 + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
-                if (player.getMahactCC().size() > 0 && mahactMalev) {
+                if (!player.getMahactCC().isEmpty() && mahactMalev) {
                     String malevMsg = "## " + player.getRepresentationUnfogged() + " you should gain your normal";
                     malevMsg += " amount of tokens now, and then you will have the option to lose your own or another";
                     malevMsg += " player's command token from your fleet pool due to _Malevolency_. Plan accordingly.";

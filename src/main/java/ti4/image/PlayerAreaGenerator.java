@@ -2401,12 +2401,12 @@ class PlayerAreaGenerator {
             if (StringUtils.isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 if (planet.getTechSpecialities().size() > 1) {
-                    String techType = "";
+                    StringBuilder techType = new StringBuilder();
                     for (String type : planet.getTechSpecialities()) {
-                        techType += type.toLowerCase();
+                        techType.append(type.toLowerCase());
                     }
                     String abbrev = "";
-                    switch (techType) {
+                    switch (techType.toString()) {
                         case "propulsionpropulsion" -> abbrev = "bb";
                         case "warfarewarfare" -> abbrev = "rr";
                         case "cyberneticcybernetic" -> abbrev = "yy";
@@ -3143,8 +3143,7 @@ class PlayerAreaGenerator {
                 if ("fs".equals(unit.getAsyncId())) {
                     String unitFaction = unit.getFaction().orElse("nekro").toLowerCase();
                     if (player.hasUnlockedBreakthrough("nekrobt")) {
-                        List<String> flagships = new ArrayList<>();
-                        flagships.addAll(
+                        List<String> flagships = new ArrayList<>(
                                 Arrays.asList(game.getStoredValue("valefarZ").split("\\|")));
                         Point offs = new Point(unitFactionOffset.x - 24, unitFactionOffset.y - 24);
                         if (flagships.size() > 1) {

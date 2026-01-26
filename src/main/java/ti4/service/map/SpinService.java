@@ -66,7 +66,7 @@ public class SpinService {
         }
 
         public static List<String> valuesAsStringList() {
-            return List.of(values()).stream().map(v -> v.toString()).collect(Collectors.toList());
+            return List.of(values()).stream().map(Enum::toString).collect(Collectors.toList());
         }
     }
 
@@ -93,7 +93,7 @@ public class SpinService {
         }
 
         public static List<String> valuesAsStringList() {
-            return List.of(values()).stream().map(v -> v.toString()).collect(Collectors.toList());
+            return List.of(values()).stream().map(Enum::toString).collect(Collectors.toList());
         }
     }
 
@@ -211,11 +211,11 @@ public class SpinService {
         }
 
         public int ring() {
-            return ring.size() > 1 ? RandomHelper.pickRandomFromList(ring) : ring.get(0);
+            return ring.size() > 1 ? RandomHelper.pickRandomFromList(ring) : ring.getFirst();
         }
 
         public int steps() {
-            return steps.size() > 1 ? RandomHelper.pickRandomFromList(steps) : steps.get(0);
+            return steps.size() > 1 ? RandomHelper.pickRandomFromList(steps) : steps.getFirst();
         }
 
         public Direction direction() {
@@ -290,8 +290,9 @@ public class SpinService {
                 }
             }
             if (!overTheBoundsWarning.isEmpty()) {
-                sb.append("-# ⚠️ Setting " + String.join(",", overTheBoundsWarning)
-                        + " could cause tiles to spin over the map edge.");
+                sb.append("-# ⚠️ Setting ")
+                        .append(String.join(",", overTheBoundsWarning))
+                        .append(" could cause tiles to spin over the map edge.");
             }
         }
 
@@ -311,7 +312,8 @@ public class SpinService {
             game.setSpinMode("OFF");
         } else {
             game.setSpinMode(String.join(
-                    SETTING_SEPARATOR, settings.stream().map(s -> s.toString()).collect(Collectors.toList())));
+                    SETTING_SEPARATOR,
+                    settings.stream().map(SpinSetting::toString).collect(Collectors.toList())));
         }
     }
 
