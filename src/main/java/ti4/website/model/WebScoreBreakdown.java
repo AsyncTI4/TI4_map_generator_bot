@@ -144,13 +144,13 @@ public class WebScoreBreakdown {
 
                 // Handle custodians - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.CUSTODIAN.equals(poKey)) {
-                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
+                    addMultiScoredEntries(player, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
                     continue;
                 }
 
                 // Handle imperial - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.IMPERIAL_RIDER.equals(poKey)) {
-                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
+                    addMultiScoredEntries(player, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
                     continue;
                 }
 
@@ -756,7 +756,6 @@ public class WebScoreBreakdown {
 
     private static void addMultiScoredEntries(
             Player player,
-            String poKey,
             List<String> scoringPlayers,
             EntryType type,
             Game game,

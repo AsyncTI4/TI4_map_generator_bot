@@ -386,8 +386,8 @@ public class AndcatReferenceCardsMessageHelper {
                 if (otherPlayerPicks.isEmpty()) {
                     continue;
                 }
-                ReferenceCardPackage otherRefPackage =
-                        draftable.getPackageByChoiceKey(otherPlayerPicks.get(0).getChoiceKey());
+                ReferenceCardPackage otherRefPackage = draftable.getPackageByChoiceKey(
+                        otherPlayerPicks.getFirst().getChoiceKey());
                 if (otherRefPackage == null) {
                     continue;
                 }
@@ -578,7 +578,7 @@ public class AndcatReferenceCardsMessageHelper {
             StringBuilder pickSummary = new StringBuilder(
                     playerName + "'s reference card picks: " + System.lineSeparator() + System.lineSeparator());
             ReferenceCardPackage refPackage =
-                    draftable.getPackageByChoiceKey(picks.get(0).getChoiceKey());
+                    draftable.getPackageByChoiceKey(picks.getFirst().getChoiceKey());
             if (refPackage.homeSystemFaction() != null) {
                 FactionModel homeSystemFaction = Mapper.getFaction(refPackage.homeSystemFaction());
                 pickSummary.append(TwilightsFallInfoHelper.getFactionSetupInfo(homeSystemFaction, false, true, false));
@@ -617,7 +617,7 @@ public class AndcatReferenceCardsMessageHelper {
             }
 
             ReferenceCardPackage refPackage =
-                    draftable.getPackageByChoiceKey(picks.get(0).getChoiceKey());
+                    draftable.getPackageByChoiceKey(picks.getFirst().getChoiceKey());
 
             if (refPackage.speakerOrderFaction() == null) {
                 unorderedPlayers.add(playerUserId);

@@ -114,14 +114,14 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (tfAbilityWindow == null) {
             return Optional.ofNullable(abilityWindow);
         }
-        return Optional.ofNullable(tfAbilityWindow);
+        return Optional.of(tfAbilityWindow);
     }
 
     public Optional<String> getTFAbilityText() {
         if (tfAbilityText == null) {
             return Optional.ofNullable(abilityText);
         }
-        return Optional.ofNullable(tfAbilityText);
+        return Optional.of(tfAbilityText);
     }
 
     public boolean isGenome() {

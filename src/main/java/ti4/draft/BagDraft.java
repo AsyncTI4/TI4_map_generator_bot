@@ -120,8 +120,7 @@ public abstract class BagDraft {
                 FrankenDraftBagService.displayPlayerHand(owner, p);
             } else {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
-                    List<DraftItem> draftableItems = new ArrayList<>();
-                    draftableItems.addAll(draftableItemsInBag(p));
+                    List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
                     findExistingBagChannel(p).getHistory().retrievePast(100).queue(m -> {
                         if (!m.isEmpty()) {
@@ -151,8 +150,7 @@ public abstract class BagDraft {
     }
 
     public List<DraftItem> draftableItemsInBag(Player player) {
-        ArrayList<DraftItem> draftableItems = new ArrayList<>();
-        draftableItems.addAll(player.getCurrentDraftBag().Contents.stream()
+        ArrayList<DraftItem> draftableItems = new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
                 .filter(draftItem -> draftItem.isDraftable(player))
                 .toList());
         return draftableItems;
@@ -353,8 +351,9 @@ public abstract class BagDraft {
                     .append(owner.getFrankenBagSize())
                     .append(")");
             if (player.isReadyToPassBag()) {
-                sb.append(" (passing a bag of size "
-                        + player.getCurrentDraftBag().Contents.size() + ")");
+                sb.append(" (passing a bag of size ")
+                        .append(player.getCurrentDraftBag().Contents.size())
+                        .append(")");
             }
             sb.append("\n");
         }
