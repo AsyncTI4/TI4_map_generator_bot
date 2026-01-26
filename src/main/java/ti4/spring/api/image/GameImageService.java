@@ -2,8 +2,9 @@ package ti4.spring.api.image;
 
 import static software.amazon.awssdk.utils.StringUtils.isBlank;
 
-import javax.annotation.Nullable;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -14,12 +15,10 @@ public class GameImageService {
 
     private final MapImageDataRepository mapImageDataRepository;
 
-    @Nullable
-    MapImageData getLatestMapImageData(String gameName) {
-        if (!GameManager.isValid(gameName)) return null;
-        return mapImageDataRepository
-                .findById(gameName)
-                .orElse(null);
+    @NotNull
+    Optional<MapImageData> getLatestMapImageData(String gameName) {
+        if (!GameManager.isValid(gameName)) return Optional.empty();
+        return mapImageDataRepository.findById(gameName);
     }
 
     public void saveMapImageName(Game game, String mapImageName) {

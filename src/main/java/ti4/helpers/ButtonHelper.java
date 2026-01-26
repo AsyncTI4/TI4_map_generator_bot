@@ -1507,7 +1507,7 @@ public class ButtonHelper {
                 }
             }
         }
-      return TeHelperUnits.affectedByQuietus(game, player, tile);
+        return TeHelperUnits.affectedByQuietus(game, player, tile);
     }
 
     public static int resolveOnActivationEnemyAbilities(
@@ -2282,34 +2282,30 @@ public class ButtonHelper {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
-            boolean foundSomething = false;
             List<Button> buttonsWeb = Buttons.mapImageButtons(game);
-            Consumer<Message> persistMessageId = msg -> {
-                SpringContext.getBean(GameImageService.class)
+            Consumer<Message> persistMessageId = msg -> SpringContext.getBean(GameImageService.class)
                     .saveDiscordMessageId(
-                        game,
-                        msg.getIdLong(),
-                        msg.getGuild().getIdLong(),
-                        msg.getChannel().getIdLong());
-            };
-            if (!game.isFowMode()) {
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        foundSomething = true;
-                        sendFileWithCorrectButtons(
-                                threadChannel_, fileUpload, message, buttonsWeb, game, persistMessageId);
-                    }
-                }
-            } else {
+                            game,
+                            msg.getIdLong(),
+                            msg.getGuild().getIdLong(),
+                            msg.getChannel().getIdLong());
+
+            if (game.isFowMode()) {
                 if (!event.getMessageChannel().getName().contains("announcements")) {
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
                 }
-                foundSomething = true;
+                return;
             }
-            if (!foundSomething) {
-                sendFileWithCorrectButtons(
-                        event.getMessageChannel(), fileUpload, message, buttonsWeb, game, persistMessageId);
+
+            for (ThreadChannel thread : threadChannels) {
+                if (threadName.equals(thread.getName())) {
+                    sendFileWithCorrectButtons(thread, fileUpload, message, buttonsWeb, game, persistMessageId);
+                    return;
+                }
             }
+
+            sendFileWithCorrectButtons(
+                    event.getMessageChannel(), fileUpload, message, buttonsWeb, game, persistMessageId);
         });
     }
 
