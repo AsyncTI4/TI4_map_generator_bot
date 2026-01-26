@@ -416,8 +416,8 @@
         "type": "agent",
         "name": "Maertin Donaais",
         "title": "Esteemed Philanthropist",
-        "abilityWindow": "When another player gains any number of commodities",
-        "abilityText": "After a player gains commodities, you may exhaust this card to convert that player's commodities to trade goods; if that player was another player, gain 2 commodities or draw 1 action card.",
+        "abilityWindow": "After a player gains commodities",
+        "abilityText": "You may exhaust this card to convert that player's commodities to trade goods; if that player was another player, gain 2 commodities or draw 1 action card.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },

@@ -1682,7 +1682,8 @@ public class ButtonHelper {
             String fincheckerForNonActive = "FFCC_" + nonActivePlayer.getFaction() + "_";
             String ident = nonActivePlayer.getRepresentationUnfogged();
             // eres
-            if (nonActivePlayer.hasTech("ers") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            if (nonActivePlayer.hasTech("ers")
+                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _E-Res Siphons_.");
@@ -1731,7 +1732,7 @@ public class ButtonHelper {
             }
             // neuroglaive
             boolean hasNg = nonActivePlayer.hasTech("ng") || nonActivePlayer.hasTech("absol_ng");
-            if (hasNg && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+            if (hasNg && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger _Neuroglaive_.");
@@ -1812,7 +1813,7 @@ public class ButtonHelper {
             }
 
             if (nonActivePlayer.hasAbility("survivalinstinct")
-                    && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)) {
+                    && FoWHelper.playerHasActualShipsInSystem(nonActivePlayer, activeSystem)) {
                 Player ralnel = nonActivePlayer;
                 List<Button> buttons =
                         TeHelperAbilities.getSurvivalInstinctSystemButtons(game, ralnel, activeSystem, null);

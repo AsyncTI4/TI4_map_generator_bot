@@ -14,6 +14,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -201,6 +202,7 @@ public class ButtonHelperTwilightsFallActionCards {
                 FractureService.spawnFracture(event, game);
                 FractureService.spawnIngressTokens(event, game, player, null);
             }
+            TeHelperTechs.initializePlanesplitterStep1(game, player);
         } else {
             Integer poIndex =
                     game.addCustomPO("Unravel " + Mapper.getRelic(relic).getName(), 1);
