@@ -36,25 +36,27 @@ class ChangeDebtIcon extends GameStateSubcommand {
 
         Emoji factionEmoji = Emoji.fromFormatted(icon);
         if (!(factionEmoji instanceof CustomEmoji || factionEmoji instanceof UnicodeEmoji)) {
-            MessageHelper.sendMessageToEventChannel(event, pool + " is not a supported emoji. Resetting to default.");
+            MessageHelper.sendMessageToEventChannel(event, icon + " is not a supported emoji. Resetting to default.");
             game.clearDebtPoolIcon(pool);
             return;
         }
         if ((factionEmoji instanceof UnicodeEmoji)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentationUnfogged() + " is setting the " + pool + " icon to " + icon + ".");
+                    event,
+                    player.getRepresentationUnfogged() + " is setting the \"" + pool + "\" icon to " + icon + ".");
             game.setDebtPoolIcon(pool, icon);
             return;
         }
         if ((factionEmoji instanceof CustomEmoji)) {
             MessageHelper.sendMessageToEventChannel(
-                    event, player.getRepresentationUnfogged() + " is setting the " + pool + " icon to " + icon + ".");
+                    event,
+                    player.getRepresentationUnfogged() + " is setting the \"" + pool + "\" icon to " + icon + ".");
             game.setDebtPoolIcon(pool, icon);
             return;
         }
         MessageHelper.sendMessageToEventChannel(
                 event,
-                "The bot cannot load " + pool
+                "The bot cannot load " + icon
                         + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
         game.clearDebtPoolIcon(pool);
     }
