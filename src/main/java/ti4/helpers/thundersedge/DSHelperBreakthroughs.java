@@ -197,7 +197,7 @@ public class DSHelperBreakthroughs {
         p1.getBreakthroughExhausted().put(btID, false);
         String message = p1.getRepresentation() + " readied _" + btModel.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
-        if (btID.equalsIgnoreCase("dihmohnbt")) {
+        if ("dihmohnbt".equalsIgnoreCase(btID)) {
             Tile tile = game.getTileByPosition(game.getActiveSystem());
             if (tile != null) {
                 List<Button> buttons =

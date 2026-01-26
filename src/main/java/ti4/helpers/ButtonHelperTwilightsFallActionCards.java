@@ -629,7 +629,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     }
                 }
                 player.addOwnedUnitByID(card);
-                found = "" + Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
+                found = Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
                 break;
             }
         }

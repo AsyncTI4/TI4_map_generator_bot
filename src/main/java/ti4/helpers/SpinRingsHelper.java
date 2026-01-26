@@ -34,8 +34,8 @@ public class SpinRingsHelper {
             "Galactic arms are spiraling",
             "Warped the orbital paths");
 
-    private static Map<String, Hex> indexToHex = new HashMap<>();
-    private static Map<Hex, String> hexToIndex = new HashMap<>();
+    private static final Map<String, Hex> indexToHex = new HashMap<>();
+    private static final Map<Hex, String> hexToIndex = new HashMap<>();
 
     static final int[][] RING_DIRS = {
         {1, 0}, // SE
@@ -58,9 +58,8 @@ public class SpinRingsHelper {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof Hex)) return false;
-            Hex h = (Hex) o;
-            return q == h.q && r == h.r;
+            if (!(o instanceof Hex h)) return false;
+          return q == h.q && r == h.r;
         }
 
         @Override
@@ -282,11 +281,10 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
 
-        StringBuilder sb = new StringBuilder("# " + randomStatusMessage());
-        sb.append("\n-# ").append(spunMessage(1, Direction.CW, 1, null, game.isFowMode()));
-        sb.append("\n-# ").append(spunMessage(2, Direction.CCW, 2, null, game.isFowMode()));
-        sb.append("\n-# ").append(spunMessage(3, Direction.CW, 3, null, game.isFowMode()));
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
+      String sb = "# " + randomStatusMessage() + "\n-# " + spunMessage(1, Direction.CW, 1, null, game.isFowMode()) +
+          "\n-# " + spunMessage(2, Direction.CCW, 2, null, game.isFowMode()) +
+          "\n-# " + spunMessage(3, Direction.CW, 3, null, game.isFowMode());
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb);
     }
 
     private static String spunMessage(int ring, Direction direction, int steps, String position, boolean fow) {

@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -78,10 +78,7 @@ public class UserSettings {
     }
 
     public boolean enoughHeatData() {
-        if (amountOfHeatData() > 150) {
-            return true;
-        }
-        return false;
+      return amountOfHeatData() > 150;
     }
 
     public int amountOfHeatData() {

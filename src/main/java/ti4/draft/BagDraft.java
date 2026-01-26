@@ -111,7 +111,7 @@ public abstract class BagDraft {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
                 setPlayerReadyToPass(p, true);
                 MessageHelper.sendMessageToChannel(
-                        this.findExistingBagChannel(p),
+                        findExistingBagChannel(p),
                         "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
                 MessageHelper.sendMessageToChannel(
                         p.getCardsInfoThread(),
@@ -123,12 +123,12 @@ public abstract class BagDraft {
                     List<DraftItem> draftableItems = new ArrayList<>();
                     draftableItems.addAll(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
-                    this.findExistingBagChannel(p)
+                    findExistingBagChannel(p)
                             .getHistory()
                             .retrievePast(100)
                             .queue(m -> {
                                 if (!m.isEmpty()) {
-                                    this.findExistingBagChannel(p)
+                                    findExistingBagChannel(p)
                                             .deleteMessages(m)
                                             .queue(Consumers.nop(), BotLogger::catchRestError);
                                 }
@@ -136,7 +136,7 @@ public abstract class BagDraft {
                     p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);
                     MessageHelper.sendMessageToChannel(
-                            this.findExistingBagChannel(p),
+                            findExistingBagChannel(p),
                             "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
                     MessageHelper.sendMessageToChannel(
                             p.getCardsInfoThread(),

@@ -254,8 +254,9 @@ public class AndcatReferenceCardsDraftableSettings extends SettingsMenu {
                 factionsInPackage.add(faction);
             }
             ReferenceCardPackage refPackage =
-                    new ReferenceCardPackage(packageKey++, factionsInPackage, null, null, null, null);
-            parsedPackages.add(refPackage);
+                    new ReferenceCardPackage(packageKey, factionsInPackage, null, null, null, null);
+          packageKey++;
+          parsedPackages.add(refPackage);
         }
 
         if (parsedPackages.size() < players) {

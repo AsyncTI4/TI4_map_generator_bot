@@ -12,7 +12,7 @@ import ti4.service.game.CreateGameService;
 
 class Setup extends GameStateSubcommand {
 
-    public Setup() {
+    Setup() {
         super(Constants.SETUP, "Game Setup", true, false);
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
