@@ -119,6 +119,17 @@ public class CombatRollService {
 
         Map<UnitModel, Integer> playerUnitsByQuantity =
                 getUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
+        if (rollType == CombatRollType.AFB && player.hasRelic("metalivoidarmaments")) {
+            UnitModel metaliFakeUnit = new UnitModel();
+            metaliFakeUnit.setAfbDieCount(3);
+            metaliFakeUnit.setAfbHitsOn(6);
+            metaliFakeUnit.setName("Metali Armaments");
+            metaliFakeUnit.setAsyncId("MetaliAFB");
+            metaliFakeUnit.setId("MetaliAFB");
+            metaliFakeUnit.setBaseType("dd");
+            metaliFakeUnit.setFaction(player.getFaction());
+            playerUnitsByQuantity.put(metaliFakeUnit, 1);
+        }
         String bombardPlanet = "";
         if (rollType == CombatRollType.bombardment
                 && !game.getStoredValue("bombardmentTarget" + player.getFaction())
@@ -333,7 +344,7 @@ public class CombatRollService {
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
-            Button decline = Buttons.gray("editMessage_" + player.getFactionEmoji() + " declined Thalnos", "Decline");
+            Button decline = Buttons.gray("deleteMessage", "Decline");
             String thalnosMessage =
                     "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(

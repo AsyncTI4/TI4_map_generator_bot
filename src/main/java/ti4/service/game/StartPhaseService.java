@@ -1109,20 +1109,6 @@ public class StartPhaseService {
                 }
             }
             StartTurnService.turnStart(event, game, nextPlayer);
-            // if (game.isShowBanners()) {
-            //     BannerGenerator.drawFactionBanner(nextPlayer);
-            // }
-            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-            //         + ").";
-            // game.updateActivePlayer(nextPlayer);
-
-            // StartTurnService.reviveInfantryII(nextPlayer);
-            // MessageHelper.sendMessageToChannelWithButtons(
-            //         nextPlayer.getPrivateChannel(),
-            //         msgExtra + "\n Use buttons to do turn.",
-            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
-            // FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
             StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
@@ -1157,46 +1143,7 @@ public class StartPhaseService {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
-            // if (game.isShowBanners()) {
-            //     BannerGenerator.drawFactionBanner(nextPlayer);
-            // }
-            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-            //         + ").";
-            // Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
             StartTurnService.turnStart(event, game, nextPlayer);
-            // if (nextNextPlayer == nextPlayer) {
-            //     msgExtra +=
-            //             "\n-# All other players are passed; you will take consecutive turns until you pass, ending
-            // the Action Phase.";
-            // } else if (nextNextPlayer != null) {
-            //     String ping =
-            //             UserSettingsManager.get(nextNextPlayer.getUserID()).isPingOnNextTurn()
-            //                     ? nextNextPlayer.getRepresentationUnfogged()
-            //                     : nextNextPlayer.getRepresentationNoPing();
-            //     int numUnpassed = -2;
-            //     for (Player p2 : game.getPlayers().values()) {
-            //         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
-            //     }
-            //     msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-            //     if (numUnpassed == 0) {
-            //         msgExtra += "No other players are unpassed.";
-            //     } else {
-            //         msgExtra +=
-            //                 numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still
-            // unpassed.";
-            //     }
-            // }
-            // if (hold.length() > 0) {
-            //     msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
-            // }
-            // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-
-            // StartTurnService.reviveInfantryII(nextPlayer);
-            // MessageHelper.sendMessageToChannelWithButtons(
-            //         game.getMainGameChannel(),
-            //         "Use buttons to do turn.",
-            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
         }
         for (Player p2 : game.getRealPlayers()) {
             if (!game.isFowMode()) {

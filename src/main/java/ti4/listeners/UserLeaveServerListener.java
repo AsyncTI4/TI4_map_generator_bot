@@ -219,15 +219,16 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 }
                 MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
             } else {
-                for (Game game : games) {
-                    gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
-                }
-                String gss = gs.toString();
-                MessageHelper.sendMessageToChannel(
-                        moderationLogChannel,
-                        player.getName()
-                                + " left some games, but the games were ruled to be duds. Games were as follows: "
-                                + gss);
+                // No longer necessary to report dud games
+                // for (Game game : games) {
+                //     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
+                // }
+                // String gss = gs.toString();
+                // MessageHelper.sendMessageToChannel(
+                //         moderationLogChannel,
+                //         player.getName()
+                //                 + " left some games, but the games were ruled to be duds. Games were as follows: "
+                //                 + gss);
             }
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(
