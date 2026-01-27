@@ -329,8 +329,10 @@ public class ListPlayerInfoService {
             }
         }
         if (!game.isFowMode()) {
+            int halfway = (game.getRealPlayers().size() + 1) / 2;
+            int i = 0;
             for (Player player : game.getRealPlayers()) {
-                representation.append(player.getFactionEmoji()).append(": ");
+                representation.append(player.getFactionEmoji()).append(":  ");
                 boolean scored = false;
                 int progress = getPlayerProgressOnObjective(objID, game, player);
                 int threshold = getObjectiveThreshold(objID, game);
@@ -345,7 +347,6 @@ public class ListPlayerInfoService {
                     } else {
                         if (threshold > 0) {
                             representation
-                                    .append(" (")
                                     .append(progress)
                                     .append("/")
                                     .append(threshold)
@@ -376,6 +377,7 @@ public class ListPlayerInfoService {
                     }
                 }
                 representation.append(UnitEmojis.Blank).append(UnitEmojis.Blank);
+                if (++i == halfway) representation.append(" ");
             }
         }
         return representation.toString();
@@ -384,15 +386,18 @@ public class ListPlayerInfoService {
     private static String representSecrets(Game game) {
         StringBuilder representation = new StringBuilder("### Scored Secret Objective Count\n> ");
         if (!game.isFowMode()) {
+            int halfway = (game.getRealPlayers().size() + 1) / 2;
+            int i = 0;
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
-                        .append(": ")
+                        .append(":  ")
                         .append(player.getSoScored())
                         .append("/")
                         .append(player.getMaxSOCount())
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
+                if (++i == halfway) representation.append(" ");
             }
         }
         return representation.toString();
@@ -401,14 +406,17 @@ public class ListPlayerInfoService {
     private static String representSupports(Game game) {
         StringBuilder representation = new StringBuilder("### _Supports For The Thrones_ Victory Points\n> ");
         if (!game.isFowMode()) {
+            int halfway = (game.getRealPlayers().size() + 1) / 2;
+            int i = 0;
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
-                        .append(": ")
+                        .append(":  ")
                         .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1 ")
+                        .append("/1")
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
+                if (++i == halfway) representation.append(" ");
             }
         }
         return representation.toString();
@@ -460,15 +468,18 @@ public class ListPlayerInfoService {
     private static String representTotalVPs(Game game) {
         StringBuilder representation = new StringBuilder("## Total Victory Points\n> ");
         if (!game.isFowMode()) {
+            int halfway = (game.getRealPlayers().size() + 1) / 2;
+            int i = 0;
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
-                        .append(": ")
+                        .append(":  ")
                         .append(player.getTotalVictoryPoints())
                         .append("/")
                         .append(game.getVp())
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
+                if (++i == halfway) representation.append(" ");
             }
         }
         return representation.toString();

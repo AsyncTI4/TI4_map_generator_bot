@@ -2616,7 +2616,7 @@ public class AgendaHelper {
         Optional<Player> argentPlayer = orderList.stream()
                 .filter(player -> player.getFaction() != null && player.hasAbility("zeal"))
                 .findFirst();
-        if (argentPlayer.isPresent()) {
+        if (argentPlayer.isPresent() && game.getStoredValue("executiveOrder").isEmpty()) {
             orderList.remove(argentPlayer.orElse(null));
             orderList.addFirst(argentPlayer.get());
         }

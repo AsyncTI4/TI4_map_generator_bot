@@ -231,7 +231,7 @@ public class ButtonHelper {
                     (totalAmount <= 10
                                     ? UnitEmojis.infantry.toString().repeat(totalAmount)
                                     : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of the status phase.");
+                            + " died and auto-revived. You will be prompted to place them on a planet you control at the start of the Status Phase.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
         }
         Game game = player.getGame();
@@ -444,14 +444,29 @@ public class ButtonHelper {
     }
 
     public static void rollMykoMechRevival(Game game, Player player) {
-        Die d1 = new Die(6);
-        String msg =
-                player.getFactionEmoji() + UnitEmojis.mech + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
-        if (d1.isSuccess()) {
-            msg += " and revived. You will be prompted to replace 1 infantry with 1 mech at the start of your turn.";
-            ButtonHelperFactionSpecific.increaseMykoMech(game);
+        String msg;
+        if (game.isTwilightsFallMode()) {
+            Die d1 = new Die(5);
+            msg = player.getFactionEmoji() + UnitEmojis.mech + " rolled a "
+                    + d1.getGreenDieIfSuccessOrRedDieIfFailure();
+            if (d1.isSuccess()) {
+                msg +=
+                        " and revived. You will be prompted to place 1 mech on a home system planet at the start of your turn.";
+                ButtonHelperFactionSpecific.increaseMykoMech(game, player);
+            } else {
+                msg += " and failed. No revival.";
+            }
         } else {
-            msg += " and failed. No revival.";
+            Die d1 = new Die(6);
+            msg = player.getFactionEmoji() + UnitEmojis.mech + " rolled a "
+                    + d1.getGreenDieIfSuccessOrRedDieIfFailure();
+            if (d1.isSuccess()) {
+                msg +=
+                        " and revived. You will be prompted to replace 1 infantry with 1 mech at the start of your turn.";
+                ButtonHelperFactionSpecific.increaseMykoMech(game, player);
+            } else {
+                msg += " and failed. No revival.";
+            }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
@@ -1177,7 +1192,8 @@ public class ButtonHelper {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("forceARefresh_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("forceARefresh_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "forceARefresh_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -6779,6 +6795,7 @@ public class ButtonHelper {
         Set<String> factionsComplete = new HashSet<>();
         for (FactionModel faction : allFactions) {
             String factionId = faction.getAlias();
+            if ("neutral".equals(factionId)) continue;
             if (game.getPlayerFromColorOrFaction(factionId) == null) {
                 String name = faction.getFactionName();
                 if (factionId.contains("keleres")) {

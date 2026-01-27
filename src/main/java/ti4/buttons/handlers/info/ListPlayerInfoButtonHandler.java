@@ -59,7 +59,9 @@ class ListPlayerInfoButtonHandler {
             buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
         } else {
             for (Player p2 : game.getRealPlayers()) {
-                Button button = Buttons.gray("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "offerInfoButtonStep3_" + category + "_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
