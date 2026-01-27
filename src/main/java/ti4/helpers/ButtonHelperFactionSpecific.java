@@ -2231,6 +2231,14 @@ public class ButtonHelperFactionSpecific {
         }
         int amount = Integer.parseInt(game.getStoredValue("mykoMech"));
         List<Button> buttons = new ArrayList<>();
+        String message;
+        if (game.isTwilightsFallMode()) {
+            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
+                    + " that may be placed on home system planets.";
+        } else {
+            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
+                    + " that may replace infantry.";
+        }
         buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         if (amount > 0) {

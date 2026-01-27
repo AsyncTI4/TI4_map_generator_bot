@@ -19,7 +19,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperHeroes;
-import ti4.helpers.ColorChangeHelper;
+import ti4.helpers.ColorChangeHelper; 
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PromissoryNoteHelper;
@@ -709,6 +709,13 @@ public class MiltyService {
 
         if (game.isThundersEdge() && "crimson".equalsIgnoreCase(player.getFaction())) {
             BreakthroughCommandHelper.unlockBreakthrough(game, player, "crimsonbt");
+        }
+        if (player.getFaction().contains("kaltrim")) {
+            player.setFleetCC(2);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set fleet pool to contain 2 command tokens for " + player.getRepresentation()
+                            + ", due to their **Kaltrim** setup.");
         }
 
         if (game.isRapidMobilizationMode()) {
