@@ -1677,6 +1677,8 @@ class PlayerAreaGenerator {
                     unitCap = reinforcementsPosition.getPositionCount(unitID);
                 }
 
+                unitCap -= ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) ? 1 : 0;
+
                 // Load voltron data
                 UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
                 boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
@@ -1728,8 +1730,22 @@ class PlayerAreaGenerator {
                     GMService.logPlayerActivity(game, player, warningMessage);
                 }
 
+                int offset = 0;
+                if ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) {
+                    offset = 16;
+                    Point position = PositionMapper.getReinforcementsPosition("number_ws")
+                            .getPosition("number_ws");
+                    drawPAImage(
+                            x + position.x - offset,
+                            y + position.y,
+                            "pa_reinforcements_dragon"
+                                    + (numInReinforcements > 0
+                                            ? DrawingUtil.getBlackWhiteFileSuffix(playerColor)
+                                            : "_red.png"));
+                }
+
                 if (numInReinforcements > -10) {
-                    paintNumber(unitID, x, y, numInReinforcements, playerColor);
+                    paintNumber(unitID, x + offset, y, numInReinforcements, playerColor);
                 }
             }
         }
@@ -3267,7 +3283,7 @@ class PlayerAreaGenerator {
                 // due to me playing around with values during debugging
                 // it might be possible to make this more efficient by hard-coding the radii
                 // NB: `int` is 32 bit two's complement, such that the range of positive numbers is
-                // 0x00000000 - 0x7F000000, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
+                // 0x00000000 - 0x7FFFFFFF, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
                 // this affects Math.max, and so requires the unsigned right-shift `>>>` to compare properly
                 BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
                 int[] pixels = icon.getRGB(0, 0, width, height, null, 0, width);

@@ -580,7 +580,9 @@ public class ButtonHelperFactionSpecific {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, p2.getColor()));
             } else {
-                Button button = Buttons.gray("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, " ");
+                Button button = Buttons.gray(
+                        "edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos,
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1542,7 +1544,9 @@ public class ButtonHelperFactionSpecific {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("productionBiomes_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("productionBiomes_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "productionBiomes_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1591,7 +1595,9 @@ public class ButtonHelperFactionSpecific {
                 if (game.isFowMode()) {
                     buttons.add(Buttons.gray("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, p2.getColor()));
                 } else {
-                    Button button = Buttons.gray("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, " ");
+                    Button button = Buttons.gray(
+                            "selectBeforeSwapSCs_" + p2.getFaction() + "_" + type,
+                            p2.getFactionModel().getShortName());
                     String factionEmojiString = p2.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     buttons.add(button);
@@ -1608,7 +1614,7 @@ public class ButtonHelperFactionSpecific {
                             "swapSCs_" + p2.getFaction() + "_" + type + "_"
                                     + p2.getSCs().toArray()[0] + "_"
                                     + hacan.getSCs().toArray()[0],
-                            " ");
+                            p2.getFactionModel().getShortName());
                     String factionEmojiString = p2.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     buttons.add(button);
@@ -2242,10 +2248,10 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         String message;
         if (game.isTwilightsFallMode()) {
-            message = player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
+            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
                     + " that may be placed on home system planets.";
         } else {
-            message = player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
+            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
                     + " that may replace infantry.";
         }
         buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));

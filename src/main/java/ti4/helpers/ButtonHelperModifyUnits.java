@@ -824,7 +824,7 @@ public class ButtonHelperModifyUnits {
                     && game.getStoredValue("mahactHeroTarget").isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        game.getActivePlayer().getRepresentation() + " your opponent has finished assigning hits.");
+                        game.getActivePlayer().getRepresentation() + ", your opponent has finished assigning hits.");
             }
         }
 
@@ -2564,7 +2564,9 @@ public class ButtonHelperModifyUnits {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("resolveContractual_" + p.getFaction(), p.getColor()));
             } else {
-                Button button = Buttons.gray("resolveContractual_" + p.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "resolveContractual_" + p.getFaction(),
+                        p.getFactionModel().getShortName());
                 buttons.add(button.withEmoji(Emoji.fromFormatted(p.getFactionEmoji())));
             }
         }
