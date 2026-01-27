@@ -6780,6 +6780,7 @@ public class ButtonHelper {
         Set<String> factionsComplete = new HashSet<>();
         for (FactionModel faction : allFactions) {
             String factionId = faction.getAlias();
+            if ("neutral".equals(factionId)) continue;
             if (game.getPlayerFromColorOrFaction(factionId) == null) {
                 String name = faction.getFactionName();
                 if (factionId.contains("keleres")) {
