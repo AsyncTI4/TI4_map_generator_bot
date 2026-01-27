@@ -804,6 +804,16 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
+            if (!player.isActivePlayer()
+                    && !game.isFowMode()
+                    && event != null
+                    && game.getActivePlayer() != null
+                    && player.isRealPlayer()
+                    && game.getStoredValue("mahactHeroTarget").isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        game.getActivePlayer() + " your opponent has finished assigning hits.");
+            }
         }
 
         // Repair units with Duranium Armor if repairable units still exist
@@ -1917,6 +1927,15 @@ public class ButtonHelperModifyUnits {
                         && game.getScPlayed().containsKey(sc)) {
                     hasConstruction = true;
                     break;
+                }
+            }
+            for (Player p2 : game.getRealPlayers()) {
+                for (Integer sc : p2.getSCs()) {
+                    StrategyCardModel scModel =
+                            game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (scModel != null && "te4construction".equalsIgnoreCase(scModel.getBotSCAutomationID())) {
+                        hasConstruction = true;
+                    }
                 }
             }
             if ("te".equalsIgnoreCase(game.getStrategyCardSet().getAlias()) || game.isTwilightsFallMode()) {
