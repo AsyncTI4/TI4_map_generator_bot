@@ -126,7 +126,7 @@
         "name": "Command",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally your ships may move through or into asteroid fields during this movement.",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through or into asteroid fields during this movement.",
         "source": "twilights_fall"
     },
     {

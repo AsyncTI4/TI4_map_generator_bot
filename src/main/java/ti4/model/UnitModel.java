@@ -199,7 +199,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && afbDieCount == 0) return 3;
+        // if (player.hasRelic("metalivoidarmaments") && afbDieCount == 0) return 3;
         if (capacityValue > 0
                 && player.getFaction().equalsIgnoreCase(player.getGame().getStoredValue("ShrapnelTurretsFaction"))
                 && getExpectedAfbHits() < 0.6) {
@@ -209,6 +209,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 && isWarsunOrDreadnought()
                 && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 1;
+        }
+        if (afbDieCount == 0
+                && getAlias().equalsIgnoreCase("pinktf_flagship")
+                && (player.ownsUnit("tf-swa") || player.ownsUnit("tf-exile") || player.ownsUnit("tf-linkship"))) {
+            return 3;
         }
         return afbDieCount;
     }
@@ -257,7 +262,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbHitsOn(Player player) {
-        if (player.hasRelic("metalivoidarmaments") && afbHitsOn == 0) return 6;
+        // if (player.hasRelic("metalivoidarmaments") && afbHitsOn == 0) return 6;
         if (capacityValue > 0
                 && player.getGame().getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction())
                 && getExpectedAfbHits() < 0.6) {
@@ -268,10 +273,24 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
                 && player.getGame().playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 5;
         }
+        if (afbDieCount == 0
+                && getAlias().equalsIgnoreCase("pinktf_flagship")
+                && (player.ownsUnit("tf-swa") || player.ownsUnit("tf-exile") || player.ownsUnit("tf-linkship"))) {
+            return 6;
+        }
         return afbHitsOn;
     }
 
     public int getBombardDieCount(Player player) {
+
+        if (getAlias().equalsIgnoreCase("pinktf_flagship")) {
+            if (player.ownsUnit("tf-dawncrusher") || player.ownsUnit("tf-superdread")) {
+                return 1;
+            }
+            if (player.ownsUnit("tf-exotrireme")) {
+                return 2;
+            }
+        }
         if (!player.getGame().getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (player.getGame().getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
                     && bombardDieCount == 0
@@ -289,6 +308,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private int getBombardHitsOn(Player player) {
+        if (getAlias().equalsIgnoreCase("pinktf_flagship")) {
+            if (player.ownsUnit("tf-dawncrusher") || player.ownsUnit("tf-superdread")) {
+                return 5;
+            }
+            if (player.ownsUnit("tf-exotrireme")) {
+                return 4;
+            }
+        }
         if (!player.getGame().getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
             if (player.getGame().getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction())
                     && bombardDieCount == 0

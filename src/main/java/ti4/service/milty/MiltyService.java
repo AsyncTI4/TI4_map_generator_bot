@@ -715,7 +715,7 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Set fleet pool to contain 2 command tokens for " + player.getRepresentation()
-                            + ", due to their **Kaltrim** setup.");
+                            + ", due to the Kaltrim setup.");
         }
 
         if (game.isRapidMobilizationMode()) {
