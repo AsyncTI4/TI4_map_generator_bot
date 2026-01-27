@@ -52,7 +52,7 @@
         "alias": "tf-engineer",
         "name": "Engineer",
         "phase": "Action",
-        "window": "When you draw cards for a splice that you initiated.",
+        "window": "When you draw cards for a splice that you initiated",
         "notes": "In Async, please play this before you initiate the splice.",
         "text": "Add 2 additional cards to the splice; after you choose your card, choose and discard 2 of the spliced cards before passing them to the next player.",
         "source": "twilights_fall"
@@ -118,7 +118,7 @@
         "name": "Command",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally your ships may move through or into asteroid fields during this movement.",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through or into asteroid fields during this movement.",
         "source": "twilights_fall"
     },
     {

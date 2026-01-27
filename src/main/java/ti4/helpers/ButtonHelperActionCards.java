@@ -768,7 +768,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("reparationsStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("reparationsStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "reparationsStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -839,7 +841,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("diplomaticPressureStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("diplomaticPressureStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "diplomaticPressureStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -863,7 +867,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("reactorMeltdownStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("reactorMeltdownStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "reactorMeltdownStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -914,7 +920,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getUprisingTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("uprisingStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "uprisingStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -941,7 +948,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("assRepsStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("assRepsStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "assRepsStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -965,7 +973,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("signalJammingStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("signalJammingStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "signalJammingStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -994,7 +1004,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech, p2.getColor()));
             } else {
-                Button button = Buttons.gray("seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech, " ");
+                Button button = Buttons.gray(
+                        "seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech,
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1075,7 +1087,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getMicrometeoroidStormTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("micrometeoroidStormStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "micrometeoroidStormStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1150,7 +1164,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getCrippleTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("crippleStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "crippleStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1177,7 +1192,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("infiltrateStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("infiltrateStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "infiltrateStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1201,7 +1218,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("spyStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("spyStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "spyStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1224,7 +1242,9 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("psionicHammerStep2_" + p2.getFaction(), p2.getColorIfCanSeeStats(player)));
             } else {
-                Button button = Buttons.gray("psionicHammerStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "psionicHammerStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1338,7 +1358,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("insubStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("insubStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "insubStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1362,7 +1383,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) { // skip choosing player
                 buttons.addAll(getUnstableTargetsFor(p2, game));
             } else {
-                Button button = Buttons.gray("unstableStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "unstableStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1389,7 +1411,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("absStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("absStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "absStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1413,7 +1436,8 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("salvageStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("salvageStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "salvageStep2_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
