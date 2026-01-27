@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3791,8 +3788,11 @@ public class ButtonHelper {
             return true;
         }
         PlanetModel planetModel = Mapper.getPlanet(planetName);
-        if (planetModel != null && planetModel.isLegendary()) {
+        if (planetModel != null && planetModel.isLegendary() && !planetModel.isSpaceStation()) {
             return true;
+        }
+        if (planetModel != null && planetModel.isSpaceStation()) {
+            return false;
         }
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
         Planet planetHolder = (Planet) unitHolder;

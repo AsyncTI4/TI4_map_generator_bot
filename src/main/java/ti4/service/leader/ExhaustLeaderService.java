@@ -62,5 +62,10 @@ public class ExhaustLeaderService {
                     player.getCorrectChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");
         }
+        if (game.isTwilightsFallMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## Note that in Twilight's Fall, genomes can be cancelled by the action card Shatter. You are encouraged to ping the table and ask for any shatter's if this leader is important and likely to be shattered. Otherwise, just assume no shatter and fix later if necessary.");
+        }
     }
 }
