@@ -91,13 +91,13 @@ public class CheckDistanceHelper {
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasAbility("voidborn")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
                                     && !player.hasTech("tf-mr"))
                             || (player != null
@@ -117,7 +117,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasTech("absol_amd")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2))) {
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
                         continue;
                     }
                 }

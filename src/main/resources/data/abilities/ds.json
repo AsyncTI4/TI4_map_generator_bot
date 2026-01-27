@@ -908,6 +908,27 @@
         "source": "ds"
     },
     {
+        "id": "lost_crown_of_kaltrim",
+        "name": "Lost Crown of Kaltrim",
+        "faction": "kaltrim",
+        "permanentEffect": "After setup, distribute 1 shrine attachment and token to each other player at random, including the Kaltrim Crown token. Each of those players must attach that shrine to a planet in a system adjacent to their home system or the Mecatol Rex system. ",
+        "source": "ds"
+    },
+    {
+        "id": "questing_prince",
+        "name": "Questing Prince",
+        "faction": "kaltrim",
+        "permanentEffect": "When you gain control of a planet that has a shrine attachment, purge that attachment. When you would purge the Kaltrim Crown token, instead place it on your faction sheet and gain 1 victory point. ",
+        "source": "ds"
+    },
+    {
+        "id": "shrines",
+        "name": "Shrines",
+        "faction": "kaltrim",
+        "permanentEffect": "Shrine attachments do not count toward scoring objectives and their tokens can only be looked at or revealed by your abilities.",
+        "source": "ds"
+    },
+    {
         "id": "classified_developments",
         "name": "Classified Developments",
         "faction": "belkosea",

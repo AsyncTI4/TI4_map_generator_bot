@@ -2236,7 +2236,9 @@ class PlayerAreaGenerator {
                     homeTile = creussGate;
                 }
             }
-            Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
+
+            final String homePos = homeTile.getPosition();
+            Point homePosition = PositionMapper.getTilePosition(homePos);
             Comparator<String> planetComparator = (planet1, planet2) -> {
                 if (homePosition == null) return 0;
 
@@ -2265,10 +2267,28 @@ class PlayerAreaGenerator {
                 Point p2 = PositionMapper.getTilePosition(tile2.getPosition());
                 if (p1 == null || p2 == null) return Comparator.nullsLast(null).compare(p1, p2);
 
-                int distance1 = ((homePosition.x - p1.x) * (homePosition.x - p1.x)
-                        + (homePosition.y - p1.y) * (homePosition.y - p1.y));
-                int distance2 = ((homePosition.x - p2.x) * (homePosition.x - p2.x)
-                        + (homePosition.y - p2.y) * (homePosition.y - p2.y));
+                int distance1, distance2;
+                if (homePos.equals(tile1.getPosition())) {
+                    distance1 = 0;
+                } else if (tile1.getPosition().contains("frac")) {
+                    distance1 = "styx".equals(planet1) ? 9000 : 8000;
+                } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile1.getPosition())) {
+                    distance1 = 7000;
+                } else {
+                    distance1 = ((homePosition.x - p1.x) * (homePosition.x - p1.x)
+                            + (homePosition.y - p1.y) * (homePosition.y - p1.y));
+                }
+                if (homePos.equals(tile2.getPosition())) {
+                    distance2 = 0;
+                } else if (tile2.getPosition().contains("frac")) {
+                    distance2 = "styx".equals(planet2) ? 9000 : 8000;
+                } else if (Arrays.asList("tl", "tr", "bl", "br").contains(tile2.getPosition())) {
+                    distance2 = 7000;
+                } else {
+                    distance2 = ((homePosition.x - p2.x) * (homePosition.x - p2.x)
+                            + (homePosition.y - p2.y) * (homePosition.y - p2.y));
+                }
+
                 if (distance1 != distance2) {
                     return distance1 - distance2;
                 }
@@ -3040,6 +3060,7 @@ class PlayerAreaGenerator {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
 
         boolean brokenWarSun = ButtonHelper.isLawInPlay(game, "schematics");
+        Set<String> unitPainted = new HashSet<>();
 
         // Add unit upgrade images
         if (techs != null) {
@@ -3064,6 +3085,7 @@ class PlayerAreaGenerator {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+                unitPainted.add(unit.getAsyncId());
 
                 if (zealotsHeroActive && zealotsTechs.contains(tech)) {
                     String path = "pa_tech_unitsnew_zealots_" + tech + ".png";
@@ -3091,6 +3113,7 @@ class PlayerAreaGenerator {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+                unitPainted.add(unit.getAsyncId());
             }
         }
 
@@ -3099,6 +3122,7 @@ class PlayerAreaGenerator {
             Point unitOffset = getUnitTechOffsets(flagship.getAsyncId(), false);
             UnitKey unitKey = Mapper.getUnitKey(flagship.getAsyncId(), player.getColor());
             drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+            unitPainted.add("fs");
             String pipsPath = "pa_leaders_pips_";
             if (flagship.getId().endsWith("_1")) {
                 pipsPath += "i";
@@ -3187,7 +3211,14 @@ class PlayerAreaGenerator {
                             unitFactionOffset.translate(0, 8);
                         }
                         for (String fsFaction : flagships) {
-                            drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
+                            drawFactionIconImageBorder(
+                                    graphics,
+                                    fsFaction,
+                                    deltaX + x + offs.x,
+                                    y + offs.y,
+                                    32,
+                                    32,
+                                    unitPainted.contains(unit.getAsyncId()));
                             Player p2 = game.getPlayerFromColorOrFaction(fsFaction);
                             UnitModel otherFlagship = (p2 == null ? null : p2.getUnitByBaseType("flagship"));
                             if (otherFlagship != null) {
@@ -3222,13 +3253,14 @@ class PlayerAreaGenerator {
                     }
                 }
 
-                drawFactionIconImage(
+                drawFactionIconImageBorder(
                         graphics,
                         unit.getFaction().get().toLowerCase(),
                         deltaX + x + unitFactionOffset.x,
                         y + unitFactionOffset.y,
                         32,
-                        32);
+                        32,
+                        unitPainted.contains(unit.getAsyncId()));
                 UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
                         unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
             }
@@ -3246,11 +3278,81 @@ class PlayerAreaGenerator {
     }
 
     private void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
-        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null);
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, false);
+    }
+
+    private void drawFactionIconImageBorder(Graphics graphics, String faction, int x, int y, int width, int height) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, true);
+    }
+
+    private void drawFactionIconImageBorder(
+            Graphics graphics, String faction, int x, int y, int width, int height, boolean border) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, border);
+    }
+
+    private void drawFactionIconImageOpaque(
+            Graphics g, String faction, int x, int y, int width, int height, Float opacity) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, opacity, false);
     }
 
     private static void drawFactionIconImageOpaque(
-            Graphics g, String faction, int x, int y, int width, int height, Float opacity) {
+            Graphics g, String faction, int x, int y, int width, int height, Float opacity, boolean border) {
+        if (border) {
+            try {
+                // this is over-engineered, allowing for any radius for the inner and outer strokes,
+                // due to me playing around with values during debugging
+                // it might be possible to make this more efficient by hard-coding the radii
+                // NB: `int` is 32 bit two's complement, such that the range of positive numbers is
+                // 0x00000000 - 0x7F000000, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
+                // this affects Math.max, and so requires the unsigned right-shift `>>>` to compare properly
+                BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
+                int[] pixels = icon.getRGB(0, 0, width, height, null, 0, width);
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] &= 0xFF000000;
+                }
+                BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                mask.setRGB(0, 0, width, height, pixels, 0, width);
+
+                final int radInner = 1;
+                final int radOuter = 2 + radInner;
+                BufferedImage maskInner =
+                        new BufferedImage(width + 2 * radInner, height + 2 * radInner, BufferedImage.TYPE_INT_ARGB);
+                BufferedImage maskOuter =
+                        new BufferedImage(width + 2 * radOuter, height + 2 * radOuter, BufferedImage.TYPE_INT_ARGB);
+                for (int i = -radOuter; i < width + radOuter; i++) {
+                    for (int j = -radOuter; j < height + radOuter; j++) {
+                        int pxInner = 0;
+                        int pxOuter = 0;
+                        for (int u = -radOuter; u <= radOuter; u++) {
+                            for (int v = -radOuter; v <= radOuter; v++) {
+                                if (i + u < 0) continue;
+                                if (j + v < 0) continue;
+                                if (i + u >= width) continue;
+                                if (j + v >= height) continue;
+                                if (u * u + v * v <= radInner * radInner) {
+                                    pxInner = Math.max(pxInner, mask.getRGB(i + u, j + v) >>> 24);
+                                }
+                                if (u * u + v * v <= radOuter * radOuter) {
+                                    pxOuter = Math.max(pxOuter, mask.getRGB(i + u, j + v) >>> 24);
+                                }
+                            }
+                        }
+                        maskOuter.setRGB(i + radOuter, j + radOuter, (pxOuter << 24) | 0x00FFFFFF);
+                        if (i + radInner < 0) continue;
+                        if (j + radInner < 0) continue;
+                        if (i + radInner >= width + 2 * radInner) continue;
+                        if (j + radInner >= height + 2 * radInner) continue;
+                        maskInner.setRGB(i + radInner, j + radInner, (pxInner << 24) | 0x00000000);
+                    }
+                }
+
+                Graphics2D g2 = (Graphics2D) g;
+                g2.drawImage(maskOuter, x - radOuter, y - radOuter, null);
+                g2.drawImage(maskInner, x - radInner, y - radInner, null);
+            } catch (Exception e) {
+                BotLogger.error("Could not display faction icon image border: " + faction, e);
+            }
+        }
         try {
             BufferedImage resourceBufferedImage = DrawingUtil.getFactionIconImageScaled(faction, width, height);
             Graphics2D g2 = (Graphics2D) g;
