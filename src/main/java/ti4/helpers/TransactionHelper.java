@@ -579,7 +579,46 @@ public class TransactionHelper {
             "The Golden Skull of Rauhl",
             "This Defective Postage Stamp, Which Has The Aeroplane Printed Upside-Down",
             "A Flanian Pobble Bead",
-            "A Red Herring");
+            "A Red Herring",
+            "∅", // empty set
+            switch (ThreadLocalRandom.current().nextInt(0, 30)) {
+                case 0 -> "Asgjë (As They Would Say In Albania)";
+                case 1 -> "Нищо (As They Would Say In Bulgaria)";
+                case 2 -> "Ništa (As They Would Say In Croatia)";
+                case 3 -> "Intet (As They Would Say In Denmark)";
+                case 4 -> "Niets (As They Would Say In The Netherlands)";
+                case 5 -> "Mitte Midagi (As They Would Say In Estonia)";
+                case 6 -> "Rien (As They Would Say In France)";
+                case 7 -> "არაფერი (As They Would Say In Georgia)";
+                case 8 -> "Nichts (As They Would Say In Germany)";
+                case 9 -> "Τίποτα (As They Would Say In Greece)";
+                case 10 -> "ʻAʻOhe Mea (As They Would Say In Hawaii)";
+                case 11 -> "कुछ नहीं (As They Would Say In India)";
+                case 12 -> "Ekkert (As They Would Say In Iceland)";
+                case 13 -> "Niente (As They Would Say In Italy)";
+                case 14 -> "아무것도 아님 (As They Would Say In Korea)";
+                case 15 -> "Nekas (As They Would Say In Latvia)";
+                case 16 -> "Nieko (As They Would Say In Lithuania)";
+                case 17 -> "Näischt (As They Would Say In Luxembourg)";
+                case 18 -> "Ништо (As They Would Say In Macedonia)";
+                case 19 -> "Kaore He Mea (As They Would Say In New Zealand)";
+                case 20 -> "Юу Ч Биш (As They Would Say In Mongolia)";
+                case 21 -> "केही छैन (As They Would Say In Nepal)";
+                case 22 -> "Ikke Noe (As They Would Say In Norway)";
+                case 23 -> "Chan Eil Dad (As They Would Say In Scotland)";
+                case 24 -> "Ништа (As They Would Say In Serbia)";
+                case 25 -> "Hakuna Kitu (As They Would Say In Tanzania)";
+                case 26 -> "Ingenting (As They Would Say In Sweden)";
+                case 27 -> "Нічого (As They Would Say In Ukraine)";
+                case 28 -> "Không Có Gì (As They Would Say In Vietnam)";
+                default -> "Dim Byd (As They Would Say In Wales)";
+            },
+            "An Air Freshener To Hang On Your Dreadnought's Rear View Mirror",
+            "A Participation Trophy",
+            "Second-Hand Nothing",
+            "A Promissory Vibe",
+            "[Nothing](<https://youtu.be/dQw4w9WgXcQ>)",
+            "||Surprise Nothing||");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
