@@ -61,7 +61,7 @@
         "source": "base"
     },
     {
-        "alias": "disarmamament",
+        "alias": "disarmament",
         "name": "Compensated Disarmament",
         "type": "Directive",
         "target": "Elect Planet",
@@ -177,7 +177,7 @@
         "source": "base"
     },
     {
-        "alias": "minister_commrece",
+        "alias": "minister_commerce",
         "name": "Minister of Commerce",
         "type": "Law",
         "target": "Elect Player",
@@ -453,7 +453,7 @@
         "source": "base"
     },
     {
-        "alias": "senate_sancuary",
+        "alias": "senate_sanctuary",
         "name": "Senate Sanctuary",
         "type": "Law",
         "target": "Elect Planet",
