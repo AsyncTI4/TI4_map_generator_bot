@@ -812,7 +812,7 @@ public class ButtonHelperModifyUnits {
                     && game.getStoredValue("mahactHeroTarget").isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        game.getActivePlayer() + " your opponent has finished assigning hits.");
+                        game.getActivePlayer() + ", your opponent has finished assigning hits.");
             }
         }
 

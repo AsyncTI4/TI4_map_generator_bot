@@ -942,7 +942,7 @@ public class PlayStrategyCardService {
                             politicsHolder.getFinsFactionCheckerPrefix()
                                     + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
                                     + faction,
-                            " ",
+                            player.getFactionModel().getShortName(),
                             player.getFactionEmojiOrColor());
 
                     assignSpeakerButtons.add(button);

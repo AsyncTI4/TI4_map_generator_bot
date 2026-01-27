@@ -1476,20 +1476,17 @@ public class Helper {
                         .append(discount)
                         .append("\n");
             }
-            msg.append("for a total spend of ")
-                    .append(res)
-                    .append(" resource")
-                    .append(res == 1 ? "" : "s")
-                    .append(".");
+            msg.append("for a total spend of ").append(res).append(" resource").append(res == 1 ? "" : "s");
 
             if (!game.getStoredValue("producedUnitCostFor" + player.getFaction())
                     .isEmpty()) {
                 int amount = Integer.parseInt(game.getStoredValue("producedUnitCostFor" + player.getFaction()));
-                msg.append(" (preceding build cost ").append(amount).append(" resources).");
+                msg.append(" (preceding build cost ").append(amount).append(" resources)");
                 if (amount > res) {
-                    msg.append("\n### WARNING: Have not spent enough resources yet.");
+                    msg.append(".\n### WARNING: Have not spent enough resources yet");
                 }
             }
+            msg.append(".");
         } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
             msg.append("for a total spend of ").append(inf).append(" influence.");
         } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
