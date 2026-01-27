@@ -563,6 +563,24 @@ public class ListPlayerInfoService {
                         }
                     } else if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 2) {
                         numAbove1++;
+                    } else {
+                        if (game.isTwilightsFallMode()) {
+                            int amount = 0;
+                            for (String planet : player.getReadiedPlanets()) {
+                                if (ButtonHelper.checkForTechSkips(game, planet)) {
+                                    Planet unitHolder = game.getPlanetsInfo().get(planet);
+                                    List<String> techTypes = unitHolder.getTechSpecialities();
+                                    for (String typeT : techTypes) {
+                                        if (type.toString().equalsIgnoreCase(typeT)) {
+                                            amount++;
+                                        }
+                                    }
+                                }
+                            }
+                            if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) + amount > 1) {
+                                numAbove1++;
+                            }
+                        }
                     }
                 }
                 return numAbove1;

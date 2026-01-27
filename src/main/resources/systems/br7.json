@@ -1,0 +1,18 @@
+{
+    "id": "br7",
+    "name": "Avkho/Kaltrim - Kaltrim",
+    "aliases": [
+        "br7",
+        "avkho",
+        "kaltrim"
+    ],
+    "imagePath": "BR7_Kaltrim.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "avkho",
+        "kaltrim"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}
