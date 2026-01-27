@@ -3263,30 +3263,56 @@ class PlayerAreaGenerator {
             Graphics g, String faction, int x, int y, int width, int height, Float opacity, boolean border) {
         if (border) {
             try {
-                BufferedImage resourceBufferedImage = DrawingUtil.getFactionIconImageScaled(faction, width, height);
-                int[] pixelsBlack = resourceBufferedImage.getRGB(0, 0, width, height, null, 0, width);
-                int[] pixelsWhite = resourceBufferedImage.getRGB(0, 0, width, height, null, 0, width);
-                for (int i = 0; i < pixelsBlack.length; i++) {
-                    pixelsBlack[i] &= 0xFF000000;
-                    pixelsWhite[i] |= 0x00FFFFFF;
+                // this is over-engineered, allowing for any radius for the inner and outer strokes,
+                // due to me playing around with values during debugging
+                // it might be possible to make this more efficient by hard-coding the radii
+                // NB: `int` is 32 bit two's complement, such that the range of positive numbers is
+                // 0x00000000 - 0x7F000000, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
+                // this affects Math.max, and so requires the unsigned right-shift `>>>` to compare properly
+                BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
+                int[] pixels = icon.getRGB(0, 0, width, height, null, 0, width);
+                for (int i = 0; i < pixels.length; i++) {
+                    pixels[i] &= 0xFF000000;
                 }
+                BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                mask.setRGB(0, 0, width, height, pixels, 0, width);
+
+                final int radInner = 1;
+                final int radOuter = 2 + radInner;
+                BufferedImage maskInner =
+                        new BufferedImage(width + 2 * radInner, height + 2 * radInner, BufferedImage.TYPE_INT_ARGB);
+                BufferedImage maskOuter =
+                        new BufferedImage(width + 2 * radOuter, height + 2 * radOuter, BufferedImage.TYPE_INT_ARGB);
+                for (int i = -radOuter; i < width + radOuter; i++) {
+                    for (int j = -radOuter; j < height + radOuter; j++) {
+                        int pxInner = 0;
+                        int pxOuter = 0;
+                        for (int u = -radOuter; u <= radOuter; u++) {
+                            for (int v = -radOuter; v <= radOuter; v++) {
+                                if (i + u < 0) continue;
+                                if (j + v < 0) continue;
+                                if (i + u >= width) continue;
+                                if (j + v >= height) continue;
+                                if (u * u + v * v <= radInner * radInner) {
+                                    pxInner = Math.max(pxInner, mask.getRGB(i + u, j + v) >>> 24);
+                                }
+                                if (u * u + v * v <= radOuter * radOuter) {
+                                    pxOuter = Math.max(pxOuter, mask.getRGB(i + u, j + v) >>> 24);
+                                }
+                            }
+                        }
+                        maskOuter.setRGB(i + radOuter, j + radOuter, (pxOuter << 24) | 0x00FFFFFF);
+                        if (i + radInner < 0) continue;
+                        if (j + radInner < 0) continue;
+                        if (i + radInner >= width + 2 * radInner) continue;
+                        if (j + radInner >= height + 2 * radInner) continue;
+                        maskInner.setRGB(i + radInner, j + radInner, (pxInner << 24) | 0x00000000);
+                    }
+                }
+
                 Graphics2D g2 = (Graphics2D) g;
-                BufferedImage maskBlack = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                maskBlack.setRGB(0, 0, width, height, pixelsBlack, 0, width);
-                g2.drawImage(maskBlack, x + 2, y, null);
-                g2.drawImage(maskBlack, x - 2, y, null);
-                g2.drawImage(maskBlack, x, y + 2, null);
-                g2.drawImage(maskBlack, x, y - 2, null);
-                g2.drawImage(maskBlack, x + 1, y + 1, null);
-                g2.drawImage(maskBlack, x - 1, y + 1, null);
-                g2.drawImage(maskBlack, x + 1, y - 1, null);
-                g2.drawImage(maskBlack, x - 1, y - 1, null);
-                BufferedImage maskWhite = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                maskWhite.setRGB(0, 0, width, height, pixelsWhite, 0, width);
-                g2.drawImage(maskWhite, x + 1, y, null);
-                g2.drawImage(maskWhite, x - 1, y, null);
-                g2.drawImage(maskWhite, x, y + 1, null);
-                g2.drawImage(maskWhite, x, y - 1, null);
+                g2.drawImage(maskOuter, x - radOuter, y - radOuter, null);
+                g2.drawImage(maskInner, x - radInner, y - radInner, null);
             } catch (Exception e) {
                 BotLogger.error("Could not display faction icon image border: " + faction, e);
             }
