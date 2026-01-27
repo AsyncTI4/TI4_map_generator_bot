@@ -11,6 +11,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
@@ -65,7 +66,7 @@ public class DraftSystemSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public DraftSystemSettings(Game game, JsonNode json) {
+    public DraftSystemSettings(@NotNull Game game, JsonNode json) {
         super(MENU_ID, "Draft Settings", "Edit draft settings, then start the draft!", null);
         this.game = game;
 
@@ -161,7 +162,7 @@ public class DraftSystemSettings extends SettingsMenu {
     protected List<Button> specialButtons() {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
-        if (preset.equals("Twilights Fall (Andcat Draft)")) {
+        if ("Twilights Fall (Andcat Draft)".equals(preset)) {
             buttons.add(Buttons.blue(prefix + "tfTourney", "TF Tourney Prelims", MiscEmojis.tf_ability));
         }
         buttons.add(Buttons.green(prefix + "startSetup", "Start Draft!"));

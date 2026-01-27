@@ -192,7 +192,7 @@ public class BlindSelectionService {
     private static String insertFactionToButtonId(String target, String type, String originalButtonPrefix, Game game) {
         if (!originalButtonPrefix.contains(TBD_FACTION)) return originalButtonPrefix;
 
-        Player owner = null;
+        Player owner;
         if (type.equals(POSITION)) {
             owner = game.getPlayerThatControlsTile(game.getTileByPosition(target));
         } else {

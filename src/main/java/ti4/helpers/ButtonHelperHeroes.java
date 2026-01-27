@@ -1,6 +1,8 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -145,7 +148,8 @@ public class ButtonHelperHeroes {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null || (unitModel.getIsStructure() && unitHolder.getName() != "space")) continue;
+                if (unitModel == null || (unitModel.getIsStructure() && !Objects.equals(unitHolder.getName(), "space")))
+                    continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = unitKey.unitName();
                 int totalUndamagedUnits = unitEntry.getValue();
@@ -1296,7 +1300,7 @@ public class ButtonHelperHeroes {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No technology specialties found.");
             return;
         }
-        String message = "";
+        StringBuilder message = new StringBuilder();
         String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(unitHolder.getName(), game);
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -1304,20 +1308,24 @@ public class ButtonHelperHeroes {
             }
 
             Set<UnitKey> uk = unitHolder.getUnitKeys();
-            String emoji = "";
+            StringBuilder emoji = new StringBuilder();
             for (UnitKey key : unitHolder.getUnitKeys()) {
                 if (!p2.getColor().equals(key.getColor())) continue;
                 int amt = unitHolder.getUnitCount(key);
                 unitHolder.removeUnit(key, amt);
-                emoji += key.unitEmoji().emojiString().repeat(amt);
+                emoji.append(key.unitEmoji().emojiString().repeat(amt));
             }
-            if (!emoji.isEmpty()) {
-                message += p2.getRepresentation() + ", your " + emoji + " on " + planetRep
-                        + " have become the latest casualties in the Nekro Virus War Upon Life.\n";
+            if (emoji.length() > 0) {
+                message.append(p2.getRepresentation())
+                        .append(", your ")
+                        .append(emoji)
+                        .append(" on ")
+                        .append(planetRep)
+                        .append(" have become the latest casualties in the Nekro Virus War Upon Life.\n");
             }
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message);
-                message = "";
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message.toString());
+                message = new StringBuilder();
             }
 
             String color = p2.getColor();
@@ -1327,9 +1335,19 @@ public class ButtonHelperHeroes {
         int oldTg = player.getTg();
         int count = unitHolder.getResources() + unitHolder.getInfluence();
         player.setTg(oldTg + count);
-        message += player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " ("
-                + oldTg + "->" + player.getTg() + ") from scouring " + planetRep + ".";
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        message.append(player.getFactionEmoji())
+                .append(" gained ")
+                .append(count)
+                .append(" trade good")
+                .append(count == 1 ? "" : "s")
+                .append(" (")
+                .append(oldTg)
+                .append("->")
+                .append(player.getTg())
+                .append(") from scouring ")
+                .append(planetRep)
+                .append(".");
+        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
 
@@ -1338,8 +1356,9 @@ public class ButtonHelperHeroes {
             List<TechnologyModel> techs = new ArrayList<>();
             for (String type : techTypes) techs.addAll(ListTechService.getAllTechOfAType(game, type, player));
             List<Button> buttons = ListTechService.getTechButtons(techs, player, "nekro");
-            message = player.getRepresentation() + ", please choose which technology you wish to get.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            message =
+                    new StringBuilder(player.getRepresentation() + ", please choose which technology you wish to get.");
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message.toString(), buttons);
         } else {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("drawSingularNewSpliceCard_ability", "Draw 1 Ability"));
@@ -2929,8 +2948,7 @@ public class ButtonHelperHeroes {
         } else {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder instanceof Planet) {
-                        Planet planet = (Planet) unitHolder;
+                    if (unitHolder instanceof Planet planet) {
                         if (planet.isSpaceStation()) {
                             continue;
                         }

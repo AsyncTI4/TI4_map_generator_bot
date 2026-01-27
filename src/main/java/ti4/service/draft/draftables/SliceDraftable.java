@@ -149,13 +149,13 @@ public class SliceDraftable extends SinglePickDraftable {
         SliceDraftableSettings sliceSettings = draftSystemSettings.getSliceSettings();
 
         if (sliceSettings.getParsedSlices() != null
-                && sliceSettings.getParsedSlices().size() > 0) {
+                && !sliceSettings.getParsedSlices().isEmpty()) {
             MapTemplateModel mapTemplate = sliceSettings.getMapTemplate().getValue();
             if (mapTemplate == null) {
                 return "Error: No map template selected to shape preset slices.";
             }
             game.setMapTemplateID(mapTemplate.getID());
-            sliceSettings.getParsedSlices().forEach(slices::add);
+            slices.addAll(sliceSettings.getParsedSlices());
             return null;
         }
 

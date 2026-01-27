@@ -618,7 +618,7 @@ public class AddPlanetService {
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("Styx", null);
 
-            String message = null;
+            String message;
             if (id != null) {
                 game.scorePublicObjective(player.getUserID(), id);
                 message = player.getRepresentation() + " scored '" + marrow + "'";

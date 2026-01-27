@@ -252,7 +252,7 @@ public class SliceDraftableSettings extends SettingsMenu {
     protected String resetSettings() {
         presetSlices = null;
         parsedSlices = null;
-        subMenus.stream().forEach(menu -> menu.resetSettings());
+        subMenus.stream().forEach(SettingsMenu::resetSettings);
         return super.resetSettings();
     }
 
@@ -263,7 +263,7 @@ public class SliceDraftableSettings extends SettingsMenu {
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                     .filter(getNucleusTemplatePredicate())
                     .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            MapTemplateModel defaultTemplate = null;
+            MapTemplateModel defaultTemplate;
             if (isNucleusMode()) {
                 defaultTemplate = Mapper.getDefaultNucleusTemplate(players);
             } else {
@@ -405,8 +405,8 @@ public class SliceDraftableSettings extends SettingsMenu {
         if (event instanceof ModalInteractionEvent modalEvent) {
             String sliceString = modalEvent.getValue("sliceString").getAsString();
             String mapString = modalEvent.getValue("mapString").getAsString();
-            String sliceStringError = this.getNucleusSettings().setPresetSlices(sliceString);
-            String mapStringError = this.getNucleusSettings().setPresetMapString(mapString);
+            String sliceStringError = nucleusSettings.setPresetSlices(sliceString);
+            String mapStringError = nucleusSettings.setPresetMapString(mapString);
             if (sliceStringError == null && mapStringError == null) {
                 return null;
             }
@@ -414,7 +414,7 @@ public class SliceDraftableSettings extends SettingsMenu {
             if (sliceStringError != null) {
                 errorSb.append(sliceStringError);
             }
-            if (errorSb.length() > 0) {
+            if (!errorSb.isEmpty()) {
                 errorSb.append("\n");
             }
             if (mapStringError != null) {
