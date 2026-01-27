@@ -2200,7 +2200,9 @@ class PlayerAreaGenerator {
                     homeTile = creussGate;
                 }
             }
-            Point homePosition = PositionMapper.getTilePosition(homeTile.getPosition());
+
+            final String homePos = homeTile.getPosition();
+            Point homePosition = PositionMapper.getTilePosition(homePos);
             Comparator<String> planetComparator = (planet1, planet2) -> {
                 if (homePosition == null) return 0;
 
@@ -2230,7 +2232,7 @@ class PlayerAreaGenerator {
                 if (p1 == null || p2 == null) return Comparator.nullsLast(null).compare(p1, p2);
 
                 int distance1, distance2;
-                if (homeTile.getPosition().equals(tile1.getPosition())) {
+                if (homePos.equals(tile1.getPosition())) {
                     distance1 = 0;
                 } else if (tile1.getPosition().contains("frac")) {
                     distance1 = "styx".equals(planet1) ? 9000 : 8000;
@@ -2240,7 +2242,7 @@ class PlayerAreaGenerator {
                     distance1 = ((homePosition.x - p1.x) * (homePosition.x - p1.x)
                             + (homePosition.y - p1.y) * (homePosition.y - p1.y));
                 }
-                if (homeTile.getPosition().equals(tile2.getPosition())) {
+                if (homePos.equals(tile2.getPosition())) {
                     distance2 = 0;
                 } else if (tile2.getPosition().contains("frac")) {
                     distance2 = "styx".equals(planet2) ? 9000 : 8000;
@@ -3022,6 +3024,7 @@ class PlayerAreaGenerator {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
 
         boolean brokenWarSun = ButtonHelper.isLawInPlay(game, "schematics");
+        Set<String> unitPainted = new HashSet<>();
 
         // Add unit upgrade images
         if (techs != null) {
@@ -3046,6 +3049,7 @@ class PlayerAreaGenerator {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+                unitPainted.add(unit.getAsyncId());
 
                 if (zealotsHeroActive && zealotsTechs.contains(tech)) {
                     String path = "pa_tech_unitsnew_zealots_" + tech + ".png";
@@ -3073,6 +3077,7 @@ class PlayerAreaGenerator {
                 Point unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+                unitPainted.add(unit.getAsyncId());
             }
         }
 
@@ -3081,6 +3086,7 @@ class PlayerAreaGenerator {
             Point unitOffset = getUnitTechOffsets(flagship.getAsyncId(), false);
             UnitKey unitKey = Mapper.getUnitKey(flagship.getAsyncId(), player.getColor());
             drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
+            unitPainted.add("fs");
             String pipsPath = "pa_leaders_pips_";
             if (flagship.getId().endsWith("_1")) {
                 pipsPath += "i";
@@ -3169,7 +3175,14 @@ class PlayerAreaGenerator {
                             unitFactionOffset.translate(0, 8);
                         }
                         for (String fsFaction : flagships) {
-                            drawFactionIconImage(graphics, fsFaction, deltaX + x + offs.x, y + offs.y, 32, 32);
+                            drawFactionIconImageBorder(
+                                    graphics,
+                                    fsFaction,
+                                    deltaX + x + offs.x,
+                                    y + offs.y,
+                                    32,
+                                    32,
+                                    unitPainted.contains(unit.getAsyncId()));
                             Player p2 = game.getPlayerFromColorOrFaction(fsFaction);
                             UnitModel otherFlagship = (p2 == null ? null : p2.getUnitByBaseType("flagship"));
                             if (otherFlagship != null) {
@@ -3204,13 +3217,14 @@ class PlayerAreaGenerator {
                     }
                 }
 
-                drawFactionIconImage(
+                drawFactionIconImageBorder(
                         graphics,
                         unit.getFaction().get().toLowerCase(),
                         deltaX + x + unitFactionOffset.x,
                         y + unitFactionOffset.y,
                         32,
-                        32);
+                        32,
+                        unitPainted.contains(unit.getAsyncId()));
                 UnitRenderGenerator.optionallyDrawEidolonMaximumDecal(
                         unitKey, deltaX + x + unitOffset.x, y + unitOffset.y, graphics, game);
             }
@@ -3228,11 +3242,55 @@ class PlayerAreaGenerator {
     }
 
     private void drawFactionIconImage(Graphics graphics, String faction, int x, int y, int width, int height) {
-        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null);
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, false);
+    }
+
+    private void drawFactionIconImageBorder(Graphics graphics, String faction, int x, int y, int width, int height) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, true);
+    }
+
+    private void drawFactionIconImageBorder(
+            Graphics graphics, String faction, int x, int y, int width, int height, boolean border) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, null, border);
+    }
+
+    private void drawFactionIconImageOpaque(
+            Graphics g, String faction, int x, int y, int width, int height, Float opacity) {
+        drawFactionIconImageOpaque(graphics, faction, x, y, width, height, opacity, false);
     }
 
     private static void drawFactionIconImageOpaque(
-            Graphics g, String faction, int x, int y, int width, int height, Float opacity) {
+            Graphics g, String faction, int x, int y, int width, int height, Float opacity, boolean border) {
+        if (border) {
+            try {
+                BufferedImage resourceBufferedImage = DrawingUtil.getFactionIconImageScaled(faction, width, height);
+                int[] pixelsBlack = resourceBufferedImage.getRGB(0, 0, width, height, null, 0, width);
+                int[] pixelsWhite = resourceBufferedImage.getRGB(0, 0, width, height, null, 0, width);
+                for (int i = 0; i < pixelsBlack.length; i++) {
+                    pixelsBlack[i] &= 0xFF000000;
+                    pixelsWhite[i] |= 0x00FFFFFF;
+                }
+                Graphics2D g2 = (Graphics2D) g;
+                BufferedImage maskBlack = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                maskBlack.setRGB(0, 0, width, height, pixelsBlack, 0, width);
+                g2.drawImage(maskBlack, x + 2, y, null);
+                g2.drawImage(maskBlack, x - 2, y, null);
+                g2.drawImage(maskBlack, x, y + 2, null);
+                g2.drawImage(maskBlack, x, y - 2, null);
+                g2.drawImage(maskBlack, x + 1, y + 1, null);
+                g2.drawImage(maskBlack, x - 1, y + 1, null);
+                g2.drawImage(maskBlack, x + 1, y - 1, null);
+                g2.drawImage(maskBlack, x - 1, y - 1, null);
+                BufferedImage maskWhite = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                maskWhite.setRGB(0, 0, width, height, pixelsWhite, 0, width);
+                g2.drawImage(maskWhite, x + 1, y, null);
+                g2.drawImage(maskWhite, x - 1, y, null);
+                g2.drawImage(maskWhite, x, y + 1, null);
+                g2.drawImage(maskWhite, x, y - 1, null);
+            } catch (Exception e) {
+                BotLogger.error("Could not display faction icon image border: " + faction, e);
+            }
+        }
         try {
             BufferedImage resourceBufferedImage = DrawingUtil.getFactionIconImageScaled(faction, width, height);
             Graphics2D g2 = (Graphics2D) g;
