@@ -90,7 +90,7 @@ public class UnitDraftItem extends DraftItem {
         if (unit.getFaction().isPresent()) {
             sb.append("Faction: ").append(unit.getFaction().get());
         }
-        return sb.toString() + "\n";
+        return sb + "\n";
     }
 
     @JsonIgnore

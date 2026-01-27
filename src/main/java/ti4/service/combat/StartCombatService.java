@@ -485,7 +485,10 @@ public class StartCombatService {
                 for (Player player : game.getRealPlayersNDummies()) {
                     if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(uH, player)) {
                         if (playersWithGF.isEmpty()
-                                || !playersWithGF.get(0).getAllianceMembers().contains(player.getFaction())) {
+                                || !playersWithGF
+                                        .getFirst()
+                                        .getAllianceMembers()
+                                        .contains(player.getFaction())) {
                             playersWithGF.add(player);
                         }
                     }

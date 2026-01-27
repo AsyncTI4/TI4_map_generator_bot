@@ -851,9 +851,12 @@ public class StartPhaseService {
                     + "\" button once you are done resolving these, or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 +=
-                    "This is the moment when you should resolve:\n- _Political Stability_\n- _Summit_\n- _Manipulate Investments_\n"
-                            + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
+            message2 += """
+                    This is the moment when you should resolve:
+                    - _Political Stability_
+                    - _Summit_
+                    - _Manipulate Investments_
+                    Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(draw1AC);

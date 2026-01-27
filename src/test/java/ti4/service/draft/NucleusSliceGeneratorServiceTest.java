@@ -175,7 +175,7 @@ public class NucleusSliceGeneratorServiceTest extends BaseTi4Test {
 
     private void runTest(Game game, MapTemplateModel mapTemplate, DraftSpec specs, boolean strictMode) {
         // Test that generator can succeed with these settings (often enough to be a unit test)
-        NucleusOutcome outcome = null;
+        NucleusOutcome outcome;
         Map<String, Integer> failureReasons = new HashMap<>();
         for (int i = 0; i < REASONABLE_MAX_ATTEMPTS; ++i) {
             outcome = NucleusSliceGeneratorService.tryGenerateNucleusAndSlices(

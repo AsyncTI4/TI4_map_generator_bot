@@ -49,7 +49,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
      * in the message's component tree. If the input component is returned, nothing happens.
      * If null is returned, the component is removed. If a different component is returned,
      * the component is replaced.
-     *
+     * <p>
      * This also populates the changedMessages set when any action is performed; this
      * allows the caller to know if any changes were made at all. (to help save on PATCH
      * requests)

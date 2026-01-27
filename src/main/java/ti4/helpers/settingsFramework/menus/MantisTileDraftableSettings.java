@@ -91,8 +91,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                     .filter(t -> !t.isNucleusTemplate())
                     .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            MapTemplateModel defaultTemplate = null;
-            defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
             if (defaultTemplate != null) {
                 mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
             }

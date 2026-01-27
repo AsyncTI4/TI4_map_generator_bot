@@ -16,7 +16,7 @@ import ti4.service.game.ManagedGameService;
 
 class PoliticsPosition extends Subcommand {
 
-    public PoliticsPosition() {
+    PoliticsPosition() {
         super(Constants.STATISTICS_POLITICS_POSITION, "List politics round 1 chances of getting custodians");
     }
 
@@ -25,8 +25,7 @@ class PoliticsPosition extends Subcommand {
         searchGames(event);
     }
 
-    public static void searchGames(SlashCommandInteractionEvent event) {
-
+    private static void searchGames(SlashCommandInteractionEvent event) {
         Predicate<ManagedGame> endedGamesFilter = game -> game.isHasEnded()
                 && game.getRound() == 5
                 && game.getRealPlayers().size() == 6

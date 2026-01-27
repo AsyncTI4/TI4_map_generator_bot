@@ -70,12 +70,11 @@ public class CreateGameButtonHandler {
         int completedAndOngoingAmount =
                 SearchGameHelper.searchGames(member.getUser(), null, false, true, false, true, false, true, true, true);
         if (completedAndOngoingAmount < 1 && !owner) {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "You need to have completed at least one game (or be currently in a game) to create new games via this button. "
-                            + "This is to prevent mistakes by people who don't know what they're doing. There are a couple of ways to get around this:\n"
-                            + "1) Have someone else who has completed a game press the button for you; or\n"
-                            + "2) Ping a bothelper for help.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), """
+                    You need to have completed at least one game (or be currently in a game) to create new games via this button. \
+                    This is to prevent mistakes by people who don't know what they're doing. There are a couple of ways to get around this:
+                    1) Have someone else who has completed a game press the button for you; or
+                    2) Ping a bothelper for help.""");
             return;
         }
 
@@ -227,10 +226,13 @@ public class CreateGameButtonHandler {
         if (gameFunName == null || gameFunName.isEmpty()) {
             memberList.append("## Players Signed Up:\n");
         } else {
-            memberList.append("## Game Fun Name: " + gameFunName.replace(":", "") + "\n\nPlayers:\n");
+            memberList
+                    .append("## Game Fun Name: ")
+                    .append(gameFunName.replace(":", ""))
+                    .append("\n\nPlayers:\n");
         }
         for (Member member : members) {
-            memberList.append(x + ". " + member.getUser().getAsMention());
+            memberList.append(x).append(". ").append(member.getUser().getAsMention());
 
             int ongoingAmount = SearchGameHelper.searchGames(
                     member.getUser(), null, false, false, false, true, false, true, true, true);
@@ -245,7 +247,7 @@ public class CreateGameButtonHandler {
                         .append(completedGames + 3)
                         .append("-game limit)");
             } else {
-                memberList.append(" " + completedGames + " games completed. ");
+                memberList.append(" ").append(completedGames).append(" games completed. ");
             }
             if (playerTurnTimes.containsKey(member.getUser().getId())) {
                 User user = member.getUser();
@@ -421,7 +423,7 @@ public class CreateGameButtonHandler {
                     }
                 }
             }
-            if (gameOwner == null) gameOwner = members.get(0);
+            if (gameOwner == null) gameOwner = members.getFirst();
         }
 
         if (isLikelyDoublePressedButton(gameName, members, lastGameName, event)

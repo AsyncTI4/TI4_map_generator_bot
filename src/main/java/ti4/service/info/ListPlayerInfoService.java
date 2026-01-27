@@ -409,7 +409,6 @@ public class ListPlayerInfoService {
                         .append("/1 ")
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
-                ;
             }
         }
         return representation.toString();

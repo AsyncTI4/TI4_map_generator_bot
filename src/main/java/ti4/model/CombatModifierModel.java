@@ -73,7 +73,7 @@ public class CombatModifierModel implements ModelInterface {
                         .filter(u -> u.getCapacityValue() > 0)
                         .toList();
                 List<UnitModel> sortedAllUnits2 = new ArrayList<>(sortedAllUnits);
-                if (sortedAllUnits2.size() > 0) {
+                if (!sortedAllUnits2.isEmpty()) {
                     sortedAllUnits2.sort(
                             Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player)));
                     isInScope = Objects.equals(sortedAllUnits2.getFirst().getAsyncId(), unit.getAsyncId());

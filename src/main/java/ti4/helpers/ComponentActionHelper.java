@@ -1055,7 +1055,7 @@ public class ComponentActionHelper {
                             })
                             .toList());
 
-                    if (buttons.size() == 0) {
+                    if (buttons.isEmpty()) {
                         buttons = ButtonHelper.getGainCCButtons(player);
                         String message2 = player.getRepresentation()
                                 + ", you would research one of your faction tech, but because you have them both, you instead gain 2 command tokens."

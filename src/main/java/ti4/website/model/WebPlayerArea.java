@@ -367,7 +367,7 @@ public class WebPlayerArea {
             }
 
             // TODO: MemePhilosopher make this a list
-            if (breakthroughs.size() > 0) {
+            if (!breakthroughs.isEmpty()) {
                 webPlayerArea.setBreakthrough(breakthroughs.getFirst());
             } else {
                 webPlayerArea.setBreakthrough(null);

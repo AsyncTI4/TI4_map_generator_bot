@@ -119,7 +119,7 @@ public class ButtonHelperTacticalAction {
                         + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
             }
-            ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+            resetStoredValuesForTacticalAction(game);
         }
     }
 

@@ -265,8 +265,7 @@ public class AgendaHelper {
         if (player.hasAbility("quash") && (player.getStrategicCC() > 0 || player.hasRelicReady("emelpar"))) {
             buttons.add(Buttons.red("queueWhen_ability_quash", "Quash"));
         }
-        ArrayList<String> acIDs = new ArrayList<>();
-        acIDs.addAll(player.getActionCards().keySet());
+        ArrayList<String> acIDs = new ArrayList<>(player.getActionCards().keySet());
         if (player.hasPlanet("garbozia")) {
             acIDs.addAll(
                     ActionCardHelper.getGarboziaActionCards(player.getGame()).keySet());
