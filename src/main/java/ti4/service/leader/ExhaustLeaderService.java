@@ -65,7 +65,9 @@ public class ExhaustLeaderService {
         if (game.isTwilightsFallMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "## Note that in Twilight's Fall, genomes can be cancelled by the action card Shatter. You are encouraged to ping the table and ask for any shatter's if this leader is important and likely to be shattered. Otherwise, just assume no shatter and fix later if necessary.");
+                    "## Note that in Twilight's Fall, genomes can be cancelled by the _Shatter_ action card."
+                            + " You are encouraged to ping the table and ask for any *Shatter*s if this genome is important, and likely to be _Shatter_'d."
+                            + " Otherwise, just assume no _Shatter_ and fix later if necessary.");
         }
     }
 }
