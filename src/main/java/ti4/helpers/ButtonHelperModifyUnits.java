@@ -106,6 +106,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
+        int metali = 0;
 
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             if (!player.unitBelongsToPlayer(unitEntry.getKey())) continue;
@@ -126,9 +127,16 @@ public class ButtonHelperModifyUnits {
             int totalUnits = unitEntry.getValue() - damagedUnits;
             if (unitModel.getSustainDamage()) {
                 sustains += totalUnits;
+            } else {
+                if (totalUnits > 0
+                        && unitModel.getUnitType() != UnitType.Fighter
+                        && unitModel.getIsShip()
+                        && player.hasRelic("metalivoidshielding")) {
+                    metali = 1;
+                }
             }
         }
-        return sustains;
+        return sustains + metali;
     }
 
     public static void autoAssignAntiFighterBarrageHits(
@@ -520,6 +528,7 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
+        boolean metailUsed = !player.hasRelic("metalivoidshielding");
 
         if (numSustains > 0) {
             // just for dread 2s
@@ -573,7 +582,7 @@ public class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null
-                        || !unitModel.getSustainDamage()
+                        || (!unitModel.getSustainDamage() && metailUsed)
                         || ((!unitModel.getIsShip()
                                         && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                                 || ButtonHelper.doesPlayerHaveFSHere(
@@ -594,6 +603,10 @@ public class ButtonHelperModifyUnits {
                         ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0)
                         : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
+                if (!unitModel.getSustainDamage() && !metailUsed && totalUnits > 0) {
+                    totalUnits = 1;
+                    metailUsed = true;
+                }
                 int min = (player.hasTech("nes")) ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
 
                 String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
@@ -602,8 +615,7 @@ public class ButtonHelperModifyUnits {
                     stuffNotToSustain = "warsunflagship";
                 }
 
-                if (unitModel.getSustainDamage()
-                        && min > 0
+                if (min > 0
                         && !stuffNotToSustain.contains(unitModel.getBaseType().toLowerCase())) {
                     hits -= min * (player.hasTech("nes") ? 2 : 1);
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
@@ -812,7 +824,7 @@ public class ButtonHelperModifyUnits {
                     && game.getStoredValue("mahactHeroTarget").isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        game.getActivePlayer() + ", your opponent has finished assigning hits.");
+                        game.getActivePlayer().getRepresentation() + " your opponent has finished assigning hits.");
             }
         }
 
@@ -2273,7 +2285,9 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("ghostbt")
                     && tile != null
-                    && !tile.getWormholes(game).isEmpty()) {
+                    && !tile.getWormholes(game).isEmpty()
+                    && !"pd".equalsIgnoreCase(unitID)
+                    && !"sd".equalsIgnoreCase(unitID)) {
                 player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
             }
         } else {

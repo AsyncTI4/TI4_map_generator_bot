@@ -2186,53 +2186,72 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static void increaseMykoMech(Game game) {
+    public static void increaseMykoMech(Game game, Player player) {
         int amount;
-        if (!game.getStoredValue("mykoMech").isEmpty()) {
-            amount = Integer.parseInt(game.getStoredValue("mykoMech"));
+        if (!game.getStoredValue("mykoMech" + player.getFaction()).isEmpty()) {
+            amount = Integer.parseInt(game.getStoredValue("mykoMech" + player.getFaction()));
             amount += 1;
         } else {
             amount = 1;
         }
-        game.setStoredValue("mykoMech", "" + amount);
+        game.setStoredValue("mykoMech" + player.getFaction(), "" + amount);
     }
 
-    private static void decreaseMykoMech(Game game) {
+    private static void decreaseMykoMech(Game game, Player player) {
         int amount = 0;
-        if (!game.getStoredValue("mykoMech").isEmpty()) {
-            amount = Integer.parseInt(game.getStoredValue("mykoMech"));
+        if (!game.getStoredValue("mykoMech" + player.getFaction()).isEmpty()) {
+            amount = Integer.parseInt(game.getStoredValue("mykoMech" + player.getFaction()));
             amount -= 1;
         }
         if (amount < 0) {
             amount = 0;
         }
-        game.setStoredValue("mykoMech", "" + amount);
+        game.setStoredValue("mykoMech" + player.getFaction(), "" + amount);
     }
 
     @ButtonHandler("resolveMykoMech")
-    public static void resolveMykoMech(Player player, Game game) {
-        decreaseMykoMech(game);
+    public static void resolveMykoMech(Player player, Game game, ButtonInteractionEvent event) {
+        decreaseMykoMech(game, player);
+        if (game.isTwilightsFallMode()) {
+            String message = player.getRepresentation() + ", please choose a home system planet to place a mech on.";
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    message,
+                    Helper.getHSPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+            int amount = 0;
+            if (!game.getStoredValue("mykoMech" + player.getFaction()).isEmpty()) {
+                amount = Integer.parseInt(game.getStoredValue("mykoMech" + player.getFaction()));
+            }
+            if (amount == 0) {
+                ButtonHelper.deleteMessage(event);
+            }
+            return;
+        }
         List<Button> buttons =
                 new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game));
         String message = player.getRepresentationUnfogged() + ", please use buttons to replace 1 infantry with 1 mech";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveMykoMechCheck(Player player, Game game) {
-        if (!player.hasUnit("mykomentori_mech")
-                || game.getStoredValue("mykoMech").isEmpty()) {
+        if (game.getStoredValue("mykoMech" + player.getFaction()).isEmpty()) {
             return;
         }
-        int amount = Integer.parseInt(game.getStoredValue("mykoMech"));
+        int amount = Integer.parseInt(game.getStoredValue("mykoMech" + player.getFaction()));
         List<Button> buttons = new ArrayList<>();
+        String message;
+        if (game.isTwilightsFallMode()) {
+            message = player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
+                    + " that may be placed on home system planets.";
+        } else {
+            message = player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
+                    + " that may replace infantry.";
+        }
         buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         if (amount > 0) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
-                            + " that may replace infantry.",
-                    buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
     }
 
