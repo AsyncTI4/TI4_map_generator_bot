@@ -2166,6 +2166,11 @@ public class StartCombatService {
             > 4. Anti-Fighter Barrage
             > 5. Declare Retreats (including _Rout_)
             > 6. Roll Dice!
+            > 7. Rerolls (Thundarian, War Funding, Thalnos, etc.)
+            > 8. Cancel hits (Shields Holding, Sustain Damage, Titans agent)
+            > 9. Assign Hits (This is the only step that is done simultaneously)
+            > 10. Retreat (if declared in step 5)
+            > 11. After a round of combat abilities (Yin Devotion, Sardakk Exo 2)
             """;
     }
 

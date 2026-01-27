@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3062,7 +3059,7 @@ public class ButtonHelper {
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
         String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
-        String msg = ident + " removed command token from " + tileRep + ".";
+        String msg = ident + " removed command token from " + tileRep;
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -3070,14 +3067,15 @@ public class ButtonHelper {
             player = game.getPlayerFromColorOrFaction(faction);
             if (game.isFowMode()) {
                 msg = player.getRepresentationUnfogged()
-                        + ", this is a notice that someone removed your command token from " + tileRep + ".";
+                        + ", this is a notice that someone removed your command token from " + tileRep;
             } else {
                 msg = player.getRepresentationUnfogged() + ", this is a notice that " + msg + " using ";
                 msg += (mahact.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "");
                 msg += "Jae Mir Kan, the Mahact" + (mahact.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "");
-                msg += " agent.";
+                msg += " agent";
             }
         }
+        msg += ".";
 
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
 
@@ -3790,8 +3788,11 @@ public class ButtonHelper {
             return true;
         }
         PlanetModel planetModel = Mapper.getPlanet(planetName);
-        if (planetModel != null && planetModel.isLegendary()) {
+        if (planetModel != null && planetModel.isLegendary() && !planetModel.isSpaceStation()) {
             return true;
+        }
+        if (planetModel != null && planetModel.isSpaceStation()) {
+            return false;
         }
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
         Planet planetHolder = (Planet) unitHolder;

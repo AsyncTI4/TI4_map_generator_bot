@@ -962,6 +962,29 @@
         "notes": "Not currently automated by the bot."
     },
     {
+        "alias": "dskaltpds",
+        "name": "Consulate II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RY",
+        "faction": "kaltrim",
+        "baseUpgrade": "pds2",
+        "source": "ds",
+        "text": "PLANETARY SHIELD, SPACE CANNON 4\nYou may use this unit's SPACE CANNON against ships that are in adjacent systems. After another player activates this system, if you do not control this planet, capture up to 1 of their infantry on the game board."
+    },
+    {
+        "alias": "dskaltr",
+        "name": "Kaldur Arrest Field",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "kaltrim",
+        "source": "ds",
+        "text": "When another player activates a system that contains 1 of your structures, you may capture 2 of their infantry on the game board, unless they spend 1 influence. You may spend your captured infantry as if they were trade goods."
+    },
+    {
         "alias": "dsbelky",
         "name": "Synchrony Matrix",
         "types": [

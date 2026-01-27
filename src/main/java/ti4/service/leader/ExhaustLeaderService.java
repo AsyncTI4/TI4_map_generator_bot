@@ -62,5 +62,12 @@ public class ExhaustLeaderService {
                     player.getCorrectChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");
         }
+        if (game.isTwilightsFallMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "## Note that in Twilight's Fall, genomes can be cancelled by the _Shatter_ action card."
+                            + " You are encouraged to ping the table and ask for any *Shatter*s if this genome is important, and likely to be _Shatter_'d."
+                            + " Otherwise, just assume no _Shatter_ and fix later if necessary.");
+        }
     }
 }

@@ -156,6 +156,7 @@
         "source": "pok",
         "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nDuring the action phase, you can exhaust planets you control that have technology specialties to gain 1 trade good.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/psychoarchaeology.png?raw=true",
+        "notes": "This does __not__ allow a player to complete the technology speciality expedition for free in Thunder's Edge.",
         "initials": "PSY",
         "shortName": "Psychoarch\n-aeology",
         "shrinkName": true

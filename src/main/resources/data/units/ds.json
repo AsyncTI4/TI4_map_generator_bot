@@ -793,6 +793,36 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/orion_platform_2.png?raw=true"
     },
     {
+        "id": "kaltrim_pds",
+        "baseType": "pds",
+        "asyncId": "pd",
+        "name": "Consulate I",
+        "upgradesToUnitId": "kaltrim_pds2",
+        "source": "ds",
+        "faction": "kaltrim",
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 1,
+        "planetaryShield": true,
+        "isStructure": true,
+        "ability": "DEPLOY: After a system is activated, you may allow 1 of your neighbors to place 1 PDS from your reinforcements into coexistence on a planet they control in the active system."
+    },
+    {
+        "id": "kaltrim_pds2",
+        "baseType": "pds",
+        "asyncId": "pd",
+        "name": "Consulate II",
+        "upgradesFromUnitId": "kaltrim_pds",
+        "requiredTechId": "dskaltpds",
+        "source": "ds",
+        "faction": "gledge",
+        "spaceCannonHitsOn": 4,
+        "spaceCannonDieCount": 1,
+        "planetaryShield": true,
+        "isStructure": true,
+        "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems. \nAfter another player activates this system, if you do not control this planet, capture up to 1 of their infantry on the game board."
+    },
+    {
         "id": "khrask_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
@@ -2337,6 +2367,21 @@
         "ability": "Other players cannot exhaust this planet. During combat as the defender, you may exhaust this planet to repair each of your units on this planet. "
     },
     {
+        "id": "kaltrim_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Thorn",
+        "source": "ds",
+        "faction": "kaltrim",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: During the agenda phase, after an outcome you voted for or predicted is resolved, place up to 1 mech from your reinforcements on a planet that contains 1 of your units."
+    },
+    {
         "id": "atokera_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
@@ -2354,6 +2399,24 @@
         "isShip": true,
         "ability": "Your other units in this system also have the unit and text abilities of other players’ units of the same type in this system.",
         "notes": "Not currently implemented by the bot."
+    },
+    {
+        "id": "kaltrim_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Jewel of the Rose",
+        "source": "ds",
+        "faction": "kaltrim",
+        "moveValue": 1,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "When an agenda is revealed, you may have this ship become damaged to discard that card and reveal 1 agenda from the top of the deck to vote on instead."
     },
     {
         "id": "belkosea_fighter",
