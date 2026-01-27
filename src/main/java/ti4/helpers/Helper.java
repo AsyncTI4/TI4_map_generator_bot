@@ -1459,11 +1459,11 @@ public class Helper {
                     .append("->")
                     .append(player.getTg())
                     .append(") \n");
-            if (player.hasTech("mc")) {
-                res += tg + keleresAgent;
-                inf += tg + keleresAgent;
-                msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
-            }
+        }
+        if (player.hasTech("mc") && tg + keleresAgent > 0) {
+            res += tg + keleresAgent;
+            inf += tg + keleresAgent;
+            msg.append("> Counted the trade goods twice due to _Mirror Computing_\n");
         }
 
         if ("res".equalsIgnoreCase(resOrInfOrBoth)) {

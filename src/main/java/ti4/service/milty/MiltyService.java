@@ -710,6 +710,13 @@ public class MiltyService {
         if (game.isThundersEdge() && "crimson".equalsIgnoreCase(player.getFaction())) {
             BreakthroughCommandHelper.unlockBreakthrough(game, player, "crimsonbt");
         }
+        if (player.getFaction().contains("kaltrim")) {
+            player.setFleetCC(2);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "Set fleet command counters to 2 for " + player.getRepresentation()
+                            + ", due to their **Kaltrim** setup.");
+        }
 
         if (game.isRapidMobilizationMode()) {
             Tile tile2 = player.getHomeSystemTile();
