@@ -1862,6 +1862,51 @@
         "source": "ds"
     },
     {
+        "alias": "kaltrim",
+        "factionName": "Principality of Kaltrim",
+        "homeSystem": "br7",
+        "startingFleet": "1 cv,2 ff,3 inf k, 1 sd k, 1 dn",
+        "commodities": 3,
+        "factionTech": [
+            "dskaltr",
+            "dskaltpds"
+        ],
+        "startingTech": [
+            "ac"
+        ],
+        "homePlanets": [
+            "kaltrim",
+            "avkho"
+        ],
+        "abilities": [
+            "questing_prince",
+            "lost_crown_of_kaltrim",
+            "shrines"
+        ],
+        "leaders": [
+            "kaltrimagent",
+            "kaltrimcommander",
+            "kaltrimhero"
+        ],
+        "promissoryNotes": [
+            "dspnkalt"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kaltrim_flagship",
+            "infantry",
+            "kaltrim_mech",
+            "kaltrim_pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
+    },
+    {
         "alias": "belkosea",
         "factionName": "Belkosea Allied States",
         "homeSystem": "br5",

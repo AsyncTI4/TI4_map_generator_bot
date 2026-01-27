@@ -241,7 +241,7 @@ public class CommanderUnlockCheckService {
             case "florzen", "augers", "kolume", "kortali", "khrask", "nokar", "zealots" -> shouldBeUnlocked = true;
 
             // BR
-            case "atokera", "belkosea", "pharadn", "qhet", "toldar", "uydai" -> shouldBeUnlocked = true;
+            case "atokera", "belkosea", "pharadn", "qhet", "toldar", "uydai", "kaltrim" -> shouldBeUnlocked = true;
         }
         if (shouldBeUnlocked) {
             UnlockLeaderService.unlockLeader(faction + "commander", game, player);

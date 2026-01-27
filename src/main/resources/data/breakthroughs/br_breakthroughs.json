@@ -60,6 +60,18 @@
         "source": "blue_reverie"
     },
     {
+        "alias": "kaltrimbt",
+        "name": "Echo Operatives",
+        "shortName": "Echo\nOperatives",
+        "faction": "kaltrim",
+        "synergy": [
+            "CYBERNETIC",
+            "PROPULSION"
+        ],
+        "text": "When you would return a promissory note to another player, you may exhaust this card to spend 1 token from your strategy pool instead of returning that promissory note. At any time, one of your neighbors may spend 3 influence to repair 1 of your units.",
+        "source": "blue_reverie"
+    },
+    {
         "alias": "toldarbt",
         "name": "Dyrun's War-Bell",
         "shortName": "Dyrun's\nWar-Bell",

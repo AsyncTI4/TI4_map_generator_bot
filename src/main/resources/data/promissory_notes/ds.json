@@ -422,6 +422,15 @@
         "text": "At the start of invasion: Choose 1 unit you control in the active system; that unit gains PLANETARY SHIELD until the end of this action. Then, return this card to the Atokera player."
     },
     {
+        "alias": "dspnkalt",
+        "name": "Kaltrim Ambassadors",
+        "faction": "kaltrim",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of the agenda phase: Place 1 infantry from the Kaltrim player's reinforcements into coexistence on a planet you control to look at the top card of the agenda deck, you may discard that card. Then, return this card to the Kaltrim player."
+    },
+    {
         "alias": "dspnbelk",
         "name": "Mercenary Sortie",
         "faction": "belkosea",
