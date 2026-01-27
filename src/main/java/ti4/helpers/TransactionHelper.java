@@ -577,8 +577,9 @@ public class TransactionHelper {
                         default -> "Power/Electrical";
                     })),
             "The Golden Skull of Rauhl",
-            "An Inverted Jenny Postage Stamp",
-            "A Flanian Pobble Bead");
+            "This Defective Postage Stamp, Which Has The Aeroplane Printed Upside-Down",
+            "A Flanian Pobble Bead",
+            "A Red Herring");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
