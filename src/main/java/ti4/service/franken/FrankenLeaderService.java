@@ -33,6 +33,7 @@ public class FrankenLeaderService {
             }
             if (fakeCommanders != null && fakeCommanders) {
                 player.getGame().addFakeCommander(leaderID);
+                player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

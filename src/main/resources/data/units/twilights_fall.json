@@ -511,7 +511,8 @@
         "combatDieCount": 1,
         "isShip": true,
         "isSpaceOnly": false,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. This unit can be committed during an invasion; either return it to the space area or replace it with 1 infantry at the end of combat."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. This unit can be committed during an invasion; either return it to the space area or replace it with 1 infantry at the end of combat.",
+        "notes": "Per Dane, this unit does not need to have a combat in order to transform into an infantry after landing during an invasion."
     },
     {
         "id": "tf-yinclone",
