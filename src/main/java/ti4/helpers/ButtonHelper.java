@@ -231,7 +231,7 @@ public class ButtonHelper {
                     (totalAmount <= 10
                                     ? UnitEmojis.infantry.toString().repeat(totalAmount)
                                     : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be prompted to place them on a planets you control at the start of the status phase.");
+                            + " died and auto-revived. You will be prompted to place them on a planet you control at the start of the Status Phase.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
         }
         Game game = player.getGame();
