@@ -1181,7 +1181,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> pools =
                         new HashSet<String>(game.getAllDebtPoolIcons().keySet());
-                pools.add(Constants.DEBT_DEFAULT_POOL);
+                pools.add(Constants.DEBT_DEFAULT_POOL.toLowerCase());
                 List<Command.Choice> options = mapTo25ChoicesThatContain(pools, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
