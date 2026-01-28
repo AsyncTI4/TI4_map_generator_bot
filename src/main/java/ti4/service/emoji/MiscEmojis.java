@@ -89,7 +89,8 @@ public enum MiscEmojis implements TI4Emoji {
     Stroter,
     Wololo,
     TaDont,
-    Zobat;
+    Zobat,
+    SharkLoan;
 
     public static TI4Emoji getCreussWormhole(@NotNull String wormhole) {
         return switch (wormhole.toLowerCase()) {

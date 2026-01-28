@@ -2569,7 +2569,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.gray("sendVadenHeroSomething_" + vaden.getFaction() + "_comms", "Send 2 Commodities"));
         }
         buttons.add(Buttons.red("sendVadenHeroSomething_" + vaden.getFaction() + "_pn", "Send 1 Promissory Note"));
-        vaden.clearDebt(target, 1);
+        vaden.clearDebt(target, 1, Constants.VADEN_DEBT_POOL);
         MessageHelper.sendMessageToChannel(
                 vaden.getCorrectChannel(),
                 vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true)
@@ -2580,7 +2580,7 @@ public class ButtonHelperHeroes {
                         + ", please choose something to give due to Putriv Sirvonsk, the Vaden hero,"
                         + " returning one of your tokens (\"your kneecaps\" are not an option).",
                 buttons);
-        if (vaden.getDebtTokenCount(target.getColor()) == 0) {
+        if (vaden.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) == 0) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }

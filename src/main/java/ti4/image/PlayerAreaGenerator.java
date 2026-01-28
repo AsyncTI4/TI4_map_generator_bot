@@ -2673,7 +2673,7 @@ class PlayerAreaGenerator {
             Color textColor = Color.white;
             if (!unl || exh) textColor = Color.gray;
 
-            String resource = model.getBackgroundResource();
+            String resource = model.getBackgroundResource(unl && !exh);
 
             BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor, model.getShrinkName());
             drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
@@ -2722,10 +2722,10 @@ class PlayerAreaGenerator {
 
         if (shrink) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 11, 30, 120, true);
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 11, 150, 120, false);
         } else {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 9, 30, 120, true);
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 9, 150, 120, false);
         }
 
         g2.setColor(boxOutline);

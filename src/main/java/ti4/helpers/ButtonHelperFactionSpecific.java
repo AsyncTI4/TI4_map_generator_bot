@@ -522,7 +522,7 @@ public class ButtonHelperFactionSpecific {
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         Tile tile = game.getTileByPosition(pos);
-        player.clearDebt(p2, 1);
+        player.clearDebt(p2, 1, Constants.VADEN_DEBT_POOL);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getRepresentation()
@@ -2176,7 +2176,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveVadenSCDebt(Player player, int sc, Game game, GenericInteractionCreateEvent event) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
-                SendDebtService.sendDebt(player, p2, 1);
+                SendDebtService.sendDebt(player, p2, 1, Constants.VADEN_DEBT_POOL);
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
