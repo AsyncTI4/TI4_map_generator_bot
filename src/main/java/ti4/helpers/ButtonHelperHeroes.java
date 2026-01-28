@@ -2541,7 +2541,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
 
         for (Player target : game.getRealPlayers()) {
-            if (vaden.getDebtTokenCount(target.getColor()) > 0) {
+            if (vaden.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                 Button button;
                 String prefix = "vadenHeroClearDebt";
                 String faction = target.getFaction();

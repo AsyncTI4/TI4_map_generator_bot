@@ -242,7 +242,7 @@ public class ButtonHelperFactionSpecific {
                         + Helper.getPlanetRepresentation(planet, game)
                         + " using the Collector (Vaden mech) ability. This forgave 1 debt from their opponent.");
         player.removeDebtTokens(
-                game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1);
+                game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1, Constants.VADEN_DEBT_POOL);
     }
 
     public static void resolveDeceive(Player player, Game game) {
