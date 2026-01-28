@@ -46,6 +46,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
+import ti4.model.RelicModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
@@ -477,6 +478,11 @@ public class CombatRollService {
                     String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign "
                             + (h == 1 ? "the hit" : "hits") + ". "
                             + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
+                    if (opponent.hasRelic("metalivoidshielding")) {
+                        RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
+                        msg2 += "\nReminder: You have the " + relicModel.getName()
+                                + " relic, you may sustain damage on one of your none-fighter ships instead of taking a hit.";
+                    }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                 } else {
                     String msg2 = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
