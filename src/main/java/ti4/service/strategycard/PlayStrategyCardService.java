@@ -615,9 +615,6 @@ public class PlayStrategyCardService {
                     scButtons.add(transaction);
                     scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
                     String label = "Send 1 Debt";
-                    if (player.hasAbility("binding_debts")) {
-                        label += " (Binding Debts)";
-                    }
                     scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
                 }
                 MessageHelper.sendMessageToChannelWithButtons(

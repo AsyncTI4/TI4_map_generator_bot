@@ -447,6 +447,7 @@ public class Constants {
     public static final String DEBT = "debt";
     public static final String DEBT_POOL = "debt_pool";
     public static final String DEBT_DEFAULT_POOL = "Debt Account";
+    public static final String VADEN_DEBT_POOL = "Shark Loans";
     public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
     public static final String LIZHO_TRAP_PNG = "attachment_lizhotrap.png";

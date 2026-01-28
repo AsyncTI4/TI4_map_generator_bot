@@ -276,7 +276,6 @@
     {
         "alias": "bastionbt",
         "name": "The Icon",
-        "shortName": "The\nIcon",
         "faction": "bastion",
         "synergy": [
             "CYBERNETIC",
