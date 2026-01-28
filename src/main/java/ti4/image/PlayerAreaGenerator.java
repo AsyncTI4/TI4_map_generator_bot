@@ -1405,6 +1405,8 @@ class PlayerAreaGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
+        graphics.setColor(Color.WHITE);
+
         for (Entry<String, Map<String, Integer>> pool :
                 player.getAllDebtTokens().entrySet()) {
 
@@ -1441,6 +1443,8 @@ class PlayerAreaGenerator {
             }
 
             int deltaX = 24;
+            g2.setFont(Storage.getFont18());
+            DrawingUtil.drawDebtBoxText(g2, pool.getKey().toUpperCase(), x - 4, y + 148, 146);
 
             int tokenDeltaY = 0;
             int playerCount = 0;
@@ -1484,9 +1488,7 @@ class PlayerAreaGenerator {
                 }
             }
             deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
-            graphics.setColor(Color.WHITE);
             graphics.drawRect(x - 2, y - 2, deltaX, 152);
-            DrawingUtil.drawTextVertically(g2, pool.getKey().toUpperCase(), x + 3, y + 148, Storage.getFont18());
             x += deltaX + 10;
         }
 

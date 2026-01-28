@@ -323,9 +323,9 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techEmoji = getType().emoji();
         title.append(factionEmoji)
                 .append(techEmoji)
-                .append(" ")
+                .append(" _")
                 .append(name)
-                .append(" ")
+                .append("_ ")
                 .append(source.emoji());
         return title.toString();
     }
