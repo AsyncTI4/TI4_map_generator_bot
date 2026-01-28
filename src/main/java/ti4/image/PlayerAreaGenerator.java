@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.font.GlyphVector;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -36,6 +37,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -78,6 +82,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.VeiledHeartService;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.spring.jda.JdaService;
@@ -526,9 +531,8 @@ class PlayerAreaGenerator {
             xDelta = leaderInfo(player, xDelta, yPlayArea, game);
         }
 
-        if (player.getDebtTokens().values().stream().anyMatch(i -> i > 0)) {
-            xDelta = debtInfo(player, xDelta, yPlayArea, game);
-        }
+        // if (player.getAllDebtTokens().values().values().stream().anyMatch(i -> i > 0))
+        xDelta = debtInfo(player, xDelta, yPlayArea, game);
 
         if (!player.getRelics().isEmpty()) {
             xDelta = relicInfo(player, xDelta, yPlayArea);
@@ -1398,63 +1402,95 @@ class PlayerAreaGenerator {
     }
 
     private int debtInfo(Player player, int x, int y, Game game) {
-        int deltaX = 0;
-        int deltaY = 0;
-
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
-        String bankImage =
-                "vaden".equalsIgnoreCase(player.getFaction()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png";
-        drawPAImage(x + deltaX, y, bankImage);
+        for (Entry<String, Map<String, Integer>> pool :
+                player.getAllDebtTokens().entrySet()) {
 
-        deltaX += 24;
-        deltaY += 2;
-
-        int tokenDeltaY = 0;
-        int playerCount = 0;
-        int maxTokenDeltaX = 0;
-        for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
-            Player debtPlayer = game.getPlayerByColorID(Mapper.getColorID(debtToken.getKey()))
-                    .orElse(null);
-            boolean hideFactionIcon =
-                    isFoWPrivate && debtPlayer != null && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
-
-            int tokenDeltaX = 0;
-            String controlID = Mapper.getControlID(debtToken.getKey());
-            if (controlID.contains("null")) {
-                continue;
+            String bankSource = game.getDebtPoolIcon(pool.getKey());
+            if (bankSource == null) {
+                if (Constants.DEBT_DEFAULT_POOL.equalsIgnoreCase(pool.getKey())) {
+                    bankSource = "pa_debtaccount.png";
+                    drawPAImage(x, y, bankSource);
+                } else {
+                    bankSource = TI4Emoji.getRandomizedEmoji(0, null).toString();
+                }
             }
 
-            float scale = 0.60f;
-            BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-
-            for (int i = 0; i < debtToken.getValue(); i++) {
-                DrawingUtil.drawControlToken(
-                        graphics,
-                        controlTokenImage,
-                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID),
-                        x + deltaX + tokenDeltaX,
-                        y + deltaY + tokenDeltaY,
-                        hideFactionIcon,
-                        scale);
-                tokenDeltaX += 15;
+            if (!"pa_debtaccount.png".equals(bankSource)) {
+                BufferedImage bankImage = null;
+                Emoji bankEmoji = Emoji.fromFormatted(bankSource);
+                if (bankEmoji instanceof CustomEmoji factionCustomEmoji) {
+                    bankImage = ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), 120, 120);
+                } else if (bankEmoji instanceof UnicodeEmoji uni) {
+                    BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g3 = img.createGraphics();
+                    g3.setFont(Storage.getEmojiFont());
+                    BasicStroke stroke4 = new BasicStroke(4.0f);
+                    DrawingUtil.superDrawString(
+                            g3, uni.getFormatted(), 20, 60, Color.white, null, null, stroke4, Color.black);
+                    GlyphVector gv = g3.getFont().createGlyphVector(g3.getFontRenderContext(), uni.getFormatted());
+                    Rectangle rect = gv.getGlyphPixelBounds(0, g3.getFontRenderContext(), 20, 60);
+                    int pad = 5;
+                    BufferedImage img2 =
+                            img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
+                    bankImage = ImageHelper.scale(ImageHelper.square(img2), 120, 120);
+                }
+                g2.drawImage(bankImage, x + 20, y + 15, null);
             }
 
-            tokenDeltaY += 29;
-            maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
-            playerCount++;
-            if (playerCount % 5 == 0) {
-                tokenDeltaY = 0;
-                deltaX += maxTokenDeltaX;
-                maxTokenDeltaX = 0;
+            int deltaX = 24;
+
+            int tokenDeltaY = 0;
+            int playerCount = 0;
+            int maxTokenDeltaX = 0;
+            for (Entry<String, Integer> debtToken : pool.getValue().entrySet()) {
+                Player debtPlayer = game.getPlayerByColorID(Mapper.getColorID(debtToken.getKey()))
+                        .orElse(null);
+                boolean hideFactionIcon = isFoWPrivate
+                        && debtPlayer != null
+                        && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
+
+                int tokenDeltaX = 0;
+                String controlID = Mapper.getControlID(debtToken.getKey());
+                if (controlID.contains("null")) {
+                    continue;
+                }
+
+                float scale = 0.60f;
+                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+
+                for (int i = 0; i < debtToken.getValue(); i++) {
+                    DrawingUtil.drawControlToken(
+                            graphics,
+                            controlTokenImage,
+                            DrawingUtil.getPlayerByControlMarker(
+                                    game.getPlayers().values(), controlID),
+                            x + deltaX + tokenDeltaX,
+                            y + 2 + tokenDeltaY,
+                            hideFactionIcon,
+                            scale);
+                    tokenDeltaX += 15;
+                }
+
+                tokenDeltaY += 29;
+                maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
+                playerCount++;
+                if (playerCount % 5 == 0) {
+                    tokenDeltaY = 0;
+                    deltaX += maxTokenDeltaX;
+                    maxTokenDeltaX = 0;
+                }
             }
+            deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
+            graphics.setColor(Color.WHITE);
+            graphics.drawRect(x - 2, y - 2, deltaX, 152);
+            DrawingUtil.drawTextVertically(g2, pool.getKey().toUpperCase(), x + 3, y + 148, Storage.getFont18());
+            x += deltaX + 10;
         }
-        deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
-        graphics.setColor(Color.WHITE);
-        graphics.drawRect(x - 2, y - 2, deltaX, 152);
 
-        return x + deltaX + 10;
+        return x;
     }
 
     private int abilityInfo(Player player, int x, int y) {

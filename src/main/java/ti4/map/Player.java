@@ -130,7 +130,8 @@ public class Player extends PlayerProperties {
     private final Map<String, String> fowCustomLabels = new HashMap<>();
     private Map<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private @Getter Map<String, Integer> currentProducedUnits = new HashMap<>();
-    private Map<String, Integer> debtTokens = new LinkedHashMap<>(); // color, count
+    private Map<String, Map<String, Integer>> debtTokens =
+            new LinkedHashMap<String, Map<String, Integer>>(); // <pool: <color: count>>
 
     public Player(String userID, String userName, Game game) {
         setUserID(userID);
@@ -2860,34 +2861,86 @@ public class Player extends PlayerProperties {
         return super.getAutoCompleteRepresentation();
     }
 
-    public Map<String, Integer> getDebtTokens() {
+    public Map<String, Map<String, Integer>> getAllDebtTokens() {
         return debtTokens;
     }
 
+    public Map<String, Integer> getDebtTokens() {
+        return getDebtTokens(Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public Map<String, Integer> getDebtTokens(String pool) {
+        Map<String, Integer> tokens = debtTokens.get(pool.toLowerCase());
+        if (tokens == null) {
+            return new LinkedHashMap<String, Integer>();
+        }
+        return tokens;
+    }
+
     public void setDebtTokens(Map<String, Integer> debtTokens) {
-        this.debtTokens = debtTokens;
+        setDebtTokens(debtTokens, Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public void setDebtTokens(Map<String, Integer> debtTokens, String pool) {
+        this.debtTokens.put(pool.toLowerCase(), debtTokens);
     }
 
     public void addDebtTokens(String tokenColor, int count) {
-        if (debtTokens.containsKey(tokenColor)) {
-            debtTokens.put(tokenColor, debtTokens.get(tokenColor) + count);
+        addDebtTokens(tokenColor, count, Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public void addDebtTokens(String tokenColor, int count, String pool) {
+        pool = pool.toLowerCase();
+        if (!debtTokens.containsKey(pool)) {
+            debtTokens.put(pool, new LinkedHashMap<String, Integer>());
+        }
+
+        if (debtTokens.get(pool).containsKey(tokenColor)) {
+            debtTokens.get(pool).put(tokenColor, debtTokens.get(pool).get(tokenColor) + count);
         } else {
-            debtTokens.put(tokenColor, count);
+            debtTokens.get(pool).put(tokenColor, count);
         }
     }
 
     public void removeDebtTokens(String tokenColor, int count) {
-        if (debtTokens.containsKey(tokenColor)) {
-            debtTokens.put(tokenColor, Math.max(debtTokens.get(tokenColor) - count, 0));
+        removeDebtTokens(tokenColor, count, Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public void removeDebtTokens(String tokenColor, int count, String pool) {
+        pool = pool.toLowerCase();
+        if (!debtTokens.containsKey(pool)) {
+            return;
+        }
+        if (debtTokens.get(pool).containsKey(tokenColor)) {
+            debtTokens.get(pool).put(tokenColor, Math.max(debtTokens.get(pool).get(tokenColor) - count, 0));
         }
     }
 
     public void clearAllDebtTokens(String tokenColor) {
-        debtTokens.remove(tokenColor);
+        clearAllDebtTokens(tokenColor, Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public void clearAllDebtTokens(String tokenColor, String pool) {
+        pool = pool.toLowerCase();
+        if (!debtTokens.containsKey(pool)) {
+            return;
+        }
+        debtTokens.get(pool).remove(tokenColor);
+        if (debtTokens.get(pool).isEmpty()) {
+            debtTokens.remove(pool);
+        }
     }
 
     public int getDebtTokenCount(String tokenColor) {
-        return debtTokens.getOrDefault(tokenColor, 0);
+        return getDebtTokenCount(tokenColor, Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public int getDebtTokenCount(String tokenColor, String pool) {
+        pool = pool.toLowerCase();
+        if (!debtTokens.containsKey(pool)) {
+            return 0;
+        }
+        return debtTokens.get(pool).getOrDefault(tokenColor, 0);
     }
 
     public boolean hasOlradinPolicies() {
@@ -3302,8 +3355,12 @@ public class Player extends PlayerProperties {
     }
 
     public void clearDebt(Player player, int count) {
+        clearDebt(player, count, Constants.DEBT_DEFAULT_POOL);
+    }
+
+    public void clearDebt(Player player, int count, String pool) {
         String clearedPlayerColor = player.getColor();
-        removeDebtTokens(clearedPlayerColor, count);
+        removeDebtTokens(clearedPlayerColor, count, pool);
     }
 
     @JsonIgnore

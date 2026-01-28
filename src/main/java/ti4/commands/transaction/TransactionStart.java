@@ -1,23 +1,14 @@
 package ti4.commands.transaction;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.GameStateCommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.TransactionHelper;
 
-public class Transaction extends GameStateCommand {
+public class TransactionStart extends GameStateSubcommand {
 
-    public Transaction() {
-        super(true, true);
-    }
-
-    @Override
-    public String getName() {
-        return Constants.TRANSACTION;
-    }
-
-    public String getDescription() {
-        return "Start a transaction with another player.";
+    public TransactionStart() {
+        super(Constants.TRANSACTION_START, "Start a transaction with another player.", true, true);
     }
 
     @Override

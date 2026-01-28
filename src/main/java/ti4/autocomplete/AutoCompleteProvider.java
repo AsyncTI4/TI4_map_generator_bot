@@ -1174,6 +1174,14 @@ public class AutoCompleteProvider {
                 }
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
+            case Constants.DEBT_POOL -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options =
+                        mapTo25ChoicesThatContain(game.getAllDebtPoolIcons().keySet(), enteredValue);
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
             case Constants.SEAT_COUNT_OPTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 if (!enteredValue.isBlank()) return;
