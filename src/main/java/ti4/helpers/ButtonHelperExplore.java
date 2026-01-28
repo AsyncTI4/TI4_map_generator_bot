@@ -59,7 +59,7 @@ class ButtonHelperExplore {
             fragmentsToPurge.removeFirst();
         }
 
-        StringBuilder message = new StringBuilder(player.getRepresentation() + " purged");
+        StringBuilder message = new StringBuilder(player.getRepresentation() + " purged ");
         if (fragmentsToPurge.size() == 1) {
             String fragId = fragmentsToPurge.getFirst();
             player.removeFragment(fragId);
