@@ -2752,8 +2752,8 @@ public class ButtonHelper {
 
     public static int howManyDifferentDebtPlayerHas(Player player) {
         int count = 0;
-        for (String color : player.getDebtTokens().keySet()) {
-            if (player.getDebtTokens().get(color) > 0) {
+        for (String color : player.getDebtTokens(Constants.VADEN_DEBT_POOL).keySet()) {
+            if (player.getDebtTokens(Constants.VADEN_DEBT_POOL).get(color) > 0) {
                 count++;
             }
         }

@@ -1591,7 +1591,7 @@ public class StartCombatService {
 
         if ((p2.hasAbility("collateralized_loans"))
                 && !game.isFowMode()
-                && p2.getDebtTokenCount(p1.getColor()) > 0
+                && p2.getDebtTokenCount(p1.getColor(), Constants.VADEN_DEBT_POOL) > 0
                 && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(
@@ -1600,7 +1600,7 @@ public class StartCombatService {
                     FactionEmojis.vaden));
         }
         if ((p1.hasAbility("collateralized_loans"))
-                && p1.getDebtTokenCount(p2.getColor()) > 0
+                && p1.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0
                 && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(
@@ -2097,7 +2097,7 @@ public class StartCombatService {
                 if (p1.hasUnit("vaden_mech")
                         && unitH.getUnitCount(Units.UnitType.Mech, p1) > 0
                         && isGroundCombat
-                        && p1.getDebtTokenCount(p2.getColor()) > 0) {
+                        && p1.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String id = p1.finChecker() + "resolveVadenMech_" + unitH.getName() + "_" + p2.getColor();
                     String label = "Vaden Mech Ability on " + nameOfHolder;
                     buttons.add(Buttons.gray(id, label, FactionEmojis.vaden));
@@ -2105,7 +2105,7 @@ public class StartCombatService {
                 if (p2.hasUnit("vaden_mech")
                         && unitH.getUnitCount(Units.UnitType.Mech, p2) > 0
                         && isGroundCombat
-                        && p2.getDebtTokenCount(p1.getColor()) > 0) {
+                        && p2.getDebtTokenCount(p1.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String id = p2.finChecker() + "resolveVadenMech_" + unitH.getName() + "_" + p1.getColor();
                     String label = "Vaden Mech Ability on " + nameOfHolder;
                     buttons.add(Buttons.gray(id, label, FactionEmojis.vaden));

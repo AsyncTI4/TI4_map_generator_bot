@@ -350,8 +350,8 @@ public class ButtonHelperAbilities {
         vaden.setTg(vaden.getTg() + 1);
         pillageCheck(vaden, game);
         player.setTg(player.getTg() - 1);
-        int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor()));
-        vaden.clearDebt(player, amount);
+        int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor(), Constants.VADEN_DEBT_POOL));
+        vaden.clearDebt(player, amount, Constants.VADEN_DEBT_POOL);
         String msg = player.getFactionEmojiOrColor() + " paid 1 trade good to "
                 + vaden.getFactionEmojiOrColor()
                 + "to clear 2 debt tokens via the **Binding Debts** ability.";
