@@ -480,8 +480,8 @@ public class CombatRollService {
                             + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                     if (opponent.hasRelic("metalivoidshielding")) {
                         RelicModel relicModel = Mapper.getRelic("metalivoidshielding");
-                        msg2 += "\nReminder: You have the " + relicModel.getName()
-                                + " relic, you may sustain damage on one of your none-fighter ships instead of taking a hit.";
+                        msg2 += "\nReminder: You have the _" + relicModel.getName()
+                                + "_ relic, you may SUSTAIN DAMAGE on one of your none-fighter ships instead of taking a hit.";
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
                 } else {
