@@ -49,6 +49,7 @@ import ti4.model.PlanetModel;
 import ti4.model.RelicModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -700,6 +701,8 @@ public class CombatRollService {
         }
         StringBuilder resultBuilder = new StringBuilder(result);
         boolean metaliVoidCounted = false;
+        boolean unitUndecided = game.getStoredValue("highestValueSingleUnit" + player.getFaction())
+                .isEmpty();
         if (rollType == CombatRollType.combatround
                 && (player.hasTech("tf-supercharge")
                         || (player.hasUnlockedBreakthrough("letnevbt")
@@ -720,9 +723,9 @@ public class CombatRollService {
                         activeSystem,
                         unitHolder);
                 int numRollsPerUnit = unitModel.getCombatDieCountForAbility(CombatRollType.combatround, player);
-                if (numRollsPerUnit + Math.min(1, extraRollsForUnit) > max) {
+                if (numRollsPerUnit + Math.min(1, extraRollsForUnit) > max && unitUndecided) {
                     max = numRollsPerUnit + Math.min(1, extraRollsForUnit);
-                    game.setStoredValue("highestValueSingleUnit", unitModel.getAsyncId());
+                    game.setStoredValue("highestValueSingleUnit" + player.getFaction(), unitModel.getAsyncId());
                 }
                 if (player.hasUnlockedBreakthrough("letnevbt") && unitModel.getIsShip()) {
                     letnevBTBoost++;
@@ -812,21 +815,24 @@ public class CombatRollService {
                     && (player.hasTech("tf-supercharge")
                             || (player.hasUnlockedBreakthrough("letnevbt")
                                     && "space".equalsIgnoreCase(unitHolder.getName())))) {
-                if (game.getStoredValue("highestValueSingleUnit").equalsIgnoreCase(unitModel.getAsyncId())) {
+                if (game.getStoredValue("highestValueSingleUnit" + player.getFaction())
+                        .equalsIgnoreCase(unitModel.getAsyncId())) {
                     singleUnitUse = new ArrayList<>(List.of("singleUnit", "RestOfUnits"));
+                    game.removeStoredValue("highestValueSingleUnit" + player.getFaction());
                 }
             }
-
+            int ogNumOfUnit = numOfUnit;
             for (String singleUnit : singleUnitUse) {
-
-                int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                int numRolls = (ogNumOfUnit * numRollsPerUnit) + extraRollsForUnit;
                 if ("singleUnit".equals(singleUnit)) {
                     numRolls = numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     modifierToHit += letnevBTBoost;
+                    numOfUnit = 1;
                 }
                 if ("RestOfUnits".equals(singleUnit)) {
-                    numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
                     modifierToHit -= letnevBTBoost;
+                    numOfUnit = ogNumOfUnit - 1;
+                    numRolls -= numRollsPerUnit + Math.min(1, extraRollsForUnit);
                 }
                 if (numRolls == 0) {
                     continue;
@@ -840,7 +846,8 @@ public class CombatRollService {
                     mult = 2;
                 }
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
-                if ("jolnar_flagship".equalsIgnoreCase(unitModel.getId())) {
+                if (unitModel.getUnitType() == UnitType.Flagship
+                        && ValefarZService.hasFlagshipAbility(game, player, "jolnar_flagship")) {
                     for (DiceHelper.Die die : resultRolls) {
                         if (die.getResult() > 8) {
                             hitRolls += 2;
