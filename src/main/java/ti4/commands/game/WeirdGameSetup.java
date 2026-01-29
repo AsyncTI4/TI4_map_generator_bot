@@ -197,6 +197,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame
+                && !game.getTags().contains(Constants.TIGL_FRACTURED_TAG)
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
