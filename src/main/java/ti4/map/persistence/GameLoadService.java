@@ -810,6 +810,17 @@ class GameLoadService {
                     game.setMinimumTIGLRankAtGameStart(rank);
                 }
                 case Constants.PRIORITY_TRACK_MODE -> game.setPriorityTrackMode(PriorityTrackMode.parse(info));
+                case Constants.DEBT_POOL -> {
+                    StringTokenizer actionCardToken = new StringTokenizer(info, ";");
+                    Map<String, String> cards = new LinkedHashMap<>();
+                    while (actionCardToken.hasMoreTokens()) {
+                        StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                        String id = cardInfo.nextToken();
+                        String value = cardInfo.nextToken();
+                        cards.put(id.replace("_", " "), value);
+                    }
+                    game.setAllDebtPoolIcons(cards);
+                }
             }
         }
     }
@@ -952,6 +963,19 @@ class GameLoadService {
                 case Constants.BONUS_SCORED_SECRETS ->
                     player.setBonusScoredSecrets(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TURN_COUNT -> player.setInRoundTurnCount(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DEBT + "2" -> {
+                    StringTokenizer split = new StringTokenizer(tokenizer.nextToken(), "|");
+                    String pool = split.nextToken().replace("_", " ");
+                    StringTokenizer debtToken = new StringTokenizer(split.nextToken(), ";");
+                    LinkedHashMap<String, Integer> debtTokens = new LinkedHashMap<String, Integer>();
+                    while (debtToken.hasMoreTokens()) {
+                        StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
+                        String color = debtInfo.nextToken();
+                        Integer count = Integer.parseInt(debtInfo.nextToken());
+                        debtTokens.put(color, count);
+                    }
+                    player.setDebtTokens(debtTokens, pool);
+                }
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();

@@ -201,7 +201,8 @@ public class AddPlanetService {
                         String msg = player_.getRepresentation()
                                 + " lost control of "
                                 + Mapper.getPlanet(planet).getName()
-                                + " (and could perhaps resolve some applicable ability).";
+                                + (player_.isNeutral() ? "" : " (and could perhaps resolve some applicable ability)")
+                                + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                         if (game.isFowMode() && player_.isRealPlayer()) {
                             MessageHelper.sendMessageToChannel(

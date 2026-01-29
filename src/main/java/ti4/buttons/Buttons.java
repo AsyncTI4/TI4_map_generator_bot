@@ -179,8 +179,11 @@ public class Buttons {
             // BotLogger.log("Button sanitized: " + id);
             return Button.of(style, id, " ", null);
         }
+        if (label != null && label.length() > 80 && label.contains("Mez Lo Orz Fei Zsha/Rep Lo Orz Qet")) {
+            label = label.replace("Mez Lo Orz Fei Zsha/Rep Lo Orz Qet", "Mez Lo O.F.Z./Rep Lo O.Q.");
+        }
         if (label != null && label.length() > 80) {
-            BotLogger.info("Button [" + id + "] label too long, truncating: " + label);
+            BotLogger.info("Button [" + id + "] label too long (" + label.length() + "), truncating: " + label);
             label = label.substring(0, 77) + "...";
         }
         return Button.of(style, id, label, e);

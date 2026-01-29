@@ -345,7 +345,6 @@ public class ListPlayerInfoService {
                     } else {
                         if (threshold > 0) {
                             representation
-                                    .append(" (")
                                     .append(progress)
                                     .append("/")
                                     .append(threshold)
@@ -406,7 +405,7 @@ public class ListPlayerInfoService {
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1 ")
+                        .append("/1")
                         .append(UnitEmojis.Blank)
                         .append(UnitEmojis.Blank);
             }

@@ -279,7 +279,9 @@ public class ButtonHelperHeroes {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("khraskHeroStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("khraskHeroStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "khraskHeroStep2_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -536,7 +538,9 @@ public class ButtonHelperHeroes {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("axisHeroStep3_" + shipOrder + "_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("axisHeroStep3_" + shipOrder + "_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "axisHeroStep3_" + shipOrder + "_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -2261,7 +2265,9 @@ public class ButtonHelperHeroes {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, p2.getColor()));
             } else {
-                Button button = Buttons.gray("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, " ");
+                Button button = Buttons.gray(
+                        "cymiaeHeroStep3_" + p2.getFaction() + "_" + acID,
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -2535,12 +2541,13 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
 
         for (Player target : game.getRealPlayers()) {
-            if (vaden.getDebtTokenCount(target.getColor()) > 0) {
+            if (vaden.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                 Button button;
                 String prefix = "vadenHeroClearDebt";
                 String faction = target.getFaction();
                 if (!game.isFowMode() && !faction.contains("franken")) {
-                    button = Buttons.gray(prefix + "_" + faction, " ");
+                    button = Buttons.gray(
+                            prefix + "_" + faction, target.getFactionModel().getShortName());
                     button = button.withEmoji(Emoji.fromFormatted(target.getFactionEmoji()));
                 } else {
                     button = Buttons.gray(prefix + "_" + target.getColor(), target.getColor());
@@ -2562,7 +2569,7 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.gray("sendVadenHeroSomething_" + vaden.getFaction() + "_comms", "Send 2 Commodities"));
         }
         buttons.add(Buttons.red("sendVadenHeroSomething_" + vaden.getFaction() + "_pn", "Send 1 Promissory Note"));
-        vaden.clearDebt(target, 1);
+        vaden.clearDebt(target, 1, Constants.VADEN_DEBT_POOL);
         MessageHelper.sendMessageToChannel(
                 vaden.getCorrectChannel(),
                 vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true)
@@ -2573,7 +2580,7 @@ public class ButtonHelperHeroes {
                         + ", please choose something to give due to Putriv Sirvonsk, the Vaden hero,"
                         + " returning one of your tokens (\"your kneecaps\" are not an option).",
                 buttons);
-        if (vaden.getDebtTokenCount(target.getColor()) == 0) {
+        if (vaden.getDebtTokenCount(target.getColor(), Constants.VADEN_DEBT_POOL) == 0) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }

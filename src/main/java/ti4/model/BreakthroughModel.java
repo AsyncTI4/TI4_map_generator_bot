@@ -193,44 +193,74 @@ public class BreakthroughModel implements ModelInterface, EmbeddableModel {
         return TechEmojis.SynergyNone.toString();
     }
 
-    @JsonIgnore
     public String getBackgroundResource() {
-        if (synergy.size() == 2) {
-            TechnologyType synergy2 = synergy.get(1);
-            String mid =
-                    switch (getFirstSynergy()) {
-                        case PROPULSION ->
-                            switch (synergy2) {
-                                case BIOTIC -> "multicolorbg";
-                                case WARFARE -> "multicolorbr";
-                                case CYBERNETIC -> "multicolorby";
-                                default -> "propulsion";
-                            };
-                        case BIOTIC ->
-                            switch (synergy2) {
-                                case PROPULSION -> "multicolorbg";
-                                case WARFARE -> "multicolorgr";
-                                case CYBERNETIC -> "multicolorgy";
-                                default -> "biotic";
-                            };
-                        case WARFARE ->
-                            switch (synergy2) {
-                                case PROPULSION -> "multicolorbr";
-                                case BIOTIC -> "multicolorgr";
-                                case CYBERNETIC -> "multicolorry";
-                                default -> "warfare";
-                            };
-                        case CYBERNETIC ->
-                            switch (synergy2) {
-                                case PROPULSION -> "multicolorby";
-                                case BIOTIC -> "multicolorgy";
-                                case WARFARE -> "multicolorry";
-                                default -> "cybernetic";
-                            };
-                        default -> null;
-                    };
-            if (mid == null) return null;
-            return "pa_tech_techicons_" + mid + ".png";
+        return getBackgroundResource(true);
+    }
+
+    @JsonIgnore
+    public String getBackgroundResource(boolean ready) {
+        String suffix = ready ? "rdy" : "exh";
+        if (synergy == null) {
+            return "pa_breakthrough_nil_" + suffix + ".png";
+        }
+        switch (synergy.size()) {
+            case 0:
+                return "pa_breakthrough_nil_" + suffix + ".png";
+            case 1:
+                switch (getFirstSynergy()) {
+                    case PROPULSION:
+                        return "pa_tech_techicons_propulsion_" + suffix + ".png";
+                    case BIOTIC:
+                        return "pa_tech_techicons_biotic_" + suffix + ".png";
+                    case WARFARE:
+                        return "pa_tech_techicons_warfare_" + suffix + ".png";
+                    case CYBERNETIC:
+                        return "pa_tech_techicons_cybernetic_" + suffix + ".png";
+                    case NONE:
+                        return "pa_breakthrough_nil_" + suffix + ".png";
+                }
+                break;
+            case 2:
+                TechnologyType synergy2 = synergy.get(1);
+                switch (getFirstSynergy()) {
+                    case PROPULSION:
+                        switch (synergy2) {
+                            case BIOTIC:
+                                return "pa_breakthrough_bg_" + suffix + ".png";
+                            case WARFARE:
+                                return "pa_breakthrough_br_" + suffix + ".png";
+                            case CYBERNETIC:
+                                return "pa_breakthrough_by_" + suffix + ".png";
+                        }
+                    case BIOTIC:
+                        switch (synergy2) {
+                            case PROPULSION:
+                                return "pa_breakthrough_bg_" + suffix + ".png";
+                            case WARFARE:
+                                return "pa_breakthrough_gr_" + suffix + ".png";
+                            case CYBERNETIC:
+                                return "pa_breakthrough_gy_" + suffix + ".png";
+                        }
+                    case WARFARE:
+                        switch (synergy2) {
+                            case PROPULSION:
+                                return "pa_breakthrough_br_" + suffix + ".png";
+                            case BIOTIC:
+                                return "pa_breakthrough_gr_" + suffix + ".png";
+                            case CYBERNETIC:
+                                return "pa_breakthrough_ry_" + suffix + ".png";
+                        }
+                    case CYBERNETIC:
+                        switch (synergy2) {
+                            case PROPULSION:
+                                return "pa_breakthrough_by_" + suffix + ".png";
+                            case BIOTIC:
+                                return "pa_breakthrough_gy_" + suffix + ".png";
+                            case WARFARE:
+                                return "pa_breakthrough_ry_" + suffix + ".png";
+                        }
+                }
+                break;
         }
         return null;
     }

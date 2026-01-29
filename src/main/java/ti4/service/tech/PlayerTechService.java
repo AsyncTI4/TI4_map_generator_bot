@@ -385,7 +385,8 @@ public class PlayerTechService {
                                 player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
                     } else {
                         Button button = Buttons.gray(
-                                player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                                player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
+                                p2.getFactionModel().getShortName());
                         String factionEmojiString = p2.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                         buttons.add(button);

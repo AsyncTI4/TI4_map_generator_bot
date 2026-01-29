@@ -458,7 +458,7 @@ public class StatusHelper {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers(true)) {
-                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
+                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
                             + " You may pay 1 trade good to get 2 debt tokens forgiven.";

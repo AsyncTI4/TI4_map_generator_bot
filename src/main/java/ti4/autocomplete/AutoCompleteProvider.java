@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -1172,6 +1173,16 @@ public class AutoCompleteProvider {
                                     Mapper.getFactions().get(faction).getFactionName() + " (all playable)", faction))
                             .toList());
                 }
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            case Constants.DEBT_POOL -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Set<String> pools =
+                        new HashSet<String>(game.getAllDebtPoolIcons().keySet());
+                pools.add(Constants.DEBT_DEFAULT_POOL.toLowerCase());
+                List<Command.Choice> options = mapTo25ChoicesThatContain(pools, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.SEAT_COUNT_OPTION -> {

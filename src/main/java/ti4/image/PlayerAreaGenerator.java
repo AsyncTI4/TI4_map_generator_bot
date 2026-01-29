@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
+import java.awt.font.GlyphVector;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -36,6 +37,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -78,6 +82,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.VeiledHeartService;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.spring.jda.JdaService;
@@ -526,9 +531,8 @@ class PlayerAreaGenerator {
             xDelta = leaderInfo(player, xDelta, yPlayArea, game);
         }
 
-        if (player.getDebtTokens().values().stream().anyMatch(i -> i > 0)) {
-            xDelta = debtInfo(player, xDelta, yPlayArea, game);
-        }
+        // if (player.getAllDebtTokens().values().values().stream().anyMatch(i -> i > 0))
+        xDelta = debtInfo(player, xDelta, yPlayArea, game);
 
         if (!player.getRelics().isEmpty()) {
             xDelta = relicInfo(player, xDelta, yPlayArea);
@@ -1398,63 +1402,100 @@ class PlayerAreaGenerator {
     }
 
     private int debtInfo(Player player, int x, int y, Game game) {
-        int deltaX = 0;
-        int deltaY = 0;
-
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
-        String bankImage =
-                "vaden".equalsIgnoreCase(player.getFaction()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png";
-        drawPAImage(x + deltaX, y, bankImage);
+        graphics.setColor(Color.WHITE);
 
-        deltaX += 24;
-        deltaY += 2;
-
-        int tokenDeltaY = 0;
-        int playerCount = 0;
-        int maxTokenDeltaX = 0;
-        for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
-            Player debtPlayer = game.getPlayerByColorID(Mapper.getColorID(debtToken.getKey()))
-                    .orElse(null);
-            boolean hideFactionIcon =
-                    isFoWPrivate && debtPlayer != null && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
-
-            int tokenDeltaX = 0;
-            String controlID = Mapper.getControlID(debtToken.getKey());
-            if (controlID.contains("null")) {
+        for (Entry<String, Map<String, Integer>> pool :
+                player.getAllDebtTokens().entrySet()) {
+            if (!pool.getValue().values().stream().anyMatch(i -> i > 0)) {
                 continue;
             }
 
-            float scale = 0.60f;
-            BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-
-            for (int i = 0; i < debtToken.getValue(); i++) {
-                DrawingUtil.drawControlToken(
-                        graphics,
-                        controlTokenImage,
-                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID),
-                        x + deltaX + tokenDeltaX,
-                        y + deltaY + tokenDeltaY,
-                        hideFactionIcon,
-                        scale);
-                tokenDeltaX += 15;
+            String bankSource = game.getDebtPoolIcon(pool.getKey());
+            if (bankSource == null) {
+                if (Constants.DEBT_DEFAULT_POOL.equalsIgnoreCase(pool.getKey())) {
+                    bankSource = "pa_debtaccount.png";
+                    drawPAImage(x, y, bankSource);
+                } else {
+                    bankSource = TI4Emoji.getRandomizedEmoji(0, null).toString();
+                }
             }
 
-            tokenDeltaY += 29;
-            maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
-            playerCount++;
-            if (playerCount % 5 == 0) {
-                tokenDeltaY = 0;
-                deltaX += maxTokenDeltaX;
-                maxTokenDeltaX = 0;
+            if (!"pa_debtaccount.png".equals(bankSource)) {
+                BufferedImage bankImage = null;
+                Emoji bankEmoji = Emoji.fromFormatted(bankSource);
+                if (bankEmoji instanceof CustomEmoji factionCustomEmoji) {
+                    bankImage = ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), 120, 120);
+                } else if (bankEmoji instanceof UnicodeEmoji uni) {
+                    BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g3 = img.createGraphics();
+                    g3.setFont(Storage.getEmojiFont());
+                    BasicStroke stroke4 = new BasicStroke(4.0f);
+                    DrawingUtil.superDrawString(
+                            g3, uni.getFormatted(), 20, 60, Color.white, null, null, stroke4, Color.black);
+                    GlyphVector gv = g3.getFont().createGlyphVector(g3.getFontRenderContext(), uni.getFormatted());
+                    Rectangle rect = gv.getGlyphPixelBounds(0, g3.getFontRenderContext(), 20, 60);
+                    int pad = 5;
+                    BufferedImage img2 =
+                            img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
+                    bankImage = ImageHelper.scale(ImageHelper.square(img2), 120, 120);
+                }
+                g2.drawImage(bankImage, x + 20, y + 15, null);
             }
+
+            int deltaX = 24;
+            g2.setFont(Storage.getFont18());
+            DrawingUtil.drawDebtBoxText(g2, pool.getKey().toUpperCase(), x - 4, y + 148, 146);
+
+            int tokenDeltaY = 0;
+            int playerCount = 0;
+            int maxTokenDeltaX = 0;
+            for (Entry<String, Integer> debtToken : pool.getValue().entrySet()) {
+                Player debtPlayer = game.getPlayerByColorID(Mapper.getColorID(debtToken.getKey()))
+                        .orElse(null);
+                boolean hideFactionIcon = isFoWPrivate
+                        && debtPlayer != null
+                        && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
+
+                int tokenDeltaX = 0;
+                String controlID = Mapper.getControlID(debtToken.getKey());
+                if (controlID.contains("null")) {
+                    continue;
+                }
+
+                float scale = 0.60f;
+                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+
+                for (int i = 0; i < debtToken.getValue(); i++) {
+                    DrawingUtil.drawControlToken(
+                            graphics,
+                            controlTokenImage,
+                            DrawingUtil.getPlayerByControlMarker(
+                                    game.getPlayers().values(), controlID),
+                            x + deltaX + tokenDeltaX,
+                            y + 2 + tokenDeltaY,
+                            hideFactionIcon,
+                            scale);
+                    tokenDeltaX += 15;
+                }
+
+                tokenDeltaY += 29;
+                maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
+                playerCount++;
+                if (playerCount % 5 == 0) {
+                    tokenDeltaY = 0;
+                    deltaX += maxTokenDeltaX;
+                    maxTokenDeltaX = 0;
+                }
+            }
+            deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
+            graphics.drawRect(x - 2, y - 2, deltaX, 152);
+            x += deltaX + 10;
         }
-        deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
-        graphics.setColor(Color.WHITE);
-        graphics.drawRect(x - 2, y - 2, deltaX, 152);
 
-        return x + deltaX + 10;
+        return x;
     }
 
     private int abilityInfo(Player player, int x, int y) {
@@ -1677,6 +1718,8 @@ class PlayerAreaGenerator {
                     unitCap = reinforcementsPosition.getPositionCount(unitID);
                 }
 
+                unitCap -= ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) ? 1 : 0;
+
                 // Load voltron data
                 UnitModel model = player == null ? null : player.getUnitFromUnitKey(unitKey);
                 boolean voltron = model != null && "naaz_voltron".equals(model.getAlias());
@@ -1728,8 +1771,22 @@ class PlayerAreaGenerator {
                     GMService.logPlayerActivity(game, player, warningMessage);
                 }
 
+                int offset = 0;
+                if ("ws".equals(unitID) && player.ownsUnit("tf-dragonfreed")) {
+                    offset = 16;
+                    Point position = PositionMapper.getReinforcementsPosition("number_ws")
+                            .getPosition("number_ws");
+                    drawPAImage(
+                            x + position.x - offset,
+                            y + position.y,
+                            "pa_reinforcements_dragon"
+                                    + (numInReinforcements > 0
+                                            ? DrawingUtil.getBlackWhiteFileSuffix(playerColor)
+                                            : "_red.png"));
+                }
+
                 if (numInReinforcements > -10) {
-                    paintNumber(unitID, x, y, numInReinforcements, playerColor);
+                    paintNumber(unitID, x + offset, y, numInReinforcements, playerColor);
                 }
             }
         }
@@ -2619,7 +2676,7 @@ class PlayerAreaGenerator {
             Color textColor = Color.white;
             if (!unl || exh) textColor = Color.gray;
 
-            String resource = model.getBackgroundResource();
+            String resource = model.getBackgroundResource(unl && !exh);
 
             BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor, model.getShrinkName());
             drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
@@ -2668,10 +2725,10 @@ class PlayerAreaGenerator {
 
         if (shrink) {
             g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 11, 30, 120, true);
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 11, 150, 120, false);
         } else {
             g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 9, 30, 120, true);
+            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 9, 150, 120, false);
         }
 
         g2.setColor(boxOutline);
@@ -3267,7 +3324,7 @@ class PlayerAreaGenerator {
                 // due to me playing around with values during debugging
                 // it might be possible to make this more efficient by hard-coding the radii
                 // NB: `int` is 32 bit two's complement, such that the range of positive numbers is
-                // 0x00000000 - 0x7F000000, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
+                // 0x00000000 - 0x7FFFFFFF, and the range of negative numbers is 0x80000000 - 0xFFFFFFFF
                 // this affects Math.max, and so requires the unsigned right-shift `>>>` to compare properly
                 BufferedImage icon = DrawingUtil.getFactionIconImageScaled(faction, width, height);
                 int[] pixels = icon.getRGB(0, 0, width, height, null, 0, width);

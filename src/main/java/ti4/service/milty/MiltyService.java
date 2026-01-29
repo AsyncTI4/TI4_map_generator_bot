@@ -715,8 +715,8 @@ public class MiltyService {
             player.setFleetCC(2);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    "Set fleet command counters to 2 for " + player.getRepresentation()
-                            + ", due to their **Kaltrim** setup.");
+                    "Set fleet pool to contain 2 command tokens for " + player.getRepresentation()
+                            + ", due to the Kaltrim setup.");
         }
 
         if (game.isRapidMobilizationMode()) {

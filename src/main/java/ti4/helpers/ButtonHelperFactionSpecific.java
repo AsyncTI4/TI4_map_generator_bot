@@ -242,7 +242,7 @@ public class ButtonHelperFactionSpecific {
                         + Helper.getPlanetRepresentation(planet, game)
                         + " using the Collector (Vaden mech) ability. This forgave 1 debt from their opponent.");
         player.removeDebtTokens(
-                game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1);
+                game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1, Constants.VADEN_DEBT_POOL);
     }
 
     public static void resolveDeceive(Player player, Game game) {
@@ -522,7 +522,7 @@ public class ButtonHelperFactionSpecific {
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         Tile tile = game.getTileByPosition(pos);
-        player.clearDebt(p2, 1);
+        player.clearDebt(p2, 1, Constants.VADEN_DEBT_POOL);
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
                 player.getRepresentation()
@@ -580,7 +580,9 @@ public class ButtonHelperFactionSpecific {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, p2.getColor()));
             } else {
-                Button button = Buttons.gray("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, " ");
+                Button button = Buttons.gray(
+                        "edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos,
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1542,7 +1544,9 @@ public class ButtonHelperFactionSpecific {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("productionBiomes_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("productionBiomes_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "productionBiomes_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -1591,7 +1595,9 @@ public class ButtonHelperFactionSpecific {
                 if (game.isFowMode()) {
                     buttons.add(Buttons.gray("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, p2.getColor()));
                 } else {
-                    Button button = Buttons.gray("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, " ");
+                    Button button = Buttons.gray(
+                            "selectBeforeSwapSCs_" + p2.getFaction() + "_" + type,
+                            p2.getFactionModel().getShortName());
                     String factionEmojiString = p2.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     buttons.add(button);
@@ -1608,7 +1614,7 @@ public class ButtonHelperFactionSpecific {
                             "swapSCs_" + p2.getFaction() + "_" + type + "_"
                                     + p2.getSCs().toArray()[0] + "_"
                                     + hacan.getSCs().toArray()[0],
-                            " ");
+                            p2.getFactionModel().getShortName());
                     String factionEmojiString = p2.getFactionEmoji();
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     buttons.add(button);
@@ -2170,17 +2176,25 @@ public class ButtonHelperFactionSpecific {
     public static void resolveVadenSCDebt(Player player, int sc, Game game, GenericInteractionCreateEvent event) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
-                SendDebtService.sendDebt(player, p2, 1);
+                SendDebtService.sendDebt(player, p2, 1, Constants.VADEN_DEBT_POOL);
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged() + " you sent 1 debt token to " + p2.getFactionEmojiOrColor()
-                                + " due to their **Fine Print** ability.");
-                MessageHelper.sendMessageToChannel(
-                        p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " you collected 1 debt token from "
-                                + player.getFactionEmojiOrColor()
-                                + " due to your **Fine Print** ability. This is technically optional, done automatically for convenience.");
+                if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged() + ", you sent 1 debt token to "
+                                    + p2.getFactionEmojiOrColor() + " due to their **Fine Print** ability.");
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
+                                    + player.getFactionEmojiOrColor()
+                                    + " due to your **Fine Print** ability. This is technically optional, done automatically for convenience.");
+                } else {
+                    MessageHelper.sendMessageToChannel(
+                            p2.getCorrectChannel(),
+                            p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
+                                    + player.getRepresentationUnfogged()
+                                    + " due to your **Fine Print** ability. This is technically optional, done automatically for convenience.");
+                }
                 break;
             }
         }
@@ -2242,10 +2256,10 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         String message;
         if (game.isTwilightsFallMode()) {
-            message = player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
+            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
                     + " that may be placed on home system planets.";
         } else {
-            message = player.getRepresentationUnfogged() + " you have " + amount + " mech" + (amount == 1 ? "" : "s")
+            message = player.getRepresentationUnfogged() + ", you have " + amount + " mech" + (amount == 1 ? "" : "s")
                     + " that may replace infantry.";
         }
         buttons.add(Buttons.green("resolveMykoMech", "Replace Infantry With Mech"));
