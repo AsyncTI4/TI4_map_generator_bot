@@ -4,9 +4,9 @@ import java.util.*;
 import ti4.helpers.Constants;
 
 public enum FrankenBanList {
-    CARTER_CUT(
-            "carter_cut",
-            "Removes Weak & Unbalanced Components for a more balanced draft",
+    Weak_Components(
+            "Weak Components",
+            "Removes Weak/Boring Components for a more empowered draft",
             Map.ofEntries(
                     Map.entry(
                             Constants.ABILITY,
@@ -24,13 +24,8 @@ public enum FrankenBanList {
                                     "zeal",
                                     "illusory_presence",
                                     "foresight",
-                                    "cargo_raiders",
-                                    "pillage",
-                                    "technological_singularity",
-                                    "classified_developments",
-                                    "data_recovery",
-                                    "honor_bound",
-                                    "prescience")),
+                                    "cargo_raiders"
+                                    )),
                     Map.entry(
                             Constants.BAN_FLEET,
                             List.of("titans", "edyn", "nekro", "winnu", "dihmohn", "ghoti", "qhet")),
@@ -63,8 +58,8 @@ public enum FrankenBanList {
                                     "kjalengardcommander",
                                     "naaluhero",
                                     "kolumehero",
-                                    "keleresheroodlynn",
-                                    "winnuhero")),
+                                    "keleresheroodlynn"
+                                    )),
                     Map.entry(
                             Constants.PROMISSORY_NOTE_ID,
                             List.of(
@@ -111,8 +106,8 @@ public enum FrankenBanList {
                                     "scc",
                                     "tp",
                                     "gr",
-                                    "is",
-                                    "dsuydab")),
+                                    "is"
+                                    )),
                     Map.entry(
                             Constants.UNIT_ID,
                             List.of(
@@ -139,14 +134,22 @@ public enum FrankenBanList {
                                     "zelian_mech",
                                     "mirveda_mech")))),
 
-    FOUR_PLAYER_BANS(
-            "4p_bans",
-            "Common Removes for 4P Franken games to balance out gameplay",
+    OP_Components(
+            "OP Components",
+            "Removes overpowered/toxic components for a more balanced draft",
             Map.ofEntries(
-                    Map.entry(Constants.LEADER, List.of("winnuhero", "mahactcommander", "xxchahero", "naaluagent")),
-                    Map.entry(Constants.TECH, List.of("lw2", "dt2", "ffac2", "qdn", "asn")),
+                    Map.entry(Constants.LEADER, List.of("winnuhero", "mahactcommander", "xxchahero", "naaluagent","edynhero","lanefirhero")),
+                    Map.entry(Constants.TECH, List.of("lw2", "dt2", "ffac2", "qdn", "asn", "dsuydab")),
                     Map.entry(Constants.UNIT_ID, List.of("mahact_mech")),
-                    Map.entry(Constants.ABILITY, List.of("telepathic", "technological_singularity"))));
+                    Map.entry(Constants.ABILITY, List.of("telepathic",
+                                                         "technological_singularity",
+                                                         "pillage",
+                                                         "technological_singularity",
+                                                         "classified_developments",
+                                                         "data_recovery",
+                                                         "honor_bound",
+                                                         "prescience"
+))));
 
     private final String id;
     private final String description;
