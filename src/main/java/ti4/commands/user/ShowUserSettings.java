@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.buttons.Buttons;
@@ -26,20 +24,18 @@ class ShowUserSettings extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
+        MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                null,
-                List.of(getSettingEmbed(
-                        event, UserSettingsManager.get(event.getUser().getId()))),
+                getSettingEmbed(event, UserSettingsManager.get(event.getUser().getId())),
                 getUserSettingsButtons());
     }
 
-    private static MessageEmbed getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {
-        EmbedBuilder eb = new EmbedBuilder();
+    private static String getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {
+        StringBuilder eb = new StringBuilder();
         String userName = event.getUser().getName();
-        eb.setTitle(userName + "'s User Settings");
-        eb.addField("", "```json\n" + getJSONRaw(userSettings) + "```", false);
-        return eb.build();
+        eb.append(userName + "'s User Settings\n");
+        eb.append("```json\n" + getJSONRaw(userSettings) + "```");
+        return eb.toString();
     }
 
     private static String getJSONRaw(UserSettings userSettings) {

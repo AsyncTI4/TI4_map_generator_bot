@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -31,6 +31,7 @@ public class UserSettings {
     private boolean prefersPillageMsg = true;
     private String voltronStyle = "eyes";
     private boolean prefersAutoDebtClearance = true;
+    private boolean activityTracking = true;
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
     private Boolean prefersWrongButtonEphemeral;
@@ -60,6 +61,9 @@ public class UserSettings {
     }
 
     public void addActiveHour(int utcHour) {
+        if (!activityTracking) {
+            return;
+        }
         if (isBlank(activeHours)) {
             activeHours = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
         }
