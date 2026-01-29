@@ -22,6 +22,7 @@
             "CYBERNETIC"
         ],
         "text": "When you activate a system that contains only your units, you may place command tokens from your reinforcements into any systems adjacent to that system that contain only your units; at the end of this action, you may move ships among the active system and systems adjacent to it that contain your command tokens.",
+        "notes": "As best as we can interpret, you cannot move ships into systems with other player's ships using this breakthrough.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/argentbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -74,6 +75,7 @@
             "BIOTIC",
             "WARFARE"
         ],
+        "notes": "As best as we can interpret, if this breakthrough brings the Fracture into play, ingress tokens are placed on 3 green and red skips and not 1 of each type.",
         "text": "This breakthrough causes The Fracture to enter play without a roll, if it is not already in play. After this card enters play, move up to 2 ingress tokens into systems that contain gravity rifts.\nApply +1 to the MOVE value of each of your ships that start their movement in The Fracture.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/cabalbt.png?raw=true",
         "source": "thunders_edge"
@@ -165,6 +167,7 @@
             "WARFARE"
         ],
         "text": "When you produce 3 or more non-fighter ships, place 1 command token from your reinforcements into your fleet pool.",
+        "notes": "You gain the command token before resolving fleet supply.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/hacanbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -309,6 +312,7 @@
             "BIOTIC"
         ],
         "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.\nEidolon Maximum: [Combat 4 (x4), Move 3, Sustain Damage] This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area.",
+        "notes": "The Eidolon Maximum will participate in space combat even while on a planet if its owner has ships in the system.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/naazbt.png?raw=true",
         "source": "thunders_edge"
     },
@@ -335,7 +339,7 @@
             "CYBERNETIC"
         ],
         "text": "ACTION: Exhaust this card to allow each other player to spend 3 trade goods and give you 1 promissory note. Each player that does may research a non-faction, non-unit upgrade technology. You also gain each technology researched in this way.",
-        "notes": "The trade good cost cannot be reduced by Aello, who only reduces resource costs.",
+        "notes": "The trade good cost cannot be reduced by the Deepwrought commander, who only reduces resource costs.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/deepwroughtbt.png?raw=true",
         "source": "thunders_edge"
     },

@@ -223,7 +223,7 @@ public class ButtonHelper {
         return controller;
     }
 
-    public static void resolveInfantryRemoval(Player player, int totalAmount) {
+    public static void resolveInfantryRemoval(Player player, int totalAmount, Tile tile) {
 
         if (player.hasUnit("tf-yinclone")) {
             MessageHelper.sendMessageToChannel(
@@ -235,10 +235,7 @@ public class ButtonHelper {
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
         }
         Game game = player.getGame();
-        if (game.isTwilightsFallMode()
-                && game.getActiveSystem() != null
-                && game.getTileByPosition(game.getActiveSystem()) != null) {
-            Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (game.isTwilightsFallMode() && tile != null) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), p2, false, true)) {
@@ -286,8 +283,8 @@ public class ButtonHelper {
         }
     }
 
-    public static void resolveInfantryDestroy(Player player, int totalAmount) {
-        resolveInfantryRemoval(player, totalAmount);
+    public static void resolveInfantryDestroy(Player player, int totalAmount, Tile tile) {
+        resolveInfantryRemoval(player, totalAmount, tile);
         if (totalAmount <= 0 || (!player.hasInf2Tech() && !player.hasUnit("mahact_infantry"))) return;
         if (player.getUnitsOwned().contains("pharadn_infantry")
                 || player.getUnitsOwned().contains("pharadn_infantry2")
