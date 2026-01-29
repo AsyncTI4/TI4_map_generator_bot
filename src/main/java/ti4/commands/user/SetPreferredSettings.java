@@ -26,6 +26,10 @@ class SetPreferredSettings extends Subcommand {
                 "True to auto clear debt when you send trade goods or commodities"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
+                "activity_tracking",
+                "False to clear all activity tracking and disable future tracking"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
                 "pass_on_agenda_stuff",
                 "True to pass on \"when\"s and \"after\"s if you have none"));
         addOptions(new OptionData(
@@ -54,6 +58,14 @@ class SetPreferredSettings extends Subcommand {
 
         Boolean debtClearance = event.getOption("auto_debt_clearance", null, OptionMapping::getAsBoolean);
         if (debtClearance != null) userSettings.setPrefersAutoDebtClearance(debtClearance);
+
+        Boolean activityTracking = event.getOption("activity_tracking", null, OptionMapping::getAsBoolean);
+        if (activityTracking != null) {
+            userSettings.setActivityTracking(activityTracking);
+            if (activityTracking == false) {
+                userSettings.setActiveHours("0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0");
+            }
+        }
 
         Boolean sarween = event.getOption("sarween_msg", null, OptionMapping::getAsBoolean);
         if (sarween != null) userSettings.setPrefersSarweenMsg(sarween);
