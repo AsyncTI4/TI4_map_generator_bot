@@ -1409,6 +1409,9 @@ class PlayerAreaGenerator {
 
         for (Entry<String, Map<String, Integer>> pool :
                 player.getAllDebtTokens().entrySet()) {
+            if (!pool.getValue().values().stream().anyMatch(i -> i > 0)) {
+                continue;
+            }
 
             String bankSource = game.getDebtPoolIcon(pool.getKey());
             if (bankSource == null) {
