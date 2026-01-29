@@ -54,6 +54,7 @@ public class FactionDraftable extends SinglePickDraftable {
                 .filter(f -> !effBannedFactions.contains(f.getAlias()))
                 .filter(f -> sources.contains(f.getSource()))
                 .filter(f -> !f.getAlias().contains("obsidian"))
+                .filter(f -> !f.getAlias().contains("kaltrim"))
                 .filter(f -> !f.getAlias().contains("neutral"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor

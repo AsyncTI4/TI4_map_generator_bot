@@ -1493,6 +1493,20 @@ public class StartCombatService {
                         FactionEmojis.Sardakk));
             }
         }
+        if ("space".equalsIgnoreCase(groundOrSpace)) {
+            if (p1.hasUnlockedBreakthrough("letnevbt")) {
+                buttons.add(Buttons.blue(
+                        p1.getFinsFactionCheckerPrefix() + "assignGravleash_" + tile.getPosition(),
+                        "Assign Gravleash Maneuvers",
+                        FactionEmojis.Letnev));
+            }
+            if (p2.hasUnlockedBreakthrough("letnevbt") && !game.isFowMode()) {
+                buttons.add(Buttons.blue(
+                        p1.getFinsFactionCheckerPrefix() + "assignGravleash_" + tile.getPosition(),
+                        "Assign Gravleash Maneuvers",
+                        FactionEmojis.Letnev));
+            }
+        }
         if (p1.hasUnlockedBreakthrough("sardakkbt")) {
             buttons.add(Buttons.gray(
                     p1.getFinsFactionCheckerPrefix() + "sardakkbtRes",

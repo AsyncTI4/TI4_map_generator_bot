@@ -30,6 +30,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.SowingReapingService;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.PlanetEmojis;
@@ -744,7 +745,7 @@ public class StatusHelper {
 
     private static void resolveSolFlagship(Game game) {
         for (Player player : game.getRealPlayers()) {
-            if (!player.hasUnit("sol_flagship")) continue;
+            if (!ValefarZService.hasFlagshipAbility(game, player, "sol_flagship")) continue;
 
             String colorID = Mapper.getColorID(player.getColor());
             UnitKey infKey = Mapper.getUnitKey("gf", colorID);

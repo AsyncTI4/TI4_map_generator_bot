@@ -29,6 +29,7 @@ import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 
@@ -187,6 +188,28 @@ public class CombatModHelper {
                             game)) {
                 modifiers.add(new NamedCombatModifierModel(
                         relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
+            }
+            if (unit.getUnitType() == UnitType.Flagship && player.hasUnlockedBreakthrough("nekrobt")) {
+                for (String fs : ValefarZService.getFlagshipAbilitys(game, player)) {
+                    UnitModel fsUnit = Mapper.getUnit(fs);
+                    if (fsUnit == unit) continue;
+                    Optional<CombatModifierModel> relevantMod2 = combatModifiers.values().stream()
+                            .filter(modifier -> modifier.isRelevantTo(Constants.UNIT, fsUnit.getAlias()))
+                            .findFirst();
+                    if (relevantMod2.isPresent()
+                            && checkModPassesCondition(
+                                    relevantMod2.get(),
+                                    tile,
+                                    player,
+                                    opponent,
+                                    unitsByQuantity,
+                                    opponentUnitsByQuantity,
+                                    game)) {
+                        modifiers.add(new NamedCombatModifierModel(
+                                relevantMod2.get(),
+                                fsUnit.getUnitEmoji() + " " + fsUnit.getName() + " " + fsUnit.getAbility()));
+                    }
+                }
             }
         }
 

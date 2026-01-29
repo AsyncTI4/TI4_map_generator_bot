@@ -49,6 +49,30 @@ public class ValefarZService {
         return false;
     }
 
+    public List<String> getFlagshipAbilitys(Game game, Player player) {
+        List<String> abilities = new ArrayList<>();
+        if (player == null) return abilities;
+        for (String fs : player.getUnitsOwned()) {
+            if (fs.contains("_flagship")) {
+                abilities.add(fs);
+            }
+        }
+        // Check for Valefar Z
+        if (player.hasUnlockedBreakthrough("nekrobt")) {
+            String valefarZ = game.getStoredValue("valefarZ");
+            for (Player p : game.getPlayers().values()) {
+                if (valefarZ.contains(p.getFaction())) {
+                    for (String fs : p.getUnitsOwned()) {
+                        if (fs.contains("_flagship")) {
+                            abilities.add(fs);
+                        }
+                    }
+                }
+            }
+        }
+        return abilities;
+    }
+
     public boolean hasAnyFlagshipAbility(Game game, Player player, String... flagships) {
         if (player == null) return false;
         for (String fs : flagships) {

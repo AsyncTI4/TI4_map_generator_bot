@@ -2546,7 +2546,7 @@ public class ButtonHelperAbilities {
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)
                     && !player.getAllianceMembers().contains(p2.getFaction())) {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
-                ButtonHelper.resolveInfantryRemoval(p2, 1);
+                ButtonHelper.resolveInfantryRemoval(p2, 1, tile);
                 opponent = p2.getRepresentationNoPing();
                 colour = p2.getColor();
                 break;

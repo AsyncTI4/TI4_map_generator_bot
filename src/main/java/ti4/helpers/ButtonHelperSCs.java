@@ -459,6 +459,9 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
         if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
+        }
+        if (scModel == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Unable to locate the **Trade** strategy card. Commodity washing was not processed.");
@@ -527,6 +530,9 @@ public class ButtonHelperSCs {
         }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("amicus").orElse(null);
         }
         if (scModel == null) {
             MessageHelper.sendMessageToChannel(

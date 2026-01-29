@@ -15,6 +15,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 public class CaptureUnitService {
@@ -49,7 +50,8 @@ public class CaptureUnitService {
 
         // "sigma_vuilraith_flagship_1" does not capture your own units
         List<Player> cabals = game.getRealPlayers().stream()
-                .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2"))
+                .filter(p -> ValefarZService.hasFlagshipAbility(game, p, "cabal_flagship")
+                        || p.hasUnit("sigma_vuilraith_flagship_2"))
                 .toList();
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {
