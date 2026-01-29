@@ -152,6 +152,7 @@ public class AsyncTi4WebsiteHelper {
                                     && !webBorderAnomalies.getBorderAnomalies().isEmpty()
                             ? webBorderAnomalies.getBorderAnomalies()
                             : null);
+            webData.put("isTwilightsFallMode", game.isTwilightsFallMode());
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
