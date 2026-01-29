@@ -70,13 +70,15 @@ public class ColorChangeHelper {
             }
 
             // Debt Tokens
-            Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
-            for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
-                String color = entry.getKey();
-                if (color.equals(oldColor)) {
-                    Integer count = entry.getValue();
-                    playerInfo.clearAllDebtTokens(color);
-                    playerInfo.addDebtTokens(newColor, count);
+            for (String pool : playerInfo.getAllDebtTokens().keySet()) {
+                Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens(pool));
+                for (Map.Entry<String, Integer> entry : debtTokens.entrySet()) {
+                    String color = entry.getKey();
+                    if (color.equals(oldColor)) {
+                        Integer count = entry.getValue();
+                        playerInfo.clearAllDebtTokens(color, pool);
+                        playerInfo.addDebtTokens(newColor, count, pool);
+                    }
                 }
             }
         }
