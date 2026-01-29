@@ -149,7 +149,8 @@ public class DestroyUnitService {
             }
 
             if (numInfantry > 0) {
-                ButtonHelper.resolveInfantryDestroy(player, numInfantry);
+                ButtonHelper.resolveInfantryDestroy(
+                        player, numInfantry, units.getFirst().tile());
             }
         }
 

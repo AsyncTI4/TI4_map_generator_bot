@@ -15,7 +15,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAbilities;
-import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -300,7 +299,6 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.resolveEmpyCommanderCheck(player, game, tile, event);
             ButtonHelper.sendEBSWarning(player, game, tile.getPosition());
             ButtonHelper.checkForIonStorm(tile, player);
-            TeHelperGeneral.addStationsToPlayArea(event, game, tile);
             ButtonHelperFactionSpecific.checkForStymie(game, player, tile);
             ButtonHelper.checkFleetInEveryTile(player, game);
             if (!game.isFowMode()) {

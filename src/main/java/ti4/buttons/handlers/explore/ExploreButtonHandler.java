@@ -120,7 +120,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
-        ButtonHelper.resolveInfantryRemoval(player, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -167,7 +167,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
-        ButtonHelper.resolveInfantryRemoval(player, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. ";
@@ -208,7 +208,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
-        ButtonHelper.resolveInfantryRemoval(player, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. ";
         message += " Gained 1 trade good " + player.gainTG(1, true) + ".";
@@ -254,7 +254,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
-        ButtonHelper.resolveInfantryRemoval(player, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         AddUnitService.addUnits(
                 event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
