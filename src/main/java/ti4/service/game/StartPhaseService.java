@@ -666,7 +666,7 @@ public class StartPhaseService {
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", a reminder this is the window to purge _Maw of Worlds_, after you do your status homework things."
-                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
+                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency.");
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + ", you may use these buttons to resolve _Maw Of Worlds_.",

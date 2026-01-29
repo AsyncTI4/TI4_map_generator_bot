@@ -101,7 +101,7 @@ public class PickStrategyCardButtonHandler {
                         ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
                         game.setStoredValue("Public Disgrace", "");
                         String msg = player.getRepresentationUnfogged() + " picked "
-                                + game.getSCEmojiWordRepresentation(scpick);
+                                + game.getSCEmojiWordRepresentation(scpick) + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
                         MessageHelper.sendMessageToChannel(
@@ -222,13 +222,17 @@ public class PickStrategyCardButtonHandler {
                 if (game.isFowMode()) {
                     buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
                 } else {
-                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ")
+                    buttons.add(Buttons.gray(
+                                    "checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(),
+                                    p2.getFactionModel().getShortName())
                             .withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                 }
             }
         }
         if (buttons.isEmpty()) {
-            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ")
+            buttons.add(Buttons.gray(
+                            "checksNBalancesPt2_" + scPicked + "_" + player.getFaction(),
+                            player.getFactionModel().getShortName())
                     .withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
         }
 

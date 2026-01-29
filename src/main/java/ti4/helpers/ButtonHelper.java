@@ -231,7 +231,7 @@ public class ButtonHelper {
                     (totalAmount <= 10
                                     ? UnitEmojis.infantry.toString().repeat(totalAmount)
                                     : UnitEmojis.infantry + "×" + totalAmount)
-                            + " died and auto-revived. You will be prompted to place them on planets you control at the start of the status phase.");
+                            + " died and auto-revived. You will be prompted to place them on a planet you control at the start of the Status Phase.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
         }
         Game game = player.getGame();
@@ -1189,7 +1189,8 @@ public class ButtonHelper {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("forceARefresh_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("forceARefresh_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "forceARefresh_" + p2.getFaction(), p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -2748,8 +2749,8 @@ public class ButtonHelper {
 
     public static int howManyDifferentDebtPlayerHas(Player player) {
         int count = 0;
-        for (String color : player.getDebtTokens().keySet()) {
-            if (player.getDebtTokens().get(color) > 0) {
+        for (String color : player.getDebtTokens(Constants.VADEN_DEBT_POOL).keySet()) {
+            if (player.getDebtTokens(Constants.VADEN_DEBT_POOL).get(color) > 0) {
                 count++;
             }
         }
@@ -6791,6 +6792,7 @@ public class ButtonHelper {
         Set<String> factionsComplete = new HashSet<>();
         for (FactionModel faction : allFactions) {
             String factionId = faction.getAlias();
+            if ("neutral".equals(factionId)) continue;
             if (game.getPlayerFromColorOrFaction(factionId) == null) {
                 String name = faction.getFactionName();
                 if (factionId.contains("keleres")) {
