@@ -24,6 +24,7 @@ import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -842,5 +843,30 @@ public class Tile {
         } else {
             return getTileModel().getEmoji();
         }
+    }
+
+      ///
+    /**
+     * Human-readable summary of the tile: position, tile name, and any planets
+     * present (using display names when available). Used for UI strings and logs.
+     */
+    @JsonIgnore
+    public String getDetailedDescription() {
+        var model = getTileModel();
+        var sb = new StringBuilder();
+        sb.append(position);
+        sb.append(" (");
+        sb.append(model.getName());
+
+        if (model.getNumPlanets() == 0 && unitHolders.size() > 1) {
+            sb.append(" with ");
+            var planetDisplayNames = unitHolders.keySet().stream()
+                    .filter(key -> !key.equals("space"))
+                    .map(planetId -> Helper.getPlanetName(planetId))
+                    .toList();
+            sb.append(String.join(", ", planetDisplayNames));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }
