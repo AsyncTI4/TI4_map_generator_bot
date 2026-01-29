@@ -23,7 +23,7 @@ class XxchaAgentButtonHandler {
         ButtonHelper.deleteMessage(event);
         RemoveUnitService.removeUnits(
                 event, game.getTileFromPlanet(planet), game, p2.getColor(), "1 infantry " + planet);
-        ButtonHelper.resolveInfantryRemoval(p2, 1);
+        ButtonHelper.resolveInfantryRemoval(p2, 1, game.getTileFromPlanet(planet));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", you removed 1 infantry from " + planetRep);

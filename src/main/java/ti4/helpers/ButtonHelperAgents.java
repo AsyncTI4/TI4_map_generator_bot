@@ -436,7 +436,7 @@ public class ButtonHelperAgents {
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), player.getCommodities() + amountToKill));
         player.setCommodities(0);
         if (amountToKill > 0) {
-            ButtonHelper.resolveInfantryDestroy(player, amountToKill);
+            ButtonHelper.resolveInfantryDestroy(player, amountToKill, game.getTileFromPlanet(planet));
             RemoveUnitService.removeUnits(
                     event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
         }
@@ -2839,7 +2839,7 @@ public class ButtonHelperAgents {
                         + "Doctor Sucaban, the Jol-Nar"
                         + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 infantry " + unitHName);
-        ButtonHelper.resolveInfantryRemoval(player, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }

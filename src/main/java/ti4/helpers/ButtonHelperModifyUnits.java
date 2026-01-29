@@ -582,7 +582,8 @@ public class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null
-                        || (!unitModel.getSustainDamage() && metailUsed)
+                        || (!unitModel.getSustainDamage()
+                                && (metailUsed || unitModel.getUnitType() == UnitType.Fighter))
                         || ((!unitModel.getIsShip()
                                         && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)
                                                 || ButtonHelper.doesPlayerHaveFSHere(
@@ -801,7 +802,7 @@ public class ButtonHelperModifyUnits {
                         var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                         RemoveUnitService.removeUnit(event, tile, game, unit);
                         if (unit.getUnitKey().getUnitType() == UnitType.Infantry)
-                            ButtonHelper.resolveInfantryRemoval(player, min);
+                            ButtonHelper.resolveInfantryRemoval(player, min, tile);
                         msg.append("> Removed ")
                                 .append(min)
                                 .append(" ")
@@ -2352,6 +2353,35 @@ public class ButtonHelperModifyUnits {
                 + " to generate 1 additional hit using _Krovoz Strike Teams_. " + p2.getRepresentation()
                 + ", please assign it with the \"Assign Hits\" button.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+
+    @ButtonHandler("assignGravleash_")
+    public static void assignGravleash(String buttonID, ButtonInteractionEvent event, Player player, Game game) {
+        String pos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+        UnitHolder uh = tile.getUnitHolders().get("space");
+        for (UnitKey unit : uh.getUnitsByStateForPlayer(player).keySet()) {
+            UnitModel um = player.getUnitFromUnitKey(unit);
+            buttons.add(Buttons.gray("chooseGravleash_" + um.getAsyncId(), um.getName(), unit.unitEmoji()));
+        }
+        String msg = player.getRepresentation() + ", please choose which of your ships in "
+                + tile.getRepresentationForButtons(game, player)
+                + " will be affected by Gravleash.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("chooseGravleash_")
+    public static void chooseGravleash(String buttonID, ButtonInteractionEvent event, Player player, Game game) {
+        String unitID = buttonID.split("_")[1];
+        game.setStoredValue("highestValueSingleUnit" + player.getFaction(), unitID);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentation()
+                        + ", you have chosen a "
+                        + player.getUnitFromAsyncID(unitID).getName()
+                        + " to be affected by Gravleash. This assignment will last for one round of combat.");
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("assCannonNDihmohn_")
