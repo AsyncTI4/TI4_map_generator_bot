@@ -75,7 +75,7 @@
             "BIOTIC",
             "WARFARE"
         ],
-        "notes": "As best as we can interpret, if this breakthrough brings the Fracture into play, ingress tokens are placed on 3 green and red skips and not 1 of each type.",
+        "notes": "As best as we can interpret, if this breakthrough brings The Fracture into play, ingress tokens are placed on 3 green and red skips and not 1 of each type.",
         "text": "This breakthrough causes The Fracture to enter play without a roll, if it is not already in play. After this card enters play, move up to 2 ingress tokens into systems that contain gravity rifts.\nApply +1 to the MOVE value of each of your ships that start their movement in The Fracture.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/cabalbt.png?raw=true",
         "source": "thunders_edge"
@@ -167,7 +167,7 @@
             "WARFARE"
         ],
         "text": "When you produce 3 or more non-fighter ships, place 1 command token from your reinforcements into your fleet pool.",
-        "notes": "You gain the command token before resolving fleet supply.",
+        "notes": "You gain the command token before resolving fleet limits.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/hacanbt.png?raw=true",
         "source": "thunders_edge"
     },
