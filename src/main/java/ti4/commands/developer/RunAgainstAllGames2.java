@@ -10,7 +10,6 @@ import ti4.image.Mapper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.model.MapTemplateModel;
 
 class RunAgainstAllGames2 extends Subcommand {
@@ -47,8 +46,10 @@ class RunAgainstAllGames2 extends Subcommand {
                         + realPlayerCount + ")");
             }
         });
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                "Found " + mismatchedGames.size() + " games with mismatched player counts out of "
+                        + GameManager.getGameCount() + " games:\n " + String.join("\n", mismatchedGames));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
-        BotLogger.info("Found " + mismatchedGames.size() + " games with mismatched player counts out of "
-                + GameManager.getGameCount() + " games:\n " + String.join("\n", mismatchedGames));
     }
 }
