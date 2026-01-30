@@ -123,8 +123,8 @@ public class TiglReportService {
     }
 
     private static String resolveDiscordTag(Player player) {
-        String userId = player.getStatsTrackedUserID();
-        if (StringUtils.isBlank(userId)) {
+        Long userId = parseDiscordId(player.getStatsTrackedUserID());
+        if (userId == null) {
             return player.getStatsTrackedUserName();
         }
         User user = JdaService.jda.getUserById(userId);
