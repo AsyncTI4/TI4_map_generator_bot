@@ -229,10 +229,14 @@ public class CreateGameButtonHandler {
             memberList
                     .append("## Game Fun Name: ")
                     .append(gameFunName.replace(":", ""))
-                    .append("\n\nPlayers:\n");
+                    .append("\n\nPlayers:");
         }
         for (Member member : members) {
-            memberList.append(x).append(". ").append(member.getUser().getAsMention());
+            memberList
+                    .append("\n")
+                    .append(x)
+                    .append(". ")
+                    .append(member.getUser().getAsMention());
 
             int ongoingAmount = SearchGameHelper.searchGames(
                     member.getUser(), null, false, false, false, true, false, true, true, true);
@@ -241,13 +245,13 @@ public class CreateGameButtonHandler {
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             if (ongoingAmount > completedGames + 2) {
                 memberList
-                        .append(" ⚠️ (Above or equal game limit: ")
+                        .append("\n  - ⚠️ (Above or equal game limit: ")
                         .append(ongoingAmount)
                         .append(" ongoing, ")
                         .append(completedGames + 3)
                         .append("-game limit)");
             } else {
-                memberList.append(" ").append(completedGames).append(" games completed. ");
+                memberList.append("\n  - ").append(completedGames).append(" games completed. ");
             }
             if (playerTurnTimes.containsKey(member.getUser().getId())) {
                 User user = member.getUser();
@@ -255,19 +259,21 @@ public class CreateGameButtonHandler {
                 long totalMillis = playerTurnTimes.get(user.getId()).getValue();
                 if (turnCount == 0 || totalMillis == 0) continue;
                 long averageTurnTime = totalMillis / turnCount;
-                memberList.append("`").append(" ");
-                memberList.append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime));
-                memberList.append("` average turn time.");
+                memberList
+                        .append("\n  - `")
+                        .append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime))
+                        .append("` average turn time.");
             }
             var userSettings = UserSettingsManager.get(member.getId());
-            if (userSettings.enoughHeatData()) {
-                String activeHoursSummary = userSettings.summarizeActiveHours(userSettings.getActiveHours());
+            String activeHoursSummary = userSettings.summarizeActiveHours(userSettings.getActiveHours());
+            if (activeHoursSummary != null) {
                 memberList
-                        .append(" Active Hours (UTC): `")
+                        .append("\n  - Active Hours: ")
                         .append(activeHoursSummary)
-                        .append("`.");
+                        .append(".");
+            } else {
+                memberList.append("\n  - Insufficient data for active hours.");
             }
-            memberList.append("\n");
             x++;
         }
         return memberList.toString();
