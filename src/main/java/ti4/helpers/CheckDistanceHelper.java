@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.model.UnitModel;
 
 @UtilityClass
 public class CheckDistanceHelper {
@@ -106,8 +108,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("absol_lwd")
                                     && tile2 != null
                                     && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2)
-                                    && (!player.hasUnit("mentak_cruiser3")
-                                            || tile2.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1))
+                                    && !playerCanMoveThroughShipsWithMentakCruiser(player, tile2))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
@@ -156,5 +157,38 @@ public class CheckDistanceHelper {
 
     private static Set<String> adjacentPositions(Game game, String position, Player player) {
         return FoWHelper.getAdjacentTilesAndNotThisTile(game, position, player, false);
+    }
+
+    private static boolean playerCanMoveThroughShipsWithMentakCruiser(Player player, Tile activeSystem) {
+        if (player == null || activeSystem == null) {
+            return false;
+        }
+        if (!player.hasUnit("mentak_cruiser3")) {
+            return false;
+        }
+        if (activeSystem.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1) {
+            return false;
+        }
+        if (!FoWHelper.otherPlayersHaveShipsInSystem(player, activeSystem, player.getGame())) {
+            return false;
+        }
+        return hasCruiserWithCorsairAbility(player, activeSystem);
+    }
+
+    private static boolean hasCruiserWithCorsairAbility(Player player, Tile activeSystem) {
+        String playerColor = player.getColor();
+        if (playerColor == null) {
+            return false;
+        }
+        for (Units.UnitKey unitKey : activeSystem.getSpaceUnitHolder().getUnitKeys()) {
+            if (!player.unitBelongsToPlayer(unitKey) || unitKey.getUnitType() != UnitType.Cruiser) {
+                continue;
+            }
+            UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+            if (unitModel != null && "mentak_cruiser3".equals(unitModel.getAlias())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
