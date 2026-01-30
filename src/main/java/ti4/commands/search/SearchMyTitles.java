@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 class SearchMyTitles extends Subcommand {
 
-    public SearchMyTitles() {
+    SearchMyTitles() {
         super(Constants.SEARCH_MY_TITLES, "List all the titles you've acquired");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to Show"));
     }

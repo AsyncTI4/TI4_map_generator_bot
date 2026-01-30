@@ -16,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
+import ti4.spring.jda.JdaService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
@@ -88,7 +89,7 @@ public class TiglReportService {
                         tiglPlayerResult.setFaction(player.getFaction());
                     }
                     tiglPlayerResult.setDiscordId(parseDiscordId(player.getStatsTrackedUserID()));
-                    tiglPlayerResult.setDiscordTag(player.getStatsTrackedUserName());
+                    tiglPlayerResult.setDiscordTag(resolveDiscordTag(player));
                     tiglPlayerResult.setWinner(winners.contains(player));
                     return tiglPlayerResult;
                 })
@@ -119,6 +120,15 @@ public class TiglReportService {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    private static String resolveDiscordTag(Player player) {
+        Long userId = parseDiscordId(player.getStatsTrackedUserID());
+        if (userId == null) {
+            return player.getStatsTrackedUserName();
+        }
+        User user = JdaService.jda.getUserById(userId);
+        return user == null ? player.getStatsTrackedUserName() : user.getName();
     }
 
     private static String determineLeague(Game game) {
