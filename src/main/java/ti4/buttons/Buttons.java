@@ -47,6 +47,7 @@ public class Buttons {
     private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     private static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
+    private static final Button REFRESH_BREAKTHROUGH_INFO = green("refreshBreakthroughInfo", "Breakthrough Info");
     public static final Button REFRESH_RELIC_INFO =
             green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
     public static final Button REFRESH_LEADER_INFO =
@@ -72,6 +73,7 @@ public class Buttons {
             REFRESH_PN_INFO,
             REFRESH_SO_INFO,
             REFRESH_ABILITY_INFO,
+            REFRESH_BREAKTHROUGH_INFO,
             REFRESH_RELIC_INFO,
             REFRESH_LEADER_INFO,
             REFRESH_UNIT_INFO,
@@ -82,6 +84,7 @@ public class Buttons {
             REFRESH_AC_INFO,
             REFRESH_SO_INFO,
             REFRESH_ABILITY_INFO,
+            REFRESH_BREAKTHROUGH_INFO,
             REFRESH_RELIC_INFO,
             REFRESH_LEADER_INFO,
             REFRESH_UNIT_INFO,
