@@ -576,7 +576,7 @@ public class AndcatReferenceCardsDraftable extends SinglePickDraftable {
         List<String> speakerOrder = getSpeakerOrder(draftManager);
         int speakerPosition = speakerOrder.indexOf(player.getUserID()) + 1;
 
-        String homeTilePosition = null;
+        String homeTilePosition;
         if (isSourceOfSeat(draftManager)) {
             // Get the HS tile from speaker order
             homeTilePosition = MapTemplateHelper.getPlayerHomeSystemLocation(speakerPosition, game.getMapTemplateID());
