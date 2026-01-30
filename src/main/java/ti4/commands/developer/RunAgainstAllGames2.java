@@ -30,6 +30,9 @@ class RunAgainstAllGames2 extends Subcommand {
             if (game.getRound() < 2) {
                 return;
             }
+            if (game.isFowMode()) {
+                return;
+            }
 
             String mapTemplateId = game.getMapTemplateID();
             int playerCountForMap = 0;
