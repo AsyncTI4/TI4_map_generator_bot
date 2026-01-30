@@ -32,18 +32,25 @@ class RunAgainstAllGames2 extends Subcommand {
             }
 
             String mapTemplateId = game.getMapTemplateID();
-            int playerCountForMap;
+            int playerCountForMap = 0;
             if (isNotBlank(mapTemplateId)) {
                 MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
-                playerCountForMap = mapTemplateModel.getPlayerCount();
-            } else {
+                if (mapTemplateModel != null) {
+                    playerCountForMap = mapTemplateModel.getPlayerCount();
+                }
+            }
+
+            boolean foundMapTemplate = playerCountForMap != 0;
+            if (!foundMapTemplate) {
                 playerCountForMap = game.getPlayerCountForMap();
             }
 
             int realPlayerCount = game.getRealAndEliminatedPlayers().size();
             if (playerCountForMap != realPlayerCount) {
-                mismatchedGames.add(game.getName() + " (player count: " + playerCountForMap + ", real player count: "
-                        + realPlayerCount + ")");
+                mismatchedGames.add(game.getName() + " (player count: "
+                        + playerCountForMap + ", real player count: "
+                        + realPlayerCount + ", found map template: "
+                        + foundMapTemplate + ")");
             }
         });
         MessageHelper.sendMessageToChannel(
