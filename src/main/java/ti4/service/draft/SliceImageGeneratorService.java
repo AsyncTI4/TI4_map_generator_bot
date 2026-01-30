@@ -69,12 +69,12 @@ public class SliceImageGeneratorService {
         return generateImage(draftManager.getGame(), slices, getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
     }
 
-    public static FileUpload generateImage(
-            Game game,
-            List<MiltyDraftSlice> slices,
-            Function<String, String> getPlayerFromSlice,
-            Function<String, FactionModel> getFactionFromPlayer,
-            String uniqueKey) {
+    private static FileUpload generateImage(
+        Game game,
+        List<MiltyDraftSlice> slices,
+        Function<String, String> getPlayerFromSlice,
+        Function<String, FactionModel> getFactionFromPlayer,
+        String uniqueKey) {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(game.getMapTemplateID());
 
         int sliceCount = slices.size();

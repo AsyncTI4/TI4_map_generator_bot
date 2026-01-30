@@ -54,13 +54,13 @@ class GameLengthStatisticsService {
             Game game, int pastDays, AtomicInteger num, AtomicInteger total, Map<String, Integer> endedGames) {
         if (game.isHasEnded()
                 && game.getWinner().isPresent()
-                && game.getPlayerCountForMap() > 2
+                && game.getRealAndEliminatedPlayers().size() > 2
                 && Helper.getDateDifference(
                                 game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis()))
                         < pastDays) {
             num.getAndIncrement();
             int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
-            endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);
+            endedGames.put(game.getName() + " (" + game.getRealAndEliminatedPlayers().size() + "p, " + game.getVp() + "pt)", dif);
             total.addAndGet(dif);
         }
     }
