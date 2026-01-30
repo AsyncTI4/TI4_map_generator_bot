@@ -15,8 +15,8 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
 import ti4.service.emoji.MiscEmojis;
+import ti4.spring.jda.JdaService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
@@ -125,9 +125,6 @@ public class TiglReportService {
     private static String resolveDiscordTag(Player player) {
         String userId = player.getStatsTrackedUserID();
         if (StringUtils.isBlank(userId)) {
-            return player.getStatsTrackedUserName();
-        }
-        if (JdaService.jda == null) {
             return player.getStatsTrackedUserName();
         }
         User user = JdaService.jda.getUserById(userId);
