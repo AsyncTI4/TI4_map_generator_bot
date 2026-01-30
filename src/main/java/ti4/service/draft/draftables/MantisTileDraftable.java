@@ -619,7 +619,6 @@ public class MantisTileDraftable extends Draftable {
 
     @Override
     public String whatsStoppingSetup(DraftManager draftManager) {
-
         Game game = draftManager.getGame();
         String mapTemplateID = game.getMapTemplateID();
         MapTemplateModel mapTemplate = mapTemplateID != null ? Mapper.getMapTemplate(mapTemplateID) : null;
