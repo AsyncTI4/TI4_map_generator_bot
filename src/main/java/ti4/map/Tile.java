@@ -845,16 +845,16 @@ public class Tile {
         }
     }
 
-      ///
+    ///
     /**
-     * Human-readable summary of the tile: position, tile name, and any planets
+     * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
      * present (using display names when available). Used for UI strings and logs.
      */
     @JsonIgnore
     public String getDetailedDescription() {
         var model = getTileModel();
         var sb = new StringBuilder();
-        sb.append(position);
+        sb.append(getPosition());
         sb.append(" (");
         sb.append(model.getName());
 
@@ -863,6 +863,7 @@ public class Tile {
             var planetDisplayNames = unitHolders.keySet().stream()
                     .filter(key -> !key.equals("space"))
                     .map(planetId -> Helper.getPlanetName(planetId))
+                    .filter(name  -> name != null)
                     .toList();
             sb.append(String.join(", ", planetDisplayNames));
         }
