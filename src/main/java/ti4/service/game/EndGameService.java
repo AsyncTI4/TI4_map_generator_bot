@@ -21,7 +21,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -307,10 +306,8 @@ public class EndGameService {
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
         if (game.isFowMode() && JdaService.guildFogOfWar != null) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildFogOfWar);
             textChannels = JdaService.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
             textChannels = JdaService.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();

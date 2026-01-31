@@ -39,7 +39,10 @@ class RunAgainstAllGames2 extends Subcommand {
             if (isNotBlank(mapTemplateId)) {
                 MapTemplateModel mapTemplateModel = Mapper.getMapTemplate(mapTemplateId);
                 if (mapTemplateModel != null) {
-                    playerCountForMap = mapTemplateModel.getPlayerCount();
+                    Integer templatePlayerCount = mapTemplateModel.getPlayerCount();
+                    if (templatePlayerCount != null) {
+                        playerCountForMap = templatePlayerCount;
+                    }
                 }
             }
 

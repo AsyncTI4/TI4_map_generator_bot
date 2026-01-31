@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -30,8 +29,6 @@ class SCPlay extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
-
         MessageChannel eventChannel = event.getChannel();
         Game game = getGame();
         MessageChannel mainGameChannel = game.getMainGameChannel() == null ? eventChannel : game.getMainGameChannel();

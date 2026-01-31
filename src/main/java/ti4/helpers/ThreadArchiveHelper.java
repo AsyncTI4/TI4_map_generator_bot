@@ -2,79 +2,76 @@ package ti4.helpers;
 
 import java.util.Comparator;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.executors.ExecutorServiceManager;
 import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 
+@UtilityClass
 public class ThreadArchiveHelper {
 
-    private static final int DEFAULT_MAX_THREAD_COUNT = 975;
+    private static final int DEFAULT_MAX_THREAD_COUNT = 950;
     private static final int DEFAULT_CLOSE_COUNT = 25;
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         if (guild == null) return;
 
-        ExecutorServiceManager.runAsyncIfNotRunning("ThreadArchiveHelper task for `" + guild.getName() + "`", () -> {
-            try {
-                long threadCount = guild.retrieveActiveThreads().complete().size();
-                int closeCount = GlobalSettings.getSetting(
-                        GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(),
-                        Integer.class,
-                        DEFAULT_CLOSE_COUNT);
-                int maxThreadCount = GlobalSettings.getSetting(
-                        GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(),
-                        Integer.class,
-                        DEFAULT_MAX_THREAD_COUNT);
+        guild.retrieveActiveThreads().queue(activeThreads -> {
+            int maxThreadCount = GlobalSettings.getSetting(
+                    GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(),
+                    Integer.class,
+                    DEFAULT_MAX_THREAD_COUNT);
+            long threadCount = activeThreads.size();
+            if (threadCount < maxThreadCount) return;
 
-                if (threadCount >= maxThreadCount) {
-                    List<ThreadChannel> closedChannels = archiveOldThreads(guild, closeCount);
-                    BotLogger.info("**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  "
-                            + maxThreadCount + ") - Archived " + closedChannels.size() + " threads");
-                }
-            } catch (Exception e) {
-                BotLogger.error("Error in checkThreadLimitAndArchive for " + guild.getName(), e);
-            }
+            archiveOldThreads(guild.getName(), activeThreads);
         });
     }
 
-    public static List<ThreadChannel> archiveOldThreads(Guild guild, int threadCount) {
-        return archiveOldThreads(guild, threadCount, false);
+    public static void archiveOldThreads(Guild guild, int numberToClose) {
+        List<ThreadChannel> threads = guild.retrieveActiveThreads().complete();
+        archiveOldThreads(guild.getName(), threads, numberToClose);
     }
 
-    public static List<ThreadChannel> archiveOldThreads(Guild guild, int threadCount, boolean skipArchiveStep) {
-        List<ThreadChannel> activeThreadChannels = guild.retrieveActiveThreads().complete().stream()
-                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
-                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
+    private static void archiveOldThreads(String guildName, List<ThreadChannel> threads) {
+        int numberToClose = GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(),
+                Integer.class,
+                DEFAULT_CLOSE_COUNT);
+        archiveOldThreads(guildName, threads, numberToClose);
+    }
+
+    private static void archiveOldThreads(String guildName, List<ThreadChannel> threads, int numberToClose) {
+        // Sort by Latest Message ID (Oldest first)
+        List<ThreadChannel> targets = threads.stream()
+                .filter(c -> !c.isArchived())
+                .sorted(Comparator.comparingLong(ThreadArchiveHelper::getSafeLatestMessageId))
+                .sorted(Comparator.comparingInt(ThreadArchiveHelper::getArchivePriority))
+                .limit(numberToClose)
                 .toList();
 
-        // Try gathering all threads that are not bot-map-updates or cards-info threads
-        List<ThreadChannel> threadChannels = activeThreadChannels.stream()
-                .filter(threadChannel -> !threadChannel.getName().endsWith(Constants.BOT_CHANNEL_SUFFIX)
-                        && !threadChannel.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX))
-                .limit(threadCount)
-                .toList();
-
-        // If there are fewer channels in the list than requested to close, include cards-info threads
-        if (threadChannels.size() - threadCount < 0) {
-            threadChannels = activeThreadChannels.stream()
-                    .filter(threadChannel -> !threadChannel.getName().endsWith(Constants.BOT_CHANNEL_SUFFIX))
-                    .limit(threadCount)
-                    .toList();
+        for (ThreadChannel thread : targets) {
+            thread.getManager()
+                    .setArchived(true)
+                    .queue(null, e -> BotLogger.error("Failed to archive thread " + thread.getName(), e));
         }
 
-        // If there are fewer channels in the list than requested to close, close them all
-        if (threadChannels.size() - threadCount < 0) {
-            threadChannels = activeThreadChannels.stream().limit(threadCount).toList();
+        if (!targets.isEmpty()) {
+            BotLogger.info("**" + guildName + "** Cleaned up " + targets.size() + " threads.");
         }
-        if (skipArchiveStep) {
-            return threadChannels;
-        }
-        for (ThreadChannel threadChannel : threadChannels) {
-            threadChannel.getManager().setArchived(true).queue(null, BotLogger::catchRestError);
-        }
-        return threadChannels;
+    }
+
+    private static int getArchivePriority(ThreadChannel channel) {
+        String name = channel.getName();
+        // Define priority: 1. Non-bot threads, 2. Non-card threads, 3. Everything else
+        if (name.endsWith(Constants.BOT_CHANNEL_SUFFIX)) return 3;
+        if (name.startsWith(Constants.CARDS_INFO_THREAD_PREFIX)) return 2;
+        return 1; // Archive first
+    }
+
+    private static long getSafeLatestMessageId(ThreadChannel channel) {
+        // If no message exists, use the creation time (ID) as a fallback
+        return channel.getLatestMessageIdLong() != 0 ? channel.getLatestMessageIdLong() : channel.getIdLong();
     }
 }
