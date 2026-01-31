@@ -338,7 +338,7 @@ public class CombatRollService {
                         + " in " + game.getName() + ".";
             }
             for (String line : message.split("\n")) {
-                if (line.startsWith("> ") || line.startsWith("**Total hits")) {
+                if (line.startsWith("> `") || line.startsWith("**Total hits")) {
                     disaster += "\n" + line;
                 }
             }
@@ -692,8 +692,8 @@ public class CombatRollService {
         // Actually roll for each unit
         int totalHits = 0;
         int letnevBTBoost = 0;
-        double chanceOfAllHits = 100.0;
-        double chanceOfAllMiss = 100.0;
+        double chanceOfAllHits = Math.nextDown(100.0);
+        double chanceOfAllMiss = Math.nextDown(100.0);
         int maximumHits = 0;
 
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
@@ -863,7 +863,7 @@ public class CombatRollService {
                 player.setExpectedHitsTimes10(
                         player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
                 chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls * mult);
-                chanceOfAllMiss *= Math.pow((toHit + modifierToHit - 1) / 10.0, numRolls * mult);
+                chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls * mult);
                 maximumHits += numRolls * mult;
                 if (usesX89c4) {
                     mult = 2;
@@ -994,7 +994,7 @@ public class CombatRollService {
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                     chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
-                    chanceOfAllMiss *= Math.pow((toHit + modifierToHit - 1) / 10.0, numMisses);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
                     maximumHits += numRolls * mult;
                     int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                     totalHits += hitRolls2;
@@ -1072,7 +1072,7 @@ public class CombatRollService {
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                     chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
-                    chanceOfAllMiss *= Math.pow((toHit + modifierToHit - 1) / 10.0, numMisses);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
                     maximumHits += numRolls * mult;
                     int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                     if (gloryHolder != null
