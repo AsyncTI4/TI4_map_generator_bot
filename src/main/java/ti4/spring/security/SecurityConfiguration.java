@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
@@ -17,6 +18,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 public class SecurityConfiguration {
 
     private final DiscordOpaqueTokenIntrospector discordOpaqueTokenIntrospector;
+    private final OptionalAuthFilter optionalAuthFilter;
 
     @Value("${management.endpoints.actuator.api.key:${MANAGEMENT_ENDPOINTS_ACTUATOR_API_KEY:}}")
     private String actuatorApiKey;
@@ -39,6 +41,8 @@ public class SecurityConfiguration {
                         .authenticated())
                 // Add API key filter for /actuator/** when key is configured.
                 .addFilterBefore(new ActuatorApiKeyFilter(actuatorApiKey), AuthorizationFilter.class)
+                // Add optional auth filter for public endpoints (before OAuth2 processing)
+                .addFilterBefore(optionalAuthFilter, BearerTokenAuthenticationFilter.class)
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.opaqueToken(token -> token.introspector(discordOpaqueTokenIntrospector)));
 
