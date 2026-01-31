@@ -2573,7 +2573,8 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(
                 vaden.getCorrectChannel(),
                 vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true)
-                        + " using Putriv Sirvonsk, the Vaden hero. Buttons have been sent to their `#cards-info` thread to resolve.");
+                        + ", from their \"Shark Loans\" pool, using Putriv Sirvonsk, the Vaden hero."
+                        + " Buttons have been sent to their `#cards-info` thread to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(
                 target.getCardsInfoThread(),
                 target.getRepresentationUnfogged()

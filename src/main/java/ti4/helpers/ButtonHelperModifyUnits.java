@@ -2367,7 +2367,7 @@ public class ButtonHelperModifyUnits {
         }
         String msg = player.getRepresentation() + ", please choose which of your ships in "
                 + tile.getRepresentationForButtons(game, player)
-                + " will be affected by Gravleash.";
+                + " will be affected by _Gravleash Maneuvers_.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
@@ -2380,7 +2380,7 @@ public class ButtonHelperModifyUnits {
                 player.getRepresentation()
                         + ", you have chosen a "
                         + player.getUnitFromAsyncID(unitID).getName()
-                        + " to be affected by Gravleash. This assignment will last for one round of combat.");
+                        + " to be affected by _Gravleash Maneuvers_. This assignment will last for one round of combat.");
         ButtonHelper.deleteMessage(event);
     }
 

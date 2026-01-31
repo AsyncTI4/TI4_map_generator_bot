@@ -232,7 +232,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you sent 1 debt token to " + owner.getFactionEmojiOrColor()
-                            + " due to _Arms Brokerage_.");
+                            + ", for their \"Shark Loans\" pool, due to _Arms Brokerage_.");
         }
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
