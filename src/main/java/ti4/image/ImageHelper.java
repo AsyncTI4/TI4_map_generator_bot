@@ -170,9 +170,10 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeWebp(BufferedImage image) {
-        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+        ImageWriter writer = null;
         try (var byteArrayOutputStream = new ByteArrayOutputStream();
                 var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
+            writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
             writer.setOutput(imageOutputStream);
 
             WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
@@ -185,7 +186,7 @@ public class ImageHelper {
             imageOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
         } finally {
-            writer.dispose();
+            if (writer != null) writer.dispose();
         }
     }
 }
