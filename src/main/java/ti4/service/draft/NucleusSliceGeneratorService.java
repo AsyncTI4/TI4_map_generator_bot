@@ -105,8 +105,7 @@ public class NucleusSliceGeneratorService {
      * @param nucleusSpecs
      * @return
      */
-    public NucleusOutcome generateNucleusAndSlices(
-            GenericInteractionCreateEvent event, Game game, NucleusSpecs nucleusSpecs) {
+    NucleusOutcome generateNucleusAndSlices(GenericInteractionCreateEvent event, Game game, NucleusSpecs nucleusSpecs) {
         String mapTemplateId = game.getMapTemplateID();
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(mapTemplateId);
         if (!mapTemplate.isNucleusTemplate()) {

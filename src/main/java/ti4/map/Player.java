@@ -130,8 +130,8 @@ public class Player extends PlayerProperties {
     private final Map<String, String> fowCustomLabels = new HashMap<>();
     private Map<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private @Getter Map<String, Integer> currentProducedUnits = new HashMap<>();
-    private Map<String, Map<String, Integer>> debtTokens =
-            new LinkedHashMap<String, Map<String, Integer>>(); // <pool: <color: count>>
+    // <pool: <color: count>>
+    private final Map<String, Map<String, Integer>> debtTokens = new LinkedHashMap<>();
 
     public Player(String userID, String userName, Game game) {
         setUserID(userID);
@@ -1567,13 +1567,8 @@ public class Player extends PlayerProperties {
     @Override
     public String getStatsTrackedUserName() {
         User statsTrackedUser = getUser(getStatsTrackedUserID());
-        if (statsTrackedUser == null) return super.getStatsTrackedUserName();
-
-        Member member = JdaService.guildPrimary.getMemberById(getStatsTrackedUserID());
-        if (member == null) {
+        if (statsTrackedUser != null) {
             setStatsTrackedUserName(statsTrackedUser.getName());
-        } else {
-            setStatsTrackedUserName(member.getEffectiveName());
         }
         return super.getStatsTrackedUserName();
     }
