@@ -736,39 +736,41 @@ public class CreateGameService {
             // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
             // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
             List<String> words = new ArrayList<>(Arrays.asList(
-                "Relativity", "Photon", "Crystalline", "Particle", "Lunar", "Ecosystem", "Hardlight", "Halogen",
+                "Relativity", "Photon", "Crystalline", "Exoplanet", "Lunar", "Ecosystem", "Hardlight", "Halogen",
                 "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
-                "Fission", "Disruptor", "Network", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
+                "Fission", "Disruptor", "Monolith", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
                 "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
                 "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
-                "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Lattice", "Obelisk", "Yggdrasil", "Jargon",
+                "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Magnetron", "Obelisk", "Yggdrasil", "Jargon",
                 "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
                 "Cryosleep", "Incandescent", "Vector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Gloom",
-                "Saturn", "Convex", "Nulldrive", "Distortion", "Equilibrium", "Abyss", "Hydra", "Friction",
+                "Muon", "Convex", "Nulldrive", "Distortion", "Equilibrium", "Abyss", "Hydra", "Friction",
                 "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
                 "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
                 "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
-                "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Sigma", "Imprint", "Overclock",
+                "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Wintermute", "Imprint", "Overclock",
                 "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
-                "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Pulsar", "Kinetic", "Chimera",
+                "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Quasar", "Kinetic", "Chimera",
                 "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
-                "Osmosis", "Thunderchild", "Electrical", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
+                "Osmosis", "Thunderchild", "Piezoelectric", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
                 "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
                 "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
-                "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Terraform",
-                "Conduit", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
+                "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Xenobiology",
+                "Continuum", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
                 "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
                 "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
                 "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Atomic",
-                "Galactic", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
+                "Datastream", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
                 "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
                 "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
-                "Parasite", "Synchronisation", "Singularity", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
+                "Sentinel", "Synchronisation", "Coriolis", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
                 "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
-                "Nitrogen", "Odyssey", "Bioluminescence", "Orbital", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+                "Nitrogen", "Odyssey", "Bioluminescence", "Lagrange", "Lightspeed", "Helix", "Photosynthesis", "Interface",
                 "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
-                "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Energy"));
-            // extra words: "Aurora", "Datastream", "Monolith", "Coriolis", "Lagrange", "Causality", "Wintermute"
+                "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Causality"));
+            // extra words: "Mnemonic", "Afterimage", "Metastable", "Synapse", "Sentience", "Failsafe", "Waypoint", "Faraday"
+            // avoid words that are similar to names of TI4 components (or parts thereof) e.g. "Quantum"
+            // also avoid ords that are similar to existing words or the list e.g. "Cyberspace" -> Nullspace", "Subspace"
             // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;
