@@ -28,7 +28,6 @@ import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
@@ -247,7 +246,6 @@ public class StartCombatService {
             String spaceOrGround,
             String unitHolderName,
             boolean firstCombatThread) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         if (threadName == null) threadName = combatThreadName(game, player1, player2, tile, null);
         if (!game.isFowMode()) {
             channel = game.getMainGameChannel();
@@ -655,7 +653,6 @@ public class StartCombatService {
             Tile tile,
             GenericInteractionCreateEvent event,
             String spaceOrGround) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext =
                 new TileGenerator(game, event, null, 0, tile.getPosition(), player).createFileUpload();
 
