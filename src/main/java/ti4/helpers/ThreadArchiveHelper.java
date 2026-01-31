@@ -74,7 +74,7 @@ public class ThreadArchiveHelper {
 
     private static int getArchivePriority(ThreadChannel channel) {
         String name = channel.getName();
-        // Define priority: 1. Non-bot threads, 2. Non-card threads, 3. Everything else
+        // 1 = normal threads (neither bot-suffix nor cards-info), 2 = cards-info, 3 = bot-suffix
         if (name.endsWith(Constants.BOT_CHANNEL_SUFFIX)) return 3;
         if (name.startsWith(Constants.CARDS_INFO_THREAD_PREFIX)) return 2;
         return 1; // Archive first
