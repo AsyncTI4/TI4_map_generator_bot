@@ -1455,6 +1455,14 @@ class PlayerAreaGenerator {
             for (Entry<String, Integer> debtToken : pool.getValue().entrySet()) {
                 Player debtPlayer = game.getPlayerByColorID(Mapper.getColorID(debtToken.getKey()))
                         .orElse(null);
+                int numTokens = debtToken.getValue();
+                if (numTokens == 0) continue;
+                int overflow = 0;
+                if (numTokens > 12) {
+                    overflow = numTokens - 10;
+                    numTokens = 10;
+                }
+
                 boolean hideFactionIcon = isFoWPrivate
                         && debtPlayer != null
                         && !FoWHelper.canSeeStatsOfPlayer(game, debtPlayer, frogPlayer);
@@ -1467,13 +1475,6 @@ class PlayerAreaGenerator {
 
                 float scale = 0.60f;
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-
-                int numTokens = debtToken.getValue();
-                int overflow = 0;
-                if (numTokens > 12) {
-                    overflow = numTokens - 10;
-                    numTokens = 10;
-                }
 
                 for (int i = 0; i < numTokens; i++) {
                     DrawingUtil.drawControlToken(
