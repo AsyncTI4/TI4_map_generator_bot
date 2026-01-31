@@ -1468,7 +1468,14 @@ class PlayerAreaGenerator {
                 float scale = 0.60f;
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
 
-                for (int i = 0; i < debtToken.getValue(); i++) {
+                int numTokens = debtToken.getValue();
+                int overflow = 0;
+                if (numTokens > 12) {
+                    overflow = numTokens - 10;
+                    numTokens = 10;
+                }
+
+                for (int i = 0; i < numTokens; i++) {
                     DrawingUtil.drawControlToken(
                             graphics,
                             controlTokenImage,
@@ -1479,6 +1486,13 @@ class PlayerAreaGenerator {
                             hideFactionIcon,
                             scale);
                     tokenDeltaX += 15;
+                }
+
+                if (overflow > 0) {
+                    graphics.setColor(Color.WHITE);
+                    graphics.setFont(Storage.getFont18());
+                    graphics.drawString("+" + overflow, x + deltaX + tokenDeltaX + 29, y + 22 + tokenDeltaY);
+                    tokenDeltaX += 2 + graphics.getFontMetrics().stringWidth("+" + overflow);
                 }
 
                 tokenDeltaY += 29;

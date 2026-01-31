@@ -5437,6 +5437,7 @@ public class ButtonHelper {
                     new LogOrigin(event, player), "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
         }
+        String msg = player.getRepresentation() + " sent 1 ";
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
             TransactionHelper.checkTransactionLegality(game, player, tradeHolder);
             if (player.getTg() > 0) {
@@ -5449,13 +5450,11 @@ public class ButtonHelper {
                                 + " you had no trade goods to send, so no trade goods were sent.");
                 return;
             }
-            tgOrDebt = "trade good";
+            msg += "trade good to " + tradeHolder.getRepresentation() + ".";
         } else {
             SendDebtService.sendDebt(player, tradeHolder, 1);
-            tgOrDebt = "debt token";
+            msg += "debt token to " + tradeHolder.getRepresentation() + ", for their \"Debt Account\" pool.";
         }
-        String msg =
-                player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(tradeHolder, "hacan");
     }

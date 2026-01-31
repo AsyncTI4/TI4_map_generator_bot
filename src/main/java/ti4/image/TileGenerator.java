@@ -1734,6 +1734,9 @@ public class TileGenerator {
                     if (unitHolder instanceof Planet planetHolder) {
                         scale = planetHolder.getRadius() / 65.0f;
                     }
+                    if (tile.getPosition().contains("frac")) {
+                        tokenPath = tile.getTokenPath("token_worlddestroyed_frac.png");
+                    }
                     scale *= 1.55f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didn't previous get changed for custodians

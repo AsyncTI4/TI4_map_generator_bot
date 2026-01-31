@@ -146,7 +146,7 @@
     {
         "alias": "kjalengardbt",
         "name": "Bannerhalls",
-        "shortName": "Bannerhalls",
+        "shortName": "Banner\nhalls",
         "faction": "kjalengard",
         "synergy": [
             "WARFARE",
@@ -254,7 +254,7 @@
     {
         "alias": "mirvedabt",
         "name": "Stabilization Arrays",
-        "shortName": "Stabilization\nArrays",
+        "shortName": "Stabiliz'n\nArrays",
         "faction": "mirveda",
         "synergy": [
             "PROPULSION",

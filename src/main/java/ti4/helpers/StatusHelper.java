@@ -461,7 +461,7 @@ public class StatusHelper {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
-                            + " You may pay 1 trade good to get 2 debt tokens forgiven.";
+                            + " You may pay 1 trade good to get 2 debt tokens forgiven, from the \"Shark Loans\" pool.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
                     buttons.add(Buttons.red("deleteButtons", "Stay Indebted"));
