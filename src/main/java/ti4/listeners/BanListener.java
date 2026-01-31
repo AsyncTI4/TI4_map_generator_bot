@@ -25,17 +25,12 @@ public class BanListener extends ListenerAdapter {
 
     private UserSnowflake getTargetUser(AuditLogEntry log) {
         if (log.getTargetType() == TargetType.MEMBER) {
-            if (log.getTargetId() != null) {
-                return UserSnowflake.fromId(log.getTargetId());
-            }
+            return UserSnowflake.fromId(log.getTargetId());
         }
         return null;
     }
 
     private UserSnowflake getInitiatingUser(AuditLogEntry log) {
-        if (log.getUserId() != null) {
-            return UserSnowflake.fromId(log.getUserId());
-        }
-        return null;
+        return UserSnowflake.fromId(log.getUserId());
     }
 }
