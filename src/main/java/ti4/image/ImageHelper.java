@@ -2,8 +2,6 @@ package ti4.image;
 
 import com.luciad.imageio.webp.CompressionType;
 import com.luciad.imageio.webp.WebPWriteParam;
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -154,49 +152,41 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(imageWithoutAlpha, "jpg", byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
-        }
+        return writeStandard(image, "jpg");
     }
 
     @SneakyThrows
     public static byte[] writePng(BufferedImage image) {
+        return writeStandard(image, "png");
+    }
+
+    @SneakyThrows
+    private static byte[] writeStandard(BufferedImage image, String format) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", byteArrayOutputStream);
+            ImageIO.write(image, format, byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
         }
     }
 
     @SneakyThrows
     public static byte[] writeWebp(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        ImageWriter writer = null;
         try (var byteArrayOutputStream = new ByteArrayOutputStream();
                 var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
-            ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+            writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+            writer.setOutput(imageOutputStream);
 
             WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
             writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             writeParam.setCompressionType(CompressionType.Lossy);
             writeParam.setUseSharpYUV(false);
             writeParam.setAlphaCompressionAlgorithm(0);
-            // writeParam.setCompressionQuality(.5f);
-            // writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
 
-            writer.setOutput(imageOutputStream);
-
-            // Encode
-            writer.write(null, new IIOImage(imageWithoutAlpha, null, null), writeParam);
+            writer.write(null, new IIOImage(image, null, null), writeParam);
+            imageOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
+        } finally {
+            if (writer != null) writer.dispose();
         }
-    }
-
-    private static BufferedImage redrawWithoutAlpha(BufferedImage image) {
-        var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = imageWithoutAlpha.createGraphics();
-        g2d.drawImage(image, 0, 0, Color.BLACK, null);
-        g2d.dispose();
-        return imageWithoutAlpha;
     }
 }
