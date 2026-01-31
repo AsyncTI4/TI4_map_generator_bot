@@ -2,6 +2,8 @@ package ti4.helpers;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -13,9 +15,17 @@ public class ThreadArchiveHelper {
 
     private static final int DEFAULT_MAX_THREAD_COUNT = 950;
     private static final int DEFAULT_CLOSE_COUNT = 25;
+    private static final int COOLDOWN_MS = 30000; // 30 seconds
+    private static final Map<Long, Long> guildIdToLastCheckTimeMs = new ConcurrentHashMap<>();
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         if (guild == null) return;
+
+        long nowMs = System.currentTimeMillis();
+        long lastCheck = guildIdToLastCheckTimeMs.getOrDefault(guild.getIdLong(), 0L);
+        if (nowMs - lastCheck < COOLDOWN_MS) return;
+
+        guildIdToLastCheckTimeMs.put(guild.getIdLong(), nowMs);
 
         guild.retrieveActiveThreads().queue(activeThreads -> {
             int maxThreadCount = GlobalSettings.getSetting(
@@ -43,11 +53,11 @@ public class ThreadArchiveHelper {
     }
 
     private static void archiveOldThreads(String guildName, List<ThreadChannel> threads, int numberToClose) {
-        // Sort by Latest Message ID (Oldest first)
+        // Sort by archive priority, then by latest message ID (oldest first)
         List<ThreadChannel> targets = threads.stream()
                 .filter(c -> !c.isArchived())
-                .sorted(Comparator.comparingLong(ThreadArchiveHelper::getSafeLatestMessageId))
-                .sorted(Comparator.comparingInt(ThreadArchiveHelper::getArchivePriority))
+                .sorted(Comparator.comparingInt(ThreadArchiveHelper::getArchivePriority)
+                        .thenComparingLong(ThreadArchiveHelper::getSafeLatestMessageId))
                 .limit(numberToClose)
                 .toList();
 
