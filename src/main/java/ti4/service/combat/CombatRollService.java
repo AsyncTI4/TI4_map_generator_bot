@@ -126,7 +126,7 @@ public class CombatRollService {
             UnitModel metaliFakeUnit = new UnitModel();
             metaliFakeUnit.setAfbDieCount(3);
             metaliFakeUnit.setAfbHitsOn(6);
-            metaliFakeUnit.setName("Metali Armaments");
+            metaliFakeUnit.setName("Metali Void Armaments");
             metaliFakeUnit.setAsyncId("MetaliAFB");
             metaliFakeUnit.setId("MetaliAFB");
             metaliFakeUnit.setBaseType("dd");
@@ -331,11 +331,11 @@ public class CombatRollService {
         if (!game.isFowMode() && !game.getStoredValue("surprisingDiceRoll").equals("none")) {
             String disaster;
             if (game.getStoredValue("surprisingDiceRoll").equals("hits")) {
-                disaster = opponent.getRepresentation() + " has been rolled disastrously against by "
-                        + player.getRepresentation() + " in " + game.getName() + ".";
+                disaster = player.getRepresentation() + " has rolled grievously against " + opponent.getRepresentation()
+                        + " in " + game.getName() + ".";
             } else {
-                disaster = player.getRepresentation() + " has rolled disastrously against "
-                        + opponent.getRepresentation() + " in " + game.getName() + ".";
+                disaster = player.getRepresentation() + " has rolled dismally against " + opponent.getRepresentation()
+                        + " in " + game.getName() + ".";
             }
             for (String line : message.split("\n")) {
                 if (line.startsWith("> ") || line.startsWith("**Total hits")) {
