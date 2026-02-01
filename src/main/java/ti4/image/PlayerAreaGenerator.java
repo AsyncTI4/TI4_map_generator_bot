@@ -2691,8 +2691,9 @@ class PlayerAreaGenerator {
 
             Color textColor = Color.white;
             if (!unl || exh) textColor = Color.gray;
-            graphics.setStroke(stroke2);
             graphics.setColor(textColor);
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setStroke(stroke2);
 
             drawFactionIconImage(graphics, faction, x - 1, y + 108, 42, 42);
             String synergies = model.getBackgroundResource(unl && !exh);
