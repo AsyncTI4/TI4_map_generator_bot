@@ -1514,7 +1514,7 @@ class PlayerAreaGenerator {
     }
 
     private int abilityInfo(Player player, int x, int y) {
-        int deltaX = 10;
+        int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
@@ -1627,7 +1627,7 @@ class PlayerAreaGenerator {
     }
 
     private int drawOwnedPromissoryNotes(Player player, int x, int y) {
-        int deltaX = 10;
+        int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
@@ -2665,10 +2665,11 @@ class PlayerAreaGenerator {
     }
 
     private int allBreakthroughInfo(Player player, int x, int y, Game game) {
+        int startX = x;
         for (String bt : player.getBreakthroughIDs()) {
             x = breakthroughInfo(player, bt, x, y, game);
         }
-        return x + 20;
+        return x + (startX == x ? 0 : 20);
     }
 
     private int breakthroughInfo(Player player, String bt, int x, int y, Game game) {
@@ -2690,12 +2691,21 @@ class PlayerAreaGenerator {
 
             Color textColor = Color.white;
             if (!unl || exh) textColor = Color.gray;
+            graphics.setColor(textColor);
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setStroke(stroke2);
 
-            String resource = model.getBackgroundResource(unl && !exh);
-
-            BufferedImage btBox = createPABox(name, resource, faction, boxColor, textColor, model.getShrinkName());
+            drawFactionIconImage(graphics, faction, x - 1, y + 108, 42, 42);
+            String synergies = model.getBackgroundResource(unl && !exh);
+            drawPAImage(x, y, synergies);
+            if (model.getShrinkName()) {
+                graphics.setFont(Storage.getFont16());
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 9, y + 144, 120);
+            } else {
+                graphics.setFont(Storage.getFont18());
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 7, y + 144, 120);
+            }
             drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
-            graphics.drawImage(btBox, x, y - 3, null);
 
             if (player.getBreakthroughTGs(bt) > 0) {
                 BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);
@@ -2717,40 +2727,7 @@ class PlayerAreaGenerator {
             BotLogger.error("Error displaying breakthrough: " + name, e);
             return x;
         }
-        return x + 44;
-    }
-
-    private BufferedImage createPABox(
-            String displayText, String resource, String faction, Color boxOutline, Color textColor) {
-        return createPABox(displayText, resource, faction, boxOutline, textColor, false);
-    }
-
-    private BufferedImage createPABox(
-            String displayText, String resource, String faction, Color boxOutline, Color textColor, boolean shrink) {
-        BufferedImage output = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage textAndBox = new BufferedImage(44, 154, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = output.getGraphics();
-        if (resource != null) drawPAImage(g, 2, 2, resource);
-        if (faction != null) drawFactionIconImageOpaque(g, faction, 2, 109, 40, 40, 1.0f);
-
-        Graphics2D g2 = textAndBox.createGraphics();
-        AffineTransform orig = g2.getTransform();
-        g2.setStroke(stroke2);
-        g2.setColor(textColor);
-
-        if (shrink) {
-            g2.setFont(Storage.getFont16());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 11, 150, 120, false);
-        } else {
-            g2.setFont(Storage.getFont18());
-            DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, displayText, 9, 150, 120, false);
-        }
-
-        g2.setColor(boxOutline);
-        g2.drawRect(1, 1, 42, 152);
-
-        g.drawImage(textAndBox, 0, 0, null);
-        return output;
+        return x + 48;
     }
 
     private int factionTechInfo(Player player, int x, int y) {
@@ -2762,8 +2739,7 @@ class PlayerAreaGenerator {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
-        int deltaX = 20;
-        deltaX = factionTechField(player, x, y, techs, deltaX);
+        int deltaX = factionTechField(player, x, y, techs, 0);
         return x + deltaX + 20;
     }
 
@@ -3309,7 +3285,7 @@ class PlayerAreaGenerator {
         }
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 252, 152);
-        deltaX += 270;
+        deltaX += 244;
         return deltaX;
     }
 

@@ -2401,11 +2401,11 @@ public class MapGenerator implements AutoCloseable {
                 x += lawWidth;
             } else {
                 secondColumn = false;
-                y += 112;
+                y += 118;
                 x -= lawWidth;
             }
         }
-        return secondColumn ? y + 115 : y + 3;
+        return y + 3 + (secondColumn ? 118 : 0);
     }
 
     private int events(int y) {
