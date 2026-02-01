@@ -1605,7 +1605,7 @@ public class ButtonHelperHeroes {
                                                 + (tf ? "" : " and capturing") + ".\n");
                                 RemoveUnitService.removeUnit(
                                         event, tile, game, p2, unitHolder, UnitType.Fighter, overCapacity, false);
-                                if (tf) {
+                                if (!tf) {
                                     AddUnitService.addUnits(
                                             event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " ff");
                                 }
