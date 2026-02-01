@@ -33,6 +33,7 @@ public class Buttons {
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
+    public static final Button CANCEL = gray("deleteButtons", "Cancel");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
 
     // Cards Info Buttons
