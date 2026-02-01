@@ -863,7 +863,7 @@ public class Tile {
             var planetDisplayNames = unitHolders.keySet().stream()
                     .filter(key -> !key.equals("space"))
                     .map(planetId -> Helper.getPlanetName(planetId))
-                    .filter(name  -> name != null)
+                    .filter(name -> name != null)
                     .toList();
             sb.append(String.join(", ", planetDisplayNames));
         }
