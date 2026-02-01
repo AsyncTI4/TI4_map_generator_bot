@@ -13,11 +13,11 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class AutoFactoriesService {
 
-    public String autoFactories() {
+    private String autoFactories() {
         return Mapper.getBreakthrough("hacanbt").getNameRepresentation();
     }
 
-    private static int getNumberOfProducedNonFighterShips(Player player, Game game) {
+    private static int getNumberOfProducedNonFighterShips(Player player) {
         int count = 0;
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
@@ -34,7 +34,7 @@ public class AutoFactoriesService {
 
     public void resolveAutoFactories(Game game, Player player, String buttonID) {
         if (!player.hasUnlockedBreakthrough("hacanbt")) return;
-        if (getNumberOfProducedNonFighterShips(player, game) < 3) return;
+        if (getNumberOfProducedNonFighterShips(player) < 3) return;
 
         // Check if Fleet Regulations is in play and player already has 4+ effective fleet CC
         if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() >= 4) {
