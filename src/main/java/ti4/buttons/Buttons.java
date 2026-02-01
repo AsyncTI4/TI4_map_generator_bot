@@ -47,6 +47,8 @@ public class Buttons {
     private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     private static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
+    private static final Button REFRESH_BREAKTHROUGH_INFO =
+            green(Constants.REFRESH_BREAKTHROUGH_INFO, "Breakthrough Info");
     public static final Button REFRESH_RELIC_INFO =
             green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
     public static final Button REFRESH_LEADER_INFO =
@@ -76,6 +78,18 @@ public class Buttons {
             REFRESH_LEADER_INFO,
             REFRESH_UNIT_INFO,
             REFRESH_TECH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
+    public static final List<Button> REFRESH_INFO_BUTTONS_TE = List.of(
+            REFRESH_AC_INFO,
+            REFRESH_PN_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_BREAKTHROUGH_INFO,
             REFRESH_PLANET_INFO,
             FACTION_EMBED);
     public static final List<Button> REFRESH_INFO_BUTTONS_TF = List.of(
