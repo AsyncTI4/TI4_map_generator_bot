@@ -2,6 +2,8 @@ package ti4.image;
 
 import com.luciad.imageio.webp.CompressionType;
 import com.luciad.imageio.webp.WebPWriteParam;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -152,16 +154,17 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        return writeStandard(image, "jpg");
+        image = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        return writeImage(image, "jpg");
     }
 
     @SneakyThrows
     public static byte[] writePng(BufferedImage image) {
-        return writeStandard(image, "png");
+        return writeImage(image, "png");
     }
 
     @SneakyThrows
-    private static byte[] writeStandard(BufferedImage image, String format) {
+    private static byte[] writeImage(BufferedImage image, String format) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
             ImageIO.write(image, format, byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
@@ -170,6 +173,7 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeWebp(BufferedImage image) {
+        image = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
         ImageWriter writer = null;
         try (var byteArrayOutputStream = new ByteArrayOutputStream();
                 var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
@@ -188,5 +192,13 @@ public class ImageHelper {
         } finally {
             if (writer != null) writer.dispose();
         }
+    }
+
+    private static BufferedImage redrawWithoutAlpha(BufferedImage image) {
+        var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = imageWithoutAlpha.createGraphics();
+        g2d.drawImage(image, 0, 0, Color.BLACK, null);
+        g2d.dispose();
+        return imageWithoutAlpha;
     }
 }
