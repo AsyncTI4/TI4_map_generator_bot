@@ -4,10 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.testUtils.BaseTi4Test;
 
+/**
+ * Tests for AutoFactoriesService.
+ * Note: These tests verify the preconditions that the service checks.
+ * Full integration tests would require complex setup with produced units,
+ * unit models, and message handling which is tested through manual testing.
+ */
 class AutoFactoriesServiceTest extends BaseTi4Test {
 
     @Test
@@ -15,7 +22,7 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         beforeAll();
 
         var game = new Game();
-        // Set Fleet Regulations law
+        // Set Fleet Regulations law (the integer value is a unique identifier for the law instance)
         game.setLaws(Map.of("regulations", 1));
 
         var player = new Player("userId", "userName", game);
@@ -26,13 +33,11 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         player.setBreakthroughUnlocked("hacanbt", true);
         player.setColor("black");
 
-        // Player should not gain fleet CC because they are already at the limit
-        // and Fleet Regulations is in play
         int initialFleetCC = player.getFleetCC();
 
-        // Direct check of the logic: player has unlocked hacanbt, and regulations is in play with 4+ fleet CC
+        // Verify the preconditions that AutoFactoriesService checks
         boolean hasBreakthrough = player.hasUnlockedBreakthrough("hacanbt");
-        boolean regulationsInPlay = game.getLaws().containsKey("regulations");
+        boolean regulationsInPlay = ButtonHelper.isLawInPlay(game, "regulations");
         boolean atOrAboveLimit = player.getEffectiveFleetCC() >= 4;
 
         assertThat(hasBreakthrough).isTrue();
@@ -40,8 +45,11 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         assertThat(atOrAboveLimit).isTrue();
         assertThat(initialFleetCC).isEqualTo(4);
 
-        // The logic in AutoFactoriesService should prevent gaining a token
-        // when regulations is in play and effective fleet CC is >= 4
+        // Under these conditions, AutoFactoriesService.resolveAutoFactories() will:
+        // 1. Check if player has unlocked hacanbt breakthrough (true)
+        // 2. Check if Fleet Regulations is in play AND effective fleet CC >= 4 (true)
+        // 3. Send a message explaining why they cannot gain the token
+        // 4. Return early WITHOUT granting the fleet token
     }
 
     @Test
@@ -49,7 +57,7 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         beforeAll();
 
         var game = new Game();
-        // Set Fleet Regulations law
+        // Set Fleet Regulations law (the integer value is a unique identifier for the law instance)
         game.setLaws(Map.of("regulations", 1));
 
         var player = new Player("userId", "userName", game);
@@ -60,11 +68,11 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         player.setBreakthroughUnlocked("hacanbt", true);
         player.setColor("black");
 
-        // Player should be able to gain a fleet token because they are below the limit
         int initialFleetCC = player.getFleetCC();
 
+        // Verify the preconditions that AutoFactoriesService checks
         boolean hasBreakthrough = player.hasUnlockedBreakthrough("hacanbt");
-        boolean regulationsInPlay = game.getLaws().containsKey("regulations");
+        boolean regulationsInPlay = ButtonHelper.isLawInPlay(game, "regulations");
         boolean belowLimit = player.getEffectiveFleetCC() < 4;
 
         assertThat(hasBreakthrough).isTrue();
@@ -72,7 +80,10 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         assertThat(belowLimit).isTrue();
         assertThat(initialFleetCC).isEqualTo(3);
 
-        // When regulations is in play but effective fleet CC < 4, gaining is allowed
+        // Under these conditions, AutoFactoriesService.resolveAutoFactories() will:
+        // 1. Check if player has unlocked hacanbt breakthrough (true)
+        // 2. Check if Fleet Regulations is in play AND effective fleet CC >= 4 (false - they're at 3)
+        // 3. Grant the fleet token, bringing them to 4
     }
 
     @Test
@@ -90,12 +101,16 @@ class AutoFactoriesServiceTest extends BaseTi4Test {
         player.setBreakthroughUnlocked("hacanbt", true);
         player.setColor("black");
 
+        // Verify the preconditions that AutoFactoriesService checks
         boolean hasBreakthrough = player.hasUnlockedBreakthrough("hacanbt");
-        boolean regulationsInPlay = game.getLaws().containsKey("regulations");
+        boolean regulationsInPlay = ButtonHelper.isLawInPlay(game, "regulations");
 
         assertThat(hasBreakthrough).isTrue();
         assertThat(regulationsInPlay).isFalse();
 
-        // When regulations is NOT in play, there is no restriction on gaining fleet tokens
+        // Under these conditions, AutoFactoriesService.resolveAutoFactories() will:
+        // 1. Check if player has unlocked hacanbt breakthrough (true)
+        // 2. Check if Fleet Regulations is in play (false)
+        // 3. Grant the fleet token (no limit when regulations is not in play)
     }
 }
