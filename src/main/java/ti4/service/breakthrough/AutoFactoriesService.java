@@ -13,11 +13,11 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class AutoFactoriesService {
 
-    public String autoFactories() {
+    private String autoFactories() {
         return Mapper.getBreakthrough("hacanbt").getNameRepresentation();
     }
 
-    private static int getNumberOfProducedNonFighterShips(Player player, Game game) {
+    private static int getNumberOfProducedNonFighterShips(Player player) {
         int count = 0;
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
@@ -34,17 +34,20 @@ public class AutoFactoriesService {
 
     public void resolveAutoFactories(Game game, Player player, String buttonID) {
         if (!player.hasUnlockedBreakthrough("hacanbt")) return;
-        if (getNumberOfProducedNonFighterShips(player, game) < 3) return;
+        if (getNumberOfProducedNonFighterShips(player) < 3) return;
+
+        // Check if Fleet Regulations is in play and player already has 4+ effective fleet CC
+        if (ButtonHelper.isLawInPlay(game, "regulations") && player.getEffectiveFleetCC() >= 4) {
+            String msg = player.getRepresentation() + ", you cannot gain a command token from " + autoFactories();
+            msg += " because _Fleet Regulations_ is a law in play, which is limiting fleet pool to 4 tokens.";
+            ButtonHelper.sendMessageToRightStratThread(player, game, msg, buttonID);
+            return;
+        }
 
         String message =
                 player.getPing() + " gained a command token into their fleet pool from " + autoFactories() + ".";
         message += "\n-# Fleet pool increased from " + player.gainFleetCC(1) + ".";
 
-        if (game.getLaws().containsKey("regulations") && player.getEffectiveFleetCC() > 4) {
-            String msg = player.getRepresentation() + ", reminder that _Fleet Regulations_ is a";
-            msg += " law in play, which is limiting fleet pool to 4 tokens.";
-            ButtonHelper.sendMessageToRightStratThread(player, game, msg, buttonID);
-        }
         ButtonHelper.sendMessageToRightStratThread(player, game, message, buttonID);
     }
 }
