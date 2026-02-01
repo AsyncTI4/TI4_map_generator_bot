@@ -3596,9 +3596,10 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("turnOffForcedScoring")
     public static void turnOffForcedScoring(ButtonInteractionEvent event, Game game) {
+        Helper.resolveAllQueuedScoring(game, event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                game.getPing() + ", forced scoring order has been turned off. Any queues will not be resolved.");
+                game.getPing() + ", forced scoring order has been turned off. All queued objectives have been resolved.");
         game.setStoredValue("forcedScoringOrder", "");
         ButtonHelper.deleteMessage(event);
     }
