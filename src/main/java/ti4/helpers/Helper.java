@@ -401,9 +401,6 @@ public class Helper {
 
         // Process all queued POs
         for (Player player : game.getRealPlayers()) {
-            if (game.getHighestScore() + 1 > game.getVp()) {
-                break;
-            }
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 String queuedPO = game.getStoredValue(player.getFaction() + "queuedPOScore");
                 if (!queuedPO.isEmpty()) {
@@ -413,13 +410,13 @@ public class Helper {
                     game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                 }
             }
+            if (game.getHighestScore() + 1 > game.getVp()) {
+                break;
+            }
         }
 
         // Process all queued SOs
         for (Player player : game.getRealPlayers()) {
-            if (game.getHighestScore() + 1 > game.getVp()) {
-                break;
-            }
             if (game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                 String queuedSO = game.getStoredValue(player.getFaction() + "queuedSOScore");
                 if (!queuedSO.isEmpty()) {
@@ -428,6 +425,9 @@ public class Helper {
                     game.setStoredValue(key2b, game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3b, game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
                 }
+            }
+            if (game.getHighestScore() + 1 > game.getVp()) {
+                break;
             }
         }
     }
