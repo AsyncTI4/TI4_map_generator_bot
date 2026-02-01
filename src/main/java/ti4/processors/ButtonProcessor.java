@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -151,11 +152,7 @@ public class ButtonProcessor {
                 // Don't add anymore cases - use @ButtonHandler
                 case "refreshInfoButtons" ->
                     MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(),
-                            null,
-                            (game != null && game.isTwilightsFallMode())
-                                    ? Buttons.REFRESH_INFO_BUTTONS_TF
-                                    : Buttons.REFRESH_INFO_BUTTONS);
+                            event.getChannel(), null, getRefreshInfoButtons(game));
                 case "factionEmbedRefresh" ->
                     MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                             player.getCardsInfoThread(),
@@ -214,6 +211,13 @@ public class ButtonProcessor {
                                     + " pressed. This button does not do anything.");
             }
         }
+    }
+
+    private static List<Button> getRefreshInfoButtons(Game game) {
+        if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
+        if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
+        if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
+        return Buttons.REFRESH_INFO_BUTTONS;
     }
 
     public static String getButtonProcessingStatistics() {
