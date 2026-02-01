@@ -159,7 +159,7 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
         <configuration>
           <lineEndings>GIT_ATTRIBUTES</lineEndings>
           <encoding>UTF-8</encoding>
