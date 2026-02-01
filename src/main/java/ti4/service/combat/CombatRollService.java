@@ -1005,7 +1005,7 @@ public class CombatRollService {
                             .append(numMisses)
                             .append(" miss")
                             .append(numMisses == 1 ? "" : "es")
-                            .append(" due to Ta Zern, the Jol-Nar Commander:\n ")
+                            .append(" due to Ta Zern, the Jol-Nar Commander:\n")
                             .append(unitRoll2);
                 }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
