@@ -24,6 +24,18 @@
         "source": "balacasi"
     },
     {
+        "alias": "zooidbt",
+        "name": "Foresight Module",
+        "shortName": "Foresight\nModule",
+        "faction": "zooid",
+        "synergy": [
+            "BIOTIC",
+            "CYBERNETIC"
+        ],
+        "text": "When you are negotiating a transaction, secret objectives can be exchanged as part of that transaction. ACTION: Exhaust this card and discard 1 secret objective to draw 1 secret objective.",
+        "source": "other"
+    },
+    {
         "alias": "kalorabt",
         "name": "Bypass Operations",
         "shortName": "Bypass\nOperations",

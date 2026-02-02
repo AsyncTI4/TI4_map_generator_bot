@@ -60,6 +60,20 @@
         "source": "other"
     },
     {
+        "id": "grand_sequence",
+        "name": "Grand Sequence",
+        "faction": "zooid",
+        "permanentEffect": "When a public objective is revealed, draw one secret objective. You may have any number of scored or unscored secret objectives.",
+        "source": "other"
+    },
+    {
+        "id": "incomprehensible",
+        "name": "Incomprehensible",
+        "faction": "zooid",
+        "permanentEffect": "You cannot score public objectives. When you would be allowed to score a public objective, you may instead score a secret objective, if you fulfil its requirements.",
+        "source": "other"
+    },
+    {
         "id": "voidmaker",
         "name": "Voidmaker",
         "faction": "raven",

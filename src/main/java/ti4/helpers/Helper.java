@@ -232,7 +232,7 @@ public class Helper {
     }
 
     public static boolean canPlayerScorePOs(Game game, Player player) {
-        if (player.isNpc()) {
+        if (player.isNpc() || player.hasAbility("incomprehensible")) {
             return false;
         }
         if (player.hasAbility("nomadic") || player.hasTech("tf-nomadic")) {
