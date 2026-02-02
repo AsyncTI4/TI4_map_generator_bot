@@ -109,6 +109,7 @@ public enum FactionEmojis implements TI4Emoji {
     vyserix,
     zephyrion,
     arachian,
+    zooid,
 
     // nomadfalcon
     erock,
@@ -285,6 +286,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
             case "arachian" -> arachian;
+            case "zooid" -> zooid;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;

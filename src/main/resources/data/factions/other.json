@@ -135,5 +135,49 @@
             "spacedock"
         ],
         "source": "other"
+    },
+    {
+        "alias": "zooid",
+        "factionName": "The Zooid Conscience",
+        "homeSystem": "ar2",
+        "startingFleet": "2 cv, 1 cr, 1 inf chrysaora, 1 inf cyanea, 1 inf t, 2 ff, 1 sd cyanea",
+        "commodities": 3,
+        "factionTech": [
+            "arzooig",
+            "arzooiy"
+        ],
+        "startingTech": [
+            "pi"
+        ],
+        "homePlanets": [
+            "chrysaora",
+            "cyanea",
+            "tamoya"
+        ],
+        "abilities": [
+            "grand_sequence",
+            "incomprehensible"
+        ],
+        "leaders": [
+            "zooidagent",
+            "zooidcommander",
+            "zooidhero"
+        ],
+        "promissoryNotes": [
+            "zooidpn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "zooid_flagship",
+            "infantry",
+            "zooid_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "other"
     }
 ]

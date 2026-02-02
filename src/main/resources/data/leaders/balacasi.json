@@ -68,6 +68,40 @@
         "source": "other"
     },
     {
+        "id": "zooidagent",
+        "faction": "zooid",
+        "type": "agent",
+        "name": "Catostylus Mosaicus",
+        "title": "The No Title",
+        "abilityWindow": "Action",
+        "abilityText": "Exhaust this card to allow 1 player to either perform the secondary ability of an unchosen strategy card or draw 1 action card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "other"
+    },
+    {
+        "id": "zooidcommander",
+        "faction": "zooid",
+        "type": "commander",
+        "name": "Quinquecirrha",
+        "title": "The No Title",
+        "abilityWindow": "When another player activates a system that contains your units",
+        "abilityText": "You may force them to give you 1 random action card from their hand.",
+        "unlockCondition": "Have 7 unscored or scored secret objectives.",
+        "source": "other"
+    },
+    {
+        "id": "zooidhero",
+        "faction": "zooid",
+        "type": "hero",
+        "name": "Turritopsis Dohrnii",
+        "title": "The No Title",
+        "abilityName": "The No Title",
+        "abilityWindow": "ACTION",
+        "abilityText": "Place this card faceup near the game board; draw 3 secret objectives. Other players may each draw 1 secret objective. Then, all players play with their secret objectives revealed for the remainder of the game.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "other"
+    },
+    {
         "id": "xanagent",
         "faction": "xan",
         "type": "agent",
