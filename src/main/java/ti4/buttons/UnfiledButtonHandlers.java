@@ -3342,10 +3342,12 @@ public class UnfiledButtonHandlers {
         }
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
-            for (Player player_ : players.values()) {
-                RefreshCardsService.refreshPlayerCards(game, player_, false);
+            if (!game.isTwilightsFallMode()) {
+                for (Player player_ : players.values()) {
+                    RefreshCardsService.refreshPlayerCards(game, player_, false);
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
