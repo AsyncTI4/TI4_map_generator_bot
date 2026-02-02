@@ -14,6 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.objectives.DrawSecretService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 
 @UtilityClass
@@ -21,6 +22,13 @@ public class NeuraloopService {
 
     public static void offerInitialNeuraloopChoice(Game game, String poID) {
         for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("incomprehensible")) {
+                DrawSecretService.drawSO(null, game, player);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(),
+                        "## " + player.getRepresentation()
+                                + " draws a secret objective due to their Incomprehensible ability.");
+            }
             if (player.hasRelic("neuraloop")) {
                 String name;
                 if (Mapper.getPublicObjective(poID) != null) {

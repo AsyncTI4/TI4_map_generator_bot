@@ -26,6 +26,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.objectives.DrawSecretService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.unit.AddUnitService;
 
@@ -371,6 +372,13 @@ public class PromissoryNoteHelper {
             owner.removeOwnedPromissoryNoteByID(id);
             player.removePromissoryNote(id);
             owner.removePromissoryNote(id);
+        }
+        if ("zooidpn".equalsIgnoreCase(id)) {
+            DrawSecretService.drawSO(event, game, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " drew a secret objective due to a PN being played. They can tell the PN owner what it is with a whisper.");
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =
