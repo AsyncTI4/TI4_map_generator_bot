@@ -108,7 +108,7 @@ public class AddPlanetService {
                                 + ", you reclaimed your Crown Shrine from "
                                 + Helper.getPlanetRepresentation(planet, game)
                                 + " with your **The Questing Prince** ability. Congratz!");
-                String kalt = "Kaltrim Crown Token 👑";
+                String kalt = "Kaltrim Crown Token";
                 Integer id = game.addCustomPO(kalt, 1);
                 game.scorePublicObjective(player.getUserID(), id);
                 String message2 = "Custom public objective \"_" + kalt + "_\" has been added.\n"
