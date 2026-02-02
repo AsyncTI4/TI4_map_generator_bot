@@ -34,5 +34,14 @@
         "playArea": false,
         "source": "other",
         "text": "When you activate a system: Apply +1 to the move value of one of your ships that moves through a system that contains one of your command tokens. Then, return this card to the Arachian Player."
+    },
+    {
+        "alias": "zooidpn",
+        "name": "Stringwalk Teachings",
+        "color": "",
+        "faction": "zooid",
+        "playArea": true,
+        "source": "other",
+        "text": "ACTION: Place this card face up into your play area, then draw one secret objective and show it to the Zooid player. At the end of the status phase, return this card to the Zooid player."
     }
 ]
