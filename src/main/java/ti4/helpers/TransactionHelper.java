@@ -241,11 +241,17 @@ public class TransactionHelper {
                     }
                     case "SendDebt" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
-                        trans.append("Send ").append(amountToTransact).append(" debt tokens");
+                        trans.append("Send ")
+                                .append(amountToTransact)
+                                .append(" debt token" + (amountToTransact == 1 ? "" : "s")
+                                        + ", for their \"Debt Account\" pool");
                     }
                     case "ClearDebt" -> {
                         amountToTransact = Integer.parseInt(furtherDetail);
-                        trans.append("Clear ").append(amountToTransact).append(" debt tokens");
+                        trans.append("Clear ")
+                                .append(amountToTransact)
+                                .append(" debt token" + (amountToTransact == 1 ? "" : "s")
+                                        + ", from their \"Debt Account\" pool");
                     }
                     case "shipOrders" ->
                         trans.append(Mapper.getRelic(furtherDetail).getName()).append(FactionEmojis.axis);
@@ -1477,7 +1483,8 @@ public class TransactionHelper {
                 if (p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
-                    message2 += "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident + ".";
+                    message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s")
+                            + " owned by " + ident + ", from their \"Debt Account\" pool.";
                 }
             }
             case "Comms" -> {
@@ -1500,7 +1507,7 @@ public class TransactionHelper {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
                     message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s")
-                            + " owned by " + ident + ".";
+                            + " owned by " + ident + ", from their \"Debt Account\" pool.";
                 }
             }
             case "WashComms" -> {
@@ -1551,13 +1558,15 @@ public class TransactionHelper {
             }
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt token"
-                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " to " + ident2 + ".";
+                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " to " + ident2
+                        + ", for their \"Debt Account\" pool.";
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
                 CommanderUnlockCheckService.checkPlayer(p2, "vaden");
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt token"
-                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " of " + ident2 + ".";
+                        + (Integer.parseInt(amountToTrans) == 1 ? "" : "s") + " of " + ident2
+                        + ", from their \"Debt Account\" pool.";
                 p1.removeDebtTokens(p2.getColor(), Integer.parseInt(amountToTrans));
             }
             case "ACs" -> {

@@ -24,7 +24,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
@@ -118,7 +117,6 @@ public class PlayStrategyCardService {
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
-        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
         message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
         if (!game.isFowMode()) {

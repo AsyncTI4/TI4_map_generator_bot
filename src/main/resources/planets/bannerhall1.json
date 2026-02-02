@@ -1,9 +1,14 @@
 {
     "id": "bannerhall1",
-    "name": "First Banner",
+    "name": "1st Banner",
     "aliases": [
         "bannerhall1",
-        "firstbanner"
+        "firstbanner",
+        "first banner",
+        "1stbanner",
+        "firstbannerhall",
+        "first bannerhall",
+        "1stbannerhall"
     ],
     "resources": 1,
     "influence": 1,

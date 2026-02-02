@@ -34,8 +34,11 @@ public class ShowGameService {
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        boolean shouldPersistMessageId = displayType == DisplayType.all && !game.isFowMode();
-        Consumer<Message> persistMessageId = shouldPersistMessageId
+        boolean shouldPersistFullMapMessageId = displayType == DisplayType.all && !game.isFowMode();
+        boolean shouldPersistFowMapMessageId = displayType == DisplayType.all && game.isFowMode();
+
+        // For non-FoW games: persist the full map message ID
+        Consumer<Message> persistMessageId = shouldPersistFullMapMessageId
                 ? msg -> SpringContext.getBean(GameImageService.class)
                         .saveDiscordMessageId(
                                 game,
@@ -43,21 +46,56 @@ public class ShowGameService {
                                 msg.getGuild().getIdLong(),
                                 msg.getChannel().getIdLong())
                 : null;
+
+        // For FoW games: persist the player-specific map message ID
+        String playerId = event.getUser().getId();
+        Consumer<Message> persistFowMessageId = shouldPersistFowMapMessageId
+                ? msg -> SpringContext.getBean(GameImageService.class)
+                        .savePlayerDiscordMessageId(
+                                game.getName(),
+                                playerId,
+                                msg.getIdLong(),
+                                msg.getChannel().getIdLong())
+                : null;
+
         MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = Buttons.mapImageButtons(game);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
-                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons, game, persistMessageId);
+                // Use FoW callback when sending to player's private channel, otherwise use full map callback
+                Consumer<Message> callback = (game.isFowMode() && isSendingToPrivateChannel(game, event))
+                        ? persistFowMessageId
+                        : persistMessageId;
+                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons, game, callback);
             } else {
                 MessageChannel channel = sendMessage(game, event);
-                MessageHelper.sendFileUploadToChannel(channel, fileUpload, persistMessageId);
+                Consumer<Message> callback = (game.isFowMode() && isSendingToPrivateChannel(game, event))
+                        ? persistFowMessageId
+                        : persistMessageId;
+                MessageHelper.sendFileUploadToChannel(channel, fileUpload, callback);
             }
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 buttonEvent.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);
             }
         });
+    }
+
+    /**
+     * Check if the map is being sent to a player's private channel (for FoW games).
+     */
+    private static boolean isSendingToPrivateChannel(Game game, GenericInteractionCreateEvent event) {
+        if (!game.isFowMode()) {
+            return false;
+        }
+        Player player = game.getPlayer(event.getUser().getId());
+        MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
+        return !event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
+                && game.getRealPlayers().contains(player)
+                && !game.getPlayersWithGMRole().contains(player)
+                && privateChannel != null
+                && !event.getMessageChannel().equals(privateChannel);
     }
 
     private static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {

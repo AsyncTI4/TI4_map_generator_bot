@@ -49,7 +49,6 @@ import ti4.executors.CircuitBreaker;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -1052,8 +1051,6 @@ public class MessageHelper {
                 || threadName.isEmpty()
                 || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(
-                    channel.asGuildMessageChannel().getGuild());
             channel.asTextChannel()
                     .createThreadChannel(threadName)
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
@@ -1069,8 +1066,6 @@ public class MessageHelper {
             return;
         }
         if (channel instanceof TextChannel) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(
-                    channel.asGuildMessageChannel().getGuild());
             channel.asTextChannel()
                     .createThreadChannel(threadName)
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)

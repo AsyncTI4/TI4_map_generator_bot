@@ -4729,9 +4729,7 @@ public class Game extends GameProperties {
                 || isCommunityMode()
                 || !checkAllDecksAreOfficial()
                 || !checkAllTilesAreOfficial()
-                || getPlayerCountForMap() < 3
                 || getRealAndEliminatedPlayers().size() < 3
-                || getPlayerCountForMap() > 8
                 || getRealAndEliminatedPlayers().size() > 8
                 || getFactions().stream()
                         .map(Mapper::getFaction)

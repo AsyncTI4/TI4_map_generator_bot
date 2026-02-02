@@ -31,6 +31,7 @@ import ti4.helpers.CombatModHelper;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper;
+import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
@@ -125,7 +126,7 @@ public class CombatRollService {
             UnitModel metaliFakeUnit = new UnitModel();
             metaliFakeUnit.setAfbDieCount(3);
             metaliFakeUnit.setAfbHitsOn(6);
-            metaliFakeUnit.setName("Metali Armaments");
+            metaliFakeUnit.setName("Metali Void Armaments");
             metaliFakeUnit.setAsyncId("MetaliAFB");
             metaliFakeUnit.setId("MetaliAFB");
             metaliFakeUnit.setBaseType("dd");
@@ -327,6 +328,22 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (!game.isFowMode() && !game.getStoredValue("surprisingDiceRoll").equals("none")) {
+            String disaster;
+            if (game.getStoredValue("surprisingDiceRoll").equals("hits")) {
+                disaster = player.getRepresentation() + " has rolled grievously against " + opponent.getRepresentation()
+                        + " in " + game.getName() + ".";
+            } else {
+                disaster = player.getRepresentation() + " has rolled dismally against " + opponent.getRepresentation()
+                        + " in " + game.getName() + ".";
+            }
+            for (String line : message.split("\n")) {
+                if (line.startsWith("> `") || line.startsWith("**Total hits")) {
+                    disaster += "\n" + line;
+                }
+            }
+            DisasterWatchHelper.sendMessageInDisasterWatch(game, disaster);
+        }
         if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
             if (rollType == CombatRollType.SpaceCannonOffence) {
                 // If roll was from pds button in private channel, send the result to the target
@@ -675,6 +692,9 @@ public class CombatRollService {
         // Actually roll for each unit
         int totalHits = 0;
         int letnevBTBoost = 0;
+        double chanceOfAllHits = Math.nextDown(100.0);
+        double chanceOfAllMiss = Math.nextDown(100.0);
+        int maximumHits = 0;
 
         List<UnitModel> playerUnitsList = new ArrayList<>(playerUnits.keySet());
         int totalMisses = 0;
@@ -843,6 +863,9 @@ public class CombatRollService {
 
                 player.setExpectedHitsTimes10(
                         player.getExpectedHitsTimes10() + (numRolls * mult * (11 - toHit + modifierToHit)));
+                chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numRolls * mult);
+                chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numRolls * mult);
+                maximumHits += numRolls * mult;
                 if (usesX89c4) {
                     mult = 2;
                 }
@@ -971,6 +994,9 @@ public class CombatRollService {
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
+                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
+                    maximumHits += numRolls * mult;
                     int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                     totalHits += hitRolls2;
                     String unitRoll2 = CombatMessageHelper.displayUnitRoll(
@@ -980,7 +1006,7 @@ public class CombatRollService {
                             .append(numMisses)
                             .append(" miss")
                             .append(numMisses == 1 ? "" : "es")
-                            .append(" due to Ta Zern, the Jol-Nar Commander:\n ")
+                            .append(" due to Ta Zern, the Jol-Nar Commander:\n")
                             .append(unitRoll2);
                 }
                 if (rollType == CombatRollType.SpaceCannonOffence || rollType == CombatRollType.SpaceCannonDefence) {
@@ -1077,6 +1103,9 @@ public class CombatRollService {
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
+                    chanceOfAllHits *= Math.pow((11 - toHit + modifierToHit) / 10.0, numMisses);
+                    chanceOfAllMiss *= Math.pow((toHit - modifierToHit - 1) / 10.0, numMisses);
+                    maximumHits += numRolls * mult;
                     int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                     if (gloryHolder != null
                             && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
@@ -1132,6 +1161,14 @@ public class CombatRollService {
         }
         result = resultBuilder.toString();
         player.setActualHits(player.getActualHits() + totalHits);
+        if ((chanceOfAllHits <= 2.0) && (totalHits == maximumHits)) {
+            game.setStoredValue("surprisingDiceRoll", "hits");
+        } else if ((chanceOfAllMiss <= 2.0) && (totalHits == 0)) {
+            game.setStoredValue("surprisingDiceRoll", "miss");
+        } else {
+            game.setStoredValue("surprisingDiceRoll", "none");
+        }
+
         if (usesX89c4) {
             totalHits *= 2;
         }

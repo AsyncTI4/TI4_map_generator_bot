@@ -3,8 +3,6 @@ package ti4.website;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +10,6 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.StorageClass;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
@@ -152,6 +149,7 @@ public class AsyncTi4WebsiteHelper {
                                     && !webBorderAnomalies.getBorderAnomalies().isEmpty()
                             ? webBorderAnomalies.getBorderAnomalies()
                             : null);
+            webData.put("isTwilightsFallMode", game.isTwilightsFallMode());
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
@@ -168,8 +166,7 @@ public class AsyncTi4WebsiteHelper {
                         String.format("webdata/%s/%s.json", gameId, gameId),
                         AsyncRequestBody.fromString(json),
                         "application/json",
-                        "no-cache, no-store, must-revalidate",
-                        null);
+                        "no-cache, no-store, must-revalidate");
 
                 // Upload latest image name if available
                 try {
@@ -183,8 +180,7 @@ public class AsyncTi4WebsiteHelper {
                                 String.format("webdata/%s/latestImage.json", gameId),
                                 AsyncRequestBody.fromString(imageJson),
                                 "application/json",
-                                "no-cache, no-store, must-revalidate",
-                                null);
+                                "no-cache, no-store, must-revalidate");
                     }
                 } catch (Exception e) {
                     BotLogger.error(new LogOrigin(game), "Could not upload latest image name to web server", e);
@@ -219,49 +215,9 @@ public class AsyncTi4WebsiteHelper {
                     String.format("overlays/%s/%s.json", gameId, gameId),
                     AsyncRequestBody.fromString(json),
                     "application/json",
-                    "no-cache, no-store, must-revalidate",
-                    null);
+                    "no-cache, no-store, must-revalidate");
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
-        }
-    }
-
-    public static String putMap(String gameName, String fileFormat, byte[] imageBytes, boolean frog, Player player) {
-        if (!uploadsEnabled()) return null;
-        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
-        if (bucket == null || bucket.isEmpty()) {
-            BotLogger.error("S3 bucket not configured.");
-            return null;
-        }
-
-        try {
-            String mapPath;
-            if (frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s." + fileFormat;
-            } else {
-                mapPath = "map/%s/%s." + fileFormat;
-            }
-
-            LocalDateTime date = LocalDateTime.now();
-            String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-
-            String key = String.format(mapPath, gameName, dtstamp);
-            String fileName = dtstamp + "." + fileFormat;
-
-            putObjectInBucket(
-                    key,
-                    AsyncRequestBody.fromBytes(imageBytes),
-                    "image/" + fileFormat,
-                    null,
-                    StorageClass.INTELLIGENT_TIERING);
-
-            return fileName;
-        } catch (Exception e) {
-            BotLogger.error(
-                    new LogOrigin(player),
-                    "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
-                    e);
-            return null;
         }
     }
 
@@ -282,8 +238,7 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static void putObjectInBucket(
-            String key, AsyncRequestBody body, String contentType, String cacheControl, StorageClass storageClass) {
+    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
 
         PutObjectRequest.Builder requestBuilder =
@@ -291,10 +246,6 @@ public class AsyncTi4WebsiteHelper {
 
         if (cacheControl != null) {
             requestBuilder.cacheControl(cacheControl);
-        }
-
-        if (storageClass != null) {
-            requestBuilder.storageClass(storageClass);
         }
 
         PutObjectRequest request = requestBuilder.build();

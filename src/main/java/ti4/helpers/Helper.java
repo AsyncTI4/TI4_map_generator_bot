@@ -963,7 +963,7 @@ public class Helper {
                 continue;
             }
             if ("spacedock".equalsIgnoreCase(unit)) {
-                if (uh == null || uh.getUnitCount(UnitType.Spacedock, player) > 0) {
+                if (uh.getUnitCount(UnitType.Spacedock, player) > 0) {
                     continue;
                 }
             }
