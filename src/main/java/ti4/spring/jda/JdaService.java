@@ -38,7 +38,6 @@ import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
-import ti4.cron.ThreadArchiveCron;
 import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
@@ -61,6 +60,7 @@ import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
+import ti4.listeners.ThreadCreateListener;
 import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
 import ti4.map.persistence.GameManager;
@@ -145,6 +145,7 @@ public class JdaService {
                 new UserJoinServerListener(),
                 new AutoCompleteListener(),
                 new BanListener(),
+                new ThreadCreateListener(),
 
                 // Non-Priority Listeners
                 new DeletionListener(),
@@ -329,7 +330,6 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        ThreadArchiveCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();

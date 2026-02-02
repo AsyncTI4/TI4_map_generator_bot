@@ -354,7 +354,7 @@ public class ButtonHelperAbilities {
         vaden.clearDebt(player, amount, Constants.VADEN_DEBT_POOL);
         String msg = player.getFactionEmojiOrColor() + " paid 1 trade good to "
                 + vaden.getFactionEmojiOrColor()
-                + "to clear 2 debt tokens via the **Binding Debts** ability.";
+                + "to clear 2 debt tokens from their \"Shark Loans\" pool via the **Binding Debts** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);

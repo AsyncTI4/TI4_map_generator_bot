@@ -1,6 +1,5 @@
 package ti4.commands.bothelper;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -9,7 +8,6 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.spring.jda.JdaService;
 
 class SetStatsTrackedUser extends GameStateSubcommand {
 
@@ -27,8 +25,7 @@ class SetStatsTrackedUser extends GameStateSubcommand {
         Player player = getPlayer();
 
         User trackedUser = event.getOption(Constants.USER).getAsUser();
-        Member member = JdaService.guildPrimary.getMember(trackedUser);
-        String trackedUserName = member == null ? trackedUser.getName() : member.getEffectiveName();
+        String trackedUserName = trackedUser.getName();
 
         player.setStatsTrackedUserID(trackedUser.getId());
         player.setStatsTrackedUserName(trackedUserName);

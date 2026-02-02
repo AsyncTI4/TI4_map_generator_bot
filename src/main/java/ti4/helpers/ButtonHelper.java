@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3638,7 +3641,6 @@ public class ButtonHelper {
 
     public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
         TextChannel channel = game.getMainGameChannel();
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
@@ -5438,6 +5440,7 @@ public class ButtonHelper {
                     new LogOrigin(event, player), "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
         }
+        String msg = player.getRepresentation() + " sent 1 ";
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
             TransactionHelper.checkTransactionLegality(game, player, tradeHolder);
             if (player.getTg() > 0) {
@@ -5450,13 +5453,11 @@ public class ButtonHelper {
                                 + " you had no trade goods to send, so no trade goods were sent.");
                 return;
             }
-            tgOrDebt = "trade good";
+            msg += "trade good to " + tradeHolder.getRepresentation() + ".";
         } else {
             SendDebtService.sendDebt(player, tradeHolder, 1);
-            tgOrDebt = "debt token";
+            msg += "debt token to " + tradeHolder.getRepresentation() + ", for their \"Debt Account\" pool.";
         }
-        String msg =
-                player.getRepresentation() + " sent 1 " + tgOrDebt + " to " + tradeHolder.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(tradeHolder, "hacan");
     }
@@ -6855,8 +6856,6 @@ public class ButtonHelper {
     }
 
     public static void offerPlayerSetupButtons(MessageChannel channel, Game game) {
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
-
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("startPlayerSetup", "Setup a Player"));
         String message = "After setting up the map, you may use this button instead of `/player setup` if you wish.";

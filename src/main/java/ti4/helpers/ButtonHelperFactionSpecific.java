@@ -2182,18 +2182,21 @@ public class ButtonHelperFactionSpecific {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged() + ", you sent 1 debt token to "
-                                    + p2.getFactionEmojiOrColor() + " due to their **Fine Print** ability.");
+                                    + p2.getFactionEmojiOrColor()
+                                    + ", for their \"Shark Loans\" pool, due to their **Fine Print** ability.");
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
                                     + player.getFactionEmojiOrColor()
-                                    + " due to your **Fine Print** ability. This is technically optional, done automatically for convenience.");
+                                    + ", for your \"Shark Loans\" pool, due to your **Fine Print** ability."
+                                    + " This is technically optional, done automatically for convenience.");
                 } else {
                     MessageHelper.sendMessageToChannel(
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you collected 1 debt token from "
                                     + player.getRepresentationUnfogged()
-                                    + " due to your **Fine Print** ability. This is technically optional, done automatically for convenience.");
+                                    + ", for your \"Shark Loans\" pool, due to your **Fine Print** ability."
+                                    + " This is technically optional, done automatically for convenience.");
                 }
                 break;
             }
