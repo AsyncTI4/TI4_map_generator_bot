@@ -161,7 +161,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                 game.addRelicToGame("thesilverflame");
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "The Silver Flame and Quantum Core relics have been added back to the relic deck.");
+                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
             }
         }
 

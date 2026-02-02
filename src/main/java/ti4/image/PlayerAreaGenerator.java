@@ -2700,10 +2700,10 @@ class PlayerAreaGenerator {
             drawPAImage(x, y, synergies);
             if (model.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 9, y + 144, 120);
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 11, y + 144, 120);
             } else {
                 graphics.setFont(Storage.getFont18());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 7, y + 144, 120);
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 9, y + 144, 120);
             }
             drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
 
