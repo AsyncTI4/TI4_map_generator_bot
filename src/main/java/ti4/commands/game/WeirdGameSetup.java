@@ -149,7 +149,21 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
-        if (thunderMode != null) game.setThundersEdge(thunderMode);
+        if (thunderMode != null) {
+            game.setThundersEdge(thunderMode);
+            if (thunderMode && !game.getActionCards().contains("brilliance")) {
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+            }
+            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
+                game.addRelicToGame("quantumcore");
+                game.addRelicToGame("thesilverflame");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "The Silver Flame and Quantum Core relics have been added back to the relic deck.");
+            }
+        }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
         if (riftsetMode != null && game.isFowMode()) {

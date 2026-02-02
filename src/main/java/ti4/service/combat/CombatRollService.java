@@ -832,6 +832,7 @@ public class CombatRollService {
 
             List<String> singleUnitUse = new ArrayList<>(List.of("no"));
             if (rollType == CombatRollType.combatround
+                    && !"true".equalsIgnoreCase(game.getStoredValue("thalnosPlusOne"))
                     && (player.hasTech("tf-supercharge")
                             || (player.hasUnlockedBreakthrough("letnevbt")
                                     && "space".equalsIgnoreCase(unitHolder.getName())))) {
@@ -1062,6 +1063,37 @@ public class CombatRollService {
                             buttons.add(Buttons.red("deleteButtons", "No Valid Exploration"));
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                         }
+                    }
+                }
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander")) {
+                    int num1s = 0;
+                    for (DiceHelper.Die die : resultRolls) {
+                        if (die.getResult() == 1) {
+                            num1s++;
+                        }
+                    }
+                    if (num1s > 0) {
+                        resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, num1s);
+                        player.setExpectedHitsTimes10(
+                                player.getExpectedHitsTimes10() + (num1s * (11 - toHit + modifierToHit)));
+                        int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                        totalHits += hitRolls2;
+                        String unitRoll2 = CombatMessageHelper.displayUnitRoll(
+                                unitModel,
+                                toHit,
+                                modifierToHit,
+                                numOfUnit,
+                                numRollsPerUnit,
+                                0,
+                                resultRolls2,
+                                hitRolls2);
+                        resultBuilder
+                                .append("Rerolling ")
+                                .append(num1s)
+                                .append(" roll")
+                                .append(num1s == 1 ? "" : "s")
+                                .append(" of 1 due to the Kaltrim Commander:\n ")
+                                .append(unitRoll2);
                     }
                 }
 

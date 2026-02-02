@@ -950,6 +950,26 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
     }
 
+    @ButtonHandler("addShrine_")
+    public static void addShrineToken(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.split("_")[1];
+        String message = player.getFactionEmoji() + " added a Shrine token to "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        for (int x = 1; x < 5; x++) {
+            if (!unitHolder.getTokenList().contains("token_kaltrimshrine" + x + ".png")) {
+                unitHolder.addToken("token_kaltrimshrine" + x + ".png");
+                break;
+            }
+        }
+        if (buttonID.contains("special")) {
+            game.setStoredValue("kaltrimcrownplanet", planet);
+        }
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("startAncientEmpire")
     public static void startAncientEmpire(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String message = player.getRepresentation() + ", please choose a planet to add a Tomb token to.";

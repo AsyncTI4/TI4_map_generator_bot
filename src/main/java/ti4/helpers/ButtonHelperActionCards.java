@@ -1831,16 +1831,11 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (p2.hasUnit("absol_saar_spacedock")
-                || p2.hasUnit("saar_spacedock")
-                || p2.hasTech("ffac2")
-                || p2.hasTech("absol_ffac2")) {
-            for (Tile tile : game.getTileMap().values()) {
-                if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                    buttons.add(Buttons.gray(
-                            "reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_space",
-                            tile.getRepresentationForButtons(game, player)));
-                }
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+                buttons.add(Buttons.gray(
+                        "reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_space",
+                        tile.getRepresentationForButtons(game, player)));
             }
         }
         ButtonHelper.deleteMessage(event);

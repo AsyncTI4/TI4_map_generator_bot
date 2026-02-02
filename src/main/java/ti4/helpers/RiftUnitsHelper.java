@@ -217,16 +217,38 @@ public class RiftUnitsHelper {
         if (d1.isSuccess()) {
             msg += " and survived. May you always be so lucky.";
         } else {
-            var parsedUnit = new ParsedUnit(unitKey);
-            RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-            msg += " and failed. Condolences for your loss.";
-            if (cabal != null
-                    && cabal != player
-                    && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
-                    && !game.isTwilightsFallMode()) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
-            } else if (RiftSetModeService.isActive(game)) {
-                msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander") && d1.getResult() == 1) {
+                msg += " but due to Kaltrim's leadership, it rerolls!";
+                Die d2 = new Die(threshold);
+
+                msg += " It now rolled a " + d2.getGreenDieIfSuccessOrRedDieIfFailure();
+                if (d1.isSuccess()) {
+                    msg += " and survived. May you always be so lucky.";
+                } else {
+                    var parsedUnit = new ParsedUnit(unitKey);
+                    RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+                    msg += " and failed. Condolences for your loss.";
+                    if (cabal != null
+                            && cabal != player
+                            && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
+                            && !game.isTwilightsFallMode()) {
+                        ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+                    } else if (RiftSetModeService.isActive(game)) {
+                        msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
+                    }
+                }
+            } else {
+                var parsedUnit = new ParsedUnit(unitKey);
+                RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+                msg += " and failed. Condolences for your loss.";
+                if (cabal != null
+                        && cabal != player
+                        && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
+                        && !game.isTwilightsFallMode()) {
+                    ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+                } else if (RiftSetModeService.isActive(game)) {
+                    msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
+                }
             }
         }
 
