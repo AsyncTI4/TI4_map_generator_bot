@@ -554,6 +554,16 @@ public class PlayHeroService {
                         event.getMessageChannel(),
                         player.getFactionEmoji() + " has been offered buttons to explore all their planets.");
             }
+            case "kaltrimhero" -> {
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String propMsg = player.getRepresentation() + " Your current command tokens are ";
+                propMsg += player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), propMsg, buttons);
+                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        player.getFactionEmoji() + " has been offered buttons to gain CCs and look at shrines.");
+            }
             case "toldarhero" -> ButtonHelperHeroes.resolveToldarHero(game, player);
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);

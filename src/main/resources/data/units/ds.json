@@ -2416,7 +2416,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When an agenda is revealed, you may have this ship become damaged to discard that card and reveal 1 agenda from the top of the deck to vote on instead."
+        "ability": "When an agenda is revealed, you may have this ship become damaged to swap that card with the top card of the agenda deck."
     },
     {
         "id": "belkosea_fighter",
