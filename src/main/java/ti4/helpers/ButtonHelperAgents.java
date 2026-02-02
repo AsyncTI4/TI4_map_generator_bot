@@ -1175,8 +1175,8 @@ public class ButtonHelperAgents {
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
-            String successMessage = player.getFactionEmoji() + " drew 1 action card.";
-            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card.";
+            String successMessage = player.getFactionEmoji() + " drew 1 action card";
+            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card";
             if (p2.getTg() > 0) {
                 p2.setTg(p2.getTg() - 1);
                 player.gainTG(1, true);
@@ -1185,19 +1185,11 @@ public class ButtonHelperAgents {
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 successMessage += ", then drew another action card for _Scheming_. Please now discard 1 action card.";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", please use these buttons to discard an action card.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
             }
             successMessage += ". ";
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += ", then drew another action card for _Scheming_. Please now discard 1 action card";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p2.getCardsInfoThread(),
-                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
             }
             successMessage2 += ". ";
             if (player.hasAbility("autonetic_memory")) {

@@ -2097,6 +2097,7 @@ public class AgendaHelper {
                             && (specificVote.contains("Rider")
                                     || winningR.hasAbility("future_sight")
                                     || winningR.hasTech("dsatokcr")
+                                    || winningR.hasUnit("kaltrim_mech")
                                     || specificVote.contains("Radiance")
                                     || specificVote.contains("Tarrock Ability"))) {
 
@@ -3226,6 +3227,12 @@ public class AgendaHelper {
                                 && p2.hasTech("dsatokcr")
                                 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
                             outcomeSummaryBuilder.append(" (Mirrorshard DEPLOY)");
+                        }
+                        if (!game.isFowMode()
+                                && p2 != null
+                                && p2.hasUnit("kaltrim_mech")
+                                && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "mech", true) < 4) {
+                            outcomeSummaryBuilder.append(" (Mech DEPLOY)");
                         }
                         outcomeSummaryBuilder.append(", ");
                     } else {

@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -177,6 +175,16 @@ public class UnfiledButtonHandlers {
     public static void fogAllianceAgentStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
+    }
+
+    @ButtonHandler("ralnelCommander_")
+    public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = ButtonHelperModifyUnits.getRalnelCommanderButtons(player, game, buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
+                buttons);
     }
 
     @ButtonHandler("enableDaneMode_")
@@ -1836,15 +1844,15 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannelWithEmbed(
                     p1.getCorrectChannel(), message, btModel.getRepresentationEmbed());
         }
-        {
-            String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
-            List<Button> retreatButtons =
-                    ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
-            if (retreatButtons.isEmpty()) {
-                message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
-            }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
+
+        String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
+        List<Button> retreatButtons =
+                ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled, feint);
+        if (retreatButtons.isEmpty()) {
+            message = player.getRepresentationUnfogged() + ", there are no valid systems to retreat to.";
         }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, retreatButtons);
+
         if (game.getTileByPosition(pos).isGravityRift()
                 && !player.hasRelic("circletofthevoid")
                 && !player.hasTech("tf-crucible")) {

@@ -1938,6 +1938,11 @@ public class Game extends GameProperties {
         return relics.remove(id);
     }
 
+    public void addRelicToGame(String id) {
+        relics.add(id);
+        Collections.shuffle(relics);
+    }
+
     public boolean removePOFromGame(String id) {
         if (publicObjectives1.remove(id)) return true;
         if (publicObjectives2.remove(id)) return true;

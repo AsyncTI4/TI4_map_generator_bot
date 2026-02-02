@@ -1502,7 +1502,7 @@ public class StartCombatService {
             }
             if (p2.hasUnlockedBreakthrough("letnevbt") && !game.isFowMode()) {
                 buttons.add(Buttons.blue(
-                        p1.getFinsFactionCheckerPrefix() + "assignGravleash_" + tile.getPosition(),
+                        p2.getFinsFactionCheckerPrefix() + "assignGravleash_" + tile.getPosition(),
                         "Assign Gravleash Maneuvers",
                         FactionEmojis.Letnev));
             }
@@ -1814,13 +1814,29 @@ public class StartCombatService {
         if (isSpaceCombat) {
             Consumer<Player> addForesightButton = (player) -> {
                 if (player.hasAbility("foresight") && (player.getStrategicCC() > 0 || game.isTwilightsFallMode())) {
-                    buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
+                    buttons.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "retreat_" + pos + "_foresight",
+                            "Foresight",
+                            FactionEmojis.Naalu));
                 }
             };
             if (!game.isFowMode()) {
                 addForesightButton.accept(p2);
             }
             addForesightButton.accept(p1);
+
+            Consumer<Player> addRalnelCommanderButton = (player) -> {
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
+                    buttons.add(Buttons.red(
+                            player.getFinsFactionCheckerPrefix() + "ralnelCommander_" + pos,
+                            "Retreat With Ralnel Commander",
+                            FactionEmojis.Ralnel));
+                }
+            };
+            if (!game.isFowMode()) {
+                addRalnelCommanderButton.accept(p2);
+            }
+            addRalnelCommanderButton.accept(p1);
 
             Consumer<Player> addGheminaButton = (player) -> {
                 if (player.hasReadyBreakthrough("gheminabt")) {
