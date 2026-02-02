@@ -17,6 +17,7 @@ public class RelicCommand implements ParentCommand {
                     new RelicReady(),
                     new RelicDrawSpecific(),
                     new RelicLookAtTop(),
+                    new RelicBottom(),
                     new RelicSend(),
                     new RelicShuffleBack(),
                     new RelicShowRemaining(),

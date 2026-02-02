@@ -134,7 +134,6 @@ public class MiltyService {
                 .filter(f -> specs.factionSources.contains(f.getSource()))
                 .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
                 .filter(f -> !f.getAlias().contains("obsidian"))
-                .filter(f -> !f.getAlias().contains("kaltrim"))
                 .filter(f -> !f.getAlias().contains("neutral"))
                 .filter(f -> !f.getAlias().contains("keleres")
                         || "keleresm".equals(f.getAlias())) // Limit the pool to only 1 keleres flavor

@@ -1056,6 +1056,21 @@ public class ButtonHelperModifyUnits {
         }
     }
 
+    public static List<Button> getRalnelCommanderButtons(Player player, Game game, String pos1) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false, false)) {
+            Tile targetTile = game.getTileByPosition(pos2);
+            if (!canRetreatTo(game, player, targetTile, true, false)) {
+                continue; // skip invalid systems
+            }
+            buttons.add(Buttons.gray(
+                    finChecker + "fogAllianceAgentStep3_" + pos2 + "_" + pos1,
+                    targetTile.getRepresentationForButtons(game, player)));
+        }
+        return buttons;
+    }
+
     public static List<Button> getRetreatSystemButtons(
             Player player, Game game, String pos1, boolean skilled, boolean feint) {
         String finChecker = "FFCC_" + player.getFaction() + "_";

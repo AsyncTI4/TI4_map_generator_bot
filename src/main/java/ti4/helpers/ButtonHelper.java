@@ -1384,7 +1384,8 @@ public class ButtonHelper {
 
                 for (String col : colorsCoexisting) {
                     Player p2 = game.getPlayerFromColorOrFaction(col);
-                    if (player == p2) {
+                    if (player == p2 || player.getAllianceMembers().contains(p2.getFaction())) {
+                        continue;
                     } else if (player == titans && !seenColors.contains(col)) {
                         slumberBonus++;
                         seenColors.add(col);
