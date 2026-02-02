@@ -2684,13 +2684,10 @@ class PlayerAreaGenerator {
 
         // Draw something
         try {
-            Color boxColor = Color.white;
-            if (!unl) boxColor = Color.red;
-            else if (exh) boxColor = Color.gray;
-            if (unl && player.isBreakthroughActive(bt)) boxColor = new Color(19, 249, 236);
 
             Color textColor = Color.white;
-            if (!unl || exh) textColor = Color.gray;
+            if (unl && player.isBreakthroughActive(bt)) textColor = new Color(19, 249, 236);
+            else if (!unl || exh) textColor = Color.gray;
             graphics.setColor(textColor);
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(stroke2);
@@ -2700,11 +2697,14 @@ class PlayerAreaGenerator {
             drawPAImage(x, y, synergies);
             if (model.getShrinkName()) {
                 graphics.setFont(Storage.getFont16());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 9, y + 144, 120);
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 11, y + 144, 120);
             } else {
                 graphics.setFont(Storage.getFont18());
-                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 7, y + 144, 120);
+                DrawingUtil.drawOneOrTwoLinesOfTextVertically(graphics, model.getShortName(), x + 9, y + 144, 120);
             }
+
+            if (!unl) textColor = Color.red;
+            graphics.setColor(textColor);
             drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
 
             if (player.getBreakthroughTGs(bt) > 0) {
