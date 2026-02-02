@@ -1248,6 +1248,7 @@ public class Player extends PlayerProperties {
         if (hasRelic("obsidian")) bonus++;
         if (hasRelic("absol_obsidian")) bonus++;
         if (hasAbility("information_brokers")) bonus++;
+        if (hasAbility("incomprehensible")) bonus += 11;
         return maxSOCount + Math.max(bonus, getBonusScoredSecrets());
     }
 

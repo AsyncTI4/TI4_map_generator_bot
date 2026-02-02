@@ -1853,7 +1853,8 @@ public class TransactionHelper {
             stuffToTransButtons.add(
                     Buttons.green("newTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction(), "Promissory Notes"));
         }
-        if (blackMarket && !p1.getSecretsUnscored().isEmpty()) {
+        if ((blackMarket || p1.hasUnlockedBreakthrough("zooidbt") || p2.hasUnlockedBreakthrough("zooidbt"))
+                && !p1.getSecretsUnscored().isEmpty()) {
             stuffToTransButtons.add(
                     Buttons.gray("newTransact_SOs_" + p1.getFaction() + "_" + p2.getFaction(), "Secret Objectives"));
         }

@@ -68,6 +68,28 @@
         "text": "At the end of your turn, you may exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens. "
     },
     {
+        "alias": "arzooig",
+        "name": "Psychic Disturbance",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "zooid",
+        "source": "other",
+        "text": "You may exhaust this card at the start of a ground combat on a planet you control. If your ground forces make 1 or more hits in the first combat round, move all your opponents ground forces on the planet to the space area. The combat ends in a draw."
+    },
+    {
+        "alias": "arzooiy",
+        "name": "Inscrutable Designs",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "zooid",
+        "source": "other",
+        "text": "When you activate a system that contains another player's units, you may allow both of you to either draw 1 action card or gain 1 trade good."
+    },
+    {
         "alias": "bakalodn",
         "name": "Stinger II",
         "types": [
