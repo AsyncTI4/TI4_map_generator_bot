@@ -2661,7 +2661,7 @@ class PlayerAreaGenerator {
         }
 
         deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
-        return x + deltaX + 20;
+        return x + deltaX;
     }
 
     private int allBreakthroughInfo(Player player, int x, int y, Game game) {
@@ -2705,7 +2705,7 @@ class PlayerAreaGenerator {
 
             if (!unl) textColor = Color.red;
             graphics.setColor(textColor);
-            drawRectWithOverlay(graphics, x, y - 3, 44, 154, model);
+            drawRectWithOverlay(graphics, x, y - 2, 44, 152, model);
 
             if (player.getBreakthroughTGs(bt) > 0) {
                 BufferedImage tg = ImageHelper.readEmojiImageScaled(MiscEmojis.tg, 40);
@@ -2733,7 +2733,7 @@ class PlayerAreaGenerator {
     private int factionTechInfo(Player player, int x, int y) {
         List<String> techs = player.getNotResearchedFactionTechs();
         if (techs.isEmpty()) {
-            return y;
+            return x + 20;
         }
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -3285,7 +3285,7 @@ class PlayerAreaGenerator {
         }
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 252, 152);
-        deltaX += 244;
+        deltaX += 256;
         return deltaX;
     }
 
