@@ -872,10 +872,12 @@ public class CombatRollService {
                 int hitRolls = DiceHelper.countSuccesses(resultRolls);
                 if (unitModel.getUnitType() == UnitType.Flagship
                         && ValefarZService.hasFlagshipAbility(game, player, "jolnar_flagship")) {
+                    chanceOfAllHits *= Math.pow(2.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (DiceHelper.Die die : resultRolls) {
-                        if (die.getResult() > 8) {
+                        if (die.getResult() >= 9) {
                             hitRolls += 2;
                         }
+                        maximumHits += 2;
                     }
                 }
 
@@ -895,14 +897,16 @@ public class CombatRollService {
                         && gloryHolder != null
                         && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                     ButtonHelperAbilities.readyBannerHalls(game);
+                    chanceOfAllHits *= Math.pow(1.0 / (11 - toHit + modifierToHit), numRolls * mult);
                     for (DiceHelper.Die die : resultRolls) {
-                        if (die.getResult() > 9) {
+                        if (die.getResult() >= 10) {
                             hitRolls += 1;
                             MessageHelper.sendMessageToChannel(
                                     event.getMessageChannel(),
                                     player.getRepresentation()
                                             + " got an extra hit due to the **Valor** ability (it has been accounted for in the hit count).");
                         }
+                        maximumHits += 1;
                     }
                 }
                 if ("vaden_flagship".equalsIgnoreCase(unitModel.getId()) && rollType == CombatRollType.bombardment) {

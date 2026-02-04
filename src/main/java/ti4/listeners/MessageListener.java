@@ -1,5 +1,6 @@
 package ti4.listeners;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -66,21 +67,21 @@ public class MessageListener extends ListenerAdapter {
                 .ifPresent(moderationLogChannel -> MessageHelper.sendMessageToChannel(moderationLogChannel, msg));
     }
 
+    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop", "nazi");
+
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
-                if (message.getContentRaw().toLowerCase().contains("gaslight")) {
-                    String msg = "Someone used gaslight here: " + message.getJumpUrl() + "\nFull msg: "
-                            + message.getContentRaw();
-                    sendMessageToModLog(msg);
-                }
-                if (message.getContentRaw().toLowerCase().contains("please stop")) {
-                    String msg = "Someone used please stop here: " + message.getJumpUrl() + "\nFull msg: "
-                            + message.getContentRaw();
-                    sendMessageToModLog(msg);
+                for (String phrase : interestingMessages) {
+                    if (message.getContentRaw().toLowerCase().contains(phrase)) {
+                        String msg =
+                                "Someone used \"" + phrase + "\" here " + message.getJumpUrl() + ". Full message:\n> "
+                                        + message.getContentRaw().replace("\n", "\n> ");
+                        sendMessageToModLog(msg);
+                    }
                 }
 
                 String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
