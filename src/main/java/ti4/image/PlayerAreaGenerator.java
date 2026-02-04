@@ -510,10 +510,10 @@ class PlayerAreaGenerator {
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
 
         // EQUALIZE AND CONTINUE
-        xDeltaTop = xDeltaBottom = plotCards(player, Math.max(xDeltaTop, xDeltaBottom), yPlayArea);
+        xDeltaTop = plotCards(player, xDeltaTop, yPlayArea);
 
-        // Row 1
-        xDeltaTop = speakerToken(player, xDeltaTop, yPlayArea);
+        // Row 2
+        xDeltaBottom = speakerToken(player, xDeltaBottom, yPlayAreaSecondRow);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
         xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -639,19 +639,19 @@ class PlayerAreaGenerator {
     }
 
     private int speakerToken(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
-        if (player.getUserID().equals(game.getSpeakerUserID())) {
-            xDeltaFromRightSide += 200;
-            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
-            if (speakerFile != null) {
-                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
-                graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
-            }
-        }
         if (player.isTyrant()) {
             xDeltaFromRightSide += 200;
             String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
             if (tyrantFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
+                graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
+            }
+        }
+        if (player.getUserID().equals(game.getSpeakerUserID())) {
+            xDeltaFromRightSide += (player.isTyrant() ? 80 : 200);
+            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
+            if (speakerFile != null) {
+                BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 graphics.drawImage(bufferedImage, mapWidth - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
             }
         }
@@ -1402,9 +1402,9 @@ class PlayerAreaGenerator {
     }
 
     private int debtInfo(Player player, int x, int y, Game game) {
+        int startX = x;
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-
         graphics.setColor(Color.WHITE);
 
         for (Entry<String, Map<String, Integer>> pool :
@@ -1507,10 +1507,10 @@ class PlayerAreaGenerator {
             }
             deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
             graphics.drawRect(x - 2, y - 2, deltaX, 152);
-            x += deltaX + 10;
+            x += deltaX + 4;
         }
 
-        return x;
+        return x + (startX == x ? 0 : 20);
     }
 
     private int abilityInfo(Player player, int x, int y) {
