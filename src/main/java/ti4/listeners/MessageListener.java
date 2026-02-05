@@ -75,10 +75,11 @@ public class MessageListener extends ListenerAdapter {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
+                String messageRaw = message.getContentRaw().toLowerCase();
                 for (String phrase : interestingMessages) {
-                    if (message.getContentRaw().toLowerCase().contains(phrase)) {
+                    if (messageRaw.contains(phrase)) {
                         String msg =
-                                "Someone used \"" + phrase + "\" here " + message.getJumpUrl() + ". Full message:\n> "
+                                "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
                                         + message.getContentRaw().replace("\n", "\n> ");
                         sendMessageToModLog(msg);
                     }
