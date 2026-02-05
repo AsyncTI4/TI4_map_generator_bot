@@ -775,6 +775,8 @@ public class StartCombatService {
                                 + " to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                         buttons);
             }
+            List<Button> buttons2 = new ArrayList<>();
+            buttons2.add(Buttons.red("get_so_score_buttons", "Score A Secret Objective"));
             if ("space".equalsIgnoreCase(type)
                     && player.getSecretsUnscored().containsKey("uf")
                     && tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, player.getColor())
@@ -782,7 +784,8 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
-                                + ", a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.");
+                                + ", a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.",
+                        buttons2);
             }
             if ("space".equalsIgnoreCase(type)
                     && player.getSecretsUnscored().containsKey("dtgs")
@@ -795,25 +798,29 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
-                                + ", a reminder that you could potentially score _Destroy Their Greatest Ship_ in this combat.");
+                                + ", a reminder that you could potentially score _Destroy Their Greatest Ship_ in this combat.",
+                        buttons2);
             }
             if (player.getSecretsUnscored().containsKey("sar")
                     && otherPlayer.getTotalVictoryPoints() == game.getHighestScore()) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        msg + ", a reminder that if you win the combat, you could score _Spark a Rebellion_.");
+                        msg + ", a reminder that if you win the combat, you could score _Spark a Rebellion_.",
+                        buttons2);
             }
             if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        msg + ", a reminder that if you win the combat, you could score _Brave the Void_.");
+                        msg + ", a reminder that if you win the combat, you could score _Brave the Void_.",
+                        buttons2);
             }
             if (player.getSecretsUnscored().containsKey("dts")
                     && tile.isHomeSystem(game)
                     && tile != player.getHomeSystemTile()) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
-                        msg + ", a reminder that if you win the combat, you could score _Darken the Skies_.");
+                        msg + ", a reminder that if you win the combat, you could score _Darken the Skies_.",
+                        buttons2);
             }
             if (player.hasAbility("war_stories")) {
                 msg +=
@@ -833,7 +840,8 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),
                         msg
-                                + ", a reminder that if you keep alive at least 3 non-fighter ships in the active system until the end of combat, you could score _Demonstrate Your Power_.");
+                                + ", a reminder that if you keep alive at least 3 non-fighter ships in the active system until the end of combat, you could score _Demonstrate Your Power_.",
+                        buttons2);
             }
 
             if ((player.hasAbility("edict") || player.hasAbility("imperia"))

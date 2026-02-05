@@ -1065,7 +1065,7 @@ public class ButtonHelperModifyUnits {
                 continue; // skip invalid systems
             }
             buttons.add(Buttons.gray(
-                    finChecker + "fogAllianceAgentStep3_" + pos2 + "_" + pos1,
+                    finChecker + "ralnelCStep3_" + pos2 + "_" + pos1,
                     targetTile.getRepresentationForButtons(game, player)));
         }
         return buttons;

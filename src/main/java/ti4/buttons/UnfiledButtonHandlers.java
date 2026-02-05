@@ -177,6 +177,15 @@ public class UnfiledButtonHandlers {
         ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
     }
 
+    @ButtonHandler("ralnelCStep3_")
+    public static void ralnelCStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteMessage(event);
+        String pos2 = buttonID.split("_")[1];
+        Tile targetTile = game.getTileByPosition(pos2);
+        CommandCounterHelper.addCC(event, player, targetTile);
+        ButtonHelperHeroes.argentHeroStep3(game, player, buttonID);
+    }
+
     @ButtonHandler("ralnelCommander_")
     public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteTheOneButton(event);
