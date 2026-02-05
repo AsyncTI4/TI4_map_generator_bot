@@ -98,7 +98,7 @@ class AgendaResolveButtonHandler {
         AGENDA_HANDLERS.put("constitution", new ConstitutionAgendaResolver());
         AGENDA_HANDLERS.put("crisis", new CrisisAgendaResolver());
         AGENDA_HANDLERS.put("defense_act", new DefenseActAgendaResolver());
-        AGENDA_HANDLERS.put("disarmamament", new DisarmamentAgendaResolver());
+        AGENDA_HANDLERS.put("disarmament", new DisarmamentAgendaResolver());
         AGENDA_HANDLERS.put("economic_equality", new EconomicEqualityAgendaResolver());
         AGENDA_HANDLERS.put("execution", new ExecutionDirectiveAgendaResolver());
         AGENDA_HANDLERS.put("grant_reallocation", new GrantReallocationAgendaResolver());

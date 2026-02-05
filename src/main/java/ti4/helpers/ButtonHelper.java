@@ -1471,7 +1471,7 @@ public class ButtonHelper {
     public static void resolveMinisterOfCommerceCheck(Game game, Player player, GenericInteractionCreateEvent event) {
         resolveTACheck(game, player);
         for (String law : game.getLaws().keySet()) {
-            if ("minister_commrece".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
+            if ("minister_commerce".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
                         || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     MessageChannel channel = event.getMessageChannel();

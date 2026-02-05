@@ -15,7 +15,7 @@ import ti4.service.unit.DestroyUnitService;
 public class DisarmamentAgendaResolver implements AgendaResolver {
     @Override
     public String getAgendaId() {
-        return "disarmamament";
+        return "disarmament";
     }
 
     @Override
