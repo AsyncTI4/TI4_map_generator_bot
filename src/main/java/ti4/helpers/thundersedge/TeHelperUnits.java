@@ -99,7 +99,9 @@ public class TeHelperUnits {
 
         // The crimson (fs) player has their flagship on a breach as well, and the affected player is not crimson
         for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, crimson, UnitType.Flagship)) {
-            if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE) && player != crimson) {
+            if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+                    && player != crimson
+                    && !crimson.getAllianceMembers().contains(player.getFaction())) {
                 return true;
             }
         }
@@ -109,7 +111,9 @@ public class TeHelperUnits {
         Player nekro = Helper.getPlayerFromUnlockedBreakthrough(game, "nekrobt");
         if (nekro != null && player.hasUnit("crimson_flagship")) {
             for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, nekro, UnitType.Flagship)) {
-                if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE) && player != nekro) {
+                if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+                        && player != nekro
+                        && !nekro.getAllianceMembers().contains(player.getFaction())) {
                     return true;
                 }
             }

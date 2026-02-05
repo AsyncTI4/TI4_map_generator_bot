@@ -33,6 +33,7 @@ public class CaptureUnitService {
             if (player.hasUnlockedBreakthrough("mykomentoribt")
                     && player != game.getActivePlayer()
                     && !allUnits.isEmpty()
+                    && allUnits.getFirst().getPlayer(game) != player
                     && !removedUnitType.uh().getPlayersUnitListOnHolder(player).isEmpty()) {
                 capturing.add(player);
                 continue;
