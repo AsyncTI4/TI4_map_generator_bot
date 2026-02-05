@@ -508,13 +508,14 @@ class PlayerAreaGenerator {
         xDeltaTop = nombox(player, xDeltaTop, yPlayArea);
         // Row 2
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
+        xDeltaBottom = techGenSynthesis(player, xDeltaBottom, yPlayAreaSecondRow);
 
-        // EQUALIZE AND CONTINUE
-        xDeltaTop = plotCards(player, xDeltaTop, yPlayArea);
+        int plotDelta = plotCards(player, Math.max(xDeltaTop, xDeltaBottom), yPlayArea);
+        if (plotDelta != -1) {
+            xDeltaTop = xDeltaBottom = plotDelta;
+        }
 
-        // Row 2
         xDeltaBottom = speakerToken(player, xDeltaBottom, yPlayAreaSecondRow);
-
         // SECOND ROW RIGHT SIDE (faction tokens)
         xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = crimsonRebellionTokens(player, xDeltaBottom, yPlayAreaSecondRow);
@@ -548,6 +549,7 @@ class PlayerAreaGenerator {
         if (!player.getNotResearchedFactionTechs().isEmpty()) {
             xDelta = factionTechInfo(player, xDelta, yPlayArea);
         }
+        xDelta += 20;
 
         if (!player.getAbilities().isEmpty() || !player.getSingularityTechs().isEmpty()) {
             xDelta = abilityInfo(player, xDelta, yPlayArea);
@@ -659,43 +661,43 @@ class PlayerAreaGenerator {
     }
 
     private int plotCards(Player player, int xDelta, int yDelta) {
+        if (!player.hasAbility("bladesorchestra") && !player.hasAbility("plotsplots")) {
+            return -1;
+        }
         boolean faceup = player.hasAbility("bladesorchestra");
-        if (player.hasAbility("bladesorchestra") || player.hasAbility("plotsplots")) {
-            xDelta += 230;
+        xDelta += 230;
 
-            Graphics2D g2 = (Graphics2D) graphics;
-            DrawingUtil.drawRectWithTwoColorGradient(
-                    g2,
-                    ColorUtil.getPlayerMainColor(player),
-                    ColorUtil.getPlayerAccentColor(player),
-                    mapWidth - xDelta,
-                    yDelta,
-                    210,
-                    300);
+        Graphics2D g2 = (Graphics2D) graphics;
+        DrawingUtil.drawRectWithTwoColorGradient(
+                g2,
+                ColorUtil.getPlayerMainColor(player),
+                ColorUtil.getPlayerAccentColor(player),
+                mapWidth - xDelta,
+                yDelta,
+                210,
+                300);
 
-            graphics.setColor(Color.white);
-            graphics.setFont(Storage.getFont20());
-            yDelta += 20;
+        graphics.setColor(Color.white);
+        graphics.setFont(Storage.getFont20());
+        yDelta += 20;
 
-            List<Entry<String, Integer>> plots =
-                    new ArrayList<>(player.getPlotCards().entrySet());
-            plots.sort(Entry.comparingByValue()); // sort by number to keep a consistent and anonymous ordering
-            for (Entry<String, Integer> entry : plots) {
-                String alias = entry.getKey();
-                Integer id = entry.getValue();
-                int x = mapWidth - xDelta + 5;
+        List<Entry<String, Integer>> plots =
+                new ArrayList<>(player.getPlotCards().entrySet());
+        plots.sort(Entry.comparingByValue()); // sort by number to keep a consistent and anonymous ordering
+        for (Entry<String, Integer> entry : plots) {
+            String alias = entry.getKey();
+            Integer id = entry.getValue();
+            int x = mapWidth - xDelta + 5;
 
-                String name = faceup ? Mapper.getPlot(alias).getName() : "Plot " + id;
-                DrawingUtil.superDrawString(
-                        graphics, name, x, yDelta, Color.white, HorizontalAlign.Left, null, null, null);
-                yDelta += 5;
-                for (String faction : player.getPuppetedFactionsForPlot(alias)) {
-                    Player p = game.getPlayerFromColorOrFaction(faction);
-                    DrawingUtil.getAndDrawControlToken(graphics, p, x, yDelta, isFoWPrivate, 0.6f);
-                    x += 40;
-                }
-                yDelta += 55;
+            String name = faceup ? Mapper.getPlot(alias).getName() : "Plot " + id;
+            DrawingUtil.superDrawString(graphics, name, x, yDelta, Color.white, HorizontalAlign.Left, null, null, null);
+            yDelta += 5;
+            for (String faction : player.getPuppetedFactionsForPlot(alias)) {
+                Player p = game.getPlayerFromColorOrFaction(faction);
+                DrawingUtil.getAndDrawControlToken(graphics, p, x, yDelta, isFoWPrivate, 0.6f);
+                x += 40;
             }
+            yDelta += 55;
         }
         return xDelta;
     }
@@ -2653,14 +2655,15 @@ class PlayerAreaGenerator {
         }
 
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
-        deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
 
         if (game.isVeiledHeartMode()) {
             deltaX = VeiledHeartService.veiledField(
                     graphics, x, y, VeiledHeartService.VeiledCardType.UNIT, deltaX, player);
         }
 
-        deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
+        if (!purgedTechs.isEmpty()) {
+            deltaX = techField(x, y, purgedTechs, Collections.emptyList(), deltaX, player);
+        }
         return x + deltaX;
     }
 
@@ -2733,14 +2736,14 @@ class PlayerAreaGenerator {
     private int factionTechInfo(Player player, int x, int y) {
         List<String> techs = player.getNotResearchedFactionTechs();
         if (techs.isEmpty()) {
-            return x + 20;
+            return x;
         }
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
 
         int deltaX = factionTechField(player, x, y, techs, 0);
-        return x + deltaX + 20;
+        return x + deltaX;
     }
 
     private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, int deltaX, Player player) {
@@ -2973,46 +2976,53 @@ class PlayerAreaGenerator {
         return deltaX;
     }
 
-    private int techGenSynthesis(int x, int y, int deltaX, Player player, List<String> techs) {
+    private int techGenSynthesis(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
         int genSynthesisInfantry = player.getStasisInfantry();
-        if ((techs == null && genSynthesisInfantry == 0) || !hasInfantryII(techs) && genSynthesisInfantry == 0) {
-            return deltaX;
+        List<String> techs = player.getTechs();
+        String infantryII = hasInfantryII(techs);
+        if (infantryII == null) {
+            return xDeltaFromRightSide;
         }
+        TechnologyModel infantryIITech = Mapper.getTech(infantryII);
+
+        xDeltaFromRightSide += 48;
         String techSpec = "pa_tech_techname_stasiscapsule.png";
-        drawPAImage(x + deltaX, y, techSpec);
-        if (genSynthesisInfantry < 20) {
-            graphics.setFont(Storage.getFont35());
-        } else {
-            graphics.setFont(Storage.getFont30());
-        }
-        int centerX = 0;
-        if (genSynthesisInfantry < 10) {
-            centerX += 5;
-        }
-        graphics.drawString(String.valueOf(genSynthesisInfantry), x + deltaX + 3 + centerX, y + 148);
+        drawPAImage(mapWidth - xDeltaFromRightSide + 4, yPlayAreaSecondRow, techSpec);
+
+        boolean shrinkText = (genSynthesisInfantry >= 20);
+        DrawingUtil.drawCenteredString(
+                graphics,
+                Integer.toString(genSynthesisInfantry),
+                new Rectangle(
+                        mapWidth - xDeltaFromRightSide + (shrinkText ? 2 : 4),
+                        yPlayAreaSecondRow + (shrinkText ? 123 : 121),
+                        42,
+                        30),
+                (shrinkText ? Storage.getFont30() : Storage.getFont36()));
+
         drawRectWithOverlay(
                 graphics,
-                x + deltaX - 2,
-                y - 2,
+                mapWidth - xDeltaFromRightSide + 2,
+                yPlayAreaSecondRow - 2,
                 44,
                 152,
-                "Gen Synthesis (Infantry II)",
-                "Number of infantry to revive: " + genSynthesisInfantry);
-        deltaX += 48;
-        return deltaX;
+                "Gen Synthesis - " + infantryIITech.getName(),
+                genSynthesisInfantry + " infantry to revive.");
+
+        return xDeltaFromRightSide;
     }
 
-    private boolean hasInfantryII(List<String> techs) {
+    private String hasInfantryII(List<String> techs) {
         if (techs == null) {
-            return false;
+            return null;
         }
         for (String tech : techs) {
             TechnologyModel techInformation = Mapper.getTech(tech);
             if ("inf2".equals(techInformation.getBaseUpgrade().orElse("")) || "inf2".equals(tech)) {
-                return true;
+                return tech;
             }
         }
-        return false;
+        return null;
     }
 
     private static Point getUnitTechOffsets(String asyncId, boolean getFactionIconOffset) {
