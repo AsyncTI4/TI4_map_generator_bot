@@ -229,6 +229,10 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         game.setCompetitiveTIGLGame(false);
+        if (game.isThundersEdge() || game.isTwilightsFallMode()) {
+            return true;
+            // These modes are incompatible atm with the rest of the game mode settings, so skip them
+        }
 
         if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(
