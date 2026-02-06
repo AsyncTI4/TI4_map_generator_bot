@@ -71,6 +71,8 @@ public class MessageListener extends ListenerAdapter {
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
+            BotMessageCache.cache(message);
+
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
