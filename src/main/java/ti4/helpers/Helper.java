@@ -389,6 +389,49 @@ public class Helper {
         }
     }
 
+    /**
+     * Resolves all queued scoring without respecting order.
+     * Used when forced scoring order is turned off to process all pending scores.
+     */
+    public static void resolveAllQueuedScoring(Game game, GenericInteractionCreateEvent event) {
+        String key2 = "queueToScorePOs";
+        String key3 = "potentialScorePOBlockers";
+        String key2b = "queueToScoreSOs";
+        String key3b = "potentialScoreSOBlockers";
+
+        // Process all queued POs
+        for (Player player : game.getRealPlayers()) {
+            if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                String queuedPO = game.getStoredValue(player.getFaction() + "queuedPOScore");
+                if (!queuedPO.isEmpty()) {
+                    int poIndex = Integer.parseInt(queuedPO);
+                    ScorePublicObjectiveService.scorePO(event, game, player, poIndex);
+                    game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                    game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                }
+            }
+            if (game.getHighestScore() + 1 > game.getVp()) {
+                break;
+            }
+        }
+
+        // Process all queued SOs
+        for (Player player : game.getRealPlayers()) {
+            if (game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
+                String queuedSO = game.getStoredValue(player.getFaction() + "queuedSOScore");
+                if (!queuedSO.isEmpty()) {
+                    int soIndex = Integer.parseInt(queuedSO);
+                    SecretObjectiveHelper.scoreSO(event, game, player, soIndex, player.getCorrectChannel());
+                    game.setStoredValue(key2b, game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
+                    game.setStoredValue(key3b, game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                }
+            }
+            if (game.getHighestScore() + 1 > game.getVp()) {
+                break;
+            }
+        }
+    }
+
     public static Player getPlayerWithThisSC(Game game, int sc) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc)) {
