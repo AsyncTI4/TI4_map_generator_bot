@@ -1,0 +1,23 @@
+on: 
+  repository_dispatch:
+      types: [archive_game_channel]
+name: ArchiveGameChannel
+jobs:
+  build:
+    name: Archive Game Channel
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands
+      uses: appleboy/ssh-action@master
+      env:
+        DISCORD_BOT_KEY: ${{ secrets.CHAT_EXPORT_BOT_KEY }}
+        CHANNEL_ID: ${{ github.event.client_payload.channel }}
+      with:
+        host: ${{ secrets.HOSTINGER_SSH_HOST }}
+        username: ${{ secrets.HOSTINGER_SSH_USER }}
+        password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+        port: ${{ secrets.HOSTINGER_SSH_PORT }}
+        envs: DISCORD_BOT_KEY, CHANNEL_ID
+        script: |
+          docker version
+          docker run --rm -v ${{ vars.HOST_TI4_SAVES_DIR }}/exported_channels:/out --user $(id -u):$(id -g) tyrrrz/discordchatexporter:stable export -t $DISCORD_BOT_KEY -c $CHANNEL_ID
