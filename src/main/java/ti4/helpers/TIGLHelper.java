@@ -147,6 +147,7 @@ public class TIGLHelper {
         }
         return tiglProblem;
     }
+
     public static void initializeTIGLGame(Game game) {
         initializeTIGLGame(game, false);
     }
@@ -154,7 +155,11 @@ public class TIGLHelper {
     public static void initializeTIGLGame(Game game, boolean isFractured) {
         game.setCompetitiveTIGLGame(true);
         if (isFractured) {
-            game.addTag(Constants.TIGL_FRACTURED_TAG);
+            if (!game.getTags().contains(Constants.TIGL_FRACTURED_TAG)) {
+                game.addTag(Constants.TIGL_FRACTURED_TAG);
+            }
+        } else {
+            game.removeTag(Constants.TIGL_FRACTURED_TAG);
         }
         sendTIGLSetupText(game);
         List<User> users =

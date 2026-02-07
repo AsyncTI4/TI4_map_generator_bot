@@ -469,8 +469,11 @@ public class MapGenerator implements AutoCloseable {
         // GAME MODES
         int deltaY = -150;
         if (game.isCompetitiveTIGLGame()) {
-            drawGeneralImage(x + deltaX, y + deltaY,
-                    game.getTags().contains(Constants.TIGL_FRACTURED_TAG) ? "GameMode_TIGL_Fractured.png"
+            drawGeneralImage(
+                    x + deltaX,
+                    y + deltaY,
+                    game.getTags().contains(Constants.TIGL_FRACTURED_TAG)
+                            ? "GameMode_TIGL_Fractured.png"
                             : "GameMode_TIGL.png");
             TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
             if (rank != null) {

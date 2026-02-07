@@ -61,10 +61,10 @@ public class GameSetupSettings extends SettingsMenu {
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
         boolean defaultTigl = game.isCompetitiveTIGLGame();
-        tigl = new BooleanSettingWithCustomAction("TIGL", "TIGL Game", defaultTigl, (value) -> ensureTIGLConsistency(true, false));
-        tiglFractured = new BooleanSettingWithCustomAction("TIGL Fractured", "TIGL Fractured Game", defaultTigl, 
-            (value) -> ensureTIGLConsistency(false, true)
-        );
+        tigl = new BooleanSettingWithCustomAction(
+                "TIGL", "TIGL Game", defaultTigl, (value) -> ensureTIGLConsistency(true, false));
+        tiglFractured = new BooleanSettingWithCustomAction(
+                "TIGL Fractured", "TIGL Fractured Game", false, (value) -> ensureTIGLConsistency(false, true));
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
 
         // Initialize values & keys for gamePlayers
@@ -166,7 +166,7 @@ public class GameSetupSettings extends SettingsMenu {
         }
         return null;
     }
-    
+
     private String preset444() {
         pointTotal.setVal(12);
         stage1s.setVal(4);
