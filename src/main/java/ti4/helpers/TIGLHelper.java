@@ -149,7 +149,18 @@ public class TIGLHelper {
     }
 
     public static void initializeTIGLGame(Game game) {
+        initializeTIGLGame(game, false);
+    }
+
+    public static void initializeTIGLGame(Game game, boolean isFractured) {
         game.setCompetitiveTIGLGame(true);
+        if (isFractured) {
+            if (!game.getTags().contains(Constants.TIGL_FRACTURED_TAG)) {
+                game.addTag(Constants.TIGL_FRACTURED_TAG);
+            }
+        } else {
+            game.removeTag(Constants.TIGL_FRACTURED_TAG);
+        }
         sendTIGLSetupText(game);
         List<User> users =
                 game.getPlayers().values().stream().map(Player::getUser).toList();
