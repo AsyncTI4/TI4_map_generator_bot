@@ -147,9 +147,15 @@ public class TIGLHelper {
         }
         return tiglProblem;
     }
-
     public static void initializeTIGLGame(Game game) {
+        initializeTIGLGame(game, false);
+    }
+
+    public static void initializeTIGLGame(Game game, boolean isFractured) {
         game.setCompetitiveTIGLGame(true);
+        if (isFractured) {
+            game.addTag(Constants.TIGL_FRACTURED_TAG);
+        }
         sendTIGLSetupText(game);
         List<User> users =
                 game.getPlayers().values().stream().map(Player::getUser).toList();

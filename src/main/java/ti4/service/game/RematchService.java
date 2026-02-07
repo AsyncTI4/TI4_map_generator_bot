@@ -152,7 +152,7 @@ public class RematchService {
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://asyncti4.com/game/" + newName);
 
-        if (game.isCompetitiveTIGLGame()) TIGLHelper.initializeTIGLGame(newGame);
+        if (game.isCompetitiveTIGLGame()) TIGLHelper.initializeTIGLGame(newGame, game.getTags().contains(Constants.TIGL_FRACTURED_TAG));
 
         CreateGameService.presentSetupToPlayers(newGame);
         GameManager.save(newGame, "Rematch");

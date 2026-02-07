@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
+import ti4.helpers.settingsFramework.settings.BooleanSettingWithCustomAction;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -35,7 +36,8 @@ public class GameSetupSettings extends SettingsMenu {
     private final IntegerSetting stage1s;
     private final IntegerSetting stage2s;
     private final IntegerSetting secrets;
-    private final BooleanSetting tigl;
+    private final BooleanSettingWithCustomAction tigl;
+    private final BooleanSettingWithCustomAction tiglFractured;
     private final BooleanSetting alliance;
     // Categories
     private final DeckSettings decks;
@@ -59,7 +61,10 @@ public class GameSetupSettings extends SettingsMenu {
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
         boolean defaultTigl = game.isCompetitiveTIGLGame();
-        tigl = new BooleanSetting("TIGL", "TIGL Game", defaultTigl);
+        tigl = new BooleanSettingWithCustomAction("TIGL", "TIGL Game", defaultTigl, (value) -> ensureTIGLConsistency(true, false));
+        tiglFractured = new BooleanSettingWithCustomAction("TIGL Fractured", "TIGL Fractured Game", defaultTigl, 
+            (value) -> ensureTIGLConsistency(false, true)
+        );
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
 
         // Initialize values & keys for gamePlayers
@@ -77,6 +82,7 @@ public class GameSetupSettings extends SettingsMenu {
         stage2s.setEmoji(CardEmojis.Public2);
         secrets.setEmoji(CardEmojis.SecretObjective);
         tigl.setEmoji(MiscEmojis.TIGL);
+        tiglFractured.setEmoji(MiscEmojis.TIGL);
         alliance.setEmoji(SourceEmojis.StrategicAlliance);
 
         // Other init
@@ -89,6 +95,7 @@ public class GameSetupSettings extends SettingsMenu {
             stage2s.initialize(json.get("stage2s"));
             secrets.initialize(json.get("secrets"));
             tigl.initialize(json.get("tigl"));
+            tiglFractured.initialize(json.get("tiglFractured"));
             alliance.initialize(json.get("alliance"));
             gamePlayers.initialize(json.get("gamePlayers"));
         }
@@ -116,6 +123,7 @@ public class GameSetupSettings extends SettingsMenu {
         settings.add(stage2s);
         settings.add(secrets);
         settings.add(tigl);
+        settings.add(tiglFractured);
         settings.add(alliance);
         return settings;
     }
@@ -143,7 +151,22 @@ public class GameSetupSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-
+    private String ensureTIGLConsistency(boolean userToggleTIGL, boolean userToggleTIGLFractured) {
+        if (userToggleTIGL) {
+            boolean tiglStatus = tigl.isVal();
+            if (!tiglStatus) {
+                tiglFractured.setVal(false); // keep fractured off if TIGL is turned off
+            }
+        }
+        if (userToggleTIGLFractured) {
+            boolean fracturedStatus = tiglFractured.isVal();
+            if (fracturedStatus) {
+                tigl.setVal(true); // keep TIGL on if fractured is on
+            }
+        }
+        return null;
+    }
+    
     private String preset444() {
         pointTotal.setVal(12);
         stage1s.setVal(4);
