@@ -15,7 +15,7 @@ import ti4.service.unit.ParsedUnit;
 
 class AddCaptureUnits extends GameStateSubcommand {
 
-    public AddCaptureUnits() {
+    AddCaptureUnits() {
         super(Constants.ADD_UNITS, "Capture units", true, true);
         addOptions(new OptionData(
                         OptionType.STRING,

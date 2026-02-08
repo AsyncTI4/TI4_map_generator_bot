@@ -1,9 +1,14 @@
 package ti4.processors;
 
 import java.text.DecimalFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
@@ -27,7 +32,9 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.button.ReactionService;
 import ti4.service.game.GameNameService;
+import ti4.settings.users.UserSettingsManager;
 
+@UtilityClass
 public class ButtonProcessor {
 
     private static final Map<String, Consumer<ButtonContext>> knownButtons =
@@ -36,6 +43,11 @@ public class ButtonProcessor {
 
     public static void queue(ButtonInteractionEvent event) {
         BotLogger.logButton(event);
+        User user = event.getUser();
+        var userSettings = UserSettingsManager.get(user.getId());
+        int currentHourUTC = ZonedDateTime.now(ZoneId.of("UTC")).getHour();
+        userSettings.addActiveHour(currentHourUTC);
+        UserSettingsManager.save(userSettings);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(
@@ -140,7 +152,7 @@ public class ButtonProcessor {
                 // Don't add anymore cases - use @ButtonHandler
                 case "refreshInfoButtons" ->
                     MessageHelper.sendMessageToChannelWithButtons(
-                            event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
+                            event.getChannel(), null, getRefreshInfoButtons(game));
                 case "factionEmbedRefresh" ->
                     MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                             player.getCardsInfoThread(),
@@ -199,6 +211,13 @@ public class ButtonProcessor {
                                     + " pressed. This button does not do anything.");
             }
         }
+    }
+
+    private static List<Button> getRefreshInfoButtons(Game game) {
+        if (game == null) return Buttons.REFRESH_INFO_BUTTONS;
+        if (game.isTwilightsFallMode()) return Buttons.REFRESH_INFO_BUTTONS_TF;
+        if (game.isThundersEdge()) return Buttons.REFRESH_INFO_BUTTONS_TE;
+        return Buttons.REFRESH_INFO_BUTTONS;
     }
 
     public static String getButtonProcessingStatistics() {

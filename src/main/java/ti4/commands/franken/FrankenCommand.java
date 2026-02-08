@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
-import ti4.commands.franken.Ban.Ban;
+import ti4.commands.franken.ban.Ban;
 import ti4.helpers.Constants;
 
 public class FrankenCommand implements ParentCommand {
@@ -21,6 +21,10 @@ public class FrankenCommand implements ParentCommand {
                     new PNRemove(),
                     new UnitAdd(),
                     new UnitRemove(),
+                    new BreakthroughAdd(),
+                    new BreakthroughRemove(),
+                    // WARNING: Franken commands are at 25/25 capacity.
+                    //          Reorganization must happen in order to add more commands
                     new StartFrankenDraft(),
                     new SetFactionIcon(),
                     new SetFactionDisplayName(),
@@ -31,7 +35,6 @@ public class FrankenCommand implements ParentCommand {
                     new Ban(),
                     new DraftLimits(),
                     new BanFaction(),
-                    new SetBreakthrough(),
                     new ApplyDraftBags(),
                     new SetHomeSystemPosition(),
                     new BuildMap())

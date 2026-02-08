@@ -232,5 +232,23 @@
         "primaryColor": { "red": 242, "green": 242, "blue": 242 },
         "secondaryColor": { "red": 255, "green": 210, "blue": 112 },
         "hue": "MULTI2"
+    },
+    {
+        "alias": "abr",
+        "name": "aberration",
+        "aliases": ["abr","aberration"],
+        "textColor": "black",
+        "primaryColor": { "red": 206, "green": 206, "blue": 206 },
+        "secondaryColor": { "red": 50, "green": 50, "blue": 50 },
+        "hue": "MULTI1"
+    },
+    {
+        "alias": "ryl",
+        "name": "royal",
+        "aliases": ["ryl", "royal"],
+        "textColor": "white",
+        "primaryColor": { "red": 119, "green": 17, "blue": 247 },
+        "secondaryColor": { "red": 42, "green": 7, "blue": 87 },
+        "hue": "PURPLE"
     }
 ]

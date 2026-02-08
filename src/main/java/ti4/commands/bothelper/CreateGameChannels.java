@@ -98,7 +98,7 @@ class CreateGameChannels extends Subcommand {
                     break;
                 }
             }
-            if (categoryChannel == null) categoryChannel = CreateGameService.createNewCategory(categoryChannelName);
+            if (categoryChannel == null) categoryChannel = CreateGameService.createNewGameCategory(categoryChannelName);
             if (categoryChannel == null) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
@@ -122,7 +122,7 @@ class CreateGameChannels extends Subcommand {
         if (!CreateGameService.serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToEventChannel(
                     event,
-                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                    "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return;
         }
 

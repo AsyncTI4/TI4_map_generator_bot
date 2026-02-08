@@ -30,7 +30,7 @@ Branch permissions can be granted, but for now you may fork the repository and c
    * Ensure Default Install Settings are correct.
    * Create an install link, paste it into the discord server you want your bot in.
 5. Invite your Test Bot to your server
-6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/JdaService.java`
+6. Create a `bot-log` channel, and `Admin`, `Developer` and `Bothelper` roles; add the role IDs to `src/main/java/ti4/spring/jda/JdaService.java`
 
 # Setup a Test Bot
 
@@ -92,7 +92,9 @@ The bot won't build successfully unless the code is well formatted. We use the [
 
 You can run `mvn spotless:apply` to check for and apply the formatting.
 
-It's best to get "format on save" set up using Spotless, which you can do with plugins.
+It is highly recommended to install the pre push git hook with `mvn spotless:install-git-pre-push-hook`, which will run `mvn spotless:apply` when you try to push, and either successfully push, or fail the push but leave you with formatting changes to commit.
+
+You may want to get "format on save" set up using Spotless, which you can do with plugins.
 
 For Windows/VSCode, you can use the [RunOnSave](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave) plugin. To run `mvn spotless:apply` every time you save a `.java` file, add the following to your VSCode workspace settings:
 

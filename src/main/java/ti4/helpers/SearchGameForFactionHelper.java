@@ -22,7 +22,6 @@ import ti4.service.game.ManagedGameService;
 public class SearchGameForFactionHelper {
 
     public static int searchGames(String faction, GenericInteractionCreateEvent event, boolean includeEndedGames) {
-
         Predicate<ManagedGame> factionFilter = game -> game.getGame().getPlayerFromColorOrFaction(faction) != null;
         Predicate<ManagedGame> endedGamesFilter =
                 includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();

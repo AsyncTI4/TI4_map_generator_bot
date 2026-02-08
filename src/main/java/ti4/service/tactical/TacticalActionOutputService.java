@@ -18,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -238,7 +239,8 @@ public class TacticalActionOutputService {
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
                 maxBonus++;
-                output += " (has Winnu Breakthrough for +1 movement for one ship when moving to a legendary tile)";
+                output +=
+                        " (has _Imperator_ for +1 movement for one ship when moving into a legendary planet's system)";
             }
             if (player.getTechs().contains("dsgledb")) {
                 maxBonus++;
@@ -271,11 +273,14 @@ public class TacticalActionOutputService {
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
+        if (game.isTwilightsFallMode()) {
+            tileHasWormhole = FoWHelper.doesTileHaveWHs(game, tile.getPosition());
+        }
         Tile activeSystem = getActiveSystem(game);
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
-        if (tile.isNebula()
+        if (tile.isNebula(game)
                 && !player.hasAbility("voidborn")
                 && !player.hasAbility("celestial_being")
                 && !player.hasTech("absol_amd")
@@ -299,6 +304,9 @@ public class TacticalActionOutputService {
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             bonusMoveValue++;
         }
+        if (player.hasUnit("tf-echoofascension") && model.getUnitType() == UnitType.Flagship) {
+            bonusMoveValue++;
+        }
         if (player.hasAbility("slipstream") && (tileHasWormhole || (movingFromHome && !game.isTwilightsFallMode()))) {
             bonusMoveValue++;
         }
@@ -310,11 +318,18 @@ public class TacticalActionOutputService {
             bonusMoveValue++;
         }
 
+        if (player.hasTech("tf-planesplitter") && tile.getPosition().contains("frac")) {
+            bonusMoveValue++;
+        }
+
         if (player.hasUnlockedBreakthrough("crimsonbt") && (tileHasBreach || movingFromHome)) {
             bonusMoveValue++;
         }
 
-        if (player.hasAbility("song_of_something") && movingFromHome) {
+        if ((player.hasAbility("song_of_something")
+                        || player.hasAbility("echo_of_divergence")
+                        || player.hasAbility("echo_of_sacrifice"))
+                && movingFromHome) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {

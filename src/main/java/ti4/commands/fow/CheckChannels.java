@@ -1,9 +1,13 @@
 package ti4.commands.fow;
 
+import java.util.ArrayList;
+import java.util.List;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -13,7 +17,7 @@ import ti4.message.MessageHelper;
 class CheckChannels extends GameStateSubcommand {
 
     public CheckChannels() {
-        super(Constants.CHECK_CHANNELS, "Ping each channel that is set up", true, false);
+        super(Constants.CHECK_CHANNELS, "Check fow channel setup", false, false);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -22,14 +26,19 @@ class CheckChannels extends GameStateSubcommand {
             return;
         }
 
+        List<Button> createChannelButtons = new ArrayList<>();
         StringBuilder output = new StringBuilder();
         output.append("**__Currently set channels:__**\n>>> ");
         boolean first = true;
         for (Player player : getGame().getPlayers().values()) {
+            boolean isNeutral = "neutral".equals(player.getFaction());
             if (!first) output.append("\n");
             first = false;
 
-            output.append(player.getUserName()).append(" - ");
+            output.append(player.getUserName());
+            output.append(" ");
+            output.append(player.getFactionEmojiOrColor());
+            output.append(" - ");
             MessageChannel channel = player.getPrivateChannel();
             if (channel == null) {
                 output.append("No private channel");
@@ -41,14 +50,23 @@ class CheckChannels extends GameStateSubcommand {
             }
             output.append(" - ");
 
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity == null) {
-                output.append("No community role");
+            if (isNeutral) {
+                output.append("Is Neutral");
             } else {
-                output.append(roleForCommunity.getAsMention());
+                Role roleForCommunity = player.getRoleForCommunity();
+                if (roleForCommunity == null) {
+                    output.append("No community role");
+                } else {
+                    output.append(roleForCommunity.getAsMention());
+                }
+            }
+
+            if (player.getPrivateChannel() == null && !isNeutral && player.getMember() != null) {
+                createChannelButtons.add(Buttons.green(
+                        "fowCreateChannelFor_" + player.getUserID(), "Create Channel for " + player.getUserName()));
             }
         }
 
-        MessageHelper.replyToMessage(event, output.toString());
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), output.toString(), createChannelButtons);
     }
 }

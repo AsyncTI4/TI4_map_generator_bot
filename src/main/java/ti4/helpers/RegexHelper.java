@@ -42,8 +42,7 @@ public class RegexHelper {
     public static String breakthroughRegex(Game game) {
         Set<String> bts = new HashSet<>();
         for (Player p : game.getRealPlayers()) {
-            String bt = p.getBreakthroughID();
-            if (Mapper.isValidBreakthrough(bt)) bts.add(bt);
+            for (String bt : p.getBreakthroughIDs()) if (Mapper.isValidBreakthrough(bt)) bts.add(bt);
         }
         return regexBuilder("breakthrough", bts);
     }
@@ -225,8 +224,7 @@ public class RegexHelper {
 
     /** @return group "tech" */
     public static String techRegex(Game game) {
-        Set<String> techs =
-                new HashSet<>(Mapper.getDeck(game.getTechnologyDeckID()).getNewDeck());
+        Set<String> techs = new HashSet<>(Mapper.getTechs().keySet());
         return regexBuilder("tech", techs);
     }
 

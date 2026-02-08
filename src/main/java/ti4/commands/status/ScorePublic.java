@@ -9,7 +9,7 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 
 class ScorePublic extends GameStateSubcommand {
 
-    public ScorePublic() {
+    ScorePublic() {
         super(Constants.SCORE_OBJECTIVE, "Score Public Objective", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
                 .setRequired(true)
@@ -22,6 +22,11 @@ class ScorePublic extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int poID = event.getOption(Constants.PO_ID).getAsInt();
-        ScorePublicObjectiveService.scorePO(event, event.getChannel(), getGame(), getPlayer(), poID);
+        ScorePublicObjectiveService.scorePO(event, getGame(), getPlayer(), poID);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

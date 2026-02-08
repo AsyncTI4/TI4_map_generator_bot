@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +18,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String shortName;
     private Boolean shrinkName;
     private String text;
+    private String notes;
     private String flavourText;
     private String flavourTextFormatted;
     private Boolean isFakeRelic;
@@ -32,7 +33,12 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getSimpleRepresentation() {
-        return source.emoji() + String.format("_%s_ - %s (%s)", name, text, source);
+        return getSimpleRepresentation(true);
+    }
+
+    public String getSimpleRepresentation(boolean includeCardText) {
+        if (includeCardText) return source.emoji() + String.format("_%s_ - %s (%s)", name, text, source);
+        return source.emoji() + String.format("_%s_", name);
     }
 
     /**
@@ -82,6 +88,9 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title.toString(), null);
 
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
         if (includeFlavourText && flavourText != null) eb.addField("", flavourText, false);
 
         // Colour

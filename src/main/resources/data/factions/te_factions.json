@@ -45,6 +45,11 @@
             "pds",
             "bastion_spacedock"
         ],
+        "preferredColours": [
+            "dw",
+            "ylw",
+            "tpl"
+        ],
         "source": "thunders_edge",
         "priorityNumber": 21
     },
@@ -86,6 +91,11 @@
             "deepwrought_mech",
             "pds",
             "spacedock"
+        ],
+        "preferredColours": [
+            "gcr",
+            "ppl",
+            "vpw"
         ],
         "source": "thunders_edge",
         "priorityNumber": 7
@@ -135,6 +145,11 @@
             "pds",
             "spacedock"
         ],
+        "preferredColours": [
+            "rby",
+            "gry",
+            "psn"
+        ],
         "source": "thunders_edge",
         "priorityNumber": 30
     },
@@ -183,6 +198,7 @@
     {
         "alias": "crimson",
         "factionName": "The Crimson Rebellion",
+        "shortName": "Rebellion",
         "homeSystem": "94",
         "startingFleet": "4 inf a, sd a, 3 ff, pds a, cv, 2 dd",
         "commodities": 2,
@@ -225,12 +241,18 @@
             "pds",
             "spacedock"
         ],
+        "preferredColours": [
+            "red",
+            "nm",
+            "sns"
+        ],
         "source": "thunders_edge",
         "priorityNumber": 16
     },
     {
         "alias": "ralnel",
         "factionName": "The Ral Nel Consortium",
+        "shortName": "Ral Nel",
         "homeSystem": "93",
         "startingFleet": "2 inf m, 2 inf r, cv, 2 ff, dn, pds r, pds m, dd, sd m",
         "commodities": 4,
@@ -272,6 +294,11 @@
             "ralnel_mech",
             "pds",
             "spacedock"
+        ],
+        "preferredColours": [
+            "lme",
+            "wtm",
+            "grn"
         ],
         "source": "thunders_edge",
         "priorityNumber": 12

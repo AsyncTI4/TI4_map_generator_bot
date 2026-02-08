@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.experimental.UtilityClass;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.async.AsyncCommand;
@@ -36,9 +37,11 @@ import ti4.commands.search.SearchCommand;
 import ti4.commands.search.SearchCommand2;
 import ti4.commands.special.Special2Command;
 import ti4.commands.special.SpecialCommand;
+import ti4.commands.spin.SpinCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
+import ti4.commands.tf.TwilightFallCommand;
 import ti4.commands.tigl.TiglCommand;
 import ti4.commands.tokens.AddCCCommand;
 import ti4.commands.tokens.AddFrontierTokensCommand;
@@ -46,7 +49,7 @@ import ti4.commands.tokens.AddTokenCommand;
 import ti4.commands.tokens.RemoveAllCC;
 import ti4.commands.tokens.RemoveCCCommand;
 import ti4.commands.tokens.RemoveTokenCommand;
-import ti4.commands.transaction.Transaction;
+import ti4.commands.transaction.TransactionCommand;
 import ti4.commands.uncategorized.AllInfoCommand;
 import ti4.commands.uncategorized.CardsInfoCommand;
 import ti4.commands.uncategorized.SelectionBoxDemoCommand;
@@ -63,6 +66,7 @@ import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 
+@UtilityClass
 public class CommandManager {
 
     private static final Map<String, ParentCommand> commands = Stream.of(
@@ -85,7 +89,7 @@ public class CommandManager {
                     new AddUnitDamage(),
                     new RemoveUnitDamage(),
                     new RemoveAllUnitDamage(),
-                    new Transaction(),
+                    new TransactionCommand(),
                     new MapCommand(),
                     new HelpCommand(),
                     new SearchCommand(),
@@ -114,6 +118,7 @@ public class CommandManager {
                     new CaptureCommand(),
                     new GenericButtonCommand(),
                     new DiscordantStarsCommand(),
+                    new TwilightFallCommand(),
                     new StatisticsCommand(),
                     new TechCommand(),
                     new BreakthroughCommand(),
@@ -123,7 +128,8 @@ public class CommandManager {
                     new TiglCommand(),
                     new AsyncCommand(),
                     new OmegaPhaseCommand(),
-                    new DraftCommand())
+                    new DraftCommand(),
+                    new SpinCommand())
             .collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {

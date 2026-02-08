@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -15,6 +16,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.service.fow.BlindSelectionService;
 
 @UtilityClass
 public class SleeperTokenHelper {
@@ -59,9 +62,9 @@ public class SleeperTokenHelper {
     }
 
     @ButtonHandler("selectPlayerToSleeper")
-    public static void selectPlayerToSleeper(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void selectPlayerToSleeper(ButtonInteractionEvent event, Game game, Player player) {
         String msg =
-                "Choose the player who owns the planet that you wish to put a sleeper on. Note that you need their permission, but this is not a transaction.";
+                "Choose the player who owns the planet that you wish to put a Sleeper token on. You need their permission, but this is not a transaction.";
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -86,8 +89,9 @@ public class SleeperTokenHelper {
             }
             buttons.add(Buttons.gray("putSleeperOnPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
+        BlindSelectionService.filterForBlindPlanetSelection(game, player, buttons, "putSleeperOnPlanet");
         buttons.add(Buttons.red("deleteButtons", "Don't Place Sleeper"));
         MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

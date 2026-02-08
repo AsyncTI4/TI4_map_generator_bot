@@ -22,7 +22,7 @@ public class DistanceTool {
     private final Game game;
     private final Map<String, Map<String, Integer>> distanceCache = new HashMap<>();
     private final Set<String> legalPositions = new HashSet<>();
-    private final int MAX_DISTANCE = 10;
+    private static final int MAX_DISTANCE = 10;
 
     public DistanceTool(Game game) {
         this.game = game;
@@ -45,7 +45,7 @@ public class DistanceTool {
                     TileModel tile = TileHelper.getTileById(tileId);
                     return !tile.isHyperlane();
                 })
-                .map(t -> t.getPos())
+                .map(MapTemplateModel.MapTemplateTile::getPos)
                 .collect(HashSet::new, HashSet::add, HashSet::addAll));
     }
 
@@ -59,7 +59,7 @@ public class DistanceTool {
      * @return the move distance between the two positions, or -1 if they are not reachable.
      */
     public Integer getNattyDistance(String pos1, String pos2) {
-        if (pos1.equals(pos2) || pos1 == null || pos2 == null) {
+        if (pos1.equals(pos2) || pos2 == null) {
             return 0;
         }
         // Use the same ordering for path checks to double our cache hits

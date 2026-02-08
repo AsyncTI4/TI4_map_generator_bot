@@ -45,6 +45,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Discard 1 of your neighbor's genomes.",
+        "notes": "\"Genome\" is what Twilight's Fall calls the agentesque splice cards.",
         "source": "twilights_fall"
     },
     {
@@ -52,6 +53,7 @@
         "name": "Engineer",
         "phase": "Action",
         "window": "When you draw cards for a splice that you initiated",
+        "notes": "In Async, please play this before you initiate the splice.",
         "text": "Add 2 additional cards to the splice; after you choose your card, choose and discard 2 of the spliced cards before passing them to the next player.",
         "source": "twilights_fall"
     },
@@ -59,7 +61,7 @@
         "alias": "tf-manipulate",
         "name": "Manipulate",
         "phase": "Action",
-        "window": "After another player initiates a splice that you are not participating in",
+        "window": "After cards are drawn for a splice that you are not participating in",
         "text": "Take the spliced cards. Choose which card each participating player will take.",
         "source": "twilights_fall"
     },
@@ -116,7 +118,7 @@
         "name": "Command",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally your ships may move through or into asteroid fields during this movement.",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through or into asteroid fields during this movement.",
         "source": "twilights_fall"
     },
     {
@@ -124,7 +126,7 @@
         "name": "Command",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally your ships may move through or into asteroid fields during this movement.",
+        "text": "Apply +1 to the move value of each of your ships during this tactical action. Additionally, your ships may move through or into asteroid fields during this movement.",
         "source": "twilights_fall"
     },
     {
@@ -172,6 +174,7 @@
         "name": "Reverse",
         "phase": "Action",
         "window": "When a splice begins",
+        "notes": "In Async, please play this before you initiate the splice.",
         "text": "Reverse the order the spliced cards are passed.",
         "source": "twilights_fall"
     },
@@ -188,7 +191,7 @@
         "name": "Meddle",
         "phase": "Action",
         "window": "When any die is rolled",
-        "text": "Add or sintract 1 from its result.",
+        "text": "Add or subtract 1 from its result.",
         "source": "twilights_fall"
     },
     {
@@ -253,7 +256,7 @@
         "name": "Unravel",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose and purge a relic. If the relic belonged to another player, that player gains 1 victory point; if it belonged to you, put the Fracture into play and place 1 additional ingress token in a system that contains your units.",
+        "text": "Choose and purge a relic. If the relic belonged to another player, that player gains 1 victory point; if it belonged to you, put The Fracture into play and place 1 additional ingress token in a system that contains your units.",
         "source": "twilights_fall"
     },
     {
@@ -342,6 +345,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose a supernova; each player destroys 3 of their units in that supernova and each adjacent system.",
+        "notes": "This cannot be played if there is no supernovae on the game board. In such a case, consider getting table permission to purge this action card and draw a replacement.",
         "source": "twilights_fall"
     },
     {

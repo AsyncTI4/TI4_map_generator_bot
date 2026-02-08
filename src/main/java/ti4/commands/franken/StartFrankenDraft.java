@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.draft.FrankenDraft;
+import ti4.draft.InauguralSpliceFrankenDraft;
 import ti4.draft.OnePickFrankenDraft;
 import ti4.draft.PoweredFrankenDraft;
 import ti4.draft.PoweredOnePickFrankenDraft;
@@ -33,7 +34,9 @@ class StartFrankenDraft extends GameStateSubcommand {
         Game game = getGame();
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
-        if (!force && game.getPlayers().values().stream().anyMatch(Player::isRealPlayer)) {
+        if (!force
+                && game.getPlayers().values().stream().anyMatch(Player::isRealPlayer)
+                && !game.isTwilightsFallMode()) {
             String message =
                     "There are players that are currently set up already. Please rerun the command with the force option set to True to overwrite them.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -58,8 +61,12 @@ class StartFrankenDraft extends GameStateSubcommand {
                 case ONEPICK -> game.setBagDraft(new OnePickFrankenDraft(game));
                 case POWEREDONEPICK -> game.setBagDraft(new PoweredOnePickFrankenDraft(game));
                 case TWILIGHTSFALL -> {
-                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
                     game.setupTwilightsFallMode(event);
+                    game.setBagDraft(new TwilightsFallFrankenDraft(game));
+                }
+                case INAUGURALSPLICE -> {
+                    game.setupTwilightsFallMode(event);
+                    game.setBagDraft(new InauguralSpliceFrankenDraft(game));
                 }
             }
         }

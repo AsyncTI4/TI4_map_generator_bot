@@ -154,41 +154,43 @@ public class ImageHelper {
 
     @SneakyThrows
     public static byte[] writeJpg(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(imageWithoutAlpha, "jpg", byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
-        }
+        image = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        return writeImage(image, "jpg");
     }
 
     @SneakyThrows
     public static byte[] writePng(BufferedImage image) {
+        return writeImage(image, "png");
+    }
+
+    @SneakyThrows
+    private static byte[] writeImage(BufferedImage image, String format) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            ImageIO.write(image, "png", byteArrayOutputStream);
+            ImageIO.write(image, format, byteArrayOutputStream);
             return byteArrayOutputStream.toByteArray();
         }
     }
 
     @SneakyThrows
     public static byte[] writeWebp(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        image = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
+        ImageWriter writer = null;
         try (var byteArrayOutputStream = new ByteArrayOutputStream();
                 var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
-            ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+            writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+            writer.setOutput(imageOutputStream);
 
             WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
             writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             writeParam.setCompressionType(CompressionType.Lossy);
             writeParam.setUseSharpYUV(false);
             writeParam.setAlphaCompressionAlgorithm(0);
-            // writeParam.setCompressionQuality(.5f);
-            // writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
 
-            writer.setOutput(imageOutputStream);
-
-            // Encode
-            writer.write(null, new IIOImage(imageWithoutAlpha, null, null), writeParam);
+            writer.write(null, new IIOImage(image, null, null), writeParam);
+            imageOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
+        } finally {
+            if (writer != null) writer.dispose();
         }
     }
 

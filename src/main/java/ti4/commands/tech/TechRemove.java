@@ -7,7 +7,7 @@ import ti4.service.tech.PlayerTechService;
 
 class TechRemove extends TechAddRemove {
 
-    public TechRemove() {
+    TechRemove() {
         super(Constants.TECH_REMOVE, "Remove a technology");
     }
 

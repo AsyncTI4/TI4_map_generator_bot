@@ -17,6 +17,7 @@
         "18_1"
     ],
     "positionInTile": { "x": 171.0, "y": 149.0 },
+    "radius": 114.0,
     "resources": 1,
     "influence": 6,
     "factionHomeworld": null,

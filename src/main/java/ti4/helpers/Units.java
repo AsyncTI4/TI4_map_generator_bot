@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
 import ti4.image.Mapper;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.spring.jda.JdaService;
@@ -66,7 +67,7 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
+            if (unitType == UnitType.Celagrom || unitType == UnitType.Lady || unitType == UnitType.Cavalry) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
             if (unitType == UnitType.TyrantsLament) {
@@ -117,8 +118,10 @@ public class Units {
         PlenaryOrbital("plenaryorbital"),
         TyrantsLament("tyrantslament"),
         Lady("lady"),
+        Celagrom("celagrom"),
         Cavalry("cavalry"), // relics
-        StarfallPds("starfallpds");
+        StarfallPds("starfallpds"),
+        MetaliVoidArmaments("metalivoidarmaments");
 
         @Getter
         public final String value;
@@ -144,7 +147,9 @@ public class Units {
                 case TyrantsLament -> "Tyrant's Lament";
                 case Cavalry -> "The Cavalry";
                 case Lady -> "The Lady";
+                case Celagrom -> "The Celagrom";
                 case Monument -> "Monument";
+                case MetaliVoidArmaments -> "Metali Void Armaments";
             };
         }
 
@@ -165,7 +170,9 @@ public class Units {
                 case TyrantsLament -> "tyrantslament";
                 case Cavalry -> "cavalry";
                 case Lady -> "lady";
+                case Celagrom -> "celagrom";
                 case Monument -> "monument";
+                case MetaliVoidArmaments -> "metalivoidarmaments";
             };
         }
 
@@ -181,10 +188,11 @@ public class Units {
                 case Cruiser -> UnitEmojis.cruiser;
                 case Carrier -> UnitEmojis.carrier;
                 case Dreadnought -> UnitEmojis.dreadnought;
-                case Flagship, Cavalry, Lady -> UnitEmojis.flagship;
+                case Flagship, Cavalry, Lady, Celagrom -> UnitEmojis.flagship;
                 case TyrantsLament -> UnitEmojis.TyrantsLament;
                 case Warsun -> UnitEmojis.warsun;
                 case Monument -> UnitEmojis.Monument;
+                case MetaliVoidArmaments -> ExploreEmojis.Relic;
             };
         }
 
@@ -246,6 +254,24 @@ public class Units {
                 case dmg_glv -> "Dmg+Glv";
             };
         }
+
+        public TI4Emoji stateEmoji() {
+            return switch (this) {
+                case none -> null;
+                case dmg -> UnitEmojis.Damaged;
+                case glv -> UnitEmojis.Galvanized;
+                case dmg_glv -> UnitEmojis.DamagedGalvanized;
+            };
+        }
+
+        public TI4Emoji stateEmojiWithBlank() {
+            return switch (this) {
+                case none -> UnitEmojis.Blank;
+                case dmg -> UnitEmojis.Damaged;
+                case glv -> UnitEmojis.Galvanized;
+                case dmg_glv -> UnitEmojis.DamagedGalvanized;
+            };
+        }
     }
 
     public static UnitState findUnitState(String state) {
@@ -275,8 +301,10 @@ public class Units {
             case "plenaryorbital" -> UnitType.PlenaryOrbital;
             case "tyrantslament" -> UnitType.TyrantsLament;
             case "lady" -> UnitType.Lady;
+            case "celagrom" -> UnitType.Celagrom;
             case "cavalry" -> UnitType.Cavalry;
             case "starfallpds" -> UnitType.StarfallPds;
+            case "metaliafb" -> UnitType.MetaliVoidArmaments;
             default -> null;
         };
     }

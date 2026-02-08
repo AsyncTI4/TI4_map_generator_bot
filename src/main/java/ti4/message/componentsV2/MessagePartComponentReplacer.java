@@ -23,7 +23,7 @@ import ti4.message.logging.BotLogger;
 public class MessagePartComponentReplacer implements TrackingComponentReplacer {
     private final Map<String, ReplaceMessagePart> replaceByCustomId;
     private final List<ReplaceMessagePart> replaceByPattern;
-    private boolean madeChanges = false;
+    private boolean madeChanges;
 
     public MessagePartComponentReplacer(
             List<ReplaceMessagePart> replaceByCustomId, List<ReplaceMessagePart> replaceByPattern) {
@@ -49,7 +49,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
      * in the message's component tree. If the input component is returned, nothing happens.
      * If null is returned, the component is removed. If a different component is returned,
      * the component is replaced.
-     *
+     * <p>
      * This also populates the changedMessages set when any action is performed; this
      * allows the caller to know if any changes were made at all. (to help save on PATCH
      * requests)
@@ -146,9 +146,6 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             return null;
         }
         ReplaceMessagePart replacement = replaceByCustomId.getOrDefault(curId, null);
-        if (replacement == null) {
-            return null;
-        }
         return replacement;
     }
 
@@ -171,9 +168,8 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
         if (mediaGallery == null || contains == null) {
             return false;
         }
-        Predicate<MediaGalleryItem> matchFunc = (item) -> {
-            return item.getUrl() != null && item.getUrl().contains(contains);
-        };
+        Predicate<MediaGalleryItem> matchFunc =
+                (item) -> item.getUrl() != null && item.getUrl().contains(contains);
         return mediaGallery.getItems().stream().anyMatch(matchFunc);
     }
 
@@ -181,9 +177,6 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
         if (current == null || replacement == null) {
             return true;
         }
-        if (!current.getClass().equals(replacement.getClass())) {
-            return false;
-        }
-        return true;
+        return current.getClass().equals(replacement.getClass());
     }
 }

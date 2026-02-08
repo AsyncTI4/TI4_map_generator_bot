@@ -19,6 +19,7 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String name;
     private String text;
+    private String notes;
     private String mapText;
     private Integer complexity;
     private String errata;
@@ -82,13 +83,16 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
                     .append(")` - ");
         }
         sb.append(CardEmojis.Event);
-        sb.append("**__").append(getName()).append("__** ");
-        sb.append(getSource().emoji());
+        sb.append("**__").append(name).append("__** ");
+        sb.append(source.emoji());
         sb.append("\n");
 
-        if (getText().length() > 0) {
+        if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
+        }
+        if (notes != null) {
+            sb.append("\n> -# [").append(notes).append("]");
         }
 
         return sb.toString();
@@ -101,28 +105,26 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(CardEmojis.Event)
-                .append("__**")
-                .append(getName())
-                .append("**__")
-                .append(getSource().emoji());
-        eb.setTitle(sb.toString());
+        String sb = CardEmojis.Event + "__**" + name + "**__" + source.emoji();
+        eb.setTitle(sb);
 
         eb.setDescription(getText());
+        if (notes != null) {
+            eb.setDescription(getText() + "\n-# [" + notes + "]");
+        }
 
         eb.setColor(Color.black);
-        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
+        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
         return eb.build();
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString)
-                || getName().toLowerCase().contains(searchString)
-                || getSearchTags().contains(searchString);
+        return alias.toLowerCase().contains(searchString)
+                || name.toLowerCase().contains(searchString)
+                || searchTags.contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " [" + getSource() + "]";
+        return name + " [" + source + "]";
     }
 }

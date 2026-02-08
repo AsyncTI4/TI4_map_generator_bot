@@ -14,7 +14,7 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
     public PrivateCommunicationsCheck() {
         super(
                 Constants.CHECK_PRIVATE_COMMUNICATIONS,
-                "Check the status of private communication threads and offer a button to suggest new ones.",
+                "Check the status of private comm threads and offer a button to suggest new ones.",
                 false,
                 true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which check as", false, true);
@@ -27,7 +27,7 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
 
         if (!FowCommunicationThreadService.isActive(game)) {
             MessageHelper.replyToMessage(
-                    event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
+                    event, "Bot managed comm threads are not enabled.\nEnable them with `/fow fow_options`");
             return;
         }
 
@@ -51,7 +51,7 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
             return;
         }
 
-        FowCommunicationThreadService.checkNewNeighbors(game, player);
-        MessageHelper.replyToMessage(event, "Communication threads with neighbors checked.");
+        FowCommunicationThreadService.checkNewCommPartners(game, player);
+        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), "Communication threads checked.");
     }
 }

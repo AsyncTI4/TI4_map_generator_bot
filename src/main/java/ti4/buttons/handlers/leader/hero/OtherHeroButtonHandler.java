@@ -17,6 +17,7 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -36,6 +37,9 @@ class OtherHeroButtonHandler {
 
     private static void purgeHeroPreamble(
             ButtonInteractionEvent event, Player player, Game game, String heroId, String heroTitle) {
+        if (heroId.contains("redcreuss") && player.hasLeaderUnlocked("crimsonhero")) {
+            heroId = "crimsonhero";
+        }
         Leader playerLeader = player.unsafeGetLeader(heroId);
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
@@ -43,7 +47,7 @@ class OtherHeroButtonHandler {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " is playing " + heroTitle + ".",
-                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
+                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText, game.isTwilightsFallMode()));
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -53,11 +57,12 @@ class OtherHeroButtonHandler {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), heroTitle + ", has been purged.");
+            DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), heroTitle + ", was not purged - something went wrong.");
         }
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("purgeHacanHero")
@@ -232,13 +237,25 @@ class OtherHeroButtonHandler {
                 player.getCorrectChannel(),
                 msg,
                 ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    @ButtonHandler("purgeBastionHero_")
+    public static void purgeBastionHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
+        purgeHeroPreamble(event, player, game, "bastionhero", "Lyra Keen, the Bastion hero");
+        String msg = player.getRepresentationNoPing()
+                + ", please choose the galvanized unit that recently died, with which you wish to resolve _Intelligence Unshackled_.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                msg,
+                ButtonHelperActionCards.getCourageousOptions(player, game, true, "Bastion Hero"));
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("purgeRedCreussHero_")
     public static void purgeRedCreussHero(
             ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
-        purgeHeroPreamble(event, player, game, "redcreusshero", "\"A Tall Stranger\", the Red Creuss hero");
+        purgeHeroPreamble(event, player, game, "redcreusshero", "Homesick Phantom, the Rebellion hero");
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         UnitHolder captureUnitHolder = player.getNombox();
@@ -277,7 +294,7 @@ class OtherHeroButtonHandler {
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to duplicate.",
                 buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("ghotiHeroIn_")
@@ -288,6 +305,6 @@ class OtherHeroButtonHandler {
                 event.getChannel(),
                 player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.",
                 buttons);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 }

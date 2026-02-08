@@ -7,12 +7,17 @@ import ti4.service.tech.PlayerTechService;
 
 class TechAdd extends TechAddRemove {
 
-    public TechAdd() {
+    TechAdd() {
         super(Constants.TECH_ADD, "Add a technology");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         PlayerTechService.addTech(event, getGame(), player, techID);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

@@ -25,6 +25,8 @@ public class SearchCommand implements ParentCommand {
                     // no /search franken_errata yet
                     // no /search generic_cards yet
                     new SearchLeadersSubcommand(),
+                    new SearchGenomesSubcommand(),
+                    new SearchParadigmsSubcommand(),
                     // no /search map_templates yet
                     new SearchPromissoryNotesSubcommand(),
                     new SearchPublicObjectivesSubcommand(),
@@ -73,6 +75,8 @@ public class SearchCommand implements ParentCommand {
                     new SearchActionCardsSubcommand(),
                     new SearchTechsSubcommand(),
                     new SearchLeadersSubcommand(),
+                    new SearchGenomesSubcommand(),
+                    new SearchParadigmsSubcommand(),
                     new SearchPromissoryNotesSubcommand(),
                     new SearchExploresSubcommand(),
                     new SearchDecksSubcommand(),

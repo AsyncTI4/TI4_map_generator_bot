@@ -43,6 +43,7 @@ public enum FactionEmojis implements TI4Emoji {
     Deepwrought,
     Firmament,
     Obsidian,
+    Neutral,
 
     // Twilight's Fall
 
@@ -95,7 +96,8 @@ public enum FactionEmojis implements TI4Emoji {
     qhet,
     atokera,
     belkosea,
-    toldar, //
+    toldar,
+    kaltrim, //
 
     // balacasi
     arvaxi,
@@ -107,6 +109,12 @@ public enum FactionEmojis implements TI4Emoji {
     vyserix,
     zephyrion,
     arachian,
+    zooid,
+
+    // nomadfalcon
+    erock,
+    explanetary,
+    councilors,
 
     // Franken
     Franken1,
@@ -172,7 +180,6 @@ public enum FactionEmojis implements TI4Emoji {
     saera,
     shadows, // Eronous
     Lazax,
-    Neutral,
     RandomFaction,
     AdminsFaction,
     netharii,
@@ -225,7 +232,6 @@ public enum FactionEmojis implements TI4Emoji {
             case "yin" -> Yin;
 
             case "lazax" -> Lazax;
-            case "neutral" -> Neutral;
 
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
             case "redcreuss", "redghost" -> RedCreuss;
@@ -236,6 +242,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "deepwrought" -> Deepwrought;
             case "obsidian" -> Obsidian;
             case "firmament" -> Firmament;
+            case "neutral" -> Neutral;
+
             case "augers" -> augers;
             case "axis" -> axis;
             case "bentor" -> bentor;
@@ -278,11 +286,13 @@ public enum FactionEmojis implements TI4Emoji {
             case "onyxxa" -> onyxxa;
             case "tyris" -> tyris;
             case "arachian" -> arachian;
+            case "zooid" -> zooid;
             case "vyserix" -> vyserix;
             case "zephyrion" -> zephyrion;
             case "pharadn" -> pharadn;
             case "qhet" -> qhet;
             case "atokera" -> atokera;
+            case "kaltrim" -> kaltrim;
             case "toldar" -> toldar;
             case "belkosea" -> belkosea;
             case "admins" -> AdminsFaction;
@@ -332,6 +342,10 @@ public enum FactionEmojis implements TI4Emoji {
             case "raven" -> raven;
             case "syndicate" -> syndicate;
             case "terminator" -> terminator;
+
+            case "councilors" -> councilors;
+            case "erock" -> erock;
+            case "explanetary" -> explanetary;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

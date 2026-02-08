@@ -1,0 +1,24 @@
+{
+    "id": "campe",
+    "tileId": "cpti20campe",
+    "name": "Campe",
+    "aliases": [
+        "campe"
+    ],
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "NONE"
+    ],
+    "legendaryAbilityName": "The Big Scoop",
+    "legendaryAbilityText": "At the end of your turn, you may exhaust this card to move up to 3 ground forces from the main galaxy onto Campe and Typhon, place any other player's units into coexistence. Units on Campe are also on Typhon.",
+    "planetLayout": {
+        "unitHolderName": "campe",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 135.0,
+            "y": 85.0
+        }
+    },
+    "source": "other"
+}

@@ -1,5 +1,6 @@
 package ti4.listeners;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -36,6 +38,11 @@ public class MessageListener extends ListenerAdapter {
     private static final int EXECUTION_TIME_WARNING_THRESHOLD_SECONDS = 1;
     private static final Pattern FUTURE = Pattern.compile("future");
     private static final Pattern PATTERN = Pattern.compile("[^a-zA-Z0-9]+$");
+    // The mention itself is 23 characters long
+    private static final int BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD = 53;
+    private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
+        Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!
+        """;
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -46,7 +53,7 @@ public class MessageListener extends ListenerAdapter {
 
         Message message = event.getMessage();
         if (message.getContentRaw().startsWith("[DELETE]")) {
-            message.delete().queue();
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -54,11 +61,29 @@ public class MessageListener extends ListenerAdapter {
                 "MessageListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS, () -> processMessage(event, message));
     }
 
+    private static void sendMessageToModLog(String msg) {
+        JdaService.guildPrimary.getTextChannelsByName("interesting-messages-log", true).stream()
+                .findFirst()
+                .ifPresent(moderationLogChannel -> MessageHelper.sendMessageToChannel(moderationLogChannel, msg));
+    }
+
+    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop", "nazi");
+
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
             if (!event.getAuthor().isBot()) {
+                if (respondToBotHelperPing(message)) return;
                 if (checkForFogOfWarInvitePrompt(message)) return;
                 if (copyLFGPingsToLFGPingsChannel(event, message)) return;
+                String messageRaw = message.getContentRaw().toLowerCase();
+                for (String phrase : interestingMessages) {
+                    if (messageRaw.contains(phrase)) {
+                        String msg =
+                                "Someone used \"" + phrase + "\" at " + message.getJumpUrl() + ". Full message:\n> "
+                                        + message.getContentRaw().replace("\n", "\n> ");
+                        sendMessageToModLog(msg);
+                    }
+                }
 
                 String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
                 if (GameManager.isValid(gameName)) {
@@ -67,24 +92,6 @@ public class MessageListener extends ListenerAdapter {
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
             }
-            // if ("572698679618568193".equalsIgnoreCase(event.getAuthor().getId())) {
-            //     TextChannel deletionLogChannel =
-            //             JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
-            //                     .findFirst()
-            //                     .orElse(null);
-            //     if (deletionLogChannel == null) return;
-            //     String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped()
-            //             + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
-            //     if (!message.getComponents().isEmpty()) {
-            //         msg += "\n" + message.getComponents().getFirst().getType().name();
-            //     }
-            //     if (!message.getEmbeds().isEmpty()) {
-            //         MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, msg, message.getEmbeds());
-            //     } else {
-            //         MessageHelper.sendMessageToChannel(deletionLogChannel, msg + "\n No embeds");
-            //     }
-            //     return;
-            // }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
             BotLogger.error(
@@ -92,6 +99,19 @@ public class MessageListener extends ListenerAdapter {
                             + event.getMessage().getJumpUrl(),
                     e);
         }
+    }
+
+    private static boolean respondToBotHelperPing(Message message) {
+        boolean messageLikelyMissingExplanation =
+                message.getContentRaw().length() < BOTHELPER_MENTION_REMINDER_MESSAGE_LENGTH_THRESHOLD;
+        boolean messageMentionsBotHelper = message.getMentions().getRoles().stream()
+                .anyMatch(mentionedRole -> JdaService.bothelperRoles.stream()
+                        .anyMatch(bothelperRole -> bothelperRole.getIdLong() == mentionedRole.getIdLong()));
+        boolean shouldRespondToBotHelperPing = messageLikelyMissingExplanation && messageMentionsBotHelper;
+        if (shouldRespondToBotHelperPing) {
+            message.reply(BOTHELPER_MENTION_REMINDER_TEXT).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
+        return shouldRespondToBotHelperPing;
     }
 
     private static Player getPlayer(MessageReceivedEvent event, Game game) {
@@ -117,7 +137,7 @@ public class MessageListener extends ListenerAdapter {
         }
         message.reply(
                         "to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ")
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         return true;
     }
 
@@ -159,7 +179,7 @@ public class MessageListener extends ListenerAdapter {
 
     private static boolean handleWhispers(MessageReceivedEvent event, Message message, String gameName) {
         if (message.getContentRaw().contains("used /fow whisper")) {
-            message.delete().queue();
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         String messageText = message.getContentRaw();
@@ -210,7 +230,7 @@ public class MessageListener extends ListenerAdapter {
 
         String messageContent = StringUtils.substringAfter(messageText, " ");
         if (messageContent.isEmpty()) {
-            message.reply("No message content?").queue();
+            message.reply("No message content?").queue(Consumers.nop(), BotLogger::catchRestError);
             return true;
         }
 
@@ -233,7 +253,7 @@ public class MessageListener extends ListenerAdapter {
         } else {
             WhisperService.sendWhisper(
                     game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
-            message.delete().queue();
+            message.delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         GameManager.save(game, "Whisper"); // TODO: We should be locking since we're saving
         return true;
@@ -248,7 +268,7 @@ public class MessageListener extends ListenerAdapter {
         MessageHelper.sendMessageToPlayerCardsInfoThread(
                 sender,
                 "You sent a future message to " + receiver.getRepresentationNoPing() + ":\n>>> " + messageContent);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static void whisperToFutureMe(MessageReceivedEvent event, Game game, Player player) {
@@ -263,7 +283,7 @@ public class MessageListener extends ListenerAdapter {
                 event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
         MessageHelper.sendMessageToPlayerCardsInfoThread(
                 player, "You sent yourself a future message:\n>>> " + messageContent);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
@@ -280,7 +300,7 @@ public class MessageListener extends ListenerAdapter {
             if (!player.isSpeaker()) {
                 event.getChannel().getHistory().retrievePast(1).queue(messages -> {
                     var emoji = Emoji.fromFormatted("🤫");
-                    messages.getFirst().addReaction(emoji).queue();
+                    messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
                 });
             }
         }
@@ -302,11 +322,11 @@ public class MessageListener extends ListenerAdapter {
                                 .equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
                     if (managedGame.isFactionReactMode()) {
                         var emoji = Emoji.fromFormatted(player.getFactionEmoji());
-                        messages.getFirst().addReaction(emoji).queue();
+                        messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (managedGame.isColorReactMode()) {
                         var emoji = ColorEmojis.getColorEmoji(player.getColor()).asEmoji();
-                        messages.getFirst().addReaction(emoji).queue();
+                        messages.getFirst().addReaction(emoji).queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (managedGame.isStratReactMode()) {
                         if (game.getPhaseOfGame().contains("action")
@@ -320,7 +340,9 @@ public class MessageListener extends ListenerAdapter {
                                 }
                                 if (emoji2 != null && emoji2.asEmoji() != null) {
                                     var demoji2 = emoji2.asEmoji();
-                                    messages.getFirst().addReaction(demoji2).queue();
+                                    messages.getFirst()
+                                            .addReaction(demoji2)
+                                            .queue(Consumers.nop(), BotLogger::catchRestError);
                                 }
                             }
                         }
@@ -340,6 +362,8 @@ public class MessageListener extends ListenerAdapter {
         if (!JdaService.fowServers.isEmpty()
                 && // fog servers exists
                 !JdaService.fowServers.contains(event.getGuild())
+                && // 2nd server actually exists
+                JdaService.guildCommunityPlays != null
                 && // event server IS NOT the fog server
                 !JdaService.guildCommunityPlays.getId().equals(event.getGuild().getId())
                 && // NOR the community server

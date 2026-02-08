@@ -1,0 +1,25 @@
+{
+    "id": "cerberuscpti",
+    "tileId": "cpti20cerberus",
+    "name": "Cerberus",
+    "aliases": [
+        "cerberuscpti"
+    ],
+    "resources": 0,
+    "influence": 1,
+    "planetTypes": [
+        "NONE"
+    ],
+    "legendaryAbilityName": "An Eye for Two Eyes Is a Good Deal",
+    "legendaryAbilityText": "When you pass, you may spend any number of resources to place a neutral ship with the cost lower or equal to double that number in any system that contains no players' ships.",
+    "legendaryAbilityFlavourText": "The last memory of the universe before.",
+    "planetLayout": {
+        "unitHolderName": "cerberuscpti",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 170.0,
+            "y": 150.0
+        }
+    },
+    "source": "other"
+}

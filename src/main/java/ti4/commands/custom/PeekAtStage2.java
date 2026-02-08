@@ -21,4 +21,9 @@ class PeekAtStage2 extends GameStateSubcommand {
         Integer loc1 = event.getOption(Constants.LOCATION1, null, OptionMapping::getAsInt);
         ObjectiveHelper.secondHalfOfPeakStage2(getGame(), getPlayer(), loc1);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

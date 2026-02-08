@@ -1,0 +1,32 @@
+{
+    "id": "cottus",
+    "tileId": "cpti20cottus",
+    "name": "Cottus",
+    "aliases": [
+        "cottus"
+    ],
+    "positionInTile": {
+        "x": 214,
+        "y": 89
+    },
+    "resources": 1,
+    "influence": 0,
+    "factionHomeworld": null,
+    "planetType": "HAZARDOUS",
+    "cardImagePath": null,
+    "techSpecialties": [
+        "CYBERNETIC",
+        "WARFARE"
+    ],
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "planetLayout": {
+        "unitHolderName": "cottus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 214,
+            "y": 89
+        }
+    },
+    "source": "other"
+}

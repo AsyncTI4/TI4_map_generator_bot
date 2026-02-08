@@ -162,7 +162,8 @@ public class RemoveUnitService {
             Game game,
             ParsedUnit parsedUnit,
             boolean prioritizeDamagedUnits) {
-        return removeUnit(event, tile, game, parsedUnit, UnitState.dmg);
+        UnitState preferredState = prioritizeDamagedUnits ? UnitState.dmg : UnitState.none;
+        return removeUnit(event, tile, game, parsedUnit, preferredState);
     }
 
     public static List<RemovedUnit> removeUnit(

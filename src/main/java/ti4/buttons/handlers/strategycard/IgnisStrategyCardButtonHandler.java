@@ -2,12 +2,14 @@ package ti4.buttons.handlers.strategycard;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.EventHelper;
 import ti4.helpers.RelicHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.ExploreEmojis;
 
 @UtilityClass
@@ -19,7 +21,7 @@ class IgnisStrategyCardButtonHandler {
             MessageHelper.sendMessageToEventChannel(event, "You don't have the Antiquities strategy card.");
             return;
         }
-        event.editButton(event.getButton().asDisabled()).queue();
+        event.editButton(event.getButton().asDisabled()).queue(Consumers.nop(), BotLogger::catchRestError);
         RelicHelper.drawRelicAndNotify(player, event, game);
         EventHelper.revealEvent(event, game, game.getMainGameChannel());
     }

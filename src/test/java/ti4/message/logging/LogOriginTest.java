@@ -44,8 +44,7 @@ class LogOriginTest {
             LogOrigin origin = new LogOrigin(event, game);
             String log = new TestEventLog(origin).getLogString();
 
-            String expected =
-                    """
+            String expected = """
                 **__`timestamp`__** Tester used command `/ping`
 
                 Game info: TestGame [tt] [act]

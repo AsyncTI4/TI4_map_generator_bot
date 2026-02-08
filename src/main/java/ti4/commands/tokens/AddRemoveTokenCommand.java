@@ -82,4 +82,9 @@ abstract class AddRemoveTokenCommand extends GameStateCommand {
     }
 
     abstract void doAction(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

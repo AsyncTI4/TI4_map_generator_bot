@@ -1,11 +1,13 @@
 package ti4.draft;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -108,6 +110,36 @@ public abstract class BagDraft {
         for (Player p : owner.getRealPlayers()) {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
                 setPlayerReadyToPass(p, true);
+                MessageHelper.sendMessageToChannel(
+                        findExistingBagChannel(p),
+                        "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+                MessageHelper.sendMessageToChannel(
+                        p.getCardsInfoThread(),
+                        "You are passing the following cards to your right:\n"
+                                + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
+                FrankenDraftBagService.displayPlayerHand(owner, p);
+            } else {
+                if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
+                    List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
+                    p.getDraftHand().Contents.addAll(draftableItems);
+                    findExistingBagChannel(p).getHistory().retrievePast(100).queue(m -> {
+                        if (!m.isEmpty()) {
+                            findExistingBagChannel(p)
+                                    .deleteMessages(m)
+                                    .queue(Consumers.nop(), BotLogger::catchRestError);
+                        }
+                    });
+                    p.getCurrentDraftBag().Contents.removeAll(draftableItems);
+                    setPlayerReadyToPass(p, true);
+                    MessageHelper.sendMessageToChannel(
+                            findExistingBagChannel(p),
+                            "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+                    MessageHelper.sendMessageToChannel(
+                            p.getCardsInfoThread(),
+                            "You are passing the following cards to your right:\n"
+                                    + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
+                    FrankenDraftBagService.displayPlayerHand(owner, p);
+                }
             }
         }
         return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
@@ -115,6 +147,13 @@ public abstract class BagDraft {
 
     public boolean playerHasDraftableItemInBag(Player player) {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
+    }
+
+    public List<DraftItem> draftableItemsInBag(Player player) {
+        ArrayList<DraftItem> draftableItems = new ArrayList<>(player.getCurrentDraftBag().Contents.stream()
+                .filter(draftItem -> draftItem.isDraftable(player))
+                .toList());
+        return draftableItems;
     }
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
@@ -133,7 +172,7 @@ public abstract class BagDraft {
                     sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
                 }
             } else {
-                if (this.getItemLimitForCategory(cat) > 0) {
+                if (getItemLimitForCategory(cat) > 0) {
                     sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
                 }
             }
@@ -297,6 +336,7 @@ public abstract class BagDraft {
             sb.append("> ");
             if (player.isReadyToPassBag()) {
                 sb.append("✅");
+
             } else {
                 sb.append("❌");
             }
@@ -310,6 +350,11 @@ public abstract class BagDraft {
                     .append("/")
                     .append(owner.getFrankenBagSize())
                     .append(")");
+            if (player.isReadyToPassBag()) {
+                sb.append(" (passing a bag of size ")
+                        .append(player.getCurrentDraftBag().Contents.size())
+                        .append(")");
+            }
             sb.append("\n");
         }
         return sb.toString();

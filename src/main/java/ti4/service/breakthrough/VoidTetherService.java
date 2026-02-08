@@ -21,6 +21,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.regex.RegexService;
 
 @UtilityClass
@@ -61,33 +62,57 @@ public class VoidTetherService {
     }
 
     public void postInitialButtons(Game game, Player player, Tile activeSystem) {
-        List<Button> buttons = VoidTetherService.getInitialVoidTetherButtons(game, player, activeSystem.getPosition());
+        List<Button> buttons = getInitialVoidTetherButtons(game, player, activeSystem.getPosition());
         String message = player.getRepresentationNoPing()
-                + " you can use these buttons to place or move a Void Tether token using your breakthrough:";
+                + ", please use these buttons to place or move a Void Tether token using your breakthrough.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
-    public List<Button> getInitialVoidTetherButtons(Game game, Player player, String pos) {
-        List<Button> buttons = new ArrayList<>();
-
-        // Find existing void tethers
-        String prefixRemove = player.finChecker() + "moveVoidTether_" + pos;
-        for (BorderAnomalyHolder border : game.getBorderAnomalies()) {
-            if (border == null) continue;
-            if (border.getType() == BorderAnomalyType.VOID_TETHER) {
-                String dir = "(" + directionStr(border.getDirection()) + ")";
-                String id = prefixRemove + "_" + border.getTile() + "_" + border.getDirection();
-                buttons.add(Buttons.red(id, "Remove from " + border.getTile() + " " + dir));
+    private List<BorderAnomalyHolder> getTethersOnMap(Game game) {
+        List<BorderAnomalyHolder> tethers = new ArrayList<>();
+        for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
+            if (b != null && b.getType() == BorderAnomalyType.VOID_TETHER) {
+                tethers.add(b);
             }
         }
+        return tethers;
+    }
 
+    public List<Button> getRemoveVoidTetherButtons(Game game, Player player, String pos) {
+        List<Button> buttons = new ArrayList<>();
+        String prefixRemove = player.finChecker() + "moveVoidTether_" + pos;
+        if (pos == null) {
+            prefixRemove = player.finChecker() + "removeVoidTether";
+        }
+        for (BorderAnomalyHolder border : getTethersOnMap(game)) {
+            String dir = "(" + directionStr(border.getDirection()) + ")";
+            String id = prefixRemove + "_" + border.getTile() + "_" + border.getDirection();
+            buttons.add(Buttons.red(id, "Remove From " + border.getTile() + " " + dir));
+        }
+        return buttons;
+    }
+
+    public List<Button> getInitialVoidTetherButtons(Game game, Player player, String pos) {
+        List<Button> buttons = getRemoveVoidTetherButtons(game, player, pos);
         // If there are Tethers left in reinforcements...
         if (buttons.size() < 2) {
             String prefixNew = player.finChecker() + "newVoidTether_" + pos;
-            buttons.add(Buttons.green(prefixNew, "Use new token"));
+            buttons.add(Buttons.green(prefixNew, "Use New Token"));
         }
-        buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
         return buttons;
+    }
+
+    public void fixVoidTether(Game game, Player empyrean) {
+        if (!empyrean.hasUnlockedBreakthrough("empyreanbt")) return;
+        String finChecker = empyrean.finChecker();
+
+        List<Button> buttons = new ArrayList<>(getRemoveVoidTetherButtons(game, empyrean, null));
+        buttons.add(Buttons.blue(finChecker + "addVoidTetherStep1", "Add Void Tether", FactionEmojis.Empyrean));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS);
+
+        String message = "Use the buttons to interact with your Void Tether tokens.";
+        MessageHelper.sendMessageToChannelWithButtons(empyrean.getCorrectChannel(), message, buttons);
     }
 
     private List<Button> getPlaceVoidTetherButtons(Game game, Player player, String pos) {
@@ -102,23 +127,20 @@ public class VoidTetherService {
             int dirFrom = (dir + 3) % 6;
             String position_ = directlyAdjacentTiles.get(dir);
             boolean alreadyHas = false;
-            for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
+            for (BorderAnomalyHolder b : getTethersOnMap(game)) {
                 if (b == null || b.getTile() == null) continue;
-                if (b.getTile().equals(pos) && b.getDirection() == dir && b.getType() == BorderAnomalyType.VOID_TETHER)
-                    alreadyHas = true;
-                if (b.getTile().equals(position_)
-                        && b.getDirection() == dirFrom
-                        && b.getType() == BorderAnomalyType.VOID_TETHER) alreadyHas = true;
+                if (b.getTile().equals(pos) && b.getDirection() == dir) alreadyHas = true;
+                if (b.getTile().equals(position_) && b.getDirection() == dirFrom) alreadyHas = true;
             }
             if (alreadyHas) continue;
 
             String override = game.getAdjacentTileOverride(pos, dir);
             if (override != null) position_ = override;
-            if (position_.equals("x")) continue;
+            if ("x".equals(position_)) continue;
             if (game.getTileByPosition(position_) == null) continue;
             String tileBlocked = game.getTileByPosition(position_).getRepresentationForButtons(game, player);
             // there is a tile that exists in that direction
-            buttons.add(Buttons.blue(prefix + dir, directionStr(dir) + ", blocking " + tileBlocked));
+            buttons.add(Buttons.blue(prefix + dir, directionStr(dir) + ", Blocking " + tileBlocked));
         }
         return buttons;
     }
@@ -146,8 +168,9 @@ public class VoidTetherService {
             List<Button> buttons = getPlaceVoidTetherButtons(game, player, position);
             String message = "Removed Void Tether token from between "
                     + getVoidTetherBetweenText(game, player, removePos, removeDir) + ".";
-            message += "\nUse buttons to decide where to put your new token, relative to the active system (" + position
-                    + "):";
+            message +=
+                    "\nPlease use these buttons to choose where to put your new token, relative to the active system ("
+                            + position + ").";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
         });
@@ -159,8 +182,9 @@ public class VoidTetherService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String position = matcher.group("pos");
             List<Button> buttons = getPlaceVoidTetherButtons(game, player, position);
-            String message = "Use buttons to decide where to put your new token, relative to the active system ("
-                    + position + "):";
+            String message =
+                    "Please use these buttons to choose where to put your new token, relative to the active system ("
+                            + position + ").";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
         });
@@ -168,8 +192,8 @@ public class VoidTetherService {
 
     @ButtonHandler("placeVoidTether_")
     private void placeVoidTether(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        final String regex = "placeVoidTether_" + RegexHelper.posRegex("pos") + "_" + RegexHelper.intRegex("dir");
-        final Pattern pattern = Pattern.compile(regex);
+        String regex = "placeVoidTether_" + RegexHelper.posRegex("pos") + "_" + RegexHelper.intRegex("dir");
+        Pattern pattern = Pattern.compile(regex);
         RegexService.runMatcher(pattern, buttonID, matcher -> {
             String position = matcher.group("pos");
             int direction = Integer.parseInt(matcher.group("dir"));
@@ -180,6 +204,65 @@ public class VoidTetherService {
                     tetherRep(),
                     getVoidTetherBetweenText(game, player, position, direction));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    // Commands for manual interaction
+
+    @ButtonHandler("removeVoidTether_")
+    private void removeVoidTether(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex =
+                "removeVoidTether_" + RegexHelper.posRegex(game, "removepos") + "_" + RegexHelper.intRegex("removedir");
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String removePos = matcher.group("removepos");
+            int removeDir = Integer.parseInt(matcher.group("removedir"));
+            game.removeBorderAnomaly(removePos, removeDir);
+            String message = "Removed Void Tether token from between "
+                    + getVoidTetherBetweenText(game, player, removePos, removeDir) + ".";
+
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    @ButtonHandler("addVoidTetherStep1")
+    private void addVoidTether(ButtonInteractionEvent event, Game game, Player player) {
+        String prefix = "addVoidTetherStep2";
+        List<Button> buttons = ButtonHelper.getTilesWithShipsForAction(player, game, prefix, false);
+        String message = "Please choose a system with your ships that you want to place a Void Tether token near.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("addVoidTetherStep2_")
+    private void addVoidTether(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "addVoidTetherStep2_" + RegexHelper.posRegex(game, "pos");
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String position = matcher.group("pos");
+            List<Button> buttons = new ArrayList<>();
+            for (String pos : FoWHelper.getAdjacentTiles(game, position, player, false, true)) {
+                Tile tile = game.getTileByPosition(pos);
+                if (tile == null) continue;
+                String id = "addVoidTetherStep3_" + pos;
+                String label = tile.getRepresentationForButtons(game, player);
+                buttons.add(Buttons.blue(id, label, FactionEmojis.Empyrean));
+            }
+            String message = "Please use these buttons to decide where to put your Void Tether token.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+            ButtonHelper.deleteMessage(event);
+        });
+    }
+
+    @ButtonHandler("addVoidTetherStep3_")
+    private void addVoidTetherPos(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "addVoidTetherStep3_" + RegexHelper.posRegex(game, "pos");
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String position = matcher.group("pos");
+            Tile tile = game.getTileByPosition(position);
+            if (tile != null) {
+                postInitialButtons(game, player, tile);
+            }
             ButtonHelper.deleteMessage(event);
         });
     }

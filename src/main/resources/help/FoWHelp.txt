@@ -1,0 +1,18 @@
+## Fog of War (FoW)
+
+For those who thrive on uncertainty and discovery.
+Fog of War introduces a sense of realism — you see only what’s around you. Beyond that lies the unknown.
+
+__**Features:**__
+> • Only systems adjacent to those you control are visible.
+> • Opponents’ play areas and factions are concealed — you won’t know:
+>    – who they are
+>    – which technologies they’ve mastered
+>    – what strategy cards they hold
+>    – or even who truly leads the score
+
+And that’s only the beginning.
+FoW is renowned for strange, unpredictable modes — the kind that twist your mind and rewrite the rules you thought you knew.
+
+If curiosity gets the better of you, Async FoW Server is discoverable by writing
+`to go where no stroter has gone before...`

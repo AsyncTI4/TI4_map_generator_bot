@@ -21,6 +21,7 @@ import ti4.map.persistence.ManagedGame;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.service.async.BanCleanupService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
@@ -46,6 +47,9 @@ public class UserLeaveServerListener extends ListenerAdapter {
                                     if (log.getTargetIdLong() == event.getUser().getIdLong()) {
                                         if (log.getType() == ActionType.BAN || log.getType() == ActionType.KICK) {
                                             voluntary = false;
+                                            if (log.getType() == ActionType.BAN) {
+                                                BanCleanupService.cleanupBotQuestionChannels(event.getUser());
+                                            }
                                             break;
                                         }
                                     }
@@ -215,15 +219,16 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 }
                 MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
             } else {
-                for (Game game : games) {
-                    gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
-                }
-                String gss = gs.toString();
-                MessageHelper.sendMessageToChannel(
-                        moderationLogChannel,
-                        player.getName()
-                                + " left some games, but the games were ruled to be duds. Games were as follows: "
-                                + gss);
+                // No longer necessary to report dud games
+                // for (Game game : games) {
+                //     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
+                // }
+                // String gss = gs.toString();
+                // MessageHelper.sendMessageToChannel(
+                //         moderationLogChannel,
+                //         player.getName()
+                //                 + " left some games, but the games were ruled to be duds. Games were as follows: "
+                //                 + gss);
             }
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(

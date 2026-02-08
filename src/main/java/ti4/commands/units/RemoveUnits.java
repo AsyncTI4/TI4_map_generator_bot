@@ -62,4 +62,9 @@ public class RemoveUnits extends GameStateCommand {
 
         UnitCommandHelper.handleGenerateMapOption(event, game);
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

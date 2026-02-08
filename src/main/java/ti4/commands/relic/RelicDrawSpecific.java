@@ -17,7 +17,7 @@ import ti4.model.RelicModel;
 
 class RelicDrawSpecific extends GameStateSubcommand {
 
-    public RelicDrawSpecific() {
+    RelicDrawSpecific() {
         super(Constants.RELIC_DRAW_SPECIFIC, "Draw a specific relic", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust")
                 .setAutoComplete(true)
@@ -41,13 +41,20 @@ class RelicDrawSpecific extends GameStateSubcommand {
         Player player = getPlayer();
         player.addRelic(relicID);
         RelicModel relicModel = Mapper.getRelic(relicID);
-        String message = player.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
+        String message = player.getFactionEmoji() + " drew _" + relicModel.getName() + "_ from the relic deck";
         if (forced) {
-            message += " (FORCE DRAW: This relic was not in the deck but was forcefully drawn from the ether)";
+            message +=
+                    " (this was a __forced__ draw; this relic might not have been the deck, but was forcefully summoned from the ether)";
         }
+        message += ".";
         MessageHelper.sendMessageToChannelWithEmbed(
                 event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
         RelicHelper.resolveRelicEffects(event, game, player, relicID);
         TeHelperUnits.serveIconoclastDeployAbility(game, player);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

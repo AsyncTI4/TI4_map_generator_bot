@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public abstract class UnitHolder {
     private final String name;
     private final Point holderCenterPosition;
 
-    private final Map<UnitKey, List<Integer>> unitsByState = new HashMap<>();
+    private final Map<UnitKey, List<Integer>> unitsByState = new LinkedHashMap<>();
     private final Set<String> ccList = new LinkedHashSet<>();
     private final Set<String> controlList = new LinkedHashSet<>();
     protected final Set<String> tokenList = new LinkedHashSet<>();
@@ -57,11 +58,11 @@ public abstract class UnitHolder {
     public abstract String getRepresentation(Game game);
 
     public void inheritEverythingFrom(UnitHolder other) {
-        unitsByState.putAll(other.getUnitsByState());
+        unitsByState.putAll(other.unitsByState);
 
-        ccList.addAll(other.getCcList());
-        controlList.addAll(other.getControlList());
-        tokenList.addAll(other.getTokenList());
+        ccList.addAll(other.ccList);
+        controlList.addAll(other.controlList);
+        tokenList.addAll(other.tokenList);
     }
 
     public void addUnit(UnitKey unit, Integer count) {
@@ -243,7 +244,7 @@ public abstract class UnitHolder {
         return unitsByState.entrySet().stream()
                 .filter(e -> getTotalUnitCount(e.getValue()) > 0)
                 .map(Entry::getKey)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Deprecated
@@ -416,7 +417,9 @@ public abstract class UnitHolder {
 
     @JsonIgnore
     public int getTotalGalvanizedCount() {
-        return unitsByState.values().stream().collect(Collectors.summingInt(UnitHolder::getGalvanizedUnitStateCount));
+        return unitsByState.values().stream()
+                .mapToInt(UnitHolder::getGalvanizedUnitStateCount)
+                .sum();
     }
 
     public int getGalvanizedUnitCount(UnitKey unitKey) {
@@ -432,7 +435,8 @@ public abstract class UnitHolder {
     public int getGalvanizedUnitCount(String colorID) {
         return unitsByState.entrySet().stream()
                 .filter(e -> e.getKey().getColorID().equals(colorID))
-                .collect(Collectors.summingInt(e -> getGalvanizedUnitStateCount(e.getValue())));
+                .mapToInt(e -> getGalvanizedUnitStateCount(e.getValue()))
+                .sum();
     }
 
     @JsonIgnore

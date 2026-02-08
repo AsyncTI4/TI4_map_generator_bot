@@ -59,7 +59,7 @@ public class AddUnits extends GameStateCommand {
                 new OptionData(
                         OptionType.BOOLEAN,
                         Constants.COEXIST,
-                        "Coexist with existing units. Default false. True will skip combat."),
+                        "\"True\" to coexist; \"False\" (default) to not, and to start a combat etc. if another player is present"),
                 new OptionData(
                         OptionType.BOOLEAN,
                         Constants.NO_MAPGEN,
@@ -117,5 +117,10 @@ public class AddUnits extends GameStateCommand {
             return;
         }
         getPlayer().exhaustTech("sr");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

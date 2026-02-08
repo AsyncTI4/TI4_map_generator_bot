@@ -8,7 +8,7 @@ import ti4.service.franken.FrankenFactionTechService;
 
 class FactionTechRemove extends FactionTechAddRemove {
 
-    public FactionTechRemove() {
+    FactionTechRemove() {
         super(Constants.FACTION_TECH_REMOVE, "Remove a faction technology from your faction");
     }
 

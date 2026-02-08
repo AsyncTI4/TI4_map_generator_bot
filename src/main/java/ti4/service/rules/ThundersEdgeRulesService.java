@@ -20,7 +20,7 @@ import ti4.model.RuleModel;
 public class ThundersEdgeRulesService {
 
     private static List<MessageEmbed> getRuleEmbeds(String... rules) {
-        return Arrays.asList(rules).stream()
+        return Arrays.stream(rules)
                 .map(Mapper::getRule)
                 .filter(Objects::nonNull)
                 .map(RuleModel::getRepresentationEmbed)
@@ -29,8 +29,8 @@ public class ThundersEdgeRulesService {
     }
 
     public static List<MessageEmbed> startOfDraftRules(Game game) {
-        List<MessageEmbed> relevantRules = new ArrayList<>();
-        relevantRules.addAll(getRuleEmbeds("expeditions", "breakthroughAndSynergy", "coexist"));
+        List<MessageEmbed> relevantRules =
+                new ArrayList<>(getRuleEmbeds("expeditions", "breakthroughAndSynergy", "coexist"));
 
         Set<String> extraRules = new HashSet<>();
         for (var slice : game.getMiltyDraftManager().getSlices()) {
@@ -54,7 +54,7 @@ public class ThundersEdgeRulesService {
     public static void alertTabletalkWithRulesAtStartOfDraft(Game game) {
         String msg = "Hello " + game.getPing() + "!\n";
         msg +=
-                "It looks like you are playing with Thunder's Edge. Since it's brand new, you might like some of the rules posted here for your convenience:";
+                "It looks like you are playing with Thunder's Edge. Since it's new, you might like some of the rules posted here for your convenience:";
         if (game.getTableTalkChannel() != null) {
             List<MessageEmbed> embeds = startOfDraftRules(game);
             MessageHelper.sendMessageToChannelWithEmbeds(game.getTableTalkChannel(), msg, embeds);

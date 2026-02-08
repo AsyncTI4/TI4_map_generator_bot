@@ -38,7 +38,7 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
     public MiltySliceDraftableSettings(Game game, JsonNode json, SettingsMenu parent) {
-        super(MENU_ID, "Slice value settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
+        super(MENU_ID, "Draft settings", "Advanced settings to fine-tune how rich the galaxy will be", parent);
 
         // Initialize Settings to default values
         minimumRes = new IntegerSetting("MinRes", "Min Optimal Res", 2, 0, 4, 1);
@@ -56,9 +56,9 @@ public class MiltySliceDraftableSettings extends SettingsMenu {
 
         // Other Initialization
         minimumRes.setExtraInfo(
-                "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
+                "(this value does not account for flexibly spent planets - you may be used to those appearing as +0.5)");
         minimumInf.setExtraInfo(
-                "(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
+                "(this value does not account for flexibly spent planets - you may be used to those appearing as +0.5)");
 
         // Verify this is the correct JSON node and continue initialization
         if (json != null

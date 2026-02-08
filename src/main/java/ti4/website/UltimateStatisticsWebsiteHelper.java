@@ -1,9 +1,11 @@
 package ti4.website;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.message.MessageHelper;
@@ -13,21 +15,22 @@ import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglUsernameChangeRequest;
 
 @Slf4j
+@UtilityClass
 public class UltimateStatisticsWebsiteHelper {
 
     private static final String TI4_ULTIMATE_STATISTICS_API_KEY = System.getenv("TI4_ULTIMATE_STATISTICS_API_KEY");
     private static final String PLAYER_SETTINGS_URL = "https://api.ti4ultimate.com/api/Async/player-settings";
     private static final String TIGL_REPORT_GAMES_URL = "https://api.ti4ultimate.com/api/Tigl/report-game";
     private static final String TIGL_CHANGE_USERNAME_URL = "https://api.ti4ultimate.com/api/Tigl/change-username";
-    private static final String TIGL_REPORT_GAMES_SUCCESS_MESSAGE =
-            "TIGL game test upload successful. Please log game as normal using the form.";
+    private static final String TIGL_REPORT_GAMES_SUCCESS_MESSAGE = "TIGL game upload successful.";
     private static final String TIGL_REPORT_GAMES_FAILURE_MESSAGE =
-            "Failed to report TIGL game. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game";
+            "Failed to report TIGL game. Please ping BLT or Lazik to check how to proceed.";
     private static final String TIGL_CHANGE_USERNAME_SUCCESS_MESSAGE = "TIGL nickname successfully updated.";
     private static final String TIGL_CHANGE_USERNAME_FAILURE_MESSAGE = "Failed to change TIGL nickname.";
     private static final String PLAYER_SETTINGS_SUCCESS_MESSAGE =
             "Successfully logged your decision. Feel free to check out stats at <https://www.ti4ultimate.com/community/async/>.";
     private static final String PLAYER_SETTINGS_FAILURE_MESSAGE = "Failed to change TI4 Ultimate settings.";
+    private static final String LAZIK_DISCORD_NOTIFICATION = "<@206450549371961346>";
 
     public static void sendTiglGameReport(TiglGameReport request, MessageChannel channel) {
         sendJson(
@@ -86,19 +89,37 @@ public class UltimateStatisticsWebsiteHelper {
                         return null;
                     });
         } catch (IOException e) {
-            BotLogger.error("An IOException occurred while sending a request to TI4 Ultimate Stats: " + url, e);
+            BotLogger.error(
+                    LAZIK_DISCORD_NOTIFICATION + " An IOException occurred while sending a request to TI4 "
+                            + "Ultimate Stats: " + url,
+                    e);
             MessageHelper.sendMessageToChannel(channel, failureMessage);
         }
     }
 
     private static void logHttpError(String url, String json, Throwable e) {
-        BotLogger.error(String.format("An exception occurred during HTTP call to %s: %s", url, json), e);
+        BotLogger.error(
+                String.format(
+                        "%s An exception occurred during HTTP call to %s: %s", LAZIK_DISCORD_NOTIFICATION, url, json),
+                e);
     }
 
     private static void handleErrorResponse(
             HttpResponse<String> response, MessageChannel channel, String failureMessage) {
         String body = response.body();
-        BotLogger.error(failureMessage + "\n```" + body + "```");
+        BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
+        try {
+            JsonNode node = EgressClientManager.getObjectMapper().readTree(body);
+            String title = node.path("problemDetails").path("title").asText();
+            String detail = node.path("problemDetails").path("detail").asText();
+            if (!title.isEmpty() || !detail.isEmpty()) {
+                String details = detail.isEmpty() ? title : title + " - " + detail;
+                MessageHelper.sendMessageToChannel(channel, String.format("%s (%s)", failureMessage, details));
+                return;
+            }
+        } catch (IOException e) {
+            BotLogger.error("Failed to parse TI4 Ultimate error response", e);
+        }
         MessageHelper.sendMessageToChannel(channel, failureMessage);
     }
 }

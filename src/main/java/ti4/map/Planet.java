@@ -40,6 +40,7 @@ public class Planet extends UnitHolder {
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
     private String contrastColor;
+    private float radius;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -71,6 +72,7 @@ public class Planet extends UnitHolder {
                         .toList());
             }
             if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
+            radius = planetInfo.getRadius();
         }
         resetOriginalPlanetResInf();
     }
@@ -108,13 +110,25 @@ public class Planet extends UnitHolder {
     }
 
     public void updateTriadStats(Player player) {
-        if (getName().equals("triad")) {
+        if ("triad".equals(getName())) {
             resourcesModifier = 0;
             if (player.getHrf() > 0) resourcesModifier++;
             if (player.getIrf() > 0) resourcesModifier++;
             if (player.getCrf() > 0) resourcesModifier++;
             if (player.getUrf() > 0) resourcesModifier++;
             influenceModifier = resourcesModifier;
+        }
+    }
+
+    public void updateGroveStats(Player player) {
+        if ("grove".equals(getName())) {
+
+            influenceModifier =
+                    player.getGame().getPlanetsPlayerIsCoexistingOn(player).size();
+            resourcesModifier = 0;
+            if (influenceModifier == 0) {
+                resourcesModifier = -2;
+            }
         }
     }
 
@@ -146,6 +160,14 @@ public class Planet extends UnitHolder {
                 .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
                 .filter(Objects::nonNull)
                 .anyMatch(UnitModel::getIsGroundForce);
+    }
+
+    public boolean hasStructures(Player player) {
+        return getUnits().keySet().stream()
+                .filter(player::unitBelongsToPlayer)
+                .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
+                .filter(Objects::nonNull)
+                .anyMatch(UnitModel::getIsStructure);
     }
 
     public boolean hasGroundForces(Game game) {
@@ -234,6 +256,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public int getHigherofInfluenceOrResource() {
+        return Math.max(getInfluence(), getResources());
+    }
+
+    @JsonIgnore
     public int getMaxResInf() {
         return Math.max(getResources(), getInfluence());
     }
@@ -295,6 +322,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public boolean isFake() {
+        return getPlanetModel().isFake();
+    }
+
+    @JsonIgnore
     public Set<String> getPlanetTypes() {
         Set<String> types = new HashSet<>();
         List<String> three = List.of("hazardous", "cultural", "industrial");
@@ -317,9 +349,8 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public List<String> getTechSpecialities() {
-        List<String> specialties = new ArrayList<>();
 
-        specialties.addAll(techSpeciality);
+        List<String> specialties = new ArrayList<>(techSpeciality);
         specialties.removeAll(Collections.singleton(null));
         specialties.removeAll(Collections.singleton(""));
         if (isNotBlank(originalTechSpeciality) && specialties.isEmpty()) {
@@ -378,5 +409,9 @@ public class Planet extends UnitHolder {
 
     public String getContrastColor() {
         return contrastColor;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }

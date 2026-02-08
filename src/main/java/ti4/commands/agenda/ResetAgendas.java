@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 class ResetAgendas extends GameStateSubcommand {
 
-    public ResetAgendas() {
+    ResetAgendas() {
         super(Constants.RESET_AGENDAS, "Reset agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
                 .setRequired(true));
@@ -21,7 +21,11 @@ class ResetAgendas extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping confirmOption = event.getOption(Constants.CONFIRM);
         if (confirmOption == null || !"YES".equals(confirmOption.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(confirmOption.getAsString()) ? " - this is case sensitive" : "")
+                            + ".");
             return;
         }
 
@@ -30,5 +34,10 @@ class ResetAgendas extends GameStateSubcommand {
         MessageHelper.replyToMessage(
                 event,
                 "Agenda deck reset to deck: `" + game.getAgendaDeckID() + "`. Discards removed. All shuffled as new");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

@@ -47,12 +47,12 @@ public class DraftButtonService {
             return;
         }
         if (outcome.equals(DELETE_BUTTON)) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else if (outcome.equals(DELETE_MESSAGE)) {
             ButtonHelper.deleteMessage(event);
         } else if (outcome.startsWith(USER_MISTAKE_PREFIX)) {
             String userMessage = outcome.substring(USER_MISTAKE_PREFIX.length());
-            if (userMessage == null || userMessage.isEmpty()) {
+            if (userMessage.isEmpty()) {
                 userMessage = "You can't use this button.";
             }
             if (event instanceof ButtonInteractionEvent bevent) {
@@ -62,7 +62,7 @@ public class DraftButtonService {
                         .queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
                 userMessage = event.getUser().getAsMention() + ": " + userMessage;
-                event.getMessageChannel().sendMessage(userMessage).queue();
+                event.getMessageChannel().sendMessage(userMessage).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else {
             // Another message, likely an error.

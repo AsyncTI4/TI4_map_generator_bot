@@ -7,7 +7,7 @@ import ti4.service.tech.PlayerTechService;
 
 class TechExhaust extends TechAddRemove {
 
-    public TechExhaust() {
+    TechExhaust() {
         super(Constants.TECH_EXHAUST, "Exhaust a technology");
     }
 

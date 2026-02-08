@@ -16,6 +16,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.transaction.SendDebtService;
 
 class SendPN extends GameStateSubcommand {
 
@@ -111,6 +113,15 @@ class SendPN extends GameStateSubcommand {
                 && !targetPlayer.equals(pnOwner)
                 && !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
             targetPlayer.addPromissoryNoteToPlayArea(id);
+            if (pnOwner.hasUnlockedBreakthrough("vadenbt")) {
+                SendDebtService.sendDebt(targetPlayer, pnOwner, 1);
+                CommanderUnlockCheckService.checkPlayer(pnOwner, "vaden");
+                MessageHelper.sendMessageToChannel(
+                        targetPlayer.getCorrectChannel(),
+                        targetPlayer.getRepresentationUnfogged() + " you sent 1 debt token to "
+                                + pnOwner.getFactionEmojiOrColor()
+                                + ", for their \"Shark Loans\" pool, due to _Arms Brokerage_.");
+            }
         }
 
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, targetPlayer, false);
@@ -121,12 +132,10 @@ class SendPN extends GameStateSubcommand {
         String message = player.getRepresentation() + " sent " + CardEmojis.PN + conditionalPNName + preposition
                 + targetPlayer.getRepresentation() + ".";
         if (game.isFowMode()) {
-            String fail = "User for faction not found. Report to ADMIN.";
-            String success = message + "\nThe other player has been notified.";
-            MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event, message, fail, success);
-            MessageHelper.sendMessageToEventChannel(event, "Promissory note sent.");
+            MessageHelper.sendMessageToChannel(targetPlayer.getPrivateChannel(), message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Promissory note sent.");
         } else {
-            MessageHelper.sendMessageToEventChannel(event, message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
 
         // FoW specific pinging

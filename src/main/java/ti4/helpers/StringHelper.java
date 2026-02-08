@@ -49,7 +49,9 @@ public final class StringHelper {
         return Integer.toString(i);
     }
 
-    private static Map<String, String> escapables() {
+    private static final Map<String, String> ESCAPABLES = createEscapables();
+
+    private static Map<String, String> createEscapables() {
         Map<String, String> escape = new LinkedHashMap<>();
         // Do not simply change these values.
         // If you need to change any value, add a line in escape to handle the old value
@@ -62,7 +64,7 @@ public final class StringHelper {
         escape.put(",", "{cma}");
         escape.put("\n", "{nl}");
         escape.put(" ", "{sp}");
-        return escape;
+        return Collections.unmodifiableMap(escape);
     }
 
     // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by
@@ -70,7 +72,7 @@ public final class StringHelper {
     public static String escape(String input) {
         if (input == null) return null;
         String output = input;
-        for (Entry<String, String> entry : escapables().entrySet())
+        for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getKey(), entry.getValue());
         return output.replace("\r", "");
     }
@@ -78,7 +80,7 @@ public final class StringHelper {
     public static String unescape(String input) {
         if (input == null) return null;
         String output = input;
-        for (Entry<String, String> entry : escapables().entrySet())
+        for (Entry<String, String> entry : ESCAPABLES.entrySet())
             output = output.replace(entry.getValue(), entry.getKey());
         output = output.replace("666fin", ":");
         output = output.replace("667fin", ",");
@@ -117,11 +119,8 @@ public final class StringHelper {
             } else {
                 sb.append(separator);
             }
-            line = line.replace(
-                    String.valueOf(ESCAPE_CHARACTER),
-                    String.valueOf(ESCAPE_CHARACTER) + String.valueOf(ESCAPE_CHARACTER));
-            line = line.replace(
-                    String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + String.valueOf(separator));
+            line = line.replace(String.valueOf(ESCAPE_CHARACTER), String.valueOf(ESCAPE_CHARACTER) + ESCAPE_CHARACTER);
+            line = line.replace(String.valueOf(separator), String.valueOf(ESCAPE_CHARACTER) + separator);
             sb.append(line);
         }
         return sb.toString();
@@ -154,7 +153,7 @@ public final class StringHelper {
             }
         }
         // Add the last line if there's any content
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString());
         }
 
@@ -169,7 +168,7 @@ public final class StringHelper {
         return replaceWithEmojis(initial, false);
     }
 
-    private static Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
+    private static final Pattern emojiToReplace = Pattern.compile("<(?<cat>\\w+):(?<name>\\w+)>");
 
     private static String replaceWithEmojis(String initial, boolean replaceWithBlank) {
         StringBuilder output = new StringBuilder();
@@ -181,7 +180,7 @@ public final class StringHelper {
                 output.append(initial.substring(index));
                 break;
             }
-            output.append(initial.substring(index, pos));
+            output.append(initial, index, pos);
 
             int end = initial.indexOf('>', pos);
             if (end == -1) {
@@ -230,19 +229,19 @@ public final class StringHelper {
                 }
                 if (currentMessage.length() + chunk.length() + sep.length() > maxLength) {
                     // This chunk would make the message too big, so start a new message
-                    if (currentMessage.length() > 0) {
+                    if (!currentMessage.isEmpty()) {
                         messages.add(currentMessage.toString());
                     }
                     currentMessage = new StringBuilder(chunk);
                 } else {
                     // This chunk fits in the current message
-                    if (currentMessage.length() > 0) {
+                    if (!currentMessage.isEmpty()) {
                         currentMessage.append(sep);
                     }
                     currentMessage.append(chunk);
                 }
             }
-            if (currentMessage.length() > 0) {
+            if (!currentMessage.isEmpty()) {
                 messages.add(currentMessage.toString());
             }
             if (!messages.isEmpty()) {

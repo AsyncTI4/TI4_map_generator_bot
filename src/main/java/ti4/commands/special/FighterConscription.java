@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 
 class FighterConscription extends GameStateSubcommand {
 
-    public FighterConscription() {
+    FighterConscription() {
         super(Constants.FIGHTER_CONSCRIPTION, "Fighter Conscription +1 fighter in each space area", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
@@ -20,5 +20,10 @@ class FighterConscription extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         ActionCardHelper.doFfCon(event, getPlayer(), getGame());
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

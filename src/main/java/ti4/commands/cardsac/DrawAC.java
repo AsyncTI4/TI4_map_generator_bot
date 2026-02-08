@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 
 class DrawAC extends GameStateSubcommand {
 
-    public DrawAC() {
+    DrawAC() {
         super(Constants.DRAW_AC, "Draw Action Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1, max 10"));
         addOptions(
@@ -23,5 +23,10 @@ class DrawAC extends GameStateSubcommand {
         count = Math.max(count, 1);
         count = Math.min(count, 10);
         ActionCardHelper.drawActionCards(getGame(), getPlayer(), count, false);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

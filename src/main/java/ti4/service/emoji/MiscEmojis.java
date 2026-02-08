@@ -22,7 +22,10 @@ public enum MiscEmojis implements TI4Emoji {
     CreussGamma, //
     LegendaryPlanet,
     SpeakerToken,
+    BenedictionToken,
+    Gavel,
     DoubleBoom,
+    Ingress,
 
     // Res / Inf
     influence,
@@ -57,6 +60,11 @@ public enum MiscEmojis implements TI4Emoji {
     Scout,
     ScoutSpinner,
 
+    // Twilight's Fall
+    tf_ability,
+    tf_genome,
+    tf_paradigm,
+
     // Tiles
     Supernova,
     Asteroids,
@@ -80,7 +88,9 @@ public enum MiscEmojis implements TI4Emoji {
     BLT,
     Stroter,
     Wololo,
-    TaDont;
+    TaDont,
+    Zobat,
+    SharkLoan;
 
     public static TI4Emoji getCreussWormhole(@NotNull String wormhole) {
         return switch (wormhole.toLowerCase()) {

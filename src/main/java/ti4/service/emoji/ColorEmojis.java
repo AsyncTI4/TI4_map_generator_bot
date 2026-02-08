@@ -74,7 +74,14 @@ public enum ColorEmojis implements TI4Emoji {
     splityellow,
     riftset,
     nightmare,
-    dawn; //
+    dawn,
+    aberration,
+    jade,
+    azure,
+    cinnabar,
+    verdigris,
+    beige,
+    royal; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
@@ -160,6 +167,13 @@ public enum ColorEmojis implements TI4Emoji {
             case "ero", "riftset" -> riftset + "**RiftSet**";
             case "nm", "nightmare" -> nightmare + "**Nightmare**";
             case "dw", "dawn" -> dawn + "**Dawn**";
+            case "abr", "aberration" -> aberration + "**Aberration**";
+            case "jad", "jade" -> jade + "**Jade**";
+            case "azr", "azure" -> azure + "**Azure**";
+            case "cnb", "cinnabar" -> cinnabar + "**Cinnabar**";
+            case "vdg", "verdigris" -> verdigris + "**Verdigris**";
+            case "beg", "beige" -> beige + "**Beige**";
+            case "ryl", "royal" -> royal + "**Royal**";
             default -> null;
         };
     }
@@ -235,6 +249,13 @@ public enum ColorEmojis implements TI4Emoji {
             case "ero", "riftset" -> riftset;
             case "dw", "dawn" -> dawn;
             case "nm", "nightmare" -> nightmare;
+            case "abr", "aberration" -> aberration;
+            case "jad", "jade" -> jade;
+            case "azr", "azure" -> azure;
+            case "cnb", "cinnabar" -> cinnabar;
+            case "vdg", "verdigris" -> verdigris;
+            case "beg", "beige" -> beige;
+            case "ryl", "royal" -> royal;
 
             default -> TI4Emoji.getRandomGoodDog();
         };

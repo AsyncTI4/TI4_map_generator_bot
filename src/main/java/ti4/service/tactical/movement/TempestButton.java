@@ -14,7 +14,7 @@ public final class TempestButton implements MoveAbilityButton {
     }
 
     public List<Button> build(MoveContext ctx) {
-        return List.of(
-                Buttons.gray("planetAbilityExhaust_tempesta", "Exhaust Tempesta Ability", MiscEmojis.LegendaryPlanet));
+        return List.of(Buttons.gray(
+                "planetAbilityExhaust_tempesta", "Exhaust Ionian Fuel Refinery", MiscEmojis.LegendaryPlanet));
     }
 }

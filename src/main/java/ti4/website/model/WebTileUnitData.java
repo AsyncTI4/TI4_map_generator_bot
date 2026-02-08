@@ -54,6 +54,12 @@ public class WebTileUnitData {
             }
         }
 
+        // Add virtual "special" tile for off-tile planets (custodiavigilia, oceans, etc.)
+        WebTileUnitData specialTileData = extractOffTilePlanetsData(game);
+        if (specialTileData != null && !specialTileData.planets.isEmpty()) {
+            tileUnitData.put(Constants.SPECIAL, specialTileData);
+        }
+
         return tileUnitData;
     }
 
@@ -75,139 +81,37 @@ public class WebTileUnitData {
             }
         }
 
+        // Main Loop: Iterate over all UnitHolders
         for (Map.Entry<String, UnitHolder> holderEntry : tile.getUnitHolders().entrySet()) {
             String holderName = holderEntry.getKey();
             boolean isSpace = Constants.SPACE.equals(holderName);
             UnitHolder unitHolder = holderEntry.getValue();
 
-            // Extract unit data
-            if (unitHolder.hasUnits()) {
-                // Group units by faction
-                Map<String, List<WebEntityData>> factionEntities = new HashMap<>();
-
-                for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-                    Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-                    int unitCount = unitHolder.getUnitCount(unitKey);
-                    String unitId = getUnitIdFromType(unitKey.getUnitType());
-
-                    if (player == null || unitId == null || unitCount <= 0) {
-                        continue;
-                    }
-
-                    String faction = player.getFaction();
-
-                    // Get sustained damage count for this unit
-                    Integer sustainedDamage = null;
-                    if (unitHolder.getUnitDamage() != null
-                            && unitHolder.getUnitDamage().containsKey(unitKey)) {
-                        int damagedCount = unitHolder.getUnitDamage().get(unitKey);
-                        if (damagedCount > 0) {
-                            sustainedDamage = damagedCount;
-                        }
-                    }
-
-                    WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage);
-                    factionEntities
-                            .computeIfAbsent(faction, k -> new ArrayList<>())
-                            .add(entityData);
-                }
-
-                if (!factionEntities.isEmpty()) {
-                    if (isSpace) {
-                        // For space, merge all factions directly into the space map
-                        tileData.space.putAll(factionEntities);
-                    } else {
-                        // For planets, create or get existing WebTilePlanet
-                        WebTilePlanet planetData =
-                                tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
-                        for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
-                            planetData.getEntities().put(factionEntry.getKey(), factionEntry.getValue());
-                        }
-                    }
-                }
-            }
-
-            // Extract token data
-            List<String> holderTokens = new ArrayList<>(unitHolder.getTokenList());
-            // Remove null entries that might exist in token lists
-            holderTokens.removeIf(token -> token == null || token.trim().isEmpty());
-
-            if (!holderTokens.isEmpty()) {
-                // Group tokens by faction and add them to the entity data
-                Map<String, List<WebEntityData>> factionTokens = new HashMap<>();
-
-                for (String token : holderTokens) {
-                    // Check if this token is an attachment
-                    String entityType = "token"; // default to token
-                    if (ti4.image.Mapper.getAttachmentInfo(token) != null) {
-                        entityType = "attachment";
-                    }
-
-                    // For now, we'll treat all tokens as non-faction specific
-                    // If tokens become faction-specific in the future, we can update this logic
-                    WebEntityData tokenData =
-                            new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
-                    factionTokens
-                            .computeIfAbsent("neutral", k -> new ArrayList<>())
-                            .add(tokenData);
-                }
-
-                if (isSpace) {
-                    // Merge token data with existing space data
-                    for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
-                        tileData.space
-                                .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
-                                .addAll(factionEntry.getValue());
-                    }
-                } else {
-                    // Merge token data with existing planet data
+            if (isSpace) {
+                extractUnits(game, unitHolder, tileData.space);
+                extractTokens(unitHolder, tileData.space, false);
+            } else {
+                // For planets and space stations
+                if (unitHolder instanceof Planet planet) {
                     WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
 
-                    for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
-                        planetData
-                                .getEntities()
-                                .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
-                                .addAll(factionEntry.getValue());
+                    // Extract units and tokens
+                    extractUnits(game, unitHolder, planetData.getEntities());
+                    extractTokens(unitHolder, planetData.getEntities(), false);
+
+                    // Determine controller
+                    String controllingFaction;
+                    if (planet.isSpaceStation()) {
+                        controllingFaction = getSpaceStationController(game, planet);
+                    } else {
+                        controllingFaction = getPlanetController(game, planet);
                     }
+                    planetData.setControlledBy(controllingFaction);
+
+                    // Update metadata (commodities, shields)
+                    updatePlanetMetadata(game, planet, planetData);
                 }
             }
-        }
-
-        for (Planet planet : tile.getPlanetUnitHolders()) {
-            String holderName = planet.getName();
-
-            // Ensure planet data exists
-            WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
-
-            // Determine controlling player from control tokens
-            String controllingFaction = null;
-            if (!planet.getControlList().isEmpty()) {
-                // Get the first control token (there should only be one)
-                String controlToken = planet.getControlList().iterator().next();
-                Player controllingPlayer =
-                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
-                if (controllingPlayer != null) {
-                    controllingFaction = controllingPlayer.getFaction();
-                }
-            }
-
-            planetData.setControlledBy(controllingFaction);
-
-            // Set commodities count for Discordant Stars comms on planets functionality
-            String commsStorageKey = "CommsOnPlanet" + holderName;
-            if (!game.getStoredValue(commsStorageKey).isEmpty()) {
-                try {
-                    int comms = Integer.parseInt(game.getStoredValue(commsStorageKey));
-                    if (comms > 0) {
-                        planetData.setCommodities(comms);
-                    }
-                } catch (NumberFormatException e) {
-                    // Ignore invalid stored values
-                }
-            }
-
-            // Set planetary shield status
-            planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
         }
 
         // Calculate production and capacity for each player
@@ -235,6 +139,217 @@ public class WebTileUnitData {
         return tileData;
     }
 
+    /**
+     * Handles setting commodities (Discordant Stars "CommsOnPlanet"), planetary shields, and resources/influence.
+     */
+    private static void updatePlanetMetadata(Game game, Planet planet, WebTilePlanet planetData) {
+        // Set resources and influence
+        planetData.setResources(planet.getResources());
+        planetData.setInfluence(planet.getInfluence());
+
+        // Set commodities count for Discordant Stars comms on planets functionality
+        String commsStorageKey = "CommsOnPlanet" + planet.getName();
+        if (!game.getStoredValue(commsStorageKey).isEmpty()) {
+            try {
+                int comms = Integer.parseInt(game.getStoredValue(commsStorageKey));
+                if (comms > 0) {
+                    planetData.setCommodities(comms);
+                }
+            } catch (NumberFormatException e) {
+                // Ignore invalid stored values
+            }
+        }
+
+        // Set planetary shield status
+        planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+    }
+
+    /**
+     * Determines the controller based on the control token (standard planets).
+     */
+    private static String getPlanetController(Game game, Planet planet) {
+        if (planet.getControlList().isEmpty()) {
+            return null;
+        }
+        // Get the first control token (there should only be one)
+        String controlToken = planet.getControlList().iterator().next();
+        Player controllingPlayer =
+                DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
+        return controllingPlayer != null ? controllingPlayer.getFaction() : null;
+    }
+
+    /**
+     * Determines the controller based on player planet ownership (space stations).
+     */
+    private static String getSpaceStationController(Game game, Planet station) {
+        String holderName = station.getName();
+        for (Player player : game.getRealPlayers()) {
+            if (player.getPlanets().contains(holderName)) {
+                return player.getFaction();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extract units from a UnitHolder and add them to the target entities map.
+     */
+    private static void extractUnits(
+            Game game, UnitHolder unitHolder, Map<String, List<WebEntityData>> targetEntities) {
+        if (!unitHolder.hasUnits()) {
+            return;
+        }
+
+        // Group units by faction
+        Map<String, List<WebEntityData>> factionEntities = new HashMap<>();
+
+        for (UnitKey unitKey : unitHolder.getUnitKeys()) {
+            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+            int unitCount = unitHolder.getUnitCount(unitKey);
+            String unitId = getUnitIdFromType(unitKey.getUnitType());
+
+            if (player == null || unitId == null || unitCount <= 0) {
+                continue;
+            }
+
+            String faction = player.getFaction();
+
+            // Get sustained damage count for this unit
+            Integer sustainedDamage = null;
+            if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().containsKey(unitKey)) {
+                int damagedCount = unitHolder.getUnitDamage().get(unitKey);
+                if (damagedCount > 0) {
+                    sustainedDamage = damagedCount;
+                }
+            }
+
+            // Get unit state counts: [healthy, damaged, galvanized, damaged+galvanized]
+            List<Integer> unitStates = unitHolder.getUnitStates(unitKey);
+            WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage, unitStates);
+            factionEntities.computeIfAbsent(faction, k -> new ArrayList<>()).add(entityData);
+        }
+
+        if (!factionEntities.isEmpty()) {
+            // Add units to target entities
+            for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
+                targetEntities
+                        .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                        .addAll(factionEntry.getValue());
+            }
+        }
+    }
+
+    /**
+     * Extract tokens and/or attachments from a UnitHolder and add them to the target entities map.
+     *
+     * @param unitHolder The source of tokens
+     * @param targetEntities The map to add the extracted entities to
+     * @param attachmentsOnly If true, only extracts tokens that are identified as attachments
+     */
+    private static void extractTokens(
+            UnitHolder unitHolder, Map<String, List<WebEntityData>> targetEntities, boolean attachmentsOnly) {
+        List<String> holderTokens = new ArrayList<>(unitHolder.getTokenList());
+        // Remove null entries that might exist in token lists
+        holderTokens.removeIf(token -> token == null || token.trim().isEmpty());
+
+        if (holderTokens.isEmpty()) {
+            return;
+        }
+
+        // Group tokens by faction and add them to the entity data
+        Map<String, List<WebEntityData>> factionTokens = new HashMap<>();
+
+        for (String token : holderTokens) {
+            boolean isAttachment = ti4.image.Mapper.getAttachmentInfo(token) != null;
+
+            // Skip if we only want attachments and this isn't one
+            if (attachmentsOnly && !isAttachment) {
+                continue;
+            }
+
+            String entityType = isAttachment ? "attachment" : "token";
+
+            // For now, we'll treat all tokens as non-faction specific
+            WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
+            factionTokens.computeIfAbsent("neutral", k -> new ArrayList<>()).add(tokenData);
+        }
+
+        // Merge token data with existing data
+        for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
+            targetEntities
+                    .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                    .addAll(factionEntry.getValue());
+        }
+    }
+
+    /**
+     * Extract data for off-tile planets (custodiavigilia, oceans, etc.) that don't exist on any tile
+     * but are stored in game.getPlanetsInfo()
+     */
+    private static WebTileUnitData extractOffTilePlanetsData(Game game) {
+        WebTileUnitData specialTileData = new WebTileUnitData();
+
+        // List of off-tile planets that don't exist on tiles
+        List<String> offTilePlanetIds = List.of(
+                "custodiavigilia",
+                "custodiavigiliaplus",
+                "ghoti",
+                "nevermore",
+                "ocean1",
+                "ocean2",
+                "ocean3",
+                "ocean4",
+                "ocean5",
+                "triad",
+                "grove");
+
+        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+
+        for (String planetId : offTilePlanetIds) {
+            Planet planet = planetsInfo.get(planetId);
+            if (planet == null) {
+                continue;
+            }
+
+            // Create planet data entry
+            WebTilePlanet planetData = new WebTilePlanet();
+
+            // Determine controlling player by checking which players have the planet
+            String controllingFaction = null;
+            Player controllingPlayer = null;
+            for (Player player : game.getRealPlayers()) {
+                if (player.getPlanets().contains(planetId)) {
+                    controllingFaction = player.getFaction();
+                    controllingPlayer = player;
+                    break;
+                }
+            }
+            planetData.setControlledBy(controllingFaction);
+
+            // Set exhausted status based on controlling player's exhausted planets
+            boolean isExhausted = false;
+            if (controllingPlayer != null) {
+                isExhausted = controllingPlayer.getExhaustedPlanets().contains(planetId);
+            }
+            planetData.setExhausted(isExhausted);
+
+            // Extract tokens and attachments (no units, no commodities)
+            extractTokens(planet, planetData.getEntities(), false);
+
+            // Set resources and influence
+            planetData.setResources(planet.getResources());
+            planetData.setInfluence(planet.getInfluence());
+
+            // Set planetary shield status
+            planetData.setPlanetaryShield(TileGenerator.shouldPlanetHaveShield(planet, game));
+
+            // Add planet to special tile
+            specialTileData.planets.put(planetId, planetData);
+        }
+
+        return specialTileData;
+    }
+
     private static String getUnitIdFromType(UnitType unitType) {
         return switch (unitType) {
             case Infantry -> "gf";
@@ -252,6 +367,7 @@ public class WebTileUnitData {
             case PlenaryOrbital -> "plenaryorbital";
             case TyrantsLament -> "tyrantslament";
             case Lady -> "lady";
+            case Celagrom -> "celagrom";
             case Cavalry -> "cavalry";
             case StarfallPds -> "starfallpds";
             default -> null;

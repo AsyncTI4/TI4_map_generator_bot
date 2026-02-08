@@ -61,7 +61,7 @@ public class ResonanceGeneratorService {
         buttons.add(Buttons.red(player.finChecker() + "deleteButtons", "Delete these buttons"));
 
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(), "Choose a tile to place or flip a breach", buttons);
+                player.getCorrectChannel(), "Choose a tile to place or flip a breach.", buttons);
     }
 
     @ButtonHandler("flipBreach_")
@@ -85,8 +85,8 @@ public class ResonanceGeneratorService {
             newState = "inactive";
         }
 
-        String msg = player.getRepresentationNoPing() + " Flipped " + oldState + " breach to " + newState + " in tile "
-                + tile.getRepresentationForButtons(game, player);
+        String msg = player.getRepresentationNoPing() + " flipped " + oldState + " breach to " + newState + " in the "
+                + tile.getRepresentationForButtons(game, player) + " system.";
         // msg += " using " + resonanceRep() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -95,6 +95,11 @@ public class ResonanceGeneratorService {
     @ButtonHandler("placeBreach_")
     private static void resolvePlaceBreach(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("placeBreach_", "");
+        String source = resonanceRep();
+        if (pos.contains("_")) {
+            source = "an Exile destroyer";
+            pos = pos.split("_")[0];
+        }
         Tile tile = game.getTileByPosition(pos);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
 
@@ -103,8 +108,27 @@ public class ResonanceGeneratorService {
             space.addToken(Constants.TOKEN_BREACH_ACTIVE);
         }
 
-        String msg = "Placed active breach in tile " + tile.getRepresentation();
-        msg += " using " + resonanceRep() + ".";
+        String msg = "Placed active breach in " + tile.getDetailedDescription();
+        msg += " using " + source + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        checkCrimsonCommanderUnlock(game, player, tile);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("placeInactiveBreach_")
+    private static void resolvePlaceInactiveBreach(
+            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.replace("placeInactiveBreach_", "");
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+
+        // TODO: JAZZ - idk if you can have multiple, so don't double add for now
+        if (!space.getTokenList().contains(Constants.TOKEN_BREACH_INACTIVE)) {
+            space.addToken(Constants.TOKEN_BREACH_INACTIVE);
+        }
+
+        String msg = "Placed inactive breach in the " + tile.getRepresentation();
+        msg += " system using an Exile destroyer.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);

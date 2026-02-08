@@ -1,5 +1,7 @@
 package ti4.image;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -32,6 +34,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -77,6 +80,7 @@ import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.CardEmojis;
 
+@UtilityClass
 public class Mapper {
 
     // private static final Properties colors = new Properties();
@@ -399,9 +403,14 @@ public class Mapper {
     }
 
     public static ActionCardModel getActionCard(String id) {
-        if (id != null) {
-            id = id.replace("extra1", "");
-            id = id.replace("extra2", "");
+        if (isBlank(id)) {
+            throw new IllegalArgumentException("AC id cannot be blank.");
+        }
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
+        if (!actionCards.containsKey(id)) {
+            BotLogger.critical("Action card not found: " + id);
+            return null;
         }
         return actionCards.get(id);
     }
@@ -1185,7 +1194,6 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-
         return tokensFromProperties.getProperty(tokenID);
     }
 
@@ -1409,7 +1417,6 @@ public class Mapper {
                 .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
                 .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
                 .filter(tileModel -> !tileModel.isHyperlane())
-                .filter(TileModel::isEmpty)
                 .map(TileModel::getId)
                 .toList();
     }

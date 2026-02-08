@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 class RevealAndPutACIntoDiscard extends GameStateSubcommand {
 
-    public RevealAndPutACIntoDiscard() {
+    RevealAndPutACIntoDiscard() {
         super(
                 Constants.REVEAL_AND_PUT_AC_INTO_DISCARD,
                 "Reveal Action Card from deck and put into discard pile",

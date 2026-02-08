@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class ShuffleAgendas extends GameStateSubcommand {
 
-    public ShuffleAgendas() {
+    ShuffleAgendas() {
         super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
                 .setRequired(true));
@@ -20,11 +20,19 @@ class ShuffleAgendas extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String confirm = event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString);
         if (!"YES".equals(confirm)) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`" + ("YES".equalsIgnoreCase(confirm) ? " - this is case sensitive" : "")
+                            + ".");
             return;
         }
 
         getGame().shuffleAgendas();
         MessageHelper.replyToMessage(event, "Agenda deck shuffled");
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

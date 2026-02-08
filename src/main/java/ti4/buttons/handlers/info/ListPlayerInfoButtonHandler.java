@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -15,6 +16,8 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.model.BreakthroughModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.UnitInfoService;
 import ti4.service.player.PlayerStatsService;
@@ -32,6 +35,7 @@ class ListPlayerInfoButtonHandler {
         buttons.add(Buttons.green("offerInfoButtonStep2_agent", "Agent Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_commander", "Commander Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_hero", "Hero Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_breakthrough", "Breakthrough Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
         buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
@@ -55,7 +59,9 @@ class ListPlayerInfoButtonHandler {
             buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
         } else {
             for (Player p2 : game.getRealPlayers()) {
-                Button button = Buttons.gray("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        "offerInfoButtonStep3_" + category + "_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -83,13 +89,15 @@ class ListPlayerInfoButtonHandler {
                         messageEmbeds.add(Mapper.getAbility(ability).getRepresentationEmbed());
                     }
                     for (Leader lead : p2.getLeaders()) {
-                        messageEmbeds.add(lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
+                        messageEmbeds.add(lead.getLeaderModel()
+                                .get()
+                                .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
                     }
                     for (String tech : p2.getFactionTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                     }
                     for (String unit : p2.getUnitsOwned()) {
-                        if (unit.contains("_")) {
+                        if (unit.contains("_") || unit.contains("tf-")) {
                             messageEmbeds.add(Mapper.getUnit(unit).getRepresentationEmbed());
                         }
                     }
@@ -108,6 +116,9 @@ class ListPlayerInfoButtonHandler {
                             messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                         }
                     }
+                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
+                        messageEmbeds.add(bt.getRepresentationEmbed());
+                    }
                 }
                 case "abilities" -> {
                     for (String ability : p2.getAbilities()) {
@@ -123,6 +134,11 @@ class ListPlayerInfoButtonHandler {
                 case "ftech" -> {
                     for (String tech : p2.getFactionTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
+                    }
+                }
+                case "breakthrough" -> {
+                    for (BreakthroughModel bt : p2.getBreakthroughModels()) {
+                        messageEmbeds.add(bt.getRepresentationEmbed());
                     }
                 }
                 case "tech" -> {
@@ -146,8 +162,9 @@ class ListPlayerInfoButtonHandler {
                 case "agent", "commander", "hero" -> {
                     for (Leader lead : p2.getLeaders()) {
                         if (lead.getId().contains(category)) {
-                            messageEmbeds.add(
-                                    lead.getLeaderModel().get().getRepresentationEmbed(true, true, true, true));
+                            messageEmbeds.add(lead.getLeaderModel()
+                                    .get()
+                                    .getRepresentationEmbed(true, true, true, true, game.isTwilightsFallMode()));
                         }
                     }
                 }
@@ -156,7 +173,7 @@ class ListPlayerInfoButtonHandler {
         }
 
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCardsInfoThread(), sb.toString(), messageEmbeds);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = "showObjInfo_", save = false)
@@ -166,7 +183,7 @@ class ListPlayerInfoButtonHandler {
             ListPlayerInfoService.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
             ListPlayerInfoService.displayerScoringProgression(game, false, event.getMessageChannel(), extent);
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

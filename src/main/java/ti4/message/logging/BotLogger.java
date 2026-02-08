@@ -1,5 +1,9 @@
 package ti4.message.logging;
 
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,10 +17,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.CronManager;
+import ti4.executors.CircuitBreaker;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
+import ti4.helpers.ThreadGetter;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.SREStats;
 import ti4.settings.GlobalSettings;
@@ -38,7 +45,11 @@ public class BotLogger {
      * Initialize the BotLogger system. Should be called once at bot startup.
      */
     public static void init() {
-        getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+        if (!logToConsole()) getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+    }
+
+    public static boolean logToConsole() {
+        return JdaService.testingMode;
     }
 
     /**
@@ -120,9 +131,18 @@ public class BotLogger {
         logToChannel(null, message, null, LogSeverity.Error);
     }
 
+    public static void critical(@Nonnull String message) {
+        logToChannel(null, message, null, LogSeverity.Critical);
+    }
+
     public static void error(
             @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
         logToChannel(new LogOrigin(event), message, throwable, LogSeverity.Error);
+    }
+
+    public static void critical(
+            @Nonnull GenericInteractionCreateEvent event, @Nonnull String message, Throwable throwable) {
+        logToChannel(new LogOrigin(event), message, throwable, LogSeverity.Critical);
     }
 
     /**
@@ -139,8 +159,16 @@ public class BotLogger {
         logToChannel(null, message, err, LogSeverity.Error);
     }
 
+    public static void critical(@Nonnull String message, @Nullable Throwable err) {
+        logToChannel(null, message, err, LogSeverity.Critical);
+    }
+
     public static void error(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
         logToChannel(logOrigin, message, err, LogSeverity.Error);
+    }
+
+    public static void critical(@Nonnull LogOrigin logOrigin, @Nonnull String message, @Nullable Throwable err) {
+        logToChannel(logOrigin, message, err, LogSeverity.Critical);
     }
 
     /**
@@ -155,6 +183,23 @@ public class BotLogger {
      */
     public static void error(@Nullable LogOrigin origin, @Nonnull String message) {
         logToChannel(origin, message, null, LogSeverity.Error);
+    }
+
+    public static void critical(@Nullable LogOrigin origin, @Nonnull String message) {
+        logToChannel(origin, message, null, LogSeverity.Critical);
+    }
+
+    public static void errorToThread(@Nonnull String message, @Nonnull String threadName) {
+        errorToThread(null, message, null, threadName);
+    }
+
+    public static void errorToThread(@Nonnull String message, @Nullable Throwable err, @Nonnull String threadName) {
+        errorToThread(null, message, err, threadName);
+    }
+
+    public static void errorToThread(
+            @Nullable LogOrigin origin, @Nonnull String message, @Nullable Throwable err, @Nonnull String threadName) {
+        logToChannel(origin, message, err, LogSeverity.Error, threadName);
     }
 
     /**
@@ -172,8 +217,17 @@ public class BotLogger {
             @Nonnull String message,
             @Nullable Throwable err,
             @Nonnull LogSeverity severity) {
+        logToChannel(origin, message, err, severity, null);
+    }
+
+    private static void logToChannel(
+            @Nullable LogOrigin origin,
+            @Nonnull String message,
+            @Nullable Throwable err,
+            @Nonnull LogSeverity severity,
+            @Nullable String threadName) {
         // Count Error-severity logs once per entry
-        if (severity == LogSeverity.Error) {
+        if (severity.isErrorOrHigher()) {
             SREStats.incrementErrorCount();
         }
 
@@ -206,16 +260,35 @@ public class BotLogger {
         // Send off message
         String compiledMessage = msg.toString();
         int msgLength = compiledMessage.length();
+        if (logToConsole()) {
+            if (severity.isErrorOrHigher()) {
+                System.err.println(severity.name() + ": " + compiledMessage);
+            } else {
+                System.out.println(severity.name() + ": " + compiledMessage);
+            }
+            return;
+        }
 
+        List<String> messageChunks = new ArrayList<>();
         // Handle message length overflow. Overflow length is derived from previous implementation
         for (int i = 0; i <= msgLength; i += MAX_DISCORD_MESSAGE_SIZE) {
-            String msgChunk = compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength));
+            messageChunks.add(compiledMessage.substring(i, Math.min(i + MAX_DISCORD_MESSAGE_SIZE, msgLength)));
+        }
 
-            if (err == null
-                    || i + MAX_DISCORD_MESSAGE_SIZE
-                            < msgLength) { // If length could overflow or there is no error to trace
+        if (threadName != null && channel != null) {
+            sendMessageToThread(channel, threadName, messageChunks, err);
+            return;
+        }
+
+        for (int i = 0; i < messageChunks.size(); i++) {
+            String msgChunk = messageChunks.get(i);
+            boolean isLastChunk = i == messageChunks.size() - 1;
+
+            if (err == null || !isLastChunk) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
-                else channel.sendMessage(msgChunk).queue(); // Send message on channel
+                else
+                    channel.sendMessage(msgChunk)
+                            .queue(Consumers.nop(), BotLogger::catchRestError); // Send message on channel
             } else { // Handle error on last send
                 ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
 
@@ -233,6 +306,20 @@ public class BotLogger {
                 }
             }
         }
+    }
+
+    private static void sendMessageToThread(
+            @Nonnull TextChannel channel,
+            @Nonnull String threadName,
+            @Nonnull List<String> messageChunks,
+            @Nullable Throwable err) {
+        ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
+        ThreadGetter.getThreadInChannel(channel, threadName, thread -> {
+            messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue(Consumers.nop(), BotLogger::catchRestError));
+            if (err != null) {
+                MessageHelper.sendMessageToChannel(thread, ExceptionUtils.getStackTrace(err));
+            }
+        });
     }
 
     /**
@@ -318,6 +405,9 @@ public class BotLogger {
     }
 
     public static void catchRestError(Throwable e) {
+        if (isDiscordServerError(e)) {
+            CircuitBreaker.incrementThresholdCount("Discord server error during REST call: " + e.getMessage());
+        }
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =
                 GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);

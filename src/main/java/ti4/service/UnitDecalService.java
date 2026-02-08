@@ -21,6 +21,7 @@ public class UnitDecalService {
             case "cb_37", "cb_38", "cb_39", "cb_40" -> false; // disable trait icons to prevent confusion
             case "cb_42" -> false; // disable eye icon for use elsewhere
             case "cb_54" -> false; // disable Australia icon
+            case "cb_103" -> "627421461367357441".equals(userID); // Big Al -> Stew
             default -> true;
         };
     }

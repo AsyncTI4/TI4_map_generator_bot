@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
@@ -30,11 +31,20 @@ public class MahactKingDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public String getLongDescriptionImpl() {
         FactionModel faction = Mapper.getFaction(ItemId);
         if (faction != null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(faction.getFactionName() + "\n> Commodities: " + faction.getCommodities() + "\n> Flagship: ");
+            sb.append(faction.getFactionName())
+                    .append("\n> Commodities: ")
+                    .append(faction.getCommodities())
+                    .append("\n> Flagship: ");
             UnitModel unit = Mapper.getUnit(ItemId + "_flagship");
             sb.append(" Combat: ");
             sb.append(unit.getCombatHitsOn());

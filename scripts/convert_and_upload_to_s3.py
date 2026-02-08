@@ -366,7 +366,7 @@ def upload_images(s3_client, files_to_upload, bucket_name):
 
 
 def scan_and_upload_directory(
-    s3_client, source_dir, bucket_name, existing_s3_keys, prefix="", check_hash=False
+    s3_client, source_dir, bucket_name, existing_s3_keys, prefix="", check_hash=False, force_upload=False
 ):
     """Scan directory and upload files.
 
@@ -377,6 +377,7 @@ def scan_and_upload_directory(
         existing_s3_keys: Dict mapping S3 keys to their ETags (or set of keys if check_hash=False)
         prefix: S3 key prefix
         check_hash: If True, compare file hashes; if False, only check filename existence
+        force_upload: If True, always upload all files regardless of S3 state
 
     Returns:
         tuple: (uploaded_count, skipped_count, error_count)
@@ -385,7 +386,12 @@ def scan_and_upload_directory(
         logger.info(f"Directory does not exist: {source_dir}")
         return 0, 0, 0
 
-    mode_msg = "with hash checking" if check_hash else "replacing all files"
+    if force_upload:
+        mode_msg = "force upload all files"
+    elif check_hash:
+        mode_msg = "with hash checking"
+    else:
+        mode_msg = "skip existing files"
     _log_header(f"UPLOADING DIRECTORY: {source_dir} ({mode_msg})")
 
     # Scan all files
@@ -394,6 +400,11 @@ def scan_and_upload_directory(
 
     for local_file, relative_path in _scan_directory(source_dir):
         s3_key = _build_s3_key(relative_path / local_file.name, prefix)
+
+        # Force upload mode: upload everything
+        if force_upload:
+            files_to_upload.append((local_file, s3_key))
+            continue
 
         # Default mode: skip only if exists
         if not check_hash:
@@ -506,11 +517,11 @@ def main():
         # Upload converted images
         uploaded, upload_errors = upload_images(s3_client, files_to_upload, args.bucket)
 
-        # Upload TypeScript files from web_data directory
+        # Upload TypeScript files from web_data directory (always force upload)
         web_data_dir = project_root / "web_data"
 
         web_uploaded, web_skipped, web_errors = scan_and_upload_directory(
-            s3_client, web_data_dir, args.bucket, existing_s3_keys, prefix="web_data", check_hash=args.check_hash
+            s3_client, web_data_dir, args.bucket, existing_s3_keys, prefix="web_data", force_upload=True
         )
 
         # Final summary

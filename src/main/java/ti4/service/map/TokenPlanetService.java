@@ -74,11 +74,17 @@ public class TokenPlanetService {
             tokenPlanetPosition = Constants.MIRAGE_TRIPLE_POSITION;
         }
 
-        Point tokenPlanetCenter = Constants.TOKEN_PLANET_CENTER_OFFSET;
+        PlanetModel planetModel = Mapper.getPlanet(planetName);
+        Point tokenPlanetCenter = new Point(71, 59);
+        if (planetModel != null
+                && planetModel.getPlanetLayout() != null
+                && planetModel.getPlanetLayout().getCenterPosition() != null) {
+            tokenPlanetCenter = planetModel.getPlanetLayout().getCenterPosition();
+        }
 
         Point planetCenter =
                 new Point(tokenPlanetPosition.x + tokenPlanetCenter.x, tokenPlanetPosition.y + tokenPlanetCenter.y);
-        if (planetName.equalsIgnoreCase("thundersedge")) {
+        if ("thundersedge".equalsIgnoreCase(planetName)) {
             planetCenter = Constants.SPACE_CENTER_POSITION;
         }
         Planet planetObject = new Planet(planetName, planetCenter);

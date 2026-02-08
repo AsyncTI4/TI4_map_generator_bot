@@ -3,6 +3,7 @@ package ti4.service.franken;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -16,7 +17,11 @@ public class FrankenUnitService {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
-
+            if (player.getGame().isTwilightsFallMode()
+                    && ("fs".equalsIgnoreCase(unitModel.getAsyncId()) || "mf".equalsIgnoreCase(unitModel.getAsyncId()))
+                    && !unitID.contains("_")) {
+                allowDuplicates = true;
+            }
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
@@ -48,6 +53,11 @@ public class FrankenUnitService {
             }
             sb.append("\n");
             player.removeOwnedUnitByID(unitID);
+            UnitModel u = Mapper.getUnit(unitID);
+            if (u.getUnitType() != UnitType.Flagship && u.getUnitType() != UnitType.Mech) {
+                String replacementUnit = u.getBaseType();
+                player.addOwnedUnitByID(replacementUnit);
+            }
 
             if ("naaz_mech".equalsIgnoreCase(unitID)) {
                 player.removeOwnedUnitByID("naaz_mech_space");

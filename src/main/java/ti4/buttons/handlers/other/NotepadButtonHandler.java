@@ -8,11 +8,13 @@ import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.StringHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 class NotepadButtonHandler {
@@ -44,7 +46,7 @@ class NotepadButtonHandler {
         Modal modal = Modal.create(modalID, player.getFlexibleDisplayName() + "'s Notepad")
                 .addComponents(Label.of("Edit summary", textInputBuilder.build()))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("notepadModal")

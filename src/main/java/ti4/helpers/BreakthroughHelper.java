@@ -18,11 +18,12 @@ public class BreakthroughHelper {
         if (leaderID != null) {
             player.addLeader(leaderID);
             game.addFakeCommander(leaderID);
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " acquired a new commander, "
+            UnlockLeaderService.unlockLeader(
+                    leaderID,
+                    game,
+                    player,
+                    player.getRepresentation() + " has used _Yin Ascendant_ to acquire a new commander, "
                             + Mapper.getLeader(leaderID).getName() + "!");
-            UnlockLeaderService.unlockLeader(leaderID, game, player);
         } else {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -50,6 +51,7 @@ public class BreakthroughHelper {
                     || Mapper.getLeader(commanderName) == null
                     || "unknown"
                             .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())
+                    || game.getStoredValue("mercCommander").contains(commanderName)
                     || Mapper.getLeader(commanderName)
                             .getAbilityText()
                             .toLowerCase()

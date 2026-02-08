@@ -21,10 +21,13 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.abilities.MahactTokenService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.game.StartPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.objectives.DrawSecretService;
+import ti4.service.transaction.SendDebtService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -215,11 +218,22 @@ public class PromissoryNoteHelper {
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.addPromissoryNoteToPlayArea(id);
         } else {
-            player.removePromissoryNote(id);
-            if (!"dspncymi".equalsIgnoreCase(id)) {
-                owner.setPromissoryNote(id);
+            if (!"malevolency".equalsIgnoreCase(id)) {
+                player.removePromissoryNote(id);
+                if (!"dspncymi".equalsIgnoreCase(id)) {
+                    owner.setPromissoryNote(id);
+                }
             }
             // PN Info is refreshed later
+        }
+
+        if (owner.hasUnlockedBreakthrough("vadenbt")) {
+            SendDebtService.sendDebt(player, owner, 1);
+            CommanderUnlockCheckService.checkPlayer(owner, "vaden");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + " you sent 1 debt token to " + owner.getFactionEmojiOrColor()
+                            + ", for their \"Shark Loans\" pool, due to _Arms Brokerage_.");
         }
 
         String emojiToUse = game.isFowMode() ? "" : owner.getFactionEmoji();
@@ -269,6 +283,12 @@ public class PromissoryNoteHelper {
         if ("iff".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
             String message = player.getRepresentationUnfogged() + ", please choose type of wormhole you wish to drop";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        }
+
+        if ("sever".equalsIgnoreCase(id)) {
+            List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getSeverLocationOptions(game, player));
+            String message = player.getRepresentationUnfogged() + ", please choose the system that you wish to Sever.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("greyfire".equalsIgnoreCase(id)) {
@@ -337,19 +357,30 @@ public class PromissoryNoteHelper {
             ButtonHelperAgents.resolveArtunoCheck(player, 2);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you gained 2 trade goods " + ms + " from Black Ops.");
+                    player.getRepresentationUnfogged() + " you gained 2 trade goods " + ms + " from _Black Ops_.");
             String trueIdentity = player.getRepresentationUnfogged();
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
                     + ". Use buttons to gain 2 command tokens.";
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             ActionCardHelper.sendPlotCardInfo(game, owner);
             MessageHelper.sendMessageToChannel(
                     owner.getCardsInfoThread(),
-                    owner.getRepresentation() + " place a plot into play with " + player.getRepresentationNoPing()
-                            + " token on it from black ops");
+                    owner.getRepresentation() + " _Black Ops_ has been played by " + player.getRepresentationNoPing()
+                            + ". Please choose a Plot to put into play with a control token from them on it.");
             owner.removeOwnedPromissoryNoteByID(id);
+            player.removePromissoryNote(id);
+            owner.removePromissoryNote(id);
+        }
+        if ("zooidpn".equalsIgnoreCase(id)) {
+            DrawSecretService.drawSO(event, game, player);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + " drew a secret objective due to _Stringwalk Teachings_ being played. They should tell "
+                            + (game.isFrankenGame() ? "its owner" : "the Zooid player")
+                            + " what it is with a whisper.");
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =
@@ -360,9 +391,35 @@ public class PromissoryNoteHelper {
                         owner.getCorrectChannel(),
                         owner.getRepresentationUnfogged()
                                 + " lost a command token from strategy pool due to a _Military Support_ play.");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        owner.getCorrectChannel(),
+                        owner.getRepresentationUnfogged()
+                                + " had no command tokens in their strategy pool when _Military Support_ was played.");
             }
-            String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
+            String message = player.getRepresentationUnfogged()
+                    + ", please choose which planet you wish to drop 2 infantry upon.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        }
+        if ("malevolency".equalsIgnoreCase(id)) {
+
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getFactionEmojiOrColor() + " is paying 1 influence to pass _Malevolency_ to a neighbor.");
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(doneExhausting);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), "Please spend 1 influence.", buttons);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            buttons = new ArrayList<>();
+            for (Player p2 : player.getNeighbouringPlayers(true)) {
+                buttons.add(Buttons.green("passMalevolencyTo_" + p2.getFaction(), p2.getFactionNameOrColor()));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", please choose the neighbor to pass the note to.",
+                    buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps") && !id.contains("absol")) {
             if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {
@@ -393,11 +450,7 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " acquired the War Sun technology.");
-            owner.setFleetCC(owner.getFleetCC() - 1);
-            String reducedMsg = owner.getRepresentationUnfogged()
-                    + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
-            ButtonHelper.checkFleetInEveryTile(owner, game);
-            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
+            MahactTokenService.removeFleetCC(game, owner, "due to _Fires of the Gashlai_ being played");
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
@@ -659,7 +712,7 @@ public class PromissoryNoteHelper {
         String promissoryNoteId = promissoryNotes.getFirst();
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, sourcePlayer, targetPlayer, CardEmojis.ActionCard + " Action Card", null);
+                    game, event, sourcePlayer, targetPlayer, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
 
         sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));

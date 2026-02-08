@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
@@ -21,7 +22,9 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.service.info.ListPlayerInfoService;
+import ti4.service.map.SpinService;
 import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
@@ -31,6 +34,7 @@ public class StatusCleanupService {
         game.removeStoredValue("deflectedSC");
         game.removeStoredValue("pharadnPNUsed");
         game.removeStoredValue("willParticipateInSplice");
+        game.removeStoredValue("Puppets On A String");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (Player toldar : game.getRealPlayers()) {
@@ -58,6 +62,9 @@ public class StatusCleanupService {
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeAllCC();
                 unitHolder.removeAllUnitDamage();
+                if (unitHolder.getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                    unitHolder.removeToken(Constants.TOKEN_SEVERED);
+                }
             }
         }
         game.removeStoredValue("galacticThreatUsed");
@@ -67,8 +74,6 @@ public class StatusCleanupService {
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
-
-        returnEndStatusPNs(game); // return any PNs with "end of status phase" return timing
         closeRoundThreads(game);
 
         Map<String, Player> players = game.getPlayers();
@@ -85,7 +90,7 @@ public class StatusCleanupService {
             player.setInRoundTurnCount(0);
             player.clearSCs();
             player.clearFollowedSCs();
-            player.setBreakthroughExhausted(false);
+            for (String id : player.getBreakthroughIDs()) player.setBreakthroughExhausted(id, false);
             RefreshCardsService.refreshPlayerCards(game, player, true);
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");
@@ -128,13 +133,15 @@ public class StatusCleanupService {
         game.removeStoredValue("hiredGunsInPlay");
         game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("Coup");
+        game.removeStoredValue("ExtremeDuress");
         game.removeStoredValue("PublicExecution");
+        game.removeStoredValue("VisionariaResponded");
         game.setHasHadAStatusPhase(true);
         if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode())) {
             if ("ON".equalsIgnoreCase(game.getSpinMode())) {
                 SpinRingsHelper.spinRings(game);
             } else {
-                SpinRingsHelper.spinRingsCustom(game, game.getSpinMode(), null);
+                SpinService.executeSpinsForTrigger(game, SpinService.AutoTrigger.STATUS);
             }
         }
         if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
@@ -145,7 +152,7 @@ public class StatusCleanupService {
         game.clearAllEmptyStoredValues();
     }
 
-    private void returnEndStatusPNs(Game game) {
+    public static void returnEndStatusPNs(Game game) {
         Map<String, Player> players = game.getPlayers();
         for (Player player : players.values()) {
             List<String> pns = new ArrayList<>(player.getPromissoryNotesInPlayArea());
@@ -156,8 +163,8 @@ public class StatusCleanupService {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if (pnModel.getText().contains("eturn this card")
-                        && pnModel.getText().contains("end of the status phase")) {
+                if ((pnModel.getText().toLowerCase().contains("return this card")
+                        && pnModel.getText().toLowerCase().contains("end of the status phase"))) {
                     player.removePromissoryNote(pn);
                     pnOwner.setPromissoryNote(pn);
                     PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
@@ -166,6 +173,26 @@ public class StatusCleanupService {
                             player.getCorrectChannel(),
                             "_" + pnModel.getName() + "_ has been returned to " + pnOwner.getRepresentationNoPing()
                                     + ".");
+                }
+                if ("shareknowledge".equalsIgnoreCase(pn)) {
+                    String shareKnowledgeConst = "ShareKnowledge_" + player.getFaction();
+                    String sharedKnowledge = game.getStoredValue(shareKnowledgeConst);
+                    player.removePromissoryNote(pn);
+                    pnOwner.setPromissoryNote(pn);
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, pnOwner, false);
+                    PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
+                    TechnologyModel tech = Mapper.getTech(sharedKnowledge);
+                    if (player.isRealPlayer()
+                            && sharedKnowledge != null
+                            && !sharedKnowledge.isEmpty()
+                            && tech != null) {
+                        game.removeStoredValue(shareKnowledgeConst);
+                        player.removeTech(sharedKnowledge);
+                        String msg = player.getRepresentation() + ", " + tech.getRepresentation(false)
+                                + " has been removed, and _Share Knowledge_ has been returned to "
+                                + (game.isFrankenGame() ? "the owner" : "the Deeprought player") + ".";
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    }
                 }
             }
         }

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -32,6 +33,7 @@ public class FrankenLeaderService {
             }
             if (fakeCommanders != null && fakeCommanders) {
                 player.getGame().addFakeCommander(leaderID);
+                player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
@@ -51,6 +53,7 @@ public class FrankenLeaderService {
 
     public static void removeLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed leaders:\n");
+        Game game = player.getGame();
         for (String leaderID : leaderIDs) {
             if (!player.hasLeader(leaderID)) {
                 sb.append("> ").append(leaderID).append(" (player did not have this leader)");
@@ -60,6 +63,9 @@ public class FrankenLeaderService {
             }
             sb.append("\n");
             player.removeLeader(leaderID);
+            game.setStoredValue(
+                    "savedParadigms",
+                    game.getStoredValue("savedParadigms").replace(leaderID, "").replace("__", "_"));
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

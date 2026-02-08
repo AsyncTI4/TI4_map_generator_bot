@@ -28,7 +28,9 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.SowingReapingService;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.PlanetEmojis;
@@ -80,7 +82,7 @@ public class StatusHelper {
             if (!buttons.isEmpty() && Helper.canPlayerScorePOs(game, player)) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation()
-                        + " you can use these buttons to queue a public objective to score, to speed up the status phase";
+                        + ", you may use these buttons to queue a public objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
             }
 
@@ -99,8 +101,40 @@ public class StatusHelper {
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation()
-                        + " you can use these buttons to queue a secret objective to score, to speed up the status phase";
+                        + ", you may use these buttons to queue a secret objective to score, to speed up the status phase.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+            } else {
+                var userSettings = UserSettingsManager.get(player.getUserID());
+                if (userSettings.getSandbagPref().contains("bot")) {
+                    String message = player.getRepresentationNoPing()
+                            + ", the bot will auto pass on scoring a secret objective this round for you (if you're still unable to score one when scoring occurs)."
+                            + " Click this button to change it and do it manually."
+                            + " You will be asked every round like this when you pass early, so no decision is final.";
+                    buttons.add(Buttons.gray("sandbagPref_manual", "Manually Say No Scoring"));
+                    buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                } else {
+                    String message = player.getRepresentationNoPing()
+                            + ", the bot will let you manually decide whether to score a secret objective this round."
+                            + " Click this button to change it and auto pass on scoring this round (if you still have no secrets to score when scoring occurs)."
+                            + " You will be asked every round like this when you pass early, so no decision is final.";
+                    buttons.add(Buttons.green("sandbagPref_bot", "Auto Say No Scoring"));
+                    buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                }
+            }
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (game.getStoredValue("ralnelHero").isEmpty()) {
+                    String presetRalnelHero =
+                            "You have Director Nel, the Ral Nel hero, unlocked. You can use the preset button to automatically use your hero when the last player passes."
+                                    + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                    List<Button> ralnelHeroButtons = new ArrayList<>();
+                    ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
+                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+                }
             }
         }
     }
@@ -157,9 +191,33 @@ public class StatusHelper {
                     ButtonHelperAgents.resolveArtunoCheck(player, oceans);
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + " you gained " + oceans + " trade good"
-                                    + (oceans == 1 ? "" : "s") + " due to the Hydrothermal technology.");
+                            player.getRepresentationUnfogged() + ", you gained " + oceans + " trade good"
+                                    + (oceans == 1 ? "" : "s") + " due to _ Hydrothermal Mining_.");
                 }
+            }
+            if (player.hasTech("tf-geneticresearch")) {
+                int maxNum = 0;
+                for (TechnologyType type : TechnologyType.mainFour) {
+                    maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
+                }
+                player.setTg(player.getTg() + maxNum);
+                ButtonHelperAbilities.pillageCheck(player, game);
+                ButtonHelperAgents.resolveArtunoCheck(player, maxNum);
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", you gained " + maxNum + " trade good"
+                                + (maxNum == 1 ? "" : "s") + " due to _Genetic Research_.");
+            }
+            if (player.hasTech("tf-radicaladvancement")) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "radicalAdvancementStart", "Replace a tech"));
+                buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + " , please choose if you wish to use _Radical Advancement_.",
+                        buttons);
             }
             if (player.hasTech("radical")) {
                 List<Button> buttons = new ArrayList<>();
@@ -173,7 +231,7 @@ public class StatusHelper {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
-                                + " choose a technology to replace due to Radical Advancement.",
+                                + ", please choose a technology to replace via _Radical Advancement_.",
                         buttons);
             }
             if (player.getPromissoryNotes().containsKey("dspnuyda")
@@ -215,7 +273,7 @@ public class StatusHelper {
             String keyV = player.getFaction() + "Round" + game.getRound() + "PreScoredPO";
 
             if (game.getStoredValue("BountyContracts").contains(player.getFaction())
-                    && player.getActionCards().containsKey("bounty_contracts")) {
+                    && player.getPlayableActionCards().contains("bounty_contracts")) {
                 ActionCardHelper.playAC(event, game, player, "bounty_contracts", game.getMainGameChannel());
             }
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
@@ -339,6 +397,7 @@ public class StatusHelper {
             if (Helper.checkEndGame(game, player)) {
                 break;
             }
+            ActionCardHelper.sendPlotCardInfo(game, player);
         }
 
         List<Button> poButtons = getScoreObjectiveButtons(game);
@@ -399,10 +458,10 @@ public class StatusHelper {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers(true)) {
-                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
+                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
-                            + " You may pay 1 trade good to get 2 debt tokens forgiven.";
+                            + " You may pay 1 trade good to get 2 debt tokens forgiven, from the \"Shark Loans\" pool.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
                     buttons.add(Buttons.red("deleteButtons", "Stay Indebted"));
@@ -503,9 +562,9 @@ public class StatusHelper {
 
             Player obsidian = Helper.getPlayerFromAbility(game, "marionettes");
             if (obsidian != null
-                    && obsidian.getPlotCardsFactions().get("seethe").contains(p2.getFaction())) {
-                String seetheMsg = obsidian.getRepresentation() + " use the buttons to destroy one of "
-                        + p2.getRepresentation() + " infantry using seethe.";
+                    && obsidian.getPuppetedFactionsForPlot("seethe").contains(p2.getFaction())) {
+                String seetheMsg = obsidian.getRepresentation() + ", please destroy one infantry belonging to "
+                        + p2.getRepresentation() + ", using _Seethe_.";
                 List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, "gf");
                 MessageHelper.sendMessageToChannel(obsidian.getCorrectChannel(), seetheMsg, removeButtons);
             }
@@ -513,11 +572,14 @@ public class StatusHelper {
 
         // Optional abilities
         sendMitosisButtons(game);
+        sendYinCloneButtons(game);
         sendHoldingCompanyButtons(game);
         sendEntropicScarButtons(game);
         sendNeuralParasiteButtons(game);
         sendRemoveBreachButtons(game);
         SowingReapingService.sendTheSowingButtons(game);
+        SowingReapingService.resolveTheReaping(game);
+
         // Obligatory abilities
         resolveSolFlagship(game);
     }
@@ -530,8 +592,8 @@ public class StatusHelper {
                     p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
             if (!buttons.isEmpty()) {
                 buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Done removing"));
-                String msg =
-                        p.getRepresentation() + " You may remove active breaches from systems that contain your ships:";
+                String msg = p.getRepresentation()
+                        + ", you may remove active Breaches from systems that contain your ships.";
                 MessageHelper.sendMessageToChannelWithButtons(p.getCorrectChannel(), msg, buttons);
             }
         }
@@ -543,6 +605,9 @@ public class StatusHelper {
 
         for (Player player : firmaments) {
             Tile home = player.getHomeSystemTile();
+            if (home == null) {
+                continue;
+            }
             List<Button> buttons = new ArrayList<>();
             for (Planet planet : home.getPlanetUnitHolders()) {
                 String id = player.finChecker() + "placeOneNDone_skipbuild_gf_" + planet.getName();
@@ -552,7 +617,7 @@ public class StatusHelper {
             TechnologyModel parasiteModel = Mapper.getTech("parasite-firm");
             String parasiteMsg = player.getRepresentationUnfogged() + ", a reminder to do "
                     + parasiteModel.getNameRepresentation() + ".";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), parasiteMsg, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), parasiteMsg, buttons);
         }
     }
 
@@ -563,6 +628,25 @@ public class StatusHelper {
         String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
         MessageHelper.sendMessageToChannelWithButtons(
                 arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+    }
+
+    private static void sendYinCloneButtons(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.getStasisInfantry() > 0 && player.hasUnit("tf-yinclone")) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
+                    List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
+                    String msg = player.getRepresentation() + ", please use these buttons to revive infantry. You have "
+                            + player.getStasisInfantry() + " infantry left to revive.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                } else {
+                    String msg = player.getRepresentation() + ", you had infantry II to be revived, but";
+                    msg += " the bot couldn't find any planets you control in your home system to place them on";
+                    msg += ", so per the rules they now disappear into the ether.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    player.setStasisInfantry(0);
+                }
+            }
+        }
     }
 
     private static void handleMonumentToTheAges(Game game) {
@@ -576,7 +660,7 @@ public class StatusHelper {
 
                     int remaining = game.changeCommsOnPlanet(1, planet.getName());
 
-                    String msg = "A commodity was placed on the Monument to the Ages at " + planet.getName() + ".";
+                    String msg = "A commodity was placed upon the Monument to the Ages at " + planet.getName() + ".";
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
                 }
             }
@@ -586,7 +670,7 @@ public class StatusHelper {
     public static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
-            if (t.getTileModel().isScar()) {
+            if (t.isScar()) {
                 for (Player p : game.getRealPlayers()) {
                     if (Tile.tileHasPlayerShips(p).test(t)) {
                         scars.put(p, scars.getOrDefault(p, 0) + 1);
@@ -594,8 +678,15 @@ public class StatusHelper {
                 }
             }
         }
-        for (Player player : scars.keySet()) {
+        for (Map.Entry<Player, Integer> entry : scars.entrySet()) {
+            Player player = entry.getKey();
             List<String> factionTechs = new ArrayList<>(player.getFactionTechs());
+            if (game.isTwilightsFallMode()) {
+                factionTechs.add("antimatter");
+                factionTechs.add("wavelength");
+            }
+            factionTechs.remove("vax");
+            factionTechs.remove("vay");
             player.getTechs().forEach(factionTechs::remove);
             List<Button> buttons = new ArrayList<>(factionTechs.stream()
                     .map(tech -> {
@@ -606,17 +697,39 @@ public class StatusHelper {
                                 model.getCondensedReqsEmojis(true));
                     })
                     .toList());
-            buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+            buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
 
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
-            String scarMessage = player.getRepresentation()
-                    + " You have ships in an Entropic Scar anomaly. Use the buttons to spend 1 strategy CC and gain a tech!";
-            scarMessage += "\n> You currently have " + ccs + " Strategy CC(s)";
-            if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
-                scarMessage += "\n> You also have the " + RelicHelper.sillySpelling()
-                        + " available to exhaust (This will be spent first)";
-            for (int i = 0; i < techs && i < scars.get(player); i++) {
+            if (game.isTwilightsFallMode() && techs == 0) {
+                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
+                    player.setStrategicCC(player.getStrategicCC() + 2);
+                    player.addExhaustedRelic("emelpar");
+                    player.addExhaustedRelic("absol_emelpar");
+                } else if (player.getStrategicCC() > 0) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " You have been given net +1 command tokens in your strategy pool.");
+                    player.setStrategicCC(player.getStrategicCC() + 1);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+                }
+                return;
+            }
+            String scarMessage = player.getRepresentationUnfogged()
+                    + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
+            scarMessage +=
+                    "You currently have " + ccs + " command token" + (ccs == 1 ? "" : "s") + " in your strategy pool.";
+            if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
+                scarMessage += "You also have the _" + RelicHelper.sillySpelling()
+                        + "_ available to exhaust (this will be spent first).";
+            for (int i = 0; i < techs && i < entry.getValue(); i++) {
                 if (i > 0) scarMessage = "Get another one!";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), scarMessage, buttons);
             }
@@ -632,7 +745,7 @@ public class StatusHelper {
 
     private static void resolveSolFlagship(Game game) {
         for (Player player : game.getRealPlayers()) {
-            if (!player.hasUnit("sol_flagship")) continue;
+            if (!ValefarZService.hasFlagshipAbility(game, player, "sol_flagship")) continue;
 
             String colorID = Mapper.getColorID(player.getColor());
             UnitKey infKey = Mapper.getUnitKey("gf", colorID);
@@ -681,6 +794,7 @@ public class StatusHelper {
                         && !key.contains("Seed of an")
                         && !key.contains("Mutiny")
                         && !key.contains("Stellar Atomics")
+                        && !key.contains("(Plotted)")
                         && !key.contains("Crown of Emphidia")
                         && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
                     poName = key;

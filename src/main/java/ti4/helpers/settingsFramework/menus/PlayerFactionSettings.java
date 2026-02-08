@@ -143,8 +143,8 @@ public class PlayerFactionSettings extends SettingsMenu {
                         idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
         }
         if (parent != null && parent instanceof MiltySettings ms) {
-            if (ms.getSourceSettings().getBetaTestMode().isVal())
-                ls.add(Buttons.red(idPrefix + "teFactions", "Prioritize TE Factions"));
+            // if (ms.getSourceSettings().getBetaTestMode().isVal())
+            ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
         }
         return ls;
     }
@@ -178,11 +178,11 @@ public class PlayerFactionSettings extends SettingsMenu {
     }
 
     private String prioritizeTEFactions() {
-        if (parent != null && parent instanceof MiltySettings ms) {
+        if (parent != null && parent instanceof MiltySettings) {
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if (model.getAlias().equalsIgnoreCase("obsidian")) {
+                if ("obsidian".equalsIgnoreCase(model.getAlias())) {
                     continue;
                 }
                 if (model.getSource() == ComponentSource.thunders_edge) newKeys.add(model.getAlias());

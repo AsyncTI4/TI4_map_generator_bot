@@ -24,6 +24,7 @@ import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -34,6 +35,7 @@ import ti4.image.TileHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
@@ -78,6 +80,7 @@ public class Tile {
             tileSpace.addUnitsWithStates(unit, space.getUnitsByState().get(unit));
         space.getCcList().forEach(tileSpace::addCC);
         space.getControlList().forEach(tileSpace::addControl);
+        space.getTokenList().forEach(tileSpace::addToken);
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -93,10 +96,10 @@ public class Tile {
     public static Predicate<Tile> tileMayHaveThundersEdge() {
         return tile -> {
             if (tile.getTilePath().toLowerCase().contains("hyperlane")) return false;
-            if (tile.getPlanetUnitHolders().size() > 0) return false;
+            if (!tile.getPlanetUnitHolders().isEmpty()) return false;
             if (tile.isSupernova()) return false;
-            if (tile.getTileModel().hasWormhole()) return false;
-            return true;
+            if (tile.getPosition().contains("frac")) return false;
+            return !tile.getTileModel().hasWormhole();
         };
     }
 
@@ -154,6 +157,14 @@ public class Tile {
             return;
         }
         unitHolder.addDamagedUnit(unitID, count);
+    }
+
+    public void addGalvanize(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder == null || count == null) {
+            return;
+        }
+        unitHolder.addGalvanizedUnit(unitID, count);
     }
 
     public void addCC(String ccID) {
@@ -214,11 +225,7 @@ public class Tile {
     }
 
     public static Predicate<Tile> tileHasBreach() {
-        return tile -> {
-            List<String> breaches = Arrays.asList("token_breachActive.png", "token_breachInactive.png");
-            Set<String> tokens = tile.getSpaceUnitHolder().getTokenList();
-            return CollectionUtils.containsAny(tokens, breaches);
-        };
+        return tile -> tile.hasAnyToken("token_breachActive.png", "token_breachInactive.png");
     }
 
     public void removeAllCC() {
@@ -531,22 +538,43 @@ public class Tile {
         return TileHelper.getTileById(tileID);
     }
 
+    private boolean hasAnyToken(String... tokens) {
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), tokens)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @JsonIgnore
     public boolean isAsteroidField() {
+        if (hasAnyToken("token_asteroids_async.png")) return true;
         return getTileModel().isAsteroidField();
     }
 
     @JsonIgnore
     public boolean isSupernova() {
+        if (hasAnyToken("token_supernova_async.png")) return true;
         return getTileModel().isSupernova();
     }
 
     @JsonIgnore
     public boolean isNebula() {
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (CollectionUtils.containsAny(
-                    unitHolder.getTokenList(), "token_ds_wound.png", "attachment_superweapon_availyn.png")) {
-                return true;
+        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
+            return true;
+        return getTileModel().isNebula();
+    }
+
+    @JsonIgnore
+    public boolean isNebula(Game game) {
+        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
+            return true;
+        if (game != null) {
+            for (Player p : game.getPlayers().values()) {
+                if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
+                    return true;
+                }
             }
         }
         return getTileModel().isNebula();
@@ -554,22 +582,33 @@ public class Tile {
 
     @JsonIgnore
     public boolean isGravityRift() {
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
-                return true;
-            }
-        }
+        if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
     }
 
     @JsonIgnore
     public boolean isGravityRift(Game game) {
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
-                return true;
+        if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
+        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(game);
+    }
+
+    @JsonIgnore
+    public boolean isScar() {
+        if (hasAnyToken("token_entropicscar_async.png")) return true;
+        return getTileModel().isScar();
+    }
+
+    @JsonIgnore
+    public boolean isScar(Game game) {
+        if (hasAnyToken("token_entropicscar_async.png")) return true;
+        if (game != null) {
+            for (Player p2 : game.getPlayers().values()) {
+                if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
+                    return true;
+                }
             }
         }
-        return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken(game);
+        return getTileModel().isScar();
     }
 
     @JsonIgnore
@@ -607,18 +646,16 @@ public class Tile {
 
     @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken(Game game) {
+        if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         for (UnitHolder unitHolder : unitHolders.values()) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            if (CollectionUtils.containsAny(
-                    tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) {
-                return true;
-            }
             for (UnitKey unit : unitHolder.getUnitKeys()) {
                 if (unit.getUnitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                     if (player != null) {
                         UnitModel model = player.getUnitFromUnitKey(unit);
-                        if (model != null && model.getId().contains("cabal_spacedock")) {
+                        if (model != null
+                                && (model.getId().contains("cabal_spacedock")
+                                        || player.hasTech("tf-dimensionaltear"))) {
                             return true;
                         }
                     }
@@ -629,22 +666,22 @@ public class Tile {
     }
 
     @JsonIgnore
-    public boolean isScar() {
-        return getTileModel().isScar();
+    public boolean isAnomaly() {
+        return isAnomaly(null);
     }
 
     @JsonIgnore
-    public boolean isAnomaly() {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift() || isScar()) {
+    public boolean isAnomaly(Game game) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar(game)) {
             return true;
         }
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (CollectionUtils.containsAny(
-                    unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
-                return true;
-            }
-        }
-        return false;
+        return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
+    }
+
+    @JsonIgnore
+    public boolean isMecatol(Game game) {
+        return game.getMecatolTile() != null
+                && game.getMecatolTile().getPosition().equals(getPosition());
     }
 
     @JsonIgnore
@@ -665,21 +702,8 @@ public class Tile {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
-            if (game.getTileByPosition(position_) == null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @JsonIgnore
-    public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
-            return true;
-        }
-        for (UnitHolder unitHolder : unitHolders.values()) {
-            if (CollectionUtils.containsAny(
-                    unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+            Tile tile = game.getTileByPosition(position_);
+            if (tile == null || "silver_flame".equals(tile.tileID)) {
                 return true;
             }
         }
@@ -707,7 +731,7 @@ public class Tile {
     public int getNumberOfUnitsInSystem() {
 
         int amount = 0;
-        for (UnitHolder uH : getUnitHolders().values()) {
+        for (UnitHolder uH : unitHolders.values()) {
             amount += uH.getUnitCount();
         }
         return amount;
@@ -751,8 +775,18 @@ public class Tile {
         if ("0g".equalsIgnoreCase(tileID)) {
             return true;
         }
+        TileModel tileM = TileHelper.getTileById(tileID);
+        if (tileM != null) {
+            return tileM.getTileBack() == TileBack.GREEN
+                    && !"17".equalsIgnoreCase(tileID)
+                    && !"94".equalsIgnoreCase(tileID);
+        }
+
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
+                if (planetHolder.isSpaceStation()) {
+                    continue;
+                }
                 boolean oneOfThree = (unitHolder.getTokenList() != null
                                 && unitHolder.getTokenList().contains("attachment_threetraits.png"))
                         || ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
@@ -793,7 +827,8 @@ public class Tile {
     }
 
     public static Predicate<Tile> playerCanRetreatHere(Player player) {
-        return tileHasPlayerShips(player).or(tileHasPlayerPlanet(player));
+        // No other player ships check is done elsewhere
+        return tileHasPlayerUnits(player).or(tileHasPlayerPlanet(player));
     }
 
     public String getHexTileSummary() {
@@ -808,5 +843,31 @@ public class Tile {
         } else {
             return getTileModel().getEmoji();
         }
+    }
+
+    ///
+    /**
+     * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
+     * present (using display names when available). Used for UI strings and logs.
+     */
+    @JsonIgnore
+    public String getDetailedDescription() {
+        var model = getTileModel();
+        var sb = new StringBuilder();
+        sb.append(getPosition());
+        sb.append(" (");
+        sb.append(model.getName());
+
+        if (model.getNumPlanets() == 0 && unitHolders.size() > 1) {
+            sb.append(" with ");
+            var planetDisplayNames = unitHolders.keySet().stream()
+                    .filter(key -> !key.equals("space"))
+                    .map(planetId -> Helper.getPlanetName(planetId))
+                    .filter(name -> name != null)
+                    .toList();
+            sb.append(String.join(", ", planetDisplayNames));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

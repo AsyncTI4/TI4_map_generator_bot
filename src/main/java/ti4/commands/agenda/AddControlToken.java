@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 class AddControlToken extends GameStateSubcommand {
 
-    public AddControlToken() {
+    AddControlToken() {
         super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
                 .setRequired(true)
@@ -51,5 +51,10 @@ class AddControlToken extends GameStateSubcommand {
         }
 
         game.setStoredValue("controlTokensOnAgenda" + lawId, msg);
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

@@ -9,10 +9,12 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.message.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.SourceEmojis;
@@ -53,7 +55,7 @@ public class SourceSettings extends SettingsMenu {
         codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         betaTestMode = new BooleanSetting("Beta", "Beta Mode", game.isTestBetaFeaturesMode());
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
-        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge Demo", game.isThundersEdge());
+        teDemo = new BooleanSetting("ThundersEdge", "Thunders Edge", game.isThundersEdge());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
         ignis = new BooleanSetting(
@@ -136,6 +138,7 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
+        if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (codexes.isVal())
             sources.addAll(List.of(
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
@@ -155,7 +158,7 @@ public class SourceSettings extends SettingsMenu {
                     ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
-        if (betaTestMode.isVal()) sources.add(ComponentSource.thunders_edge);
+        if (teDemo.isVal()) sources.add(ComponentSource.thunders_edge);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
         if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         return sources;
@@ -180,25 +183,20 @@ public class SourceSettings extends SettingsMenu {
                         .sendMessage(
                                 "This setting doesn't fully change the decks, please resolve manually after starting the draft if you actually want to play base game mode. You can ping Bothelper for assistance.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Codexes" ->
                 event.getHook()
                         .sendMessage("This setting doesn't really do much. It only disables Keleres.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             case "DiscoStars" ->
                 event.getHook()
                         .sendMessage(
                                 "This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             case "ThundersEdge" -> {
-                event.getHook()
-                        .sendMessage(
-                                "This is only a demo of TE until 10/31/25. No Fracture or new factions until then.")
-                        .setEphemeral(true)
-                        .queue();
                 game.setThundersEdge(true);
                 game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
             }
@@ -226,7 +224,7 @@ public class SourceSettings extends SettingsMenu {
                 event.getHook()
                         .sendMessage((ignis) ? absolDS : pokStr)
                         .setEphemeral(true)
-                        .queue();
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "UnchartSpace", "Absol", "ActionCardDeck2" -> {
                 boolean abs = absol.isVal();
@@ -259,7 +257,10 @@ public class SourceSettings extends SettingsMenu {
                 String message = inclusions.isEmpty()
                         ? "Reset your decks to include only PoK cards."
                         : "Reset your decks to include all of the " + String.join(" and ", inclusions) + " cards.";
-                event.getHook().sendMessage(message).setEphemeral(true).queue();
+                event.getHook()
+                        .sendMessage(message)
+                        .setEphemeral(true)
+                        .queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case "Eronous" -> {}
         }

@@ -8,10 +8,11 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
 class Setup extends GameStateSubcommand {
 
-    public Setup() {
+    Setup() {
         super(Constants.SETUP, "Game Setup", true, false);
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
@@ -115,6 +116,14 @@ class Setup extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     "Something went wrong and the game modes could not be set, please see error above.");
+        }
+        if (customGameName == null
+                && pingHours == null
+                && scCountPerPlayer == null
+                && maxSOCount == null
+                && vpOption == null
+                && playerCount == null) {
+            CreateGameService.presentSetupToPlayers(game);
         }
     }
 

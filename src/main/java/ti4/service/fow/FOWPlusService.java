@@ -1,5 +1,6 @@
 package ti4.service.fow;
 
+import com.nimbusds.jose.util.Pair;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,8 +16,8 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
-import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
@@ -33,7 +34,9 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
+import ti4.service.RemoveCommandCounterService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -43,7 +46,7 @@ import ti4.service.unit.RemoveUnitService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 /*
- To activate FoW+ mode use /fow fow_options
+ To activate FoW+ mode use /game weird_game_setup fow_plus:True
 
  * 0b tiles are hidden
  * Adjacent hyperlanes that don't connect to the viewing tile are hidden
@@ -58,6 +61,7 @@ public class FOWPlusService {
     private static final String FOWPLUS_TAG = "FoW+";
     private static final String VOID_TILEID = "-1";
 
+    private static final String FOWPLUS_EXPLORE_DECK = "explores_fowplus";
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
     private static final String FOWPLUS_EXPLORE_VORTEX = "fowplus_vortex";
     private static final String FOWPLUS_EXPLORE_CLARITY = "fowplus_clarity";
@@ -65,59 +69,56 @@ public class FOWPlusService {
     private static final String FOWPLUS_EXPLORE_SPOOR = "fowplus_spoor";
     private static final String FOWPLUS_EXPLORE_SACRIFICE = "fowplus_sacrifice";
 
+    public static final List<Pair<FOWOption, Boolean>> FORCED_FOWPLUS_OPTIONS = Arrays.asList(
+            Pair.of(FOWOption.ALLOW_AGENDA_COMMS, false),
+            Pair.of(FOWOption.HIDE_TOTAL_VOTES, true),
+            Pair.of(FOWOption.HIDE_VOTE_ORDER, true),
+            Pair.of(FOWOption.STATS_FROM_HS_ONLY, true),
+            Pair.of(FOWOption.HIDE_EXPLORES, true),
+            Pair.of(FOWOption.HIDE_MAP, true),
+            Pair.of(FOWOption.HIDE_PLAYER_INFOS, true));
+
     public static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.FOW_PLUS);
     }
 
     public static void setActive(Game game, boolean active) {
         game.setFowOption(FOWOption.FOW_PLUS, active);
-        toggleTag(game, active);
 
         if (active) {
-            game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);
-            game.setFowOption(FOWOption.HIDE_TOTAL_VOTES, true);
-            game.setFowOption(FOWOption.HIDE_VOTE_ORDER, true);
-            game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
-            game.setFowOption(FOWOption.HIDE_EXPLORES, true);
-            game.setFowOption(FOWOption.HIDE_MAP, true);
-            game.setFowOption(FOWOption.HIDE_PLAYER_INFOS, true);
-            game.setExplorationDeckID("explores_fowplus");
-
-            MessageHelper.sendMessageToChannel(
-                    GMService.getGMChannel(game),
-                    "### FoW+ mode activated. Following options are forced:\n"
-                            + "- No comms in agenda phase\n"
-                            + "- Hide total votes\n"
-                            + "- Hide vote order\n"
-                            + "- Player stats only visible from HS\n"
-                            + "- Hide explore/relic decks\n"
-                            + "- Hide unexplored (0b) map tiles\n"
-                            + "- Hide anchored player info areas\n"
-                            + "### In addition, following changes are in effect:\n"
-                            + "- Can only activate tiles you can see (Blind Tile button to activate any other tile)\n"
-                            + "- Activating a tile without a tile is valid and will send ships into The Void\n"
-                            + "- Cannot remove tokens from tiles you cannot see\n"
-                            + "- Explore deck set to `explores_fowplus`");
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    GMService.getGMChannel(game),
-                    "### FoW+ mode disabled.\n"
-                            + "Use `/fow fow_options` to reset options.\n"
-                            + "Use `/game set_deck` to reset explore deck.");
-        }
-    }
-
-    public static void toggleTag(Game game, boolean active) {
-        if (active) {
+            for (var option : FORCED_FOWPLUS_OPTIONS) {
+                game.setFowOption(option.getLeft(), option.getRight());
+            }
+            game.setExplorationDeckID(FOWPLUS_EXPLORE_DECK);
             game.addTag(FOWPLUS_TAG);
+
+            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), """
+                    ### FoW+ mode activated. Following options are forced:
+                    - No comms in agenda phase
+                    - Hide total votes and vote order
+                    - Player stats only visible from HS
+                    - Hide explore/relic decks
+                    - Hide unexplored (0b) map tiles
+                    - Hide anchored player info areas
+                    ### In addition, following changes are in effect:
+                    - Can only activate tiles you can see (Blind Tile button to activate any other tile)
+                    - Activating a tile without a tile is valid and will send ships into The Void
+                    - Cannot remove tokens from tiles you cannot see
+                    - Explore deck set to `explores_fowplus`""");
         } else {
             game.removeTag(FOWPLUS_TAG);
+            MessageHelper.sendMessageToChannel(GMService.getGMChannel(game), """
+                    ### FoW+ mode disabled.
+                    Use `/fow fow_options` to reset options.
+                    Use `/game set_deck` to reset explore deck.""");
         }
     }
 
     // Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game) || FoWHelper.getTilePositionsToShow(game, player).contains(position);
+        return !isActive(game)
+                || FoWHelper.getTilePositionsToShow(game, player).contains(position)
+                || game.isWarfareAction();
     }
 
     // Hide all 0b tiles from FoW map
@@ -145,7 +146,7 @@ public class FOWPlusService {
                 .addComponents(Label.of("Position to activate", position))
                 .build();
 
-        event.replyModal(blindActivationModal).queue();
+        event.replyModal(blindActivationModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("blindActivation_")
@@ -172,7 +173,7 @@ public class FOWPlusService {
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
-        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+        event.getMessageChannel().deleteMessageById(origMessageId).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     // Remove ring buttons player has no tiles they can activate
@@ -185,7 +186,9 @@ public class FOWPlusService {
                         && centerTile.getTileModel().isHyperlane()) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ringTile_000"));
         }
-        if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
+        if (Collections.disjoint(
+                visiblePositions,
+                Arrays.asList("tl", "tr", "bl", "br", "frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7"))) {
             ringButtons.removeIf(b -> b.getCustomId().contains("ring_corners"));
         }
         for (Button button : new ArrayList<>(ringButtons)) {
@@ -263,7 +266,7 @@ public class FOWPlusService {
         if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES)
                 || game.getPlayersWithGMRole().contains(player)) return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available.");
         return false;
     }
 
@@ -406,6 +409,6 @@ public class FOWPlusService {
         }
 
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

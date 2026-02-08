@@ -31,6 +31,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperTwilightsFall;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
@@ -61,8 +62,6 @@ import ti4.service.image.FileUploadService;
 import ti4.service.map.FractureService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.settings.GlobalSettings;
-import ti4.spring.api.image.GameImageService;
-import ti4.spring.context.SpringContext;
 import ti4.website.AsyncTi4WebsiteHelper;
 import ti4.website.model.WebsiteOverlay;
 
@@ -108,7 +107,7 @@ public class MapGenerator implements AutoCloseable {
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
-    private int fractureYbump = 0;
+    private int fractureYbump;
     private boolean isFoWPrivate;
     private Player fowPlayer;
 
@@ -149,8 +148,8 @@ public class MapGenerator implements AutoCloseable {
         }
         int otherObjCount = revealedObjectives.size() - stage1PublicObjCount - stage2PublicObjCount;
         otherObjCount = Math.max(Objective.retrieveCustom(game).size(), otherObjCount);
-        stage1PublicObjCount += game.getPublicObjectives1Peakable().size();
-        stage2PublicObjCount += game.getPublicObjectives2Peakable().size();
+        stage1PublicObjCount += game.getPublicObjectives1Peekable().size();
+        stage2PublicObjCount += game.getPublicObjectives2Peekable().size();
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
@@ -164,7 +163,7 @@ public class MapGenerator implements AutoCloseable {
 
         // Height of map section
         int mapHeight = getMapHeight(game);
-        if (FractureService.isFractureInPlay(game)) {
+        if (FractureService.isFractureInPlay(game) && !game.isNoFractureMode()) {
             fractureYbump = 400;
             mapHeight += fractureYbump;
         }
@@ -278,7 +277,7 @@ public class MapGenerator implements AutoCloseable {
             return;
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
-        boolean showFracture = FractureService.isFractureInPlay(game);
+        boolean showFracture = FractureService.isFractureInPlay(game) && !game.isNoFractureMode();
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -423,19 +422,9 @@ public class MapGenerator implements AutoCloseable {
         try {
             String testing = System.getenv("TESTING");
             if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-                String fileName =
-                        AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, false, null);
-
-                GameImageService gameImageService = SpringContext.getBean(GameImageService.class);
-                gameImageService.saveMapImageName(game, fileName);
-
                 AsyncTi4WebsiteHelper.putData(game.getName(), game);
                 AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
                 AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
-            } else if (isFoWPrivate) {
-                Player player = CommandHelper.getPlayerFromGame(
-                        game, event.getMember(), event.getUser().getId());
-                AsyncTi4WebsiteHelper.putMap(game.getName(), imageFormat, mainImageBytes, true, player);
             }
         } catch (Exception e) {
             BotLogger.error("Failed to send to game info to website", e);
@@ -518,14 +507,44 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
         }
 
-        // GAME FUN NAME
-        deltaY = 35;
         deltaY = 35;
         y += 40; // needed for ghost HS on br
+
+        String server;
+        if (game.getGuild() == null) {
+            server = "asyncti_icon_nothing";
+        } else {
+            switch (game.getGuild().getId()) {
+                case "943410040369479690" -> server = "asyncti_icon_hub";
+                case "1176104225932058694" -> server = "asyncti_icon_warsuntzu";
+                case "1145823841227112598" -> server = "asyncti_icon_dreadnot";
+                case "1250131684393881610" -> server = "asyncti_icon_tommerhawk";
+                case "1312882116597518416" -> server = "asyncti_icon_dudersdomain";
+                case "1090910555327434774" -> server = "asyncti_icon_stroterarea";
+                case "1209956332380229672" -> server = "asyncti_icon_fighterclub";
+                case "1378702133297414164" -> server = "asyncti_icon_whatsupdock";
+                case "1410728648817770526" -> server = "asyncti_icon_shipflag";
+                case "1434181175944941649" -> server = "asyncti_icon_pdstrians";
+                case "1434180793139204198" -> server = "asyncti_icon_greatcarrierreef";
+                case "1434632452097446040" -> server = "asyncti_icon_tournaments";
+                case "1458845770672377989" -> server = "asyncti_icon_planetaryducksystem";
+                case "1458844879709929532" -> server = "asyncti_icon_stroatymcstroatface";
+                case "1458845518393246032" -> server = "asyncti_icon_dannelscampground";
+                // fog of war?
+                // megagames?
+                default -> server = "asyncti_icon_unknown";
+            }
+        }
+        String serverPath = ResourceHelper.getResourceFromFolder("server_icons/", server + ".png");
+        int serverSize = 96;
+        BufferedImage serverImage = ImageHelper.readScaled(serverPath, serverSize, serverSize);
+        graphics.drawImage(serverImage, x, y - 3 * serverSize / 4, null);
+
+        // GAME FUN NAME
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), landscapeShift, y);
-        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName());
+        graphics.drawString(game.getCustomName(), landscapeShift + 4 * serverSize / 3, y);
+        deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName()) + 5 * serverSize / 3;
 
         // STRATEGY CARDS
         coord = drawStrategyCards(new Point(x, y));
@@ -622,26 +641,34 @@ public class MapGenerator implements AutoCloseable {
         int boxHeight = 140;
         int boxWidth = 150;
         int boxBuffer = -1;
-        if (game.getVp() > 14) {
-            boxWidth = 2250 / (game.getVp() + 1);
+
+        int pinkLimit = 0;
+        if (game.isLiberationC4Mode()) pinkLimit = 12;
+        if (game.isAllianceMode()) pinkLimit = 14;
+        int greyLimit = game.getRealPlayers().stream()
+                .mapToInt(Player::getTotalVictoryPoints)
+                .max()
+                .orElse(0);
+        if (game.getVp() > 14 || pinkLimit > 14 || greyLimit > 14) {
+            boxWidth = 2250 / (1 + Math.max(game.getVp(), Math.max(pinkLimit, greyLimit)));
         }
-        if (game.isLiberationC4Mode()) {
-            for (int i = game.getVp() + 1; i <= 12; i++) {
-                graphics.setColor(Color.WHITE);
-                Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-                DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
-                g2.setColor(Color.PINK);
-                g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-            }
-        } else if (game.isAllianceMode()) {
-            for (int i = game.getVp() + 1; i <= 14; i++) {
-                graphics.setColor(Color.WHITE);
-                Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-                DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
-                g2.setColor(Color.PINK);
-                g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
-            }
+
+        for (int i = 1 + Math.max(game.getVp(), pinkLimit); i <= greyLimit; i++) {
+            graphics.setColor(Color.WHITE);
+            Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            g2.setColor(Color.GRAY);
+            g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
         }
+
+        for (int i = game.getVp() + 1; i <= pinkLimit; i++) {
+            graphics.setColor(Color.WHITE);
+            Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+            DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+            g2.setColor(Color.PINK);
+            g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+        }
+
         for (int i = 0; i <= game.getVp(); i++) {
             graphics.setColor(Color.WHITE);
             Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
@@ -870,7 +897,10 @@ public class MapGenerator implements AutoCloseable {
     private void drawExpeditionTracker(int x, int y) {
         Expeditions exp = game.getExpeditions();
         boolean thundersEdgeOnBoard = game.getTileFromPlanet("thundersedge") != null;
-        if (!game.isThundersEdge() || exp.getRemainingExpeditionCount() == 0 || thundersEdgeOnBoard) return;
+        if (!game.isThundersEdge()
+                || exp.getRemainingExpeditionCount() == 0
+                || thundersEdgeOnBoard
+                || game.isTwilightsFallMode()) return;
 
         drawGeneralImage(x, y, "Expeditions.png");
         if (exp.getTradeGoods() != null) {
@@ -927,7 +957,12 @@ public class MapGenerator implements AutoCloseable {
         addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
 
-        drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+        drawPAImageScaled(
+                x,
+                y,
+                game.isTwilightsFallMode() ? "cardback_action_tf.jpg" : "cardback_action.jpg",
+                cardWidth,
+                cardHeight);
         DrawingUtil.superDrawString(
                 graphics,
                 Integer.toString(game.getActionCards().size()),
@@ -1021,7 +1056,8 @@ public class MapGenerator implements AutoCloseable {
         addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
 
-        drawPAImageScaled(x, y, "cardback_agenda.png", cardWidth, cardHeight);
+        drawPAImageScaled(
+                x, y, game.isTwilightsFallMode() ? "cardback_edict.jpg" : "cardback_agenda.png", cardWidth, cardHeight);
         DrawingUtil.superDrawString(
                 graphics,
                 Integer.toString(game.getAgendaDeckSize()),
@@ -1035,6 +1071,91 @@ public class MapGenerator implements AutoCloseable {
         overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
         addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
         x += horSpacing;
+
+        if (game.isTwilightsFallMode()) {
+            int cardCount, fullDeck;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "ability", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("techs_tf").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_tf_ability.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Ability Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "units", 100, true)
+                    .size();
+            fullDeck = Mapper.getUnits().size();
+            drawPAImageScaled(x, y, "cardback_unit_upgrade.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Unit Upgrade Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "genome", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("tf_genome").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_genome.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Genome Splice Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            cardCount = ButtonHelperTwilightsFall.getDeckForSplicing(game, "paradigm", 100, true)
+                    .size();
+            fullDeck = Mapper.getDeck("tf_paradigm").getNewShuffledDeck().size();
+            drawPAImageScaled(x, y, "cardback_paradigm.jpg", cardWidth, cardHeight);
+            DrawingUtil.superDrawString(
+                    graphics,
+                    Integer.toString(cardCount),
+                    x + cardWidth / 2,
+                    textY,
+                    Color.WHITE,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Bottom,
+                    outline,
+                    Color.BLACK);
+            overlayText = cardCount + "/" + fullDeck + " cards in the deck";
+            addWebsiteOverlay("Paradigm Deck", overlayText, x, y, cardWidth, cardHeight);
+            x += horSpacing;
+
+            if (game.getTyrantUserID().isEmpty()) {
+                String tyrantFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.TYRANT));
+                if (tyrantFile != null) {
+                    BufferedImage bufferedImage = ImageHelper.read(tyrantFile);
+                    graphics.drawImage(bufferedImage, x + 15, y - 13, null);
+                }
+                x += 200;
+            }
+        }
 
         return x;
     }
@@ -1386,65 +1507,66 @@ public class MapGenerator implements AutoCloseable {
                     }
                     offBoardHighlighting++;
                 }
-            } else if (displayType == DisplayType.empties) {
-                boolean hasStellar = false; // not working
-                String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
-                boolean hasHero = false; // was not working
-                String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
-                if (player.hasLeaderUnlocked("muaathero")) {
-                    heroFile =
-                            ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");
-                }
-                BufferedImage bufferedImage;
-                if (hasStellar && hasHero) {
-                    bufferedImage = ImageHelper.read(relicFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    - 30
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    bufferedImage = ImageHelper.read(heroFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    + 30
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    offBoardHighlighting += 2;
-                } else if (hasStellar) {
-                    bufferedImage = ImageHelper.read(relicFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    offBoardHighlighting++;
-                } else if (hasHero) {
-                    bufferedImage = ImageHelper.read(heroFile);
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float)
-                            Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                            bufferedImage,
-                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                            miscTile.y
-                                    + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                                    + (player.isSpeaker() ? 30 : 0),
-                            null);
-                    offBoardHighlighting++;
-                }
+                // } else if (displayType == DisplayType.empties) {
+                // boolean hasStellar = false; // not working
+                // String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
+                // boolean hasHero = false; // was not working
+                // String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
+                // if (player.hasLeaderUnlocked("muaathero")) {
+                //     heroFile =
+                //             ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/",
+                // "MuaatHero.png");
+                // }
+                // BufferedImage bufferedImage;
+                // if (hasStellar && hasHero) {
+                //     bufferedImage = ImageHelper.read(relicFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 - 30,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     - 30
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     bufferedImage = ImageHelper.read(heroFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(17000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2 + 30,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     + 30
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     offBoardHighlighting += 2;
+                // } else if (hasStellar) {
+                //     bufferedImage = ImageHelper.read(relicFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     offBoardHighlighting++;
+                // } else if (hasHero) {
+                //     bufferedImage = ImageHelper.read(heroFile);
+                //     bufferedImage = ImageHelper.scale(bufferedImage, (float)
+                //             Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                //     graphics.drawImage(
+                //             bufferedImage,
+                //             miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                //             miscTile.y
+                //                     + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                //                     + (player.isSpeaker() ? 30 : 0),
+                //             null);
+                //     offBoardHighlighting++;
+                // }
             } else if (displayType == DisplayType.wormholes && "ghost".equalsIgnoreCase(player.getFaction())) {
                 boolean alphaOnMap = false;
                 boolean betaOnMap = false;
@@ -1506,7 +1628,8 @@ public class MapGenerator implements AutoCloseable {
                     }
                     x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
                 }
-            } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
+            } else if (displayType == DisplayType.anomalies
+                    && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
                 UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
                 int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
                 unitNum = (unitNum == 0
@@ -1570,6 +1693,10 @@ public class MapGenerator implements AutoCloseable {
                 if (offBoardHighlighting >= 2) {
                     for (int i = 0; i < offBoardHighlighting; i++) {
                         BufferedImage bufferedImage = ImageHelper.read(traitFiles.get(i));
+                        if (bufferedImage == null) {
+                            BotLogger.error("Could not load trait file " + traitFiles.get(i));
+                            continue;
+                        }
                         bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f
                                 / offBoardHighlighting
                                 / bufferedImage.getWidth()
@@ -1787,6 +1914,15 @@ public class MapGenerator implements AutoCloseable {
                     graphics.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
                 }
             }
+            if (player.isTyrant()) {
+                String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
+                BufferedImage img = ImageHelper.read(speakerFile);
+                if (img != null) {
+                    point = PositionMapper.getPlayerStats("newspeaker");
+                    point.translate(miscTile.x - (img.getWidth() / 2), miscTile.y - (img.getHeight() / 2));
+                    graphics.drawImage(img, point.x, point.y - (offBoardHighlighting > 0 ? 30 : 0), null);
+                }
+            }
         }
 
         { // PAINT PASSED/ACTIVE/AFK
@@ -1986,7 +2122,7 @@ public class MapGenerator implements AutoCloseable {
             }
         }
         if (player.isTyrant()) {
-            String speakerFile = ResourceHelper.getInstance().getTokenFile("tyrant");
+            String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID("tyrant"));
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
                 point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
@@ -2138,6 +2274,7 @@ public class MapGenerator implements AutoCloseable {
             y += ObjectiveBox.getVerticalSpacing();
         }
 
+        maxY = Math.max(y, maxY);
         return maxY + 15;
     }
 
@@ -2264,11 +2401,11 @@ public class MapGenerator implements AutoCloseable {
                 x += lawWidth;
             } else {
                 secondColumn = false;
-                y += 112;
+                y += 118;
                 x -= lawWidth;
             }
         }
-        return secondColumn ? y + 115 : y + 3;
+        return y + 3 + (secondColumn ? 118 : 0);
     }
 
     private int events(int y) {

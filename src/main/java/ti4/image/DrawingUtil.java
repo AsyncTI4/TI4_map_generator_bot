@@ -313,6 +313,9 @@ public class DrawingUtil {
             return null;
         }
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionID + ".png");
+        if ("coexist".equalsIgnoreCase(factionID)) {
+            factionFile = ResourceHelper.getInstance().getGeneralFile(factionID + ".png");
+        }
         if (factionFile == null) {
             // Handle homebrew factions based on real factions
             if (Mapper.getFaction(factionID) != null
@@ -729,6 +732,30 @@ public class DrawingUtil {
             }
         }
         drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
+    }
+
+    public static void drawDebtBoxText(Graphics graphics, String text, int x, int y, int maxWidth) {
+        int spacing = graphics.getFontMetrics().getAscent()
+                + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+
+        for (int i = 0; i < 9; i++) {
+            String trimmedText = trimTextToPixelWidth(graphics, text, maxWidth);
+            if (text.equals(trimmedText)) {
+                drawTextVertically(graphics, text, x + spacing / 2, y, graphics.getFont());
+                return;
+            }
+
+            int spaceIndex = trimmedText.lastIndexOf(' ');
+            if (spaceIndex == -1) {
+                drawTextVertically(graphics, trimmedText, x + spacing / 2, y, graphics.getFont());
+                text = text.substring(trimmedText.length());
+            } else {
+                drawTextVertically(graphics, text.substring(0, spaceIndex), x + spacing / 2, y, graphics.getFont());
+                text = text.substring(spaceIndex + 1);
+            }
+            x += spacing;
+        }
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {

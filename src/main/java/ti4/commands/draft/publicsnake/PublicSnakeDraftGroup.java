@@ -35,7 +35,7 @@ public class PublicSnakeDraftGroup extends SubcommandGroup {
             return null;
         }
         DraftOrchestrator orchestrator = draftManager.getOrchestrator();
-        if (orchestrator == null || !(orchestrator instanceof PublicSnakeDraftOrchestrator)) {
+        if (!(orchestrator instanceof PublicSnakeDraftOrchestrator)) {
             return null;
         }
         return (PublicSnakeDraftOrchestrator) orchestrator;

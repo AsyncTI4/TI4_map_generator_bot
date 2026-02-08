@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class Leave extends GameStateSubcommand {
@@ -39,5 +40,11 @@ public class Leave extends GameStateSubcommand {
             return "Did not leave game: " + game.getName() + ". Try a different method or set status to dummy. ";
         }
         return "Left map: " + game.getName() + " successful";
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        Player p = getGame().getPlayer(event.getUser().getId());
+        return p != null && !p.isSpectator();
     }
 }

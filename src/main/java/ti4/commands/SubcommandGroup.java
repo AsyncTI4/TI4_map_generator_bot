@@ -14,7 +14,7 @@ public abstract class SubcommandGroup extends SubcommandGroupData implements Com
         if (subcommands == null) {
             throw new IllegalStateException("Subcommand group " + name + " returned null subcommands map");
         }
-        this.addSubcommands(subcommands.values());
+        addSubcommands(subcommands.values());
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
@@ -32,4 +32,12 @@ public abstract class SubcommandGroup extends SubcommandGroupData implements Com
     }
 
     public abstract Map<String, Subcommand> getGroupSubcommands();
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return getGroupSubcommands().values().stream()
+                .anyMatch(subcommand ->
+                        subcommand.getName().equals(event.getInteraction().getSubcommandName())
+                                && subcommand.isSuspicious(event));
+    }
 }

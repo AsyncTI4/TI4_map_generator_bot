@@ -33,9 +33,9 @@
         "type": "extrarolls",
         "value": "+1",
         "applyEachForQuantity": true,
-        "persistenceType": "CONDITIONAL",
         "scope": "mf",
         "forCombatAbility": "combatround",
+        "persistenceType": "CONDITIONAL",
         "condition": "naazFS",
         "related": [
             {
@@ -480,6 +480,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "AFB"
@@ -490,7 +494,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -505,7 +509,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -520,7 +524,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -535,7 +539,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -550,7 +554,7 @@
         "value": "+1",
         "persistenceType": "CONDITIONAL",
         "condition": "opponent_has_been_asailed",
-        "scope": "_best_",
+        "scope": "",
         "related": [
             {
                 "type": "ability",
@@ -561,7 +565,7 @@
     },
     {
         "alias": "plus1_per_opponent_sftt",
-        "type": "result_modifier",
+        "type": "mods",
         "value": "+1",
         "valueScalingType": "opponent_sftt",
         "persistenceType": "CONDITIONAL",
@@ -630,6 +634,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "bombardment"
@@ -644,6 +652,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "SpaceCannonOffence"
@@ -658,6 +670,10 @@
             {
                 "type": "leader",
                 "alias": "argentcommander"
+            },
+            {
+                "type": "tech",
+                "alias": "tf-zealous"
             }
         ],
         "forCombatAbility": "SpaceCannonDefence"
@@ -836,6 +852,36 @@
             {
                 "type": "tech",
                 "alias": "tf-unrelenting"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus2_fracture_all",
+        "type": "mods",
+        "value": "+2",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "tf-planesplitter"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus1_fracture_all",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "fracture_combat",
+        "scope": "",
+        "related": [
+            {
+                "type": "leader",
+                "alias": "obsidiancommander"
             }
         ],
         "forCombatAbility": "combatround"
@@ -1331,6 +1377,23 @@
         "forCombatAbility": "bombardment"
     },
     {
+        "alias": "plus1_roll_bluetf_mech",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "bluetfMech",
+        "valueScalingType": "mechs_in_space_area",
+        "scope": "_bestCap_",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Blue mechs in space area grant +1 die per mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus_x_frag_always_flagship_afb",
         "type": "mods",
         "value": "+1",
@@ -1450,6 +1513,21 @@
             {
                 "type": "unit",
                 "alias": "uydai_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_1_for_every_nearby_anomaly",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_anomaly",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "purpletf_mech"
             }
         ],
         "forCombatAbility": "combatround"

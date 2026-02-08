@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
@@ -26,6 +27,12 @@ public class UnitDraftItem extends DraftItem {
     @Override
     public String getShortDescription() {
         return "Unit - " + getUnit().getName() + " (" + getUnit().getUnitType().toString() + ")";
+    }
+
+    @JsonIgnore
+    @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
     }
 
     @JsonIgnore
@@ -69,11 +76,21 @@ public class UnitDraftItem extends DraftItem {
             sb.append(unit.getProductionValue());
             sb.append(" ");
         }
-        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get() + " ");
-        if (unit.getFaction().isPresent()) {
-            sb.append("Faction: " + unit.getFaction().get());
+        if (unit.getCapacityValue() > 0) {
+            sb.append("Capacity ");
+            sb.append(unit.getCapacityValue());
+            sb.append(" ");
         }
-        return sb.toString();
+        if (unit.getMoveValue() > 0) {
+            sb.append("Move ");
+            sb.append(unit.getMoveValue());
+            sb.append(" ");
+        }
+        if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get()).append(" ");
+        if (unit.getFaction().isPresent()) {
+            sb.append("Faction: ").append(unit.getFaction().get());
+        }
+        return sb + "\n";
     }
 
     @JsonIgnore
@@ -91,12 +108,12 @@ public class UnitDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems() {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, UnitModel> allUnits = Mapper.getUnits();
-        for (String unitID : allUnits.keySet()) {
-            UnitModel mod = allUnits.get(unitID);
+        for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
+            UnitModel mod = entry.getValue();
             if (mod.getFaction().isPresent() && mod.getSource() == ComponentSource.twilights_fall) {
                 FactionModel faction = Mapper.getFaction(mod.getFaction().get());
                 if (faction != null && faction.getSource() != ComponentSource.twilights_fall) {
-                    allItems.add(generate(Category.UNIT, unitID));
+                    allItems.add(generate(Category.UNIT, entry.getKey()));
                 }
             }
         }

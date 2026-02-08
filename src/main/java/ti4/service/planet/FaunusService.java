@@ -54,7 +54,7 @@ public class FaunusService {
                 buttons.add(Buttons.green(id, label, p.getPlanetModel().getEmoji()));
             }
         }
-        buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+        buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
         return buttons;
     }
 

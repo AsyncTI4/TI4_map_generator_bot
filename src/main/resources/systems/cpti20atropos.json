@@ -1,0 +1,19 @@
+{
+    "id": "cpti20atropos",
+    "name": "Atropos",
+    "aliases": [
+        "cpti20atropos",
+        "atropos"
+    ],
+    "imagePath": "cpti20-atropos.png",
+    "planets": [
+        "atropos"
+    ],
+    "wormholes": [
+        "ZETA"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "red",
+    "isAsteroidField": true,
+    "source": "other"
+}

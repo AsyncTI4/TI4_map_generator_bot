@@ -27,6 +27,12 @@ public class AbilityDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getLongDescriptionImpl(Game game) {
+        return getLongDescriptionImpl();
+    }
+
+    @JsonIgnore
+    @Override
     public String getLongDescriptionImpl() {
         AbilityModel abilityModel = getAbilityModel();
         StringBuilder sb = new StringBuilder();

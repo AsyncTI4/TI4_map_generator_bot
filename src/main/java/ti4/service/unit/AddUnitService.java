@@ -17,6 +17,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.planet.AddPlanetToPlayAreaService;
@@ -103,13 +104,19 @@ public class AddUnitService {
             UnitModel mod = player.getUnitsByAsyncID(asyncId).getFirst();
             // Ships go to space
             if (mod.getIsShip()
-                    || (UnitType.Spacedock == unitType
+                    || (unitType == UnitType.Spacedock
                             && (player.hasUnit("saar_spacedock") || player.hasUnit("tf-floatingfactory")))) {
                 assignedUnits.add(new ParsedUnit(Units.getUnitKey(unitType, color), totalAmt, Constants.SPACE));
                 continue;
             }
 
             // Non-ships get distributed to planets, prioritizing high-resource planets
+            if (planetNames.isEmpty()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "Could not find any planets for this unit list " + unitList + ". Let Fin know!");
+                continue;
+            }
             int minUnitsPerPlanet = totalAmt / planetNames.size();
             int remainder = totalAmt % planetNames.size();
             for (int i = 0; i < planetNames.size(); i++) {

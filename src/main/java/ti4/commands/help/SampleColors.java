@@ -42,8 +42,8 @@ class SampleColors extends Subcommand {
         int LINEHEIGHT = 12;
         Font bigFont = Storage.getFont12();
         Font smallFont = Storage.getFont8();
-        int PAGEWIDTH = 1600;
-        int PAGEHIGHT = 2400;
+        int PAGEWIDTH = 2400;
+        int PAGEHIGHT = 3600;
         BasicStroke stroke = new BasicStroke(2.0f);
 
         OptionMapping input = event.getOption(Constants.HUE);

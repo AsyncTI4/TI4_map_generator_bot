@@ -11,11 +11,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.game.CreateGameService;
 
 class Observer extends Subcommand {
@@ -52,9 +54,14 @@ class Observer extends Subcommand {
         Guild guild = game.getGuild();
         Member member = guild.getMemberById(user.getId());
 
+        if (member == null && event.getGuild() != null) {
+            member = event.getGuild().getMemberById(user.getId());
+        }
+
         // INVITE TO GAME SERVER IF MISSING
-        if (!CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
-                .isEmpty()) {
+        if (member == null
+                || !CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel())
+                        .isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
                     "User was not a member of the Game's server (" + guild.getName()
@@ -98,7 +105,7 @@ class Observer extends Subcommand {
         channel.getPermissionContainer()
                 .upsertPermissionOverride(user)
                 .grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(
                     event,
@@ -118,7 +125,7 @@ class Observer extends Subcommand {
         channel.getPermissionContainer()
                 .upsertPermissionOverride(user)
                 .clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(
                     event,

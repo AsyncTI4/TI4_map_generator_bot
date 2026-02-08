@@ -47,32 +47,32 @@ public class MessageV2Editor {
 
         public ReplaceMessagePart(String oldCustomId, Button part) {
             this.part = part;
-            this.type = MessagePartType.BUTTON;
-            this.replaceKey = oldCustomId;
+            type = MessagePartType.BUTTON;
+            replaceKey = oldCustomId;
         }
 
         public ReplaceMessagePart(String oldCustomId, StringSelectMenu part) {
             this.part = part;
-            this.type = MessagePartType.STRING_SELECT;
-            this.replaceKey = oldCustomId;
+            type = MessagePartType.STRING_SELECT;
+            replaceKey = oldCustomId;
         }
 
         public ReplaceMessagePart(String oldCustomId, EntitySelectMenu part) {
             this.part = part;
-            this.type = MessagePartType.ENTITY_SELECT;
-            this.replaceKey = oldCustomId;
+            type = MessagePartType.ENTITY_SELECT;
+            replaceKey = oldCustomId;
         }
 
         public ReplaceMessagePart(String oldLineStartsWith, TextDisplay part) {
             this.part = part;
-            this.type = MessagePartType.TEXT_DISPLAY;
-            this.replaceKey = oldLineStartsWith;
+            type = MessagePartType.TEXT_DISPLAY;
+            replaceKey = oldLineStartsWith;
         }
 
         public ReplaceMessagePart(String oldItemUrlPart, MediaGallery part) {
             this.part = part;
-            this.type = MessagePartType.MEDIA_GALLERY;
-            this.replaceKey = oldItemUrlPart;
+            type = MessagePartType.MEDIA_GALLERY;
+            replaceKey = oldItemUrlPart;
         }
 
         public Component asComponent() {
@@ -142,7 +142,7 @@ public class MessageV2Editor {
      * Apply changes to recent messages in a channel. This is useful for editing
      * messages that are very likely to be near the bottom of a channel. Especially
      * useful for custom channels, such as draft channels.
-     *
+     * <p>
      * If you're doing any text updates, be sure that the pattern is highly specific.
      * This method will probably check messages you didn't intend.
      * @param channel The channel to edit messages in.
@@ -175,7 +175,7 @@ public class MessageV2Editor {
      * when a complex message is split into multiple messages. You can respond to
      * an interaction in one message, while also affecting related components that
      * were split into a different message.
-     *
+     * <p>
      * If you're doing any text updates, be sure that the pattern is highly specific.
      * This method will probably check messages you didn't intend.
      * @param targetMessage The message to edit, and use as a center point for surrounding messages.

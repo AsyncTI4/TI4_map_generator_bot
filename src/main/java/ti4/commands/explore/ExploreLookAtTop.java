@@ -54,4 +54,9 @@ class ExploreLookAtTop extends GameStateSubcommand {
                 "The top card of the " + traitNameWithEmoji + " exploration deck has been set to "
                         + playerFactionNameWithEmoji + " `#cards-info` thread.");
     }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
+    }
 }

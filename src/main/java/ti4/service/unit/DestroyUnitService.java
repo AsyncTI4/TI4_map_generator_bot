@@ -18,6 +18,7 @@ import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.DisasterWatchHelper;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -67,7 +68,7 @@ public class DestroyUnitService {
         handleDestroyedUnits(event, game, units, combat);
     }
 
-    private static void destroyAllPlayerNonStructureUnits(
+    public static void destroyAllPlayerNonStructureUnits(
             GenericInteractionCreateEvent event,
             Game game,
             Player player,
@@ -148,7 +149,8 @@ public class DestroyUnitService {
             }
 
             if (numInfantry > 0) {
-                ButtonHelper.resolveInfantryDestroy(player, numInfantry);
+                ButtonHelper.resolveInfantryDestroy(
+                        player, numInfantry, units.getFirst().tile());
             }
         }
 
@@ -172,18 +174,32 @@ public class DestroyUnitService {
             capturing.addAll(devours);
         }
 
+        if (game.isTwilightsFallMode() && (unit.unitKey().getUnitType() == UnitType.Fighter)) {
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                if (p2.ownsUnit("tf-vortexer")) {
+                    for (String pos :
+                            FoWHelper.getAdjacentTiles(game, unit.tile().getPosition(), p2, false, true)) {
+                        if (game.getTileByPosition(pos).getSpaceUnitHolder().getUnitCount(UnitType.Carrier, p2) > 0) {
+                            capturing.add(p2);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
 
         switch (unit.unitKey().getUnitType()) {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
-                if (player != null && player.hasUnit("mykomentori_mech")) {
+                if (player.hasUnit("mykomentori_mech") || player.hasTech("tf-specops")) {
                     for (int x = 0; x < totalAmount; x++) {
                         ButtonHelper.rollMykoMechRevival(game, player);
                     }
                 }
-                if (player != null && player.hasUnit("cheiran_mech")) {
+                if (player.hasUnit("cheiran_mech")) {
                     AddUnitService.addUnits(
                             event,
                             unit.tile(),
@@ -308,7 +324,7 @@ public class DestroyUnitService {
 
     private static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
         if (player.hasActiveBreakthrough("naazbt")) {
-            BreakthroughCommandHelper.deactivateBreakthrough(player);
+            BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
         }
         if (player.hasTech("sar")) {
             MessageHelper.sendMessageToChannel(

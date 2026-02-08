@@ -4,21 +4,23 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.RelicModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
-import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.tactical.TacticalActionService;
 
 @UtilityClass
@@ -27,11 +29,11 @@ class RelicButtonHandler {
     @ButtonHandler("useRelic_")
     static void useRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String relic = buttonID.replace("useRelic_", "");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         if ("boon".equals(relic)) { // Sarween Tools
             player.addSpentThing("boon");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-            event.getMessage().editMessage(exhaustedMessage).queue();
+            event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -48,7 +50,7 @@ class RelicButtonHandler {
                 player.getCorrectChannel(),
                 player.getFactionEmoji() + " exhausted "
                         + Mapper.getRelic(relic).getName());
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         if ("absol_luxarchtreatise".equalsIgnoreCase(relic)) {
             game.setStoredValue("absolLux", "true");
         }
@@ -87,44 +89,8 @@ class RelicButtonHandler {
     @ButtonHandler("drawRelicFromFrag")
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("neuraloopPart1")
-    static void neuraloopPart1(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String poID = buttonID.split(";")[1];
-        String type = buttonID.split(";")[2];
-        String msg = player.getRepresentation()
-                + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
-        List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("neuraloopPart2")
-    static void neuraloopPart2(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String poID = buttonID.split(";")[1];
-        String type = buttonID.split(";")[2];
-        String relic = buttonID.split(";")[3];
-        player.removeRelic(relic);
-        player.removeExhaustedRelic(relic);
-        game.removeRevealedObjective(poID);
-        String msg = player.getRepresentation() + " is using _Neuraloop_, purge "
-                + ("neuraloop".equals(relic) ? "itself" : Mapper.getRelic(relic).getName())
-                + ", to replace the recently revealed objective with a random " + type + ".";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), game.getPing() + " Revealed objective `" + poID + "` was replaced.");
-        }
-        if ("stage1".equalsIgnoreCase(type)) {
-            RevealPublicObjectiveService.revealS1(game, event, true);
-        } else if ("stage2".equalsIgnoreCase(type)) {
-            RevealPublicObjectiveService.revealS2(game, event, true);
-        } else {
-            RevealPublicObjectiveService.revealSO(game, game.getActionsChannel());
-        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -139,10 +105,11 @@ class RelicButtonHandler {
         game.setDominusOrb(true);
         String relicId = "dominusorb";
         player.removeRelic(relicId);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(
-                event.getMessageChannel(), "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
+                event.getMessageChannel(), player.getRepresentationNoPing() + " has purged _Dominus Orb_.");
         ButtonHelper.deleteMessage(event);
         String message = "Please choose a system to move from.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
@@ -153,10 +120,11 @@ class RelicButtonHandler {
     static void eyeOfVogul(ButtonInteractionEvent event, Player player, Game game) {
         String relicId = "eye_of_vogul";
         player.removeRelic(relicId);
+        DSHelperBreakthroughs.doLanefirBtCheck(game, player);
         player.removeExhaustedRelic(relicId);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("exhauste6g0network")
@@ -186,7 +154,7 @@ class RelicButtonHandler {
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.checkACLimit(game, player);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     @ButtonHandler("crownofemphidiaexplore")

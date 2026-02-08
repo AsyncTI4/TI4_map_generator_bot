@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -19,6 +20,7 @@ import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
@@ -36,7 +38,7 @@ public class VoteButtonHandler {
         game.setStoredValue("preVoting" + player.getFaction(), "");
         player.resetSpentThings();
         if (event instanceof ButtonInteractionEvent bEvent) {
-            bEvent.getMessage().delete().queue();
+            bEvent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
@@ -127,6 +129,7 @@ public class VoteButtonHandler {
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Choosing to break tie for one of " + factionOrColor
                 + "'s planets. As Speaker, please decide a winner.";
+
         List<Button> outcomeActionRow;
         outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "resolveAgendaVote_outcomeTie*", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
@@ -283,8 +286,18 @@ public class VoteButtonHandler {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && p.isSpaceStation()) continue;
+            String agendaDetails = game.getCurrentAgendaInfo().split("_")[1].toLowerCase();
+            if (agendaDetails.contains("non-home")) {
+                if (game.getTileFromPlanet(planet) != null
+                        && game.getTileFromPlanet(planet).isHomeSystem(game)) {
+                    continue;
+                }
+                if ("mrte".equalsIgnoreCase(planet) || "mr".equalsIgnoreCase(planet)) {
+                    continue;
+                }
+            }
             Button button;
             TI4Emoji planetEmoji = PlanetEmojis.getPlanetEmoji(planet);
             if (rider == null) {
@@ -302,8 +315,14 @@ public class VoteButtonHandler {
 
     public static List<Button> getPlayerOutcomeButtons(Game game, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
-
-        for (Player player : game.getRealPlayers()) {
+        List<Player> players = game.getRealPlayers();
+        if (prefix.contains("solagent") || prefix.contains("letnevagent")) {
+            players = game.getRealPlayersNNeutral();
+        }
+        if (prefix.contains("yinHero")) {
+            players = game.getRealPlayersNNeutral();
+        }
+        for (Player player : players) {
             String faction = player.getFaction();
             Button button;
             if (!game.isFowMode() && !faction.contains("franken")) {

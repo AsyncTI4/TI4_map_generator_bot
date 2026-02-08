@@ -73,14 +73,15 @@ public class TheIconService {
         buttons.add(Buttons.blue("useTheIcon", "Use The Icon", FactionEmojis.Bastion));
         buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("Decline"));
 
-        String msg = player.getRepresentationUnfogged() + " you can use your breakthrough, " + theIcon()
-                + ", to place your produced ships in a different eligible system.";
-        ButtonHelper.sendMessageToRightStratThread(player, game, msg, buttonID);
+        String msg = player.getRepresentationUnfogged() + " you can use " + theIcon()
+                + " to place your produced ships in a different eligible system.";
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg, buttons);
     }
 
     @ButtonHandler("useTheIcon")
     private void doExhaustIcon(ButtonInteractionEvent event, Player player) {
-        BreakthroughCommandHelper.exhaustBreakthrough(event, player);
+        BreakthroughCommandHelper.exhaustBreakthrough(player, "bastionbt");
+        iconStepOne(event, player.getGame(), player);
     }
 
     public void iconStepOne(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -88,24 +89,26 @@ public class TheIconService {
                 || getEligibleIconDestinations(game, player).isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
-                    "Something went wrong, I don't know how to resolve The Icon right now. Please resolve it manually.");
+                    "Something went wrong, I don't know how to resolve _The Icon_ right now. Please resolve it manually.");
             return;
         }
 
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
-        String producedSummary = "";
-        for (String unitAndPos : producedUnits.keySet()) {
-            String[] data = unitAndPos.split("_");
+        StringBuilder producedSummary = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+            String[] data = entry.getKey().split("_");
             UnitType type = Units.findUnitType(data[0]);
             UnitModel model = player.getUnitByType(type);
             if (model.getIsShip()) {
-                producedSummary += "\n> " + model.getUnitEmoji().toString().repeat(producedUnits.get(unitAndPos));
+                producedSummary
+                        .append("\n> ")
+                        .append(model.getUnitEmoji().toString().repeat(entry.getValue()));
             }
         }
 
         String msg = "You produced the following ships:" + producedSummary;
         msg += "\n\nChoose a system that contains your command token, your ground force, and no other player's ships.";
-        msg += "\n> Warning: ALL of the listed ships will be moved to the destination system.";
+        msg += "\n> Warning: __All__ of the listed ships will be moved to the destination system.";
         List<Button> destButtons = new ArrayList<>();
         for (String pos : getEligibleIconDestinations(game, player)) {
             Tile tile = game.getTileByPosition(pos);
@@ -124,9 +127,9 @@ public class TheIconService {
             Tile dest = game.getTileByPosition(matcher.group("pos"));
             Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
 
-            String movedSummary = "";
-            for (String unitAndPos : producedUnits.keySet()) {
-                String[] data = unitAndPos.split("_");
+            StringBuilder movedSummary = new StringBuilder();
+            for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                String[] data = entry.getKey().split("_");
                 UnitType type = Units.findUnitType(data[0]);
                 String pos = data[1];
                 String uhName = data[2];
@@ -134,11 +137,13 @@ public class TheIconService {
                 UnitModel model = player.getUnitByType(type);
                 if (model.getIsShip()) {
                     Tile src = game.getTileByPosition(pos);
-                    int amt = producedUnits.get(unitAndPos);
+                    int amt = entry.getValue();
                     UnitKey key = Units.getUnitKey(type, player.getColor());
                     var states = src.getUnitHolders().get(uhName).removeUnit(key, amt, UnitState.none);
                     dest.getSpaceUnitHolder().addUnitsWithStates(key, states);
-                    movedSummary += "\n> " + model.getUnitEmoji().toString().repeat(producedUnits.get(unitAndPos));
+                    movedSummary
+                            .append("\n> ")
+                            .append(model.getUnitEmoji().toString().repeat(entry.getValue()));
                 }
             }
 

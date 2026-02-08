@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
 
-    public PutDiscardBackIntoDeckAgendas() {
+    PutDiscardBackIntoDeckAgendas() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put agenda back into deck from discard", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
                 .setRequired(true)
@@ -44,5 +44,10 @@ class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
         if (!success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda found.");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

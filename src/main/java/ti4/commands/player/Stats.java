@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
@@ -22,6 +24,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.SusSlashCommandService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -30,7 +33,10 @@ import ti4.settings.users.UserSettingsManager;
 
 class Stats extends GameStateSubcommand {
 
-    public Stats() {
+    private static final Set<String> SUS_OPTIONS = Set.of(
+            Constants.CC, Constants.TACTICAL, Constants.FLEET, Constants.STRATEGY, Constants.TG, Constants.COMMODITIES);
+
+    Stats() {
         super(Constants.STATS, "Player Stats: Command tokens, trade goods, commodities", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command token - example: 3/3/2 or +1/-1/+0"))
                 .addOptions(new OptionData(
@@ -227,7 +233,7 @@ class Stats extends GameStateSubcommand {
             if ("y".equals(value) || "yes".equals(value)) {
                 game.setSpeakerUserID(player.getUserID());
             } else {
-                message.append(", which is not a valid input. Please use one of: y/yes");
+                message.append(", which is not a valid input. Please use one of `y` or `yes`.");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -239,7 +245,7 @@ class Stats extends GameStateSubcommand {
             if ("y".equals(value) || "yes".equals(value)) {
                 game.setTyrantUserID(player.getUserID());
             } else {
-                message.append(", which is not a valid input. Please use one of: y/yes");
+                message.append(", which is not a valid input. Please use one of `y` or `yes`.");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -256,7 +262,7 @@ class Stats extends GameStateSubcommand {
             } else if ("n".equals(value) || "no".equals(value)) {
                 player.setPassed(false);
             } else {
-                message.append(", which is not a valid input. Please use one of: y/yes/n/no");
+                message.append(", which is not a valid input. Please use one of `y` `yes` `n` or `no`.");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -317,9 +323,16 @@ class Stats extends GameStateSubcommand {
                 }
 
                 var userSettings = UserSettingsManager.get(player.getUserID());
-
+                if (event.getChannel() instanceof TextChannel channel) {
+                    SusSlashCommandService.reportToModerationLog(
+                            event,
+                            channel.getJumpUrl() + " Round " + game.getRound() + "; Space Resources: "
+                                    + player.getTotalResourceValueOfUnits("space") + "; VP: "
+                                    + player.getTotalVictoryPoints() + ";\nTrack record: "
+                                    + userSettings.getTrackRecord());
+                }
                 userSettings.setTrackRecord(
-                        userSettings.getTrackRecord() + " was set as an NPC in " + game.getName() + ". ");
+                        userSettings.getTrackRecord() + " Was set as an NPC in " + game.getName() + ". ");
 
                 UserSettingsManager.save(userSettings);
 
@@ -327,7 +340,8 @@ class Stats extends GameStateSubcommand {
                 Member removedMember = guild.getMemberById(player.getUserID());
                 List<Role> roles = guild.getRolesByName(game.getName(), true);
                 if (removedMember != null && roles.size() == 1) {
-                    guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
+                    guild.removeRoleFromMember(removedMember, roles.getFirst())
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
                 }
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(
@@ -335,16 +349,29 @@ class Stats extends GameStateSubcommand {
                         "Remove View Permissions For " + player.getUserName()));
                 buttons.add(Buttons.red("deleteButtons", "Stay in channels"));
                 String msg = player.getRepresentation()
-                        + " do you want to remove yourself from the game channels? If so, press this button.";
+                        + ", do you wish to remove yourself from the game channels? If so, press this button.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-                if (event.getChannel() instanceof TextChannel channel) {
-                    SusSlashCommandService.reportSusSlashCommand(event, channel.getJumpUrl());
-                }
+
+                msg = player.getRepresentation()
+                        + ", you should know that NPC is only to be used in doomed scenarios, where your chances of winning are seemingly below 1%. You should be near eliminated or several rounds behind in scoring before using this (or perhaps have a real life reason to dip).";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+                msg = game.getPing()
+                        + ", a player has turned NPC. NPCs will auto pass on everything, and their only actions will be to pick the lowest initiative strategy card, play it as soon as possible, and then pass. If this doesn't sound quite right for this situation, we invite you to seek a replacement on the hub server channel #finding-replacements.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
     }
 
     private static String getGeneralMessage(OptionMapping option) {
         return ">  set **" + option.getName() + "** to " + option.getAsString();
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        // We're okay with reducing values
+        return event.getOptions().stream()
+                .anyMatch(option -> SUS_OPTIONS.contains(option.getName())
+                        && !option.getAsString().startsWith("-"));
     }
 }

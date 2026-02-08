@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -25,7 +26,7 @@ public class CheckDistanceHelper {
 
     private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
         if (ButtonHelper.nomadHeroAndDomOrbCheck(player, game)) return true;
-        return !CommandCounterHelper.hasCC(player, tile);
+        return !CommandCounterHelper.hasCC(player, tile) || tile.getPosition().equalsIgnoreCase(game.getActiveSystem());
     }
 
     public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game game, Player player) {
@@ -51,6 +52,8 @@ public class CheckDistanceHelper {
                             && entry.getValue() != null
                             && distances.get(tilePos) > entry.getValue()) {
                         distances.put(tilePos, entry.getValue());
+                    } else if (entry.getValue() == null && distances.get(tilePos) == null) {
+                        distances.put(tilePos, 100);
                     }
                 }
             }
@@ -83,18 +86,18 @@ public class CheckDistanceHelper {
                 int distance = i;
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
-                            || (tile.isNebula()
+                            || (tile.isNebula(game)
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasAbility("voidborn")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !ButtonHelper.isLawInPlay(game, "shared_research"))
                             || (tile.isSupernova()
                                     && player != null
                                     && !player.hasAbility("celestial_being")
                                     && !player.getRelics().contains("circletofthevoid")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2)
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2)
                                     && !player.hasAbility("gashlai_physiology")
                                     && !player.hasTech("tf-mr"))
                             || (player != null
@@ -102,7 +105,9 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("lwd")
                                     && !player.hasTech("absol_lwd")
                                     && tile2 != null
-                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
+                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2)
+                                    && (!player.hasUnit("mentak_cruiser3")
+                                            || tile2.getSpaceUnitHolder().getUnitCount(UnitType.Cruiser, player) < 1))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()
@@ -112,7 +117,7 @@ public class CheckDistanceHelper {
                                     && !player.hasTech("wavelength")
                                     && !player.getRelics().contains("circletofthevoid")
                                     && !player.hasTech("absol_amd")
-                                    && !ButtonHelper.doesPlayerHaveFSHere("pinktf_flagship", player, tile2))) {
+                                    && !ButtonHelper.doesPlayerHaveFSHere("purpletf_flagship", player, tile2))) {
                         continue;
                     }
                 }

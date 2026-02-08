@@ -1,6 +1,23 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.*;
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,12 +104,12 @@ class GameLoadService {
             Game game = readGame(file);
 
             if (game == null || game.getName() == null) {
-                BotLogger.warning("Could not load game. Game or game name is null: " + file.getName());
+                BotLogger.critical("Could not load game. Game or game name is null: " + file.getName());
                 return null;
             }
             return new ManagedGame(game);
         } catch (Exception e) {
-            BotLogger.error("Could not load game: " + file.getName(), e);
+            BotLogger.critical("Could not load game: " + file.getName(), e);
         }
         return null;
     }
@@ -111,7 +128,7 @@ class GameLoadService {
     @Nullable
     private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
-            BotLogger.error("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
+            BotLogger.critical("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
             return null;
         }
         try {
@@ -141,7 +158,7 @@ class GameLoadService {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.error(
+                        BotLogger.critical(
                                 "Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
                         return null;
                     }
@@ -172,7 +189,7 @@ class GameLoadService {
             }
             Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
             if (tileMap == null) {
-                BotLogger.error("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                BotLogger.critical("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
                 return null;
             }
             game.setTileMap(tileMap);
@@ -180,7 +197,7 @@ class GameLoadService {
             game.setStoredValue("loadedGame", "yes");
             return game;
         } catch (Exception e) {
-            BotLogger.error("Data read error: " + gameFile.getName(), e);
+            BotLogger.critical("Data read error: " + gameFile.getName(), e);
             return null;
         }
     }
@@ -231,10 +248,6 @@ class GameLoadService {
                                         found = true;
                                     }
                                 }
-                                if (tile.getTileID().equals("sig01") && unitHolderName.equals("garbozia")) {
-                                    // DELETE ME
-                                    unitHolderName = "bozgarbia";
-                                }
                                 if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(
                                             new LogOrigin(game),
@@ -249,26 +262,8 @@ class GameLoadService {
                         readUnit(tile, data, unitHolderName);
                     }
 
-                    // DEPRECATED. Delete this after September 1st
-                    boolean skipNext = true;
-                    String nextCategory = gameFileLines.next();
-                    if (UNITDAMAGE.equals(nextCategory)) {
-                        while (gameFileLines.hasNext()) {
-                            String data = skipNext ? nextCategory : gameFileLines.next();
-                            if (UNITDAMAGE.equals(data)) {
-                                skipNext = false;
-                                continue;
-                            }
-                            if (ENDUNITDAMAGE.equals(data)) {
-                                break;
-                            }
-                            readUnitDamage(tile, data, unitHolderName);
-                        }
-                    }
-
                     while (gameFileLines.hasNext()) {
-                        String data = skipNext ? nextCategory : gameFileLines.next();
-                        skipNext = false;
+                        String data = gameFileLines.next();
                         if (PLANET_TOKENS.equals(data)) {
                             continue;
                         }
@@ -290,7 +285,7 @@ class GameLoadService {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error(new LogOrigin(game), "Data read error: " + gameFile.getName(), e);
+            BotLogger.critical(new LogOrigin(game), "Data read error: " + gameFile.getName(), e);
             return null;
         }
         return tileMap;
@@ -309,9 +304,9 @@ class GameLoadService {
                 case Constants.AC -> game.setActionCards(getCardList(info));
                 case Constants.PO1 -> game.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> game.setPublicObjectives2(getCardList(info));
-                case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peakable(getCardList(info));
+                case Constants.PO1PEAKABLE -> game.setPublicObjectives1Peekable(getCardList(info));
                 case Constants.SAVED_BUTTONS -> game.setSavedButtons(getCardList(info));
-                case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peakable(getCardList(info));
+                case Constants.PO2PEAKABLE -> game.setPublicObjectives2Peekable(getCardList(info));
                 case Constants.PO1PEEKED -> game.setPublicObjectives1Peeked(loadPeekedPublicObjectives(info));
                 case Constants.PO2PEEKED -> game.setPublicObjectives2Peeked(loadPeekedPublicObjectives(info));
                 case Constants.EXPEDITION_TECHSKIP -> game.getExpeditions().setTechSkip(info);
@@ -729,6 +724,7 @@ class GameLoadService {
                     game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
                 case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
                 case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
+                case Constants.NO_FRACTURE -> game.setNoFractureMode(loadBooleanOrDefault(info, false));
                 case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(loadBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->
                     game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));
@@ -737,6 +733,7 @@ class GameLoadService {
                 case Constants.CIVILIZED_SOCIETY_MODE ->
                     game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));
+                case Constants.VEILED_HEART_MODE -> game.setVeiledHeartMode(loadBooleanOrDefault(info, false));
                 case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(loadBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(loadBooleanOrDefault(info, false));
                 case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(loadBooleanOrDefault(info, false));
@@ -744,6 +741,7 @@ class GameLoadService {
                 case Constants.SHOW_FULL_COMPONENT_TEXT ->
                     game.setShowFullComponentTextEmbeds(loadBooleanOrDefault(info, false));
                 case Constants.GAME_HAS_ENDED -> game.setHasEnded(loadBooleanOrDefault(info, false));
+                case Constants.CREATION_DATE_TIME -> game.setCreationDateTime(Long.parseLong(info));
                 case Constants.CREATION_DATE -> game.setCreationDate(info);
                 case Constants.ROUND -> {
                     try {
@@ -812,6 +810,17 @@ class GameLoadService {
                     game.setMinimumTIGLRankAtGameStart(rank);
                 }
                 case Constants.PRIORITY_TRACK_MODE -> game.setPriorityTrackMode(PriorityTrackMode.parse(info));
+                case Constants.DEBT_POOL -> {
+                    StringTokenizer actionCardToken = new StringTokenizer(info, ";");
+                    Map<String, String> cards = new LinkedHashMap<>();
+                    while (actionCardToken.hasMoreTokens()) {
+                        StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                        String id = cardInfo.nextToken();
+                        String value = cardInfo.nextToken();
+                        cards.put(id.replace("_", " "), value);
+                    }
+                    game.setAllDebtPoolIcons(cards);
+                }
             }
         }
     }
@@ -831,6 +840,32 @@ class GameLoadService {
             cardList.add(cards.nextToken());
         }
         return cardList;
+    }
+
+    private static List<String> getParsedStrList(String tokenizer) {
+        StringTokenizer data = new StringTokenizer(tokenizer, ",");
+        List<String> output = new ArrayList<>();
+        while (data.hasMoreTokens()) {
+            String value = StringHelper.unescape(data.nextToken());
+            output.add(value);
+        }
+        return output;
+    }
+
+    private static Map<String, Boolean> getParsedStrBoolMap(String tokenizer) {
+        StringTokenizer mapdata = new StringTokenizer(tokenizer, ";");
+        Map<String, Boolean> cards = new LinkedHashMap<>();
+        while (mapdata.hasMoreTokens()) {
+            StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
+            String id = entry.nextToken();
+            Boolean val = Boolean.parseBoolean(entry.nextToken());
+            cards.put(id, val);
+        }
+        return cards;
+    }
+
+    private static Map<String, Integer> getParsedStrIntMap(String tokenizer) {
+        return getParsedCards(tokenizer);
     }
 
     private static Map<String, Integer> getParsedCards(String tokenizer) {
@@ -909,6 +944,9 @@ class GameLoadService {
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.DECAL_SET -> player.setDecalSet(tokenizer.nextToken());
                 case Constants.STATS_ANCHOR_LOCATION -> player.setPlayerStatsAnchorPosition(tokenizer.nextToken());
+                case Constants.STATS_TRACKED_USER_ID -> player.setStatsTrackedUserID(tokenizer.nextToken());
+                case Constants.STATS_TRACKED_USER_NAME ->
+                    player.setStatsTrackedUserName(tokenizer.nextToken().replace("----", " "));
                 case Constants.HS_TILE_POSITION -> player.setHomeSystemPosition(tokenizer.nextToken());
                 case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
@@ -922,7 +960,22 @@ class GameLoadService {
                 case Constants.EXPECTED_HITS_TIMES_10 ->
                     player.setExpectedHitsTimes10(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_EXPENSES -> player.setTotalExpenses(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.BONUS_SCORED_SECRETS ->
+                    player.setBonusScoredSecrets(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TURN_COUNT -> player.setInRoundTurnCount(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DEBT + "2" -> {
+                    StringTokenizer split = new StringTokenizer(tokenizer.nextToken(), "|");
+                    String pool = split.nextToken().replace("_", " ");
+                    StringTokenizer debtToken = new StringTokenizer(split.nextToken(), ";");
+                    LinkedHashMap<String, Integer> debtTokens = new LinkedHashMap<String, Integer>();
+                    while (debtToken.hasMoreTokens()) {
+                        StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
+                        String color = debtInfo.nextToken();
+                        Integer count = Integer.parseInt(debtInfo.nextToken());
+                        debtTokens.put(color, count);
+                    }
+                    player.setDebtTokens(debtTokens, pool);
+                }
                 case Constants.DEBT -> {
                     StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     Map<String, Integer> debtTokens = new LinkedHashMap<>();
@@ -934,14 +987,38 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                case Constants.BREAKTHROUGH -> player.setBreakthroughID(readStringLine(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_EXH ->
-                    player.setBreakthroughExhausted(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_UNL ->
-                    player.setBreakthroughUnlocked(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_ACTV ->
-                    player.setBreakthroughActive(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_TGS -> player.setBreakthroughTGs(Integer.parseInt(tokenizer.nextToken()));
+                // OLD - DELETE THESE
+                case Constants.BREAKTHROUGH -> player.setBreakthroughIDs(getCardList(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH -> {
+                    String bt = player.getBreakthroughID();
+                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
+                    player.getBreakthroughExhausted().put(bt, stuff);
+                }
+                case Constants.BREAKTHROUGH_UNL -> {
+                    String bt = player.getBreakthroughID();
+                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
+                    player.getBreakthroughUnlocked().put(bt, stuff);
+                }
+                case Constants.BREAKTHROUGH_ACTV -> {
+                    String bt = player.getBreakthroughID();
+                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
+                    player.getBreakthroughActive().put(bt, stuff);
+                }
+                case Constants.BREAKTHROUGH_TGS -> {
+                    String bt = player.getBreakthroughID();
+                    Integer stuff = Integer.parseInt(tokenizer.nextToken());
+                    player.getBreakthroughTGs().put(bt, stuff);
+                }
+                // END DELETE
+                case Constants.BREAKTHROUGHS -> player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_EXH_MAP ->
+                    player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_UNL_MAP ->
+                    player.setBreakthroughUnlocked(getParsedStrBoolMap(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_ACTV_MAP ->
+                    player.setBreakthroughActive(getParsedStrBoolMap(tokenizer.nextToken()));
+                case Constants.BREAKTHROUGH_TGS_MAP ->
+                    player.setBreakthroughTGs(getParsedStrIntMap(tokenizer.nextToken()));
                 case Constants.STRATEGY_CARD ->
                     player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream()
                             .map(Integer::valueOf)

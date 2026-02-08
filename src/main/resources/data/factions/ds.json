@@ -1538,7 +1538,7 @@
         "alias": "veldyr",
         "factionName": "Veldyr Sovereignty",
         "homeSystem": "d01",
-        "startingFleet": "dn,cv,dd,2 ff,4 inf r,sd r,pds r",
+        "startingFleet": "dn,cv,dd,3 ff,4 inf r,sd r,pds r",
         "commodities": 4,
         "factionTech": [
             "dsvelddn",
@@ -1856,6 +1856,51 @@
             "infantry",
             "atokera_mech",
             "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
+    },
+    {
+        "alias": "kaltrim",
+        "factionName": "Principality of Kaltrim",
+        "homeSystem": "br7",
+        "startingFleet": "1 cv,2 ff,3 inf k, 1 sd k, 1 dn",
+        "commodities": 3,
+        "factionTech": [
+            "dskaltr",
+            "dskaltpds"
+        ],
+        "startingTech": [
+            "asc"
+        ],
+        "homePlanets": [
+            "kaltrim",
+            "avkho"
+        ],
+        "abilities": [
+            "questing_prince",
+            "lost_crown_of_kaltrim",
+            "shrines"
+        ],
+        "leaders": [
+            "kaltrimagent",
+            "kaltrimcommander",
+            "kaltrimhero"
+        ],
+        "promissoryNotes": [
+            "dspnkalt"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "kaltrim_flagship",
+            "infantry",
+            "kaltrim_mech",
+            "kaltrim_pds",
             "spacedock"
         ],
         "complexity": "High",

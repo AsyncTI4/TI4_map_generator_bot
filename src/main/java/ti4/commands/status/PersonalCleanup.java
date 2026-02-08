@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.thundersedge.DSHelperBreakthroughs;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -30,7 +31,10 @@ class PersonalCleanup extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
             return;
         }
         Game game = getGame();
@@ -75,6 +79,7 @@ class PersonalCleanup extends GameStateSubcommand {
             if (!leader.isLocked()) {
                 if (leader.isActive()) {
                     player.removeLeader(leader.getId());
+                    DSHelperBreakthroughs.doLanefirBtCheck(game, player);
                 } else {
                     RefreshLeaderService.refreshLeader(player, leader, game);
                 }

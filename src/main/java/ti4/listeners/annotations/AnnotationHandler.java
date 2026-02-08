@@ -1,6 +1,6 @@
 package ti4.listeners.annotations;
 
-import static org.reflections.scanners.Scanners.SubTypes;
+import static org.reflections.scanners.Scanners.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -178,16 +179,18 @@ public class AnnotationHandler {
                         buttonInteractionEvent
                                 .getInteraction()
                                 .getMessage()
-                                .reply("The button failed. An exception has been logged for the developers.")
-                                .queue();
+                                .reply(
+                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
                         origin = selectInteractionEvent;
                         selectInteractionEvent
                                 .getInteraction()
                                 .getMessage()
-                                .reply("The selection failed. An exception has been logged for the developers.")
-                                .queue();
+                                .reply(
+                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
+                                .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }
                 BotLogger.error(

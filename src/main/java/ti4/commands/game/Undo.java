@@ -32,13 +32,16 @@ class Undo extends GameStateSubcommand {
         }
 
         if (game.isFowMode() && !FoWHelper.isGameMaster(event.getUser().getId(), game)) {
-            MessageHelper.replyToMessage(event, "Only the GM can use undo in FoW.");
+            MessageHelper.replyToMessage(event, "Only the GM can use undo in Fog of War.");
             return;
         }
 
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Undo failed - Must confirm with YES");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
             return;
         }
 

@@ -68,11 +68,12 @@ public class LeaderInfoService {
         if (player.hasLeader("yssarilagent")) {
             for (Player otherPlayer : game.getPlayers().values()) {
                 if (otherPlayer != player) {
-                    Leader otherPlayerAgent = otherPlayer.unsafeGetLeader(Constants.AGENT);
-                    if (otherPlayerAgent == null) {
-                        continue;
+                    for (String leaderID : otherPlayer.getLeaderIDs()) {
+                        if (leaderID.contains("agent") && (Mapper.getLeader(leaderID) != null)) {
+                            yssarilEmbeds.add(
+                                    Mapper.getLeader(leaderID).getRepresentationEmbed(game.isTwilightsFallMode()));
+                        }
                     }
-                    yssarilEmbeds.add(otherPlayerAgent.getLeaderEmbed());
                 }
             }
         }
@@ -115,7 +116,7 @@ public class LeaderInfoService {
     private static List<MessageEmbed> getPlayersLeaderEmbeds(Player player) {
         List<MessageEmbed> embeds = new ArrayList<>();
         for (Leader leader : player.getLeaders()) {
-            embeds.add(leader.getLeaderEmbed());
+            embeds.add(leader.getLeaderEmbed(player.getGame()));
         }
         return embeds;
     }

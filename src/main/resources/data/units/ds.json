@@ -227,6 +227,26 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/chitin_hulk_2.png?raw=true"
     },
     {
+        "id": "tribune3",
+        "baseType": "dreadnought",
+        "asyncId": "dn",
+        "name": "Tribune",
+        "source": "ds",
+        "faction": "kortali",
+        "isUpgrade": true,
+        "moveValue": 2,
+        "capacityValue": 1,
+        "capacityUsed": 1,
+        "cost": 4,
+        "combatHitsOn": 5,
+        "combatDieCount": 1,
+        "bombardHitsOn": 5,
+        "bombardDieCount": 1,
+        "sustainDamage": true,
+        "isShip": true,
+        "ability": "This unit cannot be destroyed by “Direct Hit” action cards. When this unit produces a hit, you may repair it. While this unit is not damaged, you may reroll its combat roll."
+    },
+    {
         "id": "cheiran_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
@@ -390,7 +410,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After this unit moves into the active system, you may produce up to 2 units that have a combined cost of 4 or less in that system. [Note: this cannot produce ships if enemy ships are present]",
+        "ability": "After this unit moves into the active system, you may produce up to 2 units that have a combined cost of 4 or less in that system.",
+        "notes": "This cannot produce ships if enemy ships are present.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/maximus.jpg?raw=true"
     },
     {
@@ -575,6 +596,28 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/the_lady.png?raw=true"
     },
     {
+        "id": "celdauri_celagrom",
+        "baseType": "celagrom",
+        "asyncId": "celagrom",
+        "name": "The Celagrom",
+        "source": "ds",
+        "faction": "celdauri",
+        "moveValue": 1,
+        "capacityValue": 2,
+        "capacityUsed": 1,
+        "cost": 5,
+        "combatHitsOn": 5,
+        "combatDieCount": 1,
+        "bombardHitsOn": 5,
+        "bombardDieCount": 1,
+        "spaceCannonHitsOn": 5,
+        "spaceCannonDieCount": 1,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "You assign hits this unit produces. While you control another flagship, this unit rolls 1 additional combat die."
+    },
+    {
         "id": "ghemina_flagship_lord",
         "baseType": "flagship",
         "asyncId": "fs",
@@ -750,6 +793,36 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/orion_platform_2.png?raw=true"
     },
     {
+        "id": "kaltrim_pds",
+        "baseType": "pds",
+        "asyncId": "pd",
+        "name": "Consulate I",
+        "upgradesToUnitId": "kaltrim_pds2",
+        "source": "ds",
+        "faction": "kaltrim",
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 1,
+        "planetaryShield": true,
+        "isStructure": true,
+        "ability": "DEPLOY: After a system is activated, you may allow 1 of your neighbors to place 1 PDS from your reinforcements into coexistence on a planet they control in the active system."
+    },
+    {
+        "id": "kaltrim_pds2",
+        "baseType": "pds",
+        "asyncId": "pd",
+        "name": "Consulate II",
+        "upgradesFromUnitId": "kaltrim_pds",
+        "requiredTechId": "dskaltpds",
+        "source": "ds",
+        "faction": "gledge",
+        "spaceCannonHitsOn": 4,
+        "spaceCannonDieCount": 1,
+        "planetaryShield": true,
+        "isStructure": true,
+        "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems. \nAfter another player activates this system, if you do not control this planet, capture up to 1 of their infantry on the game board."
+    },
+    {
         "id": "khrask_cruiser",
         "baseType": "cruiser",
         "asyncId": "ca",
@@ -838,7 +911,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may ignore the movement effects of non-supernova anomalies. [Note: This does not ignore Gravity Rifts Rolls/non-movement-effects!]",
+        "ability": "This unit may ignore the movement effects of non-supernova anomalies.",
+        "notes": "This does not ignore Gravity Rifts Rolls/non-movement-effects.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/faction/star_dragon.png?raw=true"
     },
     {
@@ -857,7 +931,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may ignore the movement effects of anomalies. [Note: This does not ignore Gravity Rifts Rolls/non-movement-effects]",
+        "ability": "This unit may ignore the movement effects of anomalies.",
+        "notes": "This does not ignore Gravity Rifts Rolls/non-movement-effects.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/star_dragon_2.png?raw=true"
     },
     {
@@ -948,7 +1023,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Hits produced by the SPACE CANNON abilities of your units in this system cannot be canceled.[Note: this means you cannot use sustain damage on them]",
+        "ability": "Hits produced by the SPACE CANNON abilities of your units in this system cannot be canceled.",
+        "notes": "This means you cannot use SUSTAIN DAMAGE on them.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/halberd.png?raw=true"
     },
     {
@@ -1074,7 +1150,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: At the start of your turn, purge 1 of your relic fragments to place 1 mech on a planet you control, if you do, you may end your turn. [Note: Treated as a component action in the bot, despite not entirely being one]",
+        "ability": "DEPLOY: At the start of your turn, purge 1 of your relic fragments to place 1 mech on a planet you control. If you do, you may end your turn.",
+        "notes": "Treated as a component action in the bot, despite not entirely being one.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/mechs/troubadour.png?raw=true"
     },
     {
@@ -1201,7 +1278,8 @@
         "isStructure": true,
         "isPlanetOnly": false,
         "isSpaceOnly": true,
-        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed. [Note that if this unit is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot PDS.]",
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.",
+        "notes": "If this unit is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot PDS.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/faction/gauss_cannon.jpg?raw=true"
     },
     {
@@ -1223,7 +1301,8 @@
         "isStructure": true,
         "isPlanetOnly": false,
         "isSpaceOnly": true,
-        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed. [Note: this unit cannot fire into adjacent systems by itself. Needs Mirveda commander. Also note that if it is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot PDS.]",
+        "ability": "This unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.",
+        "notes": "This unit cannot fire into adjacent systems by itself; it needs the Mirveda commander. Also, if it is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot SPACE CANNON.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/gauss_cannon_2.jpg?raw=true"
     },
     {
@@ -1566,6 +1645,29 @@
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/terrafactory_2.jpg?raw=true"
     },
     {
+        "id": "rohdhna_warsun3",
+        "baseType": "warsun",
+        "asyncId": "ws",
+        "name": "Terrafactory III",
+        "source": "ds",
+        "faction": "rohdhna",
+        "isUpgrade": true,
+        "moveValue": 2,
+        "productionValue": 7,
+        "capacityValue": 8,
+        "capacityUsed": 1,
+        "cost": 10,
+        "combatHitsOn": 3,
+        "combatDieCount": 3,
+        "bombardHitsOn": 3,
+        "bombardDieCount": 3,
+        "sustainDamage": true,
+        "disablesPlanetaryShield": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit is also a station with a resource value of 2. When you would exhaust this station’s planet card, this unit becomes damaged instead."
+    },
+    {
         "id": "rohdhna_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
@@ -1670,7 +1772,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you move a destroyer into a non-home system other than Mecatol Rex, you may spend 3 resources to place 1 mech on a planet in that system. [Note: can DEPLOY 1 mech for each destroyer that moves]",
+        "ability": "DEPLOY: After you move a destroyer into a non-home system other than Mecatol Rex, you may spend 3 resources to place 1 mech on a planet in that system.",
+        "notes": "1 mech may be DEPLOY'd for each destroyer that moves.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/mechs/daedalon.jpg?raw=true"
     },
     {
@@ -2175,7 +2278,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Hits produced by this ship cannot be canceled. [Note: this means that sustain damage cannot be used to take one of these hits. Not in space combat or bombardment.]"
+        "ability": "Hits produced by this ship cannot be canceled.",
+        "notes": "This means that SUSTAIN DAMAGE cannot be used to cancel space combat or BOMBARDMENT hits."
     },
     {
         "id": "toldar_flagship",
@@ -2263,6 +2367,21 @@
         "ability": "Other players cannot exhaust this planet. During combat as the defender, you may exhaust this planet to repair each of your units on this planet. "
     },
     {
+        "id": "kaltrim_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Thorn",
+        "source": "ds",
+        "faction": "kaltrim",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "DEPLOY: During the agenda phase, after an outcome you voted for or predicted is resolved, place up to 1 mech from your reinforcements on a planet that contains 1 of your units."
+    },
+    {
         "id": "atokera_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
@@ -2278,7 +2397,26 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Your other units in this system also have the unit and text abilities of other players’ units of the same type in this system. [Note: not currently implemented by the bot]"
+        "ability": "Your other units in this system also have the unit and text abilities of other players’ units of the same type in this system.",
+        "notes": "Not currently implemented by the bot."
+    },
+    {
+        "id": "kaltrim_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Jewel of the Rose",
+        "source": "ds",
+        "faction": "kaltrim",
+        "moveValue": 1,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 7,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "When an agenda is revealed, you may have this ship become damaged to swap that card with the top card of the agenda deck."
     },
     {
         "id": "belkosea_fighter",
@@ -2319,16 +2457,18 @@
         "id": "belkosea_mech",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Orator",
+        "name": "Uzean Wardog",
         "source": "ds",
         "faction": "belkosea",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
+        "afbHitsOn": 6,
+        "afbDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "When this unit produces a hit, gain 1 commodity."
+        "ability": "When this unit produces a hit, gain 1 commodity or convert 1 of your commodities to a trade good."
     },
     {
         "id": "belkosea_flagship",

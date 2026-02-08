@@ -118,7 +118,7 @@ public class DraftTileManager {
         blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
         int bluePerPartition = Math.ceilDiv(blue.size(), 3);
         List<List<MiltyDraftTile>> partitionedTiles = new ArrayList<>(ListUtils.partition(blue, bluePerPartition));
-        tilesByTier.put(TierList.low, partitionedTiles.size() > 0 ? partitionedTiles.get(0) : List.of());
+        tilesByTier.put(TierList.low, !partitionedTiles.isEmpty() ? partitionedTiles.get(0) : List.of());
         tilesByTier.put(TierList.mid, partitionedTiles.size() > 1 ? partitionedTiles.get(1) : List.of());
         tilesByTier.put(TierList.high, partitionedTiles.size() > 2 ? partitionedTiles.get(2) : List.of());
 

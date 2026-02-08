@@ -42,7 +42,6 @@ public class Source {
         keleresplus,
         little_omega,
         project_pi,
-        neutral,
         lost_star_charts_of_ixth,
         flagshipping,
         promises_promises,
@@ -71,6 +70,7 @@ public class Source {
         luminous,
         holytispoon,
         salliance,
+        spice_thyme,
         nomadfalcon,
         unfulvio,
         andcat,
@@ -112,7 +112,7 @@ public class Source {
 
         public boolean isOfficial() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, thunders_edge -> true;
+                case base, pok, codex1, codex2, codex3, codex4, thunders_edge, twilights_fall -> true;
                 default -> false;
             };
         }
@@ -146,7 +146,6 @@ public class Source {
                         case promises_promises -> SourceEmojis.PromisesPromises;
                         case miltymod -> SourceEmojis.MiltyMod;
                         case lazax -> FactionEmojis.Lazax;
-                        case neutral -> FactionEmojis.Neutral;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
                         default -> null;

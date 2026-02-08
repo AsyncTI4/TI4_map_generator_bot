@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 class AgendaRemoveFromGame extends GameStateSubcommand {
 
-    public AgendaRemoveFromGame() {
+    AgendaRemoveFromGame() {
         super(Constants.REMOVE_AGENDA_FROM_GAME, "Agenda remove from game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID")
                 .setRequired(true)
@@ -27,5 +27,10 @@ class AgendaRemoveFromGame extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda not found in game deck");
         }
+    }
+
+    @Override
+    public boolean isSuspicious(SlashCommandInteractionEvent event) {
+        return true;
     }
 }

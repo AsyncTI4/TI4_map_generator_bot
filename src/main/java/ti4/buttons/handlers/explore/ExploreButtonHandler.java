@@ -29,12 +29,12 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
-import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.planet.PlanetService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -63,8 +63,8 @@ class ExploreButtonHandler {
                     "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
             return;
         }
-        AddUnitService.addUnits(
-                event, TileHelper.getTile(event, planetName, game), game, player.getColor(), "mech " + planetName);
+        Tile tile = TileHelper.getTile(event, planetName, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null
                 ? "`error?`"
                 : Mapper.getPlanet(planetName).getName();
@@ -76,6 +76,9 @@ class ExploreButtonHandler {
                     player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
+        if (tile != null && tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
     }
 
     @ButtonHandler("resolveVolatileMech_")
@@ -117,10 +120,11 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_.";
-        message +=
-                " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        message = " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -163,6 +167,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. ";
@@ -203,6 +208,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. ";
         message += " Gained 1 trade good " + player.gainTG(1, true) + ".";
@@ -248,6 +254,7 @@ class ExploreButtonHandler {
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
+        ButtonHelper.resolveInfantryRemoval(player, 1, tile);
 
         AddUnitService.addUnits(
                 event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
@@ -454,10 +461,11 @@ class ExploreButtonHandler {
     static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = bID.startsWith("dsdihmy_");
+        boolean scanlink = bID.startsWith("scanlink_");
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
         ExploreService.explorePlanet(
-                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
+                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, scanlink);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
             MessageHelper.sendMessageToChannel(

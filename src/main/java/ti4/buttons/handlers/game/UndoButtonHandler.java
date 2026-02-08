@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -70,7 +71,10 @@ class UndoButtonHandler {
 
         Game undo = GameManager.undo(game);
         if (undo == null) {
-            event.getHook().sendMessage("Failed to undo.").setEphemeral(true).queue();
+            event.getHook()
+                    .sendMessage("Failed to undo.")
+                    .setEphemeral(true)
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -83,6 +87,6 @@ class UndoButtonHandler {
                 break;
             }
         }
-        event.getHook().sendMessage(msg + ".").setEphemeral(true).queue();
+        event.getHook().sendMessage(msg + ".").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

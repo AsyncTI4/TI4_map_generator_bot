@@ -13,9 +13,9 @@ import ti4.map.persistence.ManagedPlayer;
 
 @RequiredArgsConstructor
 @Service
-public class MyGamesService {
+class MyGamesService {
 
-    public List<MyGameSummary> getMyGames(String userId) {
+    List<MyGameSummary> getMyGames(String userId) {
         ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
         if (managedPlayer == null) return Collections.emptyList();
 

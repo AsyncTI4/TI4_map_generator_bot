@@ -1,0 +1,28 @@
+{
+    "id": "briareus",
+    "tileId": "cpti20cottus",
+    "name": "Briareus",
+    "aliases": [
+        "briareus"
+    ],
+    "positionInTile": {
+        "x": 221,
+        "y": 229
+    },
+    "resources": 0,
+    "influence": 2,
+    "factionHomeworld": null,
+    "planetType": "SPACESTATION",
+    "cardImagePath": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "planetLayout": {
+        "unitHolderName": "briareus",
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": {
+            "x": 221,
+            "y": 229
+        }
+    },
+    "source": "other"
+}

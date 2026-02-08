@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
@@ -79,7 +80,7 @@ class ActionCardHandButtonHandler {
         if (channel == null) {
             event.getChannel()
                     .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
@@ -123,7 +124,7 @@ class ActionCardHandButtonHandler {
             if (!retainButtons) {
                 ButtonHelper.deleteMessage(event);
             } else {
-                ButtonHelper.deleteTheOneButton(event, buttonID, false);
+                ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
             }
             if (player.hasUnexhaustedLeader("cymiaeagent")) {
                 List<Button> buttons2 = new ArrayList<>();
@@ -143,7 +144,7 @@ class ActionCardHandButtonHandler {
             ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
             if (player.hasAbility("scrap_metal")) {
                 String message2 =
-                        player.getRepresentationUnfogged() + ", please resolve Scrap Metal ability using the buttons.";
+                        player.getRepresentationUnfogged() + ", please **Scrap Metal** by using these buttons.";
                 List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, false);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
             }
@@ -157,11 +158,10 @@ class ActionCardHandButtonHandler {
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
-        if (acID.contains("sabo")) {
+        if (ActionCardHelper.isSabotageOrShatter(acID)) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    player.getRepresentation()
-                            + ", please play _Sabotage_ by clicking the Sabo button on the action card you wish to Sabo.");
+                    player.getRepresentation() + ", to cancel an action card, use the button in the actions channel.");
             return;
         }
 
@@ -177,6 +177,16 @@ class ActionCardHandButtonHandler {
                             + ", after checking for Sabos, use buttons to resolve _Reverse Engineer_.",
                     scButtons);
         }
+        if (acID.contains("twinning_")) {
+            String actionCardTitle = acID.split("_")[2];
+            acID = acID.split("_")[0];
+            List<Button> scButtons = new ArrayList<>();
+            scButtons.add(Buttons.green("resolveTwin_" + actionCardTitle, "Play " + actionCardTitle + " Immediately"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Twinning_.",
+                    scButtons);
+        }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
             acID = acID.split("_")[0];
@@ -190,21 +200,21 @@ class ActionCardHandButtonHandler {
         if (channel == null) {
             event.getChannel()
                     .sendMessage("Could not find channel to play card. Please ping Bothelper.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
         try {
             String error = ActionCardHelper.playAC(event, game, player, acID, channel);
             if (error != null) {
-                event.getChannel().sendMessage(error).queue();
+                event.getChannel().sendMessage(error).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } catch (Exception e) {
             BotLogger.error(new LogOrigin(event, player), "Could not parse AC ID: " + acID, e);
             event.getChannel()
                     .asThreadChannel()
-                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.")
-                    .queue();
+                    .sendMessage("Could not parse action card ID: `" + acID + "`. Please play manually.")
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -291,7 +301,7 @@ class ActionCardHandButtonHandler {
         }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         if (!game.isTwilightsFallMode()) {
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 
@@ -300,7 +310,7 @@ class ActionCardHandButtonHandler {
         try {
             int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
             ActionCardHelper.drawActionCards(game, player, count, true);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } catch (Exception ignored) {
         }
     }

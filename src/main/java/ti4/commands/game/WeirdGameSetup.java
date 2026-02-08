@@ -20,16 +20,11 @@ import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
 
-    public WeirdGameSetup() {
+    WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.MILTYMOD_MODE,
-                "True to switch to MiltyMod mode (only compatabile with No Expansion Mode)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to base game mode."));
         addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(
@@ -41,19 +36,13 @@ class WeirdGameSetup extends GameStateSubcommand {
                 Constants.UNCHARTED_SPACE_STUFF,
                 "True to add the Uncharted Space Stuff to the draft pool."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.BETA_TEST_MODE,
-                "True to test new features that may not be released to all games yet."));
+                OptionType.BOOLEAN, Constants.NO_FRACTURE, "True to turn off fracture rolling in TE games."));
         addOptions(new OptionData(
                 OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.EXTRA_SECRET_MODE,
-                "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
-        addOptions(new OptionData(
                 OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
-        addOptions(
-                new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.TWILIGHTS_FALL_MODE, "True to enable Twilight's Fall Mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
@@ -62,10 +51,9 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(
                 new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game")
                         .setAutoComplete(true));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.THUNDERS_EDGE_MODE,
-                "True to enable the work in progress Thunders Edge Mode"));
+        addOptions(
+                new OptionData(OptionType.BOOLEAN, Constants.THUNDERS_EDGE_MODE, "True to enable Thunder's Edge Mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.VEILED_HEART_MODE, "True to enable Veiled Heart Mode"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 FOWOption.RIFTSET_MODE.toString(),
@@ -86,6 +74,9 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
         if (fowMode != null) game.setFowMode(fowMode);
 
+        Boolean tfMode = event.getOption(Constants.TWILIGHTS_FALL_MODE, null, OptionMapping::getAsBoolean);
+        if (tfMode != null) game.setTwilightsFallMode(tfMode);
+
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
@@ -94,6 +85,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
+
+        Boolean nofracture = event.getOption(Constants.NO_FRACTURE, null, OptionMapping::getAsBoolean);
+        if (nofracture != null) game.setNoFractureMode(nofracture);
 
         Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
         if (uncharted != null) {
@@ -125,6 +119,9 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean noSwapMode = event.getOption(Constants.NO_SWAP_MODE, null, OptionMapping::getAsBoolean);
         if (noSwapMode != null) game.setNoSwapMode(noSwapMode);
 
+        Boolean veiledHeartMode = event.getOption(Constants.VEILED_HEART_MODE, null, OptionMapping::getAsBoolean);
+        if (veiledHeartMode != null) game.setVeiledHeartMode(veiledHeartMode);
+
         Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
         if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
@@ -137,7 +134,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (game.isCompetitiveTIGLGame()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+                        "TIGL Games cannot be mixed with other game modes. Priority Track is unchanged.");
             } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
@@ -152,7 +149,21 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
-        if (thunderMode != null) game.setThundersEdge(thunderMode);
+        if (thunderMode != null) {
+            game.setThundersEdge(thunderMode);
+            if (thunderMode && !game.getActionCards().contains("brilliance")) {
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+            }
+            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
+                game.addRelicToGame("quantumcore");
+                game.addRelicToGame("thesilverflame");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
+            }
+        }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
         if (riftsetMode != null && game.isFowMode()) {
@@ -190,7 +201,7 @@ class WeirdGameSetup extends GameStateSubcommand {
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
-    public static boolean setGameMode(
+    static boolean setGameMode(
             GenericInteractionCreateEvent event,
             Game game,
             boolean baseGameMode,
@@ -200,6 +211,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame
+                && !game.getTags().contains(Constants.TIGL_FRACTURED_TAG)
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
@@ -209,14 +221,17 @@ class WeirdGameSetup extends GameStateSubcommand {
                         || game.isCommunityMode()
                         || votcMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+                    event.getMessageChannel(), "TIGL Games cannot be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             TIGLHelper.initializeTIGLGame(game);
             return true;
         }
-        if (!isTIGLGame) {
-            game.setCompetitiveTIGLGame(false);
+
+        game.setCompetitiveTIGLGame(false);
+        if (game.isThundersEdge() || game.isTwilightsFallMode()) {
+            return true;
+            // These modes are incompatible atm with the rest of the game mode settings, so skip them
         }
 
         if (miltyModMode && !baseGameMode) {

@@ -13,7 +13,9 @@ public class Special2Command implements ParentCommand {
                     new SetupNeutralPlayer(),
                     new GeneratePainBoxMapString(),
                     new SearchWinningPath(),
-                    new SetExpedition())
+                    new SetExpedition(),
+                    new Galvanize(),
+                    new LoreCommand())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

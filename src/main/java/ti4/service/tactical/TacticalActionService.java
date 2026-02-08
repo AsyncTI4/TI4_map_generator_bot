@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,7 +19,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -31,6 +29,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -160,6 +159,7 @@ public class TacticalActionService {
         FinishMovementContext ctx = executeCoreFinishMovement(event, game, player, tile);
 
         // UI/message block: build message and buttons
+        LoreService.showSystemLore(player, game, tile.getPosition(), LoreService.TRIGGER.MOVED);
         String message = buildFinishMovementMessage(game, player, ctx);
         List<Button> systemButtons = buildFinishMovementButtons(event, game, player, ctx);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -169,6 +169,9 @@ public class TacticalActionService {
         CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus", "hacan");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
+        if (tile.getPosition().startsWith("frac")) {
+            CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        }
         if (!game.isL1Hero() && !ctx.playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(
                     game, player, ctx.playersWithPds2, ctx.tile);
@@ -201,7 +204,9 @@ public class TacticalActionService {
 
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
                 || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
-                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0;
+                || updatedTile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0
+                || (player.hasUnit("crimson_mech")
+                        && tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE));
 
         if (unitsWereMoved) {
             ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, updatedTile, unitsWereMoved);
@@ -256,7 +261,9 @@ public class TacticalActionService {
         List<Button> buttons = new ArrayList<>();
 
         int productionVal = Helper.getProductionValue(player, game, tile, false);
-        if (productionVal > 0 || ("18".equalsIgnoreCase(tile.getTileID()) && player.hasIIHQ())) {
+        if (productionVal > 0
+                || (("18".equalsIgnoreCase(tile.getTileID()) || "112".equalsIgnoreCase(tile.getTileID()))
+                        && player.hasIIHQ())) {
             buttons.add(createBuildButton(player, tile, productionVal));
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
@@ -390,7 +397,7 @@ public class TacticalActionService {
             Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
         boolean hasUnits = FoWHelper.playerHasUnitsInSystem(player, tile);
         for (Player p2 : game.getRealPlayers()) {
-            if (player.getAllianceMembers().contains(p2.getFaction())) {
+            if (player.getAllianceMembers().contains(p2.getFaction()) && !game.isFowMode()) {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)
                         && !CommandCounterHelper.hasCC(event, p2.getColor(), tile)) {
                     hasUnits = true;
@@ -413,53 +420,6 @@ public class TacticalActionService {
 
     private boolean shouldSkipLandingOnPlanet(Planet planet) {
         return planet.getTokenList().stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
-    }
-
-    /**
-     * Check if a game is standard PoK or only uses 4/4/4 homebrew.
-     * Duplicated here to mirror URL selection logic used for the Website View button.
-     */
-    private static boolean isStandardPoKOrOnly444(Game game) {
-        if (game == null) return false;
-
-        if (game.isHomebrew()
-                || game.isExtraSecretMode()
-                || game.isFowMode()
-                || game.isAgeOfExplorationMode()
-                || game.isFacilitiesMode()
-                || game.isMinorFactionsMode()
-                || game.isLightFogMode()
-                || game.isRedTapeMode()
-                || game.isDiscordantStarsMode()
-                || game.isFrankenGame()
-                || game.isMiltyModMode()
-                || game.isAbsolMode()
-                || game.isVotcMode()
-                || game.isPromisesPromisesMode()
-                || game.isFlagshippingMode()
-                || game.isAllianceMode()
-                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
-                || game.isHomebrewSCMode()
-                || game.isCommunityMode()
-                || game.getPlayerCountForMap() < 3
-                || game.getPlayerCountForMap() > 8) {
-            return false;
-        }
-
-        try {
-            if (!game.checkAllDecksAreOfficial()
-                    || !game.checkAllTilesAreOfficial()
-                    || game.getFactions().stream()
-                            .map(Mapper::getFaction)
-                            .filter(Objects::nonNull)
-                            .anyMatch(faction -> !faction.getSource().isOfficial())) {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
     }
 
     private void addLandingAndUnlandingButtonsForPlanet(

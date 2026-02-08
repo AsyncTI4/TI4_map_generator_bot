@@ -21,11 +21,12 @@
     {
         "alias": "malevolency",
         "name": "Malevolency",
+        "shortName": "Malevo\n-lency",
         "faction": "obsidian",
         "playArea": false,
         "attachment": false,
         "source": "thunders_edge",
-        "text": "At the end of one of your tactical actions: Spend 1 influence to give this card to one of your neighbors; you can use this ability even if you are the Obsidian player.\nAt the end of the status phase, if you are not the Obsidian player, remove 1 command token from your fleet pool and return it to your reinforcements."
+        "text": "At the end of one of your tactical actions: Spend 1 influence to give this card to one of your neighbors; you can use this ability even if you are the Obsidian player.\nAt the end of the status phase, if you are not the Obsidian player, you must remove 1 command token from your fleet pool and return it to your reinforcements."
     },
     {
         "alias": "nanolink",
@@ -41,6 +42,7 @@
         "name": "Sever",
         "faction": "crimson",
         "playArea": true,
+        "playImmediately": false,
         "attachment": false,
         "source": "thunders_edge",
         "text": "ACTION: place this card face up in your play area, and place the sever token in a system that contains your units, wormholes in that system have no effect during movement. Remove the sever token and return this card to the Rebellion player at end of the status phase."
