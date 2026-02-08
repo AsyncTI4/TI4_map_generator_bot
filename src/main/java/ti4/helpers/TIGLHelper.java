@@ -149,17 +149,15 @@ public class TIGLHelper {
     }
 
     public static void initializeTIGLGame(Game game) {
-        initializeTIGLGame(game, false);
+        initializeTIGLGame(game, isFracturedTIGLGame(game));
     }
 
     public static void initializeTIGLGame(Game game, boolean isFractured) {
         game.setCompetitiveTIGLGame(true);
         if (isFractured) {
-            if (!game.getTags().contains(Constants.TIGL_FRACTURED_TAG)) {
-                game.addTag(Constants.TIGL_FRACTURED_TAG);
-            }
+            TIGLHelper.addFracturedTag(game);
         } else {
-            game.removeTag(Constants.TIGL_FRACTURED_TAG);
+            TIGLHelper.removeFracturedTag(game);
         }
         sendTIGLSetupText(game);
         List<User> users =
@@ -350,5 +348,22 @@ public class TIGLHelper {
             }
         }
         return thread;
+    }
+
+    // Fractured
+    public static boolean isFracturedTIGLGame(Game game) {
+        return game.getTags().contains(Constants.TIGL_FRACTURED_TAG);
+    }
+
+    public static void addFracturedTag(Game game) {
+        if (!isFracturedTIGLGame(game)) {
+            game.addTag(Constants.TIGL_FRACTURED_TAG);
+        }
+    }
+
+    public static void removeFracturedTag(Game game) {
+        if (isFracturedTIGLGame(game)) {
+            game.removeTag(Constants.TIGL_FRACTURED_TAG);
+        }
     }
 }

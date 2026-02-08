@@ -28,7 +28,9 @@ public class BooleanSettingWithCustomAction extends BooleanSetting {
     @Override
     public String modify(GenericInteractionCreateEvent event, String action) {
         String result = super.modify(event, action);
-        customAction.accept(isVal());
+        if (result == null) {
+            customAction.accept(isVal());
+        }
         return result;
     }
 }

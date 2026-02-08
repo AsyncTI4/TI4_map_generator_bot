@@ -3379,10 +3379,7 @@ public class Game extends GameProperties {
             setMaxSOCountPerPlayer(settings.getSecrets().getVal());
         }
         if (settings.getTigl().isVal()) {
-            TIGLHelper.initializeTIGLGame(
-                    this,
-                    settings.getTiglFractured() != null
-                            && settings.getTiglFractured().isVal());
+            TIGLHelper.initializeTIGLGame(this, settings.getTiglFractured().isVal());
         }
         setAllianceMode(settings.getAlliance().isVal());
 

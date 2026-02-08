@@ -190,7 +190,7 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private String ensureTIGLConsistency(boolean userToggleTIGL, boolean userToggleTIGLFractured) {
+    private void ensureTIGLConsistency(boolean userToggleTIGL, boolean userToggleTIGLFractured) {
         if (userToggleTIGL) {
             boolean tiglStatus = tigl.isVal();
             if (!tiglStatus) {
@@ -203,7 +203,6 @@ public class GameSettings extends SettingsMenu {
                 tigl.setVal(true); // keep TIGL on if fractured is on
             }
         }
-        return null;
     }
 
     private String preset444() {
