@@ -70,7 +70,7 @@
             "st",
             "sdn",
             "ps",
-            "aidev"
+            "aida"
         ],
         "startingTechAmount": 1,
         "homePlanets": [
@@ -248,7 +248,7 @@
             "benetrunnerssd"
         ],
         "startingTech": [
-            "aidev"
+            "aida"
         ],
         "homePlanets": [
             "kha",

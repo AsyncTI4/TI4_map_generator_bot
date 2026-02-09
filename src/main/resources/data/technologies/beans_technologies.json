@@ -75,7 +75,6 @@
         ],
         "requirements": "GRB",
         "faction": "iron",
-        "baseUpgrade": "mf2",
         "source": "beans",
         "text": "When this unit is destroyed, place 1 infantry form your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. mechs in excess of capacity count against your fleet limit."
     },
