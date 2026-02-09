@@ -789,8 +789,8 @@ public class ButtonHelperAbilities {
                 pillagerMessage +=
                         ", which is enough to ensure your name goes down in async history as one of the most successful pirates ever to sail the intergalactic seas.";
             }
-            String pillagedMessage = "Arrr, " + pillaged.getRepresentationUnfogged()
-                    + ", it do seem ye have been **Pillage**'d 🏴‍☠️🏴‍☠️🏴‍☠️";
+            String pillagedMessage =
+                    "Arrr, " + pillaged.getRepresentationUnfogged() + ", it do seem ye have been **Pillage**'d ";
 
             if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
                 pillagedMessage += ", so your worthless commodities went from " + pillaged.getCommodities() + " to "
@@ -798,20 +798,19 @@ public class ButtonHelperAbilities {
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
             } else {
                 pillagedMessage +=
-                        ", so your trade goods went from " + pillaged.getTg() + " to " + (pillaged.getTg() - 1) + ".";
+                        ", so your tgs went from " + pillaged.getTg() + " to " + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
 
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isPrefersPillageMsg() || game.isTwilightsFallMode()) {
                 pillagerMessage = player.getRepresentationUnfogged()
-                        + " you succesfully **Pillage**'d, so your ~~doubloons~~ trade goods have gone from "
+                        + " you succesfully **Pillage**'d, so your tgs have gone from "
                         + player.getTg() + " to "
                         + (player.getTg() + 1) + ".";
             } else {
-                pillagedMessage +=
-                        " This number of times your gold has been forcefully liberated from your grasping hands for the benefit of the needy this game is "
-                                + pillaged.getPillageCounter() + ".";
+                pillagedMessage += " This number of times you have been **Pillage**'d this game is "
+                        + pillaged.getPillageCounter() + ".";
             }
             player.setTg(player.getTg() + 1);
             if (game.isFowMode()) {

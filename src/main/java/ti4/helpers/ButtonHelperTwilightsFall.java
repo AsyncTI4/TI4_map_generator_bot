@@ -596,7 +596,7 @@ public class ButtonHelperTwilightsFall {
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation() + ", please pay the 3 resources and 3 influence.",
+                    player.getRepresentation() + ", please pay the 3 resources or 3 influence.",
                     buttons);
         }
         if (splice == 6) {

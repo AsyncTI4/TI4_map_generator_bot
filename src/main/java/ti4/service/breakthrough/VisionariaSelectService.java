@@ -56,7 +56,7 @@ public class VisionariaSelectService {
                 player.finChecker() + "endTurnAfterVisionaria",
                 "End Turn After All Have Reacted",
                 (!game.isFowMode() ? player.getFactionEmoji() : null)));
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(), message, game, player, buttons);
     }
 
     @ButtonHandler("giveVisionariaPN")

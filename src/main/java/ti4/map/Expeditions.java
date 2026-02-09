@@ -275,7 +275,9 @@ public class Expeditions {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), "Use these buttons to discard action cards.", acButtons);
+                            player.getCardsInfoThread(),
+                            player.getRepresentation() + "Use these buttons to discard action cards.",
+                            acButtons);
                 } else {
                     output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake";
                     MessageHelper.sendMessageToChannel(channel, output);

@@ -804,6 +804,10 @@ public class Helper {
     }
 
     public static List<Button> getRemainingSCButtons(Game game, Player playerPicker) {
+        return getRemainingSCButtons(game, playerPicker, true);
+    }
+
+    public static List<Button> getRemainingSCButtons(Game game, Player playerPicker, boolean checkTart) {
         List<Button> scButtons = new ArrayList<>();
 
         for (Integer sc : game.getSCList()) {
@@ -828,6 +832,10 @@ public class Helper {
             }
             if (game.isTwilightsFallMode() && game.getStoredValue("deflectedSC").equalsIgnoreCase(sc + "")) {
                 label += " [Has Tartarus On It]";
+                if (checkTart
+                        && getRemainingSCButtons(game, playerPicker, false).size() > 1) {
+                    continue;
+                }
             }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
                 label += " - Kyro Hero Cursed";
@@ -2171,7 +2179,8 @@ public class Helper {
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
                             "Produce War Sun",
                             UnitEmojis.warsun);
-                    if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
+                    if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                            game, Mapper.getUnitKey(AliasHandler.resolveUnit("warsun"), player.getColorID()))) {
                         wsButton = Buttons.gray(
                                 "FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
                                 "Produce War Sun",
@@ -2197,7 +2206,8 @@ public class Helper {
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                         "Produce Flagship",
                         UnitEmojis.flagship);
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship") > 0) {
+                if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                        game, Mapper.getUnitKey(AliasHandler.resolveUnit("flagship"), player.getColorID()))) {
                     fsButton = Buttons.gray(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_flagship_" + tp,
                             "Produce Flagship",
@@ -2211,7 +2221,8 @@ public class Helper {
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
                     "Produce Dreadnought",
                     UnitEmojis.dreadnought);
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought") > 4) {
+            if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("dreadnought"), player.getColorID()))) {
                 dnButton = Buttons.gray(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_dreadnought_" + tp,
                         "Produce Dreadnought",
@@ -2224,7 +2235,8 @@ public class Helper {
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_carrier_" + tp,
                     "Produce Carrier",
                     UnitEmojis.carrier);
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "carrier") > 3) {
+            if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("carrier"), player.getColorID()))) {
                 cvButton = cvButton.withStyle(ButtonStyle.SECONDARY);
             }
             if (resourcelimit > 2) {
@@ -2234,7 +2246,8 @@ public class Helper {
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
                     "Produce Cruiser",
                     UnitEmojis.cruiser);
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "cruiser") > 7) {
+            if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("cruiser"), player.getColorID()))) {
                 caButton = Buttons.gray(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_cruiser_" + tp,
                         "Produce Cruiser",
@@ -2247,7 +2260,8 @@ public class Helper {
                     "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
                     "Produce Destroyer",
                     UnitEmojis.destroyer);
-            if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer") > 7) {
+            if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                    game, Mapper.getUnitKey(AliasHandler.resolveUnit("destroyer"), player.getColorID()))) {
                 ddButton = Buttons.gray(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_destroyer_" + tp,
                         "Produce Destroyer",
@@ -2291,7 +2305,7 @@ public class Helper {
                         FactionEmojis.Argent));
             }
             if (player.hasTechReady("sar")) {
-                unitButtons.add(Buttons.green(
+                unitButtons.add(Buttons.blue(
                         "sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
                         "Use Self-Assembly Routines",
                         TechEmojis.WarfareTech));
@@ -2315,7 +2329,8 @@ public class Helper {
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
                         "Produce Mech on " + getPlanetRepresentation(pp, game),
                         UnitEmojis.mech);
-                if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
+                if (!ButtonHelperFactionSpecific.vortexButtonAvailable(
+                        game, Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()))) {
                     mfButton = Buttons.gray(
                             "FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
                             "Produce Mech on " + getPlanetRepresentation(pp, game),

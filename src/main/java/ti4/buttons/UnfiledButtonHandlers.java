@@ -190,6 +190,10 @@ public class UnfiledButtonHandlers {
     public static void ralnelCommander(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteTheOneButton(event);
         List<Button> buttons = ButtonHelperModifyUnits.getRalnelCommanderButtons(player, game, buttonID.split("_")[1]);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + ", is using the Ralnel Commander to immediately retreat 2 ships (and maybe transport).");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",

@@ -1,0 +1,285 @@
+[
+    {
+        "alias": "dream",
+        "factionName": "The Dreaming Throne",
+        "homeSystem": "be1",
+        "startingFleet": "2 cv, 1 dd, 3 ff, 2 inf x, 1 inf k, 1 pds k, sd x",
+        "commodities": 3,
+        "factionTech": [
+            "bedreamdo",
+            "bedreamneg"
+        ],
+        "startingTechOptions": [
+            "amd",
+            "det",
+            "nm",
+            "pa",
+            "gd",
+            "sr",
+            "bs",
+            "dxa"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "xylath",
+            "kathulun"
+        ],
+        "abilities": [
+            "dream_nexus",
+            "the_waking",
+            "incomprehensible_form"
+        ],
+        "leaders": [
+            "dreamagent",
+            "dreamcommander",
+            "dreamhero"
+        ],
+        "promissoryNotes": [
+            "bepndream"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "dream_flagship",
+            "infantry",
+            "dream_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "source": "beans"
+    },
+    {
+        "alias": "crystellum",
+        "factionName": "The Crystellum Collective",
+        "homeSystem": "be2",
+        "startingFleet": "1 cv, 1 dn, 1 dd, 3 ff, 2 inf p, 1 inf s, sd p",
+        "commodities": 2,
+        "factionTech": [
+            "becrystda",
+            "becrystmb"
+        ],
+        "startingTechOptions": [
+            "nm",
+            "pa",
+            "amd",
+            "det",
+            "st",
+            "sdn",
+            "ps",
+            "aidev"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "prismbe",
+            "spire"
+        ],
+        "abilities": [
+            "refraction",
+            "fragmentation"
+        ],
+        "leaders": [
+            "crystellumagent",
+            "crystellumcommander",
+            "crystellumhero"
+        ],
+        "promissoryNotes": [
+            "bepncryst"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "crystellum_flagship",
+            "infantry",
+            "crystellum_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "beans"
+    },
+    {
+        "alias": "ashen",
+        "factionName": "The Ashen Legion",
+        "homeSystem": "be3",
+        "startingFleet": "1 dn, 1 cv, 1 dd, 3 ff, 3 inf p, 1 pds p, sd p",
+        "commodities": 2,
+        "factionTech": [
+            "beasheninf",
+            "beashendn"
+        ],
+        "startingTech": [
+            "ps"
+        ],
+        "homePlanets": [
+            "pyra"
+        ],
+        "abilities": [
+            "phoenix_rising",
+            "beauty_in_destruction"
+        ],
+        "leaders": [
+            "ashenagent",
+            "ashencommander",
+            "ashenhero"
+        ],
+        "promissoryNotes": [
+            "bepnashen"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "ashen_dreadnought",
+            "ashen_flagship",
+            "ashen_infantry",
+            "ashen_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "beans"
+    },
+    {
+        "alias": "iron",
+        "factionName": "The Iron Tide",
+        "homeSystem": "be4",
+        "startingFleet": "1 cv, 1 dd, 1 dn, 2 ff, 2 inf k, 1 mf k, sd k",
+        "commodities": 2,
+        "factionTech": [
+            "beironmf",
+            "beironats"
+        ],
+        "startingTech": [
+            "sar"
+        ],
+        "homePlanets": [
+            "kymore"
+        ],
+        "abilities": [
+            "mechanized_military",
+            "exo-atmospheric",
+            "iron_resilience"
+        ],
+        "leaders": [
+            "ironagent",
+            "ironcommander",
+            "ironhero"
+        ],
+        "promissoryNotes": [
+            "bepniron"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "iron_flagship",
+            "infantry",
+            "iron_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "beans"
+    },
+    {
+        "alias": "ta",
+        "factionName": "The Architects of Ta",
+        "homeSystem": "be5",
+        "startingFleet": "1 cv, 1 cr, 1 dd, 2 ff, 3 inf t, 1 pds t, sd t",
+        "commodities": 3,
+        "factionTech": [
+            "betaqr",
+            "betaro"
+        ],
+        "startingTechOptions": [
+            "det",
+            "sdn",
+            "pa"
+        ],
+        "startingTechAmount": 1,
+        "homePlanets": [
+            "ta"
+        ],
+        "abilities": [
+            "planetary_reconfiguration",
+            "efficient_governance"
+        ],
+        "leaders": [
+            "taagent",
+            "tacommander",
+            "tahero"
+        ],
+        "promissoryNotes": [
+            "bepnta"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "ta_flagship",
+            "infantry",
+            "ta_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "beans"
+    },
+    {
+        "alias": "netrunners",
+        "factionName": "The Kha'Zyrr Net-Runners",
+        "homeSystem": "be6",
+        "startingFleet": "2 cv, 1 dd, 2 ff, 2 inf k, 2 inf z, sd k",
+        "commodities": 3,
+        "factionTech": [
+            "benetrunnersdm",
+            "benetrunnerssd"
+        ],
+        "startingTech": [
+            "aidev"
+        ],
+        "homePlanets": [
+            "kha",
+            "zyrr"
+        ],
+        "abilities": [
+            "system_breach",
+            "control_network",
+            "ransomware"
+        ],
+        "leaders": [
+            "netrunnersagent",
+            "netrunnerscommander",
+            "netrunnershero"
+        ],
+        "promissoryNotes": [
+            "bepnnetrunners"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "netrunners_flagship",
+            "infantry",
+            "netrunners_mech",
+            "pds",
+            "netrunners_spacedock"
+        ],
+        "complexity": "Medium",
+        "source": "beans"
+    }
+]
