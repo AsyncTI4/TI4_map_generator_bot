@@ -1,6 +1,7 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
-import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter

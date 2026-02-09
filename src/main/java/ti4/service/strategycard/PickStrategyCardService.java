@@ -180,7 +180,7 @@ public class PickStrategyCardService {
 
     public static List<Player> getSCPickOrder(Game game) {
         if (game.hasAnyPriorityTrackMode()) {
-            List<Player> pickOrder = PriorityTrackHelper.getPriorityTrack(game);
+            List<Player> pickOrder = PriorityTrackHelper.GetPriorityTrack(game);
             if (game.getPriorityTrackMode() == PriorityTrackMode.AFTER_SPEAKER) {
                 Player speaker = game.getSpeaker();
                 if (speaker != null) {

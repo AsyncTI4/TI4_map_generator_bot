@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         return alias != null && name != null && (faction != null || color != null) && text != null && source != null;
     }
 
-    public String getId() {
+    public String getID() {
         return alias;
     }
 

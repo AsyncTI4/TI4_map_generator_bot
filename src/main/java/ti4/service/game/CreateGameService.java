@@ -733,45 +733,45 @@ public class CreateGameService {
 
     public String autoGenerateGameName() {
         // spotless:off
-        // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
-        // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
-        List<String> words = new ArrayList<>(Arrays.asList(
-            "Relativity", "Photon", "Crystalline", "Exoplanet", "Lunar", "Ecosystem", "Metastable", "Halogen",
-            "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
-            "Fission", "Disruptor", "Monolith", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
-            "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
-            "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
-            "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Magnetron", "Obelisk", "Yggdrasil", "Jargon",
-            "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
-            "Cryosleep", "Incandescent", "Eigenvector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Mnemonic",
-            "Muon", "Convex", "Nulldrive", "Failsafe", "Equilibrium", "Abyss", "Hydra", "Friction",
-            "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
-            "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
-            "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
-            "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Wintermute", "Imprint", "Overclock",
-            "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
-            "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Quasar", "Kinetic", "Chimera",
-            "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
-            "Osmosis", "Thunderchild", "Piezoelectric", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
-            "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
-            "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
-            "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Xenobiology",
-            "Continuum", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
-            "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
-            "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
-            "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Synapse",
-            "Datastream", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
-            "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
-            "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
-            "Sentinel", "Synchronisation", "Coriolis", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
-            "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
-            "Nitrogen", "Odyssey", "Bioluminescence", "Lagrange", "Lightspeed", "Helix", "Photosynthesis", "Interface",
-            "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
-            "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Causality"));
-        // extra words: "Waypoint", "Faraday", "Perihelion", "Penumbra", "Barycentric", "Helical", "Stoichiometry", "Mechatronic", "Cognitive", "Newtonian"
-        // avoid words that are similar to names of TI4 components (or parts thereof) e.g. "Quantum"
-        // also avoid words that are similar to existing words or the list e.g. "Cyberspace" -> Nullspace", "Subspace", "Hyperspace"
-        // spotless:on
+            // if these words are changed, please replace them in place, to avoid disrupting the generation algorithm
+            // i.e. avoid deleting a word and putting a new word at the end, instead put the new word where the old word was
+            List<String> words = new ArrayList<>(Arrays.asList(
+                "Relativity", "Photon", "Crystalline", "Exoplanet", "Lunar", "Ecosystem", "Metastable", "Halogen",
+                "Fluorescence", "Helium", "Tachyon", "Jetpack", "Pluto", "Interstellar", "Cryptography", "Blueprint",
+                "Fission", "Disruptor", "Monolith", "Domino", "Doppelganger", "Freefall", "Zeta", "Hypocube",
+                "Levitation", "Chemical", "Biohazard", "Frequency", "Equinox", "Extrapolate", "Nanocarbon", "Cygnus",
+                "Labyrinth", "Zenith", "Acidic", "Oxygen", "Primordial", "Havoc", "Neutrino", "Vorpal",
+                "Solstice", "Qubit", "Cephalopod", "Vertebrate", "Magnetron", "Obelisk", "Yggdrasil", "Jargon",
+                "Compass", "Machination", "Incorporeal", "Electron", "Maglev", "Radiant", "Cosmology", "Tensor",
+                "Cryosleep", "Incandescent", "Eigenvector", "Atomizer", "Retina", "Dragonfly", "Nanotube",  "Mnemonic",
+                "Muon", "Convex", "Nulldrive", "Failsafe", "Equilibrium", "Abyss", "Hydra", "Friction",
+                "Equatorial", "Incursion", "Solenoid", "Illusion", "Inhibitor", "Sundial", "Microchip", "Krypton",
+                "Gravitational", "Entropy", "Taurus", "Hyperion", "Deuterium", "Voltage", "Viscosity", "Logarithm",
+                "Centrifuge", "Mercury", "Ioniser", "Parabola", "Starlight", "Hydrocarbon", "Precursor", "Scorpius",
+                "Covalent", "Paradox", "Chromosome", "Incognita", "Polarity", "Wintermute", "Imprint", "Overclock",
+                "Thermodynamics", "Zephyr", "Quadrant", "Cortex", "Luminance", "Irradiated", "Polymer", "Fluctuation",
+                "Cryogenics", "Pegasus", "Ferrocore", "Quaternary", "Ultrasonic", "Quasar", "Kinetic", "Chimera",
+                "Turbine", "Transduction", "Isotope", "Quicksilver", "Jovian", "Lateral", "Lithium", "Neurotoxin",
+                "Osmosis", "Thunderchild", "Piezoelectric", "Ablation", "Gigawatt", "Leviathan", "Moonstone", "Emerald",
+                "Toxicology", "Immaterial", "Disintegration", "Harmonics", "Android", "Constellation", "Parallax", "Cyborg",
+                "Tesseract", "Jupiter", "Volatile", "Moebius", "Uranium", "Phoenix", "Hardwired", "Uninhabitable",
+                "Phosphorus", "Horizon", "Oscillation", "Waveform", "Banshee", "Dissonance", "Omicron", "Xenobiology",
+                "Continuum", "Spacetime", "Eclipse", "Ultimatum", "Junkyard", "Inertia", "Hovercraft", "Symbiotic",
+                "Cellular", "Celestial", "Instability", "Decontamination", "Valence", "Diffusion", "Fractal", "Radioactive",
+                "Caduceus", "Quotient", "Atmosphere", "Apparatus", "Infosphere", "Juggernaut", "Pendulum", "Spectral",
+                "Harbinger", "Venus", "Lambda", "Alkaline", "Voyage", "Ozone", "Iota", "Synapse",
+                "Datastream", "Redshift", "Cerebral", "Fungi", "Wetware", "Dendrite", "Ziggurat", "Vermilion",
+                "Neptune", "Pathology", "Orthogonal", "Yesteryear", "Dinosaur", "Andromeda", "Catalyst", "Fabricator",
+                "Portal", "Molecular", "Encryption", "Hydrogen", "Theta", "Angstrom", "Epoch", "Digital",
+                "Sentinel", "Synchronisation", "Coriolis", "Comet", "Resonance", "Topography", "Gargoyle", "Forcefield",
+                "Citadel", "Hologram", "Circuitry", "Gemini", "Cyberspace", "Graphite", "Synthetic", "Trajectory",
+                "Nitrogen", "Odyssey", "Bioluminescence", "Lagrange", "Lightspeed", "Helix", "Photosynthesis", "Interface",
+                "Nanite", "Glacier", "Astrolabe", "Ultraviolet", "Enthalpy", "Observatory", "Solar", "Vacuum",
+                "Infrared", "Kaleidoscope", "Magnetosphere", "Gyroscope", "Diamond", "Optic", "Enzyme", "Causality"));
+            // extra words: "Waypoint", "Faraday", "Perihelion", "Penumbra", "Barycentric", "Helical", "Stoichiometry", "Mechatronic", "Cognitive", "Newtonian"
+            // avoid words that are similar to names of TI4 components (or parts thereof) e.g. "Quantum"
+            // also avoid words that are similar to existing words or the list e.g. "Cyberspace" -> Nullspace", "Subspace", "Hyperspace"
+            // spotless:on
         int gameNumber = getNextGameNumber();
         int first = gameNumber & 0xFF;
         int second = (gameNumber >> 8) & 0xFF;

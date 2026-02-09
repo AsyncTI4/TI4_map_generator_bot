@@ -1,5 +1,6 @@
 package ti4.service.emoji;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.List;
@@ -12,12 +13,11 @@ import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import org.jetbrains.annotations.NotNull;
 import ti4.json.PersistenceManager;
 import ti4.message.logging.BotLogger;
-import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
 public class ApplicationEmojiCacheService {
 
-    static List<CachedEmoji> readCachedEmojis() {
+    public static List<CachedEmoji> readCachedEmojis() {
         List<CachedEmoji> cache = null;
         try {
             cache = PersistenceManager.readObjectFromJsonFile("emojis.json", new TypeReference<>() {});
@@ -28,7 +28,7 @@ public class ApplicationEmojiCacheService {
         return cache;
     }
 
-    static void saveCachedEmojis(List<CachedEmoji> cachedEmojis) {
+    public static void saveCachedEmojis(List<CachedEmoji> cachedEmojis) {
         try {
             PersistenceManager.writeObjectToJsonFile("emojis.json", cachedEmojis);
         } catch (Exception e) {
@@ -49,7 +49,7 @@ public class ApplicationEmojiCacheService {
         private String formatted;
         private long timeCreated;
 
-        CachedEmoji(@NotNull ApplicationEmoji appEmoji) {
+        public CachedEmoji(@NotNull ApplicationEmoji appEmoji) {
             name = appEmoji.getName();
             id = appEmoji.getId();
             formatted = appEmoji.getFormatted();

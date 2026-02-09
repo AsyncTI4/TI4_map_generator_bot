@@ -7,7 +7,9 @@
     ],
     "imagePath": "er_02_async.png",
     "shipPositionsType": "TYPE10",
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [
         "eshonia"
     ],

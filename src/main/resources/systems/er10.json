@@ -15,7 +15,9 @@
         "eloknu"
     ],
     "shipPositionsType": "TYPE02",
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "isNebula": true,
     "tileBack": "red",
     "source": "eronous"

@@ -1,337 +1,337 @@
 [
     {
-        "itemCategory": "ABILITY",
-        "itemId": "mitosis",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "mitosis",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "lw2",
-        "additionalComponents": [
+        "ItemCategory": "TECH",
+        "ItemId": "lw2",
+        "AdditionalComponents": [
             "ABILITY:mitosis"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "zeal",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "zeal",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "the_tribuni",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_tribuni",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "star_forge",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "star_forge",
+        "OptionalSwaps": [
             "MECH:muaat_mech"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "gashlai_physiology",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "gashlai_physiology",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "STARTINGFLEET",
-        "itemId": "muaat",
-        "optionalSwaps": [
+        "ItemCategory": "STARTINGFLEET",
+        "ItemId": "muaat",
+        "OptionalSwaps": [
             "AGENT:muaatagent"
         ],
         "alternateText": "1 warsun (or flagship if no warsun tech)\n2 fighters\n4 infantry\n1 space dock",
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "mr",
-        "additionalComponents": [
+        "ItemCategory": "TECH",
+        "ItemId": "mr",
+        "AdditionalComponents": [
             "ABILITY:gashlai_physiology"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "AGENT",
-        "itemId": "muaatagent",
-        "undraftable": true,
+        "ItemCategory": "AGENT",
+        "ItemId": "muaatagent",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "MECH",
-        "itemId": "muaat_mech",
-        "undraftable": true,
+        "ItemCategory": "MECH",
+        "ItemId": "muaat_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "dark_whispers",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "dark_whispers",
+        "OptionalSwaps": [
             "PN:blood_pact"
         ],
-        "additionalComponents": [
+        "AdditionalComponents": [
             "PN:dark_pact"
         ],
         "alternateText": "[Franken only] During setup, take the Dark Pact promissory note as an additional component, and you may choose Blood Pact as an optional component in place of your drafted promissory notes; you have 2 faction promissory notes.",
         "source": "pok"
     },
     {
-        "itemCategory": "PN",
-        "itemId": "dark_pact",
-        "undraftable": true,
+        "ItemCategory": "PN",
+        "ItemId": "dark_pact",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "PN",
-        "itemId": "blood_pact",
-        "undraftable": true,
+        "ItemCategory": "PN",
+        "ItemId": "blood_pact",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "orbital_drop",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "orbital_drop",
+        "OptionalSwaps": [
             "MECH:sol_mech"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "MECH",
-        "itemId": "sol_mech",
-        "undraftable": true,
+        "ItemCategory": "MECH",
+        "ItemId": "sol_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "quantum_entanglement",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "quantum_entanglement",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "FLAGSHIP",
-        "itemId": "ghost_flagship",
-        "undraftable": true,
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "ghost_flagship",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "COMMANDER",
-        "itemId": "ghostcommander",
-        "additionalComponents": [
+        "ItemCategory": "COMMANDER",
+        "ItemId": "ghostcommander",
+        "AdditionalComponents": [
             "ABILITY:quantum_entanglement"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "HOMESYSTEM",
-        "itemId": "ghost",
-        "additionalComponents": [
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghost",
+        "AdditionalComponents": [
             "ABILITY:creuss_gate"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "creuss_gate",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "creuss_gate",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "edict",
+        "ItemCategory": "ABILITY",
+        "ItemId": "edict",
         "alternateText": "When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "imperia",
+        "ItemCategory": "ABILITY",
+        "ItemId": "imperia",
         "alternateText": "[Franken only] When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool do not increase your fleet limit and cannot be redistributed. While another player's command token is on your command sheet, you can use the ability of that player's commander, if it is unlocked.",
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "hubris",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "hubris",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "pillage",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "pillage",
+        "OptionalSwaps": [
             "AGENT:mentakagent",
             "PN:pop"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "PN",
-        "itemId": "pop",
-        "undraftable": true,
+        "ItemCategory": "PN",
+        "ItemId": "pop",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "AGENT",
-        "itemId": "mentakagent",
-        "undraftable": true,
+        "ItemCategory": "AGENT",
+        "ItemId": "mentakagent",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "telepathic",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "telepathic",
+        "OptionalSwaps": [
             "PN:gift"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "PN",
-        "itemId": "gift",
-        "undraftable": true,
+        "ItemCategory": "PN",
+        "ItemId": "gift",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "galactic_threat",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "galactic_threat",
+        "OptionalSwaps": [
             "TECH:vay"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "technological_singularity",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "technological_singularity",
+        "OptionalSwaps": [
             "TECH:vax"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "propagation",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "propagation",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "PN",
-        "itemId": "antivirus",
-        "undraftable": true,
+        "ItemCategory": "PN",
+        "ItemId": "antivirus",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "vax",
-        "undraftable": true,
+        "ItemCategory": "TECH",
+        "ItemId": "vax",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "vay",
-        "undraftable": true,
+        "ItemCategory": "TECH",
+        "ItemId": "vay",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "MECH",
-        "itemId": "nekro_mech",
-        "undraftable": true,
+        "ItemCategory": "MECH",
+        "ItemId": "nekro_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "the_company",
-        "additionalComponents": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_company",
+        "AdditionalComponents": [
             "AGENT:nomadagentartuno",
             "AGENT:nomadagentthundarian"
         ],
-        "optionalSwaps": [
+        "OptionalSwaps": [
             "AGENT:nomadagentmercer"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "AGENT",
-        "itemId": "nomadagentmercer",
-        "undraftable": true,
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentmercer",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "AGENT",
-        "itemId": "nomadagentthundarian",
-        "undraftable": true,
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentthundarian",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "AGENT",
-        "itemId": "nomadagentartuno",
-        "undraftable": true,
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentartuno",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "STARTINGTECH",
-        "itemId": "sardakk",
-        "undraftable": true,
+        "ItemCategory": "STARTINGTECH",
+        "ItemId": "sardakk",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "terragenesis",
-        "additionalComponents": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "terragenesis",
+        "AdditionalComponents": [
             "ABILITY:awaken",
             "ABILITY:coalescence"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "awaken",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "awaken",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "coalescence",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "coalescence",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "fragile",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "fragile",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "MECH",
-        "itemId": "jolnar_mech",
-        "undraftable": true,
+        "ItemCategory": "MECH",
+        "ItemId": "jolnar_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "devour",
-        "undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "devour",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "amalgamation",
-        "additionalComponents": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "amalgamation",
+        "AdditionalComponents": [
             "ABILITY:devour"
         ],
-        "optionalSwaps": [
+        "OptionalSwaps": [
             "HERO:cabalhero"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "riftmeld",
-        "additionalComponents": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "riftmeld",
+        "AdditionalComponents": [
             "ABILITY:devour"
         ],
-        "optionalSwaps": [
+        "OptionalSwaps": [
             "TECH:vtx",
             "AGENT:cabalagent"
         ],
@@ -339,78 +339,78 @@
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "dt2",
-        "optionalSwaps": [
+        "ItemCategory": "TECH",
+        "ItemId": "dt2",
+        "OptionalSwaps": [
             "COMMANDER:cabalcommander"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "vtx",
-        "undraftable": true,
+        "ItemCategory": "TECH",
+        "ItemId": "vtx",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "AGENT",
-        "itemId": "cabalagent",
-        "undraftable": true,
+        "ItemCategory": "AGENT",
+        "ItemId": "cabalagent",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "COMMANDER",
-        "itemId": "cabalcommander",
-        "undraftable": true,
+        "ItemCategory": "COMMANDER",
+        "ItemId": "cabalcommander",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "HERO",
-        "itemId": "cabalhero",
-        "undraftable": true,
+        "ItemCategory": "HERO",
+        "ItemId": "cabalhero",
+        "Undraftable": true,
         "alternateText": "[Franken only] ACTION: Each other player rolls a die for each of their non-fighter ships that are in or adjacent to a system that contains your Space Dock; on a 1-3, capture that unit. If this causes a player's ground forces or fighters to be removed, also capture those units. Then, purge this card.",
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "indoctrination",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "indoctrination",
+        "OptionalSwaps": [
             "MECH:yin_mech"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "MECH",
-        "itemId": "yin_mech",
-        "undraftable": true,
+        "ItemCategory": "MECH",
+        "ItemId": "yin_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "stall_tactics",
-        "optionalSwaps": [
+        "ItemCategory": "ABILITY",
+        "ItemId": "stall_tactics",
+        "OptionalSwaps": [
             "MECH:yssaril_mech"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "FLAGSHIP",
-        "itemId": "nomad_flagship",
-        "optionalSwaps": [
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "nomad_flagship",
+        "OptionalSwaps": [
             "TECH:m2"
         ],
         "source": "pok"
     },
     {
-        "itemCategory": "TECH",
-        "itemId": "m2",
-        "undraftable": true,
+        "ItemCategory": "TECH",
+        "ItemId": "m2",
+        "Undraftable": true,
         "source": "pok"
     },
     {
-        "itemCategory": "MECH",
-        "itemId": "yssaril_mech",
-        "undraftable": true,
+        "ItemCategory": "MECH",
+        "ItemId": "yssaril_mech",
+        "Undraftable": true,
         "source": "pok"
     }
 ]
