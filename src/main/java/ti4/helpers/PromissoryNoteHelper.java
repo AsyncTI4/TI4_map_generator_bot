@@ -378,7 +378,9 @@ public class PromissoryNoteHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
-                            + " drew a secret objective due to a PN being played. They can tell the PN owner what it is with a whisper.");
+                            + " drew a secret objective due to _Stringwalk Teachings_ being played. They should tell "
+                            + (game.isFrankenGame() ? "its owner" : "the Zooid player")
+                            + " what it is with a whisper.");
         }
         if ("ms".equalsIgnoreCase(id)) {
             List<Button> buttons =

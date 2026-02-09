@@ -91,11 +91,12 @@ public class AddPlanetService {
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
 
-        if ((unitHolder.getTokenList().contains("token_kaltrimshrine1.png")
-                        || unitHolder.getTokenList().contains("token_kaltrimshrine2.png")
-                        || unitHolder.getTokenList().contains("token_kaltrimshrine3.png")
-                        || unitHolder.getTokenList().contains("token_kaltrimshrine4.png"))
-                && player.hasAbility("questing_prince")) {
+        int shrineCount = 0;
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine3.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine4.png") ? 1 : 0);
+        if ((shrineCount >= 1) && player.hasAbility("questing_prince")) {
             unitHolder.removeToken("token_kaltrimshrine1.png");
             unitHolder.removeToken("token_kaltrimshrine2.png");
             unitHolder.removeToken("token_kaltrimshrine3.png");
@@ -104,10 +105,10 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + ", you reclaimed your crown shrine from "
+                                + ", you reclaimed your Crown Shrine from "
                                 + Helper.getPlanetRepresentation(planet, game)
-                                + " due to **The Questing Prince** ability. Congratz!");
-                String kalt = "Kaltrim Crown Tpken";
+                                + " with your **The Questing Prince** ability. Congratz!");
+                String kalt = "Kaltrim Crown Token";
                 Integer id = game.addCustomPO(kalt, 1);
                 game.scorePublicObjective(player.getUserID(), id);
                 String message2 = "Custom public objective \"_" + kalt + "_\" has been added.\n"
@@ -118,9 +119,10 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + ", you reclaimed your shrines from "
+                                + ", you reclaimed " + (shrineCount == 1 ? "a Shrine" : shrineCount + " Shrines")
+                                + " from "
                                 + Helper.getPlanetRepresentation(planet, game)
-                                + " due to **The Questing Prince** ability and did not find the crown token.");
+                                + " with your **The Questing Prince** ability, but did not find the Crown token.");
             }
         }
 

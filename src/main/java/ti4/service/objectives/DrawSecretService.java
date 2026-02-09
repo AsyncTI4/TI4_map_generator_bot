@@ -1,25 +1,18 @@
 package ti4.service.objectives;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
-import ti4.buttons.Buttons;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.SecretObjectiveModel;
@@ -87,57 +80,6 @@ public class DrawSecretService {
                 count + " " + CardEmojis.SecretObjective + " dealt to all players. Check your `#cards-info` threads.");
         if (game.getRound() == 1) {
             RoundOneService.RoundOne(event, game);
-            for (Player p : game.getRealPlayers()) {
-                if (p.hasAbility("questing_prince")) {
-                    int shrineCount = game.getRealPlayers().size() - 1;
-                    List<Player> others = new ArrayList<>(game.getRealPlayersExcludingThis(p));
-                    Collections.shuffle(others);
-                    for (int i = 0; i < shrineCount; i++) {
-                        Player target = others.get(i);
-                        String shrine = "normal";
-                        if (i == 0) {
-                            shrine = "special";
-                        }
-                        List<Button> buttons = new ArrayList<>();
-                        Tile rex = game.getMecatolTile();
-                        if (rex != null) {
-                            for (String pos :
-                                    FoWHelper.getAdjacentTiles(game, rex.getPosition(), target, false, false)) {
-                                Tile tile = game.getTileByPosition(pos);
-                                if (tile != null) {
-                                    for (Planet planet : tile.getPlanetUnitHolders()) {
-                                        buttons.add(Buttons.green(
-                                                "addShrine_" + planet.getName() + "_" + shrine,
-                                                Helper.getPlanetRepresentation(planet.getName(), game) + " in tile "
-                                                        + tile.getRepresentationForButtons()));
-                                    }
-                                }
-                            }
-                        }
-                        Tile hs = target.getHomeSystemTile();
-                        if (hs != null) {
-                            for (String pos :
-                                    FoWHelper.getAdjacentTiles(game, hs.getPosition(), target, false, false)) {
-                                Tile tile = game.getTileByPosition(pos);
-                                if (tile != null) {
-                                    for (Planet planet : tile.getPlanetUnitHolders()) {
-                                        buttons.add(Buttons.green(
-                                                "addShrine_" + planet.getName() + "_" + shrine,
-                                                Helper.getPlanetRepresentation(planet.getName(), game) + " in tile "
-                                                        + tile.getRepresentationForButtons()));
-                                    }
-                                }
-                            }
-                        }
-                        if (buttons.size() > 0) {
-                            MessageHelper.sendMessageToChannelWithButtons(
-                                    target.getCorrectChannel(),
-                                    target.getRepresentation() + " Select a planet to place a shrine.",
-                                    buttons);
-                        }
-                    }
-                }
-            }
         }
     }
 }

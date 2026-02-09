@@ -27,7 +27,7 @@ public class NeuraloopService {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         "## " + player.getRepresentation()
-                                + " draws a secret objective due to their Incomprehensible ability.");
+                                + " draws a secret objective due to their **Incomprehensible** ability.");
             }
             if (player.hasRelic("neuraloop")) {
                 String name;

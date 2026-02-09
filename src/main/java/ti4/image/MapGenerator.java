@@ -38,6 +38,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.PlayerStatsHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
@@ -469,7 +470,10 @@ public class MapGenerator implements AutoCloseable {
         // GAME MODES
         int deltaY = -150;
         if (game.isCompetitiveTIGLGame()) {
-            drawGeneralImage(x + deltaX, y + deltaY, "GameMode_TIGL.png");
+            drawGeneralImage(
+                    x + deltaX,
+                    y + deltaY,
+                    TIGLHelper.isFracturedTIGLGame(game) ? "GameMode_TIGL_Fractured.png" : "GameMode_TIGL.png");
             TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
             if (rank != null) {
                 graphics.setFont(Storage.getFont18());
