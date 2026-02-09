@@ -26,22 +26,15 @@ class BeginVideoGeneration extends Subcommand {
         String game = event.getOption(Constants.GAME_NAME).getAsString();
         MessageHelper.sendMessageToEventChannel(event, "Launching Video Creation for: " + game);
 
-        // In SDK v2, clients are built using static builder methods
-        // For performance, you should ideally move this client to a Spring @Bean
         try (BatchClient client = BatchClient.builder().region(Region.US_EAST_1).build()) {
-
-            // Requests are now immutable and built via builders
             SubmitJobRequest sjr = SubmitJobRequest.builder()
                     .jobName("video-" + game)
                     .jobDefinition("getting-started-wizard-job-definition:11")
                     .jobQueue("ti4-video-queue")
-                    .parameters(Map.of("game", game)) // Java 21 Map.of is cleaner
+                    .parameters(Map.of("game", game))
                     .build();
 
             SubmitJobResponse response = client.submitJob(sjr);
-
-            // Optional: Log the Job ID for debugging
-            System.out.println("Submitted Job ID: " + response.jobId());
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Failed to launch AWS job: " + e.getMessage());
         }
