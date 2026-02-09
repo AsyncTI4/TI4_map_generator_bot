@@ -15,6 +15,7 @@
         "id": "compromised",
         "imagePath": "token_beans_compromised.png",
         "spaceOrPlanet": "planet",
+        "placement": "center",
         "source": "beans"
     },
     {
