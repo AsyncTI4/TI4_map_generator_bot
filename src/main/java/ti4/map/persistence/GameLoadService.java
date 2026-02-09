@@ -61,6 +61,8 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -74,13 +76,19 @@ import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.databind.type.TypeFactory;
 
 @UtilityClass
 class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-    private static final JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper = JsonMapper.builder()
+            .addModule(new SimpleModule()
+                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
+                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .findAndAddModules()
+            .build();
     private static final Pattern PATTERN = Pattern.compile("—");
 
     static List<ManagedGame> loadManagedGames() {

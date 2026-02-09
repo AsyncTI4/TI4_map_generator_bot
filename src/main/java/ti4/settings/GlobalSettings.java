@@ -14,7 +14,8 @@ import tools.jackson.databind.json.JsonMapper;
 
 public class GlobalSettings {
 
-    private static final JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper =
+            JsonMapper.builder().findAndAddModules().build();
 
     // Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter,
     // and will allow you to get the setting easier

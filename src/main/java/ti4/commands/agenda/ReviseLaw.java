@@ -39,7 +39,7 @@ class ReviseLaw extends GameStateSubcommand {
         Player player = CommandHelper.getOtherPlayerFromEvent(game, event);
 
         String optionText;
-        boolean playerWasElected = !StringUtils.isNotBlank(
+        boolean playerWasElected = StringUtils.isNotBlank(
                 event.getOption(Constants.TARGET_FACTION_OR_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
         if (playerWasElected && player != null) {

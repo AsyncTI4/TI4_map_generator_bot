@@ -89,7 +89,7 @@ public class UltimateStatisticsWebsiteHelper {
                     });
         } catch (Exception e) {
             BotLogger.error(
-                    LAZIK_DISCORD_NOTIFICATION + " An IOException occurred while sending a request to TI4 "
+                    LAZIK_DISCORD_NOTIFICATION + " An exception occurred while sending a request to TI4 "
                             + "Ultimate Stats: " + url,
                     e);
             MessageHelper.sendMessageToChannel(channel, failureMessage);

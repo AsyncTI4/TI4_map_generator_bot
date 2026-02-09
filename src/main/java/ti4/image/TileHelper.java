@@ -82,8 +82,8 @@ public class TileHelper {
 
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
-            try {
-                PlanetModel planet = jsonMapper.readValue(new FileInputStream(file), PlanetModel.class);
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                PlanetModel planet = jsonMapper.readValue(fileInputStream, PlanetModel.class);
                 planetIdsToPlanetModels.put(planet.getId(), planet);
                 tileIdsToPlanetModels
                         .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
@@ -117,8 +117,8 @@ public class TileHelper {
                 .toList());
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
-            try {
-                TileModel tile = jsonMapper.readValue(new FileInputStream(file), TileModel.class);
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                TileModel tile = jsonMapper.readValue(fileInputStream, TileModel.class);
                 tileIdsToTileModels.put(tile.getId(), tile);
                 if (!tile.isValid()) {
                     badObjects.add(tile.getAlias());

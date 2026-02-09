@@ -68,8 +68,6 @@ import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
-import ti4.json.UnitKeyMapKeyDeserializer;
-import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
 import ti4.map.persistence.GameManager;
@@ -102,15 +100,11 @@ import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.spring.jda.JdaService;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.module.SimpleModule;
 
 public class Game extends GameProperties {
 
-    private static final JsonMapper mapper = JsonMapper.builder()
-            .addModule(new SimpleModule()
-                    .addKeySerializer(UnitKey.class, new UnitKeyMapKeySerializer())
-                    .addKeyDeserializer(UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .build();
+    private static final JsonMapper mapper =
+            JsonMapper.builder().findAndAddModules().build();
 
     // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile

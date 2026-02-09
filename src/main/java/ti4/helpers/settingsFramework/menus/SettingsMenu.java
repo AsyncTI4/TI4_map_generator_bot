@@ -42,7 +42,8 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Getter
 public abstract class SettingsMenu {
-    private static final JsonMapper mapper = new JsonMapper();
+    private static final JsonMapper mapper =
+            JsonMapper.builder().findAndAddModules().build();
 
     // Prefix "Jazz Menu Framework"
     private static final @JsonIgnore String menuNav = "jmfN";

@@ -18,7 +18,8 @@ import tools.jackson.databind.json.JsonMapper;
 public class EgressClientManager {
 
     @Getter
-    private static final JsonMapper jsonMapper = new JsonMapper();
+    private static final JsonMapper jsonMapper =
+            JsonMapper.builder().findAndAddModules().build();
 
     @Getter
     private static final HttpClient httpClient = HttpClient.newHttpClient();
