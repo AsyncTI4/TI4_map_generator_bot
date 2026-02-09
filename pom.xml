@@ -179,6 +179,7 @@
             <cleanthat/>
             <removeUnusedImports/>
             <palantirJavaFormat/>
+            <toggleOffOn/>
           </java>
         </configuration>
       </plugin>
