@@ -14,7 +14,7 @@
     {
         "id": "compromised",
         "imagePath": "token_beans_compromised.png",
-        "spaceOrPlanet": "idk",
+        "spaceOrPlanet": "planet",
         "source": "beans"
     },
     {
