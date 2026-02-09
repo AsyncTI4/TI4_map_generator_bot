@@ -49,7 +49,7 @@ public class AsyncTi4WebsiteHelper {
 
         try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(exportableFieldMap);
+            String json = EgressClientManager.getJsonMapper().writeValueAsString(exportableFieldMap);
 
             List<String> urls = getConfiguredUrls("gamestate.api.urls");
             for (String urlTemplate : urls) {
@@ -151,7 +151,7 @@ public class AsyncTi4WebsiteHelper {
                             : null);
             webData.put("isTwilightsFallMode", game.isTwilightsFallMode());
 
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
+            String json = EgressClientManager.getJsonMapper().writeValueAsString(webData);
 
             if (isDevMode) {
                 // Dev/local mode - print to console instead of uploading
@@ -175,7 +175,7 @@ public class AsyncTi4WebsiteHelper {
                     if (latestImageName != null && !latestImageName.isEmpty()) {
                         Map<String, String> imageData = new HashMap<>();
                         imageData.put("image", latestImageName);
-                        String imageJson = EgressClientManager.getObjectMapper().writeValueAsString(imageData);
+                        String imageJson = EgressClientManager.getJsonMapper().writeValueAsString(imageData);
                         putObjectInBucket(
                                 String.format("webdata/%s/latestImage.json", gameId),
                                 AsyncRequestBody.fromString(imageJson),
@@ -209,7 +209,7 @@ public class AsyncTi4WebsiteHelper {
         }
 
         try {
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(overlays);
+            String json = EgressClientManager.getJsonMapper().writeValueAsString(overlays);
 
             putObjectInBucket(
                     String.format("overlays/%s/%s.json", gameId, gameId),

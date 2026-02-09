@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +19,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.draft.DraftSetupService;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyService;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 public class MiltySettings extends SettingsMenu {

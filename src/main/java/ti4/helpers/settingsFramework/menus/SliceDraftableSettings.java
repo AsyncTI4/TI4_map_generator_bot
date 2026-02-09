@@ -2,7 +2,6 @@ package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +33,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -63,7 +63,7 @@ public class SliceDraftableSettings extends SettingsMenu {
 
     private static final String MENU_ID = "dsSlice";
 
-    public SliceDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
+    SliceDraftableSettings(Game game, JsonNode json, DraftSystemSettings parent) {
         super(MENU_ID, "Slice Settings", "Basic Slice draft setup.", parent);
 
         // Initialize settings
@@ -123,7 +123,7 @@ public class SliceDraftableSettings extends SettingsMenu {
         nucleusSettings =
                 new NucleusSliceDraftableSettings(game, json != null ? json.get("nucleusSettings") : null, this);
         subMenus.add(nucleusSettings);
-        miltySettings = new MiltySliceDraftableSettings(game, json != null ? json.get("miltySettings") : null, this);
+        miltySettings = new MiltySliceDraftableSettings(json != null ? json.get("miltySettings") : null, this);
         subMenus.add(miltySettings);
     }
 
