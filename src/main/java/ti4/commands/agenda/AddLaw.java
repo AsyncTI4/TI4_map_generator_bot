@@ -37,7 +37,7 @@ class AddLaw extends GameStateSubcommand {
         Player player = getPlayer();
         String optionText;
         boolean playerWasElected =
-                !StringUtils.isNotBlank(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
+                StringUtils.isNotBlank(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         if (playerWasElected) {
             optionText = player.getFaction();
         } else {
