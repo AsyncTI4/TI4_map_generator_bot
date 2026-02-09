@@ -66,7 +66,7 @@ public class AgentDraftItem extends DraftItem {
     public TI4Emoji getItemEmoji() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return LeaderEmojis.getLeaderEmoji(leader.getID());
+            return LeaderEmojis.getLeaderEmoji(leader.getId());
         }
         return null;
     }

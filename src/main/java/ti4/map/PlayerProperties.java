@@ -1,4 +1,4 @@
-package ti4.map.pojo;
+package ti4.map;
 
 import java.util.ArrayList;
 import java.util.HashSet;

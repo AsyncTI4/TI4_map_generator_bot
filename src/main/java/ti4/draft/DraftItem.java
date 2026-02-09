@@ -143,7 +143,7 @@ public abstract class DraftItem implements ModelInterface {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
         for (DraftErrataModel errataItem : frankenErrata) {
-            if (errataItem.ItemCategory == type && errataItem.AlwaysAddToPool) {
+            if (errataItem.itemCategory == type && errataItem.alwaysAddToPool) {
                 alwaysInclude.add(generateFromAlias(errataItem.getAlias()));
             }
         }
@@ -163,19 +163,19 @@ public abstract class DraftItem implements ModelInterface {
     public String getLongDescription() {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
         if (Errata != null) {
-            if (Errata.AdditionalComponents != null) {
+            if (Errata.additionalComponents != null) {
                 sb.append("\n>  - *Also adds: ");
-                for (DraftErrataModel i : Errata.AdditionalComponents) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
+                for (DraftErrataModel i : Errata.additionalComponents) {
+                    DraftItem item = generate(i.itemCategory, i.itemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
                 sb.append("*");
             }
-            if (Errata.OptionalSwaps != null) {
+            if (Errata.optionalSwaps != null) {
                 sb.append("\n>  - *Includes optional swaps: ");
-                for (DraftErrataModel i : Errata.OptionalSwaps) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
+                for (DraftErrataModel i : Errata.optionalSwaps) {
+                    DraftItem item = generate(i.itemCategory, i.itemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
@@ -189,19 +189,19 @@ public abstract class DraftItem implements ModelInterface {
     public String getLongDescription(Game game) {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl(game));
         if (Errata != null) {
-            if (Errata.AdditionalComponents != null) {
+            if (Errata.additionalComponents != null) {
                 sb.append("\n>  - *Also adds: ");
-                for (DraftErrataModel i : Errata.AdditionalComponents) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
+                for (DraftErrataModel i : Errata.additionalComponents) {
+                    DraftItem item = generate(i.itemCategory, i.itemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
                 sb.append("*");
             }
-            if (Errata.OptionalSwaps != null) {
+            if (Errata.optionalSwaps != null) {
                 sb.append("\n>  - *Includes optional swaps: ");
-                for (DraftErrataModel i : Errata.OptionalSwaps) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
+                for (DraftErrataModel i : Errata.optionalSwaps) {
+                    DraftItem item = generate(i.itemCategory, i.itemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }

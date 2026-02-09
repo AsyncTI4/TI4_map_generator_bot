@@ -1,4 +1,4 @@
-package ti4.map.pojo;
+package ti4.map;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 

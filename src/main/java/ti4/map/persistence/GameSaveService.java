@@ -19,7 +19,6 @@ import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
 import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +47,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
-import ti4.json.ObjectMapperFactory;
 import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -65,11 +63,12 @@ import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 class GameSaveService {
 
-    private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final JsonMapper mapper = new JsonMapper();
 
     static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
