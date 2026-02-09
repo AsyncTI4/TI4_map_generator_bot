@@ -276,10 +276,10 @@ public class Expeditions {
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(),
-                            player.getRepresentation() + "Use these buttons to discard action cards.",
+                            player.getRepresentation() + ", please discard 2 action cards.",
                             acButtons);
                 } else {
-                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake";
+                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake.";
                     MessageHelper.sendMessageToChannel(channel, output);
                 }
             }

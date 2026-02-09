@@ -63,8 +63,8 @@ public class FractureService {
             } else if (result == 6) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "> Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
-                                + ".\\- Terry Pratchett, _Guards! Guards!_");
+                        "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
+                                + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";
