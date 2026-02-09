@@ -1,0 +1,41 @@
+[
+    {
+        "id": "designabundance",
+        "name": "Abundance (Design)",
+        "imagePath": "attachment_designabundance.png",
+        "resourcesModifier": 2,
+        "isFakeAttachment": true,
+        "source": "beans"
+    },
+    {
+        "id": "designprestige",
+        "name": "Prestige (Design)",
+        "imagePath": "attachment_designprestige.png",
+        "influenceModifier": 2,
+        "isFakeAttachment": true,
+        "source": "beans"
+    },
+    {
+        "id": "designtranspose",
+        "name": "Transpose (Design)",
+        "imagePath": "attachment_designtranspose.png",
+        "isFakeAttachment": true,
+        "source": "beans"
+    },
+    {
+        "id": "worldshaperpositive",
+        "name": "Worldshaper (Positive)",
+        "imagePath": "attachment_worldshaperpositive.png",
+        "resourcesModifier": 1,
+        "influenceModifier": 1,
+        "source": "beans"
+    },
+    {
+        "id": "worldshapernegative",
+        "name": "Worldshaper (Negative)",
+        "imagePath": "attachment_worldshapernegative.png",
+        "resourcesModifier": -1,
+        "influenceModifier": -1,
+        "source": "beans"
+    }
+]

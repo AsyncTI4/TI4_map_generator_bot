@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "be3",
+    "name": "Pyra - Ashen",
+    "aliases": [
+        "be3",
+        "ashen",
+        "pyra"
+    ],
+    "imagePath": "be3_ashenhs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "pyra"
+    ],
+    "source": "beans"
+}

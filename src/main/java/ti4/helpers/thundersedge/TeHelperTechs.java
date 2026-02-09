@@ -305,9 +305,12 @@ public class TeHelperTechs {
                     }
                 }
             } else {
-                ButtonHelper.getTilesWithShipsInTheSystem(player, game)
-                        .forEach(tile -> adjTilePositions.addAll(
-                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)));
+                for (Tile tile : game.getTileMap().values()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                        adjTilePositions.addAll(
+                                FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true));
+                    }
+                }
             }
 
             adjTilePositions.stream()

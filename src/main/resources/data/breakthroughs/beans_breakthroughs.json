@@ -1,0 +1,74 @@
+[
+    {
+        "alias": "dreambt",
+        "name": "Dream-Space Convergence",
+        "shortName": "Dream-Space\nConvergence",
+        "faction": "dream",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "Once per turn, after any player activates a system that contains one of your nexus tokens and 1 or more of your units, you may either gain 1 command token or move 1 ship from an adjacent system into that system. Other players treat systems that contain nexus tokens as nebulas.",
+        "source": "beans"
+    },
+    {
+        "alias": "crystellumbt",
+        "name": "Resonance Drive",
+        "shortName": "Resonance\nDrive",
+        "faction": "crystellum",
+        "synergy": [
+            "PROPULSION",
+            "WARFARE"
+        ],
+        "text": "During movement, apply +1 to the move value of your ships that are transporting units equal to their capacity value.",
+        "source": "beans"
+    },
+    {
+        "alias": "ashenbt",
+        "name": "From Fire, Resolve",
+        "shortName": "From Fire,\nResolve",
+        "faction": "ashen",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "After you roll for your infantry's text ability, if the roll does not succeed, you may exhaust this card to treat it as a success instead. Infantry you place in combat using your Pheonix Rising ability gain +1 to their combat rolls for the rest of combat.",
+        "source": "beans"
+    },
+    {
+        "alias": "ironbt",
+        "name": "Foundry Network",
+        "shortName": "Foundry\nNetwork",
+        "faction": "iron",
+        "synergy": [
+            "WARFARE",
+            "CYBERNETIC"
+        ],
+        "text": "When producing mechs, you may place them at any of your space docks. You do not need to have a mech on a planet when you resolve exploration cards requiring them.",
+        "source": "beans"
+    },
+    {
+        "alias": "tabt",
+        "name": "Extraction",
+        "shortName": "Extraction",
+        "faction": "ta",
+        "synergy": [
+            "BIOTIC",
+            "WARFARE"
+        ],
+        "text": "ACTION: You may exhaust this card, or spend 1 token from your strategy pool, to detach a Design from a planet that has one and reattach it to any other planet you control in an adjacent system that does not already have a Design attached to it. Then, ready that planet.",
+        "source": "beans"
+    },
+    {
+        "alias": "netrunnersbt",
+        "name": "Disruption",
+        "shortName": "Disruption",
+        "faction": "netrunners",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "text": "When you activate a system, or a system that contains 1 or more of your units is activated: You may choose 1 unit ability, that unit ability cannot be used during this tactical action. You may treat compromised structures as if they were yours for the purposes of scoring objectives.",
+        "source": "beans"
+    }
+]

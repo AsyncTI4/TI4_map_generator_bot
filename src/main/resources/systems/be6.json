@@ -1,0 +1,17 @@
+{
+    "tileBack": "green",
+    "id": "be6",
+    "name": "Kha - Netrunners",
+    "aliases": [
+        "be6",
+        "netrunners",
+        "pyra"
+    ],
+    "imagePath": "be6_netrunnershs.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "kha"
+    ],
+    "source": "beans"
+}

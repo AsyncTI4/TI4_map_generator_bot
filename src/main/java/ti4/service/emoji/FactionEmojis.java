@@ -111,6 +111,14 @@ public enum FactionEmojis implements TI4Emoji {
     arachian,
     zooid,
 
+    // beans
+    iron,
+    ta,
+    netrunners,
+    crystellum,
+    dream,
+    ashen,
+
     // nomadfalcon
     erock,
     explanetary,
@@ -346,6 +354,13 @@ public enum FactionEmojis implements TI4Emoji {
             case "councilors" -> councilors;
             case "erock" -> erock;
             case "explanetary" -> explanetary;
+
+            case "dreams" -> dream;
+            case "ashen" -> ashen;
+            case "iron" -> iron;
+            case "ta" -> ta;
+            case "netrunners" -> netrunners;
+            case "crystellum" -> crystellum;
 
             case "netharii" -> netharii;
             case "drahn" -> Drahn;

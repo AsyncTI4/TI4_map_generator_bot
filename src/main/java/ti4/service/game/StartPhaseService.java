@@ -159,7 +159,7 @@ public class StartPhaseService {
             if (alreadyQueued.contains(num)) {
                 hasQueue = true;
                 continue;
-            } else if (alreadyPicked.contains(x)) {
+            } else if (alreadyPicked.contains(x) && !game.isFowMode()) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);

@@ -1741,6 +1741,9 @@ public class ButtonHelperFactionSpecific {
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, game);
         UnitHolder newPlan = game.getUnitHolderFromPlanet(newPlanet);
         for (UnitKey key : oriPlanet.getUnitKeys()) {
+            if (!key.getColor().equalsIgnoreCase(hacan.getColor())) {
+                continue;
+            }
             int amt = oriPlanet.getUnitCount(key);
             var removed = oriPlanet.removeUnit(key, amt);
             if (newPlan != null) {

@@ -209,6 +209,12 @@ public class Planet extends UnitHolder {
         if (attachment != null) {
             resourcesModifier += attachment.getResourcesModifier();
             influenceModifier += attachment.getInfluenceModifier();
+            if (attachment.getAlias().equalsIgnoreCase("designtranspose")) {
+                int originalRes = resourcesOriginal + resourcesModifier;
+                int originalInf = influenceOriginal + influenceModifier;
+                resourcesModifier += originalInf - originalRes;
+                influenceModifier += originalRes - originalInf;
+            }
             for (String planetType : attachment.getPlanetTypes()) {
                 addType(planetType);
             }
