@@ -74,10 +74,10 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import tools.jackson.databind.JavaType;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
-import tools.jackson.databind.type.TypeFactory;
 
 @UtilityClass
 class GameLoadService {
@@ -87,6 +87,7 @@ class GameLoadService {
             .addModule(new SimpleModule()
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
             .findAndAddModules()
             .build();
     private static final Pattern PATTERN = Pattern.compile("—");
@@ -370,9 +371,8 @@ class GameLoadService {
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info)) break;
                     try {
-                        JavaType reference =
-                                mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
-                        game.setBorderAnomalies(mapper.readValue(info, reference));
+                        var borderAnomalyHolders = mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
+                        game.setBorderAnomalies(borderAnomalyHolders);
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(game), "Error reading border anomalies from save file!", e);
                     }
@@ -594,13 +594,7 @@ class GameLoadService {
                 }
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     try {
-                        TypeFactory factory = mapper.getTypeFactory();
-                        JavaType states = factory.constructParametricType(List.class, Integer.class);
-                        JavaType unitHolder = factory.constructMapLikeType(
-                                HashMap.class, factory.constructType(UnitKey.class), states);
-                        JavaType reference = factory.constructMapLikeType(
-                                HashMap.class, factory.constructType(String.class), unitHolder);
-                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, reference);
+                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, new TypeReference<>() {});
                         game.setTacticalActionDisplacement(displacedUnits);
                     } catch (Exception e) {
                         BotLogger.error(
