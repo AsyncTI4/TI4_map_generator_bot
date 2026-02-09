@@ -1,41 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.2</version>
+    <version>3.5.5</version>
   </parent>
 
   <groupId>me.terterro</groupId>
   <artifactId>TI4_map_generator_discord_bot</artifactId>
   <version>1.0-SNAPSHOT</version>
-
   <properties>
-    <java.version>21</java.version>
-    <jda.version>6.3.0</jda.version>
-    <aws.sdk.version>2.41.24</aws.sdk.version>
-    <hibernate-dialects.version>${hibernate.version}</hibernate-dialects.version>
-    <reflections.version>0.10.2</reflections.version>
-    <jskills.version>1.1</jskills.version>
-    <webp-imageio.version>0.10.2</webp-imageio.version>
-    <jemoji.version>1.7.5</jemoji.version>
-    <spotless.version>3.2.1</spotless.version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>software.amazon.awssdk</groupId>
-        <artifactId>bom</artifactId>
-        <version>${aws.sdk.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -62,26 +41,23 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
+      <version>3.51.1.0</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate.orm</groupId>
       <artifactId>hibernate-community-dialects</artifactId>
-      <version>${hibernate-dialects.version}</version>
     </dependency>
-
     <dependency>
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-registry-prometheus</artifactId>
     </dependency>
-
     <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
-      <version>${jda.version}</version>
+      <version>6.3.0</version>
       <exclusions>
         <exclusion>
           <groupId>club.minnced</groupId>
@@ -89,58 +65,69 @@
         </exclusion>
       </exclusions>
     </dependency>
-
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-batch</artifactId>
+      <version>1.12.797</version>
+    </dependency>
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>s3</artifactId>
+      <version>2.41.0</version>
     </dependency>
-    <dependency>
-      <groupId>software.amazon.awssdk</groupId>
-      <artifactId>batch</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+      <version>3.20.0</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <version>1.18.42</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.github.ben-manes.caffeine</groupId>
       <artifactId>caffeine</artifactId>
+      <version>3.2.3</version>
     </dependency>
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>${reflections.version}</version>
+      <version>0.10.2</version>
     </dependency>
     <dependency>
       <groupId>de.gesundkrank.jskills</groupId>
       <artifactId>jskills</artifactId>
-      <version>${jskills.version}</version>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>com.github.usefulness</groupId>
       <artifactId>webp-imageio</artifactId>
-      <version>${webp-imageio.version}</version>
+      <version>0.10.2</version>
     </dependency>
     <dependency>
       <groupId>net.fellbaum</groupId>
       <artifactId>jemoji</artifactId>
-      <version>${jemoji.version}</version>
+      <version>1.7.5</version>
+    </dependency>
+    <!-- TEST -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.12.2</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.27.7</version>
+      <scope>test</scope>
     </dependency>
-
-
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>5.21.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -150,18 +137,18 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
+          <release>21</release>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.4</version>
         <configuration>
           <environmentVariables>
             <DB_PATH>./src/test/resources</DB_PATH>
@@ -172,15 +159,32 @@
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
-        <version>${spotless.version}</version>
+        <version>3.2.1</version>
         <configuration>
+          <lineEndings>GIT_ATTRIBUTES</lineEndings>
+          <encoding>UTF-8</encoding>
           <java>
             <cleanthat/>
             <removeUnusedImports/>
+            <formatAnnotations/>
             <palantirJavaFormat/>
             <toggleOffOn/>
           </java>
+          <pom>
+            <sortPom>
+              <expandEmptyElements>false</expandEmptyElements>
+              <sortProperties>true</sortProperties>
+            </sortPom>
+          </pom>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

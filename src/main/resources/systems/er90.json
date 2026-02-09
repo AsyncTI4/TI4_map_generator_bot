@@ -24,7 +24,9 @@
             "y": 170.0
         }
     ],
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [
         "char"
     ],

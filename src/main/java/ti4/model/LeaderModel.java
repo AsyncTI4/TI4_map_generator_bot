@@ -19,7 +19,7 @@ import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class LeaderModel implements ModelInterface, EmbeddableModel {
-    private String id;
+    private String ID;
     private String type;
     private String faction;
     private String name;
@@ -48,7 +48,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean isValid() {
-        return id != null
+        return ID != null
                 && type != null
                 && faction != null
                 && name != null
@@ -61,7 +61,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return id;
+        return ID;
     }
 
     public String getShortName() {
@@ -76,7 +76,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (getHomebrewReplacesID().isPresent()) {
             return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().get());
         }
-        return LeaderEmojis.getLeaderEmoji(id);
+        return LeaderEmojis.getLeaderEmoji(ID);
     }
 
     public Optional<String> getTFName() {
@@ -125,11 +125,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean isGenome() {
-        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(id);
+        return Mapper.getDeck(Constants.TF_GENOME).getNewDeck().contains(ID);
     }
 
     public boolean isParadigm() {
-        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(id);
+        return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(ID);
     }
 
     private Optional<String> getFlavourText() {
@@ -239,7 +239,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(id).append("    Source: ").append(source);
+        if (includeID) footer.append("ID: ").append(ID).append("    Source: ").append(source);
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -255,7 +255,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public boolean search(String searchString) {
         if (searchString == null) return true;
         searchString = searchString.toLowerCase();
-        return id.toLowerCase().contains(searchString)
+        return ID.toLowerCase().contains(searchString)
                 || name.toLowerCase().contains(searchString)
                 || getTFName().orElse("").toLowerCase().contains(searchString)
                 || title.toLowerCase().contains(searchString)

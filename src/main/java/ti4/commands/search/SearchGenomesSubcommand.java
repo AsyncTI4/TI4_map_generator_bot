@@ -36,7 +36,7 @@ class SearchGenomesSubcommand extends SearchComponentModelSubcommand {
         List<MessageEmbed> messageEmbeds = Mapper.getDeck(Constants.TF_GENOME).getNewDeck().stream()
                 .map(Mapper::getLeader)
                 .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(LeaderModel::getId))
+                .sorted(Comparator.comparing(LeaderModel::getID))
                 .map(model -> model.getRepresentationEmbed(true, true, false, true, true))
                 .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);

@@ -2,6 +2,7 @@ package ti4.map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +23,7 @@ class LeaderTest extends BaseTi4Test {
     }
 
     @Test
-    void testLeaderHasNoUnexpectedProperties() {
+    void testLeaderHasNoUnexpectedProperties() throws Exception {
         // Given
         Leader leader = buildLeader();
         Set<String> knownJsonAttributes =
@@ -38,7 +39,7 @@ class LeaderTest extends BaseTi4Test {
     }
 
     @Test
-    void testLeaderJsonSaveAndRestore() {
+    void testLeaderJsonSaveAndRestore() throws JsonProcessingException {
         // Given
         Leader leader = buildLeader();
 

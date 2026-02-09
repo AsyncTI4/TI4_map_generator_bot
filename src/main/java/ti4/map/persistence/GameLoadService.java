@@ -19,6 +19,9 @@ import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
 import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -61,8 +64,7 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.json.UnitKeyMapKeyDeserializer;
-import ti4.json.UnitKeyMapKeySerializer;
+import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -74,21 +76,12 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.module.SimpleModule;
-import tools.jackson.databind.type.TypeFactory;
 
 @UtilityClass
 class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-    private static final JsonMapper mapper = JsonMapper.builder()
-            .addModule(new SimpleModule()
-                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
-                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .findAndAddModules()
-            .build();
+    private static final ObjectMapper mapper = ObjectMapperFactory.build();
     private static final Pattern PATTERN = Pattern.compile("—");
 
     static List<ManagedGame> loadManagedGames() {

@@ -6,7 +6,9 @@
     ],
     "imagePath": "er_21_async.png",
     "shipPositionsType": "TYPE08",
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [],
     "isAsteroidField": true,
     "isSupernova": true,

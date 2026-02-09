@@ -1,6 +1,7 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +14,6 @@ import ti4.map.Game;
 import ti4.model.DeckModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.service.emoji.CardEmojis;
-import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter

@@ -1,79 +1,69 @@
 package ti4.testUtils;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashSet;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
-import ti4.helpers.Units;
-import ti4.json.UnitKeyMapKeyDeserializer;
-import ti4.json.UnitKeyMapKeySerializer;
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.module.SimpleModule;
+import ti4.json.ObjectMapperFactory;
 
+/**
+ * Utility test class that allows us to validate our source files are correctly configured
+ * for JSON save/restore.
+ */
 public final class JsonValidator {
-
-    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
-            .addModule(new SimpleModule()
-                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
-                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .findAndAddModules()
-            .build();
+    private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
 
     private JsonValidator() {}
 
-    public static <T> T jsonCycleObject(T obj, Class<T> clazz) {
-        String json = JSON_MAPPER.writeValueAsString(obj);
+    /**
+     * Subjects the provided object to a save/restore JSON loop where we serialize the object to
+     * a JSON string and then re-consistue it. Allows tests to confirm no data is lost in this
+     * process.
+     */
+    public static <T> T jsonCycleObject(T obj, Class<T> clazz) throws JsonProcessingException {
+        String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         try {
-            T restored = JSON_MAPPER.readValue(json, clazz);
-            assertNotNull(restored, "Deserialization returned null for: " + clazz.getSimpleName());
-            return restored;
+            return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Cycle fail [%s].%nJSON:%n%s", clazz.getSimpleName(), json), e);
+            System.err.println("JSON which failed to be restored:");
+            System.err.println(json);
+            throw e;
         }
     }
 
-    public static void assertAvailableJsonAttributes(Object obj, Set<String> expectedAttributes) {
-        JsonNode node = JSON_MAPPER.valueToTree(obj);
-        Set<String> actualAttributes = new HashSet<>(node.propertyNames());
+    /**
+     * Scans an object and confirms we only see attributes in the JSON output that we expect to see.
+     * <p>
+     * Any any missing attributes or unknown attributes will cause an exception to be thrown.
+     */
+    public static void assertAvailableJsonAttributes(Object obj, Set<String> knownJsonAttributes)
+            throws JacksonConfigurationException {
+        JsonNode json = objectMapper.valueToTree(obj);
 
-        Set<String> unexpected = actualAttributes.stream()
-                .filter(a -> !expectedAttributes.contains(a))
-                .collect(Collectors.toSet());
-
-        Set<String> missing = expectedAttributes.stream()
-                .filter(a -> !actualAttributes.contains(a))
-                .collect(Collectors.toSet());
-
-        if (!unexpected.isEmpty() || !missing.isEmpty()) {
-            fail(String.format("JSON Schema Mismatch!%nUnexpected: %s%nMissing: %s", unexpected, missing));
+        // Validate all fields we expect to be present in JSON output are accounted for with no extras.
+        Iterator<Entry<String, JsonNode>> fields = json.fields();
+        while (fields.hasNext()) {
+            Entry<String, JsonNode> field = fields.next();
+            if (!knownJsonAttributes.remove(field.getKey())) {
+                throw new JacksonConfigurationException(
+                        "Untested JSON property found in class. Please update tests to validate this new field is JSON safe. Field: "
+                                + field.getKey());
+            }
         }
+
+        assertEquals(
+                0, knownJsonAttributes.size(), "JSON field was expected to be seen on object but was never observed");
     }
 
+    /**
+     * Runs any tests we can on the entire class to determine if Jackson things this class can be successfully serialized.
+     */
     public static void assertIsJacksonSerializable(Class<?> clazz) {
-        try {
-            JavaType type = JSON_MAPPER.constructType(clazz);
-
-            // 1. Check Deserialization (Respects @JsonCreator and Constructors)
-            var deserContext = JSON_MAPPER._deserializationContext();
-            var deserializer = deserContext.findRootValueDeserializer(type);
-
-            if (deserializer == null) {
-                fail("Jackson 3 cannot find a Deserializer (no-args or @JsonCreator) for: " + clazz.getName());
-            }
-
-            // 2. Check Serialization
-            var serProvider = JSON_MAPPER._serializationContext();
-            var serializer = serProvider.findTypedValueSerializer(type, true);
-
-            if (serializer == null) {
-                fail("Jackson cannot find a Serializer for: " + clazz.getName());
-            }
-        } catch (Exception e) {
-            fail("Jackson validation failed for " + clazz.getName() + " Error: " + e.getMessage());
-        }
+        assertTrue(objectMapper.canSerialize(clazz), "Jackson doesn't think it can serialize this class");
     }
 }

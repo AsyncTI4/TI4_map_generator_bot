@@ -29,7 +29,9 @@
             "y": 130.0
         }
     ],
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [],
     "isNebula": true,
     "tileBack": "red",

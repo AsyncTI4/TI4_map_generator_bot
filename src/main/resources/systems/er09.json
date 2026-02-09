@@ -9,7 +9,9 @@
     ],
     "imagePath": "er_09_async.png",
     "shipPositionsType": "TYPE02",
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [
         "ugamma",
         "urho"

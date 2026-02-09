@@ -1,16 +1,21 @@
 package ti4.json;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
 import ti4.helpers.Units.UnitKey;
-import tools.jackson.core.JsonGenerator;
-import tools.jackson.databind.SerializationContext;
-import tools.jackson.databind.ValueSerializer;
-import tools.jackson.databind.json.JsonMapper;
 
-public class UnitKeyMapKeySerializer extends ValueSerializer<UnitKey> {
-    private static final JsonMapper MAPPER = JsonMapper.builder().build();
+/**
+ * JSON map keys can only be strings. So when UnitKey objects are used as Java map keys, we have to
+ * use the literal JSON string as the map key.
+ */
+class UnitKeyMapKeySerializer extends JsonSerializer<UnitKey> {
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void serialize(UnitKey value, JsonGenerator gen, SerializationContext serializers) {
-        gen.writeName(MAPPER.writeValueAsString(value));
+    public void serialize(UnitKey value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeFieldName(mapper.writeValueAsString(value));
     }
 }
