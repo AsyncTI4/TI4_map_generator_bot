@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.batch.BatchClient;
 import software.amazon.awssdk.services.batch.model.SubmitJobRequest;
-import software.amazon.awssdk.services.batch.model.SubmitJobResponse;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -34,7 +33,7 @@ class BeginVideoGeneration extends Subcommand {
                     .parameters(Map.of("game", game))
                     .build();
 
-            SubmitJobResponse response = client.submitJob(sjr);
+            client.submitJob(sjr);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Failed to launch AWS job: " + e.getMessage());
         }
