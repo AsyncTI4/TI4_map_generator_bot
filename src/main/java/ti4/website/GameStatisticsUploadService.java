@@ -1,7 +1,5 @@
 package ti4.website;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SequenceWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -19,6 +17,8 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 import ti4.website.model.stats.GameStatsDashboardPayload;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.SequenceWriter;
 
 @UtilityClass
 public class GameStatisticsUploadService {
@@ -70,7 +70,7 @@ public class GameStatisticsUploadService {
         Path tempFile = Files.createTempFile(fileName, ".json");
         try (OutputStream outputStream = Files.newOutputStream(tempFile);
                 SequenceWriter writer =
-                        EgressClientManager.getObjectMapper().writer().writeValuesAsArray(outputStream)) {
+                        EgressClientManager.getJsonMapper().writer().writeValuesAsArray(outputStream)) {
             for (ManagedGame managedGame : GameManager.getManagedGames()) {
                 if (!gamePredicate.test(managedGame)) {
                     continue;
@@ -79,7 +79,7 @@ public class GameStatisticsUploadService {
                 eligible++;
 
                 try {
-                    JsonNode node = EgressClientManager.getObjectMapper()
+                    JsonNode node = EgressClientManager.getJsonMapper()
                             .valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
                     writer.write(node);
                     uploaded++;

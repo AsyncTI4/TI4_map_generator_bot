@@ -746,7 +746,7 @@ public class MapGenerator implements AutoCloseable {
         int boxWidth = 100;
         int boxBuffer = -1;
         int labelWidth = 360;
-        var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+        var priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
         DrawingUtil.drawCenteredString(
                 g2, trackName, new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
         int trackXShift = landscapeShift + labelWidth;

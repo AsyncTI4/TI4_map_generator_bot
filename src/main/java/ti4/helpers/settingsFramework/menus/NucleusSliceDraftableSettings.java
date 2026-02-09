@@ -2,7 +2,6 @@ package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import ti4.service.emoji.TileEmojis;
 import ti4.service.map.MapStringMapper;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @JsonIgnoreProperties("messageId")

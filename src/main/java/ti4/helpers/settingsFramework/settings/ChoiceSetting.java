@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.settings;
 
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.message.logging.BotLogger;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @Setter
