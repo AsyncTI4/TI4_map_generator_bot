@@ -1003,7 +1003,7 @@ public class ButtonHelperActionCards {
             }
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech, p2.getColor()));
-            } else {
+            } else if (!p2.getFragments().isEmpty()) {
                 Button button = Buttons.gray(
                         "seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech,
                         p2.getFactionModel().getShortName());
@@ -1011,6 +1011,13 @@ public class ButtonHelperActionCards {
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
             }
+        }
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                            + ", hmmmm, it looks as though none of your neighbours have any relic fragments.");
+            return;
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(

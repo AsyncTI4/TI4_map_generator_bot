@@ -624,7 +624,9 @@ public class TransactionHelper {
             "Second-Hand Nothing",
             "A Promissory Vibe",
             "[Nothing](<https://youtu.be/dQw4w9WgXcQ>)",
-            "||Surprise Nothing||");
+            "||Surprise Nothing||",
+            "A Witty Pop Culture Reference",
+            "Hwat's This‽ A Transaction Proposal Woefully Underpopulated By Bees‽ My Briefcase Full Of Bees Ought To Put A Stop To That!");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {

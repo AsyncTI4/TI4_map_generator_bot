@@ -193,7 +193,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", is using the Ralnel Commander to immediately retreat 2 ships (and maybe transport).");
+                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
