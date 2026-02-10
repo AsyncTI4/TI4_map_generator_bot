@@ -46,6 +46,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.explore.AddFrontierTokensService;
@@ -506,6 +507,33 @@ public class PlayHeroService {
                         player.getRepresentation(true, showFlavourText)
                                 + ", please choose which planet you wish to get trade goods from (and kill any enemy units).",
                         buttons);
+            }
+            case "sanctionhero" -> {
+                boolean singleDock = false;
+                Tile tile = player.getHomeSystemTile();
+                List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "warfare", "place");
+                int productionValue = Helper.getProductionValue(player, game, tile, singleDock);
+
+                String message = player.getRepresentation() + " Use the buttons to produce.";
+                message += "\nYou have " + productionValue + " PRODUCTION value in this system.";
+                if (productionValue > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                    message +=
+                            "\nYou also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getPrivateChannel(), message + " You do not need to pay for these units.");
+                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+
+                if (player.hasUnit("tf-productionbiomes")
+                        && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
+                                .contains(tile)) {
+                    String msg = player.getRepresentation()
+                            + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                            + " If you do, you will also choose another player, who will gain 2 trade goods.";
+                    List<Button> buttons2 = new ArrayList<>();
+                    buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
+                }
             }
             case "voicehero" -> {
                 List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");

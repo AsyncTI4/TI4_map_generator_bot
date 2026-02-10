@@ -509,10 +509,8 @@ public class ButtonHelperTwilightsFall {
         }
         List<String> cards = getSpliceCards(game);
         List<MessageEmbed> embeds = getSpliceEmbeds(game, spliceType, cards, null);
-        if (!game.isVeiledHeartMode()) {
-            MessageHelper.sendMessageToChannelWithEmbeds(
-                    startPlayer.getCorrectChannel(), "A splice has started with the following options.", embeds);
-        }
+
+        MessageHelper.sendMessageToChannel(startPlayer.getCorrectChannel(), "A splice has started.");
 
         sendPlayerSpliceOptions(game, startPlayer);
         for (Player player2 : getParticipantsList(game)) {
@@ -1016,6 +1014,9 @@ public class ButtonHelperTwilightsFall {
         List<String> alreadyDrawn =
                 List.of(game.getStoredValue("savedParadigms").split("_"));
         for (String card : alreadyDrawn) {
+            if (card.equalsIgnoreCase("hacanhero")) {
+                allCards.remove("sanctionhero");
+            }
             allCards.remove(card);
         }
         String paradigm = allCards.removeFirst();

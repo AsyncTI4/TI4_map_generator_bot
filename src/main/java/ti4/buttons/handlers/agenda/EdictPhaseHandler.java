@@ -374,7 +374,12 @@ public class EdictPhaseHandler {
                         yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.getFirst()
                                 + "_orangetf",
                         "Resolve 1 Edict");
-                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg2, proceedToStrategyPhase);
+                MessageHelper.sendMessageToChannelWithButton(
+                        yellowFSPlayer.getCorrectChannel(), msg2, proceedToStrategyPhase);
+                if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(
+                            game.getActionsChannel(), "# Radiant Aur will be resolving a second edict after this one.");
+                }
             } else {
                 String msg2 = player.getRepresentation()
                         + ", after resolving the edict, use this button to proceed to the strategy phase. This button will ready all cards, and ping the speaker.";

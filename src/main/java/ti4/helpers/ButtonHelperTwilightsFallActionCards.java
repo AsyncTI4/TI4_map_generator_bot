@@ -612,6 +612,16 @@ public class ButtonHelperTwilightsFallActionCards {
                 allCards.remove(unit);
             }
         }
+        if (game.isVeiledHeartMode()) {
+            List<String> someCardList = new ArrayList<>(allCards);
+            for (String card : someCardList) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                        allCards.remove(card);
+                    }
+                }
+            }
+        }
         String found = "nothing applicable";
         Collections.shuffle(allCards);
         for (String card : allCards) {

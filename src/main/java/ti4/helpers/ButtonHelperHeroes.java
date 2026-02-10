@@ -1934,7 +1934,7 @@ public class ButtonHelperHeroes {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
-        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static List<Button> getEmpyHeroButtons(Player player, Game game) {

@@ -2153,9 +2153,8 @@ public class ButtonHelperFactionSpecific {
                 player.getRepresentation()
                         + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
-        List<Button> buttons;
-        // Muaat agent works here as it's similar so no need to add more fluff
-        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "muaatagent", "place");
+        List<Button> buttons =
+                Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "muaatagent", "place");
         String message = player.getRepresentation() + ", please use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);

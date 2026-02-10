@@ -1,9 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -3630,7 +3627,9 @@ public class ButtonHelper {
         boolean hasRealButton = updatedTree.findAll(Button.class).stream()
                 .map(Button::getCustomId)
                 .filter(Objects::nonNull)
-                .anyMatch(id -> !"deleteButtons".equalsIgnoreCase(id) && !id.contains("ultimateUndo"));
+                .anyMatch(id -> !"deleteButtons".equalsIgnoreCase(id)
+                        && !id.contains("ultimateUndo")
+                        && !id.contains("cabalHeroAll"));
 
         if (deleteMessage && !hasRealButton) {
             event.getHook().deleteOriginal().queue(Consumers.nop(), BotLogger::catchRestError);

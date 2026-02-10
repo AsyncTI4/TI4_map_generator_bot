@@ -2445,6 +2445,7 @@
         "source": "ds",
         "faction": "belkosea",
         "capacityUsed": 1,
+        "moveValue": 2,
         "cost": 0.5,
         "combatHitsOn": 8,
         "combatDieCount": 1,

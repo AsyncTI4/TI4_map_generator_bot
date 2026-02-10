@@ -355,7 +355,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "erock" -> erock;
             case "explanetary" -> explanetary;
 
-            case "dreams" -> dream;
+            case "dream" -> dream;
             case "ashen" -> ashen;
             case "iron" -> iron;
             case "ta" -> ta;
