@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -24,12 +25,12 @@ class UnitsTest extends BaseTi4Test {
         }
 
         @Test
-        void testUnitKeyHasNoUnexpectedProperties() {
+        void testUnitKeyHasNoUnexpectedProperties() throws Exception {
             // Given
             UnitKey unitKey = buildUnitKey();
             // DO NOT ADD NEW JSON KEYS TO THIS OBJECT.
             // This object is being used as a key in maps which causes issues when we
-            // try to convert the Java map to a JSON map (as maps only allow for string keys).
+            // try to conver the Java map to a JSON map (as maps only allow for string keys).
             Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList("unitType", "colorID"));
 
             // When
@@ -42,7 +43,7 @@ class UnitsTest extends BaseTi4Test {
         }
 
         @Test
-        void testUnitKeyJsonSaveAndRestore() {
+        void testUnitKeyJsonSaveAndRestore() throws JsonProcessingException {
             // Given
             UnitKey unitKey = buildUnitKey();
 

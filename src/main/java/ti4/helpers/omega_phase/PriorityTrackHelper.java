@@ -9,13 +9,11 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public final class PriorityTrackHelper {
-    private PriorityTrackHelper() {}
-
+public class PriorityTrackHelper {
     public static void PrintPriorityTrack(Game game) {
         StringBuilder sb = new StringBuilder("**Priority Track**\n");
 
-        var priorityTrack = getPriorityTrack(game);
+        var priorityTrack = GetPriorityTrack(game);
         for (var i = 0; i < priorityTrack.size(); i++) {
             int priority = i + 1;
             if (priorityTrack.get(i) != null) {
@@ -81,7 +79,7 @@ public final class PriorityTrackHelper {
                 return;
             }
 
-            var currentPriotityTrack = getPriorityTrack(game);
+            var currentPriotityTrack = GetPriorityTrack(game);
             for (var i = 0; i < currentPriotityTrack.size(); i++) {
                 if (currentPriotityTrack.get(i) == null) {
                     // Found an empty spot, assign the player here
@@ -104,7 +102,7 @@ public final class PriorityTrackHelper {
             player.setPriorityPosition(priority);
             messageOutput += player.getRepresentation() + " has been assigned to position " + priority
                     + " on the priority track.";
-        } else if (player.hasPriorityPosition()) {
+        } else if (priority < 1 && player.hasPriorityPosition()) {
             // If priority is -1, remove the player from the priority track
             player.setPriorityPosition(-1);
             messageOutput += player.getRepresentation() + " has been removed from the priority track.";
@@ -125,7 +123,7 @@ public final class PriorityTrackHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The priority track has been cleared.");
     }
 
-    public static List<Player> getPriorityTrack(Game game) {
+    public static List<Player> GetPriorityTrack(Game game) {
         List<Player> priorityTrack = new ArrayList<>();
         int numPlayers = game.getRealPlayers().size();
         for (int i = 0; i < numPlayers; i++) {
@@ -143,7 +141,7 @@ public final class PriorityTrackHelper {
     }
 
     public static void CreateDefaultPriorityTrack(Game game) {
-        var currentPriorityTrack = getPriorityTrack(game);
+        var currentPriorityTrack = GetPriorityTrack(game);
         var players = game.getRealPlayers();
         if (game.getSpeaker() != null) {
             players = Helper.getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);

@@ -113,7 +113,7 @@ public class ColorChangeHelper {
         }
 
         PromissoryNoteModel genericPNModel = pnModel.getSourcePNModel();
-        return genericPNModel.getId().replace("<color>", newColorModel.getName());
+        return genericPNModel.getID().replace("<color>", newColorModel.getName());
     }
 
     private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {

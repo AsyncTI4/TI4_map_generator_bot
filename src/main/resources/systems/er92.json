@@ -25,7 +25,9 @@
             "y": 170.0
         }
     ],
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [
         "fyrain",
         "leonelli"

@@ -3,6 +3,7 @@ package ti4.map;
 import static java.util.function.Predicate.not;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -68,9 +69,11 @@ import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
+import ti4.json.ObjectMapperFactory;
 import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
 import ti4.map.persistence.GameManager;
+import ti4.map.pojo.ExportableField;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -98,13 +101,8 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.spring.jda.JdaService;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties {
-
-    private static final JsonMapper mapper =
-            JsonMapper.builder().findAndAddModules().build();
 
     // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile
@@ -480,7 +478,7 @@ public class Game extends GameProperties {
         if (miltySettings == null) {
             if (miltyJson != null) {
                 try {
-                    JsonNode json = mapper.readTree(miltyJson);
+                    JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
                     BotLogger.error(
@@ -506,7 +504,7 @@ public class Game extends GameProperties {
         if (draftSystemSettings == null) {
             if (draftSystemSettingsJson != null) {
                 try {
-                    JsonNode json = mapper.readTree(draftSystemSettingsJson);
+                    JsonNode json = ObjectMapperFactory.build().readTree(draftSystemSettingsJson);
                     draftSystemSettings = new DraftSystemSettings(this, json);
                 } catch (Exception e) {
                     BotLogger.error(

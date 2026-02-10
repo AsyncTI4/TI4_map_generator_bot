@@ -149,7 +149,7 @@ public class DataMigrationManager {
         return migrationsApplied;
     }
 
-    private static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
+    public static Boolean renameGarboziaToBozgarbia_201025_withEnded(Game game) {
         Tile old = null;
         for (Tile t : game.getTileMap().values()) {
             if ("sig01".equals(t.getTileID())) {
