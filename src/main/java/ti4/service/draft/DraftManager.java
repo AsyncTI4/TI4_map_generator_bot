@@ -354,7 +354,7 @@ public class DraftManager extends DraftPlayerManager {
         // Errors that can't be fixed with slash commands, and should never happen
         super.validateState();
 
-      MessageChannel issueChannel = game.getMainGameChannel();
+        MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`).");

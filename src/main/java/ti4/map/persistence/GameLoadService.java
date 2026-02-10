@@ -194,8 +194,8 @@ class GameLoadService {
             TransientGameInfoUpdater.update(game);
             return game;
         } catch (Exception e) {
-            BotLogger.critical("Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.",
-                e);
+            BotLogger.critical(
+                    "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
             return null;
         }
     }
@@ -218,9 +218,9 @@ class GameLoadService {
                 tileMap.put(tile.getPosition(), tile);
             } else {
                 BotLogger.error(
-                    new LogOrigin(game),
-                    "Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData
-                        + "` - tile will be skipped - check save file");
+                        new LogOrigin(game),
+                        "Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData
+                                + "` - tile will be skipped - check save file");
             }
 
             while (gameFileLines.hasNext()) {
@@ -247,8 +247,8 @@ class GameLoadService {
                             }
                             if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                 BotLogger.warning(
-                                    new LogOrigin(game),
-                                    game.getName() + ": Not valid unitholder detected: " + unitHolderName);
+                                        new LogOrigin(game),
+                                        game.getName() + ": Not valid unitholder detected: " + unitHolderName);
                             }
                         }
                         continue;
@@ -355,7 +355,8 @@ class GameLoadService {
                 }
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info)) break;
-                    var borderAnomalyHolders = mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
+                    var borderAnomalyHolders =
+                            mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
                     game.setBorderAnomalies(borderAnomalyHolders);
                 }
                 case Constants.ADJACENCY_OVERRIDES -> game.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
@@ -560,7 +561,8 @@ class GameLoadService {
                     }
                 }
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
-                    Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, new TypeReference<>() {});
+                    Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
+                            mapper.readValue(info, new TypeReference<>() {});
                     game.setTacticalActionDisplacement(displacedUnits);
                 }
                 case Constants.FOW_OPTIONS -> {
