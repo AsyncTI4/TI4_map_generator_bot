@@ -837,10 +837,10 @@ public class ButtonHelperAbilities {
         List<String> bounties = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             for (UnitType unitType : UnitType.values()) {
-                String storedValue = game.getStoredValue(
-                        "bounties" + player.getFaction() + unitType.getValue().toLowerCase());
+                String storedValue = game.getStoredValue("bounties" + player.getFaction()
+                        + unitType.humanReadableName().toLowerCase());
                 if (!storedValue.isEmpty()) {
-                    bounties.add(player.getFaction() + " " + unitType.getValue());
+                    bounties.add(player.getFaction() + " " + unitType.humanReadableName());
                 }
             }
         }
