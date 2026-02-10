@@ -464,7 +464,7 @@ public class StartPhaseService {
                 PriorityTrackHelper.PrintPriorityTrack(game);
             } else {
                 Player speaker = game.getSpeaker();
-                List<Player> priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+                List<Player> priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
                 StringBuilder sb = new StringBuilder("**Priority Track (Speaker first)**\n");
                 if (speaker != null) {
                     sb.append(MiscEmojis.SpeakerToken)

@@ -35,7 +35,7 @@ public class ExhaustLeaderService {
             StringBuilder sb = new StringBuilder();
             leader.setTgCount(tgCount);
             String leaderName = leaderModel.getName();
-            if ("nomadagentartuno".equals(leaderModel.getID())) {
+            if ("nomadagentartuno".equals(leaderModel.getId())) {
                 leaderName = "Artuno the Betrayer, a Nomad agent";
             }
 

@@ -1,6 +1,5 @@
 package ti4.commands.bothelper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -16,8 +15,12 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.MiscEmojis;
 import ti4.spring.jda.JdaService;
+import tools.jackson.databind.json.JsonMapper;
 
 class JazzCommand extends Subcommand {
+
+    private static final JsonMapper mapper =
+            JsonMapper.builder().findAndAddModules().build();
 
     JazzCommand() {
         super("jazz_command", "jazzxhands");
@@ -48,7 +51,6 @@ class JazzCommand extends Subcommand {
     }
 
     public String json(MiltySettings object) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(object);
         } catch (Exception e) {

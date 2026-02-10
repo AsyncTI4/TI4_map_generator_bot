@@ -32,7 +32,7 @@ class DraftErrataModelTest extends BaseTi4Test {
     }
 
     private boolean validateAdditionalComponents(DraftErrataModel model) {
-        if (model.AdditionalComponents == null) {
+        if (model.additionalComponents == null) {
             return true;
         }
         List<String> draftItems =
@@ -52,7 +52,7 @@ class DraftErrataModelTest extends BaseTi4Test {
     }
 
     private boolean validateOptionalComponents(DraftErrataModel model) {
-        if (model.OptionalSwaps == null) {
+        if (model.optionalSwaps == null) {
             return true;
         }
         List<String> draftItems =
