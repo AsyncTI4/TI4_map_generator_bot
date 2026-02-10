@@ -152,8 +152,8 @@ public class JdaService {
                 new SelectionMenuListener(),
                 new ChannelCreationListener(),
                 new UserLeaveServerListener(),
-                ModalListener.getInstance() // ModalListener has a long init time
-                );
+                // ModalListener has a long init time
+                ModalListener.getInstance());
 
         BotLogger.info("AWAITING JDA READY");
         try {
