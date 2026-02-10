@@ -200,7 +200,7 @@ public class Game extends GameProperties {
     private DistanceTool distanceTool;
 
     @Getter
-    private final Expeditions expeditions = new Expeditions(this);
+    private final Expeditions expeditions = new Expeditions();
 
     @Setter
     @Getter
@@ -936,6 +936,7 @@ public class Game extends GameProperties {
 
     @Nullable
     public TextChannel getTableTalkChannel() {
+        if (JdaService.jda == null) return null;
         try {
             return JdaService.jda.getTextChannelById(getTableTalkChannelID());
         } catch (Exception e) {
@@ -954,6 +955,7 @@ public class Game extends GameProperties {
     }
 
     public TextChannel getMainGameChannel() {
+        if (JdaService.jda == null) return null;
         try {
             return JdaService.jda.getTextChannelById(getMainChannelID());
         } catch (Exception e) {

@@ -30,9 +30,6 @@ import ti4.service.emoji.TechEmojis;
 @Data
 public class Expeditions {
 
-    @JsonIgnore
-    private Game game;
-
     private Map<String, String> expeditionFactions = new LinkedHashMap<>();
 
     public String getTechSkip() {
@@ -83,8 +80,7 @@ public class Expeditions {
         return expeditionFactions.put("actionCards", value);
     }
 
-    public Expeditions(Game game) {
-        this.game = game;
+    public Expeditions() {
         expeditionFactions.put("techSkip", null);
         expeditionFactions.put("tradeGoods", null);
         expeditionFactions.put("fiveRes", null);

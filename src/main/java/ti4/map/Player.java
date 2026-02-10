@@ -2259,9 +2259,6 @@ public class Player extends PlayerProperties {
         if (game.isAgeOfCommerceMode() && comms > 0) {
             num = comms;
         }
-        if ("no".equalsIgnoreCase(game.getStoredValue("loadedGame"))) {
-            num = comms;
-        }
         super.setCommodities(num);
         if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
     }

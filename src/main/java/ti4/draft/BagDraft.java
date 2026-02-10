@@ -22,7 +22,7 @@ public abstract class BagDraft {
     private static final Pattern FORWARD_SLASH_PATTERN = Pattern.compile("/");
     private final Game owner;
 
-    public static BagDraft GenerateDraft(String draftType, Game game) {
+    public static BagDraft generateDraft(String draftType, Game game) {
         if ("franken".equals(draftType)) {
             return new FrankenDraft(game);
         }

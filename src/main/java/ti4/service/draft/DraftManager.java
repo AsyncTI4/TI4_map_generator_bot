@@ -353,14 +353,8 @@ public class DraftManager extends DraftPlayerManager {
     public void validateState() {
         // Errors that can't be fixed with slash commands, and should never happen
         super.validateState();
-        if (game == null) {
-            throw new IllegalStateException("Game not set");
-        }
-        if (draftables == null) {
-            throw new IllegalStateException("Draftables not set");
-        }
 
-        MessageChannel issueChannel = game.getMainGameChannel();
+      MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(
                     issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`).");
