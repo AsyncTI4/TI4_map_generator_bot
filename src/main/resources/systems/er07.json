@@ -8,9 +8,7 @@
     ],
     "imagePath": "er_07_async.png",
     "shipPositionsType": "TYPE05",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "khjan",
         "shul"

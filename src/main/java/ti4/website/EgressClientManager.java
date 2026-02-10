@@ -1,6 +1,5 @@
 package ti4.website;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +12,14 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import ti4.ResourceHelper;
 import ti4.message.logging.BotLogger;
+import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 public class EgressClientManager {
 
     @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final JsonMapper jsonMapper =
+            JsonMapper.builder().findAndAddModules().build();
 
     @Getter
     private static final HttpClient httpClient = HttpClient.newHttpClient();

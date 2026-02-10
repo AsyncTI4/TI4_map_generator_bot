@@ -1,8 +1,5 @@
 package ti4.commands.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -12,14 +9,18 @@ import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class ShowUserSettings extends Subcommand {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final JsonMapper mapper = JsonMapper.builder()
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .findAndAddModules()
+            .build();
 
     ShowUserSettings() {
         super("show_settings", "Show your User Settings");
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     @Override
@@ -33,15 +34,15 @@ class ShowUserSettings extends Subcommand {
     private static String getSettingEmbed(GenericInteractionCreateEvent event, UserSettings userSettings) {
         StringBuilder eb = new StringBuilder();
         String userName = event.getUser().getName();
-        eb.append(userName + "'s User Settings\n");
-        eb.append("```json\n" + getJSONRaw(userSettings) + "```");
+        eb.append(userName).append("'s User Settings\n");
+        eb.append("```json\n").append(getJSONRaw(userSettings)).append("```");
         return eb.toString();
     }
 
     private static String getJSONRaw(UserSettings userSettings) {
         try {
             return mapper.writeValueAsString(userSettings);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             return "Failed to serialize UserSettings";
         }
     }

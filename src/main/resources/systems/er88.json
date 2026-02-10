@@ -26,9 +26,7 @@
             "y": 170.0
         }
     ],
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "elan",
         "verdis"

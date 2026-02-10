@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,11 +22,11 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
-import ti4.json.ObjectMapperFactory;
 import ti4.listeners.context.ListenerContext;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * <h1>Jazzxhands Menu Framework</h1>
@@ -43,6 +42,9 @@ import ti4.message.logging.LogOrigin;
  */
 @Getter
 public abstract class SettingsMenu {
+    private static final JsonMapper mapper =
+            JsonMapper.builder().findAndAddModules().build();
+
     // Prefix "Jazz Menu Framework"
     private static final @JsonIgnore String menuNav = "jmfN";
     static final @JsonIgnore String menuAction = "jmfA";
@@ -461,7 +463,6 @@ public abstract class SettingsMenu {
 
     @JsonIgnore
     public String json() {
-        ObjectMapper mapper = ObjectMapperFactory.build();
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {

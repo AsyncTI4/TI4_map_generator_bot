@@ -8,9 +8,7 @@
     "imagePath": "m28_bunker.png",
     "shipPositionsType": "TYPE17",
     "spaceTokenLocations": null,
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "bunker"
     ],
