@@ -6,7 +6,9 @@
     ],
     "imagePath": "er_22_async.png",
     "shipPositionsType": "TYPE04",
-    "wormholes": [],
+    "wormholes": [
+        null
+    ],
     "planets": [
         "ilvoshu"
     ],

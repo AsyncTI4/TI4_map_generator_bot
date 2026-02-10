@@ -1,7 +1,15 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.awt.Color;
@@ -71,14 +79,6 @@ import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.CardEmojis;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.JavaType;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.MapperFeature;
-import tools.jackson.databind.ValueDeserializer;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 public class Mapper {
@@ -123,12 +123,10 @@ public class Mapper {
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
 
-    private static final JsonMapper jsonMapper = JsonMapper.builder()
-            .addModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()))
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-            .build();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void init() {
+        objectMapper.registerModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()));
         try {
             loadData();
         } catch (Exception e) {
@@ -192,10 +190,10 @@ public class Mapper {
     }
 
     private static <T extends ModelInterface> void importJsonObjectsFromFolder(
-            String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
+            String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws InvalidFormatException {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
-        // Added to prevent duplicates when running Mapper.init() over and over with ModelTest classes
-        objectMap.clear();
+        objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest
+        // classes
 
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
@@ -205,8 +203,11 @@ public class Mapper {
             }
             try {
                 importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
+            } catch (InvalidFormatException e) {
+                BotLogger.error("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
+                throw e;
             } catch (Exception e) {
-                BotLogger.error("Could not import JSON Objects from file: " + jsonFolderName + "/" + file.getName(), e);
+                BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
             }
         }
     }
@@ -244,14 +245,14 @@ public class Mapper {
             String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
-        JavaType type = jsonMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
+        JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, target);
 
         if (filePath != null) {
             try {
                 InputStream input = new FileInputStream(filePath);
-                allObjects = jsonMapper.readValue(input, type);
+                allObjects = objectMapper.readValue(input, type);
             } catch (Exception e) {
-                BotLogger.error("Could not import JSON Objects from file: " + jsonFileName, e);
+                BotLogger.error("Could not import JSON Objects from File: " + jsonFileName, e);
                 throw e;
             }
         }
@@ -1448,31 +1449,23 @@ public class Mapper {
                 .collect(Collectors.toSet());
     }
 
-    private static class ColorDeserializer extends ValueDeserializer<Color> {
+    private static class ColorDeserializer extends JsonDeserializer<Color> {
         @Override
-        public Color deserialize(JsonParser p, DeserializationContext c) {
-            JsonNode n = p.readValueAsTree();
-
-            // Handle "#RRGGBB" or "0xRRGGBB"
-            if (n.isTextual()) {
-                return Color.decode(n.asText());
-            }
-
-            // Handle ARGB integer
-            if (n.isNumber()) {
-                return new Color(n.asInt(), true);
-            }
-
-            // Handle { "red" : ###, "green": ###, "blue": ###, "alpha": ### }
-            if (n.isObject() && n.has("red")) {
-                int r = n.get("red").asInt();
-                int g = n.get("green").asInt();
-                int b = n.get("blue").asInt();
+        public Color deserialize(JsonParser p, DeserializationContext c) throws IOException {
+            JsonNode n = p.getCodec().readTree(p);
+            // "#RRGGBB" or "0xRRGGBB"
+            if (n.isTextual()) return Color.decode(n.asText());
+            // ARGB
+            if (n.isInt()) return new Color(n.asInt(), true);
+            // { "red" : ###, "green": ###, "blue": ###, "alpha": ### } where alpha is optional
+            if (n.has("red")) {
+                int r = n.get("red").asInt(),
+                        g = n.get("green").asInt(),
+                        b = n.get("blue").asInt();
                 int a = n.has("alpha") ? n.get("alpha").asInt() : 255;
                 return new Color(r, g, b, a);
             }
-
-            throw new RuntimeException("Unable to deserialize color: " + n);
+            throw c.weirdStringException(n.toString(), Color.class, "Unsupported color format");
         }
     }
 }

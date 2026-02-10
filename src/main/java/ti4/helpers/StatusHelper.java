@@ -444,7 +444,7 @@ public class StatusHelper {
 
     public static List<Player> GetPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
-            return PriorityTrackHelper.getPriorityTrack(game).stream()
+            return PriorityTrackHelper.GetPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
                     .toList();
         } else if (game.getPlanets().contains(EronousPlanetService.CANTRIS_ID)) {

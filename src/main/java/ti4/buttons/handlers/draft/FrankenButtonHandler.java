@@ -47,16 +47,16 @@ class FrankenButtonHandler {
 
         // Handle Errata
         if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
-            if (draftItem.Errata.additionalComponents != null) { // Auto-add Additional Components
+            if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
-                for (DraftErrataModel i : draftItem.Errata.additionalComponents) {
-                    DraftItem item = DraftItem.generate(i.itemCategory, i.itemId);
+                for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     applyFrankenItemToPlayer(event, item, player);
                 }
             }
-            if (draftItem.Errata.optionalSwaps != null) { // Offer Optional Swaps
-                for (DraftErrataModel i : draftItem.Errata.optionalSwaps) {
-                    DraftItem item = DraftItem.generate(i.itemCategory, i.itemId);
+            if (draftItem.Errata.OptionalSwaps != null) { // Offer Optional Swaps
+                for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     Button button = item.getAddButton();
                     String message = "You have the option to swap in the following item:\n" + item.getLongDescription();
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -76,16 +76,16 @@ class FrankenButtonHandler {
 
         // Handle Errata
         if (draftItem.Errata != null && !player.getGame().isTwilightsFallMode()) {
-            if (draftItem.Errata.additionalComponents != null) { // Auto-add Additional Components
+            if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
-                for (DraftErrataModel i : draftItem.Errata.additionalComponents) {
-                    DraftItem item = DraftItem.generate(i.itemCategory, i.itemId);
+                for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     removeFrankenItemFromPlayer(event, item, player);
                 }
             }
-            if (draftItem.Errata.optionalSwaps != null) { // Offer Optional Swaps
-                for (DraftErrataModel i : draftItem.Errata.optionalSwaps) {
-                    DraftItem item = DraftItem.generate(i.itemCategory, i.itemId);
+            if (draftItem.Errata.OptionalSwaps != null) { // Offer Optional Swaps
+                for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     Button button = item.getAddButton();
                     String message =
                             "WARNING! The following items were optional and may or may not have been removed by pressing the parent button:\n"

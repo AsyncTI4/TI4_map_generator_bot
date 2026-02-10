@@ -1,6 +1,7 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,6 @@ import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.logging.BotLogger;
-import tools.jackson.databind.JsonNode;
 
 // This is a sub-menu
 @Getter
