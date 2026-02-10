@@ -985,9 +985,8 @@ public class ButtonHelperTwilightsFall {
 
     public static void drawParadigm(Game game, Player player, ButtonInteractionEvent event, boolean scPara) {
 
-        String messageID = event.getMessageId();
-
         if (scPara) {
+            String messageID = event.getMessageId();
             boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player);
             StrategyCardModel scModel = game.getStrategyCardModelByInitiative(8).get();
             if (!player.getFollowedSCs().contains(scModel.getInitiative())) {

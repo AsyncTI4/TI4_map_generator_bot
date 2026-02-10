@@ -371,7 +371,8 @@ class GameLoadService {
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info)) break;
                     try {
-                        var borderAnomalyHolders = mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
+                        var borderAnomalyHolders =
+                                mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
                         game.setBorderAnomalies(borderAnomalyHolders);
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(game), "Error reading border anomalies from save file!", e);
@@ -594,7 +595,8 @@ class GameLoadService {
                 }
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     try {
-                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, new TypeReference<>() {});
+                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
+                                mapper.readValue(info, new TypeReference<>() {});
                         game.setTacticalActionDisplacement(displacedUnits);
                     } catch (Exception e) {
                         BotLogger.error(
