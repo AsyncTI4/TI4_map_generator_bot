@@ -510,7 +510,20 @@ public class StartTurnService {
                                 .append(Helper.getSCName(sc, game))
                                 .append(
                                         "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone.");
-                        appendScMessages(game, p2, sc, sb);
+
+                        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
+                            sb.append(" Message link is: ")
+                                    .append(game.getStoredValue("scPlay" + sc))
+                                    .append(".\n");
+                        }
+                        sb.append("You currently have ")
+                                .append(player.getStrategicCC())
+                                .append(" command token")
+                                .append(player.getStrategicCC() == 1 ? "" : "s")
+                                .append(" in your strategy pool.");
+                        if (!player.hasFollowedSC(sc)) {
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+                        }
                     }
                 }
             }
@@ -677,21 +690,5 @@ public class StartTurnService {
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
         return startButtons;
-    }
-
-    private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {
-        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-            sb.append("Message link is: ")
-                    .append(game.getStoredValue("scPlay" + sc))
-                    .append("\n");
-        }
-        sb.append("You currently have ")
-                .append(player.getStrategicCC())
-                .append(" command token")
-                .append(player.getStrategicCC() == 1 ? "" : "s")
-                .append(" in your strategy pool.");
-        if (!player.hasFollowedSC(sc)) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
-        }
     }
 }

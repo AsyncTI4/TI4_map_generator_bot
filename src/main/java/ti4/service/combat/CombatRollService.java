@@ -319,7 +319,8 @@ public class CombatRollService {
                     if (planet != null && planet.getGalvanizedUnitCount(player.getColorID()) > 0) {
                         int oldH = h;
                         h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
-                        message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit(s) automatically.";
+                        message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit"
+                                + (oldH - h == 1 ? "" : "s") + " automatically.";
                     }
                 }
             }

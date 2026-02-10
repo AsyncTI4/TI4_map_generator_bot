@@ -40,7 +40,7 @@ public class PlayerStatsDashboardPayload {
     @JsonIgnore
     public String getJson() {
         try {
-            return EgressClientManager.getObjectMapper().writeValueAsString(this);
+            return EgressClientManager.getJsonMapper().writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.error(
                     "Could not get PlayerStatsDashboardPayload JSON for Game: "

@@ -905,14 +905,14 @@ public class ButtonHelperAbilities {
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
             } else {
                 pillagedMessage +=
-                        ", so your tgs went from " + pillaged.getTg() + " to " + (pillaged.getTg() - 1) + ".";
+                        ", so your trade goods went from " + pillaged.getTg() + " to " + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
 
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isPrefersPillageMsg() || game.isTwilightsFallMode()) {
                 pillagerMessage = player.getRepresentationUnfogged()
-                        + " you succesfully **Pillage**'d, so your tgs have gone from "
+                        + " you successfully **Pillage**'d, so your trade goods have gone from "
                         + player.getTg() + " to "
                         + (player.getTg() + 1) + ".";
             } else {

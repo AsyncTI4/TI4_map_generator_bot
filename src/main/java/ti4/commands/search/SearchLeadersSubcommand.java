@@ -33,7 +33,7 @@ class SearchLeadersSubcommand extends SearchComponentModelSubcommand {
 
         List<MessageEmbed> messageEmbeds = Mapper.getLeaders().values().stream()
                 .filter(model -> model.search(searchString, source))
-                .sorted(Comparator.comparing(LeaderModel::getID))
+                .sorted(Comparator.comparing(LeaderModel::getId))
                 .map(model -> model.getRepresentationEmbed(true, true, true, true))
                 .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);

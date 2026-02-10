@@ -1,8 +1,8 @@
 [
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "nocturne",
-        "Undraftable": true,
+        "itemCategory": "ABILITY",
+        "itemId": "nocturne",
+        "undraftable": true,
         "source": "thunders_edge"
     }
 ]

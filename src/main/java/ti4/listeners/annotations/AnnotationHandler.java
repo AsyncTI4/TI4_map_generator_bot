@@ -1,6 +1,6 @@
 package ti4.listeners.annotations;
 
-import static org.reflections.scanners.Scanners.*;
+import static org.reflections.scanners.Scanners.SubTypes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -197,7 +197,7 @@ public class AnnotationHandler {
                         origin,
                         "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
                                 + "\":",
-                        e.getCause());
+                        e);
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters())
                         .map(param -> param.getType().getSimpleName())

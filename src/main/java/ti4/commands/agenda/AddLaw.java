@@ -1,10 +1,10 @@
 package ti4.commands.agenda;
 
-import com.amazonaws.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -37,7 +37,7 @@ class AddLaw extends GameStateSubcommand {
         Player player = getPlayer();
         String optionText;
         boolean playerWasElected =
-                !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
+                StringUtils.isNotBlank(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         if (playerWasElected) {
             optionText = player.getFaction();
         } else {
