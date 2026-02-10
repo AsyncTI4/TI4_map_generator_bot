@@ -39,6 +39,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class MapJsonIOService {
     private static final JsonMapper mapper = JsonMapper.builder()
             .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .findAndAddModules()
             .build();
 
     @ModalHandler("importMapFromJSON")

@@ -68,6 +68,7 @@ import ti4.helpers.settingsFramework.menus.GameSetupSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
 import ti4.map.persistence.GameManager;
@@ -103,8 +104,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 public class Game extends GameProperties {
 
-    private static final JsonMapper mapper =
-            JsonMapper.builder().findAndAddModules().build();
+    private static final JsonMapper mapper = JsonMapperManager.basic();
 
     // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile

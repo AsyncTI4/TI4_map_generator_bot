@@ -7,15 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import ti4.helpers.Storage;
+import ti4.json.JsonMapperManager;
 import ti4.message.logging.BotLogger;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ObjectWriter;
-import tools.jackson.databind.json.JsonMapper;
 
 public class GlobalSettings {
-
-    private static final JsonMapper mapper =
-            JsonMapper.builder().findAndAddModules().build();
 
     // Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter,
     // and will allow you to get the setting easier
@@ -73,7 +70,7 @@ public class GlobalSettings {
     }
 
     private static void saveSettings() {
-        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+        ObjectWriter writer = JsonMapperManager.basic().writerWithDefaultPrettyPrinter();
         try {
             writer.writeValue(getFile(), settings);
         } catch (Exception e) {
@@ -83,8 +80,11 @@ public class GlobalSettings {
 
     public static void loadSettings() {
         try {
-            JavaType settingsType = mapper.getTypeFactory().constructMapType(HashMap.class, String.class, Object.class);
-            settings = mapper.readValue(Files.readString(getFile().toPath()), settingsType);
+            JavaType settingsType = JsonMapperManager.basic()
+                    .getTypeFactory()
+                    .constructMapType(HashMap.class, String.class, Object.class);
+            settings = JsonMapperManager.basic()
+                    .readValue(Files.readString(getFile().toPath()), settingsType);
         } catch (IOException e) {
             // THis _probably_ means there's no file, which isn't critical.
             // So this is intended to silently fail.

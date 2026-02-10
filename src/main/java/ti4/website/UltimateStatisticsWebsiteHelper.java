@@ -6,6 +6,7 @@ import java.net.http.HttpResponse;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.statistics.StatisticOptIn;
@@ -61,7 +62,7 @@ public class UltimateStatisticsWebsiteHelper {
     private static void sendJson(
             Object request, String url, MessageChannel channel, String successMessage, String failureMessage) {
         try {
-            String json = EgressClientManager.getJsonMapper().writeValueAsString(request);
+            String json = JsonMapperManager.basic().writeValueAsString(request);
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -108,7 +109,7 @@ public class UltimateStatisticsWebsiteHelper {
         String body = response.body();
         BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
         try {
-            JsonNode node = EgressClientManager.getJsonMapper().readTree(body);
+            JsonNode node = JsonMapperManager.basic().readTree(body);
             String title = node.path("problemDetails").path("title").asText();
             String detail = node.path("problemDetails").path("detail").asText();
             if (!title.isEmpty() || !detail.isEmpty()) {

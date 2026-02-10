@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,10 +10,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 class UnitsTest extends BaseTi4Test {
+
+    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+            .addModule(new SimpleModule()
+                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
+                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .build();
 
     @Nested
     class UnitKeyTest {
@@ -52,6 +63,22 @@ class UnitsTest extends BaseTi4Test {
             // Then
             assertEquals(expectedColorId, restoredUnitKey.getColorID());
             assertEquals(expectedUnitType, restoredUnitKey.getUnitType());
+        }
+
+        @Test
+        void testUnitTypeJacksonDeserializationSupportsLegacyEnumName() {
+            UnitKey restoredUnitKey =
+                    JSON_MAPPER.readValue("{\"unitType\":\"Cruiser\",\"colorID\":\"blu\"}", UnitKey.class);
+
+            assertEquals(UnitType.Cruiser, restoredUnitKey.getUnitType());
+        }
+
+        @Test
+        void testUnitTypeJacksonDeserializationRejectsUnknownValue() {
+            assertThrows(
+                    Exception.class,
+                    () -> JSON_MAPPER.readValue(
+                            "{\"unitType\":\"SomeUnknownShip\",\"colorID\":\"blu\"}", UnitKey.class));
         }
     }
 }

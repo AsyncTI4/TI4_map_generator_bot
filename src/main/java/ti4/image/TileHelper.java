@@ -16,20 +16,16 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
+import ti4.json.JsonMapperManager;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
-import tools.jackson.databind.MapperFeature;
-import tools.jackson.databind.json.JsonMapper;
 
 public class TileHelper {
 
-    private static final JsonMapper jsonMapper = JsonMapper.builder()
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-            .build();
     private static final Pattern TILE_WITH_NAME_PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
     private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();
     private static final Map<String, PlanetModel> planetIdsToPlanetModels = new HashMap<>();
@@ -83,7 +79,7 @@ public class TileHelper {
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                PlanetModel planet = jsonMapper.readValue(fileInputStream, PlanetModel.class);
+                PlanetModel planet = JsonMapperManager.basic().readValue(fileInputStream, PlanetModel.class);
                 planetIdsToPlanetModels.put(planet.getId(), planet);
                 tileIdsToPlanetModels
                         .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
@@ -118,7 +114,7 @@ public class TileHelper {
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                TileModel tile = jsonMapper.readValue(fileInputStream, TileModel.class);
+                TileModel tile = JsonMapperManager.basic().readValue(fileInputStream, TileModel.class);
                 tileIdsToTileModels.put(tile.getId(), tile);
                 if (!tile.isValid()) {
                     badObjects.add(tile.getAlias());

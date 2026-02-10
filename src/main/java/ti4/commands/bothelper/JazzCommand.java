@@ -10,17 +10,14 @@ import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.json.JsonMapperManager;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.MiscEmojis;
 import ti4.spring.jda.JdaService;
-import tools.jackson.databind.json.JsonMapper;
 
 class JazzCommand extends Subcommand {
-
-    private static final JsonMapper mapper =
-            JsonMapper.builder().findAndAddModules().build();
 
     JazzCommand() {
         super("jazz_command", "jazzxhands");
@@ -52,7 +49,7 @@ class JazzCommand extends Subcommand {
 
     public String json(MiltySettings object) {
         try {
-            return mapper.writeValueAsString(object);
+            return JsonMapperManager.basic().writeValueAsString(object);
         } catch (Exception e) {
             BotLogger.error("Error mapping to json: ", e);
         }

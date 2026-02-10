@@ -75,7 +75,6 @@ import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
@@ -125,7 +124,7 @@ public class Mapper {
 
     private static final JsonMapper jsonMapper = JsonMapper.builder()
             .addModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()))
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+            .findAndAddModules()
             .build();
 
     public static void init() {

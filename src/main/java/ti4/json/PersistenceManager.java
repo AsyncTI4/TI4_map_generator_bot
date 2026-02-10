@@ -15,8 +15,7 @@ public class PersistenceManager {
 
     private static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
 
-    private static final JsonMapper jsonMapper =
-            JsonMapper.builder().findAndAddModules().build();
+    private static final JsonMapper jsonMapper = JsonMapperManager.basic();
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
         writeObjectToJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, object);

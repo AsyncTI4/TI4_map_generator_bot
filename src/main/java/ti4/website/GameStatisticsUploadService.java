@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.json.JsonMapperManager;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
@@ -69,8 +70,7 @@ public class GameStatisticsUploadService {
 
         Path tempFile = Files.createTempFile(fileName, ".json");
         try (OutputStream outputStream = Files.newOutputStream(tempFile);
-                SequenceWriter writer =
-                        EgressClientManager.getJsonMapper().writer().writeValuesAsArray(outputStream)) {
+                SequenceWriter writer = JsonMapperManager.basic().writer().writeValuesAsArray(outputStream)) {
             for (ManagedGame managedGame : GameManager.getManagedGames()) {
                 if (!gamePredicate.test(managedGame)) {
                     continue;
@@ -79,8 +79,8 @@ public class GameStatisticsUploadService {
                 eligible++;
 
                 try {
-                    JsonNode node = EgressClientManager.getJsonMapper()
-                            .valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
+                    JsonNode node =
+                            JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
                     writer.write(node);
                     uploaded++;
                     currentBatchSize++;

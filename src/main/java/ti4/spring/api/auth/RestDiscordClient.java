@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import ti4.json.JsonMapperManager;
 import ti4.website.EgressClientManager;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -21,7 +22,7 @@ public class RestDiscordClient {
     private static final String DISCORD_CLIENT_ID = System.getenv("DISCORD_CLIENT_ID");
     private static final String DISCORD_CLIENT_SECRET = System.getenv("DISCORD_CLIENT_SECRET");
 
-    private final JsonMapper jsonMapper = EgressClientManager.getJsonMapper();
+    private final JsonMapper jsonMapper = JsonMapperManager.basic();
     private final HttpClient httpClient = EgressClientManager.getHttpClient();
 
     public DiscordUserInfo getUserInfo(String bearerToken) throws IOException, InterruptedException {

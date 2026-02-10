@@ -12,14 +12,9 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import ti4.ResourceHelper;
 import ti4.message.logging.BotLogger;
-import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 public class EgressClientManager {
-
-    @Getter
-    private static final JsonMapper jsonMapper =
-            JsonMapper.builder().findAndAddModules().build();
 
     @Getter
     private static final HttpClient httpClient = HttpClient.newHttpClient();
