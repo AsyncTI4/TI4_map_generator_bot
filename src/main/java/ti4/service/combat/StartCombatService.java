@@ -898,7 +898,8 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(),
                             player.getRepresentation()
-                                    + " reminder that you have bounties on your opponents ships and can use these buttons to claim them when you kill them");
+                                    + " reminder that you have bounties on your opponents ships and can use these buttons to claim the bounties when you destroy the ship.",
+                            buttons);
                 }
             }
             if (player.hasAbility("technological_singularity")

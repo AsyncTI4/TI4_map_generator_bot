@@ -790,7 +790,7 @@ public class ButtonHelperAbilities {
         for (UnitType unitType : allowedUnits) {
             buttons.add(Buttons.green(
                     player.getFinsFactionCheckerPrefix() + "bountyStep2_" + p2.getFaction() + "_"
-                            + unitType.getValue().toLowerCase(),
+                            + unitType.humanReadableName().toLowerCase(),
                     unitType.humanReadableName(),
                     unitType.getUnitTypeEmoji()));
         }
