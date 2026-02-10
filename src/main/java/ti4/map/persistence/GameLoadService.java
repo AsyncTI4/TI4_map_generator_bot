@@ -1,23 +1,6 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.TILE;
-import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.UNITS;
+import static ti4.map.persistence.GamePersistenceKeys.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +24,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
@@ -61,8 +51,7 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.json.UnitKeyMapKeyDeserializer;
-import ti4.json.UnitKeyMapKeySerializer;
+import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -74,22 +63,12 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.MapperFeature;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-    private static final JsonMapper mapper = JsonMapper.builder()
-            .addModule(new SimpleModule()
-                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
-                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-            .findAndAddModules()
-            .build();
+    private static final ObjectMapper mapper = ObjectMapperFactory.build();
     private static final Pattern PATTERN = Pattern.compile("—");
 
     static List<ManagedGame> loadManagedGames() {
@@ -371,9 +350,9 @@ class GameLoadService {
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info)) break;
                     try {
-                        var borderAnomalyHolders =
-                                mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
-                        game.setBorderAnomalies(borderAnomalyHolders);
+                        JavaType reference =
+                                mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
+                        game.setBorderAnomalies(mapper.readValue(info, reference));
                     } catch (Exception e) {
                         BotLogger.error(new LogOrigin(game), "Error reading border anomalies from save file!", e);
                     }
@@ -595,8 +574,13 @@ class GameLoadService {
                 }
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
                     try {
-                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
-                                mapper.readValue(info, new TypeReference<>() {});
+                        TypeFactory factory = mapper.getTypeFactory();
+                        JavaType states = factory.constructParametricType(List.class, Integer.class);
+                        JavaType unitHolder = factory.constructMapLikeType(
+                                HashMap.class, factory.constructType(UnitKey.class), states);
+                        JavaType reference = factory.constructMapLikeType(
+                                HashMap.class, factory.constructType(String.class), unitHolder);
+                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, reference);
                         game.setTacticalActionDisplacement(displacedUnits);
                     } catch (Exception e) {
                         BotLogger.error(

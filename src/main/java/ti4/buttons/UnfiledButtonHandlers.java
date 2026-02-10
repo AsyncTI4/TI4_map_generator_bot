@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -3349,7 +3347,7 @@ public class UnfiledButtonHandlers {
             readiedCardsString = "All cards have been readied at the end of the Omega Phase.";
         }
         if (game.hasAnyPriorityTrackMode()) {
-            if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Please fill the priority track before starting the Strategy Phase.");
@@ -3558,7 +3556,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
         if (game.hasAnyPriorityTrackMode()
-                && PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
             PriorityTrackHelper.PrintPriorityTrack(game);
@@ -3864,9 +3862,9 @@ public class UnfiledButtonHandlers {
             return;
         }
         if (game.hasAnyPriorityTrackMode()
-                && PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             PriorityTrackHelper.CreateDefaultPriorityTrack(game);
-            if (PriorityTrackHelper.getPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");

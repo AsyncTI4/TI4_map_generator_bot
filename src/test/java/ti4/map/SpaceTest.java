@@ -3,7 +3,8 @@ package ti4.map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.awt.Point;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +40,7 @@ class SpaceTest extends BaseTi4Test {
     }
 
     @Test
-    void testSpaceHasNoUnexpectedProperties() {
+    void testSpaceHasNoUnexpectedProperties() throws Exception {
         // Given
         Space space = buildSpace();
         Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
@@ -55,7 +56,7 @@ class SpaceTest extends BaseTi4Test {
     }
 
     @Test
-    void testSpaceJsonSaveAndRestore() {
+    void testSpaceJsonSaveAndRestore() throws JsonProcessingException {
         // Given
         Space space = buildSpace();
 
