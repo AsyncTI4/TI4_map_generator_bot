@@ -881,6 +881,26 @@ public class StartCombatService {
                                 + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                         buttons);
             }
+            if (player.hasAbility("marked_prey") && "space".equalsIgnoreCase(type)) {
+                List<String> bounties = ButtonHelperAbilities.getBountiesForPlayer(game);
+                buttons = new ArrayList<>();
+                for (String bounty : bounties) {
+                    String faction = bounty.split(" ")[0];
+                    String ship = bounty.split(" ")[1];
+                    if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
+                        Button bountyButton =
+                                Buttons.gray("claimBounty_" + faction + "_" + ship, StringUtils.capitalize(ship));
+                        buttons.add(bountyButton);
+                    }
+                }
+                if (buttons.size() > 0) {
+                    buttons.add(Buttons.red("deleteButtons", "Delete These"));
+                    MessageHelper.sendMessageToChannel(
+                            player.getCardsInfoThread(),
+                            player.getRepresentation()
+                                    + " reminder that you have bounties on your opponents ships and can use these buttons to claim them when you kill them");
+                }
+            }
             if (player.hasAbility("technological_singularity")
                     && !otherPlayer.isDummy()
                     && (!ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(
@@ -1669,20 +1689,6 @@ public class StartCombatService {
             buttons.add(Buttons.gray(
                     finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(),
                     "Destroy 1 Ship With Caled",
-                    FactionEmojis.belkosea));
-        }
-        if (p2.hasRelicReady("superweaponavailyn") && !game.isFowMode()) {
-            String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(),
-                    "Move 3 Fighters With Availyn",
-                    FactionEmojis.belkosea));
-        }
-        if (p1.hasRelicReady("superweaponavailyn")) {
-            String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(
-                    finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(),
-                    "Move 3 Fighters With Availyn",
                     FactionEmojis.belkosea));
         }
 

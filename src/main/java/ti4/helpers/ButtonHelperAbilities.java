@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.special.SetupNeutralPlayer;
@@ -740,6 +741,112 @@ public class ButtonHelperAbilities {
                 myko.getCorrectChannel(), msg.append(".").toString());
     }
 
+    private static void offerBountyButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            String id = player.getFinsFactionCheckerPrefix() + "bountyStep1_" + p2.getFaction();
+            if (game.isFowMode()) {
+                buttons.add(Buttons.green(id, p2.getColor(), p2.getFactionEmojiOrColor()));
+            } else {
+                buttons.add(Buttons.green(id, p2.getFactionModel().getShortName(), p2.getFactionEmoji()));
+            }
+        }
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
+        List<String> currentBounties = getBountiesForPlayer(game);
+        if (currentBounties.size() >= 3) {
+            return;
+        }
+        String msg = player.getRepresentationUnfogged()
+                + ", please choose which player's ships you wish to place a bounty on. You may have up to 3 bounties at a time.";
+        if (currentBounties.size() > 0) {
+            msg += " You currently have the following bounties: " + String.join(", ", currentBounties) + ".";
+        } else {
+            msg += " You currently have no bounties.";
+        }
+
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("bountyStep1_")
+    public static void bountyStep1(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("bountyStep1_", "");
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            return;
+        }
+        String msg = player.getRepresentationUnfogged()
+                + ", please choose which type of ship you wish to place a bounty on for " + p2.getRepresentationNoPing()
+                + ".";
+        Set<UnitType> allowedUnits = Set.of(
+                UnitType.Destroyer,
+                UnitType.Cruiser,
+                UnitType.Carrier,
+                UnitType.Dreadnought,
+                UnitType.Flagship,
+                UnitType.Warsun);
+        List<Button> buttons = new ArrayList<>();
+        for (UnitType unitType : allowedUnits) {
+            buttons.add(Buttons.green(
+                    player.getFinsFactionCheckerPrefix() + "bountyStep2_" + p2.getFaction() + "_"
+                            + unitType.getValue().toLowerCase(),
+                    unitType.humanReadableName(),
+                    unitType.getUnitTypeEmoji()));
+        }
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("bountyStep2_")
+    public static void bountyStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("bountyStep2_", "");
+        String colorPlayer = buttonID.split("_")[0];
+        String unitTypeString = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            return;
+        }
+
+        game.setStoredValue("bounties" + p2.getFaction() + unitTypeString, unitTypeString);
+        String msg = player.getRepresentationUnfogged() + " placed a bounty on " + p2.getRepresentationNoPing() + "'s "
+                + StringUtils.capitalize(unitTypeString) + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("claimBounty_")
+    public static void claimBounty(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("claimBounty_", "");
+        String colorPlayer = buttonID.split("_")[0];
+        String unitTypeString = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
+        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
+        player.gainTG(3, true);
+        ButtonHelperAgents.resolveArtunoCheck(player, 3);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " claimed a bounty and gained 3tg. The bounty claimed was on "
+                        + p2.getRepresentationNoPing() + "'s " + StringUtils.capitalize(unitTypeString));
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static List<String> getBountiesForPlayer(Game game) {
+        List<String> bounties = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            for (UnitType unitType : UnitType.values()) {
+                String storedValue = game.getStoredValue(
+                        "bounties" + player.getFaction() + unitType.getValue().toLowerCase());
+                if (!storedValue.isEmpty()) {
+                    bounties.add(player.getFaction() + " " + unitType.getValue());
+                }
+            }
+        }
+        return bounties;
+    }
+
     @ButtonHandler("pillage_")
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("pillage_", "");
@@ -1179,7 +1286,7 @@ public class ButtonHelperAbilities {
                 return;
             }
             case "availyn" -> {
-                availynStep1(game, player, event, "availyn_" + buttonID.split("_")[2]);
+                availynStep1(game, player, event, "availyn");
                 return;
             }
         }
@@ -2270,6 +2377,9 @@ public class ButtonHelperAbilities {
             if (player.hasAbility("divination")) {
                 rollOmenDiceAtStartOfStrat(game, player);
             }
+            if (player.hasAbility("marked_prey")) {
+                offerBountyButtons(game, player);
+            }
             if (player.hasUnit("tyris_flagship")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false) > 0) {
                 game.setStoredValue("phantomEnergy", game.getStoredValue("phantomEnergy") + "fs");
@@ -2709,21 +2819,15 @@ public class ButtonHelperAbilities {
     }
 
     private static void availynStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String destination = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         for (Tile tile2 : game.getTileMap().values()) {
-            if (tile2.getPosition().equalsIgnoreCase(destination)) {
-                continue;
-            }
-            UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
-            if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile2)) {
                 buttons.add(Buttons.green(
-                        "availynStep2_" + destination + "_" + tile2.getPosition(),
-                        tile2.getRepresentationForButtons(game, player)));
+                        "availynStep2_" + tile2.getPosition(), tile2.getRepresentationForButtons(game, player)));
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
-        String msg = player.getRepresentation() + ", please choose the system you wish to pull fighters from.";
+        String msg = player.getRepresentation() + ", please choose the system you wish to produce 3 fighters in.";
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
@@ -2731,35 +2835,13 @@ public class ButtonHelperAbilities {
     @ButtonHandler("availynStep2_")
     public static void availynStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String destination = buttonID.split("_")[1];
-        String origin = buttonID.split("_")[2];
-        Tile orig = game.getTileByPosition(origin);
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("availynStep3_" + destination + "_" + origin + "_1", "1 fighter"));
-        if (orig.getUnitHolders().get("space").getUnitCount(UnitType.Fighter, player.getColor()) > 1) {
-            buttons.add(Buttons.green("availynStep3_" + destination + "_" + origin + "_2", "2 fighters"));
-        }
-        if (orig.getUnitHolders().get("space").getUnitCount(UnitType.Fighter, player.getColor()) > 2) {
-            buttons.add(Buttons.green("availynStep3_" + destination + "_" + origin + "_3", "3 fighters"));
-        }
-        String msg = player.getRepresentation() + ", please choose whether to pull 1 or 2 or 3 fighters.";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-    }
-
-    @ButtonHandler("availynStep3_")
-    public static void availynStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String destination = buttonID.split("_")[1];
-        Tile tile = game.getTileByPosition(destination);
-        String origin = buttonID.split("_")[2];
-        Tile tile2 = game.getTileByPosition(origin);
-        String fighters = buttonID.split("_")[3];
-
-        RemoveUnitService.removeUnits(event, tile2, game, player.getColor(), fighters + " fighters");
-        AddUnitService.addUnits(event, tile, game, player.getColor(), fighters + " fighters");
-        String msg = player.getRepresentation() + " used the _Availyn_ Superweapon ability and transferred " + fighters
-                + " fighter" + ("1".equals(fighters) ? "" : "s") + " from "
-                + tile2.getRepresentationForButtons(game, player) + " to "
-                + tile.getRepresentationForButtons(game, player) + ".";
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                player.getRepresentation() + " is using Availyn to produce up to 3 fighters (still costs the same).");
+        List<Button> buttons = Helper.getPlaceUnitButtons(
+                event, player, game, game.getTileByPosition(destination), "muaatagent", "place");
+        String message = player.getRepresentation() + ", please use the buttons to produce the fighters. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
     }
 }

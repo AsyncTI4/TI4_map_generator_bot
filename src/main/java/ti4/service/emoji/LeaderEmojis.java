@@ -283,6 +283,7 @@ public enum LeaderEmojis implements TI4Emoji {
             // TF Paradigms
             case "brilliancehero" -> JolNarHero;
             case "devourhero" -> NekroHero;
+            case "sanctionhero" -> HacanHero;
             case "eternityhero" -> ObsidianHero;
             case "eventhero" -> CabalHero;
             case "forgehero" -> NaazHero;

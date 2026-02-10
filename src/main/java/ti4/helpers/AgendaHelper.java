@@ -1848,6 +1848,9 @@ public class AgendaHelper {
                     player.getCorrectChannel(),
                     msg,
                     Helper.getPlaceUnitButtons(event, player, game, tile, "ministerBuild", "place"));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " has the opportunity to resolve a Minister of Industry build.");
         }
         if (player.hasAbility("quantum_fabrication") && !tile.isScar(game)) {
             String msg = player.getRepresentationUnfogged()

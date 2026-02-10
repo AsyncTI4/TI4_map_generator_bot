@@ -74,6 +74,13 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            String finChecker = "FFCC_" + player.getFaction() + "_";
+            buttons.add(Buttons.gray(
+                    finChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasSpaceStation()) {
             buttons.add(Buttons.gray(
                     "startTradeStationConvert", "Convert Commodities With Space Station", MiscEmojis.comm));

@@ -51,9 +51,11 @@ public class CommanderUnlockCheckService {
             case "sol" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
-                    if (game.getUnitHolderFromPlanet(planet) != null
-                            && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
-                                    || game.getUnitHolderFromPlanet(planet).isFake())) {
+                    if (planet.equalsIgnoreCase("triad")
+                            || (game.getUnitHolderFromPlanet(planet) != null
+                                    && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
+                                            || game.getUnitHolderFromPlanet(planet)
+                                                    .isFake()))) {
                         continue;
                     }
                     resources += Helper.getPlanetResources(planet, game);
@@ -106,9 +108,11 @@ public class CommanderUnlockCheckService {
             case "xxcha" -> {
                 int influence = 0;
                 for (String planet : player.getPlanets()) {
-                    if (game.getUnitHolderFromPlanet(planet) != null
-                            && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
-                                    || game.getUnitHolderFromPlanet(planet).isFake())) {
+                    if (planet.equalsIgnoreCase("triad")
+                            || (game.getUnitHolderFromPlanet(planet) != null
+                                    && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
+                                            || game.getUnitHolderFromPlanet(planet)
+                                                    .isFake()))) {
                         continue;
                     }
                     influence += Helper.getPlanetInfluence(planet, game);

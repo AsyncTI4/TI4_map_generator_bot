@@ -631,6 +631,12 @@ public class StartTurnService {
         if (player.hasUnlockedBreakthrough("titansbt")) {
             startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
         }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            startButtons.add(Buttons.gray(
+                    finChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
+        }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(
                     Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));

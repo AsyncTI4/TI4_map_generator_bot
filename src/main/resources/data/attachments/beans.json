@@ -23,6 +23,20 @@
         "source": "beans"
     },
     {
+        "id": "designcombine",
+        "name": "Combine (Design)",
+        "imagePath": "attachment_designcombine.png",
+        "isFakeAttachment": true,
+        "source": "beans"
+    },
+    {
+        "id": "designgrand",
+        "name": "Grand Design",
+        "imagePath": "attachment_designgrand.png",
+        "isFakeAttachment": true,
+        "source": "beans"
+    },
+    {
         "id": "worldshaperpositive",
         "name": "Worldshaper (Positive)",
         "imagePath": "attachment_worldshaperpositive.png",

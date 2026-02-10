@@ -2527,7 +2527,9 @@ public class UnfiledButtonHandlers {
         var endGameDeck =
                 game.isOmegaPhaseMode() ? game.getPublicObjectives1Peekable() : game.getPublicObjectives2Peekable();
         var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
-        if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
+        if ((game.getRound() > endGameRound || endGameDeck.isEmpty())
+                && !game.isRedTapeMode()
+                && !game.isCivilizedSocietyMode()) {
             if (game.isFowMode()) {
                 message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                 message2 += " Or end the game manually.";
