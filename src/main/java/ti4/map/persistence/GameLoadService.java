@@ -63,6 +63,7 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
+import ti4.json.JsonMapperManager;
 import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Game;
@@ -84,11 +85,11 @@ import tools.jackson.databind.module.SimpleModule;
 class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-    private static final JsonMapper mapper = JsonMapper.builder()
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
             .addModule(new SimpleModule()
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .findAndAddModules()
             .build();
     private static final Pattern PATTERN = Pattern.compile("—");
 

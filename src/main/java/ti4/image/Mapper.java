@@ -83,7 +83,6 @@ import tools.jackson.databind.module.SimpleModule;
 @UtilityClass
 public class Mapper {
 
-    // private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
     private static final Properties general = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import ti4.helpers.Units;
+import ti4.json.JsonMapperManager;
 import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import tools.jackson.databind.JavaType;
@@ -16,11 +17,11 @@ import tools.jackson.databind.module.SimpleModule;
 
 public final class JsonValidator {
 
-    private static final JsonMapper JSON_MAPPER = JsonMapper.builder()
+    private static final JsonMapper JSON_MAPPER = JsonMapperManager.basic()
+            .rebuild()
             .addModule(new SimpleModule()
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .findAndAddModules()
             .build();
 
     private JsonValidator() {}

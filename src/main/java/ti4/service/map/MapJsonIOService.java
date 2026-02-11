@@ -21,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.URLReaderHelper;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
+import ti4.json.JsonMapperManager;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -37,9 +38,9 @@ import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 public class MapJsonIOService {
-    private static final JsonMapper mapper = JsonMapper.builder()
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
             .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
-            .findAndAddModules()
             .build();
 
     @ModalHandler("importMapFromJSON")

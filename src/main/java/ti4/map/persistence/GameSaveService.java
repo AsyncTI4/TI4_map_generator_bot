@@ -48,6 +48,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.json.UnitKeyMapKeyDeserializer;
 import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Expeditions;
@@ -72,11 +73,11 @@ import tools.jackson.databind.module.SimpleModule;
 @UtilityClass
 class GameSaveService {
 
-    private static final JsonMapper mapper = JsonMapper.builder()
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
             .addModule(new SimpleModule()
                     .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
                     .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
-            .findAndAddModules()
             .build();
 
     static boolean save(Game game, String reason) {
