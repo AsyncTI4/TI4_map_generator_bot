@@ -781,6 +781,10 @@ public class Player extends PlayerProperties {
                     e);
         }
 
+        if (isNpc() || isDummy()) {
+            return null;
+        }
+        
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
         boolean isPrivateChannel = !game.isFowMode();
