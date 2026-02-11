@@ -57,7 +57,6 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.map.pojo.PlayerProperties;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -2258,9 +2257,6 @@ public class Player extends PlayerProperties {
             num = Math.clamp(comms, 0, getCommoditiesBase() + 10);
         }
         if (game.isAgeOfCommerceMode() && comms > 0) {
-            num = comms;
-        }
-        if ("no".equalsIgnoreCase(game.getStoredValue("loadedGame"))) {
             num = comms;
         }
         super.setCommodities(num);

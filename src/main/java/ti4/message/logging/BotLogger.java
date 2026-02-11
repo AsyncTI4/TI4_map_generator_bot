@@ -48,7 +48,7 @@ public class BotLogger {
         if (!logToConsole()) getBotLogWebhookURL(); // Ensure webhook is created at startup if required
     }
 
-    public static boolean logToConsole() {
+    private static boolean logToConsole() {
         return JdaService.testingMode;
     }
 
@@ -262,7 +262,7 @@ public class BotLogger {
         int msgLength = compiledMessage.length();
         if (logToConsole()) {
             if (severity.isErrorOrHigher()) {
-                System.err.println(severity.name() + ": " + compiledMessage);
+                System.err.println(severity.name() + ": " + compiledMessage + "\n" + err);
             } else {
                 System.out.println(severity.name() + ": " + compiledMessage);
             }

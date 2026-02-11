@@ -1,10 +1,26 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -47,7 +63,9 @@ import ti4.helpers.Units.UnitState;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
-import ti4.json.ObjectMapperFactory;
+import ti4.json.JsonMapperManager;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -59,12 +77,20 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-    private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
+            .addModule(new SimpleModule()
+                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
+                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .build();
     private static final Pattern PATTERN = Pattern.compile("—");
 
     static List<ManagedGame> loadManagedGames() {
@@ -76,7 +102,7 @@ class GameLoadService {
                     .filter(Objects::nonNull)
                     .toList();
         } catch (IOException e) {
-            BotLogger.error("Exception occurred while getting all game names.", e);
+            BotLogger.critical("Exception occurred while getting all game names.", e);
         }
         return Collections.emptyList();
     }
@@ -87,7 +113,7 @@ class GameLoadService {
             Game game = readGame(file);
 
             if (game == null || game.getName() == null) {
-                BotLogger.critical("Could not load game. Game or game name is null: " + file.getName());
+                BotLogger.critical("Could not load Managed Game. Game or game name is null: " + file.getName());
                 return null;
             }
             return new ManagedGame(game);
@@ -138,13 +164,7 @@ class GameLoadService {
                     if (ENDGAMEINFO.equals(data)) {
                         break;
                     }
-                    try {
-                        readGameInfo(game, data);
-                    } catch (Exception e) {
-                        BotLogger.critical(
-                                "Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
-                        return null;
-                    }
+                    readGameInfo(game, data);
                 }
 
                 while (gameFileLines.hasNext()) {
@@ -170,106 +190,97 @@ class GameLoadService {
                     }
                 }
             }
-            Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
-            if (tileMap == null) {
-                BotLogger.critical("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
-                return null;
-            }
+            Map<String, Tile> tileMap = getTileMap(gameFileLines, game);
             game.setTileMap(tileMap);
             TransientGameInfoUpdater.update(game);
-            game.setStoredValue("loadedGame", "yes");
             return game;
         } catch (Exception e) {
-            BotLogger.critical("Data read error: " + gameFile.getName(), e);
+            BotLogger.critical(
+                    "Encountered fatal error loading game file: " + gameFile.getName() + ". Load aborted.", e);
             return null;
         }
     }
 
-    private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game, File gameFile) {
+    private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game) {
         Map<String, Tile> tileMap = new HashMap<>();
-        try {
-            while (gameFileLines.hasNext()) {
-                String tileData = gameFileLines.next();
-                if (TILE.equals(tileData)) {
-                    continue;
-                }
-                if (ENDTILE.equals(tileData)) {
-                    continue;
-                }
-                if (tileData.isEmpty()) {
-                    continue;
-                }
-                Tile tile = readTile(tileData);
-                if (tile != null) {
-                    tileMap.put(tile.getPosition(), tile);
-                } else {
-                    BotLogger.error(
-                            new LogOrigin(game),
-                            "Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData
-                                    + "` - tile will be skipped - check save file");
-                }
+        while (gameFileLines.hasNext()) {
+            String tileData = gameFileLines.next();
+            if (TILE.equals(tileData)) {
+                continue;
+            }
+            if (ENDTILE.equals(tileData)) {
+                continue;
+            }
+            if (tileData.isEmpty()) {
+                continue;
+            }
+            Tile tile = readTile(tileData);
+            if (tile != null) {
+                tileMap.put(tile.getPosition(), tile);
+            } else {
+                BotLogger.error(
+                        new LogOrigin(game),
+                        "Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData
+                                + "` - tile will be skipped - check save file");
+            }
 
+            while (gameFileLines.hasNext()) {
+                String tmpData = gameFileLines.next();
+                if (UNITHOLDER.equals(tmpData)) {
+                    continue;
+                }
+                if (ENDUNITHOLDER.equals(tmpData)) {
+                    break;
+                }
+                String unitHolderName = null;
                 while (gameFileLines.hasNext()) {
-                    String tmpData = gameFileLines.next();
-                    if (UNITHOLDER.equals(tmpData)) {
-                        continue;
-                    }
-                    if (ENDUNITHOLDER.equals(tmpData)) {
-                        break;
-                    }
-                    String unitHolderName = null;
-                    while (gameFileLines.hasNext()) {
-                        String data = tmpData != null ? tmpData : gameFileLines.next();
-                        tmpData = null;
-                        if (UNITS.equals(data)) {
-                            unitHolderName = gameFileLines.next().toLowerCase();
-                            if (tile != null) {
-                                boolean found = false;
-                                for (String tp : Constants.TOKEN_PLANETS) {
-                                    if (unitHolderName.equals(tp)) {
-                                        Helper.addTokenPlanetToTile(game, tile, tp);
-                                        found = true;
-                                    }
-                                }
-                                if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
-                                    BotLogger.warning(
-                                            new LogOrigin(game),
-                                            game.getName() + ": Not valid unitholder detected: " + unitHolderName);
+                    String data = tmpData != null ? tmpData : gameFileLines.next();
+                    tmpData = null;
+                    if (UNITS.equals(data)) {
+                        unitHolderName = gameFileLines.next().toLowerCase();
+                        if (tile != null) {
+                            boolean found = false;
+                            for (String tp : Constants.TOKEN_PLANETS) {
+                                if (unitHolderName.equals(tp)) {
+                                    Helper.addTokenPlanetToTile(game, tile, tp);
+                                    found = true;
                                 }
                             }
-                            continue;
+                            if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
+                                BotLogger.warning(
+                                        new LogOrigin(game),
+                                        game.getName() + ": Not valid unitholder detected: " + unitHolderName);
+                            }
                         }
-                        if (ENDUNITS.equals(data)) {
-                            break;
-                        }
-                        readUnit(tile, data, unitHolderName);
+                        continue;
                     }
-
-                    while (gameFileLines.hasNext()) {
-                        String data = gameFileLines.next();
-                        if (PLANET_TOKENS.equals(data)) {
-                            continue;
-                        }
-                        if (PLANET_ENDTOKENS.equals(data)) {
-                            break;
-                        }
-                        readPlanetTokens(tile, data, unitHolderName);
+                    if (ENDUNITS.equals(data)) {
+                        break;
                     }
+                    readUnit(tile, data, unitHolderName);
                 }
 
                 while (gameFileLines.hasNext()) {
                     String data = gameFileLines.next();
-                    if (TOKENS.equals(data)) {
+                    if (PLANET_TOKENS.equals(data)) {
                         continue;
                     }
-                    if (ENDTOKENS.equals(data)) {
+                    if (PLANET_ENDTOKENS.equals(data)) {
                         break;
                     }
+                    readPlanetTokens(tile, data, unitHolderName);
                 }
             }
-        } catch (Exception e) {
-            BotLogger.critical(new LogOrigin(game), "Data read error: " + gameFile.getName(), e);
-            return null;
+
+            while (gameFileLines.hasNext()) {
+                String data = gameFileLines.next();
+                if (TOKENS.equals(data)) {
+                    continue;
+                }
+                if (ENDTOKENS.equals(data)) {
+                    break;
+                }
+            }
         }
         return tileMap;
     }
@@ -345,21 +356,11 @@ class GameLoadService {
                 }
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info)) break;
-                    try {
-                        JavaType reference =
-                                mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
-                        game.setBorderAnomalies(mapper.readValue(info, reference));
-                    } catch (Exception e) {
-                        BotLogger.error(new LogOrigin(game), "Error reading border anomalies from save file!", e);
-                    }
+                    var borderAnomalyHolders =
+                            mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>() {});
+                    game.setBorderAnomalies(borderAnomalyHolders);
                 }
-                case Constants.ADJACENCY_OVERRIDES -> {
-                    try {
-                        game.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
-                    } catch (Exception e) {
-                        BotLogger.error(new LogOrigin(game), "Failed to load adjacency overrides", e);
-                    }
-                }
+                case Constants.ADJACENCY_OVERRIDES -> game.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                 case Constants.REVERSE_SPEAKER_ORDER -> game.setReverseSpeakerOrder("true".equals(info));
                 case Constants.AGENDAS -> game.setAgendas(getCardList(info));
                 case Constants.MANDATES -> game.setMandates(getCardList(info));
@@ -404,80 +405,72 @@ class GameLoadService {
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.AUTO_PING -> {
-                    try {
+                    if (isNotBlank(info)) {
                         int pingHours = Integer.parseInt(info);
                         game.setAutoPing(pingHours != 0);
                         game.setAutoPingSpacer(pingHours);
-                    } catch (Exception e) {
                     }
                 }
                 case Constants.CURRENT_AGENDA_INFO -> {
-                    try {
-                        game.setCurrentAgendaInfo(info);
-                    } catch (Exception e) {
-                    }
+                    game.setCurrentAgendaInfo(info);
                 }
                 case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
-                    try {
-                        game.setCurrentACDrawStatusInfo(info);
-                    } catch (Exception e) {
-                    }
+                    game.setCurrentACDrawStatusInfo(info);
                 }
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
-                    try {
+                    if (isNotBlank(info)) {
                         long millis = Long.parseLong(info);
                         Date lastChange = new Date(millis);
                         game.setLastActivePlayerChange(lastChange);
-                    } catch (Exception e) {
                     }
                 }
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
-                    try {
+                    if (isBlank(info)) {
+                        game.setPlayerCountForMap(6);
+                    } else {
                         int playerCount = Integer.parseInt(info);
                         if (playerCount >= 1 && playerCount <= 30) {
                             game.setPlayerCountForMap(playerCount);
                         } else {
                             game.setPlayerCountForMap(6);
                         }
-                    } catch (Exception e) {
-                        game.setPlayerCountForMap(6);
                     }
                 }
                 case Constants.SC_COUNT_FOR_MAP -> {
-                    try {
+                    if (isBlank(info)) {
+                        game.setStrategyCardsPerPlayer(1);
+                    } else {
                         int scCount = Integer.parseInt(info);
                         if (scCount >= 1 && scCount <= 8) {
                             game.setStrategyCardsPerPlayer(scCount);
                         } else {
                             game.setStrategyCardsPerPlayer(1);
                         }
-                    } catch (Exception e) {
-                        game.setStrategyCardsPerPlayer(1);
                     }
                 }
                 case Constants.ACTIVATION_COUNT -> {
-                    try {
+                    if (isBlank(info)) {
+                        game.setActivationCount(0);
+                    } else {
                         int activationCount = Integer.parseInt(info);
                         game.setActivationCount(activationCount);
-                    } catch (Exception e) {
-                        game.setActivationCount(0);
                     }
                 }
                 case Constants.VP_COUNT -> {
-                    try {
+                    if (isBlank(info)) {
+                        game.setVp(10);
+                    } else {
                         int vpCount = Integer.parseInt(info);
                         game.setVp(vpCount);
-                    } catch (Exception e) {
-                        game.setVp(10);
                     }
                 }
                 case Constants.MAX_SO_COUNT -> {
-                    try {
+                    if (isBlank(info)) {
+                        game.setMaxSOCountPerPlayer(3);
+                    } else {
                         int soCount = Integer.parseInt(info);
                         game.setMaxSOCountPerPlayer(soCount);
-                    } catch (Exception e) {
-                        game.setVp(3);
                     }
                 }
                 case Constants.DISPLAY_TYPE -> {
@@ -569,19 +562,9 @@ class GameLoadService {
                     }
                 }
                 case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
-                    try {
-                        TypeFactory factory = mapper.getTypeFactory();
-                        JavaType states = factory.constructParametricType(List.class, Integer.class);
-                        JavaType unitHolder = factory.constructMapLikeType(
-                                HashMap.class, factory.constructType(UnitKey.class), states);
-                        JavaType reference = factory.constructMapLikeType(
-                                HashMap.class, factory.constructType(String.class), unitHolder);
-                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, reference);
-                        game.setTacticalActionDisplacement(displacedUnits);
-                    } catch (Exception e) {
-                        BotLogger.error(
-                                "Failed to load unit displace map from game save data " + Constants.jazzPing(), e);
-                    }
+                    Map<String, Map<UnitKey, List<Integer>>> displacedUnits =
+                            mapper.readValue(info, new TypeReference<>() {});
+                    game.setTacticalActionDisplacement(displacedUnits);
                 }
                 case Constants.FOW_OPTIONS -> {
                     StringTokenizer fowOptions = new StringTokenizer(info, ";");
@@ -603,169 +586,146 @@ class GameLoadService {
                 case Constants.GAME_LAUNCH_THREAD_ID -> game.setLaunchPostThreadID(info);
 
                 // GAME MODES / SETTINGS
-                case Constants.TIGL_GAME -> game.setCompetitiveTIGLGame(loadBooleanOrDefault(info, false));
+                case Constants.TIGL_GAME -> game.setCompetitiveTIGLGame(parseBooleanOrDefault(info, false));
                 case Constants.HACK_ELECTION_STATUS ->
-                    game.setHasHackElectionBeenPlayed(loadBooleanOrDefault(info, false));
-                case Constants.CC_N_PLASTIC_LIMIT -> game.setCcNPlasticLimit(loadBooleanOrDefault(info, false));
-                case Constants.BOT_FACTION_REACTS -> game.setBotFactionReacts(loadBooleanOrDefault(info, false));
-                case Constants.BOT_COLOR_REACTS -> game.setBotColorReacts(loadBooleanOrDefault(info, false));
-                case Constants.BOT_STRAT_REACTS -> game.setBotStratReacts(loadBooleanOrDefault(info, false));
-                case Constants.HAS_HAD_A_STATUS_PHASE -> game.setHasHadAStatusPhase(loadBooleanOrDefault(info, false));
-                case Constants.BOT_SHUSHING -> game.setBotShushing(loadBooleanOrDefault(info, false));
-                case Constants.COMMUNITY_MODE -> game.setCommunityMode(loadBooleanOrDefault(info, false));
-                case Constants.ALLIANCE_MODE -> game.setAllianceMode(loadBooleanOrDefault(info, false));
-                case Constants.FOW_MODE -> game.setFowMode(loadBooleanOrDefault(info, false));
-                case Constants.REPLACEMENT_MADE -> game.setReplacementMade(loadBooleanOrDefault(info, false));
-                case Constants.NAALU_AGENT -> game.setNaaluAgent(loadBooleanOrDefault(info, false));
-                case Constants.WARFARE_ACTION -> game.setWarfareAction(loadBooleanOrDefault(info, false));
-                case Constants.L1_HERO -> game.setL1Hero(loadBooleanOrDefault(info, false));
-                case Constants.NOMAD_COIN -> game.setNomadCoin(loadBooleanOrDefault(info, false));
-                case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(loadBooleanOrDefault(info, false));
-                case Constants.QUEUE_SO -> game.setQueueSO(loadBooleanOrDefault(info, false));
-                case Constants.SHOW_BUBBLES -> game.setShowBubbles(loadBooleanOrDefault(info, false));
-                case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(loadBooleanOrDefault(info, false));
-                case Constants.SHOW_GEARS -> game.setShowGears(loadBooleanOrDefault(info, false));
-                case Constants.SHOW_BANNERS -> game.setShowBanners(loadBooleanOrDefault(info, false));
+                    game.setHasHackElectionBeenPlayed(parseBooleanOrDefault(info, false));
+                case Constants.CC_N_PLASTIC_LIMIT -> game.setCcNPlasticLimit(parseBooleanOrDefault(info, false));
+                case Constants.BOT_FACTION_REACTS -> game.setBotFactionReacts(parseBooleanOrDefault(info, false));
+                case Constants.BOT_COLOR_REACTS -> game.setBotColorReacts(parseBooleanOrDefault(info, false));
+                case Constants.BOT_STRAT_REACTS -> game.setBotStratReacts(parseBooleanOrDefault(info, false));
+                case Constants.HAS_HAD_A_STATUS_PHASE -> game.setHasHadAStatusPhase(parseBooleanOrDefault(info, false));
+                case Constants.BOT_SHUSHING -> game.setBotShushing(parseBooleanOrDefault(info, false));
+                case Constants.COMMUNITY_MODE -> game.setCommunityMode(parseBooleanOrDefault(info, false));
+                case Constants.ALLIANCE_MODE -> game.setAllianceMode(parseBooleanOrDefault(info, false));
+                case Constants.FOW_MODE -> game.setFowMode(parseBooleanOrDefault(info, false));
+                case Constants.REPLACEMENT_MADE -> game.setReplacementMade(parseBooleanOrDefault(info, false));
+                case Constants.NAALU_AGENT -> game.setNaaluAgent(parseBooleanOrDefault(info, false));
+                case Constants.WARFARE_ACTION -> game.setWarfareAction(parseBooleanOrDefault(info, false));
+                case Constants.L1_HERO -> game.setL1Hero(parseBooleanOrDefault(info, false));
+                case Constants.NOMAD_COIN -> game.setNomadCoin(parseBooleanOrDefault(info, false));
+                case Constants.FAST_SC_FOLLOW -> game.setFastSCFollowMode(parseBooleanOrDefault(info, false));
+                case Constants.QUEUE_SO -> game.setQueueSO(parseBooleanOrDefault(info, false));
+                case Constants.SHOW_BUBBLES -> game.setShowBubbles(parseBooleanOrDefault(info, false));
+                case Constants.TRANSACTION_METHOD -> game.setNewTransactionMethod(parseBooleanOrDefault(info, false));
+                case Constants.SHOW_GEARS -> game.setShowGears(parseBooleanOrDefault(info, false));
+                case Constants.SHOW_BANNERS -> game.setShowBanners(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
-                case Constants.HOMEBREW_MODE -> game.setHomebrew(loadBooleanOrDefault(info, false));
+                case Constants.HOMEBREW_MODE -> game.setHomebrew(parseBooleanOrDefault(info, false));
 
                 // OTHER GAME STATE
                 case Constants.PURGED_FRAGMENTS -> {
-                    try {
+                    if (isNotBlank(info)) {
                         int value = Integer.parseInt(info);
                         game.setNumberOfPurgedFragments(value);
-                    } catch (Exception e) {
                     }
                 }
                 case Constants.TEMPORARY_PING_DISABLE ->
-                    game.setTemporaryPingDisable(loadBooleanOrDefault(info, false));
-                case Constants.DOMINUS_ORB -> game.setDominusOrb(loadBooleanOrDefault(info, false));
-                case Constants.COMPONENT_ACTION -> game.setComponentAction(loadBooleanOrDefault(info, false));
+                    game.setTemporaryPingDisable(parseBooleanOrDefault(info, false));
+                case Constants.DOMINUS_ORB -> game.setDominusOrb(parseBooleanOrDefault(info, false));
+                case Constants.COMPONENT_ACTION -> game.setComponentAction(parseBooleanOrDefault(info, false));
                 case Constants.JUST_PLAYED_COMPONENT_AC ->
-                    game.setJustPlayedComponentAC(loadBooleanOrDefault(info, false));
-                case Constants.BASE_GAME_MODE -> game.setBaseGameMode(loadBooleanOrDefault(info, false));
-                case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(loadBooleanOrDefault(info, false));
-                case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(loadBooleanOrDefault(info, false));
-                case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(loadBooleanOrDefault(info, false));
-                case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(loadBooleanOrDefault(info, false));
-                case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));
-                case Constants.OMEGA_PHASE_MODE -> game.setOmegaPhaseMode(loadBooleanOrDefault(info, false));
-                case Constants.HOMEBREW_SC_MODE -> game.setHomebrewSCMode(loadBooleanOrDefault(info, false));
-                case Constants.INJECT_RULES_LINKS -> game.setInjectRulesLinks(loadBooleanOrDefault(info, false));
+                    game.setJustPlayedComponentAC(parseBooleanOrDefault(info, false));
+                case Constants.BASE_GAME_MODE -> game.setBaseGameMode(parseBooleanOrDefault(info, false));
+                case Constants.THUNDERS_EDGE_MODE -> game.setThundersEdge(parseBooleanOrDefault(info, false));
+                case Constants.TWILIGHTS_FALL_MODE -> game.setTwilightsFallMode(parseBooleanOrDefault(info, false));
+                case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(parseBooleanOrDefault(info, false));
+                case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(parseBooleanOrDefault(info, false));
+                case Constants.RED_TAPE_MODE -> game.setRedTapeMode(parseBooleanOrDefault(info, false));
+                case Constants.OMEGA_PHASE_MODE -> game.setOmegaPhaseMode(parseBooleanOrDefault(info, false));
+                case Constants.HOMEBREW_SC_MODE -> game.setHomebrewSCMode(parseBooleanOrDefault(info, false));
+                case Constants.INJECT_RULES_LINKS -> game.setInjectRulesLinks(parseBooleanOrDefault(info, false));
                 case Constants.SPIN_MODE -> {
-                    try {
-                        String value = "false".equalsIgnoreCase(info) ? "OFF" : info;
-                        game.setSpinMode(value);
-                    } catch (Exception e) {
-                    }
+                    String value = "false".equalsIgnoreCase(info) ? "OFF" : info;
+                    game.setSpinMode(value);
                 }
-                case Constants.SHOW_UNIT_TAGS -> game.setShowUnitTags(loadBooleanOrDefault(info, false));
+                case Constants.SHOW_UNIT_TAGS -> game.setShowUnitTags(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_OWNED_PNS_IN_PLAYER_AREA ->
-                    game.setShowOwnedPNsInPlayerArea(loadBooleanOrDefault(info, false));
-                case Constants.STRAT_PINGS -> game.setStratPings(loadBooleanOrDefault(info, false));
+                    game.setShowOwnedPNsInPlayerArea(parseBooleanOrDefault(info, false));
+                case Constants.STRAT_PINGS -> game.setStratPings(parseBooleanOrDefault(info, false));
                 case Constants.TEXT_SIZE -> {
-                    try {
-                        game.setTextSize(info);
-                    } catch (Exception e) {
-                    }
+                    game.setTextSize(info);
                 }
-                case Constants.ABSOL_MODE -> game.setAbsolMode(loadBooleanOrDefault(info, false));
-                case Constants.PROMISES_PROMISES -> game.setPromisesPromisesMode(loadBooleanOrDefault(info, false));
-                case Constants.FLAGSHIPPING -> game.setFlagshippingMode(loadBooleanOrDefault(info, false));
-                case Constants.MILTYMOD_MODE -> game.setMiltyModMode(loadBooleanOrDefault(info, false));
-                case Constants.SHOW_MAP_SETUP -> game.setShowMapSetup(loadBooleanOrDefault(info, false));
-                case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(loadBooleanOrDefault(info, false));
-                case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(loadBooleanOrDefault(info, false));
-                case Constants.VERBOSITY -> {
-                    try {
-                        game.setOutputVerbosity(info);
-                    } catch (Exception e) {
-                    }
-                }
-                case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(loadBooleanOrDefault(info, false));
+                case Constants.ABSOL_MODE -> game.setAbsolMode(parseBooleanOrDefault(info, false));
+                case Constants.PROMISES_PROMISES -> game.setPromisesPromisesMode(parseBooleanOrDefault(info, false));
+                case Constants.FLAGSHIPPING -> game.setFlagshippingMode(parseBooleanOrDefault(info, false));
+                case Constants.MILTYMOD_MODE -> game.setMiltyModMode(parseBooleanOrDefault(info, false));
+                case Constants.SHOW_MAP_SETUP -> game.setShowMapSetup(parseBooleanOrDefault(info, false));
+                case Constants.DISCORDANT_STARS_MODE -> game.setDiscordantStarsMode(parseBooleanOrDefault(info, false));
+                case Constants.UNCHARTED_SPACE_STUFF -> game.setUnchartedSpaceStuff(parseBooleanOrDefault(info, false));
+                case Constants.VERBOSITY -> game.setOutputVerbosity(info);
+                case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(parseBooleanOrDefault(info, false));
                 case Constants.AGE_OF_EXPLORATION_MODE ->
-                    game.setAgeOfExplorationMode(loadBooleanOrDefault(info, false));
-                case Constants.FACILITIES_MODE -> game.setFacilitiesMode(loadBooleanOrDefault(info, false));
-                case Constants.MINOR_FACTIONS_MODE -> game.setMinorFactionsMode(loadBooleanOrDefault(info, false));
-                case Constants.HIDDEN_AGENDA_MODE -> game.setHiddenAgendaMode(loadBooleanOrDefault(info, false));
-                case Constants.AGE_OF_COMMERCE_MODE -> game.setAgeOfCommerceMode(loadBooleanOrDefault(info, false));
-                case Constants.TOTAL_WAR_MODE -> game.setTotalWarMode(loadBooleanOrDefault(info, false));
-                case Constants.STELLAR_ATOMICS_MODE -> game.setStellarAtomicsMode(loadBooleanOrDefault(info, false));
-                case Constants.DANGEROUS_WILDS_MODE -> game.setDangerousWildsMode(loadBooleanOrDefault(info, false));
-                case Constants.AGE_OF_FIGHTERS_MODE -> game.setAgeOfFightersMode(loadBooleanOrDefault(info, false));
+                    game.setAgeOfExplorationMode(parseBooleanOrDefault(info, false));
+                case Constants.FACILITIES_MODE -> game.setFacilitiesMode(parseBooleanOrDefault(info, false));
+                case Constants.MINOR_FACTIONS_MODE -> game.setMinorFactionsMode(parseBooleanOrDefault(info, false));
+                case Constants.HIDDEN_AGENDA_MODE -> game.setHiddenAgendaMode(parseBooleanOrDefault(info, false));
+                case Constants.AGE_OF_COMMERCE_MODE -> game.setAgeOfCommerceMode(parseBooleanOrDefault(info, false));
+                case Constants.TOTAL_WAR_MODE -> game.setTotalWarMode(parseBooleanOrDefault(info, false));
+                case Constants.STELLAR_ATOMICS_MODE -> game.setStellarAtomicsMode(parseBooleanOrDefault(info, false));
+                case Constants.DANGEROUS_WILDS_MODE -> game.setDangerousWildsMode(parseBooleanOrDefault(info, false));
+                case Constants.AGE_OF_FIGHTERS_MODE -> game.setAgeOfFightersMode(parseBooleanOrDefault(info, false));
                 case Constants.ZEALOUS_ORTHODOXY_MODE ->
-                    game.setZealousOrthodoxyMode(loadBooleanOrDefault(info, false));
+                    game.setZealousOrthodoxyMode(parseBooleanOrDefault(info, false));
                 case Constants.ADVENT_OF_THE_WARSUN_MODE ->
-                    game.setAdventOfTheWarsunMode(loadBooleanOrDefault(info, false));
+                    game.setAdventOfTheWarsunMode(parseBooleanOrDefault(info, false));
                 case Constants.MERCENARIES_FOR_HIRE_MODE ->
-                    game.setMercenariesForHireMode(loadBooleanOrDefault(info, false));
+                    game.setMercenariesForHireMode(parseBooleanOrDefault(info, false));
                 case Constants.CULTURAL_EXCHANGE_PROGRAM_MODE ->
-                    game.setCulturalExchangeProgramMode(loadBooleanOrDefault(info, false));
+                    game.setCulturalExchangeProgramMode(parseBooleanOrDefault(info, false));
                 case Constants.CONVENTIONS_OF_WAR_ABANDONED_MODE ->
-                    game.setConventionsOfWarAbandonedMode(loadBooleanOrDefault(info, false));
+                    game.setConventionsOfWarAbandonedMode(parseBooleanOrDefault(info, false));
                 case Constants.RAPID_MOBILIZATION_MODE ->
-                    game.setRapidMobilizationMode(loadBooleanOrDefault(info, false));
-                case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(loadBooleanOrDefault(info, false));
-                case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(loadBooleanOrDefault(info, false));
-                case Constants.NO_FRACTURE -> game.setNoFractureMode(loadBooleanOrDefault(info, false));
-                case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(loadBooleanOrDefault(info, false));
+                    game.setRapidMobilizationMode(parseBooleanOrDefault(info, false));
+                case Constants.WILD_WILD_GALAXY_MODE -> game.setWildWildGalaxyMode(parseBooleanOrDefault(info, false));
+                case Constants.WEIRD_WORMHOLES_MODE -> game.setWeirdWormholesMode(parseBooleanOrDefault(info, false));
+                case Constants.NO_FRACTURE -> game.setNoFractureMode(parseBooleanOrDefault(info, false));
+                case Constants.CALL_OF_THE_VOID_MODE -> game.setCallOfTheVoidMode(parseBooleanOrDefault(info, false));
                 case Constants.COSMIC_PHENOMENAE_MODE ->
-                    game.setCosmicPhenomenaeMode(loadBooleanOrDefault(info, false));
+                    game.setCosmicPhenomenaeMode(parseBooleanOrDefault(info, false));
                 case Constants.MONUMENTS_TO_THE_AGES_MODE ->
-                    game.setMonumentToTheAgesMode(loadBooleanOrDefault(info, false));
+                    game.setMonumentToTheAgesMode(parseBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE ->
-                    game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
-                case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));
-                case Constants.VEILED_HEART_MODE -> game.setVeiledHeartMode(loadBooleanOrDefault(info, false));
-                case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(loadBooleanOrDefault(info, false));
-                case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(loadBooleanOrDefault(info, false));
-                case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(loadBooleanOrDefault(info, false));
-                case Constants.VOTC_MODE -> game.setVotcMode(loadBooleanOrDefault(info, false));
+                    game.setCivilizedSocietyMode(parseBooleanOrDefault(info, false));
+                case Constants.NO_SWAP_MODE -> game.setNoSwapMode(parseBooleanOrDefault(info, false));
+                case Constants.VEILED_HEART_MODE -> game.setVeiledHeartMode(parseBooleanOrDefault(info, false));
+                case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(parseBooleanOrDefault(info, false));
+                case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(parseBooleanOrDefault(info, false));
+                case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(parseBooleanOrDefault(info, false));
+                case Constants.VOTC_MODE -> game.setVotcMode(parseBooleanOrDefault(info, false));
                 case Constants.SHOW_FULL_COMPONENT_TEXT ->
-                    game.setShowFullComponentTextEmbeds(loadBooleanOrDefault(info, false));
-                case Constants.GAME_HAS_ENDED -> game.setHasEnded(loadBooleanOrDefault(info, false));
+                    game.setShowFullComponentTextEmbeds(parseBooleanOrDefault(info, false));
+                case Constants.GAME_HAS_ENDED -> game.setHasEnded(parseBooleanOrDefault(info, false));
                 case Constants.CREATION_DATE_TIME -> game.setCreationDateTime(Long.parseLong(info));
                 case Constants.CREATION_DATE -> game.setCreationDate(info);
                 case Constants.ROUND -> {
-                    try {
+                    if (isNotBlank(info)) {
                         game.setRound(Integer.parseInt(info));
-                    } catch (Exception exception) {
-                        BotLogger.error(new LogOrigin(game), "Could not parse round number", exception);
                     }
                 }
                 case Constants.BUTTON_PRESS_COUNT -> {
-                    try {
+                    if (isNotBlank(info)) {
                         game.setButtonPressCount(Integer.parseInt(info));
-                    } catch (Exception exception) {
-                        BotLogger.error(new LogOrigin(game), "Could not parse button press count", exception);
                     }
                 }
                 case Constants.STARTED_DATE -> {
-                    try {
+                    if (isNotBlank(info)) {
                         game.setStartedDate(Long.parseLong(info));
-                    } catch (Exception exception) {
-                        BotLogger.error(new LogOrigin(game), "Could not parse started date", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
-                    try {
+                    if (isNotBlank(info)) {
                         game.setLastModifiedDate(Long.parseLong(info));
-                    } catch (Exception exception) {
-                        BotLogger.error(new LogOrigin(game), "Could not parse last modified date", exception);
                     }
                 }
                 case Constants.ENDED_DATE -> {
-                    try {
+                    if (isNotBlank(info)) {
                         game.setEndedDate(Long.parseLong(info));
-                    } catch (Exception exception) {
-                        BotLogger.error(new LogOrigin(game), "Could not parse ended date", exception);
                     }
                 }
                 case Constants.IMAGE_GEN_COUNT -> {
-                    try {
+                    if (isNotBlank(info)) {
                         int count = Integer.parseInt(info);
                         game.setMapImageGenerationCount(count);
-                    } catch (Exception e) {
                     }
                 }
                 case Constants.RUN_DATA_MIGRATIONS -> {
@@ -777,10 +737,7 @@ class GameLoadService {
                     }
                 }
                 case Constants.BAG_DRAFT -> {
-                    try {
-                        game.setBagDraft(BagDraft.GenerateDraft(info, game));
-                    } catch (Exception e) {
-                    }
+                    game.setBagDraft(BagDraft.generateDraft(info, game));
                 }
                 case Constants.MILTY_DRAFT_MANAGER -> game.setMiltyDraftString(info); // We will parse this later
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
@@ -808,12 +765,11 @@ class GameLoadService {
         }
     }
 
-    private static boolean loadBooleanOrDefault(String info, boolean def) {
-        try {
-            return Boolean.parseBoolean(info);
-        } catch (Exception e) {
+    private static boolean parseBooleanOrDefault(String info, boolean def) {
+        if (isBlank(info)) {
             return def;
         }
+        return Boolean.parseBoolean(info);
     }
 
     private static List<String> getCardList(String tokenizer) {
@@ -1134,44 +1090,30 @@ class GameLoadService {
                         break;
                     }
                     StringTokenizer leaderInfos = new StringTokenizer(nextToken, ";");
-                    try {
-                        List<Leader> leaderList = new ArrayList<>();
-                        while (leaderInfos.hasMoreTokens()) {
-                            String[] split = leaderInfos.nextToken().split(",");
-                            Leader leader = new Leader(split[0]);
-                            // leader.setType(Integer.parseInt(split[1])); // type is set in constructor
-                            // based on ID
-                            leader.setTgCount(Integer.parseInt(split[2]));
-                            leader.setExhausted(Boolean.parseBoolean(split[3]));
-                            leader.setLocked(Boolean.parseBoolean(split[4]));
-                            if (split.length == 6) {
-                                leader.setActive(Boolean.parseBoolean(split[5]));
-                            }
-                            leaderList.add(leader);
+                    List<Leader> leaderList = new ArrayList<>();
+                    while (leaderInfos.hasMoreTokens()) {
+                        String[] split = leaderInfos.nextToken().split(",");
+                        Leader leader = new Leader(split[0]);
+                        leader.setTgCount(Integer.parseInt(split[2]));
+                        leader.setExhausted(Boolean.parseBoolean(split[3]));
+                        leader.setLocked(Boolean.parseBoolean(split[4]));
+                        if (split.length == 6) {
+                            leader.setActive(Boolean.parseBoolean(split[5]));
                         }
-                        player.setLeaders(leaderList);
-                    } catch (Exception e) {
-                        BotLogger.error(new LogOrigin(player), "Could not parse leaders loading map", e);
+                        leaderList.add(leader);
                     }
+                    player.setLeaders(leaderList);
                 }
                 case Constants.FOW_SYSTEMS -> {
-                    try {
-                        StringTokenizer fowSystems = new StringTokenizer(tokenizer.nextToken(), ";");
-                        while (fowSystems.hasMoreTokens()) {
-                            String[] system = fowSystems.nextToken().split(",");
-                            String position = system[0];
-                            String tileID = system[1];
-                            String label = system[2];
-                            if (label != null)
-                                label = PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
-                            player.addFogTile(tileID, position, label);
-                        }
-                    } catch (Exception e) {
-                        BotLogger.error(
-                                new LogOrigin(player),
-                                "Could not parse fog of war systems for player when loading the map: "
-                                        + player.getColor(),
-                                e);
+                    StringTokenizer fowSystems = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (fowSystems.hasMoreTokens()) {
+                        String[] system = fowSystems.nextToken().split(",");
+                        String position = system[0];
+                        String tileID = system[1];
+                        String label = system[2];
+                        if (label != null)
+                            label = PATTERN.matcher(label).replaceAll(" "); // replace em dash with spaces
+                        player.addFogTile(tileID, position, label);
                     }
                 }
                 case Constants.SO_SCORED -> {
@@ -1277,16 +1219,11 @@ class GameLoadService {
     }
 
     private static Tile readTile(String tileData) {
-        try {
-            StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
-            String tileID = AliasHandler.resolveTile(tokenizer.nextToken());
-            String position = tokenizer.nextToken();
-            if (!PositionMapper.isTilePositionValid(position)) return null;
-            return new Tile(tileID, position);
-        } catch (Exception e) {
-            BotLogger.error("Error reading tileData: `" + tileData + "`", e);
-        }
-        return null;
+        StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
+        String tileID = AliasHandler.resolveTile(tokenizer.nextToken());
+        String position = tokenizer.nextToken();
+        if (!PositionMapper.isTilePositionValid(position)) return null;
+        return new Tile(tileID, position);
     }
 
     private static void readUnit(Tile tile, String data, String spaceHolder) {
@@ -1296,11 +1233,7 @@ class GameLoadService {
         List<String> nums = new ArrayList<>(Arrays.asList(tokenizer.nextToken().split(",")));
         List<Integer> counts = new ArrayList<>();
         for (String val : nums) {
-            try {
-                counts.add(Integer.parseInt(val));
-            } catch (Exception e) {
-                counts.add(0);
-            }
+            if (isNotBlank(val)) counts.add(Integer.parseInt(val));
         }
         for (int x = counts.size(); x < UnitState.values().length; x++) counts.add(0);
         if (!tile.getUnitHolders().containsKey(spaceHolder)) {
@@ -1308,12 +1241,6 @@ class GameLoadService {
             return;
         }
         tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
-    }
-
-    private static void readUnitDamage(Tile tile, String data, String spaceHolder) {
-        if (tile == null) return;
-        StringTokenizer tokenizer = new StringTokenizer(data, " ");
-        tile.addUnitDamage(spaceHolder, Units.parseID(tokenizer.nextToken()), tokenizer.nextToken());
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
@@ -1329,11 +1256,6 @@ class GameLoadService {
                 tile.addToken(token, unitHolderName);
             }
         }
-    }
-
-    private static String readStringLine(String data) {
-        if (data.isBlank()) return null;
-        return StringHelper.unescape(data);
     }
 
     private static Map<String, List<String>> loadPeekedPublicObjectives(String data) {

@@ -1,6 +1,5 @@
 package ti4.commands.bothelper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -11,6 +10,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.json.JsonMapperManager;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
@@ -48,9 +48,8 @@ class JazzCommand extends Subcommand {
     }
 
     public String json(MiltySettings object) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(object);
+            return JsonMapperManager.basic().writeValueAsString(object);
         } catch (Exception e) {
             BotLogger.error("Error mapping to json: ", e);
         }

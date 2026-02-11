@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
@@ -11,12 +12,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.spring.jda.JdaService;
 
+@UtilityClass
 public class Units {
 
     private static final String EMDASH = "—";
@@ -80,11 +83,6 @@ public class Units {
                 return getColor() + "_monument.png";
             }
 
-            return String.format("%s_%s.png", colorID, asyncID());
-        }
-
-        @JsonIgnore
-        public String getOldUnitID() {
             return String.format("%s_%s.png", colorID, asyncID());
         }
 
@@ -199,6 +197,26 @@ public class Units {
         @Override
         public String toString() {
             return value;
+        }
+
+        @JsonCreator
+        public static UnitType fromJson(String unitType) {
+            if (unitType == null) {
+                return null;
+            }
+
+            UnitType resolved = findUnitType(unitType);
+            if (resolved != null) {
+                return resolved;
+            }
+
+            for (UnitType candidate : values()) {
+                if (candidate.name().equalsIgnoreCase(unitType)) {
+                    return candidate;
+                }
+            }
+
+            throw new IllegalArgumentException("Unknown unit type: " + unitType);
         }
     }
 

@@ -1,9 +1,7 @@
 package ti4.image;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,6 +16,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
+import ti4.json.JsonMapperManager;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -27,7 +26,6 @@ import ti4.model.TileModel;
 
 public class TileHelper {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Pattern TILE_WITH_NAME_PATTERN = Pattern.compile("^\\s*\\d{3} \\(\\w+\\)\\s*$");
     private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();
     private static final Map<String, PlanetModel> planetIdsToPlanetModels = new HashMap<>();
@@ -80,8 +78,8 @@ public class TileHelper {
 
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
-            try {
-                PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                PlanetModel planet = JsonMapperManager.basic().readValue(fileInputStream, PlanetModel.class);
                 planetIdsToPlanetModels.put(planet.getId(), planet);
                 tileIdsToPlanetModels
                         .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
@@ -115,8 +113,8 @@ public class TileHelper {
                 .toList());
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
-            try {
-                TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
+            try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                TileModel tile = JsonMapperManager.basic().readValue(fileInputStream, TileModel.class);
                 tileIdsToTileModels.put(tile.getId(), tile);
                 if (!tile.isValid()) {
                     badObjects.add(tile.getAlias());
@@ -126,7 +124,7 @@ public class TileHelper {
                     duplicateDraftTiles(tile);
                 }
             } catch (Exception e) {
-                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                BotLogger.warning("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
         if (!badObjects.isEmpty())
@@ -154,38 +152,6 @@ public class TileHelper {
 
     public static boolean isDraftTile(TileModel tile) {
         return tile.getImagePath().startsWith("draft_");
-    }
-
-    public static void addNewTileToList(TileModel tile) {
-        tileIdsToTileModels.put(tile.getId(), tile);
-    }
-
-    public static void addNewPlanetToList(PlanetModel planet) {
-        planetIdsToPlanetModels.put(planet.getId(), planet);
-    }
-
-    public static void exportAllPlanets() {
-        ObjectMapper mapper = new ObjectMapper();
-        String resourcePath = Storage.getResourcePath() + File.separator + "planets" + File.separator;
-        planetIdsToPlanetModels.values().forEach(planetModel -> {
-            try {
-                mapper.writeValue(new File(resourcePath + planetModel.getId() + ".json"), planetModel);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    public static void exportAllTiles() {
-        ObjectMapper mapper = new ObjectMapper();
-        String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
-        tileIdsToTileModels.values().forEach(tileModel -> {
-            try {
-                mapper.writeValue(new File(resourcePath + tileModel.getId() + ".json"), tileModel);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
     }
 
     public static boolean isValidTile(String tileID) {

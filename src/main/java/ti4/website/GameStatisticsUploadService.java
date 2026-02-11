@@ -1,7 +1,5 @@
 package ti4.website;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SequenceWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -14,11 +12,14 @@ import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.json.JsonMapperManager;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.settings.GlobalSettings;
 import ti4.website.model.stats.GameStatsDashboardPayload;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.SequenceWriter;
 
 @UtilityClass
 public class GameStatisticsUploadService {
@@ -69,8 +70,7 @@ public class GameStatisticsUploadService {
 
         Path tempFile = Files.createTempFile(fileName, ".json");
         try (OutputStream outputStream = Files.newOutputStream(tempFile);
-                SequenceWriter writer =
-                        EgressClientManager.getObjectMapper().writer().writeValuesAsArray(outputStream)) {
+                SequenceWriter writer = JsonMapperManager.basic().writer().writeValuesAsArray(outputStream)) {
             for (ManagedGame managedGame : GameManager.getManagedGames()) {
                 if (!gamePredicate.test(managedGame)) {
                     continue;
@@ -79,8 +79,8 @@ public class GameStatisticsUploadService {
                 eligible++;
 
                 try {
-                    JsonNode node = EgressClientManager.getObjectMapper()
-                            .valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
+                    JsonNode node =
+                            JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
                     writer.write(node);
                     uploaded++;
                     currentBatchSize++;

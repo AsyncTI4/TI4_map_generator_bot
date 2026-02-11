@@ -1,6 +1,5 @@
 package ti4.website;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +15,6 @@ import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class EgressClientManager {
-
-    @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Getter
     private static final HttpClient httpClient = HttpClient.newHttpClient();
