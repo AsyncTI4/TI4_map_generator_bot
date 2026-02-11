@@ -33,6 +33,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
+import ti4.json.JsonMapperManager;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
 import ti4.model.AbilityModel;
@@ -122,9 +123,9 @@ public class Mapper {
     private static final Cache<String, ColorModel> colorToColorModelCache =
             Caffeine.newBuilder().maximumSize(1000).build();
 
-    private static final JsonMapper jsonMapper = JsonMapper.builder()
+    private static final JsonMapper jsonMapper = JsonMapperManager.basic()
+            .rebuild()
             .addModule(new SimpleModule().addDeserializer(Color.class, new ColorDeserializer()))
-            .findAndAddModules()
             .build();
 
     public static void init() {
