@@ -656,7 +656,10 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     @Nullable
     public ThreadChannel getCardsInfoThread() {
-        // ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild()); bot didn't like this!
+        if (isNpc() || isDummy()) {
+            return null;
+        }
+
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
@@ -781,10 +784,6 @@ public class Player extends PlayerProperties {
                     e);
         }
 
-        if (isNpc() || isDummy()) {
-            return null;
-        }
-        
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
         boolean isPrivateChannel = !game.isFowMode();
