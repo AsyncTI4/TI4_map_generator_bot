@@ -811,8 +811,8 @@ public class ButtonHelperAbilities {
         }
 
         game.setStoredValue("bounties" + p2.getFaction() + unitTypeString, unitTypeString);
-        String msg = player.getRepresentationUnfogged() + " placed a bounty on " + p2.getRepresentationNoPing() + "'s "
-                + StringUtils.capitalize(unitTypeString) + ".";
+        String msg = player.getRepresentationUnfogged() + " placed a bounty on a "
+                + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -828,8 +828,10 @@ public class ButtonHelperAbilities {
         ButtonHelperAgents.resolveArtunoCheck(player, 3);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " claimed a bounty and gained 3tg. The bounty claimed was on "
-                        + p2.getRepresentationNoPing() + "'s " + StringUtils.capitalize(unitTypeString));
+                player.getRepresentation()
+                        + " claimed a bounty and so gained 3 trade goods. The bounty claimed was on a "
+                        + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing()
+                        + ".");
         ButtonHelper.deleteTheOneButton(event);
     }
 
