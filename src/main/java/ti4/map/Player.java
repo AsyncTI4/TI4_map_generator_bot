@@ -2374,6 +2374,16 @@ public class Player extends PlayerProperties {
         return newPlanets;
     }
 
+    @JsonIgnore
+    public int getNumberOfRealPlanetsAllianceMode() {
+        return (int) getPlanetsAllianceMode().stream()
+                .map(planet -> game.getPlanetsInfo().get(planet))
+                .filter(Objects::nonNull)
+                .filter(planet -> !planet.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
+                .filter(planet -> !planet.isSpaceStation())
+                .count();
+    }
+
     public Set<Planet> getPlanetsForScoring(boolean secret) {
         Game game = this.game;
 

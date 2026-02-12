@@ -246,14 +246,14 @@ public class AddPlanetService {
                                             + Mapper.getPlanet(planet).getName() + ".");
                         }
                         if (player_.isRealPlayer()
-                                && player_.getPlanetsAllianceMode().isEmpty()
+                                && player_.getNumberOfRealPlanetsAllianceMode() == 0
                                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                                 game, player_, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.red(
                                     "eliminatePlayer_" + player_.getFaction(),
-                                    "Eliminate " + player_.getDisplayName()));
+                                    "Eliminate " + player_.getFlexibleDisplayName()));
                             msg = player_.getRepresentation()
                                     + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
                             MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), msg, buttons);
