@@ -138,4 +138,8 @@ public class PlayerProperties {
     private List<String> mahactCC = new ArrayList<>();
     private List<String> factionTechs = new ArrayList<>();
     private List<String> purgedTechs = new ArrayList<>();
+
+    public void loadCommodities(int commodities) {
+        this.commodities = commodities;
+    }
 }

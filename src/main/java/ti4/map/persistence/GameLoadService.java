@@ -970,7 +970,7 @@ class GameLoadService {
                     player.setCommoditiesTotal(Math.max(0, Integer.parseInt(tokenizer.nextToken())));
                 case Constants.COMMODITIES_BASE ->
                     player.setCommoditiesBase(Math.max(0, Integer.parseInt(tokenizer.nextToken())));
-                case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.COMMODITIES -> player.loadCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AUTO_SABO_PASS_MEDIAN ->
                     player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
