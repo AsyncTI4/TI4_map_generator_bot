@@ -208,6 +208,9 @@ public class CreateGameService {
 
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
+            if (player.isNpc() || player.isDummy()) {
+                continue;
+            }
             player.getCardsInfoThread();
         }
 

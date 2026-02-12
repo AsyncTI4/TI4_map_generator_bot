@@ -656,7 +656,10 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     @Nullable
     public ThreadChannel getCardsInfoThread() {
-        // ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild()); bot didn't like this!
+        if (isNpc() || isDummy()) {
+            return null;
+        }
+
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
