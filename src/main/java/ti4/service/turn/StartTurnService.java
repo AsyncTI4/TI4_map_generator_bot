@@ -517,12 +517,12 @@ public class StartTurnService {
                                     .append(".\n");
                         }
                         sb.append("You currently have ")
-                                .append(player.getStrategicCC())
+                                .append(p2.getStrategicCC())
                                 .append(" command token")
-                                .append(player.getStrategicCC() == 1 ? "" : "s")
+                                .append(p2.getStrategicCC() == 1 ? "" : "s")
                                 .append(" in your strategy pool.");
-                        if (!player.hasFollowedSC(sc)) {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+                        if (!p2.hasFollowedSC(sc)) {
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                         }
                     }
                 }
