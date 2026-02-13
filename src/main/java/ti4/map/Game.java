@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -703,7 +703,7 @@ public class Game extends GameProperties {
     }
 
     private static Player getLowestInitiativePlayer(Player player1, Player player2) {
-        if (Collections.min(player1.getSCs()) < Collections.min(player2.getSCs())) {
+        if (player1.getInitiative() < player2.getInitiative()) {
             return player1;
         }
         return player2;

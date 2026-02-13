@@ -172,7 +172,8 @@ class AgendaResolveButtonHandler {
     }
 
     private static boolean guardDoublePress(Game game, String winner, String agendaId) {
-        String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size();
+        String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size()
+                + game.getLaws().size();
         if (game.getStoredValue(key).equalsIgnoreCase(winner + agendaId)) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
