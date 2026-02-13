@@ -16,17 +16,18 @@ class EndingRoundPhaseStatisticsService {
     static void showEndingRoundPhaseStatistics(SlashCommandInteractionEvent event) {
         Map<String, Integer> endingRoundAndPhaseCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event),
-                game -> {
-                    String phase = game.getPhaseOfGame() == null || game.getPhaseOfGame().isBlank()
+        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilterForWonGame(event), game -> {
+            String phase =
+                    game.getPhaseOfGame() == null || game.getPhaseOfGame().isBlank()
                             ? "unknown"
                             : game.getPhaseOfGame();
-                    String endingRoundAndPhase = "Round " + game.getRound() + " - " + phase;
-                    endingRoundAndPhaseCount.merge(endingRoundAndPhase, 1, Integer::sum);
-                });
+            String endingRoundAndPhase = "Round " + game.getRound() + " - " + phase;
+            endingRoundAndPhaseCount.merge(endingRoundAndPhase, 1, Integer::sum);
+        });
 
-        int totalEndedGames = endingRoundAndPhaseCount.values().stream().mapToInt(Integer::intValue).sum();
+        int totalEndedGames = endingRoundAndPhaseCount.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
         AtomicInteger index = new AtomicInteger();
         StringBuilder sb = new StringBuilder("__**Game Endings by Round and Phase:**__\n");
 
@@ -45,6 +46,7 @@ class EndingRoundPhaseStatisticsService {
             sb.append("No ended games found for the selected filters.\n");
         }
 
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Ending Rounds", sb.toString());
+        MessageHelper.sendMessageToThread(
+                (MessageChannelUnion) event.getMessageChannel(), "Game Ending Rounds", sb.toString());
     }
 }
