@@ -16,6 +16,7 @@ public enum GameStatTypes {
             "Faction performance", "Shows how much each faction over or under performs its expected win rate"),
     COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
     WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"),
+    ENDING_ROUND_PHASE("End round and phase", "Shows how many games ended by round and phase"),
     PHASE_TIMES("Phase Times", "Shows how long each phase lasted, in days"),
     SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred holding a Support for the Throne"),
     GAME_COUNT("Total game count", "Shows the total game count");
