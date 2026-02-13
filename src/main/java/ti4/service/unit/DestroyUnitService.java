@@ -293,16 +293,23 @@ public class DestroyUnitService {
                 Player killer = killers.getFirst();
                 if (killer.isRealPlayer()) {
                     String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
-                    int newAmount = game.changeCommsOnPlanet(winnings, planet);
-                    MessageHelper.sendMessageToChannel(
-                            killer.getCorrectChannel(),
-                            killer.getRepresentationNoPing() + " added " + winnings + " commodities to the planet of "
-                                    + Helper.getPlanetRepresentation(planet, game)
-                                    + " (which has " + newAmount + " commodities on it now) by destroying "
-                                    + unit.getTotalRemoved() + " of "
-                                    + player.getRepresentationNoPing() + "'s "
-                                    + unit.unitKey().getUnitType().getUnitTypeEmoji()
-                                    + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
+                    if (planet.isEmpty()) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(), "Could not find a planet to place commodities on.");
+
+                    } else {
+                        int newAmount = game.changeCommsOnPlanet(winnings, planet);
+                        MessageHelper.sendMessageToChannel(
+                                killer.getCorrectChannel(),
+                                killer.getRepresentationNoPing() + " added " + winnings
+                                        + " commodities to the planet of "
+                                        + Helper.getPlanetRepresentation(planet, game)
+                                        + " (which has " + newAmount + " commodities on it now) by destroying "
+                                        + unit.getTotalRemoved() + " of "
+                                        + player.getRepresentationNoPing() + "'s "
+                                        + unit.unitKey().getUnitType().getUnitTypeEmoji()
+                                        + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
+                    }
                 }
             }
         }

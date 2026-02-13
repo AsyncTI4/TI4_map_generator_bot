@@ -340,7 +340,9 @@ public class MiltyService {
 
         // GHOST AND CRIMSON EXTRA HS TILES
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            if (!game.isBaseGameMode()) {
+                tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            }
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
                 pos = "br";
@@ -362,7 +364,9 @@ public class MiltyService {
 
         // HANDLE Crimson' HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            if (!game.isBaseGameMode()) {
+                tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            }
             tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
@@ -738,7 +742,9 @@ public class MiltyService {
     public static void setupExtraFactionTiles(Game game, Player player, String faction, String positionHS, Tile tile) {
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            if (!game.isBaseGameMode()) {
+                tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            }
             String pos = "tr";
             if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
                 pos = "br";
@@ -756,7 +762,9 @@ public class MiltyService {
 
         // HANDLE Crimson' HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
-            tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            if (!game.isBaseGameMode()) {
+                tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
+            }
             if (!game.isTwilightsFallMode()) {
                 tile.addToken(Constants.TOKEN_BREACH_INACTIVE, Constants.SPACE);
             } else {

@@ -36,7 +36,7 @@ public class FaunusService {
             if (p.getUnitCount() > 0) continue;
             if (p.isLegendary()) continue;
             if (p.isHomePlanet(game)) continue;
-            if (!p.getAttachments().isEmpty()) continue;
+            if (!p.getAttachments().isEmpty() && !p.getTokenList().contains("token_relictoken.png")) continue;
 
             // in fow, skip planets you can't see
             if (game.isFowMode() && !tiles.contains(t.getPosition())) continue;

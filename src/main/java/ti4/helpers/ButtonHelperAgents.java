@@ -719,6 +719,31 @@ public class ButtonHelperAgents {
                     + "Maertin Donaais, the Toldar" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
         }
+
+        if ("zephyrionagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Zephyrion"
+                    + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+
+            String msg = player.getRepresentationUnfogged()
+                    + " you may use the buttons to select the ship you want to kill.";
+            List<String> bounties = ButtonHelperAbilities.getBountiesForPlayer(game);
+            List<Button> buttons = new ArrayList<>();
+            for (Player otherPlayer : game.getRealPlayersExcludingThis(player)) {
+                for (String bounty : bounties) {
+                    String faction = bounty.split(" ")[0];
+                    String ship = bounty.split(" ")[1];
+                    if (otherPlayer.getFaction().equalsIgnoreCase(faction)) {
+                        Button bountyButton = Buttons.gray(
+                                "zephAgentRes_" + faction + "_" + ship,
+                                StringUtils.capitalize(ship),
+                                otherPlayer.getFactionEmojiOrColor());
+                        buttons.add(bountyButton);
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever
                     + "Doctor Sucaban, the Jol-Nar" + ssruuSlash + " agent.";

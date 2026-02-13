@@ -833,6 +833,38 @@ public class ButtonHelperAbilities {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("zephAgentRes_")
+    public static void zephAgentRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("zephAgentRes_", "");
+        String colorPlayer = buttonID.split("_")[0];
+        String unitTypeString = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(colorPlayer);
+        UnitModel unit = p2.getUnitByBaseType(unitTypeString);
+        game.removeStoredValue("bounties" + p2.getFaction() + unitTypeString);
+        player.gainTG(3, true);
+        ButtonHelperAgents.resolveArtunoCheck(player, 3);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " claimed a bounty and gained 3tg. The bounty claimed was on "
+                        + p2.getRepresentationNoPing() + "'s " + StringUtils.capitalize(unitTypeString));
+        if (unit != null) {
+            List<Button> removeButtons = new ArrayList<>();
+            String message = p2.getRepresentation() + ", please destroy one of your ships of that type";
+            removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true));
+            if (!removeButtons.isEmpty()) {
+                p2.gainTG((int) unit.getCost(), true);
+                ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
+                MessageHelper.sendMessageToChannel(
+                        p2.getCorrectChannel(),
+                        p2.getRepresentation() + " received trade goods equal to the ships cost");
+                message += ".";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, removeButtons);
+            }
+        }
+
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<String> getBountiesForPlayer(Game game) {
         List<String> bounties = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {

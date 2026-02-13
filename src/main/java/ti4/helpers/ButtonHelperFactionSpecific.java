@@ -2898,10 +2898,16 @@ public class ButtonHelperFactionSpecific {
         String commAmount = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         int winnings = Integer.parseInt(commAmount);
+        ButtonHelper.deleteMessage(event);
         Player killer = game.getPlayerFromColorOrFaction(faction);
         String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
+        if (planet.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not find a planet to place commodities on.");
+            return;
+        }
         int newAmount = game.changeCommsOnPlanet(winnings, planet);
-        ButtonHelper.deleteMessage(event);
+
         MessageHelper.sendMessageToChannel(
                 killer.getCorrectChannel(),
                 killer.getRepresentationNoPing() + " added " + winnings + " commodit" + (winnings == 1 ? "y" : "ies")

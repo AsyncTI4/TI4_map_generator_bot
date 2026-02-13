@@ -42,6 +42,12 @@ public class PassService {
 
         String text = player.getRepresentation(true, false) + " has passed" + (autoPass ? " (preset)." : ".");
 
+        if (autoPass
+                && player.getPlanets().contains("ordinian")
+                && !player.getExhaustedPlanetsAbilities().contains("ordinian")) {
+            text += "\n# They did not use the Ordinian ability. If this was a mistake, let them do so now.";
+        }
+
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation()
