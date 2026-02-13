@@ -333,7 +333,7 @@ class FrankenButtonHandler {
         DraftItem selectedItem = DraftItem.generateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {
-            if (player.getCurrentDraftBag().Contents.contains(selectedItem)) {
+            if (player.getDraftHand().Contents.contains(selectedItem)) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "You have already automatically drafted " + selectedItem.getShortDescription()

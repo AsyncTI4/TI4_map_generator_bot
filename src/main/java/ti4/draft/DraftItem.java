@@ -236,7 +236,7 @@ public abstract class DraftItem implements ModelInterface {
         }
         boolean hasDraftedThisBag = player.getDraftQueue().getCategoryCount(ItemCategory) > 0;
 
-        if (player.getCurrentDraftBag().Contents.contains(this) && ItemCategory != DraftItem.Category.COMMODITIES) {
+        if (player.getDraftHand().Contents.contains(this) && ItemCategory != DraftItem.Category.COMMODITIES) {
             return false;
         }
 
