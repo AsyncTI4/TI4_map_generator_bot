@@ -785,6 +785,49 @@ public class PlayHeroService {
                 }
             }
         }
+        if (noMoreComponentActionCards) {
+            noMoreComponentActionCards = false;
+            originalACDeckCount = game.getActionCards().size();
+            while (componentActionACCount < 3) {
+                Integer acID = null;
+                String acKey = null;
+                for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(
+                                game.drawActionCard(player.getUserID()))
+                        .entrySet()) {
+                    acID = ac.getValue();
+                    acKey = ac.getKey();
+                }
+                ActionCardModel actionCard = Mapper.getActionCard(acKey);
+                String acName = actionCard.getName();
+                String acWindow = actionCard.getWindow();
+                if ("Action".equalsIgnoreCase(acWindow)) {
+                    acDrawMessage
+                            .append("> `")
+                            .append(String.format("%02d", index))
+                            .append(".` ")
+                            .append(actionCard.getRepresentation());
+                    componentActionACCount++;
+                } else {
+                    acRevealMessage
+                            .append("> `")
+                            .append(String.format("%02d", index))
+                            .append(".` ")
+                            .append(CardEmojis.getACEmoji(game))
+                            .append(" ")
+                            .append(acName)
+                            .append("\n");
+                    game.discardActionCard(player.getUserID(), acID);
+                    cardsToShuffleBackIntoDeck.add(acKey);
+                }
+                index++;
+                if (index >= originalACDeckCount) {
+                    if (index > originalACDeckCount * 2) {
+                        noMoreComponentActionCards = true;
+                        break;
+                    }
+                }
+            }
+        }
         for (String card : cardsToShuffleBackIntoDeck) {
             Integer cardID = game.getDiscardActionCards().get(card);
             game.shuffleActionCardBackIntoDeck(cardID);

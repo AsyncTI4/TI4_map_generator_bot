@@ -182,7 +182,15 @@ public class ComponentActionHelper {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Rebellion Agent",
+                                    "Use " + leaderName + " as Crimson Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
+                        led = "zephyrionagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Zephyrion Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }

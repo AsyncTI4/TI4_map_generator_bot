@@ -4881,7 +4881,7 @@ public class ButtonHelper {
         List<Button> ringButtons = new ArrayList<>();
         Tile centerTile = game.getTileByPosition("000");
         if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game)) {
-            if (!CommandCounterHelper.hasCC(player, centerTile)) {
+            if (!CommandCounterHelper.hasCC(player, centerTile) || game.isWarfareAction() || game.isL1Hero()) {
                 Button rex = Buttons.green(
                         finChecker + "ringTile_000",
                         centerTile.getRepresentationForButtons(game, player),
@@ -6023,7 +6023,8 @@ public class ButtonHelper {
                         }
                     }
                 }
-                if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0
+                        && (game.isTwilightsFallMode() || !game.getPhaseOfGame().contains("status"))) {
                     if (uH instanceof Planet) {
                         buttons.add(Buttons.green(
                                 "mercerMove_" + planetName + "_" + tile.getPosition() + "_" + uH.getName() + "_mech",

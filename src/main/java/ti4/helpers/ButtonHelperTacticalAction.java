@@ -93,7 +93,9 @@ public class ButtonHelperTacticalAction {
                 }
             }
 
-            if (player.hasUnlockedBreakthrough("argentbt")) {
+            if (player.hasUnlockedBreakthrough("argentbt")
+                    && !game.getStoredValue("argentBTUse").isEmpty()) {
+                game.removeStoredValue("argentBTUse");
                 String msg = player.getRepresentation()
                         + ", you may use _Wing Transfer_ to move ships (and things they transport) between the active system and any adjacent system with only your units and your command tokens.";
                 List<Button> buttons = ButtonHelperHeroes.argentBreakthroughStep1(
@@ -594,6 +596,7 @@ public class ButtonHelperTacticalAction {
                 && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
                 && FoWHelper.playerHasUnitsInSystem(player, tile)
                 && ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+            game.setStoredValue("argentBTUse", "yes");
             List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

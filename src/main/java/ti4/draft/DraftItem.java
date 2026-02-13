@@ -236,6 +236,10 @@ public abstract class DraftItem implements ModelInterface {
         }
         boolean hasDraftedThisBag = player.getDraftQueue().getCategoryCount(ItemCategory) > 0;
 
+        if (player.getCurrentDraftBag().Contents.contains(this) && ItemCategory != DraftItem.Category.COMMODITIES) {
+            return false;
+        }
+
         boolean allOtherCategoriesAtHandLimit = true;
         for (Category cat : Category.values()) {
             if (ItemCategory == cat) {

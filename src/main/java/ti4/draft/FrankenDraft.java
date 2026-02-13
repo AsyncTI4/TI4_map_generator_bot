@@ -120,7 +120,7 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static final String[] excludedFactions = {
-        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral"
+        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "kaltrim"
     };
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
