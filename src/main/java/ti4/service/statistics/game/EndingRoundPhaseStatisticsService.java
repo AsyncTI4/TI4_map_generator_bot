@@ -16,11 +16,23 @@ class EndingRoundPhaseStatisticsService {
     static void showEndingRoundPhaseStatistics(SlashCommandInteractionEvent event) {
         Map<String, Integer> endingRoundAndPhaseCount = new HashMap<>();
 
-        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilterForWonGame(event), game -> {
+        GamesPage.consumeAllGames(GameStatisticsFilterer.getGamesFilter(event), game -> {
+            if (!game.isHasEnded()) return;
+
             String phase =
                     game.getPhaseOfGame() == null || game.getPhaseOfGame().isBlank()
                             ? "unknown"
                             : game.getPhaseOfGame();
+            if (phase.contains("status")) {
+                phase = "status";
+            } else if (phase.contains("agenda")) {
+                phase = "agenda";
+            } else if (phase.contains("action")) {
+                phase = "action";
+            } else {
+                phase = "unknown";
+            }
+
             String endingRoundAndPhase = "Round " + game.getRound() + " - " + phase;
             endingRoundAndPhaseCount.merge(endingRoundAndPhase, 1, Integer::sum);
         });
