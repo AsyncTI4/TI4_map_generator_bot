@@ -21,7 +21,7 @@ class EndingRoundPhaseStatisticsService {
                 game -> {
                     String phase = game.getPhaseOfGame() == null || game.getPhaseOfGame().isBlank()
                             ? "unknown"
-                            : game.getPhaseOfGame().toLowerCase();
+                            : game.getPhaseOfGame();
                     String endingRoundAndPhase = "Round " + game.getRound() + " - " + phase;
                     endingRoundAndPhaseCount.merge(endingRoundAndPhase, 1, Integer::sum);
                 });
