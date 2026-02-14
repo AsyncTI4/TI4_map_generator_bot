@@ -142,7 +142,7 @@
         "phase": "Action",
         "window": "When another player resolves the secondary ability of your strategy card",
         "text": "Return 1 of that player's command tokens from the game board to their strategy pool. Then, you may perform a transaction with that player; action cards and unscored secret objectives can be traded as part of this transaction.",
-        "flavorText": "A gambit? Magi laughed. Hardly.",
+        "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
     {
@@ -262,7 +262,7 @@
         "name": "Deflection",
         "phase": "Strategy",
         "window": "At the start of the strategy phase",
-        "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their fleet pool to choose that strategy card, if they have another choice.",
+        "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if they have another choice.",
         "flavorText": "\"It was their idea,\" Zo Cou shrugged. \"Or so they believe. Their mistake was a poison I fed them. Now they choke on it.\"",
         "source": "action_deck_2"
     },
@@ -395,7 +395,7 @@
         "name": "Incompetence",
         "phase": "Action",
         "window": "Before your opponent's units make combat rolls",
-        "text": "For up to 3 of those units' unmodified results of 1 or 2, produce 1 hit that your opponent must assign to 1 of their units.",
+        "text": "For up to 3 of those unmodified results of 1 or 2, produce 1 hit that your opponent must assign to 1 of their units.",
         "flavorText": "\"Commander, the left flank is dissolving. Crossfire—\" A hull breach slammed Agnlan to the deck before they could reply, their pitiful whine broadcast across the rapidly deteriorating battle. \"Agnlan, what happened? Agnlan!? Agnlan—!\"",
         "source": "action_deck_2"
     },
@@ -780,6 +780,42 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "shortcut1",
+        "name": "Shortcut",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "shortcut2",
+        "name": "Shortcut",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "shortcut3",
+        "name": "Shortcut",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "The ship's power flickered off, but the strain remained. The pilot had flung them into the void, trusting his intuition, and Mendosa was not eager to discover what awaited them on the other end.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "shortcut4",
+        "name": "Shortcut",
+        "phase": "Action",
+        "window": "After you activate a non-home system",
+        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
+        "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "shrapnel_turrets",
         "name": "Shrapnel Turrets",
         "phase": "Action",
@@ -877,42 +913,6 @@
         "window": "After a player activates a system that contains your units",
         "text": "Choose 1 other system. That system is adjacent to the active system during this tactical action.",
         "flavorText": "The conduit overloaded with a keening wail, slowly tearing itself apart as the space within melted away to reveal the beacon.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "weirdway1",
-        "name": "Weirdway",
-        "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
-        "flavorText": "\"Oy, Captain, best ye lock in,\" the wily pilot chuckled. \"I learned this little maneuver in me scavenging days.\" Before Mendosa could protest, the ship began to groan under the strain.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "weirdway2",
-        "name": "Weirdway",
-        "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
-        "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "weirdway3",
-        "name": "Weirdway",
-        "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
-        "flavorText": "The ship's power flickered off, but the strain remained. The pilot had flung them into the void, trusting his intuition, and Mendosa was not eager to discover what awaited them on the other end.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "weirdway4",
-        "name": "Weirdway",
-        "phase": "Action",
-        "window": "After you activate a non-home system",
-        "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
-        "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
         "source": "action_deck_2"
     },
 
@@ -1153,8 +1153,8 @@
         "name": "Invasion",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Put The Fracture into play if it is not already. Then, place 1 neutral cruiser and 2 neutral fighters in a non-home system that contains an ingress token; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "A fleet screamed from the void and encircled Faunus, trapping Brother Omar and his scientists. Omar grinned. \"Do not fear, brothers. This is but one more test.\"",
+        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system that contains no non-neutral ships and place 1 neutral cruiser and 2 neutral fighters in that system.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
     {
@@ -1235,7 +1235,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
     },
@@ -1244,7 +1244,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
     },
@@ -1253,7 +1253,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
     },
@@ -1262,7 +1262,7 @@
         "name": "Sacrifice",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective or gain your breakthrough. Then, move 1 ingress token into that planet's system.",
+        "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
     },
