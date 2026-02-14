@@ -142,7 +142,7 @@
         "phase": "Action",
         "window": "When another player resolves the secondary ability of your strategy card",
         "text": "Return 1 of that player's command tokens from the game board to their strategy pool. Then, you may perform a transaction with that player; action cards and unscored secret objectives can be traded as part of this transaction.",
-        "flavorText": "A gambit? Magi laughed. Hardly.",
+        "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
     {
