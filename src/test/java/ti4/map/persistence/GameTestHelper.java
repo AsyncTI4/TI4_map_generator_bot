@@ -10,4 +10,8 @@ public class GameTestHelper {
     static Game loadGame() {
         return GameLoadService.load(GAME_NAME);
     }
+
+    public static Game loadGame(String gameName) {
+        return GameLoadService.load(gameName);
+    }
 }

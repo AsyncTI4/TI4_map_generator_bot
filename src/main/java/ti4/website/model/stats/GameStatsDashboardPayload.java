@@ -351,7 +351,7 @@ public class GameStatsDashboardPayload {
         return game.isAllianceMode();
     }
 
-    public boolean isTIGLGame() {
+    public boolean isTiglGame() {
         return game.isCompetitiveTIGLGame();
     }
 }
