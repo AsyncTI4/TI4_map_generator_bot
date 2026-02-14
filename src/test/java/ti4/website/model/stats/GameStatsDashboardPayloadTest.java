@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import ti4.json.JsonMapperManager;
+import ti4.map.persistence.GameLoadService;
 import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
 
@@ -48,6 +50,19 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
         var laws = new GameStatsDashboardPayload(game).getLaws();
 
         assertThat(laws).containsExactly("Anti-Intellectual Revolution");
+    }
+
+    @Test
+    void serializesDisplacedUnitsGameAsDashboardPayload() {
+        var game = GameLoadService.load("game-with-displaced-units");
+
+        var payloadJson = JsonMapperManager.basic().valueToTree(new GameStatsDashboardPayload(game));
+
+        assertThat(payloadJson.path("asyncGameID").asText()).isEqualTo(game.getID());
+        assertThat(payloadJson.path("asyncFunGameName").asText()).isEqualTo(game.getCustomName());
+        assertThat(payloadJson.path("isPoK").isBoolean()).isTrue();
+        assertThat(payloadJson.path("tiglGame").isBoolean()).isTrue();
+        assertThat(payloadJson.path("tiglGame").asBoolean()).isTrue();
     }
 
     private Game createGame() {
