@@ -4431,6 +4431,10 @@ public class ButtonHelper {
             endButtons.add(Buttons.green(
                     player.finChecker() + "exhaustAgent_naazagent", "Use Naaz-Rokha Agents", FactionEmojis.Naaz));
         }
+        if (player.hasUnlockedBreakthrough("mirvedabt")) {
+            endButtons.add(
+                    Buttons.green(player.finChecker() + "resolveMirvedaBT", "Land 1 PDS", FactionEmojis.mirveda));
+        }
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(Buttons.green(
                     player.finChecker() + "exhaustAgent_lizhoagent", "Use Li-Zho Agent", FactionEmojis.lizho));
