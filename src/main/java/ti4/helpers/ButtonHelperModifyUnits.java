@@ -1910,7 +1910,7 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
                 int solBtLimit = player.getUnitFromUnitKey(unitKey).getCapacityValue();
-                if (solBtLimit > 0) {
+                if (solBtLimit > 0 && player.getUnitFromUnitKey(unitKey).getIsShip()) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition() + "_" + solBtLimit,
@@ -2285,7 +2285,8 @@ public class ButtonHelperModifyUnits {
         if (!willSkipBuild) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0
+                        && player.getUnitFromUnitKey(unitKey).getIsShip()) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition() + "_"
