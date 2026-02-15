@@ -252,7 +252,7 @@
         "phase": "Action",
         "window": "After the active player moves ships into the active system during a tactical action",
         "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against the active player's ships in the active system.",
-        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time.",
+        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
         "source": "base"
@@ -261,8 +261,9 @@
         "alias": "experimental2",
         "name": "Experimental Battlestation",
         "phase": "Action",
-        "window": "After another player moves ships into a system during a tactical action",
-        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against ships in the active system.",
+        "window": "After the active player moves ships into the active system during a tactical action",
+        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against the active player's ships in the active system.",
+        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
         "source": "base"

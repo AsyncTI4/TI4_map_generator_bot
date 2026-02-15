@@ -379,8 +379,7 @@ public class CreateGameButtonHandler {
                         return;
                     }
                     // Used for specific people we are limiting the amount of games of
-                    if ("163392891148959744".equalsIgnoreCase(member.getId())
-                            || "774413088072925226".equalsIgnoreCase(member.getId())) {
+                    if ("774413088072925226".equalsIgnoreCase(member.getId())) {
                         if (ongoingAmount > 4) {
                             MessageHelper.sendMessageToChannel(
                                     event.getChannel(),
@@ -416,8 +415,7 @@ public class CreateGameButtonHandler {
                             return;
                         }
                         // Used for specific people we are limiting the amount of games of
-                        if ("163392891148959744".equalsIgnoreCase(member.getId())
-                                || "774413088072925226".equalsIgnoreCase(member.getId())) {
+                        if ("774413088072925226".equalsIgnoreCase(member.getId())) {
                             if (ongoingAmount > 4) {
                                 MessageHelper.sendMessageToChannel(
                                         event.getChannel(),
