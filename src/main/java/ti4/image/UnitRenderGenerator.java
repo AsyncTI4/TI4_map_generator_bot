@@ -222,6 +222,16 @@ class UnitRenderGenerator {
                         .computeIfAbsent(unitId, k -> new ArrayList<>())
                         .add(new Point(imageX, imageY));
 
+                if (unitKey.getUnitType() == UnitType.Spacedock
+                        && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
+                    BufferedImage dimTear = ImageHelper.read(resourceHelper.getDecalFile("DimensionalTear.png"));
+                    if (dimTear != null) {
+                        int dtX = imageX + (unitImage.getWidth() - dimTear.getWidth()) / 2;
+                        int dtY = imageY + (unitImage.getHeight() - dimTear.getHeight()) / 2;
+                        tileGraphics.drawImage(dimTear, dtX, dtY, null);
+                    }
+                }
+
                 boolean wrongPlace = containsDMZ;
                 wrongPlace |= isSpace && unitModel.getIsPlanetOnly();
                 wrongPlace |= !isSpace && unitModel.getIsSpaceOnly();
@@ -232,16 +242,6 @@ class UnitRenderGenerator {
                     BufferedImage badPositionImage =
                             scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);
                     tileGraphics.drawImage(badPositionImage, imageX - 5, imageY - 5, null);
-                }
-
-                if (unitKey.getUnitType() == UnitType.Spacedock
-                        && (player.ownsUnitSubstring("cabal_spacedock") || player.hasTech("tf-dimensionaltear"))) {
-                    BufferedImage dimTear = ImageHelper.read(resourceHelper.getDecalFile("DimensionalTear.png"));
-                    if (dimTear != null) {
-                        int dtX = imageX + (unitImage.getWidth() - dimTear.getWidth()) / 2;
-                        int dtY = imageY + (unitImage.getHeight() - dimTear.getHeight()) / 2;
-                        tileGraphics.drawImage(dimTear, dtX, dtY, null);
-                    }
                 }
 
                 if (!"caballed".equals(player.getDecalSet()) || decal == null || posCtx.fighterOrInfantry) {

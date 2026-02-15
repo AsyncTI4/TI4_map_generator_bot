@@ -250,5 +250,14 @@
         "primaryColor": { "red": 119, "green": 17, "blue": 247 },
         "secondaryColor": { "red": 42, "green": 7, "blue": 87 },
         "hue": "PURPLE"
+    },
+    {
+        "alias": "nea",
+        "name": "neapolitan",
+        "aliases": ["nea", "neapolitan"],
+        "textColor": "black",
+        "primaryColor": { "red": 243, "green": 229, "blue": 171 },
+        "secondaryColor": { "red": 150, "green": 80, "blue": 42 },
+        "hue": "MULTI2"
     }
 ]

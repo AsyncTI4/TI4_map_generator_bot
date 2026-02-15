@@ -81,7 +81,8 @@ public enum ColorEmojis implements TI4Emoji {
     cinnabar,
     verdigris,
     beige,
-    royal; //
+    royal,
+    neapolitan; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
@@ -174,6 +175,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "vdg", "verdigris" -> verdigris + "**Verdigris**";
             case "beg", "beige" -> beige + "**Beige**";
             case "ryl", "royal" -> royal + "**Royal**";
+            case "nea", "neapolitan" -> neapolitan + "**Neapolitan**";
             default -> null;
         };
     }
@@ -256,6 +258,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "vdg", "verdigris" -> verdigris;
             case "beg", "beige" -> beige;
             case "ryl", "royal" -> royal;
+            case "nea", "neapolitan" -> neapolitan;
 
             default -> TI4Emoji.getRandomGoodDog();
         };
