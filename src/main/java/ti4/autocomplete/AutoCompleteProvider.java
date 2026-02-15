@@ -472,7 +472,8 @@ public class AutoCompleteProvider {
                         "liberation",
                         "ordinian",
                         "te",
-                        "tf");
+                        "tf",
+                        "tedemo");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
