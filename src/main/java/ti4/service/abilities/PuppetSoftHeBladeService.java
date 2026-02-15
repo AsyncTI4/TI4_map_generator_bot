@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -26,6 +28,8 @@ import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.HeroUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
+import ti4.service.unit.CheckUnitContainmentService;
 
 @UtilityClass
 public class PuppetSoftHeBladeService {
@@ -121,6 +125,7 @@ public class PuppetSoftHeBladeService {
         outputStrings.add(replacePN(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceTechAndFactionTech(game, player, oldFactionModel, newFactionModel));
         outputStrings.add(replaceLaws(game, oldFactionModel, newFactionModel));
+        outputStrings.add(replaceMechPlanetControl(game, player));
         outputStrings.add(replaceStoredValues(game, oldFactionModel, newFactionModel));
 
         String output =
@@ -292,6 +297,21 @@ public class PuppetSoftHeBladeService {
         }
 
         return "Successfully updated laws.";
+    }
+
+    private static String replaceMechPlanetControl(Game game, Player player) {
+        List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech);
+        for (Tile tile : tiles) {
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            for (String planetName : unitHolders.keySet()) {
+                UnitHolder unitHolder = unitHolders.get(planetName);
+                if (unitHolder.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0) {
+                    AddPlanetService.addPlanet(player, planetName, game);
+                }
+            }
+        }
+
+        return "Successfully took control of coexisting planets containing Viper Hollow mechs.";
     }
 
     private static String replaceStoredValues(Game game, FactionModel oldFaction, FactionModel newFaction) {
