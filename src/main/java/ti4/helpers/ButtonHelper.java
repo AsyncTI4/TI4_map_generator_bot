@@ -5654,8 +5654,8 @@ public class ButtonHelper {
                 String source = impressment ? "dsdihmy_" : (scanlink ? "scanlink_" : "filler_");
                 String buttonId =
                         player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId + "_" + trait;
-                String buttonLabel =
-                        "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " As " + trait : "");
+                String buttonLabel = "Explore " + planetRepresentation
+                        + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId
