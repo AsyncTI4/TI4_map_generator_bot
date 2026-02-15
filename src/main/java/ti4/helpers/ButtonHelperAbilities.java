@@ -847,18 +847,20 @@ public class ButtonHelperAbilities {
         ButtonHelperAgents.resolveArtunoCheck(player, 3);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " claimed a bounty and gained 3tg. The bounty claimed was on "
-                        + p2.getRepresentationNoPing() + "'s " + StringUtils.capitalize(unitTypeString));
+                player.getRepresentation()
+                        + " claimed a bounty and so gained 3 trade goods. The bounty claimed was on a "
+                        + StringUtils.capitalize(unitTypeString) + " belonging to " + p2.getRepresentationNoPing()
+                        + ".");
         if (unit != null) {
             List<Button> removeButtons = new ArrayList<>();
-            String message = p2.getRepresentation() + ", please destroy one of your ships of that type";
+            String message = p2.getRepresentation() + ", please destroy one of your ships of that type.";
             removeButtons.addAll(ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(p2, game, unitTypeString, true));
             if (!removeButtons.isEmpty()) {
                 p2.gainTG((int) unit.getCost(), true);
                 ButtonHelperAgents.resolveArtunoCheck(p2, (int) unit.getCost());
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation() + " received trade goods equal to the ships cost");
+                        p2.getRepresentation() + " received trade goods equal to the ship's cost.");
                 message += ".";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, removeButtons);
             }
@@ -907,32 +909,40 @@ public class ButtonHelperAbilities {
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
-
-            player.setPillageCounter(player.getPillageCounter() + 1);
+            int pillageCount = player.getPillageCounter() + 1;
+            player.setPillageCounter(pillageCount);
             pillaged.setPillageCounter(pillaged.getPillageCounter() + 1);
             String pillagerMessage = player.getRepresentationUnfogged()
                     + " you succesfully **Pillage**'d, so your ~~doubloons~~ trade goods have gone from "
                     + player.getTg() + " to "
                     + (player.getTg() + 1) + ". The number of innocent merchant ships you have looted this game is "
-                    + player.getPillageCounter();
-            if (player.getPillageCounter() < 5) {
+                    + pillageCount;
+            if (pillageCount < 5) {
                 pillagerMessage += ", which is not enough to be well-known yet, keep trying young matey.";
-            } else if (player.getPillageCounter() < 10) {
+            } else if (pillageCount < 10) {
                 pillagerMessage +=
                         ", which is a small but significant amount, you'll be an infamous pirate yet, just keep at it for 10, maybe 20, more rounds.";
-            } else if (player.getPillageCounter() < 15) {
+            } else if (pillageCount < 15) {
                 pillagerMessage +=
                         ", which is quite the treasure hoard of ill-gotten goods. Hope you didn't spend it all in one place.";
-            } else if (player.getPillageCounter() < 20) {
+            } else if (pillageCount < 20) {
                 pillagerMessage +=
                         ", which is starting to be a bit legendary. Sort of surprised the table hasn't united against you yet";
             } else {
                 pillagerMessage +=
                         ", which is enough to ensure your name goes down in async history as one of the most successful pirates ever to sail the intergalactic seas.";
             }
+
+            if (!game.isFowMode() && pillageCount == 40) {
+                DisasterWatchHelper.sendMessageInDisasterWatch(
+                        game,
+                        "When " + game.getName() + " wasn't looking, " + player.getRepresentation()
+                                + " took **forty** trade goods.\nThey took 40 trade goods."
+                                + "\nThat's as many as four tens.\nAnd that's terrible.");
+            }
+
             String pillagedMessage =
                     "Arrr, " + pillaged.getRepresentationUnfogged() + ", it do seem ye have been **Pillage**'d ";
-
             if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
                 pillagedMessage += ", so your worthless commodities went from " + pillaged.getCommodities() + " to "
                         + (pillaged.getCommodities() - 1) + ".";
@@ -960,10 +970,9 @@ public class ButtonHelperAbilities {
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pillagerMessage + "\n" + pillagedMessage);
             }
-            int randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
-            if (randomJokeChance == 5) {
-                randomJokeChance = ThreadLocalRandom.current().nextInt(1, 6);
-                File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage" + randomJokeChance + ".mp3");
+            if (RandomHelper.isOneInX(8)) {
+                int randomJoke = ThreadLocalRandom.current().nextInt(5) + 1;
+                File audioFile = ResourceHelper.getFile("voices/mentak/", "Pillage" + randomJoke + ".mp3");
                 if (audioFile.exists()) {
                     MessageHelper.sendFileToChannel(player.getCorrectChannel(), audioFile);
                 }
