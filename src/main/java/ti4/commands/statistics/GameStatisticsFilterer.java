@@ -161,7 +161,7 @@ public class GameStatisticsFilterer {
             case "base" -> game.isBaseGameMode();
             case "absol" -> game.isAbsolMode();
             case "ds" -> isDiscordantStarsGame(game);
-            case "pok" -> !game.isBaseGameMode();
+            case "pok" -> game.isProphecyOfKings();
             case "action_deck_2" -> game.isAcd2();
             case "franken" -> game.isFrankenGame();
             case "milty_mod" -> isMiltyModGame(game);
@@ -176,6 +176,7 @@ public class GameStatisticsFilterer {
             case "ordinian" -> game.isOrdinianC1Mode();
             case "te" -> game.isThundersEdge();
             case "tf" -> game.isTwilightsFallMode();
+            case "tedemo" -> game.isThundersEdgeDemo();
             default -> false;
         };
     }
@@ -215,7 +216,23 @@ public class GameStatisticsFilterer {
         if (galacticEventFilter == null) {
             return true;
         }
-        boolean hasEvent = game.isAgeOfExplorationMode()
+        boolean hasEvent = game.isAdventOfTheWarsunMode()
+                || game.isStellarAtomicsMode()
+                || game.isAgeOfFightersMode()
+                || game.isCivilizedSocietyMode()
+                || game.isDangerousWildsMode()
+                || game.isCallOfTheVoidMode()
+                || game.isHiddenAgendaMode()
+                || game.isWildWildGalaxyMode()
+                || game.isCulturalExchangeProgramMode()
+                || game.isCosmicPhenomenaeMode()
+                || game.isMercenariesForHireMode()
+                || game.isRapidMobilizationMode()
+                || game.isWeirdWormholesMode()
+                || game.isMonumentToTheAgesMode()
+                || game.isZealousOrthodoxyMode()
+                || game.isConventionsOfWarAbandonedMode()
+                || game.isAgeOfExplorationMode()
                 || game.isTotalWarMode()
                 || game.isAgeOfCommerceMode()
                 || game.isMinorFactionsMode();
