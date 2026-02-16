@@ -300,7 +300,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone")) {
+        if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone") && player.hasInf2Tech()) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()

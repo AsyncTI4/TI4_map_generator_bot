@@ -92,14 +92,6 @@ public abstract class BagDraft {
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
-        boolean newBagCanBeDraftedFrom = false;
-        for (DraftItem item : bag.Contents) {
-            if (item.isDraftable(player)) {
-                newBagCanBeDraftedFrom = true;
-                break;
-            }
-        }
-        player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButton(
                 player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
