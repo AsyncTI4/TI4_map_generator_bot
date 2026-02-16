@@ -301,11 +301,10 @@ public class PuppetSoftHeBladeService {
     private static String replaceMechPlanetControl(Game game, Player player) {
         List<Tile> tiles = CheckUnitContainmentService.getTilesContainingPlayersUnits(game, player, UnitType.Mech);
         for (Tile tile : tiles) {
-            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-            for (String planetName : unitHolders.keySet()) {
-                UnitHolder unitHolder = unitHolders.get(planetName);
-                if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
-                    AddPlanetService.addPlanet(player, planetName, game);
+            List<Planet> planets = tile.getPlanetUnitHolders();
+            for (Planet planet : planets) {
+                if (planet.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
+                    AddPlanetService.addPlanet(player, planet.getName(), game);
                 }
             }
         }
