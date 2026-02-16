@@ -656,7 +656,9 @@ public class TransactionHelper {
 
         List<Button> buttons = getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
-        if (game.isHiddenAgendaMode() && game.getPhaseOfGame().toLowerCase().contains("agenda")) {
+        if (game.isHiddenAgendaMode()
+                && game.getPhaseOfGame().toLowerCase().contains("agenda")
+                && !game.getStoredValue("executiveOrder").isEmpty()) {
             message = player.getRepresentation()
                     + ", this game is in Hidden Agenda mode, which does not allow transactions in the Agenda Phase.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
