@@ -703,7 +703,9 @@ public class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = Math.min(effectiveUnits, hits);
+                int min = (player.hasTech("nes"))
+                        ? Math.min(effectiveUnits, (hits + 1) / 2)
+                        : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
                         && player.getUnitsOwned().contains("naaz_mech_space")
                         && "mech".equalsIgnoreCase(unitName)
@@ -737,7 +739,10 @@ public class ButtonHelperModifyUnits {
                         continue; // Skip to the next unit since these sustains are already handled
                     }
                     hits -= min;
-                    if (player.hasTech("nes")) hits -= min;
+                    if (player.hasTech("nes")) {
+                        hits -= min;
+                    }
+
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
                         handleLetnevCommanderCheck(player, game, event, min);
