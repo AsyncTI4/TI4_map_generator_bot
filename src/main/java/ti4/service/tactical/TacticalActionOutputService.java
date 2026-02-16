@@ -257,7 +257,7 @@ public class TacticalActionOutputService {
             GMService.logPlayerActivity(game, player, output);
         }
         if (distance > 90 && player.hasAbility("sundered")) {
-            output += " (WARNING: has Sundered and cannot use wormholes)";
+            output += " (__Warning__: has **Sundered**, and so cannot use wormholes)";
         }
         if (riftDistance < distance) {
             game.setStoredValue("possiblyUsedRift", "yes");
