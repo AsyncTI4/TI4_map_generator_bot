@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
-import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -305,7 +304,7 @@ public class PuppetSoftHeBladeService {
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (String planetName : unitHolders.keySet()) {
                 UnitHolder unitHolder = unitHolders.get(planetName);
-                if (unitHolder.getUnitCount(Units.UnitType.Mech, player.getColor()) > 0) {
+                if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
                     AddPlanetService.addPlanet(player, planetName, game);
                 }
             }
