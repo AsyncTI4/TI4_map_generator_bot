@@ -415,7 +415,7 @@ public class DSHelperBreakthroughs {
 
     @ButtonHandler("resolveMirvedaBT")
     public static void resolveMirvedaBT(Game game, Player player, ButtonInteractionEvent event) {
-        String msg = player.getRepresentation() + ", you may use Mirveda Breakthrough to land 1 PDS.";
+        String msg = player.getRepresentation() + ", you may use _Stabilization Arrays_ to land 1 PDS.";
         List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
         if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
