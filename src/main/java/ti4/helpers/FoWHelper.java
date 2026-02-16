@@ -23,6 +23,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -672,7 +673,10 @@ public class FoWHelper {
 
         boolean hasQuantumEntanglement = player != null && player.hasAbility("quantum_entanglement");
 
-        if (player != null && player.hasAbility("sundered")) {
+        if (player != null
+                && player.hasAbility("sundered")
+                && player == game.getActivePlayer()
+                && !game.getCurrentActiveSystem().isEmpty()) {
             Set<String> keepers = new HashSet<>(Set.of("epsilon"));
             if (hasQuantumEntanglement || wh_recon || absol_recon) {
                 keepers.addAll(Set.of("alpha", "beta"));
@@ -698,6 +702,34 @@ public class FoWHelper {
             if (wormholeIDs.contains(Constants.ALPHA)) {
                 wormholeIDs.add(Constants.BETA);
             } else if (wormholeIDs.contains(Constants.BETA)) {
+                wormholeIDs.add(Constants.ALPHA);
+            }
+        }
+
+        if (player != null
+                && player == game.getActivePlayer()
+                && !game.getCurrentActiveSystem().isEmpty()
+                && player.hasTech("lgf")
+                && !player.getPlanets().contains("mrte")
+                && !player.getPlanets().contains("mr")
+                && (tile.getUnitHolders().keySet().contains("mrte")
+                        || tile.getUnitHolders().keySet().contains("mr"))) {
+            wormholeIDs.add(Constants.BETA);
+            wormholeIDs.add(Constants.ALPHA);
+        }
+
+        if (player != null
+                && player == game.getActivePlayer()
+                && !game.getCurrentActiveSystem().isEmpty()
+                && player.hasTech("tf-lazaxgatefolding")) {
+            boolean hasUncontrolledLeg = false;
+            for (Planet planet : tile.getPlanetUnitHolders()) {
+                if (planet.isLegendary() && player.getPlanets().contains(planet.getName())) {
+                    hasUncontrolledLeg = true;
+                }
+            }
+            if (hasUncontrolledLeg) {
+                wormholeIDs.add(Constants.BETA);
                 wormholeIDs.add(Constants.ALPHA);
             }
         }
