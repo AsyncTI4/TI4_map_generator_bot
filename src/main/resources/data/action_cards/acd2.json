@@ -1234,7 +1234,7 @@
         "alias": "sacrifice1",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
@@ -1243,7 +1243,7 @@
         "alias": "sacrifice2",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
@@ -1252,7 +1252,7 @@
         "alias": "sacrifice3",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
@@ -1261,7 +1261,7 @@
         "alias": "sacrifice4",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"
