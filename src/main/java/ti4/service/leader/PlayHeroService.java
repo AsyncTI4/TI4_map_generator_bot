@@ -521,8 +521,8 @@ public class PlayHeroService {
                             "\nYou also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
                 }
                 MessageHelper.sendMessageToChannel(
-                        player.getPrivateChannel(), message + ", you do not need to pay for these units.");
-                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+                        player.getCorrectChannel(), message + ", you do not need to pay for these units.");
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Produce Units", buttons);
 
                 if (player.hasUnit("tf-productionbiomes")
                         && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)

@@ -3137,7 +3137,7 @@ public class Helper {
         }
     }
 
-    private static void checkEndGameCivilizedSociety(Game game) {
+    public static void checkEndGameCivilizedSociety(Game game) {
         if (!"statusHomeWork".equalsIgnoreCase(game.getPhaseOfGame())) {
             return;
         }
