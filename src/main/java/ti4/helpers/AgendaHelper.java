@@ -4288,6 +4288,7 @@ public class AgendaHelper {
                 game.getMainGameChannel(),
                 "Removed all ships from systems with alphas or betas wormholes. \nYou may use the button to get your technology.",
                 List.of(Buttons.GET_A_TECH));
+        Player nekro = Helper.getPlayerFromAbility(game, "propagation");
         StringBuilder msg = new StringBuilder(" may research a technology due to _Wormhole Research_.");
         if (game.isFowMode()) {
             for (Player p2 : players) {
@@ -4298,6 +4299,16 @@ public class AgendaHelper {
                 msg.insert(0, p2.getRepresentation());
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg.toString());
+        }
+        if (nekro != null && players.contains(nekro)) {
+            Player player = nekro;
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String message2 = player.getRepresentation()
+                    + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                    + " Your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
+            MessageHelper.sendMessageToChannelWithButtons(nekro.getCorrectChannel(), message2, buttons);
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
     }
 

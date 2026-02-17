@@ -97,7 +97,9 @@ public enum FactionEmojis implements TI4Emoji {
     atokera,
     belkosea,
     toldar,
-    kaltrim, //
+    kaltrim,
+    sarcosa,
+    xin, //
 
     // balacasi
     arvaxi,
@@ -301,6 +303,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "qhet" -> qhet;
             case "atokera" -> atokera;
             case "kaltrim" -> kaltrim;
+            case "xin" -> xin;
+            case "sarcosa" -> sarcosa;
             case "toldar" -> toldar;
             case "belkosea" -> belkosea;
             case "admins" -> AdminsFaction;
