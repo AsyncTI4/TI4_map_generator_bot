@@ -84,7 +84,8 @@ public enum ColorEmojis implements TI4Emoji {
     royal,
     neapolitan,
     psychedelic,
-    camouflage; //
+    camouflage,
+    blight; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
@@ -180,6 +181,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "nea", "neapolitan" -> neapolitan + "**Neapolitan**";
             case "psy", "psychedelic" -> psychedelic + "**Psychedelic**";
             case "cam", "camouflage" -> camouflage + "**Camouflage**";
+            case "blt", "blight" -> blight + "**Blight**";
             default -> null;
         };
     }
@@ -265,6 +267,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "nea", "neapolitan" -> neapolitan;
             case "psy", "psychedelic" -> psychedelic;
             case "cam", "camouflage" -> camouflage;
+            case "blt", "blight" -> blight;
 
             default -> TI4Emoji.getRandomGoodDog();
         };
