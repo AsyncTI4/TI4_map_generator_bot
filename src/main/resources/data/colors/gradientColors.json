@@ -277,5 +277,14 @@
         "primaryColor": { "red": 90, "green": 150, "blue": 100 },
         "secondaryColor": { "red": 172, "green": 160, "blue": 116 },
         "hue": "MULTI3"
+    },
+    {
+        "alias": "blt",
+        "name": "blight",
+        "aliases": ["blt", "blight"],
+        "textColor": "black",
+        "primaryColor": { "red": 240, "green": 138, "blue": 240 },
+        "secondaryColor": { "red": 177, "green": 229, "blue": 165 },
+        "hue": "MULTI3"
     }
 ]
