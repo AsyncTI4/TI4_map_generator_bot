@@ -1907,6 +1907,94 @@
         "source": "ds"
     },
     {
+        "alias": "xin",
+        "factionName": "Xin Court",
+        "homeSystem": "br8",
+        "startingFleet": "1 cv,5 ff,4 inf y, 1 sd y, 2 cr",
+        "commodities": 4,
+        "factionTech": [
+            "dsxing",
+            "dsxiny"
+        ],
+        "startingTech": [
+            "x89c4"
+        ],
+        "homePlanets": [
+            "yu"
+        ],
+        "abilities": [
+            "matters_of_state",
+            "intrigue",
+            "harmony"
+        ],
+        "leaders": [
+            "xinagent",
+            "xincommander",
+            "xinhero"
+        ],
+        "promissoryNotes": [
+            "dspnxin"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "xin_flagship",
+            "infantry",
+            "xin_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
+    },
+    {
+        "alias": "sarcosa",
+        "factionName": "Sarcosa Drift",
+        "homeSystem": "br9",
+        "startingFleet": "1 cv, 4 ff, 3 inf s, 1 sd s, 2 cr",
+        "commodities": 3,
+        "factionTech": [
+            "dssarcdd",
+            "dssarcg"
+        ],
+        "startingTech": [
+            "lwd"
+        ],
+        "homePlanets": [
+            "sarcosa"
+        ],
+        "abilities": [
+            "raider_coves",
+            "evasive",
+            "mutineers"
+        ],
+        "leaders": [
+            "sarcosaagent",
+            "sarcosacommander",
+            "sarcosahero"
+        ],
+        "promissoryNotes": [
+            "dspnsarc"
+        ],
+        "units": [
+            "fighter",
+            "sarcosa_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "sarcosa_flagship",
+            "infantry",
+            "sarcosa_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
+    },
+    {
         "alias": "belkosea",
         "factionName": "Belkosea Allied States",
         "homeSystem": "br5",

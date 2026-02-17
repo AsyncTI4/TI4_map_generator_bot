@@ -72,6 +72,30 @@
         "source": "blue_reverie"
     },
     {
+        "alias": "xinbt",
+        "name": "Harmonious Diplomacy",
+        "shortName": "Harmonious\nDiplomacy",
+        "faction": "xin",
+        "synergy": [
+            "CYBERNETIC",
+            "BIOTIC"
+        ],
+        "text": "When you are negotiating a transaction, secret objectives can be exchanged as part of that transaction.",
+        "source": "blue_reverie"
+    },
+    {
+        "alias": "sarcosabt",
+        "name": "Gravehold",
+        "shortName": "Gravehold",
+        "faction": "sarcosa",
+        "synergy": [
+            "PROPULSION",
+            "BIOTIC"
+        ],
+        "text": "At any time, you may exhaust this card to place a neutral structure into coexistence on a planet that contains your units. The active player controls coexisting neutral structures as their own. Neutral space docks have PRODUCTION 3.",
+        "source": "blue_reverie"
+    },
+    {
         "alias": "toldarbt",
         "name": "Dyrun's War-Bell",
         "shortName": "Dyrun's\nWar-Bell",

@@ -431,6 +431,25 @@
         "text": "At the start of the agenda phase: Place 1 infantry from the Kaltrim player's reinforcements into coexistence on a planet you control to look at the top card of the agenda deck, you may discard that card. Then, return this card to the Kaltrim player."
     },
     {
+        "alias": "dspnsarc",
+        "name": "Plunderers",
+        "faction": "sarcosa",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "ds",
+        "text": "When you receive this card, if you are not the Sarcosa player, you must place it face up in your play area. When you win a combat, give this card to your opponent and take up to 2 of their trade goods or commodities. Then, the Sarcosa player gains 1 commodity."
+    },
+    {
+        "alias": "dspnxin",
+        "name": "Statecraft Mentor",
+        "faction": "xin",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "When you would return another player's promissory note to that player: You may return this promissory note instead of that promissory note. You can use this ability even if you are the Xin player. Then, the Xin player may place 1 ground force from their reinforcements into coexistence on a planet you control."
+    },
+    {
         "alias": "dspnbelk",
         "name": "Mercenary Sortie",
         "faction": "belkosea",
