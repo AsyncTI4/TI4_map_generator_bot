@@ -100,7 +100,7 @@ public class EidolonMaximumService {
             // Remove all other mechs
             UnitKey mech = Units.getUnitKey(UnitType.Mech, player.getColorID());
             for (UnitHolder uh : tile.getUnitHolders().values()) {
-                if (uh.getName().equals(keepUnitHolder)) {
+                if (uh.getName().equals(keepUnitHolder) || uh.getUnitCount(mech) == 4) {
                     uh.removeUnit(mech, uh.getUnitCount(mech) - 1);
                 } else {
                     uh.removeUnit(mech, uh.getUnitCount(mech));

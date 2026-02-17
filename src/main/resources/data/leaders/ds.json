@@ -451,7 +451,29 @@
         "name": "Keda Demas",
         "title": "Rose of Kaltrim",
         "abilityWindow": "After a player resolves the secondary ability of the “Politics” strategy card",
-        "abilityText": "You may exhaust this card to allow that player to gain 1 command token. If that player was another player, look at the top card of the agenda deck; you may discard that card. ",
+        "abilityText": "You may exhaust this card to allow that player to gain 1 command token. If that player was another player, look at the top card of the agenda deck; you may discard that card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "sarcosaagent",
+        "faction": "sarcosa",
+        "type": "agent",
+        "name": "Drift-Yol Khas",
+        "title": "The Rat",
+        "abilityWindow": "ACTION",
+        "abilityText": "Exhaust this card to allow 1 player to place up to 2 neutral destroyers or 1 neutral cruiser in a system that is in or adjacent to a system that contains their units; resolve space combat in that system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "xinagent",
+        "faction": "xin",
+        "type": "agent",
+        "name": "Liu",
+        "title": "Court of Stars",
+        "abilityWindow": "When a player would resolve the secondary ability of a strategy card",
+        "abilityText": "You may exhaust this card to allow that player to resolve the secondary ability of any exhausted strategy card instead.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -908,6 +930,28 @@
         "abilityWindow": "When you roll a die",
         "abilityText": "If the result is 1, you may reroll that die. You cannot reroll the new result.",
         "unlockCondition": "Have the Kaltrim Crown on your faction sheet.",
+        "source": "ds"
+    },
+    {
+        "id": "sarcosacommander",
+        "faction": "sarcosa",
+        "type": "commander",
+        "name": "Yuri Hargon",
+        "title": "Greedy Navigator",
+        "abilityWindow": "After you activate a system",
+        "abilityText": "Choose 2 non-fracture systems that each contain your or neutral units. Your ships treat the chosen systems as adjacent to one another during this tactical action.",
+        "unlockCondition": "Have coexisting units on 2 planets.",
+        "source": "ds"
+    },
+    {
+        "id": "xincommander",
+        "faction": "xin",
+        "type": "commander",
+        "name": "Sun",
+        "title": "Court of Steel",
+        "abilityWindow": "Once per combat",
+        "abilityText": "You may repair 1 of your units participating in that combat. Players cannot use BOMBARDMENT against your coexisting units.",
+        "unlockCondition": "Have units on 3 planets that have different traits, and 1 legendary planet.",
         "source": "ds"
     },
     {
@@ -1401,6 +1445,30 @@
         "abilityName": "Starlight Crusade - A Long Journey",
         "abilityWindow": "ACTION:",
         "abilityText": "For each player that has fewer scored secret objectives than you, you may look at 1 Shrine token on a planet that player controls, or gain up to 2 command tokens. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "xinhero",
+        "faction": "xin",
+        "type": "hero",
+        "name": "Tsao",
+        "title": "Grand Administrator",
+        "abilityName": "Harmonic Resonance - Stone, Sky, and Flame",
+        "abilityWindow": "ACTION:",
+        "abilityText": "For each player who controls a planet that contains your units, you may resolve the secondary ability of 1 of their strategy cards without spending a command token, or look at their hand of secret objectives. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "sarcosahero",
+        "faction": "sarcosa",
+        "type": "hero",
+        "name": "Cardossa Flight",
+        "title": "Pirate Queen",
+        "abilityName": "Todlys Unbound - The Leviathan",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card to place 1 neutral war sun in a system that contains neutral units or move 1 neutral ship to an adjacent system; resolve space combat in that system. Neutral war suns have the abilities on the Leviathan ability card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },

@@ -914,6 +914,56 @@
         "source": "ds"
     },
     {
+        "id": "raider_coves",
+        "name": "Raider Coves",
+        "faction": "sarcosa",
+        "permanentEffect": "When you commit units to a planet another player controls, you may choose for your units to coexist; if you do, gain 2 trade goods.",
+        "source": "ds"
+    },
+    {
+        "id": "evasive",
+        "name": "Evasive",
+        "faction": "sarcosa",
+        "permanentEffect": "Your units do not exit coexistence unless another player ends coexistence with those units. Other players must spend 2 influence to end coexistence with your units on a planet. ",
+        "source": "ds"
+    },
+    {
+        "id": "raider_coves",
+        "name": "Raider Coves",
+        "faction": "sarcosa",
+        "permanentEffect": "When you commit units to a planet another player controls, you may choose for your units to coexist; if you do, gain 2 trade goods.",
+        "source": "ds"
+    },
+    {
+        "id": "matters_of_state",
+        "name": "Matters of State",
+        "faction": "xin",
+        "permanentEffect": "After you perform an action or resolve an action card, gain 1 balance token or flip 1 balance token on your faction sheet.",
+        "source": "ds"
+    },
+    {
+        "id": "intrigue",
+        "name": "Intrigue",
+        "faction": "xin",
+        "permanentEffect": "At the end of a player's turn, you may spend 1 token from your strategy pool and 1 Intrigue card's listed balance token cost; resolve that card's ability. Then, place 1 infantry from your reinforcements into coexistence on a non-home planet the active player controls to gain 1 command token.",
+        "source": "ds"
+    },
+    {
+        "id": "harmony",
+        "name": "Harmony",
+        "faction": "xin",
+        "permanentEffect": "If you have more balance tokens of one type than the other, flip your faction technologies and mech to the matching side; the other side has no effect and your commodity value is 2.",
+        "source": "ds"
+    },
+    {
+        "id": "mutineers",
+        "name": "Mutineers",
+        "faction": "sarcosa",
+        "window": "ACTION",
+        "windowEffect": "Place 1 token from your strategy pool in a non-home system that contains exactly 1 of another player's ships to replace that ship with a neutral unit of the same type.",
+        "source": "ds"
+    },
+    {
         "id": "questing_prince",
         "name": "Questing Prince",
         "faction": "kaltrim",

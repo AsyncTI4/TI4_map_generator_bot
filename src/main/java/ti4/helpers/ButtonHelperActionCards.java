@@ -1699,12 +1699,6 @@ public class ButtonHelperActionCards {
                     && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                 continue;
             }
-            if ("triad".equalsIgnoreCase(planet)
-                    || "grove".equalsIgnoreCase(planet)
-                    || (game.getUnitHolderFromPlanet(planet) != null
-                            && game.getUnitHolderFromPlanet(planet).isSpaceStation())) {
-                continue;
-            }
             buttons.add(Buttons.gray(
                     "uprisingStep3_" + p2.getFaction() + "_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
