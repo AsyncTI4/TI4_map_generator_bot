@@ -364,7 +364,7 @@ public class CombatRollService {
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green(
                     "startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
-            Button decline = Buttons.gray("deleteMessage", "Decline");
+            Button decline = Buttons.gray("deleteButtons", "Decline");
             String thalnosMessage =
                     "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(
