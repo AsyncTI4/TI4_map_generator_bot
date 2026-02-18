@@ -594,15 +594,16 @@ public class ButtonHelperTacticalAction {
 
         if (player.hasUnlockedBreakthrough("argentbt")
                 && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                && FoWHelper.playerHasUnitsInSystem(player, tile)
-                && ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+                && FoWHelper.playerHasUnitsInSystem(player, tile)) {
             game.setStoredValue("argentBTUse", "yes");
             List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", you can use this button to place command tokens down via _Wing Transfer_.",
-                    button2);
+            if (ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you can use this button to place command tokens down via _Wing Transfer_.",
+                        button2);
+            }
         }
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
