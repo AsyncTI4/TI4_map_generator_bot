@@ -40,6 +40,7 @@ public class GameStatisticsService {
                 case GAME_COUNT -> GameCountStatisticsService.getGameCount(event);
                 case WINNING_PATH -> WinningPathsStatisticsService.showWinningPaths(event);
                 case SUPPORT_WIN_COUNT -> WinningPathsStatisticsService.showWinsWithSupport(event);
+                case RELIC_DRAW_PERCENTAGE -> RelicDrawPercentageStatisticsService.showRelicDrawPercentage(event);
                 case ENDING_ROUND_PHASE -> EndingRoundPhaseStatisticsService.showEndingRoundPhaseStatistics(event);
                 default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
             }
