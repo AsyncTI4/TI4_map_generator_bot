@@ -468,7 +468,7 @@
         "name": "Mass Transference",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "text": "Remove up to 4 of your units from planets in that system and place them on any planets you control.",
         "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2"
     },
@@ -884,7 +884,7 @@
         "name": "Syndicate",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Reveal a number of cards from the action card deck equal to the number of players. For each other player, choose 1 of those cards; that player may draw that card. Then, draw the rest.",
+        "text": "Reveal a number of cards from the action card deck equal to the number of players. For each player, choose 1 of those cards; that player draws that card.",
         "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
         "source": "action_deck_2"
     },
@@ -893,7 +893,7 @@
         "name": "Ubiquity",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Spend 6 resources to research 1 technology owned by another player; for each of your neighbors that owns that technology, reduce the resources spent by 1 and ignore 1 prerequisite.",
+        "text": "Spend 4 resources to gain 1 non-faction technology with less prerequisites than the number of players that own it.",
         "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics: patented and traded to the rim of the galaxy.",
         "source": "action_deck_2"
     },
