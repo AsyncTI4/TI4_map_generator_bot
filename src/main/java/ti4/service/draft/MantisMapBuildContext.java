@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
-import ti4.draft.DraftItem.Category;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -193,11 +193,11 @@ public record MantisMapBuildContext(
             for (DraftChoice choice : playerPicks) {
 
                 // Add choice to the correct list
-                Category category = mantisDraftable.getItemCategory(choice.getChoiceKey());
+                DraftCategory category = mantisDraftable.getItemCategory(choice.getChoiceKey());
                 String tileId = MantisTileDraftable.getItemId(choice.getChoiceKey());
-                if (category == Category.BLUETILE) {
+                if (category == DraftCategory.BLUETILE) {
                     blueTileIds.add(tileId);
-                } else if (category == Category.REDTILE) {
+                } else if (category == DraftCategory.REDTILE) {
                     redTileIds.add(tileId);
                 }
 
@@ -213,12 +213,12 @@ public record MantisMapBuildContext(
 
         public static PlayerTiles create(String playerUserId, List<DraftItem> allTiles, Integer mulligansUsed) {
             List<String> blueTileIds = allTiles.stream()
-                    .filter(item -> item.ItemCategory == Category.BLUETILE)
-                    .map(item -> item.ItemId)
+                    .filter(item -> item.getItemCategory() == DraftCategory.BLUETILE)
+                    .map(item -> item.getItemId())
                     .collect(Collectors.toList());
             List<String> redTileIds = allTiles.stream()
-                    .filter(item -> item.ItemCategory == Category.REDTILE)
-                    .map(item -> item.ItemId)
+                    .filter(item -> item.getItemCategory() == DraftCategory.REDTILE)
+                    .map(item -> item.getItemId())
                     .collect(Collectors.toList());
             return new PlayerTiles(playerUserId, blueTileIds, redTileIds, mulligansUsed);
         }

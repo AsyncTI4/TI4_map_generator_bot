@@ -791,6 +791,18 @@ class GameLoadService {
         return output;
     }
 
+    private static Map<String, String> getParsedStrStrMap(String tokenizer) {
+        StringTokenizer mapdata = new StringTokenizer(tokenizer, ";");
+        Map<String, String> data = new LinkedHashMap<>();
+        while (mapdata.hasMoreTokens()) {
+            StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
+            String id = entry.nextToken();
+            String val = entry.nextToken();
+            data.put(id, val);
+        }
+        return data;
+    }
+
     private static Map<String, Boolean> getParsedStrBoolMap(String tokenizer) {
         StringTokenizer mapdata = new StringTokenizer(tokenizer, ";");
         Map<String, Boolean> cards = new LinkedHashMap<>();
@@ -926,29 +938,9 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                // OLD - DELETE THESE
-                case Constants.BREAKTHROUGH -> player.setBreakthroughIDs(getCardList(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_EXH -> {
-                    String bt = player.getBreakthroughID();
-                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
-                    player.getBreakthroughExhausted().put(bt, stuff);
+                case Constants.PLAYER_STORED_VALUES -> {
+                    player.setStoredValueMap(getParsedStrStrMap(tokenizer.nextToken()));
                 }
-                case Constants.BREAKTHROUGH_UNL -> {
-                    String bt = player.getBreakthroughID();
-                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
-                    player.getBreakthroughUnlocked().put(bt, stuff);
-                }
-                case Constants.BREAKTHROUGH_ACTV -> {
-                    String bt = player.getBreakthroughID();
-                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
-                    player.getBreakthroughActive().put(bt, stuff);
-                }
-                case Constants.BREAKTHROUGH_TGS -> {
-                    String bt = player.getBreakthroughID();
-                    Integer stuff = Integer.parseInt(tokenizer.nextToken());
-                    player.getBreakthroughTGs().put(bt, stuff);
-                }
-                // END DELETE
                 case Constants.BREAKTHROUGHS -> player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
                 case Constants.BREAKTHROUGH_EXH_MAP ->
                     player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));

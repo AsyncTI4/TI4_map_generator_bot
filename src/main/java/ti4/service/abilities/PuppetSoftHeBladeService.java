@@ -51,7 +51,8 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        StringBuilder plotInfo = new StringBuilder("## __The Obsidian's plots are now revealed:__");
+        String factionName = player.getDisplayName();
+        StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
             plotInfo.append("\n").append(plot.getRepresentation());

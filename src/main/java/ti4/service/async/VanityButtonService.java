@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
@@ -76,6 +77,7 @@ public class VanityButtonService {
             error += " The role probably doesn't exist. Ask `@Bothelper` for assistance.";
             MessageHelper.sendEphemeralMessageToEventChannel(event, error);
         }
+        ButtonHelper.deleteMessage(event);
     }
 
     private static boolean memberHasRole(Member m, Role role) {

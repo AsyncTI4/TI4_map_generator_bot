@@ -134,6 +134,10 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
                 if (matchText(mediaGallery, replacement.getReplaceKey())) {
                     return replacement;
                 }
+            } else if (replacement.getPred() != null) {
+                if (replacement.getPred().test(curComponent)) {
+                    return replacement;
+                }
             }
         }
 

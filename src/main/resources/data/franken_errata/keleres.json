@@ -1,0 +1,32 @@
+[
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "the_tribuni",
+        "undraftable": true,
+        "source": "codex3"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "iihq",
+        "undraftable": true,
+        "source": "codex3"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "keleresa",
+        "undraftable": true,
+        "source": "codex3"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "keleresm",
+        "undraftable": true,
+        "source": "codex3"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "keleresx",
+        "undraftable": true,
+        "source": "codex3"
+    }
+]

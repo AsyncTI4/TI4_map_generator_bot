@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.components.Component;
@@ -38,11 +39,20 @@ public class MessageV2Builder {
     private final MessageChannel channel;
     private final List<MessagePart> parts = new ArrayList<>();
     private final Integer maxSplits;
+    private final Boolean pin;
 
     public MessageV2Builder(MessageChannel channel) {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
-        maxSplits = null;
+        this.maxSplits = null;
+        this.pin = false;
+    }
+
+    public MessageV2Builder(MessageChannel channel, boolean pin) {
+        Objects.requireNonNull(channel, "Channel cannot be null");
+        this.channel = channel;
+        this.maxSplits = null;
+        this.pin = pin;
     }
 
     /**
@@ -57,6 +67,7 @@ public class MessageV2Builder {
         Objects.requireNonNull(channel, "Channel cannot be null");
         this.channel = channel;
         this.maxSplits = maxSplits;
+        this.pin = false;
     }
 
     public enum MessagePartType {
@@ -138,16 +149,19 @@ public class MessageV2Builder {
     }
 
     public MessageV2Builder append(Button button) {
+        if (button == null) return this;
         parts.add(new MessagePart(button));
         return this;
     }
 
     public MessageV2Builder append(List<Button> buttons) {
+        if (buttons == null) return this;
         parts.add(new MessagePart(buttons));
         return this;
     }
 
     public MessageV2Builder append(MessageTopLevelComponent component) {
+        if (component == null) return this;
         parts.add(new MessagePart(component));
         return this;
     }
@@ -175,7 +189,10 @@ public class MessageV2Builder {
                     + String.join("\n---\n", componentTrees));
             return;
         }
-        MessageHelper.sendMessagesWithRetry(channel, combinedComponents, null, "Failed to send v2 message", 1);
+
+        Consumer<Message> onSuccess = null;
+        if (this.pin) onSuccess = MessageHelper.pin();
+        MessageHelper.sendMessagesWithRetry(channel, combinedComponents, onSuccess, "Failed to send v2 message", 1);
     }
 
     private List<MessageCreateData> build() {
