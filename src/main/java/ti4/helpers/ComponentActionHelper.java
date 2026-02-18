@@ -369,6 +369,13 @@ public class ComponentActionHelper {
                     Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
             compButtons.add(abilityButton);
         }
+        if (p1.hasAbility("mutineers")
+                && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()
+                && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
+            Button abilityButton =
+                    Buttons.green(finChecker + prefix + "ability_mutineers", "Mutineers", FactionEmojis.sarcosa);
+            compButtons.add(abilityButton);
+        }
         if (ButtonHelperSCs.findUsedFacilities(game, p1).contains("facilitycorefactory")) {
             Button abilityButton = Buttons.green(finChecker + "corefacilityAction", "Use Core Facility Action");
             compButtons.add(abilityButton);
@@ -567,6 +574,26 @@ public class ComponentActionHelper {
                     List<Button> buttons = new ArrayList<>(
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("mutineers".equalsIgnoreCase(buttonID)) {
+                    String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using "
+                            + FactionEmojis.sarcosa + "**Mutineers** (" + (p1.getStrategicCC()) + "->"
+                            + (p1.getStrategicCC() - 1) + ")";
+                    if (!p1.hasRelicReady("emelpar")) {
+
+                        p1.setStrategicCC(p1.getStrategicCC() - 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                                p1, game, event, FactionEmojis.Sol + " **Mutineers**");
+                    } else {
+                        p1.addExhaustedRelic("emelpar");
+                        successMessage = p1.getFactionEmoji() + " used the _" + RelicHelper.sillySpelling()
+                                + "_ to **Mutineers**.";
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
+                    String message = "Please choose the system you wish to replace 1 ship with.";
+                    List<Button> buttons = new ArrayList<>(
+                            Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage =
                             p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Muaat

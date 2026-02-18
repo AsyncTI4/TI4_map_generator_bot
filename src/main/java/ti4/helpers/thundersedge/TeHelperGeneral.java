@@ -43,6 +43,9 @@ public class TeHelperGeneral {
 
     public static void checkCoexistTransfer(Game game) {
         for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("evasive")) {
+                continue;
+            }
             List<String> susPlanets = new ArrayList<>();
             for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
                 UnitHolder uH = game.getUnitHolderFromPlanet(planet);

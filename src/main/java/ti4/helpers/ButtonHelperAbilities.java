@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -266,6 +267,66 @@ public class ButtonHelperAbilities {
                     "rallyToTheCauseStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
         return buttons;
+    }
+
+    public static List<Button> getTilesToMutineers(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.isHomeSystem(game)) {
+                continue;
+            }
+            int ships = 0;
+            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                String colorID = Mapper.getColorID(p2.getColor());
+                UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+                Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+
+                for (UnitKey unitKey : units.keySet()) {
+                    if (unitKey != null
+                            && unitKey.getColorID().equals(colorID)
+                            && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
+                            && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
+                        ships += units.get(unitKey);
+                    }
+                }
+            }
+            if (ships != 1) {
+                continue;
+            }
+            buttons.add(Buttons.green(
+                    "mutineersStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        }
+        return buttons;
+    }
+
+    @ButtonHandler("mutineersStep2_")
+    public static void mutineersStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos2 = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(pos2);
+        String asyncID = "";
+        Player op = null;
+        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+            String colorID = Mapper.getColorID(p2.getColor());
+            UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
+            Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
+
+            for (UnitKey unitKey : units.keySet()) {
+                if (unitKey != null
+                        && unitKey.getColorID().equals(colorID)
+                        && p2.getUnitFromAsyncID(unitKey.asyncID()) != null
+                        && p2.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
+                    asyncID = unitKey.asyncID();
+                    RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), asyncID);
+                    op = p2;
+                }
+            }
+        }
+        AddUnitService.addUnits(
+                event, tile, game, game.getPlayerFromColorOrFaction("neutral").getColor(), asyncID);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " replaced the only ship owned by " + op.getRepresentation() + " in "
+                        + tile.getRepresentation() + " with a neutral ship of that type.");
     }
 
     @ButtonHandler("mercenariesStep1_")
@@ -2175,6 +2236,13 @@ public class ButtonHelperAbilities {
             AddPlanetService.addPlanet(enemyPlayer.get(), planet, game);
         }
         oceanBoundCheck(game);
+        if (player.hasAbility("raider_coves")) {
+            player.gainTG(2, true);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " gained 2tg due to their raider coves ability");
+            ButtonHelperAgents.resolveArtunoCheck(player, 2);
+        }
     }
 
     public static void readyBannerHalls(Game game) {
