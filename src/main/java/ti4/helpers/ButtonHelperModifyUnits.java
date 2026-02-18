@@ -1209,6 +1209,7 @@ public class ButtonHelperModifyUnits {
                         || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                         || (player2.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
                         || player.hasAbility("researchteam")
+                        || player.hasAbility("raider_coves")
                         || player.hasUnit("tf-ambassador")
                         || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
@@ -1222,6 +1223,7 @@ public class ButtonHelperModifyUnits {
                     if (player.hasUnlockedBreakthrough("titansbt")
                             || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                             || player.hasAbility("researchteam")
+                            || player.hasAbility("raider_coves")
                             || player.hasUnit("tf-ambassador")) {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),

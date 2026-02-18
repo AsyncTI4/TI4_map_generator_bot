@@ -2144,7 +2144,7 @@ public class ActionCardHelper {
         } else if (count > 5) {
             sb.append("\n> Total of ").append(count);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        CommanderUnlockCheckService.checkPlayer(player, "obsidian", "arborec");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
     }
 

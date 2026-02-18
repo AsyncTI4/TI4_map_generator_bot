@@ -931,7 +931,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 hazardous planet. Exhaust that planet and destroy up to 3 infantry on it.",
-        "notes": "This may be used on an exhausted planet and still kill the infantry. It may also be used on a readied planet containing no infantry. No targeting your own planet though.",
+        "notes": "This may be used on an exhausted planet and still kill the infantry. It may also be used on a planet containing no infantry. No targeting your own planet though.",
         "automationID": "unstable",
         "flavorText": "Another quake shook the planet, and a wave of dirt and rock rose up to swallow the Tekklar legion.",
         "source": "base"
