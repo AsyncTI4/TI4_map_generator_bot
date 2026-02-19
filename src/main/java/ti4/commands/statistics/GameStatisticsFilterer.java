@@ -3,6 +3,8 @@ package ti4.commands.statistics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
 
@@ -30,6 +33,7 @@ public class GameStatisticsFilterer {
     private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
     private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
+    private static final String STARTED_AFTER_FILTER = "started_after";
 
     private static final int MINIMUM_ROUND = 3;
 
@@ -65,6 +69,10 @@ public class GameStatisticsFilterer {
                 new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
         filters.add(new OptionData(
                 OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if The Fracture was in play"));
+        filters.add(new OptionData(
+                OptionType.STRING,
+                STARTED_AFTER_FILTER,
+                "Filter games by if they started after a date (yyyy.MM.dd)"));
         return filters;
     }
 
@@ -90,6 +98,8 @@ public class GameStatisticsFilterer {
         Boolean galacticEventFilter = event.getOption(HAS_GALACTIC_EVENT_FILTER, null, OptionMapping::getAsBoolean);
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
+        String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
+        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -105,8 +115,20 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnGalacticEvent(galacticEventFilter, game))
                 .and(game -> filterOnScenario(scenarioFilter, game))
                 .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
+                .and(game -> filterOnStartedAfter(startedAfterDate, game))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
+    }
+
+    private static LocalDate parseStartedAfterDate(String startedAfterDate) {
+        if (startedAfterDate == null || startedAfterDate.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(startedAfterDate, GameHelper.CREATION_DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
@@ -249,6 +271,10 @@ public class GameStatisticsFilterer {
 
     private static boolean filterOnFractureInPlay(Boolean fractureInPlayFilter, Game game) {
         return fractureInPlayFilter == null || fractureInPlayFilter == FractureService.isFractureInPlay(game);
+    }
+
+    private static boolean filterOnStartedAfter(LocalDate startedAfterFilter, Game game) {
+        return startedAfterFilter == null || GameHelper.getCreationDateAsLocalDate(game).isAfter(startedAfterFilter);
     }
 
     private static boolean isDiscordantStarsGame(Game game) {
