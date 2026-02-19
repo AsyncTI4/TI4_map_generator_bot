@@ -16,6 +16,7 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.helper.GameHelper;
+import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
 
@@ -42,36 +43,27 @@ public class GameStatisticsFilterer {
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
-        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter games by player count, e.g. 3-8"));
-        filters.add(new OptionData(
-                OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Filter games by minimum player count, e.g. 3-8"));
-        filters.add(new OptionData(
-                OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter games by victory point goal, e.g. 10-14"));
+        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14"));
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
-                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+                        "Game type, comma seperated, e.g. pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
                         EXCLUDED_GAME_TYPES_FILTER,
-                        "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+                        "Excluded game types, comma seperated, e.g. pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
-        filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter games by if the game is a fog game"));
-        filters.add(
-                new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter games by if the game has any homebrew"));
-        filters.add(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter games by if the game has a winner"));
-        filters.add(new OptionData(
-                        OptionType.STRING,
-                        WINNING_FACTION_FILTER,
-                        "Filter games by if the game was won by said faction")
+        filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Is it a fog game?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Does it have homebrew?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Does it have a winner?"));
+        filters.add(new OptionData(OptionType.STRING, WINNING_FACTION_FILTER, "Did said faction win?")
                 .setAutoComplete(true));
-        filters.add(new OptionData(
-                OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Filter games by if the game has a galactic event"));
-        filters.add(
-                new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
-        filters.add(new OptionData(
-                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if The Fracture was in play"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Does it have a Galactic Event?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Does it have a Scenario? e.g. Ordinian"));
+        filters.add(new OptionData(OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
         filters.add(new OptionData(
                 OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
         return filters;
@@ -100,7 +92,7 @@ public class GameStatisticsFilterer {
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
-        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter);
+        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -121,11 +113,18 @@ public class GameStatisticsFilterer {
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
-    private static LocalDate parseStartedAfterDate(String startedAfterDate) {
+    private static LocalDate parseStartedAfterDate(String startedAfterDate, SlashCommandInteractionEvent event) {
         if (startedAfterDate == null || startedAfterDate.isBlank()) {
             return null;
         }
-        return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
+        try {
+            return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
+        } catch (Exception e) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Unable to parse date '" + startedAfterDate + "'. Use format 'YYYY-MM-DD' instead.");
+            return null;
+        }
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
