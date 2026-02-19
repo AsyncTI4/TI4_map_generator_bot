@@ -15,7 +15,7 @@ class GameStatistics extends Subcommand {
                 .setRequired(true)
                 .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get the history of")
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "This faction is in the game")
                 .setAutoComplete(true));
     }
 
