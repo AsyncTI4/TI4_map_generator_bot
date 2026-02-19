@@ -1,10 +1,11 @@
 package ti4.commands.statistics;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -36,6 +37,8 @@ public class GameStatisticsFilterer {
     private static final String STARTED_AFTER_FILTER = "started_after";
 
     private static final int MINIMUM_ROUND = 3;
+    private static final DateTimeFormatter STARTED_AFTER_FILTER_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT);
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
@@ -70,9 +73,7 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(
                 OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if The Fracture was in play"));
         filters.add(new OptionData(
-                OptionType.STRING,
-                STARTED_AFTER_FILTER,
-                "Filter games by if they started after a date (yyyy.MM.dd)"));
+                OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (yyyy-mm-dd)"));
         return filters;
     }
 
@@ -124,11 +125,7 @@ public class GameStatisticsFilterer {
         if (startedAfterDate == null || startedAfterDate.isBlank()) {
             return null;
         }
-        try {
-            return LocalDate.parse(startedAfterDate, GameHelper.CREATION_DATE_FORMATTER);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
+        return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
@@ -274,7 +271,8 @@ public class GameStatisticsFilterer {
     }
 
     private static boolean filterOnStartedAfter(LocalDate startedAfterFilter, Game game) {
-        return startedAfterFilter == null || GameHelper.getCreationDateAsLocalDate(game).isAfter(startedAfterFilter);
+        return startedAfterFilter == null
+                || GameHelper.getCreationDateAsLocalDate(game).isAfter(startedAfterFilter);
     }
 
     private static boolean isDiscordantStarsGame(Game game) {
