@@ -43,10 +43,8 @@ public class GameStatisticsFilterer {
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
         filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8"));
-        filters.add(new OptionData(
-                OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8"));
-        filters.add(new OptionData(
-                OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14"));
+        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14"));
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
@@ -58,20 +56,13 @@ public class GameStatisticsFilterer {
                         "Excluded game types, comma seperated, e.g. pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Is it a fog game?"));
-        filters.add(
-                new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Does it have homebrew?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Does it have homebrew?"));
         filters.add(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Does it have a winner?"));
-        filters.add(new OptionData(
-                        OptionType.STRING,
-                        WINNING_FACTION_FILTER,
-                        "Did said faction win?")
+        filters.add(new OptionData(OptionType.STRING, WINNING_FACTION_FILTER, "Did said faction win?")
                 .setAutoComplete(true));
-        filters.add(new OptionData(
-                OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Does it have a Galactic Event?"));
-        filters.add(
-                new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Does it have a Scenario? e.g. Ordinian"));
-        filters.add(new OptionData(
-                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Does it have a Galactic Event?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Does it have a Scenario? e.g. Ordinian"));
+        filters.add(new OptionData(OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
         filters.add(new OptionData(
                 OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
         return filters;
