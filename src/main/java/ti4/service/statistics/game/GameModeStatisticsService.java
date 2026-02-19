@@ -28,7 +28,8 @@ class GameModeStatisticsService {
             });
         });
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), formatModeStatistics(totalGames.get(), modeCounts));
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(), formatModeStatistics(totalGames.get(), modeCounts));
     }
 
     static String formatModeStatistics(int totalGames, Map<String, AtomicInteger> modeCounts) {
