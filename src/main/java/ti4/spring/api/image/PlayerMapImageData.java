@@ -48,6 +48,6 @@ class PlayerMapImageData {
         this.playerId = playerId;
         this.discordMessageId = discordMessageId;
         this.discordChannelId = discordChannelId;
-        this.updatedAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }

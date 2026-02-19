@@ -335,7 +335,6 @@ public class PlayHeroService {
                         + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have _Antimass Deflectors_).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
-                game.resetCurrentMovedUnitsFrom1TacticalAction();
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
             }
             case "winnuhero" -> {

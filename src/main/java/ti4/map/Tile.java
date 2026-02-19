@@ -861,7 +861,7 @@ public class Tile {
         if (model.getNumPlanets() == 0 && unitHolders.size() > 1) {
             sb.append(" with ");
             var planetDisplayNames = unitHolders.keySet().stream()
-                    .filter(key -> !key.equals("space"))
+                    .filter(key -> !"space".equals(key))
                     .map(planetId -> Helper.getPlanetName(planetId))
                     .filter(name -> name != null)
                     .toList();
