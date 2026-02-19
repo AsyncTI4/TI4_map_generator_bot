@@ -16,6 +16,7 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.helper.GameHelper;
+import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
 
@@ -91,7 +92,7 @@ public class GameStatisticsFilterer {
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
-        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter);
+        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -112,11 +113,18 @@ public class GameStatisticsFilterer {
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
-    private static LocalDate parseStartedAfterDate(String startedAfterDate) {
+    private static LocalDate parseStartedAfterDate(String startedAfterDate, SlashCommandInteractionEvent event) {
         if (startedAfterDate == null || startedAfterDate.isBlank()) {
             return null;
         }
-        return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
+        try {
+            return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
+        } catch (Exception e) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Unable to parse date '" + startedAfterDate + "'. Use format 'YYYY-MM-DD' instead.");
+            return null;
+        }
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
