@@ -9,7 +9,7 @@ import ti4.service.statistics.game.GameStatisticsService;
 
 class GameStatistics extends Subcommand {
 
-    public GameStatistics() {
+    GameStatistics() {
         super(Constants.GAMES, "Game Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a statistic to show")
                 .setRequired(true)
