@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ti4.helpers.Constants;
@@ -163,7 +164,7 @@ public class GameStatsDashboardPayload {
         return objectives;
     }
 
-    public List<String> getModes() {
+    public Set<String> getModes() {
         return GameModeService.getModes(game);
     }
 

@@ -1,8 +1,8 @@
 package ti4.service.game;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,8 +13,12 @@ import ti4.map.Game;
 @UtilityClass
 public class GameModeService {
 
-    public static List<String> getModes(Game game) {
-        List<String> enabledModes = Stream.of(
+    public static Set<String> getModes(Game game) {
+        Set<String> enabledModes = Stream.of(
+                        Map.entry("Normal", (Supplier<Boolean>) game::isNormalGame),
+                        Map.entry("Veiled Heart", (Supplier<Boolean>) game::isVeiledHeartMode),
+                        Map.entry("Action Card Deck 2", (Supplier<Boolean>) game::isAcd2),
+                        Map.entry("Franken", (Supplier<Boolean>) game::isFrankenGame),
                         Map.entry("Alliance", (Supplier<Boolean>) game::isAllianceMode),
                         Map.entry("Community", (Supplier<Boolean>) game::isCommunityMode),
                         Map.entry("TIGL", (Supplier<Boolean>) game::isCompetitiveTIGLGame),
@@ -64,7 +68,7 @@ public class GameModeService {
                         Map.entry("Liberation", (Supplier<Boolean>) game::isLiberationC4Mode))
                 .filter(entry -> entry.getValue().get())
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(HashSet::new));
 
         if (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode())) {
             enabledModes.add("Spin Mode");
@@ -72,8 +76,10 @@ public class GameModeService {
 
         PriorityTrackHelper.PriorityTrackMode priorityTrackMode = game.getPriorityTrackMode();
         if (priorityTrackMode != null && priorityTrackMode != PriorityTrackHelper.PriorityTrackMode.NONE) {
-            enabledModes.add(priorityTrackMode.name() + " Priority Track");
+            enabledModes.add("Priority Track (" + priorityTrackMode.name() + ")");
         }
+
+        enabledModes.addAll(game.getTags());
 
         return enabledModes;
     }

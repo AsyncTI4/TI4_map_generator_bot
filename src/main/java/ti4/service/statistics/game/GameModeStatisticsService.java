@@ -31,16 +31,18 @@ class GameModeStatisticsService {
 
     private static String formatModeStatistics(int totalGames, Map<String, Integer> modeCounts) {
         StringBuilder message = new StringBuilder("Game count by mode (total games: " + totalGames + "):\n");
-        modeCounts.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(entry -> {
-            double percent = totalGames == 0 ? 0.0 : (entry.getValue() * 100.0) / totalGames;
-            message.append("- ")
-                    .append(entry.getKey())
-                    .append(": ")
-                    .append(entry.getValue())
-                    .append(" (")
-                    .append(String.format("%.1f%%", percent))
-                    .append(")\n");
-        });
+        modeCounts.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .forEach(entry -> {
+                    double percent = totalGames == 0 ? 0.0 : (entry.getValue() * 100.0) / totalGames;
+                    message.append("- ")
+                            .append(entry.getKey())
+                            .append(": ")
+                            .append(entry.getValue())
+                            .append(" (")
+                            .append(String.format("%.1f%%", percent))
+                            .append(")\n");
+                });
         return message.toString();
     }
 }
