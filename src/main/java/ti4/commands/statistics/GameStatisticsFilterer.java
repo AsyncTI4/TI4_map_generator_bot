@@ -100,6 +100,7 @@ public class GameStatisticsFilterer {
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
         String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
+        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -115,7 +116,7 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnGalacticEvent(galacticEventFilter, game))
                 .and(game -> filterOnScenario(scenarioFilter, game))
                 .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
-                .and(game -> filterOnStartedAfter(startedAfterFilter, game))
+                .and(game -> filterOnStartedAfter(startedAfterDate, game))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
     }
@@ -269,9 +270,8 @@ public class GameStatisticsFilterer {
         return fractureInPlayFilter == null || fractureInPlayFilter == FractureService.isFractureInPlay(game);
     }
 
-    private static boolean filterOnStartedAfter(String startedAfterFilter, Game game) {
-        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter);
-        return startedAfterFilter == null
+    private static boolean filterOnStartedAfter(LocalDate startedAfterDate, Game game) {
+        return startedAfterDate == null
                 || GameHelper.getCreationDateAsLocalDate(game).isAfter(startedAfterDate);
     }
 
