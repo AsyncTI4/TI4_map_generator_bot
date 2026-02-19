@@ -81,7 +81,7 @@ public class TacticalActionDisplacementService {
         if (player.hasTech("dsmirvpds")
                 || player.hasUnlockedBreakthrough("mirvedabt")
                 || player.hasUnit("mirveda_pds")) {
-            movableFromPlanets.addAll(List.of(UnitType.Pds));
+            movableFromPlanets.add(UnitType.Pds);
         }
 
         Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);

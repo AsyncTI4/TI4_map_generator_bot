@@ -2275,7 +2275,7 @@ class PlayerAreaGenerator {
                 }
             }
 
-            final String homePos = homeTile.getPosition();
+            String homePos = homeTile.getPosition();
             Point homePosition = PositionMapper.getTilePosition(homePos);
             Comparator<String> planetComparator = (planet1, planet2) -> {
                 if (homePosition == null) return 0;
