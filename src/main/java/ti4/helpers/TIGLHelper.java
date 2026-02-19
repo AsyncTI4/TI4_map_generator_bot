@@ -155,9 +155,9 @@ public class TIGLHelper {
     public static void initializeTIGLGame(Game game, boolean isFractured) {
         game.setCompetitiveTIGLGame(true);
         if (isFractured) {
-            TIGLHelper.addFracturedTag(game);
+            addFracturedTag(game);
         } else {
-            TIGLHelper.removeFracturedTag(game);
+            removeFracturedTag(game);
         }
         sendTIGLSetupText(game);
         List<User> users =

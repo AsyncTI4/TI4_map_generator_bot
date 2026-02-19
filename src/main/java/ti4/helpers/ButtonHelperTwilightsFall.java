@@ -1013,7 +1013,7 @@ public class ButtonHelperTwilightsFall {
         List<String> alreadyDrawn =
                 List.of(game.getStoredValue("savedParadigms").split("_"));
         for (String card : alreadyDrawn) {
-            if (card.equalsIgnoreCase("hacanhero")) {
+            if ("hacanhero".equalsIgnoreCase(card)) {
                 allCards.remove("sanctionhero");
             }
             allCards.remove(card);

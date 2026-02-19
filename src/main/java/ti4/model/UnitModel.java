@@ -211,7 +211,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return 1;
         }
         if (afbDieCount == 0
-                && getAlias().equalsIgnoreCase("pinktf_flagship")
+                && "pinktf_flagship".equalsIgnoreCase(id)
                 && (player.ownsUnit("tf-swa") || player.ownsUnit("tf-exile") || player.ownsUnit("tf-linkship"))) {
             return 3;
         }
@@ -274,7 +274,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return 5;
         }
         if (afbDieCount == 0
-                && getAlias().equalsIgnoreCase("pinktf_flagship")
+                && "pinktf_flagship".equalsIgnoreCase(id)
                 && (player.ownsUnit("tf-swa") || player.ownsUnit("tf-exile") || player.ownsUnit("tf-linkship"))) {
             return 6;
         }
@@ -283,7 +283,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getBombardDieCount(Player player) {
 
-        if (getAlias().equalsIgnoreCase("pinktf_flagship")) {
+        if ("pinktf_flagship".equalsIgnoreCase(id)) {
             if (player.ownsUnit("tf-dawncrusher") || player.ownsUnit("tf-superdread")) {
                 return 1;
             }
@@ -308,7 +308,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private int getBombardHitsOn(Player player) {
-        if (getAlias().equalsIgnoreCase("pinktf_flagship")) {
+        if ("pinktf_flagship".equalsIgnoreCase(id)) {
             if (player.ownsUnit("tf-dawncrusher") || player.ownsUnit("tf-superdread")) {
                 return 5;
             }

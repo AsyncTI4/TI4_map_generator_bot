@@ -1,6 +1,7 @@
 package ti4.service.combat;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -305,12 +306,8 @@ public class CombatRollService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
-        if (rollType == CombatRollType.bombardment
-                && opponent != null
-                && opponent != player
-                && opponent.hasTech("proxima")
-                && h > 0) {
-            if (opponent.hasTech("tf-proxima") && h > 0) {
+        if (rollType == CombatRollType.bombardment && opponent != player && opponent.hasTech("proxima") && h > 0) {
+            if (opponent.hasTech("tf-proxima")) {
                 message += "\n_Proxima Targeting VI_ canceled 1 hit automatically.";
                 h--;
             } else {
@@ -329,9 +326,9 @@ public class CombatRollService {
             message = message.substring(0, message.length() - 2);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (!game.isFowMode() && !game.getStoredValue("surprisingDiceRoll").equals("none")) {
+        if (!game.isFowMode() && !"none".equals(game.getStoredValue("surprisingDiceRoll"))) {
             String disaster;
-            if (game.getStoredValue("surprisingDiceRoll").equals("hits")) {
+            if ("hits".equals(game.getStoredValue("surprisingDiceRoll"))) {
                 disaster = player.getRepresentation() + " has rolled grievously against " + opponent.getRepresentation()
                         + " in " + game.getName() + ".";
             } else {
