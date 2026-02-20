@@ -431,6 +431,12 @@
         "source": "thunders_edge"
     },
     {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "obsidian",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "miniaturization",
         "undraftable": true,
