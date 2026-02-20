@@ -2571,7 +2571,8 @@ public class AgendaHelper {
 
         if (hasXxchaAlliance == 0
                 && (game.getStoredValue("AssassinatedReps").contains(player.getFaction())
-                        || game.getStoredValue("PublicExecution").contains(player.getFaction()))) {
+                        || (game.getStoredValue("PublicExecution").contains(player.getFaction())
+                                && game.getStoredValue("executiveOrder").isEmpty()))) {
             voteCount = 0;
         }
 

@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -195,7 +193,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged()
-                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).");
+                        + ", is using Watchful Ojz, the Ral Nel commander, to immediately retreat 2 ships (and maybe transport).\nReminder: Dane has ruled that you need a valid retreat location before you can even announce retreats and use this commander.");
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
                 player.getRepresentationUnfogged() + ", please choose which system you wish to move units to.",
@@ -1833,9 +1831,6 @@ public class UnfiledButtonHandlers {
             }
             skilled = true;
             ButtonHelper.deleteMessage(event);
-        }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "ralnelcommander")) {
-            skilled = true;
         }
         if (buttonID.contains("foresight")) {
             if (!game.isTwilightsFallMode()) {

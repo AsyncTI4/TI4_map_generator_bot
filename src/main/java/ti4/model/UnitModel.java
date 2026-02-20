@@ -9,6 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
@@ -500,7 +501,15 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
         }
         if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
-            return player.hasTech("pds2");
+            Game game = player.getGame();
+            if (Helper.getDateDifference(
+                            Helper.getDateRepresentation(game.getCreationDateTime()),
+                            Helper.getDateRepresentation(1771475738353L))
+                    < 0) {
+                return player.hasTech("pds2");
+            } else {
+                return false;
+            }
         }
         return getDeepSpaceCannon();
     }

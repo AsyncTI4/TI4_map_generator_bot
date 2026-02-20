@@ -379,6 +379,15 @@ public class CreateGameButtonHandler {
                 && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
                 && !CommandHelper.hasRole(event, JdaService.developerRoles)) return;
 
+        if (event != null
+                && !members.contains(event.getMember())
+                && !CommandHelper.hasRole(event, JdaService.bothelperRoles)
+                && !CommandHelper.hasRole(event, JdaService.developerRoles)) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "You must be a bothelper or a member of the game to launch the game.");
+            return;
+        }
+
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
