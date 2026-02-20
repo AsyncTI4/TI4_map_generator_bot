@@ -252,7 +252,7 @@
         "phase": "Action",
         "window": "After the active player moves ships into the active system during a tactical action",
         "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against the active player's ships in the active system.",
-        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time.",
+        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
         "source": "base"
@@ -261,8 +261,9 @@
         "alias": "experimental2",
         "name": "Experimental Battlestation",
         "phase": "Action",
-        "window": "After another player moves ships into a system during a tactical action",
-        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against ships in the active system.",
+        "window": "After the active player moves ships into the active system during a tactical action",
+        "text": "Choose 1 of your space docks that is either in or adjacent to that system. That space dock uses SPACE CANNON 5(x3) against the active player's ships in the active system.",
+        "notes": "This resolves in the same window as normal SPACE CANNON fire, and any existing SPACE CANNON abilities will be rolled at the same time. This cannot be used against yourself.",
         "automationID": "experimental",
         "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
         "source": "base"
@@ -930,7 +931,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 hazardous planet. Exhaust that planet and destroy up to 3 infantry on it.",
-        "notes": "This may be used on an exhausted planet and still kill the infantry. It may also be used on a readied planet containing no infantry. No targeting your own planet though.",
+        "notes": "This may be used on an exhausted planet and still kill the infantry. It may also be used on a planet containing no infantry. No targeting your own planet though.",
         "automationID": "unstable",
         "flavorText": "Another quake shook the planet, and a wave of dirt and rock rose up to swallow the Tekklar legion.",
         "source": "base"

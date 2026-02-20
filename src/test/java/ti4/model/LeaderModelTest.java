@@ -3,7 +3,6 @@ package ti4.model;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -14,13 +13,13 @@ import ti4.service.emoji.TI4Emoji;
 class LeaderModelTest extends ModelTest<LeaderModel> {
 
     @Override
-    public Map<String, LeaderModel> getModels() {
-        return Mapper.getLeaders();
+    public void loadData() {
+        this.type = "LeaderModel";
+        this.models = Mapper.getLeaders();
     }
 
     @Test
     void testLeaders() {
-        System.out.println("Validating `" + count() + "` leaders");
         for (LeaderModel model : getModelList()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateFaction(model), model.getAlias() + ": invalid FactionID");

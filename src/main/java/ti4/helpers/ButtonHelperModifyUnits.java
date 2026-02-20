@@ -703,7 +703,9 @@ public class ButtonHelperModifyUnits {
                 if (isRemainingSustains) {
                     effectiveUnits -= damagedUnits;
                 }
-                int min = Math.min(effectiveUnits, hits);
+                int min = (player.hasTech("nes"))
+                        ? Math.min(effectiveUnits, (hits + 1) / 2)
+                        : Math.min(effectiveUnits, hits);
                 if (isNraShenanigans
                         && player.getUnitsOwned().contains("naaz_mech_space")
                         && "mech".equalsIgnoreCase(unitName)
@@ -737,7 +739,10 @@ public class ButtonHelperModifyUnits {
                         continue; // Skip to the next unit since these sustains are already handled
                     }
                     hits -= min;
-                    if (player.hasTech("nes")) hits -= min;
+                    if (player.hasTech("nes")) {
+                        hits -= min;
+                    }
+
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
                         handleLetnevCommanderCheck(player, game, event, min);
@@ -1204,6 +1209,7 @@ public class ButtonHelperModifyUnits {
                         || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                         || (player2.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player2) > 0)
                         || player.hasAbility("researchteam")
+                        || player.hasAbility("raider_coves")
                         || player.hasUnit("tf-ambassador")
                         || player2.hasAbility("researchteam")) {
                     String planetName = Helper.getPlanetRepresentation(unitHolder.getName(), game);
@@ -1217,6 +1223,7 @@ public class ButtonHelperModifyUnits {
                     if (player.hasUnlockedBreakthrough("titansbt")
                             || (player.hasUnit("firmament_mech") && unitHolder.getUnitCount(UnitType.Mech, player) > 0)
                             || player.hasAbility("researchteam")
+                            || player.hasAbility("raider_coves")
                             || player.hasUnit("tf-ambassador")) {
                         buttons.add(Buttons.green(
                                 player.getFinsFactionCheckerPrefix() + "enterCoexistence_" + unitHolder.getName(),
@@ -1910,7 +1917,7 @@ public class ButtonHelperModifyUnits {
             }
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
                 int solBtLimit = player.getUnitFromUnitKey(unitKey).getCapacityValue();
-                if (solBtLimit > 0) {
+                if (solBtLimit > 0 && player.getUnitFromUnitKey(unitKey).getIsShip()) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition() + "_" + solBtLimit,
@@ -2049,12 +2056,8 @@ public class ButtonHelperModifyUnits {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        CommanderUnlockCheckService.checkPlayer(player, "titans");
-        CommanderUnlockCheckService.checkPlayer(player, "saar");
-        CommanderUnlockCheckService.checkPlayer(player, "rohdhna");
-        CommanderUnlockCheckService.checkPlayer(player, "cheiran");
-        CommanderUnlockCheckService.checkPlayer(player, "celdauri");
-        CommanderUnlockCheckService.checkPlayer(player, "gledge");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "titans", "empyrean", "cabal", "naalu", "saar", "cheiran", "celdauri", "gledge", "rohdhna");
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
@@ -2285,7 +2288,8 @@ public class ButtonHelperModifyUnits {
         if (!willSkipBuild) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             if (player.hasUnlockedBreakthrough("solbt") && unitKey != null) {
-                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0) {
+                if (player.getUnitFromUnitKey(unitKey).getCapacityValue() > 0
+                        && player.getUnitFromUnitKey(unitKey).getIsShip()) {
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green(
                             "solBtBuild_" + tile.getPosition() + "_"

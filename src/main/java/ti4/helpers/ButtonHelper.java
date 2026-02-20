@@ -1152,8 +1152,11 @@ public class ButtonHelper {
         if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")) {
             return true;
         }
+        if (player.hasTech("tf-mr") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0) {
+            return true;
+        }
 
-        return player.hasTech("mr") && tile.getTileModel().isSupernova();
+        return (player.hasTech("mr")) && tile.getTileModel().isSupernova();
     }
 
     @ButtonHandler("forceARefresh_")
@@ -3853,7 +3856,6 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
-        CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal");
         TeHelperGeneral.addStationsToPlayArea(null, game, tile);
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};
@@ -4351,6 +4353,43 @@ public class ButtonHelper {
         deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
+    public static List<Button> getBalanceButtons(Player player) {
+        List<Button> buttons2 = new ArrayList<>();
+        if (player.getStarbalanceCounter() + player.getSteelbalanceCounter() < 8) {
+            buttons2.add(Buttons.green("balanceToken_gain_star", "Gain 1 Star"));
+            buttons2.add(Buttons.green("balanceToken_gain_steel", "Gain 1 Steel"));
+        }
+        if (player.getSteelbalanceCounter() > 1) {
+            buttons2.add(Buttons.gray("balanceToken_flip_star", "Flip 1 Steel to Star"));
+        }
+        if (player.getStarbalanceCounter() > 1) {
+            buttons2.add(Buttons.gray("balanceToken_flip_steel", "Flip 1 Star to Steel"));
+        }
+        return buttons2;
+    }
+
+    @ButtonHandler("balanceToken_")
+    public static void balanceToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String action = buttonID.split("_")[1];
+        String type = buttonID.split("_")[2];
+        String msg = player.getRepresentation() + " gained 1 " + type + " balance token.";
+        if (type.equalsIgnoreCase("steel")) {
+            player.setSteelbalanceCounter(player.getSteelbalanceCounter() + 1);
+            if (action.equalsIgnoreCase("flip")) {
+                msg += " They lost 1 star token";
+                player.setStarbalanceCounter(player.getStarbalanceCounter() - 1);
+            }
+        } else {
+            player.setStarbalanceCounter(player.getStarbalanceCounter() + 1);
+            if (action.equalsIgnoreCase("flip")) {
+                msg += " They lost 1 steel token";
+                player.setSteelbalanceCounter(player.getSteelbalanceCounter() - 1);
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        deleteMessage(event);
+    }
+
     public static Button getEndTurnButton(Game game, Player player) {
         int abilities = getEndOfTurnAbilities(player, game).size();
         if (abilities > 0) {
@@ -4430,6 +4469,10 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("naazagent")) {
             endButtons.add(Buttons.green(
                     player.finChecker() + "exhaustAgent_naazagent", "Use Naaz-Rokha Agents", FactionEmojis.Naaz));
+        }
+        if (player.hasUnlockedBreakthrough("mirvedabt")) {
+            endButtons.add(
+                    Buttons.green(player.finChecker() + "resolveMirvedaBT", "Land 1 PDS", FactionEmojis.mirveda));
         }
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(Buttons.green(
@@ -5654,8 +5697,8 @@ public class ButtonHelper {
                 String source = impressment ? "dsdihmy_" : (scanlink ? "scanlink_" : "filler_");
                 String buttonId =
                         player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId + "_" + trait;
-                String buttonLabel =
-                        "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " As " + trait : "");
+                String buttonLabel = "Explore " + planetRepresentation
+                        + (explorationTraits.size() > 1 ? " As " + StringUtils.capitalize(trait) : "");
                 buttons.add(Buttons.gray(buttonId, buttonLabel, ExploreEmojis.getTraitEmoji(trait)));
                 if (player.hasUnlockedBreakthrough("kolleccbt") && player.hasReadyBreakthrough("kolleccbt")) {
                     String buttonId2 = player.getFinsFactionCheckerPrefix() + "movedNExplored_" + source + planetId

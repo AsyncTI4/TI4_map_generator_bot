@@ -2,6 +2,7 @@
     {
         "alias": "keleresm",
         "factionName": "The Council Keleres - Mentak",
+        "shortName": "Keleres",
         "homeSystem": "94new",
         "startingFleet": "2 inf, 2 cv, 2 ff, 1 ca, sd mollprimusk",
         "commodities": 2,
@@ -40,7 +41,7 @@
         ],
         "preferredColours": [
             "sbt",
-            "ptb",
+            "nea",
             "lgy"
         ],
         "source": "codex3",
@@ -49,6 +50,7 @@
     {
         "alias": "keleresx",
         "factionName": "The Council Keleres - Xxcha",
+        "shortName": "Keleres",
         "homeSystem": "92new",
         "startingFleet": "2 inf, 2 cv, 2 ff, 1 ca, sd archonrenk",
         "commodities": 2,
@@ -88,7 +90,7 @@
         ],
         "preferredColours": [
             "sbt",
-            "ptb",
+            "nea",
             "lgy"
         ],
         "source": "codex3"
@@ -96,6 +98,7 @@
     {
         "alias": "keleresa",
         "factionName": "The Council Keleres - Argent",
+        "shortName": "Keleres",
         "homeSystem": "93new",
         "startingFleet": "2 inf, 2 cv, 2 ff, 1 ca, sd valkk",
         "commodities": 2,
@@ -136,7 +139,7 @@
         ],
         "preferredColours": [
             "sbt",
-            "ptb",
+            "nea",
             "lgy"
         ],
         "source": "codex3"

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -17,7 +18,13 @@ import ti4.service.emoji.TI4Emoji;
 public class TechDraftItem extends DraftItem {
 
     public TechDraftItem(String itemId) {
-        super(Category.TECH, itemId);
+        super(DraftCategory.TECH, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getTech().getNameRepresentation();
     }
 
     @JsonIgnore
@@ -27,7 +34,7 @@ public class TechDraftItem extends DraftItem {
     }
 
     private TechnologyModel getTech() {
-        return Mapper.getTech(ItemId);
+        return Mapper.getTech(getItemId());
     }
 
     @JsonIgnore
@@ -53,7 +60,7 @@ public class TechDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.TECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.TECH);
         return allItems;
     }
 
@@ -61,7 +68,7 @@ public class TechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (var tech : faction.getFactionTech()) {
-                allItems.add(generate(DraftItem.Category.TECH, tech));
+                allItems.add(generate(DraftCategory.TECH, tech));
             }
         }
         return allItems;
@@ -69,7 +76,7 @@ public class TechDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.TECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.TECH);
         return allItems;
     }
 
@@ -79,7 +86,7 @@ public class TechDraftItem extends DraftItem {
             for (TechnologyModel tech : Mapper.getTechs().values()) {
                 if (tech.getSource() == ComponentSource.twilights_fall
                         && tech.getFaction().isPresent()) {
-                    allItems.add(generate(Category.TECH, tech.getID()));
+                    allItems.add(generate(DraftCategory.TECH, tech.getID()));
                 }
             }
         } else {
@@ -89,7 +96,7 @@ public class TechDraftItem extends DraftItem {
                     if (Arrays.asList(results).contains(tech)) {
                         continue;
                     }
-                    allItems.add(generate(DraftItem.Category.TECH, tech));
+                    allItems.add(generate(DraftCategory.TECH, tech));
                 }
             }
         }

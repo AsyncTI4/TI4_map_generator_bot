@@ -9,26 +9,31 @@ public class PoweredFrankenDraft extends FrankenDraft {
     }
 
     @Override
-    public int getItemLimitForCategory(DraftItem.Category category) {
+    public int getItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case ABILITY -> 4;
+            case TECH, BLUETILE -> 3;
+            case AGENT, COMMANDER, HERO -> 2;
+            case STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 2;
+            case FLAGSHIP, MECH, BREAKTHROUGH -> 2;
+            case PN, COMMODITIES, REDTILE -> 2;
+            case DRAFTORDER -> 1;
+            case UNIT, PLOT, MAHACTKING -> 0;
+        };
+    }
 
-        int limit = 0;
-        switch (category) {
-            case ABILITY -> limit = 4;
-            case TECH, BLUETILE -> limit = 3;
-            case AGENT,
-                    COMMANDER,
-                    REDTILE,
-                    STARTINGFLEET,
-                    STARTINGTECH,
-                    HOMESYSTEM,
-                    PN,
-                    COMMODITIES,
-                    FLAGSHIP,
-                    MECH,
-                    HERO -> limit = 2;
-            case DRAFTORDER -> limit = 1;
-        }
-        return limit;
+    @Override
+    public int getKeptItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case ABILITY -> 4;
+            case TECH -> 3;
+            case BLUETILE -> 3;
+            case REDTILE -> 2;
+            case COMMODITIES, FLAGSHIP, MECH, PN -> 1;
+            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+            case DRAFTORDER, STARTINGFLEET, STARTINGTECH, HOMESYSTEM -> 1;
+            case UNIT, PLOT, MAHACTKING -> 0;
+        };
     }
 
     @Override

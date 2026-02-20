@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -23,35 +24,30 @@ public abstract class BagDraft {
     private final Game owner;
 
     public static BagDraft generateDraft(String draftType, Game game) {
-        if ("franken".equals(draftType)) {
-            return new FrankenDraft(game);
-        }
-        if ("powered_franken".equals(draftType)) {
-            return new PoweredFrankenDraft(game);
-        }
-        if ("onepick_franken".equals(draftType)) {
-            return new OnePickFrankenDraft(game);
-        }
-        if ("poweredonepick_franken".equals(draftType)) {
-            return new PoweredOnePickFrankenDraft(game);
-        }
-        if ("twilights_fall".equals(draftType)) {
-            return new TwilightsFallFrankenDraft(game);
-        }
-        if ("inaugural_splice".equals(draftType)) {
-            return new InauguralSpliceFrankenDraft(game);
-        }
-        return null;
+        return switch (draftType) {
+            case "franken" -> new FrankenDraft(game);
+            case "powered_franken" -> new PoweredFrankenDraft(game);
+            case "onepick_franken" -> new OnePickFrankenDraft(game);
+            case "overdraft_franken" -> new OverdraftFrankenDraft(game);
+            case "poweredonepick_franken" -> new PoweredOnePickFrankenDraft(game);
+            case "powered_overdraft_franken" -> new PoweredOverdraftFrankenDraft(game);
+            case "twilights_fall" -> new TwilightsFallFrankenDraft(game);
+            case "inaugural_splice" -> new InauguralSpliceFrankenDraft(game);
+            default -> null;
+        };
     }
 
     BagDraft(Game owner) {
         this.owner = owner;
     }
 
-    public abstract int getItemLimitForCategory(DraftItem.Category category);
+    public abstract int getItemLimitForCategory(DraftCategory category);
+
+    public abstract int getKeptItemLimitForCategory(DraftCategory category);
 
     public abstract String getSaveString();
 
+    @Nullable
     public abstract List<DraftBag> generateBags(Game game);
 
     public abstract int getBagSize();
@@ -116,19 +112,13 @@ public abstract class BagDraft {
                 MessageHelper.sendMessageToChannel(
                         p.getCardsInfoThread(),
                         "You are passing the following cards to your right:\n"
-                                + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
+                                + FrankenDraftBagService.getBagReceipt(p));
                 FrankenDraftBagService.displayPlayerHand(owner, p);
             } else {
                 if (draftableItemsInBag(p).size() == 1 && !playerHasItemInQueue(p) && !p.isReadyToPassBag()) {
                     List<DraftItem> draftableItems = new ArrayList<>(draftableItemsInBag(p));
                     p.getDraftHand().Contents.addAll(draftableItems);
-                    findExistingBagChannel(p).getHistory().retrievePast(100).queue(m -> {
-                        if (!m.isEmpty()) {
-                            findExistingBagChannel(p)
-                                    .deleteMessages(m)
-                                    .queue(Consumers.nop(), BotLogger::catchRestError);
-                        }
-                    });
+                    clearBagChannel(p);
                     p.getCurrentDraftBag().Contents.removeAll(draftableItems);
                     setPlayerReadyToPass(p, true);
                     MessageHelper.sendMessageToChannel(
@@ -137,7 +127,7 @@ public abstract class BagDraft {
                     MessageHelper.sendMessageToChannel(
                             p.getCardsInfoThread(),
                             "You are passing the following cards to your right:\n"
-                                    + FrankenDraftBagService.getBagReceipt(p.getCurrentDraftBag()));
+                                    + FrankenDraftBagService.getBagReceipt(p));
                     FrankenDraftBagService.displayPlayerHand(owner, p);
                 }
             }
@@ -166,7 +156,7 @@ public abstract class BagDraft {
 
     public String getLongBagRepresentation(DraftBag bag, Game game) {
         StringBuilder sb = new StringBuilder();
-        for (DraftItem.Category cat : DraftItem.Category.values()) {
+        for (DraftCategory cat : DraftCategory.values()) {
             if (this instanceof FrankenDraft) {
                 if (FrankenDraft.getItemLimitForCategory(cat, game) > 0) {
                     sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
@@ -181,6 +171,18 @@ public abstract class BagDraft {
         return sb.toString();
     }
 
+    public void clearBagChannel(Player player) {
+        ThreadChannel channel = findExistingBagChannel(player);
+        channel.getHistory()
+                .retrievePast(100)
+                .flatMap(m -> !m.isEmpty(), m -> {
+                    if (m.size() == 1)
+                        return channel.deleteMessageById(m.getFirst().getId());
+                    return channel.deleteMessages(m);
+                })
+                .queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
     public ThreadChannel regenerateBagChannel(Player player) {
         TextChannel actionsChannel = owner.getMainGameChannel();
         if (actionsChannel == null) {
@@ -191,14 +193,7 @@ public abstract class BagDraft {
             return null;
         }
 
-        String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
-                + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
-        if (owner.isFowMode()) {
-            threadName = owner.getName() + "-" + "bag-info-"
-                    + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
-        }
-
-        ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
+        ThreadChannel existingChannel = findExistingBagChannel(player);
 
         if (existingChannel != null) {
             if (existingChannel.isArchived()) {
@@ -206,16 +201,7 @@ public abstract class BagDraft {
             }
 
             // Clear out all messages from the existing thread
-            existingChannel
-                    .getHistory()
-                    .retrievePast(100)
-                    .submit()
-                    .thenAccept(m -> {
-                        if (m.size() > 1) {
-                            existingChannel.deleteMessages(m).submit().join();
-                        }
-                    })
-                    .join();
+            clearBagChannel(player);
             return existingChannel;
         }
 
@@ -226,27 +212,30 @@ public abstract class BagDraft {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = ((TextChannel) player.getCorrectChannel())
-                .createThreadChannel(threadName, isPrivateChannel)
+                .createThreadChannel(getBagChannelThreadName(player), isPrivateChannel)
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
             threadAction = threadAction.setInvitable(false);
         }
-        ThreadChannel threadChannel =
-                threadAction
-                        .complete(); // Must `complete` if we're using this channel as part of an interaction that saves
-        // the
-        // game
+
+        // Must `complete` if we're using this channel as part of an interaction that saves the game
+        ThreadChannel threadChannel = threadAction.complete();
         player.setBagInfoThreadID(threadChannel.getId());
         return threadChannel;
     }
 
-    public ThreadChannel findExistingBagChannel(Player player) {
+    public String getBagChannelThreadName(Player player) {
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-"
                 + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("");
         if (owner.isFowMode()) {
             threadName = owner.getName() + "-" + "bag-info-"
                     + FORWARD_SLASH_PATTERN.matcher(player.getUserName()).replaceAll("") + "-private";
         }
+        return threadName;
+    }
+
+    public ThreadChannel findExistingBagChannel(Player player) {
+        String threadName = getBagChannelThreadName(player);
         return findExistingBagChannel(player, threadName);
     }
 
@@ -328,6 +317,23 @@ public abstract class BagDraft {
         return !p.getDraftQueue().Contents.isEmpty();
     }
 
+    public boolean playerQueueIsFull(Player player) {
+        Game game = player.getGame();
+        int draftQueueCount = player.getDraftQueue().Contents.size();
+        boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
+        boolean isQueueFull = draftQueueCount >= getPicksFromNextBags();
+        if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
+            isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
+        }
+        if (isFirstDraft) {
+            isQueueFull = draftQueueCount >= getPicksFromFirstBag();
+            if (!game.getStoredValue("frankenLimitFIRSTPICK").isEmpty()) {
+                isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
+            }
+        }
+        return isQueueFull;
+    }
+
     @JsonIgnore
     public String getDraftStatusMessage() {
         StringBuilder sb = new StringBuilder();
@@ -356,6 +362,22 @@ public abstract class BagDraft {
                         .append(")");
             }
             sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    @JsonIgnore
+    public String getFinishedBuildingMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("### __Faction Building Status__:\n");
+        String key = "frankenBuilt";
+        for (Player player : owner.getRealPlayers()) {
+
+            String finished = player.getStoredValue(key).equals("n") ? "❌" : "✅";
+            String ident =
+                    owner.getRealPlayers().size() > 10 ? player.getFactionEmoji() : player.getRepresentationNoPing();
+
+            sb.append("> ").append(finished).append(" ").append(ident).append("\n");
         }
         return sb.toString();
     }

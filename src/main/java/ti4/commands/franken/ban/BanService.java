@@ -21,6 +21,13 @@ public class BanService implements IBanService {
             return "Successfully banned ability: " + Mapper.getAbility(id).getName() + ".\n";
         });
 
+        BAN_APPLIERS.put(Constants.BREAKTHROUGH, (game, id) -> {
+            if (isBlank(id) || Mapper.getBreakthrough(id) == null) return "";
+            appendStoredValue(game, "bannedBreakthroughs", id);
+            return "Successfully banned breakthrough: "
+                    + Mapper.getBreakthrough(id).getName() + ".\n";
+        });
+
         BAN_APPLIERS.put(Constants.LEADER, (game, id) -> {
             if (isBlank(id) || Mapper.getLeader(id) == null) return "";
             appendStoredValue(game, "bannedLeaders", id);

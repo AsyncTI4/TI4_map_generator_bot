@@ -15,6 +15,7 @@ import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 
 @Data
@@ -106,6 +107,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(tfTitle);
     }
 
+    public String getTFTitleIfAble() {
+        return getTFTitle().orElse(getTitle());
+    }
+
     public Optional<String> getAbilityName() {
         return Optional.ofNullable(abilityName);
     }
@@ -130,6 +135,12 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public boolean isParadigm() {
         return Mapper.getDeck(Constants.TF_PARADIGM).getNewDeck().contains(id);
+    }
+
+    public TI4Emoji getTFEmoji() {
+        if (isGenome()) return MiscEmojis.tf_genome;
+        if (isParadigm()) return MiscEmojis.tf_paradigm;
+        return null;
     }
 
     private Optional<String> getFlavourText() {
@@ -244,6 +255,12 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         eb.setColor(Color.black);
         return eb.build();
+    }
+
+    public String getTFNameRepresentation() {
+        return FactionEmojis.getFactionIcon(faction) + " " + getTFEmoji()
+                + getLeaderEmoji() + " " + getTFNameIfAble() + " (" + getTFTitleIfAble() + ") "
+                + source.emoji();
     }
 
     public String getNameRepresentation() {

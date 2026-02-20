@@ -146,6 +146,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    public String getNameRepresentation() {
+        return getEmoji() + " _" + getName() + "_ " + getPlanetTypeEmoji();
+    }
+
     @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);

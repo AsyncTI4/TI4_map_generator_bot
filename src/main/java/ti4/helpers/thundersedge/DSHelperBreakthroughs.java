@@ -413,6 +413,16 @@ public class DSHelperBreakthroughs {
                 event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
     }
 
+    @ButtonHandler("resolveMirvedaBT")
+    public static void resolveMirvedaBT(Game game, Player player, ButtonInteractionEvent event) {
+        String msg = player.getRepresentation() + ", you may use _Stabilization Arrays_ to land 1 PDS.";
+        List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
+        if (!buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     public static void doLanefirBtCheck(Game game, Player player) {
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             if (p2.hasUnlockedBreakthrough("lanefirbt")) {

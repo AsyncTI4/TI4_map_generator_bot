@@ -650,7 +650,8 @@ public class ActionCardHelper {
 
         if ("blackmarketdealing".equals(acID)
                 && game.getPhaseOfGame().toLowerCase().contains("agenda")
-                && game.isHiddenAgendaMode()) {
+                && game.isHiddenAgendaMode()
+                && !game.getStoredValue("executiveOrder").isEmpty()) {
             return "You cannot make transactions during the agenda phase in Hidden Agenda mode. Cancelling this action card automatically";
         }
 
@@ -1697,6 +1698,13 @@ public class ActionCardHelper {
                 }
                 serveReverseEngineerButtons(game, player, List.of(acID));
                 serveTwinningButtons(game, player, List.of(acID));
+            } else {
+                if (player.hasAbility("matters_of_state")) {
+                    String message2 = player.getRepresentationUnfogged()
+                            + " if the AC is not sabod, please gain or flip 1 balance token.";
+                    List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
+                }
             }
         }
 
@@ -2143,7 +2151,7 @@ public class ActionCardHelper {
         } else if (count > 5) {
             sb.append("\n> Total of ").append(count);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        CommanderUnlockCheckService.checkPlayer(player, "obsidian", "arborec");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
     }
 

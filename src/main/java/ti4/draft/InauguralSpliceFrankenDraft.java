@@ -20,17 +20,21 @@ public class InauguralSpliceFrankenDraft extends FrankenDraft {
     }
 
     @Override
-    public int getItemLimitForCategory(DraftItem.Category category) {
+    public int getItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case TECH -> 3;
+            case AGENT, UNIT -> 2;
+            default -> 0;
+        };
+    }
 
-        int limit = 0;
-        switch (category) {
-            case ABILITY -> limit = 0;
-            case TECH -> limit = 3;
-            case REDTILE, BLUETILE, STARTINGFLEET, HOMESYSTEM -> limit = 0;
-            case DRAFTORDER, MAHACTKING, COMMANDER, STARTINGTECH, PN, COMMODITIES, FLAGSHIP, MECH, HERO -> limit = 0;
-            case AGENT, UNIT -> limit = 2;
-        }
-        return limit;
+    @Override
+    public int getKeptItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case TECH -> 2;
+            case AGENT, UNIT -> 1;
+            default -> 0;
+        };
     }
 
     @Override

@@ -335,7 +335,6 @@ public class PlayHeroService {
                         + " Reminder that you may carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have _Antimass Deflectors_).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
-                game.resetCurrentMovedUnitsFrom1TacticalAction();
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
             }
             case "winnuhero" -> {
@@ -521,8 +520,8 @@ public class PlayHeroService {
                             "\nYou also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.";
                 }
                 MessageHelper.sendMessageToChannel(
-                        player.getPrivateChannel(), message + ", you do not need to pay for these units.");
-                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), "Produce Units", buttons);
+                        player.getCorrectChannel(), message + ", you do not need to pay for these units.");
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Produce Units", buttons);
 
                 if (player.hasUnit("tf-productionbiomes")
                         && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)

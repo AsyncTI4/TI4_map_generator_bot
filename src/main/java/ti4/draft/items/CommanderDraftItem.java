@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -17,12 +18,12 @@ import ti4.service.emoji.TI4Emoji;
 public class CommanderDraftItem extends DraftItem {
 
     public CommanderDraftItem(String itemId) {
-        super(Category.COMMANDER, itemId);
+        super(DraftCategory.COMMANDER, itemId);
     }
 
     @JsonIgnore
     private LeaderModel getLeader() {
-        return Mapper.getLeader(ItemId);
+        return Mapper.getLeader(getItemId());
     }
 
     @JsonIgnore
@@ -33,12 +34,19 @@ public class CommanderDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
+    public String getTitle(Game game) {
+        LeaderModel leader = getLeader();
+        return leader.getNameRepresentation();
+    }
+
+    @JsonIgnore
+    @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
         if (leader == null) {
             return getAlias();
         }
-        return "Commander - " + getLeader().getName();
+        return getLeader().getName();
     }
 
     @JsonIgnore
@@ -64,7 +72,7 @@ public class CommanderDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.COMMANDER);
         return allItems;
     }
 
@@ -76,7 +84,7 @@ public class CommanderDraftItem extends DraftItem {
             leaders.removeIf((String leader) ->
                     !"commander".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(generate(Category.COMMANDER, leader));
+                allItems.add(generate(DraftCategory.COMMANDER, leader));
             }
         }
         return allItems;
@@ -84,7 +92,7 @@ public class CommanderDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.COMMANDER);
         return allItems;
     }
 
@@ -100,7 +108,7 @@ public class CommanderDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;
                 }
-                allItems.add(generate(Category.COMMANDER, leader));
+                allItems.add(generate(DraftCategory.COMMANDER, leader));
             }
         }
         return allItems;

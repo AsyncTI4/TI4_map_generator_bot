@@ -228,10 +228,19 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "gledgebt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "mantle_cracking",
         "additionalComponents": [
             "ABILITY:celestial_reclamation"
+        ],
+        "optionalSwaps": [
+            "BREAKTHROUGH:gledgebt"
         ],
         "source": "ds"
     },
@@ -279,6 +288,12 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "kjalengardbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "glory",
         "additionalComponents": [
@@ -291,7 +306,8 @@
             "AGENT:kjalengardagent",
             "COMMANDER:kjalengardcommander",
             "HERO:kjalengardhero",
-            "MECH:kjalengard_mech"
+            "MECH:kjalengard_mech",
+            "BREAKTHROUGH:kjalengardbt"
         ],
         "source": "ds"
     },
@@ -407,12 +423,19 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "lizhobt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "cunning",
         "additionalComponents": [
             "ABILITY:subterfuge"
         ],
         "optionalSwaps": [
+            "BREAKTHROUGH:lizhobt",
             "COMMANDER:lizhocommander",
             "HERO:lizhohero",
             "MECH:lizho_mech"
@@ -444,6 +467,20 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "khraskbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "meteor_slings",
+        "additionalComponents": [
+            "BREAKTHROUGH:khraskbt"
+        ],
+        "source": "ds"
+    },
+    {
         "itemCategory": "STARTINGFLEET",
         "itemId": "khrask",
         "undraftable": true,
@@ -462,10 +499,31 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "mirvedabt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "TECH",
         "itemId": "dsmirvpds",
         "additionalComponents": [
-            "ABILITY:privileged_citizenry"
+            "ABILITY:privileged_citizenry",
+            "BREAKTHROUGH:mirvedabt"
+        ],
+        "source": "ds"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "mykomentoribt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "dsmykosd",
+        "additionalComponents": [
+            "BREAKTHROUGH:mykomentoribt"
         ],
         "source": "ds"
     },
@@ -525,10 +583,17 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "nivynbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "MECH",
         "itemId": "nivyn_mech",
         "additionalComponents": [
-            "ABILITY:singularity_point"
+            "ABILITY:singularity_point",
+            "BREAKTHROUGH:nivynbt"
         ],
         "optionalSwaps": [
             "TECH:dsnivymf",
@@ -543,10 +608,17 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "nokarbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "hired_guns",
         "additionalComponents": [
-            "ABILITY:desperados"
+            "ABILITY:desperados",
+            "BREAKTHROUGH:nokarbt"
         ],
         "optionalSwaps": [
             "COMMANDER:nokarcommander"
@@ -566,6 +638,12 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "olradinbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "HERO",
         "itemId": "olradinhero",
         "undraftable": true,
@@ -581,9 +659,16 @@
         "itemCategory": "ABILITY",
         "itemId": "policies",
         "optionalSwaps": [
+            "BREAKTHROUGH:olradinbt",
             "HERO:olradinhero",
             "MECH:olradin_mech"
         ],
+        "source": "ds"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "rohdhnabt",
+        "undraftable": true,
         "source": "ds"
     },
     {
@@ -606,6 +691,9 @@
         "additionalComponents": [
             "ABILITY:orbital_foundries"
         ],
+        "optionalSwaps": [
+            "BREAKTHROUGH:rohdhnabt"
+        ],
         "source": "ds"
     },
     {
@@ -626,6 +714,12 @@
         "additionalComponents": [
             "ABILITY:stealth_insertion"
         ],
+        "source": "ds"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "vadenbt",
+        "undraftable": true,
         "source": "ds"
     },
     {
@@ -654,6 +748,9 @@
         "additionalComponents": [
             "ABILITY:binding_debts",
             "ABILITY:fine_print"
+        ],
+        "optionalSwaps": [
+            "BREAKTHROUGH:vadenbt"
         ],
         "source": "ds"
     },
@@ -818,6 +915,12 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "pharadnbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "TECH",
         "itemId": "dspharinf",
         "additionalComponents": [
@@ -826,7 +929,8 @@
         ],
         "optionalSwaps": [
             "COMMANDER:pharadncommander",
-            "HERO:pharadnhero"
+            "HERO:pharadnhero",
+            "BREAKTHROUGH:pharadnbt"
         ],
         "source": "ds"
     },
@@ -869,6 +973,12 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "toldarbt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "honor_bound",
         "additionalComponents": [
@@ -877,7 +987,8 @@
         ],
         "optionalSwaps": [
             "COMMANDER:toldarcommander",
-            "MECH:toldar_mech"
+            "MECH:toldar_mech",
+            "BREAKTHROUGH:toldarbt"
         ],
         "source": "ds"
     },
@@ -894,13 +1005,20 @@
         "source": "ds"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "belkoseabt",
+        "undraftable": true,
+        "source": "ds"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "classified_developments",
         "additionalComponents": [
             "ABILITY:superweapon_projects"
         ],
         "optionalSwaps": [
-            "COMMANDER:belkoseacommander"
+            "COMMANDER:belkoseacommander",
+            "BREAKTHROUGH:belkoseabt"
         ],
         "source": "ds"
     },

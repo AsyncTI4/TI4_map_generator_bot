@@ -790,8 +790,8 @@ public class PlayerTechService {
                 }
             }
             if (game.isTwilightsFallMode()
-                    && !techID.equalsIgnoreCase("wavelength")
-                    && !techID.equalsIgnoreCase("antimatter")
+                    && !"wavelength".equalsIgnoreCase(techID)
+                    && !"antimatter".equalsIgnoreCase(techID)
                     && (player.hasTech("tf-singularityx")
                             || player.hasTech("tf-singularityy")
                             || player.hasTech("tf-singularityz"))) {
