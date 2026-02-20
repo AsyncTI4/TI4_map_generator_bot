@@ -2056,12 +2056,8 @@ public class ButtonHelperModifyUnits {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        CommanderUnlockCheckService.checkPlayer(player, "titans");
-        CommanderUnlockCheckService.checkPlayer(player, "saar");
-        CommanderUnlockCheckService.checkPlayer(player, "rohdhna");
-        CommanderUnlockCheckService.checkPlayer(player, "cheiran");
-        CommanderUnlockCheckService.checkPlayer(player, "celdauri");
-        CommanderUnlockCheckService.checkPlayer(player, "gledge");
+        CommanderUnlockCheckService.checkPlayer(
+                player, "titans", "empyrean", "cabal", "naalu", "saar", "cheiran", "celdauri", "gledge", "rohdhna");
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }

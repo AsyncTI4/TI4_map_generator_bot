@@ -392,6 +392,11 @@ public class PlayStrategyCardService {
                     player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
                     graceButtons);
         }
+        if (player.hasAbility("matters_of_state")) {
+            String message2 = player.getRepresentationUnfogged() + " please gain or flip 1 balance token.";
+            List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
+        }
         if (scModel.usesAutomationForSCID("anarchy8")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

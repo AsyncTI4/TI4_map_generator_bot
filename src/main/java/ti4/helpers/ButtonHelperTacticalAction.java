@@ -267,6 +267,8 @@ public class ButtonHelperTacticalAction {
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
             for (Player nonActivePlayer : game.getRealPlayers()) {
                 if (player == nonActivePlayer) {
                     continue;
