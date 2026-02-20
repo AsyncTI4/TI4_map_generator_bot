@@ -3588,13 +3588,14 @@ public class UnfiledButtonHandlers {
         List<Button> dwsCommanders = game.getPlayers().values().stream()
                 .filter(p1 -> p1 != player)
                 .filter(p1 -> game.playerHasLeaderUnlockedOrAlliance(p1, "deepwroughtcommander"))
-                .map(p1 -> Buttons.gray(
-                        "useDwsDiscount_" + p1.getFaction(),
-                        "Use Aello Discount, Generating Money For "
-                                + (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, p1, player)
-                                        ? p1.getFaction()
-                                        : "Somebody"),
-                        p1.getFactionEmoji()))
+                .map(p1 -> {
+                    String id = "useDwsDiscount_" + p1.getFaction();
+                    boolean anon = game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, p1, player);
+                    String ident = anon ? "Somebody's" : p1.getFactionModel().getShortName() + "'s";
+                    String label = "Use " + ident + " Aello Discount";
+                    String emoji = p1.getFactionEmoji();
+                    return Buttons.gray(id, label, emoji);
+                })
                 .toList();
         buttons.addAll(dwsCommanders);
         Button doneExhausting = Buttons.red("deleteButtons_technology", "Done Exhausting Planets");

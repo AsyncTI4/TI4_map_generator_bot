@@ -1,7 +1,7 @@
 package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -53,6 +53,10 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
             return po1.points < po2.points ? -1 : 1;
         }
     };
+
+    public String getNameRepresentation() {
+        return getObjectiveEmoji() + " _" + getName() + "_ " + source.emoji();
+    }
 
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);

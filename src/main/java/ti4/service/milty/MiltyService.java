@@ -1,17 +1,21 @@
 package ti4.service.milty;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
@@ -745,22 +749,16 @@ public class MiltyService {
             if (!game.isBaseGameMode()) {
                 tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
             }
-            String pos = "tr";
-            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
-                pos = "br";
-            }
-            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
-                pos = "bl";
-            }
-            tile = new Tile("51", pos);
-            game.setTile(tile);
-            player.setHomeSystemPosition(pos);
             if (game.isTwilightsFallMode()) {
                 player.addAbility("echo_of_sacrifice");
             }
+
+            // Add the new tile
+            String pos = addAnotherCornerTile(game, "51", positionHS);
+            player.setHomeSystemPosition(pos);
         }
 
-        // HANDLE Crimson' HOME SYSTEM LOCATION
+        // HANDLE CRIMSON'S HOME SYSTEM LOCATION
         if ("crimson".equals(faction)) {
             if (!game.isBaseGameMode()) {
                 tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
@@ -770,24 +768,68 @@ public class MiltyService {
             } else {
                 player.addAbility("echo_of_divergence");
             }
-            String pos = "tr";
-            if ("307".equalsIgnoreCase(positionHS) || "310".equalsIgnoreCase(positionHS)) {
-                pos = "br";
-            }
-            if ("313".equalsIgnoreCase(positionHS) || "316".equalsIgnoreCase(positionHS)) {
-                pos = "bl";
-            }
-            if (game.getTileByPosition(pos) != null) {
-                if ("tr".equalsIgnoreCase(pos)) {
-                    pos = "br";
-                } else {
-                    pos = "tr";
-                }
-            }
-            tile = new Tile("118", pos);
-            game.setTile(tile);
+
+            // Add the new tile
+            String pos = addAnotherCornerTile(game, "118", positionHS);
             player.setHomeSystemPosition(pos);
         }
+    }
+
+    private static String addAnotherCornerTile(Game game, String tileID, String anchorPos) {
+        record TileAndAnchor(Tile tile, String pos) {}
+        List<TileAndAnchor> tilesWithAnchors = List.of("tl", "tr", "bl", "br").stream()
+                .map(game::getTileByPosition)
+                .filter(Objects::nonNull)
+                .map(t -> new TileAndAnchor(t, getAnchorPositionForTile(game, t)))
+                .collect(Collectors.toCollection(() -> new ArrayList<>()));
+        System.out.println(" - Found " + tilesWithAnchors.size() + " other corner tiles to rearrange.");
+        tilesWithAnchors.add(new TileAndAnchor(new Tile(tileID, "tl"), anchorPos));
+        if (tilesWithAnchors.size() > 4) {
+            String err = "# " + game.getPing() + " UNABLE TO ADD ANOTHER CORNER TILE. PLEASE RESOLVE.";
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), err);
+            return null;
+        }
+        String pos = "tr";
+        for (List<String> positions : CollectionUtils.permutations(List.of("tl", "tr", "bl", "br"))) {
+            boolean acceptable = true;
+            Point center = PositionMapper.getTilePosition("000");
+            for (int x = 0; x < tilesWithAnchors.size(); x++) {
+                String xAnchorPos = tilesWithAnchors.get(x).pos();
+                if (xAnchorPos != null) {
+                    Point anchor = PositionMapper.getTilePosition(xAnchorPos);
+                    String corner = positions.get(x);
+                    acceptable &= switch (corner) {
+                        case "tl" -> anchor.x <= center.x && anchor.y <= center.y;
+                        case "tr" -> anchor.x >= center.x && anchor.y <= center.y;
+                        case "bl" -> anchor.x <= center.x && anchor.y >= center.y;
+                        case "br" -> anchor.x >= center.x && anchor.y >= center.y;
+                        default -> false;
+                    };
+                }
+            }
+            if (acceptable) {
+                for (int x = 0; x < positions.size(); x++) {
+                    String corner = positions.get(x);
+                    if (x >= tilesWithAnchors.size()) {
+                        game.getTileMap().remove(corner);
+                    } else {
+                        Tile tile = tilesWithAnchors.get(x).tile();
+                        if (tile.getTileID().equals(tileID)) pos = corner;
+                        tile.setPosition(corner);
+                        game.setTile(tile);
+                    }
+                }
+            }
+        }
+        return pos;
+    }
+
+    private static String getAnchorPositionForTile(Game game, Tile t) {
+        return switch (t.getTileID()) {
+            case "51" -> game.getTile("17").getPosition();
+            case "118" -> game.getTile("94").getPosition();
+            default -> null;
+        };
     }
 
     private static void addUnits(FactionModel setupInfo, Tile tile, String color, GenericInteractionCreateEvent event) {

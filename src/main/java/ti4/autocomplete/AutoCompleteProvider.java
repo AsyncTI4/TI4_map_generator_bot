@@ -56,7 +56,6 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.ShipPositionModel;
-import ti4.model.Source;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
@@ -625,7 +624,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SOURCE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of(Source.ComponentSource.values())
+                List<Command.Choice> options = Stream.of(ComponentSource.values())
                         .filter(token -> token.toString().contains(enteredValue))
                         .limit(25)
                         .map(token -> new Command.Choice(token.toString(), token.toString()))
@@ -1708,9 +1707,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
                 .filter(model -> model.search(enteredValue, source))
-                .filter(model -> model.getSource() != ComponentSource.miltymod
-                        && model.getSource() != ComponentSource.project_pi
-                        && model.getSource() != ComponentSource.asteroid)
+                .filter(model -> !model.getSource().isHiddenFromSearch())
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
                 .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))

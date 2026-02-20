@@ -66,9 +66,10 @@ public class ButtonProcessor {
         long contextRuntime = 0;
         long resolveRuntime = 0;
         long saveRuntime = 0;
+        ButtonContext context = null;
         try {
             long beforeTime = System.currentTimeMillis();
-            ButtonContext context = new ButtonContext(event);
+            context = new ButtonContext(event);
             contextRuntime = System.currentTimeMillis() - beforeTime;
 
             if (context.isValid()) {
@@ -81,7 +82,8 @@ public class ButtonProcessor {
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            BotLogger.error(new LogOrigin(event), "Something went wrong with button interaction", e);
+            LogOrigin origin = new LogOrigin(event, context);
+            BotLogger.error(origin, "Something went wrong with button interaction", e);
         }
 
         runtimeWarningService.submitNewRuntime(
@@ -153,12 +155,6 @@ public class ButtonProcessor {
                 case "refreshInfoButtons" ->
                     MessageHelper.sendMessageToChannelWithButtons(
                             event.getChannel(), null, getRefreshInfoButtons(game));
-                case "factionEmbedRefresh" ->
-                    MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
-                            player.getCardsInfoThread(),
-                            null,
-                            List.of(player.getRepresentationEmbed()),
-                            List.of(Buttons.FACTION_EMBED));
                 case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
                 case "gain_2_comms" -> ButtonHelperStats.gainComms(event, game, player, 2, true);
                 case "gain_3_comms" -> ButtonHelperStats.gainComms(event, game, player, 3, true);

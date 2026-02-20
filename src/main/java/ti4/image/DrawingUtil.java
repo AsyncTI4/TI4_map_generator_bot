@@ -42,6 +42,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class DrawingUtil {
@@ -338,12 +339,13 @@ public class DrawingUtil {
         return factionFile;
     }
 
-    public static Image getUserDiscordAvatar(User user) {
+    public static Image getUserDiscordAvatar(String userID) {
         try {
+            User user = JdaService.jda.getUserById(userID);
             if (user == null) return null;
             return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
-            BotLogger.error("Could not get Avatar", e);
+            // BotLogger.error("Could not get Avatar", e);
         }
         return null;
     }

@@ -1,12 +1,13 @@
 package ti4.commands.franken;
 
+import net.dv8tion.jda.api.components.container.Container;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.draft.DraftItem;
-import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
 
 class FrankenViewCard extends GameStateSubcommand {
 
@@ -21,8 +22,8 @@ class FrankenViewCard extends GameStateSubcommand {
         String alias = editOption.getAsString();
 
         DraftItem item = DraftItem.generateFromAlias(alias);
-
-        MessageHelper.sendMessageToEventChannel(
-                event, item.getItemEmoji() + " " + item.getShortDescription() + "\n" + item.getLongDescription());
+        MessageV2Builder builder = new MessageV2Builder(event.getMessageChannel());
+        builder.append(Container.of(item.getTextDisplays(getGame(), getPlayer(), true)));
+        builder.send();
     }
 }

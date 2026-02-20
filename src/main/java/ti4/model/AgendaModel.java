@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +57,10 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public String getName() {
         return name;
+    }
+
+    public String getNameRepresentation() {
+        return CardEmojis.Agenda + " _" + name + "_ " + source.emoji();
     }
 
     private String getCategory() {

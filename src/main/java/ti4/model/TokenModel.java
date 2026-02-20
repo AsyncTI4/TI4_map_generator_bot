@@ -61,6 +61,10 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    public String getNameRepresentation() {
+        return "_" + getAlias() + "_ " + source.emoji();
+    }
+
     @Override
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();

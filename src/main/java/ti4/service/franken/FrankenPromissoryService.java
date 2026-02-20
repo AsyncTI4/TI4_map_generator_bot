@@ -45,7 +45,7 @@ public class FrankenPromissoryService {
             player.addOwnedPromissoryNoteByID(pnID);
             player.setPromissoryNote(pnID);
         }
-        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb.toString(), embeds);
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static void removePromissoryNotes(GenericInteractionCreateEvent event, Player player, List<String> pnIDs) {
@@ -60,6 +60,6 @@ public class FrankenPromissoryService {
             player.removeOwnedPromissoryNoteByID(pnID);
             player.removePromissoryNote(pnID);
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

@@ -20,6 +20,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -3373,58 +3374,43 @@ public class Helper {
     }
 
     public static String getUnitListEmojis(String unitList) {
-        String[] units = unitList.split(",");
+        List<UnitTypeAndCount> entries = getUnitListEntries(unitList);
         StringBuilder sb = new StringBuilder();
-        for (String desc : units) {
-            UnitTypeAndCount utc = parseUnitTypeAndCount(desc);
-            if (utc == null) {
-                continue;
-            }
-            sb.append(StringUtils.repeat(utc.unitType().getUnitTypeEmoji().toString(), utc.count()));
-        }
+        entries.forEach(utc -> sb.append(utc.emojis()));
         return sb.toString();
     }
 
     public static String getOrderedUnitListEmojis(String unitList, boolean descending) {
-        List<Map.Entry<UnitType, Integer>> entries = getUnitListEntries(unitList);
-        entries.sort(Comparator.comparing(Map.Entry::getKey));
-        if (descending) {
-            Collections.reverse(entries);
-        }
+        List<UnitTypeAndCount> entries = getUnitListEntries(unitList);
+        Comparator<UnitTypeAndCount> comp = Comparator.comparing(UnitTypeAndCount::unitType);
+        if (descending) comp = comp.reversed();
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<UnitType, Integer> entry : entries) {
-            sb.append(StringUtils.repeat(entry.getKey().getUnitTypeEmoji().toString(), entry.getValue()));
-        }
+        entries.stream().sorted(comp).forEach(utc -> sb.append(utc.emojis()));
         return sb.toString();
     }
 
-    public static List<Map.Entry<UnitType, Integer>> getUnitListEntries(String unitList) {
-        Map<UnitType, Integer> unitCounts = new HashMap<>();
+    private static List<UnitTypeAndCount> getUnitListEntries(String unitList) {
         String[] units = unitList.split(",");
-        for (String desc : units) {
-            UnitTypeAndCount utc = parseUnitTypeAndCount(desc);
-            if (utc == null) {
-                continue;
-            }
-            unitCounts.merge(utc.unitType(), utc.count(), Integer::sum);
-        }
-        return new ArrayList<>(unitCounts.entrySet());
+        return Stream.of(units)
+                .map(Helper::parseUnitTypeAndCount)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public static Map<UnitType, Integer> getUnitList(String unitList) {
         Map<UnitType, Integer> unitCounts = new HashMap<>();
-        String[] units = unitList.split(",");
-        for (String desc : units) {
-            UnitTypeAndCount utc = parseUnitTypeAndCount(desc);
-            if (utc == null) {
-                continue;
-            }
+        for (UnitTypeAndCount utc : getUnitListEntries(unitList)) {
             unitCounts.merge(utc.unitType(), utc.count(), Integer::sum);
         }
         return unitCounts;
     }
 
-    private record UnitTypeAndCount(UnitType unitType, int count) {}
+    private record UnitTypeAndCount(UnitType unitType, int count) {
+        public String emojis() {
+            String emoji = unitType().getUnitTypeEmoji().toString();
+            return StringUtils.repeat(emoji, count);
+        }
+    }
 
     private static UnitTypeAndCount parseUnitTypeAndCount(String desc) {
         String[] split = desc.trim().split(" ");

@@ -125,9 +125,25 @@ public class Source {
             };
         }
 
+        public boolean isTe() {
+            return switch (this) {
+                case base, pok, codex1, codex2, codex3, codex4, thunders_edge -> true;
+                default -> false;
+            };
+        }
+
         public boolean isDs() {
             return switch (this) {
                 case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
+                default -> false;
+            };
+        }
+
+        public boolean isHiddenFromSearch() {
+            return switch (this) {
+                case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
+                case keleresplus, project_pi, asteroid -> true;
+                case pbd100, pbd500, pbd1000 -> true;
                 default -> false;
             };
         }

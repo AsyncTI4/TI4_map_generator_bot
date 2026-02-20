@@ -120,10 +120,6 @@ class SearchSources extends Subcommand {
         occurrences.put("Explores", Mapper.getExploresSources(compSource).size());
         occurrences.put("Factions", Mapper.getFactionsSources(compSource).size());
         occurrences.put(
-                "Draft Errata",
-                Mapper.getDraftErratasSources(compSource)
-                        .size()); // Draft Errata is related to files in \data\franken_errata\*
-        occurrences.put(
                 "Generic Cards", Mapper.getGenericCardsSources(compSource).size());
         occurrences.put("Leaders", Mapper.getLeadersSources(compSource).size());
         // occurrences.put("Map Templates", get...(compSource).size());
@@ -172,7 +168,6 @@ class SearchSources extends Subcommand {
         List<String> eventSources = Mapper.getEventsSources(null);
         List<String> exploreSources = Mapper.getExploresSources(null);
         List<String> factionSources = Mapper.getFactionsSources(null);
-        List<String> drafterrataSources = Mapper.getDraftErratasSources(null);
         List<String> genericcardSources = Mapper.getGenericCardsSources(null);
         List<String> leaderSources = Mapper.getLeadersSources(null);
         // map_templates not sourced
@@ -197,7 +192,6 @@ class SearchSources extends Subcommand {
                         eventSources,
                         exploreSources,
                         factionSources,
-                        drafterrataSources,
                         genericcardSources,
                         leaderSources,
                         promissorynoteSources,

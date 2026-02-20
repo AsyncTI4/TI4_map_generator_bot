@@ -42,7 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
-import ti4.draft.DraftItem;
+import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.AliasHandler;
@@ -586,19 +586,11 @@ public class Game extends GameProperties {
 
     public int getFrankenBagSize() {
         int size = 0;
-        boolean overRodeNormal = false;
-        Iterable<DraftItem.Category> categories = new ArrayList<>(EnumSet.allOf(DraftItem.Category.class));
-        for (DraftItem.Category category : categories) {
-            if (!getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
-                overRodeNormal = true;
-            }
+        Iterable<DraftCategory> categories = new ArrayList<>(EnumSet.allOf(DraftCategory.class));
+        for (DraftCategory category : categories) {
             size += FrankenDraft.getItemLimitForCategory(category, this);
         }
-        if (overRodeNormal) {
-            return size;
-        } else {
-            return activeDraft.getBagSize();
-        }
+        return size;
     }
 
     public void setBagDraft(BagDraft draft) {

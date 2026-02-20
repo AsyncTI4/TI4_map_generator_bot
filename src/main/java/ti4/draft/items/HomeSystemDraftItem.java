@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -19,13 +20,25 @@ import ti4.service.emoji.TI4Emoji;
 public class HomeSystemDraftItem extends DraftItem {
 
     public HomeSystemDraftItem(String itemId) {
-        super(Category.HOMESYSTEM, itemId);
+        super(DraftCategory.HOMESYSTEM, itemId);
+    }
+
+    public static HomeSystemDraftItem generate(String itemId) {
+        return new HomeSystemDraftItem(itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        FactionModel faction = Mapper.getFaction(getItemId());
+        TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
+        return getItemEmoji() + " " + tile.getNameRepresentation();
     }
 
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return Mapper.getFaction(ItemId).getFactionName() + " Home System";
+        return Mapper.getFaction(getItemId()).getShortName() + " HS";
     }
 
     @JsonIgnore
@@ -37,10 +50,12 @@ public class HomeSystemDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
-        if ("ghost".equals(ItemId)) {
-            return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
+        if ("ghost".equals(getItemId())) {
+            return "Delta Wormhole, Creuss (4/2)";
+        } else if ("crimson".equals(getItemId())) {
+            return "Epsilon Wormhole, Ahk Creuxx (4/2)";
         }
-        FactionModel faction = Mapper.getFaction(ItemId);
+        FactionModel faction = Mapper.getFaction(getItemId());
         TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanets();
@@ -64,26 +79,26 @@ public class HomeSystemDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public TI4Emoji getItemEmoji() {
-        return FactionEmojis.getFactionIcon(ItemId);
+        return FactionEmojis.getFactionIcon(getItemId());
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.HOMESYSTEM);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.HOMESYSTEM);
         return allItems;
     }
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(generate(DraftCategory.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.HOMESYSTEM);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.HOMESYSTEM);
         return allItems;
     }
 
@@ -94,7 +109,7 @@ public class HomeSystemDraftItem extends DraftItem {
             if (Arrays.asList(results).contains(faction.getAlias())) {
                 continue;
             }
-            allItems.add(generate(Category.HOMESYSTEM, faction.getAlias()));
+            allItems.add(generate(DraftCategory.HOMESYSTEM, faction.getAlias()));
         }
         return allItems;
     }

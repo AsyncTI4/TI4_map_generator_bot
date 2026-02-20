@@ -33,7 +33,10 @@ public class Buttons {
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
+    public static final Button CANCEL = gray("deleteButtons", "Cancel");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
+    public static final Button DEAL_2_SO =
+            green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);
 
     // Cards Info Buttons
     public static final Button EDIT_SUMMARIES = blue("editEndOfRoundSummaries", "Edit Summaries");

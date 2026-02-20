@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -63,6 +63,10 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
             return po1.points < po2.points ? -1 : 1;
         }
     };
+
+    public String getNameRepresentation() {
+        return CardEmojis.SecretObjective + " _" + getName() + "_ " + source.emoji();
+    }
 
     public String getRepresentation() {
         return getRepresentation(true);
