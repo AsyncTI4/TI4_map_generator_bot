@@ -104,7 +104,7 @@
         "alias": "classified_weapons1",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When your units make a combat or unit ability roll",
+        "window": "When 1 or more of your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
         "source": "action_deck_2"
@@ -113,7 +113,7 @@
         "alias": "classified_weapons2",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When your units make a combat or unit ability roll",
+        "window": "When 1 or more of your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn chuckled. \"Finish them.\"",
         "source": "action_deck_2"
@@ -122,7 +122,7 @@
         "alias": "classified_weapons3",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When your units make a combat or unit ability roll",
+        "window": "When 1 or more of your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
         "source": "action_deck_2"
@@ -131,7 +131,7 @@
         "alias": "classified_weapons4",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When your units make a combat or unit ability roll",
+        "window": "When 1 or more of your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
         "source": "action_deck_2"
@@ -310,8 +310,8 @@
         "alias": "efficiency1",
         "name": "Efficiency",
         "phase": "Any",
-        "window": "When your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
         "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
         "source": "action_deck_2"
     },
@@ -319,8 +319,8 @@
         "alias": "efficiency2",
         "name": "Efficiency",
         "phase": "Any",
-        "window": "When your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
         "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
         "source": "action_deck_2"
     },
@@ -328,17 +328,17 @@
         "alias": "efficiency3",
         "name": "Efficiency",
         "phase": "Any",
-        "window": "When your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by up to 4.",
-        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph. \"I heard there's good money in scrap these days.\"",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
         "source": "action_deck_2"
     },
     {
         "alias": "efficiency4",
         "name": "Efficiency",
         "phase": "Any",
-        "window": "When your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
         "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
         "source": "action_deck_2"
     },
@@ -475,10 +475,10 @@
         "alias": "liquidation",
         "name": "Liquidation",
         "phase": "Action",
-        "window": "When your units use PRODUCTION",
+        "window": "When 1 or more of your units use PRODUCTION",
         "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
         "notes": "These trade goods are available to be spent during this PRODUCTION.",
-        "flavorText": "The blueprints called for triple-redundant cooling systems. I48S found that with a 6% increase in risk, they could reclaim enough raw polymer to satisfy the local trade guilds. Further, buyers would line up for the scrap created from the catastrophic failures.",
+        "flavorText": "I48S found that cutting redundant cooling systems resulted in a 6% increase in risk, but they could reclaim enough polymer to satisfy the trade guilds. Plus, buyers would line up for what was left of any catastrophic failure.",
         "source": "action_deck_2"
     },
     {
@@ -685,7 +685,7 @@
         "name": "Refabrication",
         "phase": "Any",
         "window": "After 1 of your ships is destroyed",
-        "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of the produced ship by up to 4.",
+        "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of the produced ship by 4.",
         "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
         "source": "action_deck_2"
     },
