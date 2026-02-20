@@ -84,6 +84,8 @@ class MigrationHelper {
             mapNeededMigrating |= replace(game.getAgendas(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getDiscardAgendas(), toReplace, replacement);
             mapNeededMigrating |= replaceKey(game.getSentAgendas(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getLaws(), toReplace, replacement);
+            mapNeededMigrating |= replaceKey(game.getLawsInfo(), toReplace, replacement);
         }
         return mapNeededMigrating;
     }
@@ -99,12 +101,14 @@ class MigrationHelper {
     }
 
     private static <K> boolean replace(List<K> list, K toReplace, K replacement) {
+        boolean replaced = false;
         int index = list.indexOf(toReplace);
-        if (index > -1) {
+        while (index > -1) {
             list.set(index, replacement);
-            return true;
+            replaced = true;
+            index = list.indexOf(toReplace);
         }
-        return false;
+        return replaced;
     }
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {

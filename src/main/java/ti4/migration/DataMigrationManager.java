@@ -52,6 +52,9 @@ public class DataMigrationManager {
         migrations.put(
                 "renameGarboziaToBozgarbia_201025_withEnded",
                 DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
+        migrations.put(
+                "fixMisspelledAgendaIds_200226",
+                DataMigrationManager::fixMisspelledAgendaIds_200226);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -170,5 +173,14 @@ public class DataMigrationManager {
         p.getExhaustedPlanets().add("bozgarbia");
         p.getExhaustedPlanetsAbilities().add("bozgarbia");
         return true;
+    }
+
+    private static Boolean fixMisspelledAgendaIds_200226(Game game) {
+        Map<String, String> replacements = Map.of(
+                "disarmamament", "disarmament",
+                "minister_commrece", "minister_commerce",
+                "senate_sancturary", "senate_sanctuary");
+
+        return MigrationHelper.replaceAgendaCards(game, List.of(game.getAgendaDeckID()), replacements);
     }
 }
