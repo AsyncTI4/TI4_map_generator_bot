@@ -4,7 +4,7 @@
         "name": "Amendment",
         "phase": "Action",
         "window": "At the end of the status phase",
-        "text": "Purge 1 public objective you have scored. Then, draw and reveal 1 secret objective; that objective is a public objective and is placed near the others in the common play area.",
+        "text": "Purge 1 public objective you have scored. Then, draw and reveal an objective from either public objective deck and place it near the other public objectives.",
         "flavorText": "Junn waddled away from the stunned hush that followed his announcements, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_deck_2"
     },
@@ -104,7 +104,7 @@
         "alias": "classified_weapons1",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
         "source": "action_deck_2"
@@ -113,7 +113,7 @@
         "alias": "classified_weapons2",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn chuckled. \"Finish them.\"",
         "source": "action_deck_2"
@@ -122,7 +122,7 @@
         "alias": "classified_weapons3",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
         "source": "action_deck_2"
@@ -131,7 +131,7 @@
         "alias": "classified_weapons4",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
         "source": "action_deck_2"
@@ -141,7 +141,7 @@
         "name": "Collusion",
         "phase": "Action",
         "window": "When another player resolves the secondary ability of your strategy card",
-        "text": "Return 1 of that player's command tokens from the game board to their strategy pool. Then, you may perform a transaction with that player; action cards and unscored secret objectives can be traded as part of this transaction.",
+        "text": "Return 1 of that player's command tokens from the game board to their strategy pool.",
         "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
@@ -159,7 +159,7 @@
         "name": "Contingency",
         "phase": "Action",
         "window": "After another player activates a system that contains your units",
-        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less.",
+        "text": "Produce up to 2 ships in that system that have a combined cost of 3 or less.",
         "flavorText": "\"Il Na Viroset will arrive soon,\" Artuno promised. Gila hesitated, \"How do you know?\"",
         "source": "action_deck_2"
     },
@@ -1226,7 +1226,7 @@
         "name": "Rogues",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Place 3 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
+        "text": "Place 3 neutral fighters in a non-home anomaly; space combat is resolved in that system if it contains non-neutral ships.",
         "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
         "source": "action_deck_2"
     },
