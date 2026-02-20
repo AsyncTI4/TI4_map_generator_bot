@@ -4,7 +4,7 @@
         "name": "Amendment",
         "phase": "Action",
         "window": "At the end of the status phase",
-        "text": "Purge 1 public objective you have scored. Then, draw and reveal 1 secret objective; that objective is a public objective and is placed near the others in the common play area.",
+        "text": "Purge 1 public objective you have scored. Then, draw and reveal an objective from either public objective deck and place it near the other public objectives.",
         "flavorText": "Junn waddled away from the stunned hush that followed his announcements, a ghost of a smile betraying the victory he had labored years to secure.",
         "source": "action_deck_2"
     },
@@ -104,7 +104,7 @@
         "alias": "classified_weapons1",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
         "source": "action_deck_2"
@@ -113,7 +113,7 @@
         "alias": "classified_weapons2",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn chuckled. \"Finish them.\"",
         "source": "action_deck_2"
@@ -122,7 +122,7 @@
         "alias": "classified_weapons3",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
         "source": "action_deck_2"
@@ -131,7 +131,7 @@
         "alias": "classified_weapons4",
         "name": "Classified Weapons",
         "phase": "Action",
-        "window": "When 1 of your units makes a combat or unit ability roll",
+        "window": "When your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
         "source": "action_deck_2"
@@ -141,7 +141,7 @@
         "name": "Collusion",
         "phase": "Action",
         "window": "When another player resolves the secondary ability of your strategy card",
-        "text": "Return 1 of that player's command tokens from the game board to their strategy pool. Then, you may perform a transaction with that player; action cards and unscored secret objectives can be traded as part of this transaction.",
+        "text": "Return 1 of that player's command tokens from the game board to their strategy pool.",
         "flavorText": "Gambit? The magi laughed. Hardly.",
         "source": "action_deck_2"
     },
@@ -159,7 +159,7 @@
         "name": "Contingency",
         "phase": "Action",
         "window": "After another player activates a system that contains your units",
-        "text": "You may resolve a transaction with any player; action cards can be traded as part of this transaction. Then, produce up to 2 ships in that system that have a combined cost of 3 or less.",
+        "text": "Produce up to 2 ships in that system that have a combined cost of 3 or less.",
         "flavorText": "\"Il Na Viroset will arrive soon,\" Artuno promised. Gila hesitated, \"How do you know?\"",
         "source": "action_deck_2"
     },
@@ -307,6 +307,42 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "efficiency1",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "efficiency2",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "efficiency3",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph. \"I heard there's good money in scrap these days.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "efficiency4",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "smuggler_routes",
         "name": "Smuggler Routes",
         "phase": "Action",
@@ -314,16 +350,6 @@
         "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action.",
         "notes": "You can transport units during this movement.",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "efficiency_initiative",
-        "name": "Efficiency Initiative",
-        "phase": "Action",
-        "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
-        "notes": "These trade goods are available to be spent during this PRODUCTION.",
-        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
         "source": "action_deck_2"
     },
     {
@@ -446,6 +472,16 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "liquidation",
+        "name": "Liquidation",
+        "phase": "Action",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
+        "notes": "These trade goods are available to be spent during this PRODUCTION.",
+        "flavorText": "The blueprints called for triple-redundant cooling systems. I48S found that with a 6% increase in risk, they could reclaim enough raw polymer to satisfy the local trade guilds. Further, buyers would line up for the scrap created from the catastrophic failures.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "lost_treatise",
         "name": "Lost Treatise",
         "phase": "Action",
@@ -468,7 +504,7 @@
         "name": "Mass Transference",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "text": "Remove up to 4 of your units from planets in that system and place them on any planets you control.",
         "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2"
     },
@@ -672,42 +708,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "relay_assembly1",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly2",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "Umbat had seen to the supply chain himself. No need went unmet; each world supplied the next with generational craftsmanship.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly3",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "In short order, their once-meager fleet grew into an armada spanning sectors. From Umbat's hearthworld to distant suns, its shadow lengthened—stoked by their fury.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly4",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "retrofit",
         "name": "Retrofit",
         "phase": "Action",
@@ -876,7 +876,7 @@
         "window": "When another player gains 3 or more trade goods",
         "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
         "notes": "This works at any time such a quantity could be PILLAGE'd. The additional trade good gained does not open another PILLAGE window.",
-        "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
@@ -884,7 +884,7 @@
         "name": "Syndicate",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Reveal a number of cards from the action card deck equal to the number of players. For each other player, choose 1 of those cards; that player may draw that card. Then, draw the rest.",
+        "text": "Reveal a number of cards from the action card deck equal to the number of players. For each player, choose 1 of those cards; that player draws that card.",
         "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
         "source": "action_deck_2"
     },
@@ -893,7 +893,7 @@
         "name": "Ubiquity",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Spend 6 resources to research 1 technology owned by another player; for each of your neighbors that owns that technology, reduce the resources spent by 1 and ignore 1 prerequisite.",
+        "text": "Spend 4 resources to gain 1 non-faction technology with less prerequisites than the number of players that own it.",
         "flavorText": "Once an enigmatic device plucked from the void, it had become nothing more than schematics: patented and traded to the rim of the galaxy.",
         "source": "action_deck_2"
     },
@@ -1163,7 +1163,7 @@
         "phase": "Action",
         "window": "After you lose a space combat",
         "text": "Place 1 neutral cruiser and 2 neutral destroyers in that system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
+        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg.\"",
         "source": "action_deck_2"
     },
     {
@@ -1222,19 +1222,19 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "rogues",
-        "name": "Rogues",
+        "alias": "relay_assembly",
+        "name": "Relay Assembly",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Place 3 neutral fighters in a non-home system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury. His engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
     },
     {
         "alias": "sacrifice1",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Sharsiss exulted. Each foolish puppet had done his bidding without notice. Their minds shattered at the merest glimpse of power—of what was to come, of what they would become.",
         "source": "action_deck_2"
@@ -1243,7 +1243,7 @@
         "alias": "sacrifice2",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Mot was disturbed by the sight of the ivory monolith looming over the capitol. He was told that it was his idea to bring it here, but had no recollection of it.",
         "source": "action_deck_2"
@@ -1252,7 +1252,7 @@
         "alias": "sacrifice3",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "The insignificant device let off no energy, no known signals. It lay inert for untold ages. Yet, upon touch, innumerable, unspeakable truths were relayed in an instant. Then, there was only darkness.",
         "source": "action_deck_2"
@@ -1261,7 +1261,7 @@
         "alias": "sacrifice4",
         "name": "Sacrifice",
         "phase": "Action",
-        "window": "At the start of your turn",
+        "window": "ACTION",
         "text": "Choose 1 planet that contains your units. Destroy each unit on that planet to either draw 1 secret objective, gain your breakthrough, or move 1 ingress token into that planet's system.",
         "flavorText": "Dart sighed. \"Wake the unspeakable horror from eternal slumber, you said—they'll be grateful!\" Tai only whimpered as their ship lifted off without them.",
         "source": "action_deck_2"

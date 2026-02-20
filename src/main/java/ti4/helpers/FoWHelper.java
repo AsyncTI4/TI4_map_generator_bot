@@ -712,8 +712,8 @@ public class FoWHelper {
                 && player.hasTech("lgf")
                 && !player.getPlanets().contains("mrte")
                 && !player.getPlanets().contains("mr")
-                && (tile.getUnitHolders().keySet().contains("mrte")
-                        || tile.getUnitHolders().keySet().contains("mr"))) {
+                && (tile.getUnitHolders().containsKey("mrte")
+                        || tile.getUnitHolders().containsKey("mr"))) {
             wormholeIDs.add(Constants.BETA);
             wormholeIDs.add(Constants.ALPHA);
         }

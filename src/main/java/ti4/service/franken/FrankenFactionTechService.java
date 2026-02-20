@@ -13,6 +13,11 @@ import ti4.model.UnitModel;
 public class FrankenFactionTechService {
 
     public static void addFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
+        if (player.getGame().isTwilightsFallMode()) {
+            addTF_Techs(event, player, techIDs);
+            return;
+        }
+
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added technologies:\n");
         for (String techID : techIDs) {
             if (player.getFactionTechs().contains(techID)) {
@@ -34,10 +39,15 @@ public class FrankenFactionTechService {
                 });
             }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static void removeFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
+        if (player.getGame().isTwilightsFallMode()) {
+            removeTF_Techs(event, player, techIDs);
+            return;
+        }
+
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed faction technologies:\n");
         for (String techID : techIDs) {
             if (!player.getFactionTechs().contains(techID)) {
@@ -59,6 +69,37 @@ public class FrankenFactionTechService {
                 player.addOwnedUnitByID(unitModel.getBaseType()); // add the base unit back
             }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
+    }
+
+    private void addTF_Techs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
+        for (String tech : techIDs) {
+            if (player.getGame().isVeiledHeartMode()) {
+                String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+
+                String key = "veiledCards" + player.getFaction();
+                String val = player.getGame().getStoredValue("veiledCards" + player.getFaction()) + tech + "_";
+                player.getGame().setStoredValue(key, val);
+            } else {
+                player.addTech(tech);
+            }
+        }
+    }
+
+    private void removeTF_Techs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
+        for (String tech : techIDs) {
+            if (player.getGame().isVeiledHeartMode()) {
+                String msg = "Removed a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+                MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+
+                String key = "veiledCards" + player.getFaction();
+                String val = player.getGame().getStoredValue("veiledCards" + player.getFaction());
+                val = val.replace(tech + "_", "");
+                player.getGame().setStoredValue(key, val);
+            } else {
+                player.addTech(tech);
+            }
+        }
     }
 }

@@ -19,6 +19,7 @@ public enum GameStatTypes {
     ENDING_ROUND_PHASE("End round and phase", "Shows how many games ended by round and phase"),
     PHASE_TIMES("Phase Times", "Shows how long each phase lasted, in days"),
     SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred holding a Support for the Throne"),
+    GAME_MODE_COUNT("Game count by mode", "Shows game counts and percentages for each game mode"),
     GAME_COUNT("Total game count", "Shows the total game count");
 
     private final String name;

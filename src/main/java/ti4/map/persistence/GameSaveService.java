@@ -874,8 +874,8 @@ class GameSaveService {
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
-            writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
-            writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
+            writeCards(player.getPlotCardsRaw(), writer, Constants.PLOT_CARDS);
+            writeCardsStringList(player.getPlotCardsFactionsRaw(), writer, Constants.PLOT_FACTIONS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -956,8 +956,6 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
-            // old spot
-
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
@@ -1001,6 +999,8 @@ class GameSaveService {
                                     .map(String::valueOf)
                                     .toList()));
             writer.write(System.lineSeparator());
+
+            writeStrStrMap(writer, Constants.PLAYER_STORED_VALUES, player.getStoredValueMap());
 
             player.getBreakthroughUnlocked().remove(null);
             player.getBreakthroughExhausted().remove(null);
@@ -1134,6 +1134,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
+    /** Assumes the map is already properly escaped */
     private static void writeStrStrMap(Writer writer, String field, Map<String, String> map) throws IOException {
         List<String> entries = map.entrySet().stream()
                 .map(e -> e.getKey() + "," + e.getValue())
