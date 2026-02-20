@@ -7,9 +7,9 @@ import ti4.commands.GameStateSubcommand;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-class StarBalanceCount extends GameStateSubcommand {
+class SteelBalanceCount extends GameStateSubcommand {
 
-    public StarBalanceCount() {
+    public SteelBalanceCount() {
         super("steelbalance_count", "Set steel balance amount", true, true);
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
     }

@@ -789,6 +789,8 @@ public class PlayerAreaGenerator {
         if (player.getDishonorCounter() < 1
                 && player.getHonorCounter() < 1
                 && player.getPathTokenCounter() < 1
+                && player.getSteelbalanceCounter() < 1
+                && player.getStarbalanceCounter() < 1
                 && !game.isVeiledHeartMode()) {
             return xDeltaFromRightSide;
         }
@@ -801,18 +803,31 @@ public class PlayerAreaGenerator {
                     mapWidth - xDeltaFromRightSide - 300,
                     yDelta + 50);
         } else {
-            if (player.getHonorCounter() > 0) {
+            if (player.getHonorCounter() > 0 || player.getDishonorCounter() > 0) {
                 DrawingUtil.superDrawStringCenteredDefault(
                         graphics,
                         "Honor Count: " + player.getHonorCounter(),
                         mapWidth - xDeltaFromRightSide - 300,
                         yDelta + 50);
             } else {
-                DrawingUtil.superDrawStringCenteredDefault(
-                        graphics,
-                        "Path Token Count: " + player.getPathTokenCounter(),
-                        mapWidth - xDeltaFromRightSide - 300,
-                        yDelta + 50);
+                if (player.getSteelbalanceCounter() > 0 || player.getStarbalanceCounter() > 0) {
+                    DrawingUtil.superDrawStringCenteredDefault(
+                            graphics,
+                            "Steel Count: " + player.getSteelbalanceCounter(),
+                            mapWidth - xDeltaFromRightSide - 300,
+                            yDelta + 50);
+                    DrawingUtil.superDrawStringCenteredDefault(
+                            graphics,
+                            "Star Count: " + player.getStarbalanceCounter(),
+                            mapWidth - xDeltaFromRightSide - 300,
+                            yDelta + 100);
+                } else {
+                    DrawingUtil.superDrawStringCenteredDefault(
+                            graphics,
+                            "Path Token Count: " + player.getPathTokenCounter(),
+                            mapWidth - xDeltaFromRightSide - 300,
+                            yDelta + 50);
+                }
             }
             if (player.getDishonorCounter() > 0) {
                 DrawingUtil.superDrawStringCenteredDefault(
