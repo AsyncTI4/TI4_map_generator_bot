@@ -307,6 +307,42 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "efficiency1",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "efficiency2",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "efficiency3",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph. \"I heard there's good money in scrap these days.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "efficiency4",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by up to 4.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "smuggler_routes",
         "name": "Smuggler Routes",
         "phase": "Action",
@@ -314,16 +350,6 @@
         "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this action.",
         "notes": "You can transport units during this movement.",
         "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "efficiency_initiative",
-        "name": "Efficiency Initiative",
-        "phase": "Action",
-        "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
-        "notes": "These trade goods are available to be spent during this PRODUCTION.",
-        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
         "source": "action_deck_2"
     },
     {
@@ -443,6 +469,16 @@
         "window": "After you gain control of a planet",
         "text": "Place 2 infantry from your reinforcements on that planet. Then, ready and explore it.",
         "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "liquidation",
+        "name": "Liquidation",
+        "phase": "Action",
+        "window": "When your units use PRODUCTION",
+        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
+        "notes": "These trade goods are available to be spent during this PRODUCTION.",
+        "flavorText": "The blueprints called for triple-redundant cooling systems. I48S found that with a 6% increase in risk, they could reclaim enough raw polymer to satisfy the local trade guilds. Further, buyers would line up for the scrap created from the catastrophic failures.",
         "source": "action_deck_2"
     },
     {
@@ -672,42 +708,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "relay_assembly1",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly2",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "Umbat had seen to the supply chain himself. No need went unmet; each world supplied the next with generational craftsmanship.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly3",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "In short order, their once-meager fleet grew into an armada spanning sectors. From Umbat's hearthworld to distant suns, its shadow lengthened—stoked by their fury.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "relay_assembly4",
-        "name": "Relay Assembly",
-        "phase": "Action",
-        "window": "After you produce a ship",
-        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
-        "flavorText": "His engineers broke into celebration as Umbat called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "retrofit",
         "name": "Retrofit",
         "phase": "Action",
@@ -876,7 +876,7 @@
         "window": "When another player gains 3 or more trade goods",
         "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
         "notes": "This works at any time such a quantity could be PILLAGE'd. The additional trade good gained does not open another PILLAGE window.",
-        "flavorText": "The deal was too good to be true. Every seal was genuine, every signature correct. Only Suffi and the cargo were amiss.",
+        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
     {
@@ -1163,7 +1163,7 @@
         "phase": "Action",
         "window": "After you lose a space combat",
         "text": "Place 1 neutral cruiser and 2 neutral destroyers in that system; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
+        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg.\"",
         "source": "action_deck_2"
     },
     {
@@ -1222,12 +1222,12 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "rogues",
-        "name": "Rogues",
+        "alias": "relay_assembly",
+        "name": "Relay Assembly",
         "phase": "Action",
-        "window": "ACTION",
-        "text": "Place 3 neutral fighters in a non-home anomaly; space combat is resolved in that system if it contains non-neutral ships.",
-        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "From Umbat's hearthworld to distant suns, the shadow of his armada lengthened—stoked by their fury. His engineers broke into celebration as he called out in praise, \"The forge burns my soul alight! This is our freedom!\"",
         "source": "action_deck_2"
     },
     {
