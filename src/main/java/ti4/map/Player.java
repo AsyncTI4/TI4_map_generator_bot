@@ -957,6 +957,9 @@ public class Player extends PlayerProperties {
 
     public boolean isOtherPlayerPuppeted(Player p2) {
         for (List<String> puppets : getPlotCardsFactions().values()) {
+            if (puppets == null) {
+                return false;
+            }
             if (puppets.contains(p2.getFaction())) {
                 return true;
             }
@@ -1515,6 +1518,9 @@ public class Player extends PlayerProperties {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
+        }
+        if (hasAbility("balance") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+            bonus -= 2;
         }
 
         if (hasAbility("necrophage")) {

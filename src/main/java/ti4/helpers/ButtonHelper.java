@@ -21,13 +21,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -56,6 +50,9 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1155,7 +1152,7 @@ public class ButtonHelper {
         if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")) {
             return true;
         }
-        if(player.hasTech("tf-mr") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0){
+        if (player.hasTech("tf-mr") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0) {
             return true;
         }
 
@@ -4354,6 +4351,43 @@ public class ButtonHelper {
         Tile tile = game.getTileByPosition(pos);
         ExploreService.expFront(event, tile, game, player, true);
         deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    public static List<Button> getBalanceButtons(Player player) {
+        List<Button> buttons2 = new ArrayList<>();
+        if (player.getStarbalanceCounter() + player.getSteelbalanceCounter() < 8) {
+            buttons2.add(Buttons.green("balanceToken_gain_star", "Gain 1 Star"));
+            buttons2.add(Buttons.green("balanceToken_gain_steel", "Gain 1 Steel"));
+        }
+        if (player.getSteelbalanceCounter() > 1) {
+            buttons2.add(Buttons.gray("balanceToken_flip_star", "Flip 1 Steel to Star"));
+        }
+        if (player.getStarbalanceCounter() > 1) {
+            buttons2.add(Buttons.gray("balanceToken_flip_steel", "Flip 1 Star to Steel"));
+        }
+        return buttons2;
+    }
+
+    @ButtonHandler("balanceToken_")
+    public static void balanceToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String action = buttonID.split("_")[1];
+        String type = buttonID.split("_")[2];
+        String msg = player.getRepresentation() + " gained 1 " + type + " balance token.";
+        if (type.equalsIgnoreCase("steel")) {
+            player.setSteelbalanceCounter(player.getSteelbalanceCounter() + 1);
+            if (action.equalsIgnoreCase("flip")) {
+                msg += " They lost 1 star token";
+                player.setStarbalanceCounter(player.getStarbalanceCounter() - 1);
+            }
+        } else {
+            player.setStarbalanceCounter(player.getStarbalanceCounter() + 1);
+            if (action.equalsIgnoreCase("flip")) {
+                msg += " They lost 1 steel token";
+                player.setSteelbalanceCounter(player.getSteelbalanceCounter() - 1);
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        deleteMessage(event);
     }
 
     public static Button getEndTurnButton(Game game, Player player) {

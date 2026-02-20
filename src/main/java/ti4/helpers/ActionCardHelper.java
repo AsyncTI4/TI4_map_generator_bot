@@ -1698,6 +1698,13 @@ public class ActionCardHelper {
                 }
                 serveReverseEngineerButtons(game, player, List.of(acID));
                 serveTwinningButtons(game, player, List.of(acID));
+            } else {
+                if (player.hasAbility("matters_of_state")) {
+                    String message2 = player.getRepresentationUnfogged()
+                            + " if the AC is not sabod, please gain or flip 1 balance token.";
+                    List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
+                }
             }
         }
 
