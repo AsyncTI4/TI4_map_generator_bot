@@ -25,7 +25,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.MessageHelper.MessageFunction;
 import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
@@ -109,7 +108,7 @@ public class PublicDraftInfoService {
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
-        MessageFunction clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
+        Consumer<Message> clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
 
@@ -347,7 +346,7 @@ public class PublicDraftInfoService {
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(
+    private Consumer<Message> clearOldPingsAndButtonsFunc(
             boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)

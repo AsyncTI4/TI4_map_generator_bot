@@ -520,6 +520,7 @@ public class Constants {
     public static final String CURRENT_ACDRAWSTATUS_INFO = "current_acdrawstatus_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String CHECK_REACTS_INFO = "check_reacts_info";
+    public static final String PLAYER_STORED_VALUES = "player_stored_values";
     public static final String THALNOS_UNITS = "thalnos_units";
     public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";

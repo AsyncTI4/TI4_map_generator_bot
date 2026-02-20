@@ -1,6 +1,7 @@
 package ti4.map;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -211,15 +212,15 @@ public class Planet extends UnitHolder {
             influenceModifier += attachment.getInfluenceModifier();
             int originalRes = resourcesOriginal + resourcesModifier;
             int originalInf = influenceOriginal + influenceModifier;
-            if (attachment.getAlias().equalsIgnoreCase("designtranspose")) {
+            if ("designtranspose".equalsIgnoreCase(attachment.getAlias())) {
                 resourcesModifier += originalInf - originalRes;
                 influenceModifier += originalRes - originalInf;
             }
-            if (attachment.getAlias().equalsIgnoreCase("designgrand")) {
+            if ("designgrand".equalsIgnoreCase(attachment.getAlias())) {
                 resourcesModifier += originalRes;
                 influenceModifier += originalInf;
             }
-            if (attachment.getAlias().equalsIgnoreCase("designcombine")) {
+            if ("designcombine".equalsIgnoreCase(attachment.getAlias())) {
                 resourcesModifier += originalInf;
                 influenceModifier += originalRes;
             }

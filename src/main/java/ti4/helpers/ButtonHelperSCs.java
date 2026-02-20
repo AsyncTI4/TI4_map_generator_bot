@@ -1270,8 +1270,7 @@ public class ButtonHelperSCs {
     }
 
     @ButtonHandler("leadershipGenerateCCButtons")
-    public static void leadershipGenerateCCButtons(
-            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void leadershipButtons(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok1leadership")) {

@@ -375,7 +375,6 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
 
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
         game.getTacticalActionDisplacement().clear();
     }
 

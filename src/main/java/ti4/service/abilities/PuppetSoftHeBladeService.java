@@ -51,7 +51,8 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        StringBuilder plotInfo = new StringBuilder("## __The Obsidian's plots are now revealed:__");
+        String factionName = player.getDisplayName();
+        StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
             plotInfo.append("\n").append(plot.getRepresentation());
@@ -136,7 +137,7 @@ public class PuppetSoftHeBladeService {
     private static void resolveFirmamentMechFlip(Game game, Player player) {
         int count = 0;
         String output = "### " + player.getRepresentation(false, true)
-                + " the following planets have been taken control of by Obisidian mechs:";
+                + ", the following planets have been taken control of by Vipers Hollow:";
         for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
             UnitHolder uH = game.getUnitHolderFromPlanet(planet);
             if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {

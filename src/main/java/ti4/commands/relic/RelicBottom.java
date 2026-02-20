@@ -18,7 +18,6 @@ class RelicBottom extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to bottom")
                 .setAutoComplete(true)
                 .setRequired(true));
-        ;
     }
 
     @Override

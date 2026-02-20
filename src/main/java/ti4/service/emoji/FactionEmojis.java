@@ -43,6 +43,7 @@ public enum FactionEmojis implements TI4Emoji {
     Deepwrought,
     Firmament,
     Obsidian,
+    Firma_Obs,
     Neutral,
 
     // Twilight's Fall

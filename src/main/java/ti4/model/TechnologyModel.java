@@ -320,7 +320,7 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         String techFaction = getFaction().orElse("");
         if (!techFaction.isBlank())
             factionEmoji = FactionEmojis.getFactionIcon(techFaction).toString();
-        String techEmoji = getType().emoji();
+        String techEmoji = getCondensedReqsEmojis(false);
         title.append(factionEmoji)
                 .append(techEmoji)
                 .append(" _")
