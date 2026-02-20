@@ -179,7 +179,7 @@ public class RoundOneService {
                             }
                         }
                     }
-                    if (buttons.size() > 0) {
+                    if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 target.getCorrectChannel(),
                                 target.getRepresentation() + ", please choose a planet on which to place a Shrine.",
