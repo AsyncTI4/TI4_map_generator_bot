@@ -925,7 +925,7 @@ public class Player extends PlayerProperties {
     public Map<String, List<String>> getPlotCardsFactions() {
         Map<String, List<String>> plots = new LinkedHashMap<>();
         for (String plot : getPlotCards().keySet()) {
-            plots.put(plot, getPlotCardsFactionsRaw().get(plot));
+            plots.put(plot, getPlotCardsFactionsRaw().getOrDefault(plot, List.of()));
         }
         return MapUtils.unmodifiableMap(plots);
     }
