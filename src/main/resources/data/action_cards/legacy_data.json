@@ -1545,5 +1545,60 @@
         "text": "Choose 1 system. All systems adjacent to that system are adjacent to each other during this tactical action.",
         "flavorText": "Somehow they were alive and ahead of schedule. Deft Doug's hoots turned to yowls as Mendosa rapped him on the head. \"Better to call ye Deaf Doug. Ye won't be 'eyeballing' our routes ever again!\"",
         "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly1",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly2",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly3",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "relay_assembly4",
+        "name": "Relay Assembly",
+        "phase": "Action",
+        "window": "After you produce a ship",
+        "text": "Produce 1 ship of that type in any number of  systems that contain 1 of your units with PRODUCTION; reduce the combined cost of the produced ships by 2.",
+        "flavorText": "Each forge was an exact copy. Inside, thousands of drones worked in unison with counterparts across the stars.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency_initiative",
+        "name": "Efficiency Initiative",
+        "phase": "Action",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods.",
+        "notes": "These trade goods are available to be spent during this PRODUCTION.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "rogues",
+        "name": "Rogues",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Place 3 neutral fighters in a non-home anomaly; space combat is resolved in that system if it contains non-neutral ships.",
+        "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg\"",
+        "source": "deprecated"
     }
 ]
