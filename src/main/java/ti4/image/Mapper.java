@@ -149,7 +149,6 @@ public class Mapper {
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
         importJsonObjectsFromFolder("events", events, EventModel.class);
         importJsonObjectsFromFolder("explores", explores, ExploreModel.class);
-        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
         importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
         importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
@@ -167,6 +166,7 @@ public class Mapper {
         importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
         importJsonObjectsFromFolder("tokens", spaceTokens, SpaceTokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         readData("decals.properties", decals);
         readData("general.properties", general);
         readData("hyperlanes.properties", hyperlaneAdjacencies);
@@ -755,11 +755,8 @@ public class Mapper {
         return frankenErrata;
     }
 
-    public static List<String> getDraftErratasSources(ComponentSource CompSource) {
-        return frankenErrata.values().stream()
-                .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
-                .map(model -> model.getSource().toString())
-                .toList();
+    public static DraftErrataModel getFrankenErrata(String alias) {
+        return frankenErrata.getOrDefault(alias, null);
     }
 
     // ####################

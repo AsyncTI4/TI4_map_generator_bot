@@ -19,6 +19,17 @@ import ti4.service.leader.HeroUnlockCheckService;
 public class FrankenLeaderService {
 
     public static void addLeaders(GenericInteractionCreateEvent event, Player player, List<String> leaderIDs) {
+        if (player.getGame().isVeiledHeartMode()) {
+            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+
+            String key = "veiledCards" + player.getFaction();
+            String val = player.getGame().getStoredValue(key);
+            val += "_" + String.join("_", leaderIDs);
+            player.getGame().setStoredValue(key, val);
+            return;
+        }
+
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added leaders:\n");
         Boolean fakeCommanders = false;
         if (event instanceof SlashCommandInteractionEvent slash) {
@@ -36,7 +47,7 @@ public class FrankenLeaderService {
                 player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
             }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static String getAddLeaderText(Player player, String leaderID) {
@@ -67,6 +78,6 @@ public class FrankenLeaderService {
                     "savedParadigms",
                     game.getStoredValue("savedParadigms").replace(leaderID, "").replace("__", "_"));
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

@@ -21,17 +21,18 @@
     },
     {
         "itemCategory": "ABILITY",
-        "itemId": "the_tribuni",
-        "undraftable": true,
+        "itemId": "star_forge",
+        "optionalSwaps": [
+            "MECH:muaat_mech",
+            "BREAKTHROUGH:muaatbt"
+        ],
         "source": "pok"
     },
     {
-        "itemCategory": "ABILITY",
-        "itemId": "star_forge",
-        "optionalSwaps": [
-            "MECH:muaat_mech"
-        ],
-        "source": "pok"
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "muaatbt",
+        "undraftable": true,
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "ABILITY",
@@ -180,6 +181,20 @@
         "source": "pok"
     },
     {
+        "itemCategory": "HERO",
+        "itemId": "naaluhero",
+        "additionalComponents": [
+            "BREAKTHROUGH:naalubt"
+        ],
+        "source": "pok"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "naalubt",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "telepathic",
         "optionalSwaps": [
@@ -196,10 +211,19 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "galactic_threat",
+        "additionalComponents": [
+            "BREAKTHROUGH:nekrobt"
+        ],
         "optionalSwaps": [
             "TECH:vay"
         ],
         "source": "pok"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "nekrobt",
+        "undraftable": true,
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "ABILITY",
@@ -247,9 +271,16 @@
             "AGENT:nomadagentthundarian"
         ],
         "optionalSwaps": [
-            "AGENT:nomadagentmercer"
+            "AGENT:nomadagentmercer",
+            "BREAKTHROUGH:nomadbt"
         ],
         "source": "pok"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "nomadbt",
+        "undraftable": true,
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "AGENT",
@@ -276,11 +307,20 @@
         "source": "pok"
     },
     {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "titansbt",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "terragenesis",
         "additionalComponents": [
             "ABILITY:awaken",
             "ABILITY:coalescence"
+        ],
+        "optionalSwaps": [
+            "BREAKTHROUGH:titansbt"
         ],
         "source": "pok"
     },
@@ -384,6 +424,27 @@
         "itemId": "yin_mech",
         "undraftable": true,
         "source": "pok"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "scheming",
+        "undraftable": true,
+        "source": "pok"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "crafty",
+        "additionalComponents": [
+            "ABILITY:scheming",
+            "BREAKTHROUGH:yssarilbt"
+        ],
+        "source": "pok"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "yssarilbt",
+        "undraftable": true,
+        "source": "thunders_edge"
     },
     {
         "itemCategory": "ABILITY",

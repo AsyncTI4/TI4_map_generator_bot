@@ -23,7 +23,6 @@ import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.MessageHelper.MessageFunction;
 import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
@@ -69,7 +68,7 @@ public class MiltyDraftDisplayService {
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
-        MessageFunction func = clearOldPingsAndButtonsFunc(true, clearOldButtons);
+        Consumer<Message> func = clearOldPingsAndButtonsFunc(true, clearOldButtons);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, func);
     }
 
@@ -189,7 +188,7 @@ public class MiltyDraftDisplayService {
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(boolean clearFirstPing, boolean clearOldDraftInfo) {
+    private Consumer<Message> clearOldPingsAndButtonsFunc(boolean clearFirstPing, boolean clearOldDraftInfo) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)
                 .queue(hist -> clearHistMessages(hist, clearFirstPing, clearOldDraftInfo), BotLogger::catchRestError);

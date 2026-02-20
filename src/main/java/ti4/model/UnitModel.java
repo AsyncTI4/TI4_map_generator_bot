@@ -172,7 +172,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
         TI4Emoji unitEmoji = getUnitEmoji();
         String name = this.name == null ? "" : this.name;
-        return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
+        return factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
     }
 
     private String getSourceEmoji() {

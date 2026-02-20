@@ -88,11 +88,10 @@ public class PlayerProperties {
     private Map<String, Boolean> breakthroughExhausted = new LinkedHashMap<>();
     private Map<String, Boolean> breakthroughActive = new LinkedHashMap<>();
     private Map<String, Integer> breakthroughTGs = new LinkedHashMap<>();
-    // private String breakthroughID = "";
-    // private boolean breakthroughUnlocked;
-    // private boolean breakthroughExhausted;
-    // private boolean breakthroughActive;
-    // private int breakthroughTGs;
+
+    // Firmament Plots
+    private final Map<String, Integer> plotCards = new LinkedHashMap<>();
+    private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
 
     // Stat tracking
     private int sarweenCounter;
@@ -138,6 +137,9 @@ public class PlayerProperties {
     private List<String> mahactCC = new ArrayList<>();
     private List<String> factionTechs = new ArrayList<>();
     private List<String> purgedTechs = new ArrayList<>();
+
+    // tech debt lmao
+    private Map<String, String> storedValueMap = new LinkedHashMap<>();
 
     public void loadCommodities(int commodities) {
         this.commodities = commodities;

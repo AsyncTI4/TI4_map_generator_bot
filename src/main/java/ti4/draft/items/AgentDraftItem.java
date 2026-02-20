@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -19,12 +20,19 @@ import ti4.service.emoji.TI4Emoji;
 public class AgentDraftItem extends DraftItem {
 
     public AgentDraftItem(String itemId) {
-        super(Category.AGENT, itemId);
+        super(DraftCategory.AGENT, itemId);
     }
 
     @JsonIgnore
     private LeaderModel getLeader() {
-        return Mapper.getLeader(ItemId);
+        return Mapper.getLeader(getItemId());
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        if (game.isTwilightsFallMode()) return getLeader().getTFNameRepresentation();
+        return getLeader().getNameRepresentation();
     }
 
     @JsonIgnore
@@ -34,7 +42,7 @@ public class AgentDraftItem extends DraftItem {
         if (leader == null) {
             return getAlias();
         }
-        return "Agent - " + leader.getName();
+        return leader.getName();
     }
 
     @JsonIgnore
@@ -73,7 +81,7 @@ public class AgentDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.AGENT);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.AGENT);
         return allItems;
     }
 
@@ -85,7 +93,7 @@ public class AgentDraftItem extends DraftItem {
             agents.removeIf(
                     (String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
-                allItems.add(generate(Category.AGENT, agent));
+                allItems.add(generate(DraftCategory.AGENT, agent));
             }
         }
         return allItems;
@@ -93,7 +101,7 @@ public class AgentDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.AGENT);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.AGENT);
         return allItems;
     }
 
@@ -103,7 +111,7 @@ public class AgentDraftItem extends DraftItem {
         if (game.isTwilightsFallMode()) {
             DeckModel deck = Mapper.getDeck("tf_genome");
             for (String leader : deck.getNewShuffledDeck()) {
-                allItems.add(generate(Category.AGENT, leader));
+                allItems.add(generate(DraftCategory.AGENT, leader));
             }
         } else {
             String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
@@ -115,7 +123,7 @@ public class AgentDraftItem extends DraftItem {
                     if (Arrays.asList(results).contains(agent)) {
                         continue;
                     }
-                    allItems.add(generate(Category.AGENT, agent));
+                    allItems.add(generate(DraftCategory.AGENT, agent));
                 }
             }
         }

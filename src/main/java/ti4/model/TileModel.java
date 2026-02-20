@@ -75,6 +75,22 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
+    public String getNameRepresentation() {
+        StringBuilder sb = new StringBuilder();
+        TileEmojis emoji = TileEmojis.getTileEmojiFromTileID(id);
+        sb.append(emoji);
+
+        if (emoji.isGeneric()) {
+            if (isEmpty()) sb.append(ExploreEmojis.Frontier);
+            if (asteroidField) sb.append(MiscEmojis.Asteroids);
+            if (supernova) sb.append(MiscEmojis.Supernova);
+            if (nebula) sb.append(MiscEmojis.Nebula);
+            if (gravityRift) sb.append(MiscEmojis.GravityRift);
+        }
+        sb.append(" ").append(getName());
+        return sb.toString();
+    }
+
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
