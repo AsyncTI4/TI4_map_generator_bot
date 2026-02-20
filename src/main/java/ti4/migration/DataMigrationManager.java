@@ -52,9 +52,7 @@ public class DataMigrationManager {
         migrations.put(
                 "renameGarboziaToBozgarbia_201025_withEnded",
                 DataMigrationManager::renameGarboziaToBozgarbia_201025_withEnded);
-        migrations.put(
-                "fixMisspelledAgendaIds_200226",
-                DataMigrationManager::fixMisspelledAgendaIds_200226);
+        migrations.put("fixMisspelledAgendaIds_200226", DataMigrationManager::fixMisspelledAgendaIds_200226);
         // migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -178,6 +176,8 @@ public class DataMigrationManager {
     private static Boolean fixMisspelledAgendaIds_200226(Game game) {
         Map<String, String> replacements = Map.of(
                 "disarmamament", "disarmament",
+                "absol_disarmamament", "absol_disarmament",
+                "cryypter_disarmamament", "cryypter_disarmament",
                 "minister_commrece", "minister_commerce",
                 "senate_sancturary", "senate_sanctuary");
 
