@@ -77,6 +77,7 @@ public class CreateGameButtonHandler {
                     2) Ping a bothelper for help.""");
             return;
         }
+        
 
         createGameChannels(event);
     }

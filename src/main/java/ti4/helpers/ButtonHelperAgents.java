@@ -37,8 +37,10 @@ import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -134,8 +136,7 @@ public class ButtonHelperAgents {
     @ButtonHandler("toldarAgent_")
     public static void toldarAgent(Player toldar, Game game, String buttonID, GenericInteractionCreateEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String am = buttonID.split("_")[2];
-        int amount = Integer.parseInt(am);
+
         exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
         int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(
@@ -147,12 +148,20 @@ public class ButtonHelperAgents {
                         + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
-        toldar.setCommodities(toldar.getCommodities() + amount);
-        MessageHelper.sendMessageToChannel(
-                toldar.getCorrectChannel(),
-                toldar.getRepresentation() + ", you now have " + toldar.getCommodities() + " commodit"
-                        + (toldar.getCommodities() == 1 ? "y" : "ies") + " after using your agent.");
-        toldarAgentInitiation(game, toldar, amount);
+
+        List<Button> buttons = new ArrayList<>();
+        if (p2 != toldar) {
+            buttons.add(Buttons.green(
+                    toldar.getFinsFactionCheckerPrefix() + "draw_1_ACDelete",
+                    "Draw 1 Action Card",
+                    CardEmojis.ActionCard));
+            buttons.add(Buttons.blue(
+                    toldar.getFinsFactionCheckerPrefix() + "gain_2_comms", "Gain 2 Commodities", MiscEmojis.comm));
+            MessageHelper.sendMessageToChannel(
+                    toldar.getCorrectChannel(),
+                    toldar.getRepresentation() + " please choose to either gain 2 commodities or draw 1 AC",
+                    buttons);
+        }
     }
 
     @ButtonHandler("startCabalAgent_")

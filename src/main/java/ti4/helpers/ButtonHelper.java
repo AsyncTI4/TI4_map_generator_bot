@@ -21,7 +21,13 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -50,9 +56,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -1152,8 +1155,11 @@ public class ButtonHelper {
         if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")) {
             return true;
         }
+        if(player.hasTech("tf-mr") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0){
+            return true;
+        }
 
-        return player.hasTech("mr") && tile.getTileModel().isSupernova();
+        return (player.hasTech("mr")) && tile.getTileModel().isSupernova();
     }
 
     @ButtonHandler("forceARefresh_")
@@ -3853,7 +3859,6 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
-        CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal");
         TeHelperGeneral.addStationsToPlayArea(null, game, tile);
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -333,7 +334,8 @@ public class TacticalActionService {
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game));
+                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game)
+                            || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
                 out.add(Buttons.green(
                         player.finChecker() + "tacticalMoveFrom_" + tileEntry.getKey(),
