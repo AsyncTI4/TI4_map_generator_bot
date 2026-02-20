@@ -1519,7 +1519,7 @@ public class Player extends PlayerProperties {
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
         }
-        if (hasAbility("balance") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
             bonus -= 2;
         }
 
