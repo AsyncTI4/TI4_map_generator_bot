@@ -720,7 +720,7 @@ public class StatusHelper {
                     player.setStrategicCC(player.getStrategicCC() + 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
                 }
-                return;
+                continue;
             }
             String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";

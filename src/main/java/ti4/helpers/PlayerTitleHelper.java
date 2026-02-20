@@ -2,12 +2,14 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -47,6 +49,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.blue("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
             buttons.add(Buttons.blue("bestowTitleStep1_Shard Fumbler", "Shard Fumbler"));
             buttons.add(Buttons.blue("bestowTitleStep1_Rules Master", "Rules Master"));
+            buttons.add(Buttons.blue("bestowTitleStep1_Loose Cannon", "Loose Cannon"));
             buttons.add(Buttons.gray("bestowTitleStep1_Observer", "Observer"));
 
             buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));

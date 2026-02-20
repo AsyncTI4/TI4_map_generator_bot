@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -267,6 +268,8 @@ public class ButtonHelperTacticalAction {
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
             for (Player nonActivePlayer : game.getRealPlayers()) {
                 if (player == nonActivePlayer) {
                     continue;
