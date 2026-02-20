@@ -50,8 +50,8 @@
         "name": "Betrayal",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Discard 1 or more action cards to choose an equal number of other players. Each of those players gives you 1 random action card.",
-        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the Arbiter's documents.",
+        "text": "Give 1 promissory note to another player. Then, that player and each player with 1 of your promissory notes in their play area gives you 1 random action card.",
+        "flavorText": "Communications were jammed. Supply lines were harried. Staffing officers were found dead in their bunks. The grandeur of the scheme shocked Claire to her core.",
         "source": "action_deck_2"
     },
     {
@@ -105,7 +105,7 @@
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
-        "text": "That unit rolls 2 additional dice.",
+        "text": "Choose 1 of those units to roll 2 additional dice.",
         "flavorText": "\"What's wrong with these blasted sensors?\" Mirik slapped his console. The enemy's signature blinked to a thirteenth location.",
         "source": "action_deck_2"
     },
@@ -114,7 +114,7 @@
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
-        "text": "That unit rolls 2 additional dice.",
+        "text": "Choose 1 of those units to roll 2 additional dice.",
         "flavorText": "Chaos consumed the battlefield as swarms of fighters tumbled into the distortion field. Unlenn chuckled. \"Finish them.\"",
         "source": "action_deck_2"
     },
@@ -123,7 +123,7 @@
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
-        "text": "That unit rolls 2 additional dice.",
+        "text": "Choose 1 of those units to roll 2 additional dice.",
         "flavorText": "Mirik slumped into his seat as he watched his fleet sunder around him, the wreckage flailing into the black void. His tactics were sound, but his munitions were far outmatched. \"Retreat,\" he said. \"This is no battle—it's a trap.\"",
         "source": "action_deck_2"
     },
@@ -132,7 +132,7 @@
         "name": "Classified Weapons",
         "phase": "Action",
         "window": "When 1 or more of your units make a combat or unit ability roll",
-        "text": "That unit rolls 2 additional dice.",
+        "text": "Choose 1 of those units to roll 2 additional dice.",
         "flavorText": "\"Battle isn't arithmetic,\" Unlenn said. \"Every enemy can be exploited; each has an Ixthian heel. Now, administer this harsh lesson.\"",
         "source": "action_deck_2"
     },
