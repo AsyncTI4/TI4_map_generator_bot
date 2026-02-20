@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -38,7 +39,7 @@ public class VisionariaSelectService {
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         String message = game.getPing() + " - " + visionariaName() + " breakthrough was exhausted"
                 + (!game.isFowMode() ? " by " + player.getRepresentationNoPing() : "") + ".";
-        message += "\n> Use the buttons to research, or decline.";
+        message += "\n> Use the buttons to research non-faction, non-unit upgrade technology, or decline.";
         message +=
                 "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a promissory note of your choice.";
 
@@ -55,7 +56,7 @@ public class VisionariaSelectService {
                 player.finChecker() + "endTurnAfterVisionaria",
                 "End Turn After All Have Reacted",
                 (!game.isFowMode() ? player.getFactionEmoji() : null)));
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(), message, game, player, buttons);
     }
 
     @ButtonHandler("giveVisionariaPN")
@@ -150,6 +151,15 @@ public class VisionariaSelectService {
         if (!readyToMoveOn(game)) return;
 
         Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    "Could not find active player when trying to move on after _Visionaria Select_.");
+            game.removeStoredValue("endTurnAfterVisionaria");
+            game.removeStoredValue("fleetLogAfterVisionaria");
+            game.removeStoredValue("VisionariaResponded");
+            return;
+        }
         if (game.getStoredValue("endTurnAfterVisionaria").equals(activePlayer.getFaction())) {
             EndTurnService.endTurnAndUpdateMap(null, game, activePlayer);
 
@@ -172,6 +182,7 @@ public class VisionariaSelectService {
             // DWS Copy Tech
             if (!deepwrought.hasTech(techID)) {
                 deepwrought.addTech(techID);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(deepwrought, techID, game);
                 String dwsMsg = deepwrought.getRepresentationUnfogged() + " also acquired "
                         + techM.getRepresentation(false) + " due to _" + visionariaName() + "_.";
                 MessageHelper.sendMessageToChannel(deepwrought.getCorrectChannel(), dwsMsg);

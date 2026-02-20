@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -43,6 +44,7 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
+@UtilityClass
 public class ComponentActionHelper {
 
     public static List<Button> getAllPossibleCompButtons(Game game, Player p1, GenericInteractionCreateEvent event) {
@@ -100,28 +102,29 @@ public class ComponentActionHelper {
             compButtons.add(tButton);
         }
 
-        BreakthroughModel bt = p1.getBreakthroughModel();
-        if (bt != null && bt.getText().contains("ACTION:")) {
-            if (p1.hasReadyBreakthrough(bt.getAlias())) {
-                boolean validAction =
-                        switch (bt.getAlias()) {
-                            case "arborecbt" ->
-                                game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
-                            case "crimsonbt" -> true;
-                            case "mahactbt" -> !p1.getTechs().isEmpty();
-                            case "saarbt" ->
-                                game.getTileMap().values().stream()
-                                        .filter(Tile::isAsteroidField)
-                                        .anyMatch(Tile.tileHasPlayerShips(p1));
-                            case "deepwroughtbt" -> true;
-                            default -> true;
-                        };
+        for (BreakthroughModel bt : p1.getBreakthroughModels()) {
+            if (bt != null && bt.getText().contains("ACTION:")) {
+                if (p1.hasReadyBreakthrough(bt.getAlias())) {
+                    boolean validAction =
+                            switch (bt.getAlias()) {
+                                case "arborecbt" ->
+                                    game.getTileMap().values().stream().anyMatch(Tile.tileHasPlayersInfAndCC(p1));
+                                case "crimsonbt" -> true;
+                                case "mahactbt" -> !p1.getTechs().isEmpty();
+                                case "saarbt" ->
+                                    game.getTileMap().values().stream()
+                                            .filter(Tile::isAsteroidField)
+                                            .anyMatch(Tile.tileHasPlayerShips(p1));
+                                case "deepwroughtbt" -> true;
+                                default -> true;
+                            };
 
-                if (validAction) {
-                    TI4Emoji btEmoji = bt.getFactionEmoji();
-                    Button btButton = Buttons.green(
-                            finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
-                    compButtons.add(btButton);
+                    if (validAction) {
+                        TI4Emoji btEmoji = bt.getFactionEmoji();
+                        Button btButton = Buttons.green(
+                                finChecker + prefix + "exhaustBT_" + bt.getAlias(), "Exhaust " + bt.getName(), btEmoji);
+                        compButtons.add(btButton);
+                    }
                 }
             }
         }
@@ -179,7 +182,15 @@ public class ComponentActionHelper {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Buttons.gray(
                                     finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Rebellion Agent",
+                                    "Use " + leaderName + " as Crimson Agent",
+                                    factionEmoji);
+                            compButtons.add(lButton);
+                        }
+                        led = "zephyrionagent";
+                        if (p1.hasExternalAccessToLeader(led)) {
+                            Button lButton = Buttons.gray(
+                                    finChecker + prefix + "leader_" + led,
+                                    "Use " + leaderName + " as Zephyrion Agent",
                                     factionEmoji);
                             compButtons.add(lButton);
                         }
@@ -356,6 +367,13 @@ public class ComponentActionHelper {
         if (p1.hasAbility("orbital_drop") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
             Button abilityButton =
                     Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
+            compButtons.add(abilityButton);
+        }
+        if (p1.hasAbility("mutineers")
+                && !ButtonHelperAbilities.getTilesToMutineers(game, p1).isEmpty()
+                && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))) {
+            Button abilityButton =
+                    Buttons.green(finChecker + prefix + "ability_mutineers", "Mutineers", FactionEmojis.sarcosa);
             compButtons.add(abilityButton);
         }
         if (ButtonHelperSCs.findUsedFacilities(game, p1).contains("facilitycorefactory")) {
@@ -556,6 +574,26 @@ public class ComponentActionHelper {
                     List<Button> buttons = new ArrayList<>(
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("mutineers".equalsIgnoreCase(buttonID)) {
+                    String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using "
+                            + FactionEmojis.sarcosa + "**Mutineers** (" + (p1.getStrategicCC()) + "->"
+                            + (p1.getStrategicCC() - 1) + ")";
+                    if (!p1.hasRelicReady("emelpar")) {
+
+                        p1.setStrategicCC(p1.getStrategicCC() - 1);
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(
+                                p1, game, event, FactionEmojis.Sol + " **Mutineers**");
+                    } else {
+                        p1.addExhaustedRelic("emelpar");
+                        successMessage = p1.getFactionEmoji() + " used the _" + RelicHelper.sillySpelling()
+                                + "_ to **Mutineers**.";
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
+                    String message = "Please choose the system you wish to replace 1 ship with.";
+                    List<Button> buttons = new ArrayList<>(
+                            Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage =
                             p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Muaat
@@ -801,7 +839,9 @@ public class ComponentActionHelper {
                     if (game.isFowMode()) {
                         buttons.add(Buttons.gray("atomicsStep2_" + p2.getFaction(), p2.getColor()));
                     } else {
-                        Button button = Buttons.gray("atomicsStep2_" + p2.getFaction(), " ");
+                        Button button = Buttons.gray(
+                                "atomicsStep2_" + p2.getFaction(),
+                                p2.getFactionModel().getShortName());
                         String factionEmojiString = p2.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                         buttons.add(button);
@@ -1031,7 +1071,43 @@ public class ComponentActionHelper {
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
-            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
+            case "enigmaticdevice" -> {
+                if (game.isTwilightsFallMode()) {
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+                    Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+                    buttons.add(DoneExhausting);
+                    MessageHelper.sendMessageToChannel(
+                            event.getMessageChannel(), "Use this to spend 6 resources.", buttons);
+                    List<String> factionTechs = new ArrayList<>();
+                    factionTechs.add("antimatter");
+                    factionTechs.add("wavelength");
+                    player.getTechs().forEach(factionTechs::remove);
+                    buttons = new ArrayList<>(factionTechs.stream()
+                            .map(tech -> {
+                                TechnologyModel model = Mapper.getTech(tech);
+                                return Buttons.green(
+                                        player.getFinsFactionCheckerPrefix() + "getTech_" + tech + "__noPay",
+                                        model.getName(),
+                                        model.getCondensedReqsEmojis(true));
+                            })
+                            .toList());
+
+                    if (buttons.isEmpty()) {
+                        buttons = ButtonHelper.getGainCCButtons(player);
+                        String message2 = player.getRepresentation()
+                                + ", you would research one of your faction tech, but because you have them both, you instead gain 2 command tokens."
+                                + " Your current command tokens are " + player.getCCRepresentation()
+                                + ". Use buttons to gain command tokens.";
+                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                    } else {
+                        MessageHelper.sendMessageToChannel(
+                                event.getMessageChannel(), "Gain one of your faction tech.", buttons);
+                    }
+                } else {
+                    ButtonHelperActionCards.resolveResearch(game, player, event);
+                }
+            }
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(event, player, game);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" ->
                 ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
@@ -1051,7 +1127,7 @@ public class ComponentActionHelper {
                 if ("absol_dynamiscore".equals(relicID)) {
                     player.setTg(oldTg + Math.min(player.getCommoditiesBase() * 2, 10));
                 } else {
-                    player.setTg(oldTg + player.getCommoditiesBase() + 2);
+                    player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
                 message = player.getRepresentationUnfogged() + ", your trade goods increased from " + oldTg + " -> "
                         + player.getTg() + ".";

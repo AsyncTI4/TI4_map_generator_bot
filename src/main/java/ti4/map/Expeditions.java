@@ -30,9 +30,6 @@ import ti4.service.emoji.TechEmojis;
 @Data
 public class Expeditions {
 
-    @JsonIgnore
-    private Game game;
-
     private Map<String, String> expeditionFactions = new LinkedHashMap<>();
 
     public String getTechSkip() {
@@ -83,8 +80,7 @@ public class Expeditions {
         return expeditionFactions.put("actionCards", value);
     }
 
-    public Expeditions(Game game) {
-        this.game = game;
+    public Expeditions() {
         expeditionFactions.put("techSkip", null);
         expeditionFactions.put("tradeGoods", null);
         expeditionFactions.put("fiveRes", null);
@@ -144,14 +140,14 @@ public class Expeditions {
     }
 
     @JsonIgnore
-    private TI4Emoji getExpeditionEmoji(String expeditionID) {
+    private TI4Emoji getExpeditionEmoji(String expeditionID, Game game) {
         return switch (expeditionID) {
             case "techSkip" -> TechEmojis.PropulsionTech;
             case "tradeGoods" -> MiscEmojis.tg;
             case "fiveRes" -> MiscEmojis.Resources_5;
             case "fiveInf" -> MiscEmojis.Influence_5;
             case "secret" -> CardEmojis.SecretObjective;
-            case "actionCards" -> CardEmojis.ActionCard;
+            case "actionCards" -> CardEmojis.getACEmoji(game);
             default -> null;
         };
     }
@@ -173,7 +169,7 @@ public class Expeditions {
     public String printExpeditionInfo(Game game, Player player) {
         StringBuilder sb = new StringBuilder("Thunder's Edge Expedition Status:");
         for (Entry<String, String> exp : expeditionFactions.entrySet()) {
-            sb.append("\n> ").append(getExpeditionEmoji(exp.getKey()));
+            sb.append("\n> ").append(getExpeditionEmoji(exp.getKey(), game));
             sb.append(" ").append(playerInfo(game, player, exp.getValue()));
         }
         return sb.toString();
@@ -187,7 +183,7 @@ public class Expeditions {
             if (exp.getValue() != null) continue;
             String id = prefix + "TEexpedition_" + exp.getKey();
             String msg = getExpeditionMessage(exp.getKey());
-            buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey())));
+            buttons.add(Buttons.green(id, msg, getExpeditionEmoji(exp.getKey(), player.getGame())));
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return buttons;
@@ -275,9 +271,11 @@ public class Expeditions {
                     output += "\n-# Use the buttons in your private channel to discard 2 action cards.";
                     MessageHelper.sendMessageToChannel(channel, output);
                     MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), "Use these buttons to discard action cards.", acButtons);
+                            player.getCardsInfoThread(),
+                            player.getRepresentation() + ", please discard 2 action cards.",
+                            acButtons);
                 } else {
-                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake";
+                    output += "\n-# you may not have enough action cards... use `/game undo` if this was a mistake.";
                     MessageHelper.sendMessageToChannel(channel, output);
                 }
             }

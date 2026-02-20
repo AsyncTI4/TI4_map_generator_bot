@@ -21,7 +21,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -37,6 +36,8 @@ import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglReportService;
+import ti4.spring.api.image.GameImageService;
+import ti4.spring.context.SpringContext;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
@@ -224,7 +225,19 @@ public class EndGameService {
                             summaryChannel,
                             m -> { // POST INITIAL MESSAGE
                                 m.editMessageAttachments(fileUpload)
-                                        .queue(Consumers.nop(), BotLogger::catchRestError); // ADD MAP FILE TO MESSAGE
+                                        .queue(
+                                                success -> {
+                                                    // Save message ID to SQLite, same as show game
+                                                    SpringContext.getBean(GameImageService.class)
+                                                            .saveDiscordMessageId(
+                                                                    game,
+                                                                    success.getIdLong(),
+                                                                    success.getGuild()
+                                                                            .getIdLong(),
+                                                                    success.getChannel()
+                                                                            .getIdLong());
+                                                },
+                                                BotLogger::catchRestError); // ADD MAP FILE TO MESSAGE
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
@@ -293,10 +306,8 @@ public class EndGameService {
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
         if (game.isFowMode() && JdaService.guildFogOfWar != null) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildFogOfWar);
             textChannels = JdaService.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
             textChannels = JdaService.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();

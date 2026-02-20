@@ -1,0 +1,21 @@
+{
+    "id": "bannerhall3",
+    "name": "3rd Banner",
+    "aliases": [
+        "bannerhall3",
+        "thirdbanner",
+        "third banner",
+        "3rdbanner",
+        "thirdbannerhall",
+        "third bannerhall",
+        "3rdbannerhall"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "FAKE",
+        "FACTION"
+    ],
+    "flavourText": "I wonder if these will get erased someday.",
+    "source": "ds"
+}

@@ -156,6 +156,7 @@
         "source": "pok",
         "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nDuring the action phase, you can exhaust planets you control that have technology specialties to gain 1 trade good.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/psychoarchaeology.png?raw=true",
+        "notes": "This does __not__ allow a player to complete the technology speciality expedition for free in Thunder's Edge.",
         "initials": "PSY",
         "shortName": "Psychoarch\n-aeology",
         "shrinkName": true
@@ -230,7 +231,8 @@
         ],
         "requirements": "RR",
         "source": "base",
-        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round. [Note: this only occurs after the normal assign hits step in a combat round, which occurs after both sides roll combat dice. It occurs even if the opponent rolled no hits.]",
+        "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round.",
+        "notes": "This only occurs after the normal assign hits step in a combat round, which occurs after both sides roll combat dice. It occurs even if the opponent rolled no hits.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/duranium_armor.png?raw=true",
         "initials": "DA"
     },
@@ -614,6 +616,8 @@
     {
         "alias": "vax",
         "name": "Valefar Assimilator X",
+        "shortName": "Valefar X\nAssimilator",
+        "shrinkName": true,
         "types": [
             "NONE"
         ],
@@ -920,12 +924,14 @@
     {
         "alias": "vay",
         "name": "Valefar Assimilator Y",
+        "shortName": "Valefar Y\nAssimilator",
+        "shrinkName": true,
         "types": [
             "NONE"
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you would gain another players technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
+        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.\nWhile that token is on a technology, this card gains that technology's text.\nYou cannot place an assimilator token on technology that already has an assimilator token.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/valefar_assimilator_y.jpg?raw=true"
     },
     {
@@ -1069,7 +1075,8 @@
         "requirements": "Y",
         "faction": "keleres",
         "source": "pok",
-        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\n\n[Custodia Vigilia is a 2/3 legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Custodians VP using Imperial Primary.]",
+        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.",
+        "notes": "Custodia Vigilia is a 2r/3i legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Mexatol Rex VP using Imperial Primary.",
         "shortName": "I.I.H.Q. Mod-\nernization",
         "shrinkName": true,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/iihq_modernization.jpg?raw=true"
@@ -1083,10 +1090,10 @@
         "requirements": "YY",
         "faction": "keleres",
         "source": "pok",
-        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
+        "text": "Once per action, when you resolve a unit's PRODUCTION ability, you may resolve another of your unit's PRODUCTION abilities in any system.",
         "shortName": "Agency\nSupply Net.",
         "shrinkName": false,
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network_te.jpg?raw=true"
     },
     {
         "alias": "nekroc4y",

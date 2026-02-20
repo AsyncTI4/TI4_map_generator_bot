@@ -67,7 +67,8 @@
     {
         "alias": "total_war",
         "name": "Total War",
-        "text": "- When a player destroys another player's units [Note: neutral units count for this], they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
+        "text": "- When a player destroys another player's units, they place commodities from the supply equal to the combined cost of those units on a planet they control in their home system (infantry and fighters are worth 1 each).\n- When a player gains control of a planet that has commodities on it, they may move those commodities to a planet they control in their home system.\n- All players can perform the following action:\n> - ACTION: Discard 10 commodities from planets in your home system to gain 1 victory point.",
+        "notes": "Neutral units will provide commodities.",
         "complexity": 3,
         "source": "thunders_edge"
     },

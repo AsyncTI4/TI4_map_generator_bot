@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import org.reflections.Reflections;
@@ -54,6 +55,8 @@ public class AnnotationHandler {
             if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
                 continue;
             if (param.getType().equals(StringSelectInteractionEvent.class)
+                    && contextClass.equals(SelectionMenuContext.class)) continue;
+            if (param.getType().equals(EntitySelectInteractionEvent.class)
                     && contextClass.equals(SelectionMenuContext.class)) continue;
 
             // string parameters
@@ -127,6 +130,8 @@ public class AnnotationHandler {
                     args.add(ctx.getEvent());
                 if (param.getType().equals(StringSelectInteractionEvent.class)
                         && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
+                if (param.getType().equals(EntitySelectInteractionEvent.class)
+                        && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
                 if (param.getType().equals(MessageChannel.class))
                     args.add(ctx.getEvent().getMessageChannel());
 
@@ -180,7 +185,7 @@ public class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions and feedback channel. It will probably require a code change.")
+                                        "The button failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
@@ -189,7 +194,7 @@ public class AnnotationHandler {
                                 .getInteraction()
                                 .getMessage()
                                 .reply(
-                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions and feedback channel. It will probably require a code change.")
+                                        "The selection failed. An exception has been logged for the developers. Please report this to the bot questions channel. It will probably require a code change.")
                                 .queue(Consumers.nop(), BotLogger::catchRestError);
                     }
                 }

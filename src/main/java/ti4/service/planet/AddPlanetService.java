@@ -68,7 +68,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 2 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -89,6 +89,41 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
+        }
+
+        int shrineCount = 0;
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine3.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine4.png") ? 1 : 0);
+        if ((shrineCount >= 1) && player.hasAbility("questing_prince")) {
+            unitHolder.removeToken("token_kaltrimshrine1.png");
+            unitHolder.removeToken("token_kaltrimshrine2.png");
+            unitHolder.removeToken("token_kaltrimshrine3.png");
+            unitHolder.removeToken("token_kaltrimshrine4.png");
+            if (game.getStoredValue("kaltrimcrownplanet").equalsIgnoreCase(planet)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you reclaimed your Crown Shrine from "
+                                + Helper.getPlanetRepresentation(planet, game)
+                                + " with your **The Questing Prince** ability. Congratz!");
+                String kalt = "Kaltrim Crown Token";
+                Integer id = game.addCustomPO(kalt, 1);
+                game.scorePublicObjective(player.getUserID(), id);
+                String message2 = "Custom public objective \"_" + kalt + "_\" has been added.\n"
+                        + player.getRepresentation() + " scored \"_" + kalt + "_\".";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
+                CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you reclaimed " + (shrineCount == 1 ? "a Shrine" : shrineCount + " Shrines")
+                                + " from "
+                                + Helper.getPlanetRepresentation(planet, game)
+                                + " with your **The Questing Prince** ability, but did not find the Crown token.");
+            }
         }
 
         if (game.mecatols().contains(planet) && player.hasIIHQ()) {
@@ -201,7 +236,8 @@ public class AddPlanetService {
                         String msg = player_.getRepresentation()
                                 + " lost control of "
                                 + Mapper.getPlanet(planet).getName()
-                                + " (and could perhaps resolve some applicable ability).";
+                                + (player_.isNeutral() ? "" : " (and could perhaps resolve some applicable ability)")
+                                + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                         if (game.isFowMode() && player_.isRealPlayer()) {
                             MessageHelper.sendMessageToChannel(
@@ -210,14 +246,14 @@ public class AddPlanetService {
                                             + Mapper.getPlanet(planet).getName() + ".");
                         }
                         if (player_.isRealPlayer()
-                                && player_.getPlanetsAllianceMode().isEmpty()
+                                && player_.getNumberOfRealPlanetsAllianceMode() == 0
                                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                                 game, player_, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.red(
                                     "eliminatePlayer_" + player_.getFaction(),
-                                    "Eliminate " + player_.getDisplayName()));
+                                    "Eliminate " + player_.getFlexibleDisplayName()));
                             msg = player_.getRepresentation()
                                     + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
                             MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), msg, buttons);
@@ -618,7 +654,7 @@ public class AddPlanetService {
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("Styx", null);
 
-            String message = null;
+            String message;
             if (id != null) {
                 game.scorePublicObjective(player.getUserID(), id);
                 message = player.getRepresentation() + " scored '" + marrow + "'";

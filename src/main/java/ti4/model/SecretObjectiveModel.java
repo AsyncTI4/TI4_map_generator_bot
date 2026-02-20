@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,6 +17,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     private String name;
     private String phase;
     private String text;
+    private String notes;
     private int points;
     private String homebrewReplacesID;
     private String imageURL;
@@ -63,6 +64,10 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         }
     };
 
+    public String getNameRepresentation() {
+        return CardEmojis.SecretObjective + " _" + getName() + "_ " + source.emoji();
+    }
+
     public String getRepresentation() {
         return getRepresentation(true);
     }
@@ -84,6 +89,9 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

@@ -42,6 +42,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
+import ti4.spring.jda.JdaService;
 
 @UtilityClass
 public class DrawingUtil {
@@ -338,12 +339,13 @@ public class DrawingUtil {
         return factionFile;
     }
 
-    public static Image getUserDiscordAvatar(User user) {
+    public static Image getUserDiscordAvatar(String userID) {
         try {
+            User user = JdaService.jda.getUserById(userID);
             if (user == null) return null;
             return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
-            BotLogger.error("Could not get Avatar", e);
+            // BotLogger.error("Could not get Avatar", e);
         }
         return null;
     }
@@ -732,6 +734,30 @@ public class DrawingUtil {
             }
         }
         drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
+    }
+
+    public static void drawDebtBoxText(Graphics graphics, String text, int x, int y, int maxWidth) {
+        int spacing = graphics.getFontMetrics().getAscent()
+                + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+
+        for (int i = 0; i < 9; i++) {
+            String trimmedText = trimTextToPixelWidth(graphics, text, maxWidth);
+            if (text.equals(trimmedText)) {
+                drawTextVertically(graphics, text, x + spacing / 2, y, graphics.getFont());
+                return;
+            }
+
+            int spaceIndex = trimmedText.lastIndexOf(' ');
+            if (spaceIndex == -1) {
+                drawTextVertically(graphics, trimmedText, x + spacing / 2, y, graphics.getFont());
+                text = text.substring(trimmedText.length());
+            } else {
+                drawTextVertically(graphics, text.substring(0, spaceIndex), x + spacing / 2, y, graphics.getFont());
+                text = text.substring(spaceIndex + 1);
+            }
+            x += spacing;
+        }
     }
 
     private static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {

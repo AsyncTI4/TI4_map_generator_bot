@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
@@ -48,6 +49,9 @@ public class CardsInfoService {
     }
 
     public static void sendVariousAdditionalButtons(Game game, Player player) {
+        ThreadChannel playerCardsInfoThread = player.getCardsInfoThread();
+        if (playerCardsInfoThread == null) return;
+
         List<Button> buttons = new ArrayList<>();
         Button transaction = Buttons.blue("transaction", "Transaction");
         buttons.add(transaction);
@@ -69,6 +73,13 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+        }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            String finChecker = "FFCC_" + player.getFaction() + "_";
+            buttons.add(Buttons.gray(
+                    finChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
         }
         if (player.hasSpaceStation()) {
             buttons.add(Buttons.gray(
@@ -239,6 +250,9 @@ public class CardsInfoService {
                 && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             buttons.add(Buttons.green("getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
+        if (player.hasTechReady("dsuydag")) {
+            buttons.add(Buttons.green("exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
+        }
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
@@ -333,7 +347,7 @@ public class CardsInfoService {
         String message = "You may use these buttons to do various things:";
 
         // Refresh the various buttons if they're the last message in the thread
-        player.getCardsInfoThread()
+        playerCardsInfoThread
                 .retrieveMessageById(player.getCardsInfoThread().getLatestMessageId())
                 .queue(
                         msg -> {
@@ -342,7 +356,7 @@ public class CardsInfoService {
                             }
                         },
                         BotLogger::catchRestError);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(playerCardsInfoThread, message, buttons);
         if (game.isTwilightsFallMode() && game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),

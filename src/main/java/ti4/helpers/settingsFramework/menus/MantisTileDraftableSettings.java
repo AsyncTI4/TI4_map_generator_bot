@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import ti4.model.MapTemplateModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.TileEmojis;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 @JsonIgnoreProperties("messageId")
@@ -91,8 +91,7 @@ public class MantisTileDraftableSettings extends SettingsMenu {
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
                     .filter(t -> !t.isNucleusTemplate())
                     .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
-            MapTemplateModel defaultTemplate = null;
-            defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
+            MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
             if (defaultTemplate != null) {
                 mapTemplate.setAllValues(allowed, defaultTemplate.getAlias());
             }

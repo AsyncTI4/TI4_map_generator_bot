@@ -21,6 +21,9 @@ public class RearmamentAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         for (Player player : game.getRealPlayers()) {
+            if (player.hasActiveBreakthrough("naazbt")) {
+                continue;
+            }
             String message = player.getRepresentation() + ", please choose a home system planet to place a mech on.";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),

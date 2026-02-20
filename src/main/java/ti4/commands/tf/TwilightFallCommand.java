@@ -14,6 +14,7 @@ public class TwilightFallCommand implements ParentCommand {
                     new DrawRandomUnit(),
                     new DrawRandomGenome(),
                     new DrawSpecificParadigm(),
+                    new DrawRandomParadigm(),
                     new RadicalAdvancement(),
                     new FixColors(),
                     new StartNewSplice(),

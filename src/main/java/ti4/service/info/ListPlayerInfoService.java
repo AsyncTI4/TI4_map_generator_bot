@@ -276,6 +276,7 @@ public class ListPlayerInfoService {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
+            msg.append("### Public Objectives\n");
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
                     msg.append(representScoring(game, id, x)).append("\n\n");
@@ -330,20 +331,24 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
+                boolean scored = false;
+                int progress = getPlayerProgressOnObjective(objID, game, player);
+                int threshold = getObjectiveThreshold(objID, game);
+
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
                             || game.didPlayerScoreThisAlready(
                                     player.getUserID(),
                                     Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅");
+                        scored = true;
                     } else {
-                        if (getObjectiveThreshold(objID, game) > 0) {
+                        if (threshold > 0) {
                             representation
-                                    .append(" (")
-                                    .append(getPlayerProgressOnObjective(objID, game, player))
+                                    .append(progress)
                                     .append("/")
-                                    .append(getObjectiveThreshold(objID, game))
-                                    .append(")  ");
+                                    .append(threshold)
+                                    .append(progress >= threshold ? "#" : "");
                         } else {
                             representation.append("0/1");
                         }
@@ -352,16 +357,17 @@ public class ListPlayerInfoService {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
                             && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
                         representation.append("✅");
+                        scored = true;
                     } else {
                         representation
-                                .append(getPlayerProgressOnObjective(objID, game, player))
+                                .append(progress)
                                 .append("/")
-                                .append(getObjectiveThreshold(objID, game))
-                                .append("");
+                                .append(threshold)
+                                .append(progress >= threshold ? "#" : "");
                     }
                 }
 
-                if (!player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
+                if (!scored && !player.hasAbility("nomadic") && !player.hasTech("tf-nomadic")) {
                     if (player.getFaction().equals(game.getStoredValue("silverFlamed"))) {
                         representation.append(ExploreEmojis.SilverFlame);
                     } else if (!Helper.canPlayerScorePOs(game, player)) {
@@ -375,7 +381,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representSecrets(Game game) {
-        StringBuilder representation = new StringBuilder("__**Scored Secret Objectives**__\n> ");
+        StringBuilder representation = new StringBuilder("### Scored Secret Objective Count\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
@@ -384,21 +390,24 @@ public class ListPlayerInfoService {
                         .append(player.getSoScored())
                         .append("/")
                         .append(player.getMaxSOCount())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
     }
 
     private static String representSupports(Game game) {
-        StringBuilder representation = new StringBuilder("__**Support Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("### _Supports For The Thrones_ Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
                         .append(player.getFactionEmoji())
                         .append(": ")
                         .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1  ");
+                        .append("/1")
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -419,7 +428,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTransferablePoints(Game game) {
-        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
+        StringBuilder representation = new StringBuilder("### Transferable Victory Points");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
                 String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
@@ -448,7 +457,7 @@ public class ListPlayerInfoService {
     }
 
     private static String representTotalVPs(Game game) {
-        StringBuilder representation = new StringBuilder("__**Total Victory Points**__\n> ");
+        StringBuilder representation = new StringBuilder("## Total Victory Points\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
@@ -457,7 +466,8 @@ public class ListPlayerInfoService {
                         .append(player.getTotalVictoryPoints())
                         .append("/")
                         .append(game.getVp())
-                        .append("  ");
+                        .append(UnitEmojis.Blank)
+                        .append(UnitEmojis.Blank);
             }
         }
         return representation.toString();
@@ -473,7 +483,15 @@ public class ListPlayerInfoService {
                 int aboveN = 0;
                 for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanetsForScoring(false).size();
-                    int p2count = p2.getPlanetsForScoring(false).size();
+                    int mutualPlanets = 0;
+                    for (String plan : game.getPlanetsPlayerIsCoexistingOn(player)) {
+                        if (game.getPlayersPlanetsThatOthersAreCoexistingOn(p2).contains(plan)) {
+                            mutualPlanets++;
+                        }
+                    }
+                    int p2count = p2.getPlanetsForScoring(false).size()
+                            - game.getPlanetsPlayerIsCoexistingOn(p2).size()
+                            - mutualPlanets;
                     if (p1count > p2count) {
                         aboveN++;
                     }
@@ -551,6 +569,24 @@ public class ListPlayerInfoService {
                         }
                     } else if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 2) {
                         numAbove1++;
+                    } else {
+                        if (game.isTwilightsFallMode()) {
+                            int amount = 0;
+                            for (String planet : player.getReadiedPlanets()) {
+                                if (ButtonHelper.checkForTechSkips(game, planet)) {
+                                    Planet unitHolder = game.getPlanetsInfo().get(planet);
+                                    List<String> techTypes = unitHolder.getTechSpecialities();
+                                    for (String typeT : techTypes) {
+                                        if (type.toString().equalsIgnoreCase(typeT)) {
+                                            amount++;
+                                        }
+                                    }
+                                }
+                            }
+                            if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) + amount > 1) {
+                                numAbove1++;
+                            }
+                        }
                     }
                 }
                 return numAbove1;

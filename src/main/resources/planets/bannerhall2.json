@@ -1,0 +1,21 @@
+{
+    "id": "bannerhall2",
+    "name": "2nd Banner",
+    "aliases": [
+        "bannerhall2",
+        "secondbanner",
+        "second banner",
+        "2ndbanner",
+        "secondbannerhall",
+        "second bannerhall",
+        "2ndbannerhall"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "FAKE",
+        "FACTION"
+    ],
+    "flavourText": "Some say this text is important. They are wrong.",
+    "source": "ds"
+}

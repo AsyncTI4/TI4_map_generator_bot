@@ -114,6 +114,19 @@ class Replace extends GameStateSubcommand {
             if (removed) {
                 value.add(replacementUser.getId());
             }
+            // for custodians
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
         }
 
         String oldPlayerUserId = replacedPlayer.getUserID();

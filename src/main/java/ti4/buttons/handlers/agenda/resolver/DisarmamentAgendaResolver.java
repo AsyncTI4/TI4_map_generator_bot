@@ -26,6 +26,17 @@ public class DisarmamentAgendaResolver implements AgendaResolver {
                 Tile tile = game.getTileFromPlanet(winner);
                 Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);
                 int count = 0;
+                // kill coexisters first
+                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                    for (UnitKey uk : uH.getUnitsByStateForPlayer(p2).keySet()) {
+                        if (p2.getUnitFromUnitKey(uk).getIsGroundForce()) {
+                            int amt = uH.getUnitCount(uk);
+                            count += amt;
+                            DestroyUnitService.destroyUnit(event, tile, game, uk, amt, uH, false);
+                            units.append(uk.unitEmoji().emojiString().repeat(amt));
+                        }
+                    }
+                }
                 for (UnitKey uk : uH.getUnitsByStateForPlayer(player).keySet()) {
                     if (player.getUnitFromUnitKey(uk).getIsGroundForce()) {
                         int amt = uH.getUnitCount(uk);

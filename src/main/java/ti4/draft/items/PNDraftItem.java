@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -17,12 +18,18 @@ import ti4.service.emoji.TI4Emoji;
 public class PNDraftItem extends DraftItem {
 
     public PNDraftItem(String itemId) {
-        super(Category.PN, itemId);
+        super(DraftCategory.PN, itemId);
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getPn().getNameRepresentation();
     }
 
     @JsonIgnore
     private PromissoryNoteModel getPn() {
-        return Mapper.getPromissoryNote(ItemId);
+        return Mapper.getPromissoryNote(getItemId());
     }
 
     @JsonIgnore
@@ -34,8 +41,7 @@ public class PNDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        PromissoryNoteModel pn = getPn();
-        return "Promissory Note - " + pn.getName();
+        return getPn().getName();
     }
 
     @JsonIgnore
@@ -53,7 +59,7 @@ public class PNDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.PN);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.PN);
         return allItems;
     }
 
@@ -61,7 +67,7 @@ public class PNDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String pnID : faction.getPromissoryNotes()) {
-                allItems.add(generate(Category.PN, pnID));
+                allItems.add(generate(DraftCategory.PN, pnID));
             }
         }
         return allItems;
@@ -69,7 +75,7 @@ public class PNDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.PN);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.PN);
         return allItems;
     }
 
@@ -81,7 +87,7 @@ public class PNDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(pnID)) {
                     continue;
                 }
-                allItems.add(generate(Category.PN, pnID));
+                allItems.add(generate(DraftCategory.PN, pnID));
             }
         }
         return allItems;

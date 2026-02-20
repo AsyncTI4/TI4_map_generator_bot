@@ -60,8 +60,8 @@ public class HeartOfIxthService {
             Button goodHeart = good.withCustomId(good.getCustomId() + "_heart");
             Button badHeart = bad.withCustomId(bad.getCustomId() + "_heart");
             if (rollingPlayer.is(heart)) {
-                goodHeart = goodHeart.withLabel(good.getLabel() + " [Exhaust 🩷]");
-                badHeart = badHeart.withLabel(bad.getLabel() + " [Exhaust 🩷]");
+                goodHeart = goodHeart.withLabel(good.getLabel() + " [Exhaust Heart of Ixth]");
+                badHeart = badHeart.withLabel(bad.getLabel() + " [Exhaust Heart of Ixth]");
             }
             if (result.eligibleForHeartPlus()) buttons.add(goodHeart);
             if (result.eligibleForHeartMinus()) buttons.add(badHeart);

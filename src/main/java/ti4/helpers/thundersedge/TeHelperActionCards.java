@@ -144,15 +144,16 @@ public class TeHelperActionCards {
                 buttons.add(Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button =
-                        Buttons.gray(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                Button button = Buttons.gray(
+                        player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
+                        p2.getFactionModel().getShortName());
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
             }
         }
         String message = player.getRepresentationUnfogged()
-                + ", please tell the bot which two of your neighbor did the transaction.";
+                + ", please tell the bot which two of your neighbors did the transaction.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
@@ -288,7 +289,7 @@ public class TeHelperActionCards {
             buttons.add(Buttons.green("diploRefresh2", "Ready 2 Planets", CardEmojis.SC2));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+            buttons.add(Buttons.green("draw2 AC", "Draw 2 Action Cards", CardEmojis.getACEmoji(game)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             buttons.add(Buttons.green("construction_spacedock", "Place A Space Dock", UnitEmojis.spacedock));
@@ -542,12 +543,13 @@ public class TeHelperActionCards {
                 }
             }
 
-            if (lockedCount > 0) {
-                String id = "resolveBrillianceUnlock_" + p.getFaction();
+            String id = "resolveBrillianceUnlock_" + p.getFaction();
+            if (lockedCount == 1) {
                 String label = "Unlock " + p.getBreakthroughModel().getName();
-                if (lockedCount > 1) {
-                    label = "Unlock Breakthrough Of " + p.getFactionModel().getShortName();
-                }
+                buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
+            } else if (lockedCount > 1) {
+                String label =
+                        "Unlock " + lockedCount + " " + p.getFactionModel().getShortName() + " Breakthroughs";
                 buttons.add(Buttons.gray(id, label, p.getFactionEmoji()));
             }
         }

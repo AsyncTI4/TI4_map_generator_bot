@@ -83,10 +83,19 @@ public class PlayerTechService {
     }
 
     @ButtonHandler("removeSingularity")
+    @ButtonHandler("removeValefar")
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String componentID) {
+        boolean exhaustNewest = false;
         if (componentID.contains("removeSingularity")) {
             componentID = componentID.split("_")[1];
+            exhaustNewest = true;
         }
+        if (componentID.contains("removeValefar")) {
+            componentID = componentID.split("_")[1];
+            exhaustNewest = true;
+        }
+
+        exhaustNewest &= player.getExhaustedTechs().contains(componentID);
         player.removeTech(componentID);
 
         if (Mapper.getTech(componentID) != null) {
@@ -98,7 +107,10 @@ public class PlayerTechService {
             MessageHelper.sendMessageToEventChannel(
                     event, player.getRepresentation(false, false) + " removed technology: " + componentID + ".");
         }
+
+        boolean singularity = false;
         if (player.getSingularityTechs().contains(componentID)) {
+            singularity = true;
             String oldVal = player.getGame().getStoredValue(player.getFaction() + "singularityTechs");
             if (oldVal.contains(componentID + "_")) {
                 oldVal = oldVal.replace(componentID + "_", "");
@@ -108,6 +120,39 @@ public class PlayerTechService {
             player.getGame().setStoredValue(player.getFaction() + "singularityTechs", oldVal);
             if (event instanceof ButtonInteractionEvent bevent) {
                 ButtonHelper.deleteMessage(bevent);
+            }
+        }
+
+        if (exhaustNewest) {
+            String newestTech = null;
+            if (singularity) {
+                List<String> singularityTechs = player.getSingularityTechs();
+                if (!singularityTechs.isEmpty()) {
+                    newestTech = singularityTechs.getLast();
+                }
+            } else {
+                for (String nekroTech : player.getTechs()) {
+                    if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
+                        continue;
+                    }
+                    TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(nekroTech));
+                    if (!techModel.getFaction().orElse("").isEmpty()) {
+                        newestTech = nekroTech;
+                    }
+                }
+            }
+
+            if (newestTech != null) {
+                player.exhaustTech(newestTech);
+                TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(newestTech));
+                String techName = techModel.getName() == null ? "the new technology" : "_" + techModel.getName() + "_";
+                String message = player.getRepresentation(false, false)
+                        + ", since the removed technology was exhausted, then by moving the "
+                        + (singularity ? "Singularity" : "Valefar") + " token, " + techName + " will also be exhausted."
+                        + "\n-# If " + techName
+                        + " does not have an exhaust ability, then this will have little effect, unless you move the "
+                        + (singularity ? "Singularity" : "Valefar") + " token again before it readies.";
+                MessageHelper.sendMessageToEventChannel(event, message);
             }
         }
     }
@@ -262,7 +307,7 @@ public class PlayerTechService {
                 Button draw2ACButton = Buttons.gray(
                         player.getFinsFactionCheckerPrefix() + "draw2 AC",
                         "Draw 2 Action Cards",
-                        CardEmojis.ActionCard);
+                        CardEmojis.getACEmoji(game));
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 // sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -340,7 +385,8 @@ public class PlayerTechService {
                                 player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
                     } else {
                         Button button = Buttons.gray(
-                                player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                                player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(),
+                                p2.getFactionModel().getShortName());
                         String factionEmojiString = p2.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                         buttons.add(button);
@@ -379,7 +425,7 @@ public class PlayerTechService {
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydag" -> {
-                deleteIfButtonEvent(event);
+                deleteTheOneButtonIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
@@ -389,7 +435,6 @@ public class PlayerTechService {
                         "Please choose the planets you wish to exhaust to pay the required "
                                 + player.getPlanetsAllianceMode().size() + " influence.",
                         buttons);
-                sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydab" -> {
                 game.setDominusOrb(true);
@@ -745,6 +790,8 @@ public class PlayerTechService {
                 }
             }
             if (game.isTwilightsFallMode()
+                    && !"wavelength".equalsIgnoreCase(techID)
+                    && !"antimatter".equalsIgnoreCase(techID)
                     && (player.hasTech("tf-singularityx")
                             || player.hasTech("tf-singularityy")
                             || player.hasTech("tf-singularityz"))) {

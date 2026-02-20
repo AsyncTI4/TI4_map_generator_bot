@@ -1,1 +1,16 @@
-{"id":"100","name":"Tempesta","aliases":["te12","tempesta","tempest"],"imagePath":"100_Tempesta.png","planets":["tempesta"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"thunders_edge"}
+{
+    "id": "100",
+    "name": "Tempesta",
+    "aliases": [
+        "te12",
+        "tempesta",
+        "tempest"
+    ],
+    "imagePath": "100_Tempesta.png",
+    "planets": [
+        "tempesta"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "thunders_edge"
+}

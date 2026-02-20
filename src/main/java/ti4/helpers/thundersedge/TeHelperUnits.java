@@ -99,7 +99,9 @@ public class TeHelperUnits {
 
         // The crimson (fs) player has their flagship on a breach as well, and the affected player is not crimson
         for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, crimson, UnitType.Flagship)) {
-            if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE) && player != crimson) {
+            if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+                    && player != crimson
+                    && !crimson.getAllianceMembers().contains(player.getFaction())) {
                 return true;
             }
         }
@@ -109,7 +111,9 @@ public class TeHelperUnits {
         Player nekro = Helper.getPlayerFromUnlockedBreakthrough(game, "nekrobt");
         if (nekro != null && player.hasUnit("crimson_flagship")) {
             for (Tile fs : ButtonHelper.getTilesOfPlayersSpecificUnits(game, nekro, UnitType.Flagship)) {
-                if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE) && player != nekro) {
+                if (fs.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE)
+                        && player != nekro
+                        && !nekro.getAllianceMembers().contains(player.getFaction())) {
                     return true;
                 }
             }
@@ -334,7 +338,7 @@ public class TeHelperUnits {
                 String msg = player.getRepresentationUnfogged() + ", you have " + icono.getNameRepresentation()
                         + ", and somebody just drew a relic.";
                 msg += " You may use the buttons to DEPLOY 1 Iconoclast onto a planet you control:";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
         }
     }

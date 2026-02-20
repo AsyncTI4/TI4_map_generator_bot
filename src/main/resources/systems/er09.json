@@ -6,13 +6,10 @@
         "ulongamma",
         "ulonrho",
         "urho"
-
     ],
     "imagePath": "er_09_async.png",
     "shipPositionsType": "TYPE02",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "ugamma",
         "urho"

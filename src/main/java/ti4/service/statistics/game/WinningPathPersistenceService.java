@@ -1,6 +1,5 @@
 package ti4.service.statistics.game;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import ti4.json.PersistenceManager;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
 import ti4.message.logging.BotLogger;
+import tools.jackson.core.type.TypeReference;
 
 @UtilityClass
 public class WinningPathPersistenceService {

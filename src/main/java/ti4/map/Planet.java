@@ -41,6 +41,7 @@ public class Planet extends UnitHolder {
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
     private String contrastColor;
+    private float radius;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
@@ -72,6 +73,7 @@ public class Planet extends UnitHolder {
                         .toList());
             }
             if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
+            radius = planetInfo.getRadius();
         }
         resetOriginalPlanetResInf();
     }
@@ -125,6 +127,9 @@ public class Planet extends UnitHolder {
             influenceModifier =
                     player.getGame().getPlanetsPlayerIsCoexistingOn(player).size();
             resourcesModifier = 0;
+            if (influenceModifier == 0) {
+                resourcesModifier = -2;
+            }
         }
     }
 
@@ -205,6 +210,20 @@ public class Planet extends UnitHolder {
         if (attachment != null) {
             resourcesModifier += attachment.getResourcesModifier();
             influenceModifier += attachment.getInfluenceModifier();
+            int originalRes = resourcesOriginal + resourcesModifier;
+            int originalInf = influenceOriginal + influenceModifier;
+            if ("designtranspose".equalsIgnoreCase(attachment.getAlias())) {
+                resourcesModifier += originalInf - originalRes;
+                influenceModifier += originalRes - originalInf;
+            }
+            if ("designgrand".equalsIgnoreCase(attachment.getAlias())) {
+                resourcesModifier += originalRes;
+                influenceModifier += originalInf;
+            }
+            if ("designcombine".equalsIgnoreCase(attachment.getAlias())) {
+                resourcesModifier += originalInf;
+                influenceModifier += originalRes;
+            }
             for (String planetType : attachment.getPlanetTypes()) {
                 addType(planetType);
             }
@@ -405,5 +424,9 @@ public class Planet extends UnitHolder {
 
     public String getContrastColor() {
         return contrastColor;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }

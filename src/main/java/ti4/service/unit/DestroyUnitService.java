@@ -149,7 +149,8 @@ public class DestroyUnitService {
             }
 
             if (numInfantry > 0) {
-                ButtonHelper.resolveInfantryDestroy(player, numInfantry);
+                ButtonHelper.resolveInfantryDestroy(
+                        player, numInfantry, units.getFirst().tile());
             }
         }
 
@@ -173,9 +174,7 @@ public class DestroyUnitService {
             capturing.addAll(devours);
         }
 
-        if (game.isTwilightsFallMode()
-                && (unit.unitKey().getUnitType() == UnitType.Infantry
-                        || unit.unitKey().getUnitType() == UnitType.Fighter)) {
+        if (game.isTwilightsFallMode() && (unit.unitKey().getUnitType() == UnitType.Fighter)) {
             for (Player p2 : game.getRealPlayersExcludingThis(player)) {
                 if (p2.ownsUnit("tf-vortexer")) {
                     for (String pos :
@@ -195,7 +194,7 @@ public class DestroyUnitService {
             case Infantry -> capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
             case Mech -> {
                 handleSelfAssemblyRoutines(player, totalAmount, game);
-                if (player.hasUnit("mykomentori_mech")) {
+                if (player.hasUnit("mykomentori_mech") || player.hasTech("tf-specops")) {
                     for (int x = 0; x < totalAmount; x++) {
                         ButtonHelper.rollMykoMechRevival(game, player);
                     }
@@ -294,16 +293,23 @@ public class DestroyUnitService {
                 Player killer = killers.getFirst();
                 if (killer.isRealPlayer()) {
                     String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
-                    int newAmount = game.changeCommsOnPlanet(winnings, planet);
-                    MessageHelper.sendMessageToChannel(
-                            killer.getCorrectChannel(),
-                            killer.getRepresentationNoPing() + " added " + winnings + " commodities to the planet of "
-                                    + Helper.getPlanetRepresentation(planet, game)
-                                    + " (which has " + newAmount + " commodities on it now) by destroying "
-                                    + unit.getTotalRemoved() + " of "
-                                    + player.getRepresentationNoPing() + "'s "
-                                    + unit.unitKey().getUnitType().getUnitTypeEmoji()
-                                    + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
+                    if (planet.isEmpty()) {
+                        MessageHelper.sendMessageToChannel(
+                                player.getCorrectChannel(), "Could not find a planet to place commodities on.");
+
+                    } else {
+                        int newAmount = game.changeCommsOnPlanet(winnings, planet);
+                        MessageHelper.sendMessageToChannel(
+                                killer.getCorrectChannel(),
+                                killer.getRepresentationNoPing() + " added " + winnings
+                                        + " commodities to the planet of "
+                                        + Helper.getPlanetRepresentation(planet, game)
+                                        + " (which has " + newAmount + " commodities on it now) by destroying "
+                                        + unit.getTotalRemoved() + " of "
+                                        + player.getRepresentationNoPing() + "'s "
+                                        + unit.unitKey().getUnitType().getUnitTypeEmoji()
+                                        + "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
+                    }
                 }
             }
         }

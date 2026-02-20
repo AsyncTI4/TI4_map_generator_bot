@@ -15,9 +15,10 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
-class CaptureUnitService {
+public class CaptureUnitService {
 
     public static List<Player> listCapturingMechPlayers(
             Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
@@ -31,6 +32,8 @@ class CaptureUnitService {
         for (Player player : game.getRealPlayers()) {
             if (player.hasUnlockedBreakthrough("mykomentoribt")
                     && player != game.getActivePlayer()
+                    && !allUnits.isEmpty()
+                    && allUnits.getFirst().getPlayer(game) != player
                     && !removedUnitType.uh().getPlayersUnitListOnHolder(player).isEmpty()) {
                 capturing.add(player);
                 continue;
@@ -48,7 +51,8 @@ class CaptureUnitService {
 
         // "sigma_vuilraith_flagship_1" does not capture your own units
         List<Player> cabals = game.getRealPlayers().stream()
-                .filter(p -> p.hasUnit("cabal_flagship") || p.hasUnit("sigma_vuilraith_flagship_2"))
+                .filter(p -> ValefarZService.hasFlagshipAbility(game, p, "cabal_flagship")
+                        || p.hasUnit("sigma_vuilraith_flagship_2"))
                 .toList();
         List<Player> cabalsWithFs = new ArrayList<>();
         for (Player p : cabals) {

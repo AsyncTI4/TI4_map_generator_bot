@@ -30,6 +30,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.SowingReapingService;
+import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.PlanetEmojis;
@@ -105,21 +106,34 @@ public class StatusHelper {
             } else {
                 var userSettings = UserSettingsManager.get(player.getUserID());
                 if (userSettings.getSandbagPref().contains("bot")) {
-                    String message = player.getRepresentation()
+                    String message = player.getRepresentationNoPing()
                             + ", the bot will auto pass on scoring a secret objective this round for you (if you're still unable to score one when scoring occurs)."
                             + " Click this button to change it and do it manually."
                             + " You will be asked every round like this when you pass early, so no decision is final.";
-                    buttons.add(Buttons.red("sandbagPref_manual", "Manually Say No Scoring"));
+                    buttons.add(Buttons.gray("sandbagPref_manual", "Manually Say No Scoring"));
                     buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                 } else {
-                    String message = player.getRepresentation()
+                    String message = player.getRepresentationNoPing()
                             + ", the bot will let you manually decide whether to score a secret objective this round."
                             + " Click this button to change it and auto pass on scoring this round (if you still have no secrets to score when scoring occurs)."
                             + " You will be asked every round like this when you pass early, so no decision is final.";
                     buttons.add(Buttons.green("sandbagPref_bot", "Auto Say No Scoring"));
                     buttons.add(Buttons.gray("deleteButtons", "Keep Current Setting"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+                }
+            }
+            if (player.hasLeaderUnlocked("ralnelhero")) {
+                if (game.getStoredValue("ralnelHero").isEmpty()) {
+                    String presetRalnelHero =
+                            "You have Director Nel, the Ral Nel hero, unlocked. You can use the preset button to automatically use your hero when the last player passes."
+                                    + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
+
+                    List<Button> ralnelHeroButtons = new ArrayList<>();
+                    ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
+                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
                 }
             }
         }
@@ -430,7 +444,7 @@ public class StatusHelper {
 
     public static List<Player> GetPlayersInScoringOrder(Game game) {
         if (game.hasFullPriorityTrackMode()) {
-            return PriorityTrackHelper.GetPriorityTrack(game).stream()
+            return PriorityTrackHelper.getPriorityTrack(game).stream()
                     .filter(Objects::nonNull)
                     .toList();
         } else if (game.getPlanets().contains(EronousPlanetService.CANTRIS_ID)) {
@@ -444,10 +458,10 @@ public class StatusHelper {
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers(true)) {
-                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
+                if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor(), Constants.VADEN_DEBT_POOL) > 0) {
                     String msg = p2.getRepresentationUnfogged()
                             + ", you have the opportunity to pay off **Binding Debts** here."
-                            + " You may pay 1 trade good to get 2 debt tokens forgiven.";
+                            + " You may pay 1 trade good to get 2 debt tokens forgiven, from the \"Shark Loans\" pool.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
                     buttons.add(Buttons.red("deleteButtons", "Stay Indebted"));
@@ -656,7 +670,7 @@ public class StatusHelper {
     public static void sendEntropicScarButtons(Game game) {
         Map<Player, Integer> scars = new HashMap<>();
         for (Tile t : game.getTileMap().values()) {
-            if (t.getTileModel().isScar()) {
+            if (t.isScar()) {
                 for (Player p : game.getRealPlayers()) {
                     if (Tile.tileHasPlayerShips(p).test(t)) {
                         scars.put(p, scars.getOrDefault(p, 0) + 1);
@@ -688,14 +702,31 @@ public class StatusHelper {
             int ccs = player.getStrategicCC();
             int techs = buttons.size() - 1;
             if (game.isTwilightsFallMode() && techs == 0) {
-                techs++;
-                buttons.add(Buttons.blue("redistributeCCButtons", "Gain 2 Command Tokens (And Spend 1 From Strategy)"));
+                if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar")) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " _Scepter of Emelpar_ has been exhausted and you have been given +2 command tokens in your strategy pool.");
+                    player.setStrategicCC(player.getStrategicCC() + 2);
+                    player.addExhaustedRelic("emelpar");
+                    player.addExhaustedRelic("absol_emelpar");
+                } else if (player.getStrategicCC() > 0) {
+                    MessageHelper.sendMessageToChannel(
+                            player.getCorrectChannel(),
+                            player.getRepresentationUnfogged()
+                                    + ", you have ships in an Entropic Scar anomaly. However, you have no faction technologies left to gain."
+                                    + " You have been given net +1 command tokens in your strategy pool.");
+                    player.setStrategicCC(player.getStrategicCC() + 1);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, null, "Entropic Scar");
+                }
+                continue;
             }
             String scarMessage = player.getRepresentationUnfogged()
                     + " You have ships in an Entropic Scar anomaly. You may use these buttons to spend a token from your strategy pool to gain one of your faction technologies.";
             scarMessage +=
                     "You currently have " + ccs + " command token" + (ccs == 1 ? "" : "s") + " in your strategy pool.";
-            if (player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter"))
+            if (player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar"))
                 scarMessage += "You also have the _" + RelicHelper.sillySpelling()
                         + "_ available to exhaust (this will be spent first).";
             for (int i = 0; i < techs && i < entry.getValue(); i++) {
@@ -714,7 +745,7 @@ public class StatusHelper {
 
     private static void resolveSolFlagship(Game game) {
         for (Player player : game.getRealPlayers()) {
-            if (!player.hasUnit("sol_flagship")) continue;
+            if (!ValefarZService.hasFlagshipAbility(game, player, "sol_flagship")) continue;
 
             String colorID = Mapper.getColorID(player.getColor());
             UnitKey infKey = Mapper.getUnitKey("gf", colorID);

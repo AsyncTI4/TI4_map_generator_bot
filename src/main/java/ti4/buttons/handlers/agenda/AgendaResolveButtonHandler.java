@@ -172,7 +172,8 @@ class AgendaResolveButtonHandler {
     }
 
     private static boolean guardDoublePress(Game game, String winner, String agendaId) {
-        String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size();
+        String key = "agendaRes" + game.getRound() + game.getDiscardAgendas().size()
+                + game.getLaws().size();
         if (game.getStoredValue(key).equalsIgnoreCase(winner + agendaId)) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
@@ -331,6 +332,18 @@ class AgendaResolveButtonHandler {
                 MessageHelper.sendMessageToChannelWithButtons(
                         rid.getCorrectChannel(),
                         "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.",
+                        buttons);
+            }
+            if (rid.hasUnit("kaltrim_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "mech", true) < 4) {
+                MessageHelper.sendMessageToChannel(
+                        rid.getCorrectChannel(),
+                        rid.getFactionEmoji() + " may DEPLOY 1 mech to a planet that contains their units.");
+                List<Button> buttons =
+                        new ArrayList<>(Helper.getPlanetPlaceUnitButtons(rid, game, "mech", "placeOneNDone_skipbuild"));
+                buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        rid.getCorrectChannel(),
+                        "Use buttons to DEPLOY 1 mech to a planet that contains their units.",
                         buttons);
             }
             if (game.isFowMode()) {

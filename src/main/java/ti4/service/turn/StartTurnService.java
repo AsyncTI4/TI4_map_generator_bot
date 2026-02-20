@@ -214,10 +214,14 @@ public class StartTurnService {
                         && p2.getCommodities() > 0
                         && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
-                    buttonsRedCreuss.add(
-                            Buttons.green("redCreussWashFull_" + p2.getUserID(), "Full Wash", MiscEmojis.Wash));
-                    buttonsRedCreuss.add(
-                            Buttons.blue("redCreussWashPartial_" + p2.getUserID(), "Partial Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.green(
+                            player.getFinsFactionCheckerPrefix() + "redCreussWashFull_" + p2.getUserID(),
+                            "Full Wash",
+                            MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.blue(
+                            player.getFinsFactionCheckerPrefix() + "redCreussWashPartial_" + p2.getUserID(),
+                            "Partial Wash",
+                            MiscEmojis.Wash));
                     buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(),
@@ -296,7 +300,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf") && !player.hasUnit("tf-yinclone")) {
+        if (player.getStasisInfantry() > 0 && !player.hasUnit("tf-yinclone") && player.hasInf2Tech()) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry()
@@ -471,18 +475,18 @@ public class StartTurnService {
 
         if (!hadAnyUnplayedSCs && !doneActionThisTurn) {
             if (player.hasLeaderUnlocked("ralnelhero")) {
-                if (game.getStoredValue("ralnelHero") != null) {}
+                if (game.getStoredValue("ralnelHero").isEmpty()) {
+                    String presetRalnelHero =
+                            "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
+                                    + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."
+                                    + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
 
-                String presetRalnelHero =
-                        "You have Director Nel, the Ral Nel hero, unlocked. If you're not about to pass, you can ignore this message."
-                                + " Otherwise, you can use the preset button to automatically use your hero when the last player passes."
-                                + " Don't worry, you can always unset the preset later if you decide you don't want to use it.";
-
-                List<Button> ralnelHeroButtons = new ArrayList<>();
-                ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
-                ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+                    List<Button> ralnelHeroButtons = new ArrayList<>();
+                    ralnelHeroButtons.add(Buttons.blue("resolvePreassignment_ralnelHero", "Preset Ral Nel Hero"));
+                    ralnelHeroButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                    MessageHelper.sendMessageToChannelWithButtons(
+                            player.getCardsInfoThread(), presetRalnelHero, ralnelHeroButtons);
+                }
             }
 
             if (player.getPlayableActionCards().contains("puppetsonastring")) {
@@ -506,7 +510,20 @@ public class StartTurnService {
                                 .append(Helper.getSCName(sc, game))
                                 .append(
                                         "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone.");
-                        appendScMessages(game, p2, sc, sb);
+
+                        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
+                            sb.append(" Message link is: ")
+                                    .append(game.getStoredValue("scPlay" + sc))
+                                    .append(".\n");
+                        }
+                        sb.append("You currently have ")
+                                .append(p2.getStrategicCC())
+                                .append(" command token")
+                                .append(p2.getStrategicCC() == 1 ? "" : "s")
+                                .append(" in your strategy pool.");
+                        if (!p2.hasFollowedSC(sc)) {
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+                        }
                     }
                 }
             }
@@ -525,6 +542,11 @@ public class StartTurnService {
             }
             if (!game.isJustPlayedComponentAC()) {
                 AutoPingMetadataManager.setupQuickPing(game.getName());
+            }
+            if (player.hasAbility("matters_of_state")) {
+                String message2 = player.getRepresentationUnfogged() + " please gain or flip 1 balance token.";
+                List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
             }
         } else {
             game.setJustPlayedComponentAC(false);
@@ -611,6 +633,10 @@ public class StartTurnService {
             startButtons.add(
                     Buttons.green(finChecker + "getPsychoButtons", "Use Psychoarcheology", TechEmojis.BioticTech));
         }
+        if (player.hasTechReady("dsuydag")) {
+            startButtons.add(Buttons.green(
+                    finChecker + "exhaustTech_dsuydag", "Exhaust Messiah Protocols", TechEmojis.BioticTech));
+        }
 
         Button transaction = Buttons.blue("transaction", "Transaction");
         startButtons.add(transaction);
@@ -622,6 +648,12 @@ public class StartTurnService {
         }
         if (player.hasUnlockedBreakthrough("titansbt")) {
             startButtons.add(Buttons.gray("selectPlayerToSleeper", "Add a sleeper token", MiscEmojis.Sleeper));
+        }
+        if (player.hasRelicReady("superweaponavailyn")) {
+            startButtons.add(Buttons.gray(
+                    finChecker + "exhaustSuperweapon_availyn",
+                    "Produce 3 Fighters With Availyn",
+                    FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("pharadnagent")) {
             startButtons.add(
@@ -663,21 +695,5 @@ public class StartTurnService {
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
         return startButtons;
-    }
-
-    private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {
-        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-            sb.append("Message link is: ")
-                    .append(game.getStoredValue("scPlay" + sc))
-                    .append("\n");
-        }
-        sb.append("You currently have ")
-                .append(player.getStrategicCC())
-                .append(" command token")
-                .append(player.getStrategicCC() == 1 ? "" : "s")
-                .append(" in your strategy pool.");
-        if (!player.hasFollowedSC(sc)) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
-        }
     }
 }

@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +24,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String target;
     private String text1;
     private String text2;
+    private String notes;
     private String forEmoji;
     private String againstEmoji;
     private String mapText;
@@ -56,6 +57,10 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public String getName() {
         return name;
+    }
+
+    public String getNameRepresentation() {
+        return CardEmojis.Agenda + " _" + name + "_ " + source.emoji();
     }
 
     private String getCategory() {
@@ -128,6 +133,9 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
             String arg = getText2().replace("Against:", "**Against:**");
             sb.append("> ").append(arg).append("\n");
         }
+        if (notes != null) {
+            sb.append("> -# [").append(notes).append("]\n");
+        }
         if (footnote() != null) sb.append(footnote());
 
         return sb.toString();
@@ -156,6 +164,9 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "__**Against:**__");
             text.append(arg).append("\n");
+        }
+        if (notes != null) {
+            text.append("-# [").append(notes).append("]\n");
         }
         eb.setDescription(text.toString());
 

@@ -20,7 +20,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
 
-    public WeirdGameSetup() {
+    WeirdGameSetup() {
         super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
@@ -134,7 +134,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (game.isCompetitiveTIGLGame()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
-                        "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+                        "TIGL Games cannot be mixed with other game modes. Priority Track is unchanged.");
             } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
@@ -149,7 +149,21 @@ class WeirdGameSetup extends GameStateSubcommand {
         }
 
         Boolean thunderMode = event.getOption(Constants.THUNDERS_EDGE_MODE, null, OptionMapping::getAsBoolean);
-        if (thunderMode != null) game.setThundersEdge(thunderMode);
+        if (thunderMode != null) {
+            game.setThundersEdge(thunderMode);
+            if (thunderMode && !game.getActionCards().contains("brilliance")) {
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "The Thunder's Edge action card deck has been set.");
+            }
+            if (thunderMode && !game.getAllRelics().contains("thesilverflame")) {
+                game.addRelicToGame("quantumcore");
+                game.addRelicToGame("thesilverflame");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "_The Silver Flame_ and _The Quantumcore_ relics have been added back to the relic deck.");
+            }
+        }
 
         Boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), null, OptionMapping::getAsBoolean);
         if (riftsetMode != null && game.isFowMode()) {
@@ -187,7 +201,7 @@ class WeirdGameSetup extends GameStateSubcommand {
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
-    public static boolean setGameMode(
+    static boolean setGameMode(
             GenericInteractionCreateEvent event,
             Game game,
             boolean baseGameMode,
@@ -197,6 +211,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             boolean isTIGLGame,
             boolean votcMode) {
         if (isTIGLGame
+                && !TIGLHelper.isFracturedTIGLGame(game)
                 && (baseGameMode
                         || absolMode
                         || discordantStarsMode
@@ -206,14 +221,17 @@ class WeirdGameSetup extends GameStateSubcommand {
                         || game.isCommunityMode()
                         || votcMode)) {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+                    event.getMessageChannel(), "TIGL Games cannot be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             TIGLHelper.initializeTIGLGame(game);
             return true;
         }
-        if (!isTIGLGame) {
-            game.setCompetitiveTIGLGame(false);
+
+        game.setCompetitiveTIGLGame(false);
+        if (game.isThundersEdge() || game.isTwilightsFallMode()) {
+            return true;
+            // These modes are incompatible atm with the rest of the game mode settings, so skip them
         }
 
         if (miltyModMode && !baseGameMode) {

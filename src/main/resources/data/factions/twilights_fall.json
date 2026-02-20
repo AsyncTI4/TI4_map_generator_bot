@@ -2,6 +2,7 @@
     {
         "alias": "redtf",
         "factionName": "The Ruby Monarch",
+        "shortName": "Ruby Monarch",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 2,
@@ -24,11 +25,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "red"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "orangetf",
         "factionName": "Radiant Aur",
+        "shortName": "Radiant Aur",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 4,
@@ -51,11 +56,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "org"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "yellowtf",
         "factionName": "Avarice Rex",
+        "shortName": "Avarice Rex",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 6,
@@ -78,11 +87,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "ylw"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "greentf",
         "factionName": "Il Sai Lakoe, Herald of Thorns",
+        "shortName": "Il Sai Lakoe",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 3,
@@ -105,11 +118,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "grn"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "bluetf",
         "factionName": "The Saint of Swords",
+        "shortName": "Saint of Swords",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 3,
@@ -132,11 +149,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "blu"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "purpletf",
         "factionName": "Il Na Viroset",
+        "shortName": "Il Na Viroset",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 4,
@@ -159,11 +180,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "ppl"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "pinktf",
         "factionName": "El Nen Janovet",
+        "shortName": "El Nen Janovet",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 3,
@@ -186,11 +211,15 @@
             "spacedock",
             "tf_warsun"
         ],
+        "preferredColours": [
+            "pnk"
+        ],
         "source": "twilights_fall"
     },
     {
         "alias": "blacktf",
         "factionName": "A Sickening Lurch",
+        "shortName": "Sickening Lurch",
         "homeSystem": "",
         "startingFleet": "",
         "commodities": 2,
@@ -212,6 +241,9 @@
             "pds",
             "spacedock",
             "tf_warsun"
+        ],
+        "preferredColours": [
+            "blk"
         ],
         "source": "twilights_fall"
     }

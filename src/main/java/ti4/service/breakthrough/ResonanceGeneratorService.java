@@ -108,8 +108,8 @@ public class ResonanceGeneratorService {
             space.addToken(Constants.TOKEN_BREACH_ACTIVE);
         }
 
-        String msg = "Placed active breach in the " + tile.getRepresentation();
-        msg += " system using " + source + ".";
+        String msg = "Placed active breach in " + tile.getDetailedDescription();
+        msg += " using " + source + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         checkCrimsonCommanderUnlock(game, player, tile);
         ButtonHelper.deleteMessage(event);

@@ -19,7 +19,6 @@ import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
 import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -44,11 +43,14 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
-import ti4.json.ObjectMapperFactory;
+import ti4.json.JsonMapperManager;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -65,11 +67,18 @@ import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 class GameSaveService {
 
-    private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
+            .addModule(new SimpleModule()
+                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
+                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .build();
 
     static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
@@ -145,7 +154,6 @@ class GameSaveService {
     }
 
     private static void saveGameInfo(Writer writer, Game game) throws IOException {
-        game.setStoredValue("loadedGame", "no");
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -714,6 +722,17 @@ class GameSaveService {
         writer.write(Constants.PRIORITY_TRACK_MODE + " " + game.getPriorityTrackMode());
         writer.write(System.lineSeparator());
 
+        sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : game.getAllDebtPoolIcons().entrySet()) {
+            if (entry.getValue() == null) continue;
+            sb.append(entry.getKey().replace(" ", "_"))
+                    .append(",")
+                    .append(entry.getValue())
+                    .append(";");
+        }
+        writer.write(Constants.DEBT_POOL + " " + sb);
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -855,8 +874,8 @@ class GameSaveService {
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
-            writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
-            writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
+            writeCards(player.getPlotCardsRaw(), writer, Constants.PLOT_CARDS);
+            writeCardsStringList(player.getPlotCardsFactionsRaw(), writer, Constants.PLOT_FACTIONS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -930,11 +949,13 @@ class GameSaveService {
             writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
+            for (Map.Entry<String, Map<String, Integer>> entry :
+                    player.getAllDebtTokens().entrySet()) {
+                writer.write(Constants.DEBT + "2 " + entry.getKey().replace(" ", "_") + "|"
+                        + getStringRepresentationOfMap(entry.getValue()));
+                writer.write(System.lineSeparator());
+            }
 
-            // old spot
-
-            writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
@@ -978,6 +999,8 @@ class GameSaveService {
                                     .map(String::valueOf)
                                     .toList()));
             writer.write(System.lineSeparator());
+
+            writeStrStrMap(writer, Constants.PLAYER_STORED_VALUES, player.getStoredValueMap());
 
             player.getBreakthroughUnlocked().remove(null);
             player.getBreakthroughExhausted().remove(null);
@@ -1111,6 +1134,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
+    /** Assumes the map is already properly escaped */
     private static void writeStrStrMap(Writer writer, String field, Map<String, String> map) throws IOException {
         List<String> entries = map.entrySet().stream()
                 .map(e -> e.getKey() + "," + e.getValue())

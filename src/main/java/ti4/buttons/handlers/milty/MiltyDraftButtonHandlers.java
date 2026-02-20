@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -34,9 +33,8 @@ class MiltyDraftButtonHandlers {
     }
 
     @ButtonHandler("miltyFactionInfo_")
-    private void sendAvailableFactionInfo(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    private void sendAvailableFactionInfo(Game game, Player player, String buttonID) {
         if (player == null) return;
-        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         String whichOnes = buttonID.replace("miltyFactionInfo_", "");
         List<FactionModel> displayFactions = new ArrayList<>();
         switch (whichOnes) {
@@ -54,6 +52,28 @@ class MiltyDraftButtonHandlers {
             if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
             MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
             first = false;
+        }
+        if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
+            List<MessageEmbed> teEmbeds = new ArrayList<>();
+            for (FactionModel faction : displayFactions) {
+                String btId = faction.getID() + "bt";
+                if (btId.contains("keleres")) {
+                    btId = "keleresbt";
+                }
+                if (Mapper.getBreakthrough(btId) != null) {
+                    teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
+                }
+            }
+            first = true;
+            for (MessageEmbed e : teEmbeds) {
+                String message = "";
+                if (first) {
+                    message =
+                            player.getRepresentationUnfogged() + ", here is an overview of the faction breakthroughs.";
+                }
+                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
+                first = false;
+            }
         }
     }
 

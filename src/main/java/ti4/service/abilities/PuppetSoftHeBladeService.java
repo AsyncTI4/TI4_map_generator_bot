@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ComponentActionHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -26,6 +28,7 @@ import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.leader.HeroUnlockCheckService;
+import ti4.service.planet.AddPlanetService;
 
 @UtilityClass
 public class PuppetSoftHeBladeService {
@@ -48,7 +51,8 @@ public class PuppetSoftHeBladeService {
         flipFactionToObsidian(game, player);
 
         // Announce Plots
-        StringBuilder plotInfo = new StringBuilder("## __The Obsidian's plots are now revealed:__");
+        String factionName = player.getDisplayName();
+        StringBuilder plotInfo = new StringBuilder("## __" + factionName + " plots are now revealed:__");
         for (String plotID : player.getPlotCards().keySet()) {
             GenericCardModel plot = Mapper.getPlot(plotID);
             plotInfo.append("\n").append(plot.getRepresentation());
@@ -127,6 +131,25 @@ public class PuppetSoftHeBladeService {
                 "### " + player.getRepresentation(false, true) + " the following components have been updated:\n> ";
         output += String.join("\n> ", outputStrings);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output);
+        resolveFirmamentMechFlip(game, player);
+    }
+
+    private static void resolveFirmamentMechFlip(Game game, Player player) {
+        int count = 0;
+        String output = "### " + player.getRepresentation(false, true)
+                + ", the following planets have been taken control of by Vipers Hollow:";
+        for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
+            UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+            if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                count++;
+                output += "\n> " + Helper.getPlanetRepresentation(planet, game);
+                AddPlanetService.addPlanet(player, planet, game);
+            }
+        }
+
+        if (count > 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), output);
+        }
     }
 
     // Replacing home system MUST be done before changing faction sheets

@@ -1,18 +1,18 @@
 package ti4.website;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.json.JsonMapperManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglUsernameChangeRequest;
+import tools.jackson.databind.JsonNode;
 
 @Slf4j
 @UtilityClass
@@ -62,7 +62,7 @@ public class UltimateStatisticsWebsiteHelper {
     private static void sendJson(
             Object request, String url, MessageChannel channel, String successMessage, String failureMessage) {
         try {
-            String json = EgressClientManager.getObjectMapper().writeValueAsString(request);
+            String json = JsonMapperManager.basic().writeValueAsString(request);
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -88,9 +88,9 @@ public class UltimateStatisticsWebsiteHelper {
                         MessageHelper.sendMessageToChannel(channel, failureMessage);
                         return null;
                     });
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.error(
-                    LAZIK_DISCORD_NOTIFICATION + " An IOException occurred while sending a request to TI4 "
+                    LAZIK_DISCORD_NOTIFICATION + " An exception occurred while sending a request to TI4 "
                             + "Ultimate Stats: " + url,
                     e);
             MessageHelper.sendMessageToChannel(channel, failureMessage);
@@ -109,7 +109,7 @@ public class UltimateStatisticsWebsiteHelper {
         String body = response.body();
         BotLogger.error(LAZIK_DISCORD_NOTIFICATION + " " + failureMessage + "\n```" + body + "```");
         try {
-            JsonNode node = EgressClientManager.getObjectMapper().readTree(body);
+            JsonNode node = JsonMapperManager.basic().readTree(body);
             String title = node.path("problemDetails").path("title").asText();
             String detail = node.path("problemDetails").path("detail").asText();
             if (!title.isEmpty() || !detail.isEmpty()) {
@@ -117,7 +117,7 @@ public class UltimateStatisticsWebsiteHelper {
                 MessageHelper.sendMessageToChannel(channel, String.format("%s (%s)", failureMessage, details));
                 return;
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.error("Failed to parse TI4 Ultimate error response", e);
         }
         MessageHelper.sendMessageToChannel(channel, failureMessage);

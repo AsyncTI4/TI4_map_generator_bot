@@ -3,6 +3,7 @@ package ti4.listeners.context;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 
 @Getter
@@ -13,7 +14,12 @@ public class SelectionMenuContext extends ListenerContext {
     private List<String> values;
 
     public StringSelectInteractionEvent getEvent() {
-        if (event instanceof StringSelectInteractionEvent button) return button;
+        if (event instanceof StringSelectInteractionEvent event2) return event2;
+        return null;
+    }
+
+    public EntitySelectInteractionEvent getEntityEvent() {
+        if (event instanceof EntitySelectInteractionEvent event2) return event2;
         return null;
     }
 

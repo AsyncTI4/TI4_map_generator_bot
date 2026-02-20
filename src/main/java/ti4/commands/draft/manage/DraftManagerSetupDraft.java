@@ -7,7 +7,7 @@ import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.map.Game;
 
 class DraftManagerSetupDraft extends GameStateSubcommand {
-    public DraftManagerSetupDraft() {
+    DraftManagerSetupDraft() {
         super(Constants.DRAFT_MANAGE_SETUP_DRAFT, "Setup a new draft, with nothing preset", true, false);
     }
 

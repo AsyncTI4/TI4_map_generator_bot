@@ -250,10 +250,10 @@ public class GMService {
                     acs.append("__")
                             .append(player.getRepresentationUnfoggedNoPing())
                             .append("__\n");
-                    player.getActionCards().entrySet().forEach(entry -> acs.append("> ")
-                            .append(Mapper.getActionCard(entry.getKey()).getNameRepresentation())
+                    player.getActionCards().forEach((key, value) -> acs.append("> ")
+                            .append(Mapper.getActionCard(key).getNameRepresentation())
                             .append(" (")
-                            .append(entry.getValue())
+                            .append(value)
                             .append(")\n"));
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), acs.toString());

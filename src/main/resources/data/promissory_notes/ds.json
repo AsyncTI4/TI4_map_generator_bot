@@ -204,7 +204,7 @@
         "name": "Spoils of War",
         "faction": "lanefir",
         "color": "",
-        "playArea": true,
+        "playArea": false,
         "playImmediately": false,
         "source": "ds",
         "text": "After you win a combat: Place this card face-up in your play area to explore 1 planet you control.\nAt the start of the Lanefir player's turn, return this card to the Lanefir player."
@@ -398,9 +398,9 @@
         "name": "Death Binding",
         "faction": "pharadn",
         "color": "",
-        "playArea": true,
+        "playArea": false,
         "source": "ds",
-        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAfter 1 of your opponent’s infantry is destroyed during ground combat, you may exhaust this card to place 1 infantry from your reinforcements on that planet. Then, the Pharad'n player captures 1 infantry from their reinforcements."
+        "text": "When the Pharad’n player passes, remove 4 of your infantry from the game board to gain 1 technology with no prerequisites. Then, return this card to the Pharad'n player; that player captures 1 infantry from the supply."
     },
     {
         "alias": "dspnqhet",
@@ -409,7 +409,8 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of a round of combat: Choose up to 3 of your units; during this round of combat, hits those units produce cannot be canceled.  [Note: this means that sustain damage cannot be used against these hits.] After this round of combat, return this card to the Qhet player."
+        "text": "At the start of a round of combat: Choose up to 3 of your units; during this round of combat, hits those units produce cannot be canceled. After this round of combat, return this card to the Qhet player.",
+        "notes": "This means that SUSTAIN DAMAGE cannot be used against these hits."
     },
     {
         "alias": "dspnatok",
@@ -421,13 +422,41 @@
         "text": "At the start of invasion: Choose 1 unit you control in the active system; that unit gains PLANETARY SHIELD until the end of this action. Then, return this card to the Atokera player."
     },
     {
+        "alias": "dspnkalt",
+        "name": "Kaltrim Ambassadors",
+        "faction": "kaltrim",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of the agenda phase: Place 1 infantry from the Kaltrim player's reinforcements into coexistence on a planet you control to look at the top card of the agenda deck, you may discard that card. Then, return this card to the Kaltrim player."
+    },
+    {
+        "alias": "dspnsarc",
+        "name": "Plunderers",
+        "faction": "sarcosa",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "ds",
+        "text": "When you receive this card, if you are not the Sarcosa player, you must place it face up in your play area. When you win a combat, give this card to your opponent and take up to 2 of their trade goods or commodities. Then, the Sarcosa player gains 1 commodity."
+    },
+    {
+        "alias": "dspnxin",
+        "name": "Statecraft Mentor",
+        "faction": "xin",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "When you would return another player's promissory note to that player: You may return this promissory note instead of that promissory note. You can use this ability even if you are the Xin player. Then, the Xin player may place 1 ground force from their reinforcements into coexistence on a planet you control."
+    },
+    {
         "alias": "dspnbelk",
         "name": "Mercenary Sortie",
         "faction": "belkosea",
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of combat: Roll 4 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat.Then, return this card to the Belkosea player."
+        "text": "At the start of combat: Roll 3 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat. After the first round of this combat, return this card to the Belkosea player."
     },
     {
         "alias": "dspntold",
@@ -437,6 +466,6 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens  from your reinforcements and return this card to that player."
+        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens from your reinforcements and return this card to that player."
     }
 ]

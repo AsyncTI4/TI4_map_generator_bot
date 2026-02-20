@@ -54,7 +54,7 @@ class AddTile extends GameStateSubcommand {
 
         for (String position : positions) {
             Tile tile = new Tile(planetTileName, position);
-            if (tile.isMecatol(game) && !game.isLiberationC4Mode()) {
+            if (tile.isMecatol() && !game.isLiberationC4Mode()) {
                 AddTileService.addCustodianToken(tile, game);
             }
 

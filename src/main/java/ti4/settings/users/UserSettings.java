@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor // needed for ObjectMapper
+@NoArgsConstructor // needed for JsonMapper
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserSettings {
 
@@ -29,7 +29,9 @@ public class UserSettings {
     private boolean hasAnsweredSurvey;
     private boolean prefersSarweenMsg = true;
     private boolean prefersPillageMsg = true;
+    private String voltronStyle = "eyes";
     private boolean prefersAutoDebtClearance = true;
+    private boolean activityTracking = true;
     private boolean prefersPassOnWhensAfters;
     private boolean prefersPrePassOnSC = true;
     private Boolean prefersWrongButtonEphemeral;
@@ -59,40 +61,23 @@ public class UserSettings {
     }
 
     public void addActiveHour(int utcHour) {
+        if (!activityTracking) {
+            return;
+        }
         if (isBlank(activeHours)) {
             activeHours = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
         }
         int x = 0;
-        String newActiveHours = "";
+        StringBuilder newActiveHours = new StringBuilder();
         for (String hourStr : activeHours.split(";")) {
             int hour = Integer.parseInt(hourStr);
             if (x == utcHour) {
                 hour++;
             }
-            newActiveHours += hour + ";";
+            newActiveHours.append(hour).append(";");
             x++;
         }
-        newActiveHours = newActiveHours.substring(0, newActiveHours.length() - 1);
-        activeHours = newActiveHours;
-    }
-
-    public boolean enoughHeatData() {
-        if (amountOfHeatData() > 150) {
-            return true;
-        }
-        return false;
-    }
-
-    public int amountOfHeatData() {
-        if (isBlank(activeHours)) {
-            activeHours = "0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0";
-        }
-        int count = 0;
-        for (String hourStr : activeHours.split(";")) {
-            int hour = Integer.parseInt(hourStr);
-            count += hour;
-        }
-        return count;
+        activeHours = newActiveHours.substring(0, newActiveHours.length() - 1);
     }
 
     public String summarizeActiveHours(String activity) {
@@ -102,16 +87,22 @@ public class UserSettings {
         }
         String[] hourStrings = activity.split(";");
         int[] checkins = new int[24];
+        int heat = 0;
 
         for (int i = 0; i < hourStrings.length; i++) {
             checkins[i] = Integer.parseInt(hourStrings[i].trim());
+            heat += checkins[i];
+        }
+
+        if (heat < 150) {
+            return null;
         }
 
         StringBuilder result = new StringBuilder();
         int rangeStart = -1;
-
+        long midnight = 1767225600L; // midnight Jan 1st 2026 UTC
         for (int hour = 0; hour < 24; hour++) {
-            if (checkins[hour] > (amountOfHeatData() / 30)) {
+            if (checkins[hour] > (heat / 30)) {
                 // Start or continue a range
                 if (rangeStart == -1) {
                     rangeStart = hour;
@@ -119,32 +110,30 @@ public class UserSettings {
             } else {
                 // End of a range
                 if (rangeStart != -1) {
-                    if (result.length() > 0) {
+                    if (!result.isEmpty()) {
                         result.append(", ");
                     }
-                    if (rangeStart == hour - 1) {
-                        // Single hour, not a range
-                        result.append(rangeStart);
-                    } else {
-                        // Range of hours
-                        result.append(rangeStart).append("-").append(hour - 1);
-                    }
+                    result.append("<t:")
+                            .append(midnight + 60 * 60 * rangeStart)
+                            .append(":t>-<t:")
+                            .append(midnight + 60 * 60 * hour)
+                            .append(":t>");
                     rangeStart = -1;
                 }
             }
         }
         if (rangeStart != -1) {
-            if (result.length() > 0) {
+            if (!result.isEmpty()) {
                 result.append(", ");
             }
-            if (rangeStart == 23) {
-                result.append(23);
-            } else {
-                result.append(rangeStart).append("-").append(23);
-            }
+            result.append("<t:")
+                    .append(midnight + 60 * 60 * rangeStart)
+                    .append(":t>-<t:")
+                    .append(midnight + 60 * 60 * 24)
+                    .append(":t>");
         }
 
-        return result.length() == 0 ? "No active hours" : result.toString();
+        return result.isEmpty() ? null : result.toString();
     }
 
     @JsonGetter("myDateTime")

@@ -1,5 +1,5 @@
 {
-    "tileBack":"green",
+    "tileBack": "green",
     "id": "01",
     "name": "Jord - Sol",
     "aliases": [
@@ -13,6 +13,8 @@
     "imagePath": "01_Jord.png",
     "shipPositionsType": "TYPE01",
     "wormholes": [],
-    "planets": ["jord"],
+    "planets": [
+        "jord"
+    ],
     "source": "base"
 }

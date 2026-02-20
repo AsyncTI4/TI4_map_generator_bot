@@ -53,7 +53,7 @@ public class PlayerStatsService {
         sb.append("> Unfollowed Strategy Cards: `")
                 .append(player.getUnfollowedSCs())
                 .append("`\n");
-        sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
+        sb.append("> Debt: `").append(player.getAllDebtTokens()).append("`\n");
         sb.append("> Speaker: `")
                 .append(game.getSpeakerUserID().equals(player.getUserID()))
                 .append("`\n");
@@ -77,6 +77,11 @@ public class PlayerStatsService {
         sb.append("> Faction Technologies: `").append(player.getFactionTechs()).append("`\n");
         sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
+        if (player.getBreakthroughIDs().isEmpty()) {
+            sb.append("> Breakthroughs: `None`\n");
+        } else {
+            sb.append("> Breakthroughs: `").append(player.getBreakthroughIDs()).append("`\n");
+        }
         sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
         sb.append("> Owned Promissory Notes: `")
@@ -161,7 +166,7 @@ public class PlayerStatsService {
         player.addSC(scNumber);
         if (game.isFowMode()) {
             String messageToSend =
-                    ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber);
+                    ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + game.getSCName(scNumber) + ".";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
         }
 
@@ -178,7 +183,7 @@ public class PlayerStatsService {
         }
 
         Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
-        String msg = player.getRepresentationUnfogged() + " picked " + scModel.getEmojiWordRepresentation();
+        String msg = player.getRepresentationUnfogged() + " picked " + scModel.getEmojiWordRepresentation() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
@@ -189,10 +194,11 @@ public class PlayerStatsService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                            + " from picking " + game.getSCName(scNumber) + ".");
+                            + " from picking **" + game.getSCName(scNumber) + "**.");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                        + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + game.getSCName(scNumber) + ".";
+                String messageToSend =
+                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
+                                + (tgCount == 1 ? "" : "s") + " from picking **" + game.getSCName(scNumber) + "**.";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

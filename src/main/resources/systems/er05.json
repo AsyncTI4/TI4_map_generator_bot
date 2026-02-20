@@ -7,9 +7,7 @@
     ],
     "imagePath": "er_05_async.png",
     "shipPositionsType": "TYPE04",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "planets": [
         "kkita"
     ],

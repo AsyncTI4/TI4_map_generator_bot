@@ -2,7 +2,7 @@
     {
         "alias": "dynamiscore",
         "name": "Dynamis Core",
-        "text": "While this card is in your play area, your commodity value is increased by 2.\nACTION: Purge this card to gain trade goods equal to your printed commodity value+2.",
+        "text": "While this card is in your play area, your commodity value is increased by 2.\nACTION: Gain trade goods equal to your commodity value, then purge this card.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/dynamis_core.jpg?raw=true",
         "source": "codex2",
         "flavourText": "*Dart and Tai stood, mesmerized by the swirling mass. Neither had any idea what it was, but both were fairly sure they were about to retire.*"

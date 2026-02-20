@@ -1,7 +1,3 @@
-# Application configuration:
-# - What: Configures server port and Spring Boot Actuator Prometheus exposure.
-# - How: 'server.port' sets the HTTP port; 'management.*' configures actuator endpoints and metrics export.
-
 server:
   port: 8081
   error:
@@ -25,13 +21,9 @@ spring:
         PRAGMA busy_timeout=5000;
         PRAGMA synchronous=NORMAL;
   jpa:
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
       ddl-auto: update
     properties:
       hibernate.jdbc.time_zone: UTC
+      hibernate.format_sql: true
     open-in-view: false
-  data:
-    jdbc:
-      repositories:
-        enabled: false

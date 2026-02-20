@@ -86,6 +86,7 @@ class CreateGameButton extends Subcommand {
         buttons.add(Buttons.green("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
         if ("_".equals(gameFunName)) {
+
             gameFunName = CreateGameService.autoGenerateGameName();
         }
         if (!members.isEmpty()) {

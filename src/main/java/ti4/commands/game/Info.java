@@ -107,7 +107,7 @@ class Info extends GameStateSubcommand {
                 .append("\n");
         sb.append("Decks: ").append("\n");
         sb.append("- ")
-                .append(CardEmojis.ActionCard)
+                .append(CardEmojis.getACEmoji(game))
                 .append("Action Card Deck: `")
                 .append(game.getAcDeckID())
                 .append("` ")
@@ -297,9 +297,8 @@ class Info extends GameStateSubcommand {
             activeP = game.getActivePlayer().getRepresentationNoPing();
         }
         sb.append("Current Active Player: ").append(activeP).append("\n");
-        sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append("\n");
-        sb.append("Game Real Player Count: ")
-                .append(game.getRealPlayers().size())
+        sb.append("Game Player Count: ")
+                .append(game.getRealAndEliminatedPlayers().size())
                 .append("\n");
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append("\n");
         sb.append("TopMostTileOffset: `")

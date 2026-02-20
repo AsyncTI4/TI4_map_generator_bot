@@ -48,7 +48,7 @@ public class TeHelperCommanders {
         player.addSpentThing("dwsDiscount_" + commanderFaction);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
         String editedMsg = Helper.buildSpentThingsMessage(player, game, "res");
-        event.editMessage(editedMsg).queue(Consumers.nop(), BotLogger::catchRestError);
+        event.getMessage().editMessage(editedMsg).queue(Consumers.nop(), BotLogger::catchRestError);
 
         // Notify the DWS commander holder that their discount was used
         String message = dws.getRepresentation(true, true) + " ";
@@ -74,9 +74,7 @@ public class TeHelperCommanders {
         String pos = game.getActiveSystem();
         Tile tile = game.getTileByPosition(pos);
 
-        List<Button> buttons = new ArrayList<>();
-        buttons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Remove");
-        return buttons;
+        return ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Remove");
     }
 
     @ButtonHandler("moveOjzRetreatS1_")

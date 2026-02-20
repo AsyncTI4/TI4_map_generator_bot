@@ -14,6 +14,7 @@ import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
+import ti4.json.JsonMapperManager;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -25,7 +26,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
-import ti4.website.EgressClientManager;
 
 public class PlayerStatsDashboardPayload {
 
@@ -40,7 +40,7 @@ public class PlayerStatsDashboardPayload {
     @JsonIgnore
     public String getJson() {
         try {
-            return EgressClientManager.getObjectMapper().writeValueAsString(this);
+            return JsonMapperManager.basic().writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.error(
                     "Could not get PlayerStatsDashboardPayload JSON for Game: "

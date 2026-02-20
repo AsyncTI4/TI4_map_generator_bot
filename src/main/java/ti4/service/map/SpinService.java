@@ -39,7 +39,7 @@ public class SpinService {
 
         public static Direction fromString(String dir) {
             try {
-                return Direction.valueOf(dir.toUpperCase());
+                return valueOf(dir.toUpperCase());
             } catch (Exception e) {
                 return null;
             }
@@ -51,32 +51,60 @@ public class SpinService {
         STRATEGY("start of Strategy"),
         NO("Never");
 
-        private final String description;
+        private final String displayName;
 
-        AutoTrigger(String description) {
-            this.description = description;
+        AutoTrigger(String displayName) {
+            this.displayName = displayName;
         }
 
         public static AutoTrigger fromString(String trigger) {
             try {
-                return AutoTrigger.valueOf(trigger.toUpperCase());
+                return valueOf(trigger.toUpperCase());
             } catch (Exception e) {
                 return null;
             }
         }
 
         public static List<String> valuesAsStringList() {
-            return List.of(values()).stream().map(v -> v.toString()).collect(Collectors.toList());
+            return List.of(values()).stream().map(Enum::toString).collect(Collectors.toList());
+        }
+    }
+
+    public enum ToSpin {
+        ALL("All");
+        // PLANETS("Movable Planets"),
+        // BORDERS("Border Tokens"),
+        // UNITS("Units in Space"),
+        // WORMHOLES("Wormhole Tokens"),
+        // ANOMALIES("Anomaly Tokens");
+
+        public final String displayName;
+
+        ToSpin(String displayName) {
+            this.displayName = displayName;
+        }
+
+        public static ToSpin fromString(String toSpin) {
+            try {
+                return valueOf(toSpin.toUpperCase());
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        public static List<String> valuesAsStringList() {
+            return List.of(values()).stream().map(Enum::toString).collect(Collectors.toList());
         }
     }
 
     public class SpinSetting {
         private String id;
-        private String center;
-        private List<Integer> ring;
-        private Direction direction;
-        private List<Integer> steps;
-        private AutoTrigger trigger;
+        private final String center;
+        private final List<Integer> ring;
+        private final Direction direction;
+        private final List<Integer> steps;
+        private final AutoTrigger trigger;
+        private final ToSpin toSpin;
 
         public SpinSetting(
                 String center,
@@ -84,16 +112,16 @@ public class SpinService {
                 Direction direction,
                 List<Integer> steps,
                 AutoTrigger trigger,
+                ToSpin toSpin,
                 Game game) {
             this.center = center;
             this.ring = ring;
             this.direction = direction;
             this.steps = steps;
             this.trigger = trigger;
-
+            this.toSpin = toSpin;
             if (game != null) {
-                this.id = String.valueOf(
-                        ((game.getName() + toString()).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
+                id = String.valueOf(((game.getName() + this).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
             }
         }
 
@@ -104,6 +132,7 @@ public class SpinService {
             Direction direction = null;
             String center = "000";
             AutoTrigger trigger = AutoTrigger.STATUS;
+            ToSpin toSpin = ToSpin.ALL;
             try {
                 ring = List.of(parts[0].split(LIST_SEPARATOR)).stream()
                         .map(Integer::parseInt)
@@ -121,6 +150,11 @@ public class SpinService {
                     trigger = null;
                     trigger = AutoTrigger.valueOf(parts[4]);
                 }
+
+                if (parts.length > 5) {
+                    toSpin = null;
+                    toSpin = ToSpin.valueOf(parts[5]);
+                }
             } catch (Exception e) {
                 BotLogger.error(
                         new LogOrigin(game),
@@ -128,24 +162,26 @@ public class SpinService {
                         e);
             }
 
-            return new SpinSetting(center, ring, direction, steps, trigger, game);
+            return new SpinSetting(center, ring, direction, steps, trigger, toSpin, game);
         }
 
-        // ring:direction:steps:center:trigger
-        // 1,2:CW:1,2:000:STATUS = ring 1 or 2 clockwise 1 or 2 steps with center at 000 auto-triggering in status phase
+        // ring:direction:steps:center:trigger:toSpin
+        // 1,2:CW:1,2:000:STATUS:ALL = all of ring 1 or 2 clockwise 1 or 2 steps with center at 000 auto-triggering in
+        // status phase
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append(ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR)));
-            sb.append(OPTION_SEPARATOR);
-            sb.append(direction.toString());
-            sb.append(OPTION_SEPARATOR);
-            sb.append(steps.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR)));
-            sb.append(OPTION_SEPARATOR);
-            sb.append(center);
-            sb.append(OPTION_SEPARATOR);
-            sb.append(trigger.toString());
-            return sb.toString();
+            String sb = ring.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+                    + OPTION_SEPARATOR
+                    + direction.toString()
+                    + OPTION_SEPARATOR
+                    + steps.stream().map(String::valueOf).collect(Collectors.joining(LIST_SEPARATOR))
+                    + OPTION_SEPARATOR
+                    + center
+                    + OPTION_SEPARATOR
+                    + trigger.toString();
+            // sb.append(OPTION_SEPARATOR);
+            // sb.append(toSpin.toString());
+            return sb;
         }
 
         public String getRepresentation(boolean forExecution) {
@@ -153,6 +189,9 @@ public class SpinService {
             if (id != null) {
                 sb.append("(").append(id).append(") ");
             }
+            sb.append("**");
+            sb.append(toSpin.displayName);
+            sb.append("** of ");
             sb.append("Ring **");
             sb.append(ring.stream().map(String::valueOf).collect(Collectors.joining(" or ")));
             sb.append("** of **");
@@ -164,7 +203,7 @@ public class SpinService {
             sb.append("** steps");
             if (!forExecution) {
                 sb.append(" auto-triggering **");
-                sb.append(trigger.description);
+                sb.append(trigger.displayName);
                 sb.append("**");
             }
             sb.append(".");
@@ -172,11 +211,11 @@ public class SpinService {
         }
 
         public int ring() {
-            return ring.size() > 1 ? RandomHelper.pickRandomFromList(ring) : ring.get(0);
+            return ring.size() > 1 ? RandomHelper.pickRandomFromList(ring) : ring.getFirst();
         }
 
         public int steps() {
-            return steps.size() > 1 ? RandomHelper.pickRandomFromList(steps) : steps.get(0);
+            return steps.size() > 1 ? RandomHelper.pickRandomFromList(steps) : steps.getFirst();
         }
 
         public Direction direction() {
@@ -226,10 +265,7 @@ public class SpinService {
             }
 
             // Max ring check
-            if (maxRing() > MAX_RING_TO_SPIN) {
-                return false;
-            }
-            return true;
+            return maxRing() <= MAX_RING_TO_SPIN;
         }
     }
 
@@ -254,8 +290,9 @@ public class SpinService {
                 }
             }
             if (!overTheBoundsWarning.isEmpty()) {
-                sb.append("-# ⚠️ Setting " + String.join(",", overTheBoundsWarning)
-                        + " could cause tiles to spin over the map edge.");
+                sb.append("-# ⚠️ Setting ")
+                        .append(String.join(",", overTheBoundsWarning))
+                        .append(" could cause tiles to spin over the map edge.");
             }
         }
 
@@ -275,7 +312,8 @@ public class SpinService {
             game.setSpinMode("OFF");
         } else {
             game.setSpinMode(String.join(
-                    SETTING_SEPARATOR, settings.stream().map(s -> s.toString()).collect(Collectors.toList())));
+                    SETTING_SEPARATOR,
+                    settings.stream().map(SpinSetting::toString).collect(Collectors.toList())));
         }
     }
 
@@ -299,7 +337,7 @@ public class SpinService {
     public static void executeSpinsForTrigger(Game game, AutoTrigger trigger) {
         List<SpinSetting> settingsToExecute = new ArrayList<>();
         getSpinSettings(game).stream()
-                .filter(setting -> trigger.equals(setting.trigger()))
+                .filter(setting -> trigger == setting.trigger())
                 .forEach(settingsToExecute::add);
         if (!settingsToExecute.isEmpty()) {
             executeSpinSettings(game, settingsToExecute);

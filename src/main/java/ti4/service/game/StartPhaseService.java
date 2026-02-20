@@ -147,11 +147,19 @@ public class StartPhaseService {
     public static List<Button> getQueueSCPickButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        Set<Integer> alreadyPicked = new HashSet<>();
+        for (Player p : game.getRealPlayers()) {
+            if (p.getSCs() != null) {
+                alreadyPicked.addAll(p.getSCs());
+            }
+        }
         boolean hasQueue = false;
         for (int x = 1; x < 9; x++) {
             String num = x + "";
             if (alreadyQueued.contains(num)) {
                 hasQueue = true;
+                continue;
+            } else if (alreadyPicked.contains(x) && !game.isFowMode()) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
@@ -169,7 +177,7 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you are #" + number
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + ", you are #" + number
                 + " pick in this Strategy Phase and so can queue " + number + " strategy cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
@@ -456,7 +464,7 @@ public class StartPhaseService {
                 PriorityTrackHelper.PrintPriorityTrack(game);
             } else {
                 Player speaker = game.getSpeaker();
-                List<Player> priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+                List<Player> priorityTrack = PriorityTrackHelper.getPriorityTrack(game);
                 StringBuilder sb = new StringBuilder("**Priority Track (Speaker first)**\n");
                 if (speaker != null) {
                     sb.append(MiscEmojis.SpeakerToken)
@@ -658,7 +666,7 @@ public class StartPhaseService {
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged()
                             + ", a reminder this is the window to purge _Maw of Worlds_, after you do your status homework things."
-                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
+                            + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency.");
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + ", you may use these buttons to resolve _Maw Of Worlds_.",
@@ -793,7 +801,7 @@ public class StartPhaseService {
         }
         String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
-        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.ActionCard);
+        Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.getACEmoji(game));
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens")
                 .withEmoji(Emoji.fromFormatted("🔺"));
         Button yssarilPolicy = null;
@@ -843,9 +851,12 @@ public class StartPhaseService {
                     + "\" button once you are done resolving these, or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 +=
-                    "This is the moment when you should resolve:\n- _Political Stability_\n- _Summit_\n- _Manipulate Investments_\n"
-                            + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
+            message2 += """
+                    This is the moment when you should resolve:
+                    - _Political Stability_
+                    - _Summit_
+                    - _Manipulate Investments_
+                    Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(draw1AC);
@@ -882,6 +893,9 @@ public class StartPhaseService {
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
+        }
+        if (game.isCivilizedSocietyMode()) {
+            Helper.checkEndGameCivilizedSociety(game);
         }
     }
 
@@ -1098,20 +1112,6 @@ public class StartPhaseService {
                 }
             }
             StartTurnService.turnStart(event, game, nextPlayer);
-            // if (game.isShowBanners()) {
-            //     BannerGenerator.drawFactionBanner(nextPlayer);
-            // }
-            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-            //         + ").";
-            // game.updateActivePlayer(nextPlayer);
-
-            // StartTurnService.reviveInfantryII(nextPlayer);
-            // MessageHelper.sendMessageToChannelWithButtons(
-            //         nextPlayer.getPrivateChannel(),
-            //         msgExtra + "\n Use buttons to do turn.",
-            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
-            // FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
             StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
@@ -1146,46 +1146,7 @@ public class StartPhaseService {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrderService.turnOrder(event, game);
-            // if (game.isShowBanners()) {
-            //     BannerGenerator.drawFactionBanner(nextPlayer);
-            // }
-            // String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-            //         + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound()
-            //         + ").";
-            // Player nextNextPlayer = EndTurnService.findNextUnpassedPlayer(game, nextPlayer);
             StartTurnService.turnStart(event, game, nextPlayer);
-            // if (nextNextPlayer == nextPlayer) {
-            //     msgExtra +=
-            //             "\n-# All other players are passed; you will take consecutive turns until you pass, ending
-            // the Action Phase.";
-            // } else if (nextNextPlayer != null) {
-            //     String ping =
-            //             UserSettingsManager.get(nextNextPlayer.getUserID()).isPingOnNextTurn()
-            //                     ? nextNextPlayer.getRepresentationUnfogged()
-            //                     : nextNextPlayer.getRepresentationNoPing();
-            //     int numUnpassed = -2;
-            //     for (Player p2 : game.getPlayers().values()) {
-            //         numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
-            //     }
-            //     msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-            //     if (numUnpassed == 0) {
-            //         msgExtra += "No other players are unpassed.";
-            //     } else {
-            //         msgExtra +=
-            //                 numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still
-            // unpassed.";
-            //     }
-            // }
-            // if (hold.length() > 0) {
-            //     msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
-            // }
-            // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-
-            // StartTurnService.reviveInfantryII(nextPlayer);
-            // MessageHelper.sendMessageToChannelWithButtons(
-            //         game.getMainGameChannel(),
-            //         "Use buttons to do turn.",
-            //         StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
         }
         for (Player p2 : game.getRealPlayers()) {
             if (!game.isFowMode()) {

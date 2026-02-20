@@ -18,6 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.UnitEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -26,13 +27,13 @@ import ti4.service.leader.UnlockLeaderService;
 
 public class SecretObjectiveHelper {
 
-    public static void scoreSO(
+    public static boolean scoreSO(
             GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
-            return;
+            return false;
         }
 
         StringBuilder message = new StringBuilder(player.getRepresentation() + " scored ");
@@ -109,7 +110,17 @@ public class SecretObjectiveHelper {
                     && !game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "## " + game.getPing() + ", a player has scored an action phase secret objective.");
+                        "## " + game.getPing() + ", a player has scored an Action Phase secret objective.");
+            }
+            if (Mapper.getSecretObjective(entry.getKey()) != null
+                    && Mapper.getSecretObjective(entry.getKey())
+                            .getPhase()
+                            .toLowerCase()
+                            .contains("agenda")
+                    && !game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "## " + game.getPing() + ", a player has scored an Agenda Phase secret objective.");
             }
             if ("dhw".equalsIgnoreCase(entry.getKey())) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
@@ -206,7 +217,7 @@ public class SecretObjectiveHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
-        Helper.checkEndGame(game, player);
+        return Helper.checkEndGame(game, player);
     }
 
     public static void showAll(Player player, Player player_, Game game) {
@@ -299,8 +310,8 @@ public class SecretObjectiveHelper {
         }
         currentSecrets.removeAll(game.getSoToPoList());
         StringBuilder sb = new StringBuilder();
-        sb.append("__Game: ").append(game.getName()).append("__\n");
-        sb.append("__Unscored Action Phase Secrets__:\n");
+        sb.append("## Game: ").append(game.getName()).append("\n");
+        sb.append("### Unscored Action Phase Secrets:\n");
         int index = 1;
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
@@ -319,7 +330,7 @@ public class SecretObjectiveHelper {
             }
         }
         index = 1;
-        sb.append("\n").append("__Unscored Status Phase Secrets__:\n");
+        sb.append("\n").append("### Unscored Status Phase Secrets:\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
@@ -338,7 +349,7 @@ public class SecretObjectiveHelper {
             }
         }
         index = 1;
-        sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
+        sb.append("\n").append("### Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
@@ -366,12 +377,15 @@ public class SecretObjectiveHelper {
         }
         StringBuilder sb = new StringBuilder("> ");
         for (Player player : game.getRealPlayers()) {
+            int progress = ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player);
             sb.append(player.getFactionEmoji())
                     .append(": ")
-                    .append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
+                    .append(progress)
                     .append("/")
                     .append(threshold)
-                    .append(" ");
+                    .append(progress >= threshold ? "#" : "")
+                    .append(UnitEmojis.Blank)
+                    .append(UnitEmojis.Blank);
         }
         sb.append("\n");
         return sb.toString();

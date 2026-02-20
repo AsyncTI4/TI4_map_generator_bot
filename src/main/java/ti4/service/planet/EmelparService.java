@@ -92,7 +92,10 @@ public class EmelparService {
     private static void getOtherFactionsEmelpar(ButtonInteractionEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayers()) {
-            buttons.add(Buttons.gray("getEmelparButtons_" + player2.getFaction(), " ", player2.getFactionEmoji()));
+            buttons.add(Buttons.gray(
+                    "getEmelparButtons_" + player2.getFaction(),
+                    player2.getFactionModel().getShortName(),
+                    player2.getFactionEmoji()));
         }
         String msg = "Choose the faction you wish to ready a component for.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
@@ -137,7 +140,7 @@ public class EmelparService {
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String bt = matcher.group("breakthrough");
             player2.setBreakthroughExhausted(bt, false);
-            String readyItem = player2.getBreakthroughModel().getNameRepresentation();
+            String readyItem = player2.getBreakthroughModel(bt).getNameRepresentation();
             postSummary(event, player, readyItem);
         });
     }

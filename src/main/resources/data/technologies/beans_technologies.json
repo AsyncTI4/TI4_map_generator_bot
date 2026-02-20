@@ -1,0 +1,137 @@
+[
+    {
+        "alias": "bedreamdo",
+        "name": "Directa Obscura",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "dream",
+        "source": "beans",
+        "text": "Before you spend a token from your command sheet, you may exhaust this card to remove one of your tokens form the game board and spend it instead."
+    },
+    {
+        "alias": "bedreamneg",
+        "name": "Non-Euclidean Geometries",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "dream",
+        "source": "beans",
+        "text": "Your ships are adjacent to nexus tokens. When you retreat, you may exhaust this card to treat your home system as if it contained a nexus token"
+    },
+    {
+        "alias": "becrystda",
+        "name": "Defensive Architecture",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "crystellum",
+        "source": "beans",
+        "text": "After 1 or more hits are produced against your units during space combat, you may exhaust this card to cancel 1 of those hits. If you do, produce 1 hit and assign it to 1 of your opponent's ships."
+    },
+    {
+        "alias": "becrystmb",
+        "name": "Molecular Binding",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "crystellum",
+        "source": "beans",
+        "text": "At the start of your turn, you may replace 1 of your fighters on the game board with 1 destroyer from your reinforcements, or 2 infantry on any planet you control with 1 mech from your reinforcements."
+    },
+    {
+        "alias": "beasheninf",
+        "name": "Cinderborn II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "ashen",
+        "baseUpgrade": "inf2",
+        "source": "beans",
+        "text": "When this unit is destroyed, roll 1 die. If the result is 6 or greater, you may produce 1 hit. Then, place this unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
+    },
+    {
+        "alias": "beashendn",
+        "name": "Ashfall Engine II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "ashen",
+        "baseUpgrade": "dn2",
+        "source": "beans",
+        "text": "This unit may not be destroyed by 'Direct Hit' action cards. When this unit is destroyed or uses its SUSTAIN DAMAGE ability, you may use its BOMBARDMENT ability against a planet in its system."
+    },
+    {
+        "alias": "beironmf",
+        "name": "Riptide II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRB",
+        "faction": "iron",
+        "source": "beans",
+        "text": "When this unit is destroyed, place 1 infantry form your reinforcements on its planet. If it was in the space area, place 1 fighter instead. This unit may move without being transported. mechs in excess of capacity count against your fleet limit."
+    },
+    {
+        "alias": "beironats",
+        "name": "Advanced Targeting Systems",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "iron",
+        "source": "beans",
+        "text": "At the start of ground combat: You may exhaust this card. If you do, only your units roll for the first round of combat."
+    },
+    {
+        "alias": "betaqr",
+        "name": "Quantum Restructuring",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "ta",
+        "source": "beans",
+        "text": "ACTION: Exhaust this card to place 1 structure on a planet with a Design attached to it."
+    },
+    {
+        "alias": "betaro",
+        "name": "Resource Optimization",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "ta",
+        "source": "beans",
+        "text": "At any time, exhaust this card to exhaust a planet you control and ready any other planet you control. If it is a legendary planet, ready it's ability card as well."
+    },
+    {
+        "alias": "benetrunnersdm",
+        "name": "Data Mining",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "netrunners",
+        "source": "beans",
+        "text": "At the start of the status phase, gain 1 trade good for every compromised structure on the game board."
+    },
+    {
+        "alias": "benetrunnerssd",
+        "name": "Siphon II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "netrunners",
+        "baseUpgrade": "sd2",
+        "source": "beans",
+        "text": "When using this unit's PRODUCTION ability, discount the combined cost of the units produced by the number of compromised structures on the game board. Up to 3 fighters in this system do not count against capacity."
+    }
+]

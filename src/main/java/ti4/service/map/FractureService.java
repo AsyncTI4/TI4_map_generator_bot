@@ -33,8 +33,9 @@ import ti4.service.unit.AddUnitService;
 public class FractureService {
 
     public static boolean isFractureInPlay(Game game) {
-        return Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
-                .allMatch(pos -> game.getTileByPosition(pos) != null);
+        return game.getTileFromPlanet("styx") != null
+                || Stream.of("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7")
+                        .allMatch(pos -> game.getTileByPosition(pos) != null);
     }
 
     @ButtonHandler("rollFracture")
@@ -61,8 +62,8 @@ public class FractureService {
             } else if (result == 6) {
                 MessageHelper.sendMessageToChannel(
                         player.getCorrectChannel(),
-                        "> Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(result)
-                                + ".\\- Terry Pratchett, _Guards! Guards!_");
+                        "> \"Thunder rolled...\n> It rolled a " + DiceEmojis.getGrayDieEmoji(6)
+                                + ".\"\n> \\- Terry Pratchett, _Guards! Guards!_");
             } else { // fail
                 String msg = player.getRepresentation(true, false) + " rolled a " + DiceEmojis.getGrayDieEmoji(result)
                         + ", better luck next time.";

@@ -24,7 +24,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
 import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
@@ -37,7 +36,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.breakthrough.MindsieveService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -119,7 +117,6 @@ public class PlayStrategyCardService {
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
-        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         StringBuilder message = new StringBuilder();
         message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
         if (!game.isFowMode()) {
@@ -140,16 +137,17 @@ public class PlayStrategyCardService {
                     String num2 = sc + "";
                     num2 = num2.substring(num2.length() - 1);
                     if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
-                        gamePing.append(p2.getRepresentation()).append(" ");
+                        gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
                         playersToFollow.add(p2);
                     }
                 }
             }
         }
         if (!gamePing.isEmpty()) {
-            message.append(gamePing).append("\n");
+            message.append(gamePing).append(", please indicate your choice with these buttons.");
+        } else {
+            message.append("Please indicate your choice with these buttons.");
         }
-        message.append("Indicate your choice by pressing a button below.");
 
         for (Player player2 : playersToFollow) {
             if (winnuHero) {
@@ -394,6 +392,11 @@ public class PlayStrategyCardService {
                     player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
                     graceButtons);
         }
+        if (player.hasAbility("matters_of_state")) {
+            String message2 = player.getRepresentationUnfogged() + " please gain or flip 1 balance token.";
+            List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
+        }
         if (scModel.usesAutomationForSCID("anarchy8")) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -615,9 +618,6 @@ public class PlayStrategyCardService {
                     scButtons.add(transaction);
                     scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
                     String label = "Send 1 Debt";
-                    if (player.hasAbility("binding_debts")) {
-                        label += " (Binding Debts)";
-                    }
                     scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
                 }
                 MessageHelper.sendMessageToChannelWithButtons(
@@ -765,7 +765,7 @@ public class PlayStrategyCardService {
     public static void handleSOQueueing(Game game, boolean winnuHero) {
         if (winnuHero) {
             String message =
-                    "### No queuing will occur if secrets are drawn off of this. Handle timing yourselves if relevant";
+                    "### No queuing will occur if secrets are drawn off of this. Handle timing yourselves if relevant.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             return;
         }
@@ -905,7 +905,7 @@ public class PlayStrategyCardService {
     private static List<Button> getLuminous2Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo A System");
-        Button draw1AC = Buttons.gray("lumiACdraw", "Draw 1 Action Card", CardEmojis.ActionCard);
+        Button draw1AC = Buttons.gray("lumiACdraw", "Draw 1 Action Card", CardEmojis.getACEmoji(player));
         Button refreshButton = Buttons.gray("exploreAPlanet", "Explore a planet");
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, draw1AC, refreshButton, noFollowButton);
@@ -930,26 +930,21 @@ public class PlayStrategyCardService {
 
     public static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            if (!player.isSpeaker()) {
+        List<Player> players = new ArrayList<>(game.getRealPlayers());
+        if (game.isFowMode()) {
+            Collections.shuffle(players);
+        }
+        for (Player player : players) {
+            if (!player.isSpeaker() || game.isFowMode()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
-                    Button button;
-                    if (!game.isFowMode()) {
-                        button = Buttons.gray(
-                                politicsHolder.getFinsFactionCheckerPrefix()
-                                        + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
-                                        + faction,
-                                " ",
-                                player.getFactionEmoji());
-                    } else {
-                        button = Buttons.gray(
-                                politicsHolder.getFinsFactionCheckerPrefix()
-                                        + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
-                                        + faction,
-                                player.getColor(),
-                                ColorEmojis.getColorEmoji(player.getColor()));
-                    }
+                    Button button = Buttons.gray(
+                            politicsHolder.getFinsFactionCheckerPrefix()
+                                    + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX
+                                    + faction,
+                            player.getFactionNameOrColor(),
+                            player.getFactionEmojiOrColor());
+
                     assignSpeakerButtons.add(button);
                 }
             }

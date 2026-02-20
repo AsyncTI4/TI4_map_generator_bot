@@ -192,6 +192,9 @@ public class WebPlayerArea {
     // Decal ID
     private String decalId;
 
+    // Nekro Z Assimilator targets (Thunder's Edge) - factions whose flagships have been assimilated
+    private List<String> valefarZTargets;
+
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
@@ -293,17 +296,7 @@ public class WebPlayerArea {
 
         // Planets
         webPlayerArea.setPlanets(player.getPlanets());
-        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
-        // Ensure Custodia Vigilia is in exhausted planets if the player has it
-        // (it's always exhausted when gained via gainCustodiaVigilia())
-        if (player.getPlanets().contains("custodiavigilia") && !exhaustedPlanets.contains("custodiavigilia")) {
-            exhaustedPlanets.add("custodiavigilia");
-        }
-        // Also handle custodiavigiliaplus if it exists
-        if (player.getPlanets().contains("custodiavigiliaplus") && !exhaustedPlanets.contains("custodiavigiliaplus")) {
-            exhaustedPlanets.add("custodiavigiliaplus");
-        }
-        webPlayerArea.setExhaustedPlanets(exhaustedPlanets);
+        webPlayerArea.setExhaustedPlanets(new ArrayList<>(player.getExhaustedPlanets()));
         webPlayerArea.setExhaustedPlanetAbilities(player.getExhaustedPlanetsAbilities());
 
         // Relics and fragments
@@ -361,6 +354,21 @@ public class WebPlayerArea {
         // Decal ID
         webPlayerArea.setDecalId(player.getDecalSet());
 
+        // Nekro Z Assimilator targets (Thunder's Edge)
+        // Parse valefarZ stored value which contains factions whose flagships have been assimilated
+        List<String> valefarZTargets = new ArrayList<>();
+        if (player.hasUnlockedBreakthrough("nekrobt")) {
+            String valefarZValue = game.getStoredValue("valefarZ");
+            if (!valefarZValue.isEmpty()) {
+                for (String faction : valefarZValue.split("\\|")) {
+                    if (!faction.isEmpty()) {
+                        valefarZTargets.add(faction);
+                    }
+                }
+            }
+        }
+        webPlayerArea.setValefarZTargets(valefarZTargets);
+
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
             List<BreakthroughInfo> breakthroughs = new ArrayList<>();
@@ -377,7 +385,7 @@ public class WebPlayerArea {
             }
 
             // TODO: MemePhilosopher make this a list
-            if (breakthroughs.size() > 0) {
+            if (!breakthroughs.isEmpty()) {
                 webPlayerArea.setBreakthrough(breakthroughs.getFirst());
             } else {
                 webPlayerArea.setBreakthrough(null);

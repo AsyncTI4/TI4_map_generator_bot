@@ -3,11 +3,15 @@ package ti4.draft;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.BreakthroughDraftItem;
 import ti4.draft.items.CommanderDraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
 import ti4.draft.items.FlagshipDraftItem;
@@ -16,6 +20,7 @@ import ti4.draft.items.HomeSystemDraftItem;
 import ti4.draft.items.MahactKingDraftItem;
 import ti4.draft.items.MechDraftItem;
 import ti4.draft.items.PNDraftItem;
+import ti4.draft.items.PlotDraftItem;
 import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
@@ -27,48 +32,49 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
-import ti4.model.ModelInterface;
 import ti4.service.emoji.TI4Emoji;
 
-public abstract class DraftItem implements ModelInterface {
-    @Override
-    public boolean isValid() {
-        return true;
-    }
+public abstract class DraftItem {
+
+    private @Getter final DraftCategory ItemCategory;
+    private @Getter final String ItemId;
+    private @Getter final DraftErrataModel Errata;
 
     @Override
+    public boolean equals(Object i2) {
+        if (i2 instanceof DraftItem item) return item.getAlias().equals(getAlias());
+        return false;
+    }
+
+    protected DraftItem(DraftCategory category, String itemId) {
+        ItemCategory = category;
+        ItemId = itemId;
+        Errata = Optional.ofNullable(Mapper.getFrankenErrata(getAlias())).orElse(DraftErrataModel.blank());
+    }
+
     public String getAlias() {
         return ItemCategory.toString() + ":" + ItemId;
     }
 
-    public enum Category {
-        ABILITY,
-        TECH,
-        AGENT,
-        COMMANDER,
-        HERO,
-        MECH,
-        FLAGSHIP,
-        COMMODITIES,
-        PN,
-        HOMESYSTEM,
-        STARTINGTECH,
-        STARTINGFLEET,
-        BLUETILE,
-        REDTILE,
-        DRAFTORDER,
-        MAHACTKING,
-        UNIT
+    public abstract String getTitle(Game game);
+
+    public abstract String getShortDescription();
+
+    protected abstract String getLongDescriptionImpl();
+
+    protected abstract String getLongDescriptionImpl(Game game);
+
+    public abstract TI4Emoji getItemEmoji();
+
+    public boolean hasOptionalSwaps() {
+        return getErrata() != null && !getErrata().getOptionalSwaps().isEmpty();
     }
 
-    public final Category ItemCategory;
+    public boolean hasAdditionalComponents() {
+        return getErrata() != null && !getErrata().getAdditionalComponents().isEmpty();
+    }
 
-    // The system ID of the item. Only convert this to player-readable text when necessary
-    public final String ItemId;
-
-    public DraftErrataModel Errata;
-
-    public static DraftItem generate(Category category, String itemId) {
+    public static DraftItem generate(DraftCategory category, String itemId) {
         DraftItem item =
                 switch (category) {
                     case ABILITY -> item = new AbilityDraftItem(itemId);
@@ -88,19 +94,19 @@ public abstract class DraftItem implements ModelInterface {
                     case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
                     case MAHACTKING -> item = new MahactKingDraftItem(itemId);
                     case UNIT -> item = new UnitDraftItem(itemId);
+                    case BREAKTHROUGH -> item = new BreakthroughDraftItem(itemId);
+                    case PLOT -> item = new PlotDraftItem(itemId);
                 };
-
-        item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;
     }
 
     public static DraftItem generateFromAlias(String alias) {
         String[] split = alias.split(":");
-        return generate(Category.valueOf(split[0]), split[1]);
+        return generate(DraftCategory.valueOf(split[0]), split[1]);
     }
 
     public static List<DraftItem> generateAllDraftableCards() {
-        List<FactionModel> factions = FrankenDraft.getAllFrankenLegalFactions();
+        List<FactionModel> factions = FrankenDraft.getAllFrankenLegalFactions(null);
         List<DraftItem> items = new ArrayList<>();
         items.addAll(AbilityDraftItem.buildAllDraftableItems(factions));
         items.addAll(TechDraftItem.buildAllDraftableItems(factions));
@@ -116,6 +122,7 @@ public abstract class DraftItem implements ModelInterface {
         items.addAll(MechDraftItem.buildAllDraftableItems(factions));
         items.addAll(UnitDraftItem.buildAllDraftableItems());
         items.addAll(MahactKingDraftItem.buildAllDraftableItems());
+        items.addAll(BreakthroughDraftItem.buildAllDraftableItems(factions));
         return items;
     }
 
@@ -136,14 +143,16 @@ public abstract class DraftItem implements ModelInterface {
         items.addAll(MechDraftItem.buildAllItems(factions));
         items.addAll(UnitDraftItem.buildAllItems());
         items.addAll(MahactKingDraftItem.buildAllItems());
+        items.addAll(BreakthroughDraftItem.buildAllItems(factions));
+        items.addAll(PlotDraftItem.buildAllItems());
         return items;
     }
 
-    public static List<DraftItem> getAlwaysIncludeItems(Category type) {
+    public static List<DraftItem> getAlwaysIncludeItems(DraftCategory type) {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
         for (DraftErrataModel errataItem : frankenErrata) {
-            if (errataItem.ItemCategory == type && errataItem.AlwaysAddToPool) {
+            if (errataItem.getItemCategory() == type && errataItem.isAlwaysAddToPool()) {
                 alwaysInclude.add(generateFromAlias(errataItem.getAlias()));
             }
         }
@@ -151,36 +160,67 @@ public abstract class DraftItem implements ModelInterface {
         return alwaysInclude;
     }
 
-    protected DraftItem(Category category, String itemId) {
-        ItemCategory = category;
-        ItemId = itemId;
-    }
-
+    /**
+     * &ltemojis&gt Item Name &ltemojis&gt
+     * <br>&gt description
+     * <br>&gt description
+     * <br>&gt - ➕ Added Components
+     * <br>&gt - ♻️ Optional Swap
+     */
     @JsonIgnore
-    public abstract String getShortDescription();
+    public List<TextDisplay> getTextDisplays(Game game, Player player, boolean showDescr) {
+        List<TextDisplay> textFields = new ArrayList<>();
+
+        String details = getTitle(game);
+        if (showDescr || ItemCategory.showDescrByDefault()) {
+            String descr = getLongDescriptionImpl(game);
+            descr = descr.trim().replaceAll("\n> ", "\n").replaceAll("\n", "\n> ");
+            details += System.lineSeparator() + "> " + descr;
+        }
+        textFields.add(TextDisplay.of(details));
+
+        if (hasAdditionalComponents() && !game.isTwilightsFallMode()) {
+            List<String> adds = new ArrayList<>();
+            adds.add("**__Additional Added Components:__**");
+            for (DraftErrataModel i2 : getErrata().getAdditionalComponents()) {
+                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
+                adds.add("> + " + item2.getTitle(game));
+            }
+            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), adds)));
+        }
+
+        if (hasOptionalSwaps() && !game.isTwilightsFallMode()) {
+            List<String> swaps = new ArrayList<>();
+            swaps.add("**__Optional Component Swaps:__**");
+            for (DraftErrataModel i2 : getErrata().getOptionalSwaps()) {
+                DraftItem item2 = generate(i2.getItemCategory(), i2.getItemId());
+                swaps.add("> ♻️ " + item2.getTitle(game));
+            }
+            textFields.add(TextDisplay.of(String.join(System.lineSeparator(), swaps)));
+        }
+        return textFields;
+    }
 
     @JsonIgnore
     public String getLongDescription() {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl());
-        if (Errata != null) {
-            if (Errata.AdditionalComponents != null) {
-                sb.append("\n>  - *Also adds: ");
-                for (DraftErrataModel i : Errata.AdditionalComponents) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
-                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
-                    sb.append(", ");
-                }
-                sb.append("*");
+        if (hasAdditionalComponents()) {
+            sb.append("\n>  - *Also adds: ");
+            for (DraftErrataModel i : getErrata().getAdditionalComponents()) {
+                DraftItem item = generate(i.getItemCategory(), i.getItemId());
+                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(", ");
             }
-            if (Errata.OptionalSwaps != null) {
-                sb.append("\n>  - *Includes optional swaps: ");
-                for (DraftErrataModel i : Errata.OptionalSwaps) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
-                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
-                    sb.append(", ");
-                }
-                sb.append("*");
+            sb.append("*");
+        }
+        if (hasOptionalSwaps()) {
+            sb.append("\n>  - *Includes optional swaps: ");
+            for (DraftErrataModel i : getErrata().getOptionalSwaps()) {
+                DraftItem item = generate(i.getItemCategory(), i.getItemId());
+                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(", ");
             }
+            sb.append("*");
         }
         return sb.toString();
     }
@@ -188,72 +228,93 @@ public abstract class DraftItem implements ModelInterface {
     @JsonIgnore
     public String getLongDescription(Game game) {
         StringBuilder sb = new StringBuilder(getLongDescriptionImpl(game));
-        if (Errata != null) {
-            if (Errata.AdditionalComponents != null) {
-                sb.append("\n>  - *Also adds: ");
-                for (DraftErrataModel i : Errata.AdditionalComponents) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
-                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
-                    sb.append(", ");
-                }
-                sb.append("*");
+        if (hasAdditionalComponents()) {
+            sb.append("\n>  - *Also adds: ");
+            for (DraftErrataModel i : getErrata().getAdditionalComponents()) {
+                DraftItem item = generate(i.getItemCategory(), i.getItemId());
+                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(", ");
             }
-            if (Errata.OptionalSwaps != null) {
-                sb.append("\n>  - *Includes optional swaps: ");
-                for (DraftErrataModel i : Errata.OptionalSwaps) {
-                    DraftItem item = generate(i.ItemCategory, i.ItemId);
-                    sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
-                    sb.append(", ");
-                }
-                sb.append("*");
+            sb.append("*");
+        }
+        if (hasOptionalSwaps()) {
+            sb.append("\n>  - *Includes optional swaps: ");
+            for (DraftErrataModel i : getErrata().getOptionalSwaps()) {
+                DraftItem item = generate(i.getItemCategory(), i.getItemId());
+                sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
+                sb.append(", ");
             }
+            sb.append("*");
         }
         return sb.toString();
     }
 
-    @JsonIgnore
-    protected abstract String getLongDescriptionImpl();
-
-    @JsonIgnore
-    protected abstract String getLongDescriptionImpl(Game game);
-
-    @JsonIgnore
-    public abstract TI4Emoji getItemEmoji();
-
     public boolean isDraftable(Player player) {
-        BagDraft draftRules = player.getGame().getActiveBagDraft();
-        DraftBag draftHand = player.getDraftHand();
-        boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory)
-                        + player.getDraftQueue().getCategoryCount(ItemCategory)
-                >= draftRules.getItemLimitForCategory(ItemCategory);
-        if (draftRules instanceof FrankenDraft) {
-            isAtHandLimit = draftHand.getCategoryCount(ItemCategory)
-                            + player.getDraftQueue().getCategoryCount(ItemCategory)
-                    >= FrankenDraft.getItemLimitForCategory(ItemCategory, player.getGame());
-        }
-        if (isAtHandLimit) {
+        if (player.getDraftHand().Contents.contains(this) && ItemCategory != DraftCategory.COMMODITIES) {
             return false;
         }
-        boolean hasDraftedThisBag = player.getDraftQueue().getCategoryCount(ItemCategory) > 0;
+        return isDraftable(player, ItemCategory);
+    }
 
-        boolean allOtherCategoriesAtHandLimit = true;
-        for (Category cat : Category.values()) {
-            if (ItemCategory == cat) {
-                continue;
-            }
-            if (draftRules instanceof FrankenDraft) {
-                allOtherCategoriesAtHandLimit &=
-                        draftHand.getCategoryCount(cat) >= FrankenDraft.getItemLimitForCategory(cat, player.getGame());
-            } else {
-                allOtherCategoriesAtHandLimit &=
-                        draftHand.getCategoryCount(cat) >= draftRules.getItemLimitForCategory(cat);
-            }
+    public static boolean isDraftable(Player player, DraftCategory category) {
+        if (isFinishedWithBag(player)) {
+            return false;
         }
-
-        if (hasDraftedThisBag) {
-            return allOtherCategoriesAtHandLimit;
+        if (isAtHandLimit(player, category)) {
+            return false;
+        }
+        if (alreadyDraftedThisCategory(player, category)) {
+            return !otherCategoriesAvailable(player, category);
         }
         return true;
+    }
+
+    public static String undraftableReason(Player player, DraftCategory category) {
+        if (isDraftable(player, category)) return null;
+        if (isFinishedWithBag(player)) return "⚠️ Cannot draft more components from this bag. ⚠️";
+        if (isAtHandLimit(player, category)) return "⚠️ Already at hand limit for this component. ⚠️";
+        if (alreadyDraftedThisCategory(player, category)) return "⚠️ Already drafted a component of this type. ⚠️";
+        return null;
+    }
+
+    public static boolean isFinishedWithBag(Player player) {
+        return player.getGame().getActiveBagDraft().playerQueueIsFull(player);
+    }
+
+    public static boolean isAtHandLimit(Player player, DraftCategory cat) {
+        BagDraft draftRules = player.getGame().getActiveBagDraft();
+        DraftBag draftHand = player.getDraftHand();
+        boolean isAtHandLimit =
+                draftHand.getCategoryCount(cat) + player.getDraftQueue().getCategoryCount(cat)
+                        >= draftRules.getItemLimitForCategory(cat);
+        if (draftRules instanceof FrankenDraft) {
+            isAtHandLimit =
+                    draftHand.getCategoryCount(cat) + player.getDraftQueue().getCategoryCount(cat)
+                            >= FrankenDraft.getItemLimitForCategory(cat, player.getGame());
+        }
+        return isAtHandLimit;
+    }
+
+    public static boolean alreadyDraftedThisCategory(Player player, DraftCategory category) {
+        return player.getDraftQueue().getCategoryCount(category) > 0;
+    }
+
+    public static boolean otherCategoriesAvailable(Player player, DraftCategory category) {
+        BagDraft draftRules = player.getGame().getActiveBagDraft();
+        DraftBag draftHand = player.getDraftHand();
+
+        for (DraftCategory cat : DraftCategory.values()) {
+            if (category == cat) continue;
+            int catLimit = draftRules.getItemLimitForCategory(cat);
+
+            if (draftRules instanceof FrankenDraft) {
+                catLimit = FrankenDraft.getItemLimitForCategory(cat, player.getGame());
+            }
+            if (draftHand.getCategoryCount(cat) >= catLimit) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @JsonIgnore

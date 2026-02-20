@@ -447,6 +447,10 @@ public class TileGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
+                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)) {
+                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
+                            .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
+                    drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40, true);
                 }
                 if (reconstruction && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA))) {
                     BufferedImage doubleWormholeImage = ImageHelper.readScaled(
@@ -1112,10 +1116,9 @@ public class TileGenerator {
                 tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
 
                 for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (!(uh instanceof Planet)) {
+                    if (!(uh instanceof Planet planet)) {
                         continue;
                     }
-                    Planet planet = (Planet) uh;
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
                     if (traits.isEmpty() && StringUtils.isNotBlank(planet.getOriginalPlanetType())) {
@@ -1609,9 +1612,12 @@ public class TileGenerator {
         if (position == null) return position;
         if (Constants.TOKEN_PLANETS.contains(planet.getName())) {
             Point centerPosition = planet.getHolderCenterPosition(tile);
-            Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
+            int radius = 55;
+            if (planet instanceof Planet p) {
+                radius = (int) p.getRadius();
+            }
             position = new Point(position);
-            position.translate(centerPosition.x - offset.x, centerPosition.y - offset.y);
+            position.translate(centerPosition.x - radius, centerPosition.y - radius);
         }
         return position;
     }
@@ -1701,25 +1707,25 @@ public class TileGenerator {
             String tokenPath =
                     switch (StringUtils.defaultString(planetHolder.getContrastColor())) {
                         case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+                        case "test" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_test.png");
                         default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     };
-            float scale = 0.95f;
-            List<String> smallLegendaries = List.of(
-                    "mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "industrex", "thundersedge");
-            if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
-                    && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                scale = 1.65f;
-            }
-            if ("elysium".equalsIgnoreCase(unitHolder.getName()) || "magna".equalsIgnoreCase(unitHolder.getName())) {
-                scale = 1.65f;
-            }
-            if (Constants.MECATOLS.contains(unitHolder.getName())) {
-                scale = 1.9f;
-            }
+            float scale = planetHolder.getRadius() / 58.0f;
             tokenImage = ImageHelper.readScaled(tokenPath, scale);
             Point position = new Point(
                     centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
             tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y, null);
+            if ("99".equals(tile.getTileID())) {
+                tokenImage = ImageHelper.readScaled(tokenPath, scale * 0.2526f);
+                tileGraphics.drawImage(
+                        tokenImage, TILE_PADDING + position.x + 172, TILE_PADDING + position.y + 148, null);
+                tokenImage = ImageHelper.readScaled(tokenPath, scale * 0.1421f);
+                tileGraphics.drawImage(
+                        tokenImage, TILE_PADDING + position.x - 19, TILE_PADDING + position.y + 13, null);
+                tokenImage = ImageHelper.readScaled(tokenPath, scale * 0.0842f);
+                tileGraphics.drawImage(
+                        tokenImage, TILE_PADDING + position.x - 7, TILE_PADDING + position.y + 195, null);
+            }
         }
         boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
         for (String tokenID : tokenList) {
@@ -1730,30 +1736,23 @@ public class TileGenerator {
                     continue;
                 }
                 float scale = 0.85f;
-                List<String> smallLegendaries =
-                        List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "thundersedge");
-                boolean isLegendary = Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null;
-                if (tokenPath.contains(Constants.DMZ_LARGE)) {
-                    scale = 0.3f;
-                    if (isLegendary
-                            && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                        scale = 0.53f;
+                if (tokenID.contains(Constants.DMZ_LARGE)) {
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 65.0f;
                     }
-                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
-                        scale = 0.50f;
-                    }
-                    if (Constants.MECATOLS.contains(unitHolder.getName())) {
-                        scale = 0.61f;
-                    }
+                    scale *= 0.35f;
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                    scale = 1.32f;
-                    if (isLegendary
-                            && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                        scale = 2.33f;
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 65.0f;
                     }
+                    if (tile.getPosition().contains("frac")) {
+                        tokenPath = tile.getTokenPath("token_worlddestroyed_frac.png");
+                    }
+                    scale *= 1.55f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didn't previous get changed for custodians
                 }
+
                 tokenImage = ImageHelper.readScaled(tokenPath, scale);
                 if (tokenImage == null) continue;
                 Point position = new Point(
@@ -1814,17 +1813,8 @@ public class TileGenerator {
                             null);
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
-                    List<String> smallLegendaries =
-                            List.of("mirage", "mallice", "mallicelocked", "eko", "domna", "avernus", "thundersedge");
-                    if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
-                            && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
-                        scale = 0.53f;
-                    }
-                    if ("elysium".equalsIgnoreCase(unitHolder.getName())) {
-                        scale = 0.50f;
-                    }
-                    if (Constants.MECATOLS.contains(unitHolder.getName())) {
-                        scale = 0.61f;
+                    if (unitHolder instanceof Planet planetHolder) {
+                        scale = planetHolder.getRadius() / 184.0f;
                     }
                     tokenImage = ImageHelper.readScaled(tokenPath, scale);
                     tileGraphics.drawImage(
@@ -1948,6 +1938,32 @@ public class TileGenerator {
         return Comparator.comparing(sortTokenPlanet);
     }
 
+    private static boolean isWormholeToken(String tokenPath) {
+        tokenPath = tokenPath.toLowerCase();
+        if (tokenPath.contains("wormhole")) {
+            return true;
+        }
+        if (tokenPath.contains("token_creuss")) {
+            return true;
+        }
+        if (tokenPath.contains("token_crimsoncreuss")) {
+            return true;
+        }
+        if (tokenPath.contains("token_custom_eronous_wh")) {
+            return true;
+        }
+        if (tokenPath.toLowerCase().contains("token_custom_eronous_wh")) {
+            return !tokenPath.contains("token_custom_eronous_whno");
+        }
+        if (tokenPath.contains("token_gamma")) {
+            return true;
+        }
+        if (tokenPath.contains("token_ion")) {
+            return true;
+        }
+        return tokenPath.contains("token_wh");
+    }
+
     private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort(sortTokensForDisplay());
@@ -1991,7 +2007,7 @@ public class TileGenerator {
 
             boolean isTokenPlanet = Constants.TOKEN_PLANETS.contains(tokenName);
             if (isTokenPlanet) {
-                Point tokenCenter = Helper.getTokenPlanetCenterPosition(tile, tokenName);
+                Point tokenCenter = Helper.getTokenPlanetCenterOfImage(tile, tokenName);
                 int tokenX = tokenCenter.x - (tokenImage.getWidth() / 2);
                 int tokenY = tokenCenter.y - (tokenImage.getHeight() / 2);
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + tokenX, TILE_PADDING + tokenY, null);
@@ -2038,6 +2054,19 @@ public class TileGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
                             .getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
+                } else if (tile.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_SEVERED)
+                        && isWormholeToken(tokenPath)) {
+                    BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance()
+                            .getTokenFile("agenda_wormhole_blocked"
+                                    + (reconstruction
+                                                    && (tokenPath.toLowerCase().contains("alpha")
+                                                            || tokenPath
+                                                                    .toLowerCase()
+                                                                    .contains("beta"))
+                                            ? "_half"
+                                            : "")
+                                    + ".png"));
+                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
                 }
                 if (reconstruction && tokenPath.toLowerCase().contains("alpha")) {
                     BufferedImage doubleWormholeImage = ImageHelper.readScaled(
@@ -2065,68 +2094,99 @@ public class TileGenerator {
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {
-        drawOnWormhole(tile, graphics, icon, offset, "ab");
+        drawOnWormhole(tile, graphics, icon, offset, "ab", false);
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, String types) {
+        drawOnWormhole(tile, graphics, icon, offset, types, false);
+    }
+
+    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, boolean all) {
+        drawOnWormhole(tile, graphics, icon, offset, "", all);
+    }
+
+    private static void drawOnWormhole(
+            Tile tile, Graphics graphics, BufferedImage icon, int offset, String types, boolean all) {
         switch (tile.getTileID()) {
-            case "82b": // wormhole nexus
-                if (types.contains("a"))
-                    graphics.drawImage(icon, TILE_PADDING + offset + 95, TILE_PADDING + offset + 249, null);
-                if (types.contains("b"))
+            case "17": // creuss gate
+                if (all || types.contains("d"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 187, TILE_PADDING + offset + 206, null);
+                break;
+            case "51": // creuss hs
+                if (all || types.contains("d"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 239, TILE_PADDING + offset + 251, null);
+                break;
+            case "82a": // inactuve wormhole nexus
+                if (all || types.contains("g"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
                 break;
+            case "82b": // wormhole nexus
+                if (all || types.contains("a"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 95, TILE_PADDING + offset + 249, null);
+                if (all || types.contains("b"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
+                if (all || types.contains("g"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 243, TILE_PADDING + offset + 249, null);
+                break;
+            case "94": // sorrow
+                if (all || types.contains("e"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 45, TILE_PADDING + offset + 152, null);
+                break;
+            case "118": // rebellion hs
+                if (all || types.contains("e"))
+                    graphics.drawImage(icon, TILE_PADDING + offset + 250, TILE_PADDING + offset + 236, null);
+                break;
             case "c02": // Locke/Bentham
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 37, TILE_PADDING + offset + 158, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 223, TILE_PADDING + offset + 62, null);
                 break;
             case "c10": // Kwon
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 182, TILE_PADDING + offset + 22, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 259, TILE_PADDING + offset + 241, null);
                 break;
             case "c11": // Ethan
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 54, TILE_PADDING + offset + 138, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 159, TILE_PADDING + offset + 275, null);
                 break;
             case "d119": // beta/nebula
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 94, TILE_PADDING + offset + 170, null);
                 break;
             case "d123": // alpha/beta/supernova
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 22, TILE_PADDING + offset + 110, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 190, TILE_PADDING + offset + 206, null);
                 break;
             case "er19": // alpha/beta/rift
             case "er119": // alpha/beta/nebula
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 60, TILE_PADDING + offset + 44, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 192, TILE_PADDING + offset + 184, null);
                 break;
             case "er94": // Iynntani
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 157, TILE_PADDING + offset + 165, null);
                 break;
             case "er95": // Kytos/Prymis
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 60, TILE_PADDING + offset + 155, null);
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 215, TILE_PADDING + offset + 61, null);
                 break;
             case "m05": // Shanh
-                if (types.contains("a"))
+                if (all || types.contains("a"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 185, TILE_PADDING + offset + 180, null);
                 break;
             case "m32": // Vespa/Apis
-                if (types.contains("b"))
+                if (all || types.contains("b"))
                     graphics.drawImage(icon, TILE_PADDING + offset + 49, TILE_PADDING + offset + 147, null);
                 break;
             default:

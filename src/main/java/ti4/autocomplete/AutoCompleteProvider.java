@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +56,6 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.ShipPositionModel;
-import ti4.model.Source;
 import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechSpecialtyModel;
@@ -213,6 +213,24 @@ public class AutoCompleteProvider {
                         .limit(25)
                         .map(entry -> new Command.Choice(entry.getValue(), entry.getKey()))
                         .collect(Collectors.toList());
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            case Constants.VOLTRON_STYLE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<String> values = List.of(
+                        "eyes",
+                        "arms",
+                        "link",
+                        "saiyan",
+                        "at_field",
+                        "nyan",
+                        "fancy",
+                        "royal",
+                        "baba",
+                        "minis",
+                        "lightning",
+                        "panther");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(values, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.CC_USE -> {
@@ -453,7 +471,8 @@ public class AutoCompleteProvider {
                         "liberation",
                         "ordinian",
                         "te",
-                        "tf");
+                        "tf",
+                        "tedemo");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -605,7 +624,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SOURCE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of(Source.ComponentSource.values())
+                List<Command.Choice> options = Stream.of(ComponentSource.values())
                         .filter(token -> token.toString().contains(enteredValue))
                         .limit(25)
                         .map(token -> new Command.Choice(token.toString(), token.toString()))
@@ -869,7 +888,7 @@ public class AutoCompleteProvider {
                         .map(bt -> new Command.Choice(bt.getAutoCompleteName(game), bt.getAlias()))
                         .collect(Collectors.toList());
                 if (addAllOpt) {
-                    options.add(0, new Command.Choice("all", "all"));
+                    options.addFirst(new Command.Choice("all", "all"));
                 }
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
@@ -1154,6 +1173,16 @@ public class AutoCompleteProvider {
                                     Mapper.getFactions().get(faction).getFactionName() + " (all playable)", faction))
                             .toList());
                 }
+                event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+            case Constants.DEBT_POOL -> {
+                if (!GameManager.isValid(gameName)) return;
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                Set<String> pools =
+                        new HashSet<String>(game.getAllDebtPoolIcons().keySet());
+                pools.add(Constants.DEBT_DEFAULT_POOL.toLowerCase());
+                List<Command.Choice> options = mapTo25ChoicesThatContain(pools, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.SEAT_COUNT_OPTION -> {
@@ -1527,7 +1556,7 @@ public class AutoCompleteProvider {
         if (!optionName.equals(Constants.EXPLORE_CARD_ID)) return;
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode()) {
-            event.replyChoice("You can not see the autocomplete in Fog of War", "[error]")
+            event.replyChoice("You cannot see the autocomplete in Fog of War", "[error]")
                     .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
@@ -1678,9 +1707,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
                 .filter(model -> model.search(enteredValue, source))
-                .filter(model -> model.getSource() != ComponentSource.miltymod
-                        && model.getSource() != ComponentSource.project_pi
-                        && model.getSource() != ComponentSource.asteroid)
+                .filter(model -> !model.getSource().isHiddenFromSearch())
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
                 .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))

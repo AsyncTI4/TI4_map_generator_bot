@@ -22,6 +22,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String name;
     private List<String> primaryTexts;
     private List<String> secondaryTexts;
+    private String notes;
     private String botSCAutomationID; // ID of another SCModel to use the automation/button suite of
     private String imageFileName;
     private String flavourText;
@@ -37,6 +38,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
                 && primaryTexts != null
                 && secondaryTexts != null
                 && source != null;
+    }
+
+    public String getNameRepresentation() {
+        return CardEmojis.getSCFrontFromInteger(initiative) + " _" + getName() + "_ " + source.emoji();
     }
 
     @Override

@@ -83,10 +83,30 @@ public enum LeaderEmojis implements TI4Emoji {
     YssarilAgent,
     YssarilCommander,
     YssarilHero,
+    // Codex 4 Liberation Scenarion
     RedCreussAgent,
     RedCreussCommander,
     RedCreussHero,
     OrlandoHero,
+    // Thunders Edge
+    BastionAgent,
+    BastionCommander,
+    BastionHero,
+    CrimsonAgent,
+    CrimsonCommander,
+    CrimsonHero,
+    DeepwroughtAgent,
+    DeepwroughtCommander,
+    DeepwroughtHero,
+    FirmamentAgent,
+    FirmamentCommander,
+    FirmamentHero,
+    ObsidianAgent,
+    ObsidianCommander,
+    ObsidianHero,
+    RalnelAgent,
+    RalnelCommander,
+    RalnelHero,
 
     // Discordant Stars
     AugersAgent,
@@ -250,8 +270,28 @@ public enum LeaderEmojis implements TI4Emoji {
         }
 
         return switch (leader.toLowerCase()) {
+            // Codex Updates
             case "xxchahero-te" -> XxchaHero;
             case "naaluagent-te" -> NaaluAgent;
+
+            // TF Genomes
+            case "experimentalagent" -> JolNarAgent;
+            case "hyperagent" -> MentakAgent;
+            case "researchagent" -> DeepwroughtAgent;
+            case "valiantagent" -> BastionAgent;
+
+            // TF Paradigms
+            case "brilliancehero" -> JolNarHero;
+            case "devourhero" -> NekroHero;
+            case "sanctionhero" -> HacanHero;
+            case "eternityhero" -> ObsidianHero;
+            case "eventhero" -> CabalHero;
+            case "forgehero" -> NaazHero;
+            case "lawshero" -> DeepwroughtHero;
+            case "poisonhero" -> NaaluHero;
+            case "voicehero" -> XxchaHero;
+            case "witchinghero" -> KeleresHeroOdlynn;
+
             default -> TI4Emoji.getRandomGoodDog(leader.toLowerCase());
         };
     }

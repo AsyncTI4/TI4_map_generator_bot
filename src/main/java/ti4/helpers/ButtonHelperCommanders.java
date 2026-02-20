@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -562,22 +562,16 @@ public class ButtonHelperCommanders {
 
     @ButtonHandler("uydaiCommander")
     public static void uydaiCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentationNoPing() + ", you need at least 1 trade good to use this ability.");
-            return;
-        }
+
         if (game.getActivePlayer() != player) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing() + ", you need to be the active player to use this ability.");
             return;
         }
-        player.setTg(player.getTg() - 1);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
+                player.getRepresentationNoPing() + " is looking at the top card of a deck.");
         List<Button> buttons = getUydaiCommanderButtons(game, false, player);
         String message =
                 player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
@@ -811,29 +805,30 @@ public class ButtonHelperCommanders {
                 }
             } else {
                 if (player.hasAbility("technological_singularity")) {
-                    int count = 0;
-                    for (String nekroTech : player.getTechs()) {
-                        if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
-                            continue;
-                        }
-                        if (!Mapper.getTech(AliasHandler.resolveTech(nekroTech))
-                                .getFaction()
-                                .orElse("")
-                                .isEmpty()) {
-                            count += 1;
-                        }
-                    }
-                    if (count > 2) {
-                        MessageHelper.sendMessageToChannel(
-                                player.getCorrectChannel(),
-                                player.getRepresentationUnfogged()
-                                        + ", heads up, that was your third faction technology, and so you may wish to lose one with `/tech remove`.");
-                    }
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentationUnfogged()
                                     + ", you acquired access to a technology while having Nekro Acidos, the Nekro commander, but since it is a faction technology and so you used one of your Valefar Assimilators,"
                                     + " the number of technologies you owned did not increase, and therefore you do not draw an action card.");
+                    List<Button> removeTechButtons = new ArrayList<>();
+                    for (String nekroTech : player.getTechs()) {
+                        if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
+                            continue;
+                        }
+                        TechnologyModel techModel = Mapper.getTech(AliasHandler.resolveTech(nekroTech));
+                        if (!techModel.getFaction().orElse("").isEmpty()) {
+                            removeTechButtons.add(
+                                    Buttons.blue("removeValefar_" + nekroTech, "Remove " + techModel.getName()));
+                        }
+                    }
+                    if (removeTechButtons.size() > 2) {
+                        removeTechButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                        MessageHelper.sendMessageToChannelWithButtons(
+                                player.getCorrectChannel(),
+                                player.getRepresentationUnfogged()
+                                        + ", heads up, that was your third faction technology, and so you should probably remove one.",
+                                removeTechButtons);
+                    }
                 }
             }
         }

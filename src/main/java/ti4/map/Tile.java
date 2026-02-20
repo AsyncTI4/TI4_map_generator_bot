@@ -24,6 +24,7 @@ import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -701,7 +702,8 @@ public class Tile {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
-            if (game.getTileByPosition(position_) == null) {
+            Tile tile = game.getTileByPosition(position_);
+            if (tile == null || "silver_flame".equals(tile.tileID)) {
                 return true;
             }
         }
@@ -841,5 +843,31 @@ public class Tile {
         } else {
             return getTileModel().getEmoji();
         }
+    }
+
+    ///
+    /**
+     * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
+     * present (using display names when available). Used for UI strings and logs.
+     */
+    @JsonIgnore
+    public String getDetailedDescription() {
+        var model = getTileModel();
+        var sb = new StringBuilder();
+        sb.append(getPosition());
+        sb.append(" (");
+        sb.append(model.getName());
+
+        if (model.getNumPlanets() == 0 && unitHolders.size() > 1) {
+            sb.append(" with ");
+            var planetDisplayNames = unitHolders.keySet().stream()
+                    .filter(key -> !"space".equals(key))
+                    .map(planetId -> Helper.getPlanetName(planetId))
+                    .filter(name -> name != null)
+                    .toList();
+            sb.append(String.join(", ", planetDisplayNames));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

@@ -24,6 +24,8 @@ public class DiscordantStarsCommand implements ParentCommand {
                     new PathToken(),
                     new HonorCount(),
                     new DishonorCount(),
+                    new SteelBalanceCount(),
+                    new StarBalanceCount(),
                     new SetPlanetTradeGoods())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

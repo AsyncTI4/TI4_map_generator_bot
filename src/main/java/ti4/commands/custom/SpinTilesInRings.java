@@ -20,7 +20,7 @@ class SpinTilesInRings extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        if (!game.getSpinMode().equals("ON")) {
+        if (!"ON".equals(game.getSpinMode())) {
             MessageHelper.replyToMessage(
                     event,
                     "Enable classic Spin Mode first with `/custom customization spin_mode: ON` or use the advanced `/spin`");
