@@ -257,7 +257,7 @@ class GameLoadService {
                     if (ENDUNITS.equals(data)) {
                         break;
                     }
-                    readUnit(game.getName(), tile, data, unitHolderName);
+                    readUnit(game, tile, data, unitHolderName);
                 }
 
                 while (gameFileLines.hasNext()) {
@@ -1218,7 +1218,7 @@ class GameLoadService {
         return new Tile(tileID, position);
     }
 
-    private static void readUnit(String gameName, Tile tile, String data, String spaceHolder) {
+    private static void readUnit(Game game, Tile tile, String data, String spaceHolder) {
         if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         UnitKey uk = Units.parseID(tokenizer.nextToken());
@@ -1229,8 +1229,9 @@ class GameLoadService {
         }
         for (int x = counts.size(); x < UnitState.values().length; x++) counts.add(0);
         if (!tile.getUnitHolders().containsKey(spaceHolder)) {
-            BotLogger.error("Invalid unitHolder detected during load of game " + gameName + ": " + tile.getTileID()
-                    + " / " + spaceHolder);
+            BotLogger.error(
+                    new LogOrigin(game),
+                    "Invalid unitHolder detected during load: " + tile.getTileID() + " / " + spaceHolder);
             return;
         }
         tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
