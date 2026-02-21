@@ -304,11 +304,6 @@ public class CreateGameButtonHandler {
     private static void createGameChannels(ButtonInteractionEvent event) {
         String userName = event.getUser().getEffectiveName();
         List<Member> members = fetchMembersFromMessage(event);
-        if (!members.contains(event.getMember())) {
-            MessageHelper.sendEphemeralMessageToEventChannel(
-                    event, "You are not part of this game, so you cannot start it.");
-            return;
-        }
         MessageHelper.sendMessageToEventChannel(event, userName + " pressed the [Create Game] button");
 
         if (!CreateGameService.isGameCreationAllowed()) {
@@ -328,8 +323,6 @@ public class CreateGameButtonHandler {
         }
 
         String buttonMsg = event.getMessage().getContentRaw();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Message for posterity:\n\n" + buttonMsg);
-
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         if (gameSillyName == null || gameSillyName.isEmpty()) {
             gameSillyName = CreateGameService.autoGenerateGameName();
@@ -388,6 +381,8 @@ public class CreateGameButtonHandler {
             return;
         }
 
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Message for posterity:\n\n" + buttonMsg);
+
         // CHECK IF GIVEN CATEGORY IS VALID
         String categoryChannelName = CreateGameService.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
@@ -410,8 +405,11 @@ public class CreateGameButtonHandler {
         Game game = CreateGameService.createGameChannels(
                 members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {
-            GameManager.save(
-                    game, "Created game channels"); // TODO: We should be locking since we're saving? Maybe not here
+            MessageHelper.sendMessageToEventChannel(event, "Message for posterity:\n\n" + buttonMsg);
+            // TODO: We should be locking since we're saving? Maybe not here
+            GameManager.save(game, "Created game channels");
+        } else {
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong...");
         }
     }
 
