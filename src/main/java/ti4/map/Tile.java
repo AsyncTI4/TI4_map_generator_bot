@@ -195,13 +195,6 @@ public class Tile {
         }
     }
 
-    public void removeControl(String tokenID, String spaceHolder) {
-        UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null) {
-            unitHolder.removeControl(tokenID);
-        }
-    }
-
     public void addToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
@@ -266,15 +259,6 @@ public class Tile {
         try {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
-        } catch (Exception e) {
-            BotLogger.error("Could not parse unit count", e);
-        }
-    }
-
-    public void addUnitDamage(String spaceHolder, UnitKey unitID, String count) {
-        try {
-            int unitCount = Integer.parseInt(count);
-            addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
             BotLogger.error("Could not parse unit count", e);
         }
