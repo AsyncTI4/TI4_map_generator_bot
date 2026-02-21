@@ -918,7 +918,7 @@ class GameLoadService {
                     StringTokenizer split = new StringTokenizer(tokenizer.nextToken(), "|");
                     String pool = split.nextToken().replace("_", " ");
                     StringTokenizer debtToken = new StringTokenizer(split.nextToken(), ";");
-                    LinkedHashMap<String, Integer> debtTokens = new LinkedHashMap<String, Integer>();
+                    Map<String, Integer> debtTokens = new LinkedHashMap<>();
                     while (debtToken.hasMoreTokens()) {
                         StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
                         String color = debtInfo.nextToken();
@@ -1229,7 +1229,8 @@ class GameLoadService {
         }
         for (int x = counts.size(); x < UnitState.values().length; x++) counts.add(0);
         if (!tile.getUnitHolders().containsKey(spaceHolder)) {
-            BotLogger.error("Invalid unitHolder detected during load of game " + gameName + ": " + tile.getTileID() + " / " + spaceHolder);
+            BotLogger.error("Invalid unitHolder detected during load of game " + gameName + ": " + tile.getTileID()
+                    + " / " + spaceHolder);
             return;
         }
         tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
