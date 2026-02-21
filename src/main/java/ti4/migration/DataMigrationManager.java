@@ -179,7 +179,7 @@ public class DataMigrationManager {
                 "absol_disarmamament", "absol_disarmament",
                 "cryypter_disarmamament", "cryypter_disarmament",
                 "minister_commrece", "minister_commerce",
-                "senate_sancturary", "senate_sanctuary");
+                "senate_sancuary", "senate_sanctuary");
 
         return MigrationHelper.replaceAgendaCards(game, List.of(game.getAgendaDeckID()), replacements);
     }
