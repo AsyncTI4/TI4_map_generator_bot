@@ -5,24 +5,22 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class GamePersistenceKeys {
 
-    public static final String TILE = "-tile-";
-    public static final String UNITS = "-units-";
-    public static final String UNITHOLDER = "-unitholder-";
-    public static final String ENDUNITHOLDER = "-endunitholder-";
-    public static final String ENDUNITS = "-endunits-";
-    public static final String ENDUNITDAMAGE = "-endunitdamage-";
-    public static final String UNITDAMAGE = "-unitdamage-";
-    public static final String ENDTILE = "-endtile-";
-    public static final String TOKENS = "-tokens-";
-    public static final String ENDTOKENS = "-endtokens-";
-    public static final String PLANET_TOKENS = "-planettokens-";
-    public static final String PLANET_ENDTOKENS = "-planetendtokens-";
-    public static final String MAPINFO = "-mapinfo-";
-    public static final String ENDMAPINFO = "-endmapinfo-";
-    public static final String GAMEINFO = "-gameinfo-";
-    public static final String ENDGAMEINFO = "-endgameinfo-";
-    public static final String PLAYERINFO = "-playerinfo-";
-    public static final String ENDPLAYERINFO = "-endplayerinfo-";
-    public static final String PLAYER = "-player-";
-    public static final String ENDPLAYER = "-endplayer-";
+    static final String TILE = "-tile-";
+    static final String UNITS = "-units-";
+    static final String UNITHOLDER = "-unitholder-";
+    static final String ENDUNITHOLDER = "-endunitholder-";
+    static final String ENDUNITS = "-endunits-";
+    static final String ENDTILE = "-endtile-";
+    static final String TOKENS = "-tokens-";
+    static final String ENDTOKENS = "-endtokens-";
+    static final String PLANET_TOKENS = "-planettokens-";
+    static final String PLANET_ENDTOKENS = "-planetendtokens-";
+    static final String MAPINFO = "-mapinfo-";
+    static final String ENDMAPINFO = "-endmapinfo-";
+    static final String GAMEINFO = "-gameinfo-";
+    static final String ENDGAMEINFO = "-endgameinfo-";
+    static final String PLAYERINFO = "-playerinfo-";
+    static final String ENDPLAYERINFO = "-endplayerinfo-";
+    static final String PLAYER = "-player-";
+    static final String ENDPLAYER = "-endplayer-";
 }

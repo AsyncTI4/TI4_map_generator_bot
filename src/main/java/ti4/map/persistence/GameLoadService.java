@@ -249,7 +249,7 @@ class GameLoadService {
                             if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                 BotLogger.warning(
                                         new LogOrigin(game),
-                                        game.getName() + ": Not valid unitholder detected: " + unitHolderName);
+                                        "Invalid UnitHolder detected: " + unitHolderName);
                             }
                         }
                         continue;
@@ -1218,7 +1218,7 @@ class GameLoadService {
         return new Tile(tileID, position);
     }
 
-    private static void readUnit(Game game, Tile tile, String data, String spaceHolder) {
+    private static void readUnit(Game game, Tile tile, String data, String unitHolderName) {
         if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         UnitKey uk = Units.parseID(tokenizer.nextToken());
@@ -1228,13 +1228,13 @@ class GameLoadService {
             if (isNotBlank(val)) counts.add(Integer.parseInt(val));
         }
         for (int x = counts.size(); x < UnitState.values().length; x++) counts.add(0);
-        if (!tile.getUnitHolders().containsKey(spaceHolder)) {
+        if (!tile.getUnitHolders().containsKey(unitHolderName)) {
             BotLogger.error(
                     new LogOrigin(game),
-                    "Invalid unitHolder detected during load: " + tile.getTileID() + " / " + spaceHolder);
+                    "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
+        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
