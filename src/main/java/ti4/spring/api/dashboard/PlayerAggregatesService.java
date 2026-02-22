@@ -30,14 +30,13 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * Builds and caches per-player dashboard aggregates.
  *
- * <p>Cache-busting is based on a deterministic hash of completed game IDs:
- * completed game names are deduplicated, sorted ascending, concatenated with a stable delimiter,
- * and hashed with SHA-256. If hash, count, or aggregate version differs from the stored row,
- * a background recompute is queued.
+ * <p>Cache-busting is based on a deterministic hash of completed game IDs: completed game names are
+ * deduplicated, sorted ascending, concatenated with a stable delimiter, and hashed with SHA-256. If
+ * hash, count, or aggregate version differs from the stored row, a background recompute is queued.
  *
- * <p>The dashboard call is non-blocking: this service returns fresh cached data when available.
- * If the cache is stale, it schedules refresh work asynchronously and returns an empty aggregate
- * shell until recompute completes.
+ * <p>The dashboard call is non-blocking: this service returns fresh cached data when available. If the
+ * cache is stale, it schedules refresh work asynchronously and returns an empty aggregate shell until
+ * recompute completes.
  */
 class PlayerAggregatesService {
 
@@ -58,41 +57,66 @@ class PlayerAggregatesService {
      * 4) Return fresh cached payload if present, otherwise an empty aggregate shell.
      */
     PlayerDashboardResponse.PlayerAggregates getOrQueueRefresh(String userId, List<ManagedGame> playerGames) {
+        CacheContext context = buildCacheContext(userId, playerGames);
+        if (needsRefresh(context)) {
+            queueRecompute(context.userId(), context.completedGameIds(), context.completedGamesHash());
+        }
+        return buildResponseFromCache(context);
+    }
+
+    /**
+     * Builds the cache context used for refresh and response decisions.
+     */
+    private CacheContext buildCacheContext(String userId, List<ManagedGame> playerGames) {
         List<String> completedGameIds = getCompletedGameIds(playerGames);
         String completedGamesHash = hashCompletedGameIds(completedGameIds);
-
-        Optional<PlayerAggregatesCache> cachedOptional = repository.findById(userId);
-        PlayerAggregatesCache cached = cachedOptional.orElse(null);
+        PlayerAggregatesCache cached = repository.findById(userId).orElse(null);
         boolean shouldRecompute = shouldRecompute(cached, completedGamesHash, completedGameIds.size());
-        if (shouldRecompute) {
-            queueRecompute(userId, completedGameIds, completedGamesHash);
-        }
+        return new CacheContext(userId, completedGameIds, completedGamesHash, cached, shouldRecompute);
+    }
 
-        if (shouldRecompute) {
+    /**
+     * Determines whether the aggregate cache should be refreshed for this context.
+     */
+    private static boolean needsRefresh(CacheContext context) {
+        return context.shouldRecompute();
+    }
+
+    /**
+     * Builds API response from cache context, returning an empty shell when stale/invalid.
+     */
+    private PlayerDashboardResponse.PlayerAggregates buildResponseFromCache(CacheContext context) {
+        if (context.shouldRecompute()) {
             return emptyAggregates(
                     false,
-                    completedGamesHash,
-                    completedGameIds.size(),
+                    context.completedGamesHash(),
+                    context.completedGameIds().size(),
                     0,
-                    cached == null ? null : cached.getComputedAtEpochMs(),
-                    completedGameIds);
+                    context.cached() == null ? null : context.cached().getComputedAtEpochMs(),
+                    context.completedGameIds());
         }
 
-        if (cached == null) {
-            return emptyAggregates(false, completedGamesHash, completedGameIds.size(), 0, null, completedGameIds);
+        if (context.cached() == null) {
+            return emptyAggregates(
+                    false,
+                    context.completedGamesHash(),
+                    context.completedGameIds().size(),
+                    0,
+                    null,
+                    context.completedGameIds());
         }
 
         StoredAggregates stored =
-                parseStoredAggregates(cached.getAggregatesJson()).orElse(null);
+                parseStoredAggregates(context.cached().getAggregatesJson()).orElse(null);
         if (stored == null || !isStoredAggregateUsable(stored)) {
-            queueRecompute(userId, completedGameIds, completedGamesHash);
+            queueRecompute(context.userId(), context.completedGameIds(), context.completedGamesHash());
             return emptyAggregates(
                     false,
-                    completedGamesHash,
-                    completedGameIds.size(),
+                    context.completedGamesHash(),
+                    context.completedGameIds().size(),
                     0,
-                    cached.getComputedAtEpochMs(),
-                    completedGameIds);
+                    context.cached().getComputedAtEpochMs(),
+                    context.completedGameIds());
         }
 
         int eligibleGameCount = Optional.ofNullable(stored.eligibleGameCount()).orElse(0);
@@ -101,12 +125,12 @@ class PlayerAggregatesService {
 
         return new PlayerDashboardResponse.PlayerAggregates(
                 true,
-                completedGamesHash,
-                completedGameIds.size(),
+                context.completedGamesHash(),
+                context.completedGameIds().size(),
                 eligibleGameCount,
                 CURRENT_AGGREGATES_VERSION,
-                cached.getComputedAtEpochMs(),
-                completedGameIds,
+                context.cached().getComputedAtEpochMs(),
+                context.completedGameIds(),
                 techStats);
     }
 
@@ -137,8 +161,8 @@ class PlayerAggregatesService {
     /**
      * Determines the canonical completed-game ID set used by hash and recompute logic.
      *
-     * <p>Only ended games are included. IDs are deduplicated and sorted so the resulting
-     * hash is stable and independent of iteration order.
+     * <p>Only ended games are included. IDs are deduplicated and sorted so the resulting hash is
+     * stable and independent of iteration order.
      */
     private static List<String> getCompletedGameIds(List<ManagedGame> playerGames) {
         if (playerGames == null || playerGames.isEmpty()) {
@@ -156,8 +180,8 @@ class PlayerAggregatesService {
     /**
      * Returns {@code true} when cached aggregates must be recomputed.
      *
-     * <p>Recompute is required if the row is missing, aggregate version changed,
-     * completed-game hash changed, or completed-game count changed.
+     * <p>Recompute is required if the row is missing, aggregate version changed, completed-game hash
+     * changed, or completed-game count changed.
      */
     private static boolean shouldRecompute(
             PlayerAggregatesCache cached, String completedGamesHash, int completedGameCount) {
@@ -246,14 +270,21 @@ class PlayerAggregatesService {
      * {@code homebrewReplacesID} chain traversal. {@code gamesWithTech} counts completed games where
      * the player had that tech in final state.
      *
-     * <p>{@code percentInEligibleGames} uses the denominator of completed games excluding
-     * Franken and Twilight's Fall games. Numerator also counts only eligible games.
+     * <p>{@code percentInEligibleGames} uses the denominator of completed games excluding Franken and
+     * Twilight's Fall games. Numerator also counts only eligible games.
      */
     private static ComputedTechStats computeTechStats(String userId, Collection<String> completedGameIds) {
-        Map<String, Integer> gamesWithTech = new HashMap<>();
-        Map<String, Integer> eligibleGamesWithTech = new HashMap<>();
-        int eligibleGameCount = 0;
+        List<GameTechSnapshot> snapshots = loadPlayerTechsPerGame(userId, completedGameIds);
+        TechCountAccumulator counts = accumulateEligibleCounts(snapshots);
+        Map<String, PlayerDashboardResponse.TechStat> byTech = toTechStatMap(counts);
+        return new ComputedTechStats(counts.eligibleGameCount(), byTech);
+    }
 
+    /**
+     * Loads canonical player tech sets for each completed game.
+     */
+    private static List<GameTechSnapshot> loadPlayerTechsPerGame(String userId, Collection<String> completedGameIds) {
+        List<GameTechSnapshot> snapshots = new ArrayList<>();
         for (String gameId : completedGameIds) {
             if (gameId == null) {
                 continue;
@@ -272,31 +303,60 @@ class PlayerAggregatesService {
             }
 
             boolean eligibleForPercent = !managedGame.isTwilightsFallMode() && !game.isFrankenGame();
-            if (eligibleForPercent) {
+            Set<String> canonicalTechsForGame = canonicalTechsForPlayer(player);
+            snapshots.add(new GameTechSnapshot(eligibleForPercent, canonicalTechsForGame));
+        }
+        return snapshots;
+    }
+
+    /**
+     * Creates the canonical tech set for a player's final game state.
+     */
+    private static Set<String> canonicalTechsForPlayer(Player player) {
+        Set<String> canonicalTechsForGame = new HashSet<>();
+        for (String techId : player.getTechs()) {
+            String canonicalTechId = normalizeToCanonicalTechId(techId);
+            if (canonicalTechId != null && !canonicalTechId.isBlank()) {
+                canonicalTechsForGame.add(canonicalTechId);
+            }
+        }
+        return canonicalTechsForGame;
+    }
+
+    /**
+     * Accumulates completed and eligible tech counters from game snapshots.
+     */
+    private static TechCountAccumulator accumulateEligibleCounts(List<GameTechSnapshot> snapshots) {
+        Map<String, Integer> gamesWithTech = new HashMap<>();
+        Map<String, Integer> eligibleGamesWithTech = new HashMap<>();
+        int eligibleGameCount = 0;
+
+        for (GameTechSnapshot snapshot : snapshots) {
+            if (snapshot.eligibleForPercent()) {
                 eligibleGameCount++;
             }
 
-            Set<String> canonicalTechsForGame = new HashSet<>();
-            for (String techId : player.getTechs()) {
-                String canonicalTechId = normalizeToCanonicalTechId(techId);
-                if (canonicalTechId != null && !canonicalTechId.isBlank()) {
-                    canonicalTechsForGame.add(canonicalTechId);
-                }
-            }
-
-            canonicalTechsForGame.forEach(tech -> gamesWithTech.merge(tech, 1, Integer::sum));
-            if (eligibleForPercent) {
-                canonicalTechsForGame.forEach(tech -> eligibleGamesWithTech.merge(tech, 1, Integer::sum));
+            snapshot.canonicalTechs().forEach(tech -> gamesWithTech.merge(tech, 1, Integer::sum));
+            if (snapshot.eligibleForPercent()) {
+                snapshot.canonicalTechs().forEach(tech -> eligibleGamesWithTech.merge(tech, 1, Integer::sum));
             }
         }
 
-        int eligibleGameCountFinal = eligibleGameCount;
-        Map<String, PlayerDashboardResponse.TechStat> byTech = gamesWithTech.entrySet().stream()
+        return new TechCountAccumulator(gamesWithTech, eligibleGamesWithTech, eligibleGameCount);
+    }
+
+    /**
+     * Projects counters into API-ready tech stats sorted by tech ID.
+     */
+    private static Map<String, PlayerDashboardResponse.TechStat> toTechStatMap(TechCountAccumulator counts) {
+        int eligibleGameCountFinal = counts.eligibleGameCount();
+        return counts.gamesWithTech().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(java.util.stream.Collectors.toMap(
                         Map.Entry::getKey,
                         entry -> {
-                            int eligibleCountForTech = eligibleGamesWithTech.getOrDefault(entry.getKey(), 0);
+                            int eligibleCountForTech =
+                                    counts.eligibleGamesWithTech().getOrDefault(entry.getKey(), 0);
                             double percent = eligibleGameCountFinal == 0
                                     ? 0.0
                                     : (eligibleCountForTech * 100.0) / eligibleGameCountFinal;
@@ -304,8 +364,6 @@ class PlayerAggregatesService {
                         },
                         (a, b) -> a,
                         java.util.LinkedHashMap::new));
-
-        return new ComputedTechStats(eligibleGameCount, byTech);
     }
 
     /**
@@ -372,6 +430,18 @@ class PlayerAggregatesService {
             throw new IllegalStateException("SHA-256 is unavailable", e);
         }
     }
+
+    private record CacheContext(
+            String userId,
+            List<String> completedGameIds,
+            String completedGamesHash,
+            PlayerAggregatesCache cached,
+            boolean shouldRecompute) {}
+
+    private record GameTechSnapshot(boolean eligibleForPercent, Set<String> canonicalTechs) {}
+
+    private record TechCountAccumulator(
+            Map<String, Integer> gamesWithTech, Map<String, Integer> eligibleGamesWithTech, int eligibleGameCount) {}
 
     private record ComputedTechStats(int eligibleGameCount, Map<String, PlayerDashboardResponse.TechStat> byTech) {}
 
