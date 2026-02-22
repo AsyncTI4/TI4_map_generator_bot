@@ -2573,13 +2573,19 @@ public class Game extends GameProperties {
                 player.setEvent(id);
                 return player.getActionCards();
             }
-        } else {
-            getEvents().addAll(discardedEvents.keySet());
-            discardedEvents.clear();
-            Collections.shuffle(getEvents());
-            return drawEvent(userID);
         }
-        return null;
+
+        if (discardedEvents.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                getActionsChannel(),
+                "Unable to draw an event: both the deck and discard pile are empty.");
+            return null;
+        }
+
+        getEvents().addAll(discardedEvents.keySet());
+        discardedEvents.clear();
+        Collections.shuffle(getEvents());
+        return drawEvent(userID);
     }
 
     private List<String> getExplores(String reqType, List<String> superDeck) {
