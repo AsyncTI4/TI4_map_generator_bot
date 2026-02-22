@@ -35,6 +35,7 @@ import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
+import ti4.cron.PersistGameStatsDashboardPayloadsCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
@@ -71,6 +72,8 @@ import ti4.selections.SelectionManager;
 import ti4.service.draft.SliceGenerationPipeline;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
+import ti4.spring.context.SpringContext;
+import ti4.spring.service.gamestats.GameStatsDashboardPayloadPersistenceService;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
@@ -316,11 +319,18 @@ public class JdaService {
             BotLogger.info("FINISHED RUNNING MIGRATIONS");
         }
 
+        try {
+            SpringContext.getBean(GameStatsDashboardPayloadPersistenceService.class).persistAllGames();
+        } catch (Exception e) {
+            BotLogger.error("Failed to persist game stats dashboard payloads during startup.", e);
+        }
+
         // START CRONS
         AutoPingCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCron.register();
+        PersistGameStatsDashboardPayloadsCron.register();
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
