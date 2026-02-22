@@ -22,7 +22,18 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
     public record PlayerActivity(int totalTurns, Long averageTurnTimeSeconds) {}
 
     public record BadgeAward(
-            String key, String name, String tier, String description, Integer score, Integer threshold, Double ratio) {}
+            String key,
+            String name,
+            String tier,
+            String description,
+            BadgeMetric primaryMetric,
+            List<BadgeRequirement> requirements,
+            String summary,
+            String tierRuleText) {}
+
+    public record BadgeMetric(String label, double value, String unit) {}
+
+    public record BadgeRequirement(String label, double current, double target, String unit, boolean met) {}
 
     public record ImperialDoctrine(String archetype, List<String> traits) {}
 
