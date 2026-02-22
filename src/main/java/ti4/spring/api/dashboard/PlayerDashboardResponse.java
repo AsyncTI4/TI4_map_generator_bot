@@ -11,7 +11,8 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
             String tiglLatestRankAtGameStart,
             TitleSummary titles,
             DiceLuckSummary diceLuck,
-            PlayerInsights insights) {}
+            PlayerInsights insights,
+            PlayerAggregates aggregates) {}
 
     public record PlayerInsights(
             PlayerActivity activity,
@@ -36,6 +37,20 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
 
     public record DashboardSummary(
             int gamesPlayed, int activeGames, int finishedGames, int abandonedGames, int wins, Double winPercent) {}
+
+    public record PlayerAggregates(
+            boolean ready,
+            String completedGamesHash,
+            int completedGameCount,
+            int eligibleGameCount,
+            int aggregatesVersion,
+            Long computedAtEpochMs,
+            List<String> completedGameIds,
+            TechStats techStats) {}
+
+    public record TechStats(java.util.Map<String, TechStat> byTech) {}
+
+    public record TechStat(int gamesWithTech, double percentInEligibleGames) {}
 
     public record DashboardGame(
             String gameId,

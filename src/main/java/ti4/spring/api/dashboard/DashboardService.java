@@ -22,8 +22,22 @@ import ti4.model.EventModel;
 
 @RequiredArgsConstructor
 @Service
+/**
+ * Assembles the API payload for the authenticated player's dashboard.
+ *
+ * <p>This service composes gameplay summaries and requests aggregate data from
+ * {@link PlayerAggregatesService}. Aggregate computation is cache-backed and async; when a cache
+ * refresh is in flight, responses include an empty aggregate shell rather than stale aggregate data.
+ */
 class DashboardService {
 
+    private final PlayerAggregatesService playerAggregatesService;
+
+    /**
+     * Builds the full dashboard response for a player.
+     *
+     * <p>If no managed player exists, returns an empty dashboard shape.
+     */
     PlayerDashboardResponse getDashboard(String userId) {
         ManagedPlayer managedPlayer = GameManager.getManagedPlayer(userId);
         if (managedPlayer == null) {
@@ -39,7 +53,16 @@ class DashboardService {
                                     new PlayerDashboardResponse.PlayerActivity(0, null),
                                     List.of(),
                                     new PlayerDashboardResponse.ImperialDoctrine("Balanced High Command", List.of()),
-                                    List.of())),
+                                    List.of()),
+                            new PlayerDashboardResponse.PlayerAggregates(
+                                    false,
+                                    "",
+                                    0,
+                                    0,
+                                    1,
+                                    null,
+                                    List.of(),
+                                    new PlayerDashboardResponse.TechStats(Map.of()))),
                     new PlayerDashboardResponse.DashboardSummary(0, 0, 0, 0, 0, null),
                     List.of());
         }
@@ -86,10 +109,12 @@ class DashboardService {
                 gamesPlayed, activeGames, finishedGames, abandonedGames, wins, winPercent);
         PlayerDashboardResponse.PlayerInsights insights = DashboardBadgeEngine.analyze(
                 userId, playerGames, games, dashboardSummary, titleSummary, diceLuckSummary);
+        PlayerDashboardResponse.PlayerAggregates aggregates =
+                playerAggregatesService.getOrQueueRefresh(userId, playerGames);
 
         return new PlayerDashboardResponse(
                 new PlayerDashboardResponse.PlayerProfile(
-                        userId, userName, null, latestTiglRank, titleSummary, diceLuckSummary, insights),
+                        userId, userName, null, latestTiglRank, titleSummary, diceLuckSummary, insights, aggregates),
                 dashboardSummary,
                 games);
     }
