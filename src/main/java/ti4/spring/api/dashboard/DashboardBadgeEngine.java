@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.ManagedGame;
-import ti4.settings.users.UserSettings;
-import ti4.settings.users.UserSettingsManager;
 
 final class DashboardBadgeEngine {
 
@@ -30,16 +28,9 @@ final class DashboardBadgeEngine {
     private static final int GALACTIC_ENDURANCE_LEGENDARY_GAMES = 3;
     private static final int LONG_HAUL_GAME_DAYS = 180;
 
-    private static final int SPEAKERS_HAND_GOLD_SIGNALS = 4;
-    private static final int SPEAKERS_HAND_LEGENDARY_SIGNALS = 6;
-
-    private static final int TWILIGHT_STRATEGIST_MIN_ACTIVITY_CHECKINS = 150;
-    private static final double TWILIGHT_STRATEGIST_MIN_OFF_HOURS_RATIO = 0.35;
-    private static final double TWILIGHT_STRATEGIST_GOLD_OFF_HOURS_RATIO = 0.45;
-    private static final double TWILIGHT_STRATEGIST_LEGENDARY_OFF_HOURS_RATIO = 0.55;
-
-    private static final int OFF_HOURS_START_INCLUSIVE = 22;
-    private static final int OFF_HOURS_END_INCLUSIVE = 5;
+    private static final int SPEAKERS_HAND_MIN_SIGNALS = 8;
+    private static final int SPEAKERS_HAND_GOLD_SIGNALS = 15;
+    private static final int SPEAKERS_HAND_LEGENDARY_SIGNALS = 25;
 
     private static final int IMPERIAL_DOCTRINE_MIN_FINISHED_GAMES = 8;
     private static final double IMPERIAL_DOCTRINE_DECISIVE_WIN_RATE = 0.35;
@@ -72,14 +63,12 @@ final class DashboardBadgeEngine {
         int closeWins = getCloseWins(userId, games);
         int longHaulFinishes = getLongHaulFinishes(games);
         int diplomacySignals = getDiplomacySignals(titleSummary);
-        NightWatchSignal nightWatchSignal = getNightWatchSignal(userId);
 
         List<PlayerDashboardResponse.BadgeAward> badges = new ArrayList<>();
         addFleetLogisticsBadge(badges, turnAggregate);
         addFromTheBrinkBadge(badges, closeWins);
         addGalacticEnduranceBadge(badges, longHaulFinishes);
         addSpeakersHandBadge(badges, diplomacySignals);
-        addTwilightStrategistBadge(badges, nightWatchSignal);
         addGalacticMetamorphBadge(badges, games);
 
         PlayerDashboardResponse.ImperialDoctrine doctrine = buildImperialDoctrine(
@@ -217,30 +206,6 @@ final class DashboardBadgeEngine {
                 .sum();
     }
 
-    private static NightWatchSignal getNightWatchSignal(String userId) {
-        UserSettings settings = UserSettingsManager.get(userId);
-        String activeHours = settings.getActiveHours();
-        if (activeHours == null || activeHours.isBlank()) {
-            return new NightWatchSignal(0, 0);
-        }
-        String[] parts = activeHours.split(";");
-        int total = 0;
-        int offHours = 0;
-        for (int hour = 0; hour < parts.length; hour++) {
-            int value;
-            try {
-                value = Integer.parseInt(parts[hour].trim());
-            } catch (NumberFormatException e) {
-                continue;
-            }
-            total += Math.max(value, 0);
-            if (hour <= OFF_HOURS_END_INCLUSIVE || hour >= OFF_HOURS_START_INCLUSIVE) {
-                offHours += Math.max(value, 0);
-            }
-        }
-        return new NightWatchSignal(offHours, total);
-    }
-
     private static void addFleetLogisticsBadge(
             List<PlayerDashboardResponse.BadgeAward> badges, PlayerTurnAggregate turnAggregate) {
         if (turnAggregate.totalTurns() < FLEET_LOGISTICS_MIN_TURNS
@@ -264,9 +229,11 @@ final class DashboardBadgeEngine {
                 "Fleet Logistics",
                 tier,
                 "Maintains a rapid operational tempo across many turns.",
-                turnAggregate.totalTurns(),
-                FLEET_LOGISTICS_MIN_TURNS,
-                null));
+                new PlayerDashboardResponse.BadgeMetric("Average turn time", avgSeconds, "seconds"),
+                List.of(new PlayerDashboardResponse.BadgeRequirement(
+                        "Tracked turns", turnAggregate.totalTurns(), FLEET_LOGISTICS_MIN_TURNS, "turns", true)),
+                "Average turn speed across all tracked turns.",
+                "Legendary <30m, Gold <1h, Silver <2h"));
     }
 
     private static void addFromTheBrinkBadge(List<PlayerDashboardResponse.BadgeAward> badges, int closeWins) {
@@ -281,9 +248,11 @@ final class DashboardBadgeEngine {
                 "From the Brink",
                 tier,
                 "Closes out razor-thin endgames when the table is at match point.",
-                closeWins,
-                FROM_THE_BRINK_MIN_CLOSE_WINS,
-                null));
+                new PlayerDashboardResponse.BadgeMetric("Clutch wins", closeWins, "count"),
+                List.of(new PlayerDashboardResponse.BadgeRequirement(
+                        "Clutch wins", closeWins, FROM_THE_BRINK_MIN_CLOSE_WINS, "count", true)),
+                "Wins where at least one opponent was also near the finish line.",
+                "Legendary 6+, Gold 4+, Silver 2+"));
     }
 
     private static void addGalacticEnduranceBadge(
@@ -299,13 +268,15 @@ final class DashboardBadgeEngine {
                 "Galactic Endurance",
                 tier,
                 "Finishes marathon campaigns that run at least 180 days.",
-                longHaulFinishes,
-                GALACTIC_ENDURANCE_MIN_GAMES,
-                null));
+                new PlayerDashboardResponse.BadgeMetric("Marathon finishes", longHaulFinishes, "count"),
+                List.of(new PlayerDashboardResponse.BadgeRequirement(
+                        "180+ day finished games", longHaulFinishes, GALACTIC_ENDURANCE_MIN_GAMES, "games", true)),
+                "Counts completed games lasting 180 days or longer.",
+                "Legendary 3+, Gold 2+, Silver 1+"));
     }
 
     private static void addSpeakersHandBadge(List<PlayerDashboardResponse.BadgeAward> badges, int diplomacySignals) {
-        if (diplomacySignals == 0) {
+        if (diplomacySignals < SPEAKERS_HAND_MIN_SIGNALS) {
             return;
         }
         String tier = diplomacySignals >= SPEAKERS_HAND_LEGENDARY_SIGNALS
@@ -316,31 +287,11 @@ final class DashboardBadgeEngine {
                 "Speaker's Hand",
                 tier,
                 "Earns repeated diplomacy-oriented titles and table influence signals.",
-                diplomacySignals,
-                1,
-                null));
-    }
-
-    private static void addTwilightStrategistBadge(
-            List<PlayerDashboardResponse.BadgeAward> badges, NightWatchSignal nightWatchSignal) {
-        if (nightWatchSignal.totalCheckins() < TWILIGHT_STRATEGIST_MIN_ACTIVITY_CHECKINS) {
-            return;
-        }
-        double offHoursRatio = nightWatchSignal.offHoursCheckins() * 1.0 / nightWatchSignal.totalCheckins();
-        if (offHoursRatio < TWILIGHT_STRATEGIST_MIN_OFF_HOURS_RATIO) {
-            return;
-        }
-        String tier = offHoursRatio >= TWILIGHT_STRATEGIST_LEGENDARY_OFF_HOURS_RATIO
-                ? "LEGENDARY"
-                : offHoursRatio >= TWILIGHT_STRATEGIST_GOLD_OFF_HOURS_RATIO ? "GOLD" : "SILVER";
-        badges.add(new PlayerDashboardResponse.BadgeAward(
-                "twilight_strategist",
-                "Twilight Strategist",
-                tier,
-                "Regularly active in late-night strategic windows.",
-                nightWatchSignal.offHoursCheckins(),
-                TWILIGHT_STRATEGIST_MIN_ACTIVITY_CHECKINS,
-                offHoursRatio));
+                new PlayerDashboardResponse.BadgeMetric("Diplomacy signals", diplomacySignals, "count"),
+                List.of(new PlayerDashboardResponse.BadgeRequirement(
+                        "Diplomacy signals", diplomacySignals, SPEAKERS_HAND_MIN_SIGNALS, "count", true)),
+                "Recognizes sustained council-and-trade identity from title history.",
+                "Legendary 25+, Gold 15+, Silver 8+"));
     }
 
     private static void addGalacticMetamorphBadge(
@@ -369,9 +320,15 @@ final class DashboardBadgeEngine {
                 "Galactic Metamorph",
                 tier,
                 "Wins with multiple factions, adapting identity to the table.",
-                (int) distinctWinFactions,
-                GALACTIC_METAMORPH_MIN_DISTINCT_WIN_FACTIONS,
-                null));
+                new PlayerDashboardResponse.BadgeMetric("Distinct winning factions", distinctWinFactions, "count"),
+                List.of(new PlayerDashboardResponse.BadgeRequirement(
+                        "Distinct factions won with",
+                        distinctWinFactions,
+                        GALACTIC_METAMORPH_MIN_DISTINCT_WIN_FACTIONS,
+                        "factions",
+                        true)),
+                "Measures how many different factions you've won games with.",
+                "Legendary 30+, Gold 20+, Silver 10+"));
     }
 
     private static PlayerDashboardResponse.ImperialDoctrine buildImperialDoctrine(
@@ -444,5 +401,4 @@ final class DashboardBadgeEngine {
 
     private record PlayerTurnAggregate(int totalTurns, OptionalLong averageTurnTimeSeconds) {}
 
-    private record NightWatchSignal(int offHoursCheckins, int totalCheckins) {}
 }
