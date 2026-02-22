@@ -46,7 +46,7 @@ class DashboardService {
 
         List<ManagedGame> playerGames = managedPlayer.getGames().stream()
                 .filter(game -> isRealParticipant(game, userId))
-                .sorted(Comparator.comparingLong(ManagedGame::getLastModifiedDate)
+                .sorted(Comparator.comparingLong(DashboardService::getCreationDateTimeEpochMs)
                         .reversed())
                 .toList();
 
@@ -96,6 +96,14 @@ class DashboardService {
 
     private static boolean isRealParticipant(ManagedGame managedGame, String userId) {
         return managedGame.getRealPlayers().stream().anyMatch(player -> userId.equals(player.getId()));
+    }
+
+    private static long getCreationDateTimeEpochMs(ManagedGame managedGame) {
+        Game game = managedGame.getGame();
+        if (game == null) {
+            return 0;
+        }
+        return game.getCreationDateTime();
     }
 
     private static Optional<String> getLatestTiglRankAtGameStart(String userId, List<ManagedGame> playerGames) {
