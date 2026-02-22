@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.ManagedGame;
-import ti4.settings.users.UserSettings;
-import ti4.settings.users.UserSettingsManager;
 
 final class DashboardBadgeEngine {
 
@@ -33,14 +31,6 @@ final class DashboardBadgeEngine {
     private static final int SPEAKERS_HAND_MIN_SIGNALS = 8;
     private static final int SPEAKERS_HAND_GOLD_SIGNALS = 15;
     private static final int SPEAKERS_HAND_LEGENDARY_SIGNALS = 25;
-
-    private static final int TWILIGHT_STRATEGIST_MIN_ACTIVITY_CHECKINS = 150;
-    private static final double TWILIGHT_STRATEGIST_MIN_OFF_HOURS_RATIO = 0.35;
-    private static final double TWILIGHT_STRATEGIST_GOLD_OFF_HOURS_RATIO = 0.45;
-    private static final double TWILIGHT_STRATEGIST_LEGENDARY_OFF_HOURS_RATIO = 0.55;
-
-    private static final int OFF_HOURS_START_INCLUSIVE = 22;
-    private static final int OFF_HOURS_END_INCLUSIVE = 5;
 
     private static final int IMPERIAL_DOCTRINE_MIN_FINISHED_GAMES = 8;
     private static final double IMPERIAL_DOCTRINE_DECISIVE_WIN_RATE = 0.35;
@@ -73,14 +63,12 @@ final class DashboardBadgeEngine {
         int closeWins = getCloseWins(userId, games);
         int longHaulFinishes = getLongHaulFinishes(games);
         int diplomacySignals = getDiplomacySignals(titleSummary);
-        NightWatchSignal nightWatchSignal = getNightWatchSignal(userId);
 
         List<PlayerDashboardResponse.BadgeAward> badges = new ArrayList<>();
         addFleetLogisticsBadge(badges, turnAggregate);
         addFromTheBrinkBadge(badges, closeWins);
         addGalacticEnduranceBadge(badges, longHaulFinishes);
         addSpeakersHandBadge(badges, diplomacySignals);
-        addTwilightStrategistBadge(badges, nightWatchSignal);
         addGalacticMetamorphBadge(badges, games);
 
         PlayerDashboardResponse.ImperialDoctrine doctrine = buildImperialDoctrine(
@@ -218,30 +206,6 @@ final class DashboardBadgeEngine {
                 .sum();
     }
 
-    private static NightWatchSignal getNightWatchSignal(String userId) {
-        UserSettings settings = UserSettingsManager.get(userId);
-        String activeHours = settings.getActiveHours();
-        if (activeHours == null || activeHours.isBlank()) {
-            return new NightWatchSignal(0, 0);
-        }
-        String[] parts = activeHours.split(";");
-        int total = 0;
-        int offHours = 0;
-        for (int hour = 0; hour < parts.length; hour++) {
-            int value;
-            try {
-                value = Integer.parseInt(parts[hour].trim());
-            } catch (NumberFormatException e) {
-                continue;
-            }
-            total += Math.max(value, 0);
-            if (hour <= OFF_HOURS_END_INCLUSIVE || hour >= OFF_HOURS_START_INCLUSIVE) {
-                offHours += Math.max(value, 0);
-            }
-        }
-        return new NightWatchSignal(offHours, total);
-    }
-
     private static void addFleetLogisticsBadge(
             List<PlayerDashboardResponse.BadgeAward> badges, PlayerTurnAggregate turnAggregate) {
         if (turnAggregate.totalTurns() < FLEET_LOGISTICS_MIN_TURNS
@@ -328,41 +292,6 @@ final class DashboardBadgeEngine {
                         "Diplomacy signals", diplomacySignals, SPEAKERS_HAND_MIN_SIGNALS, "count", true)),
                 "Recognizes sustained council-and-trade identity from title history.",
                 "Legendary 25+, Gold 15+, Silver 8+"));
-    }
-
-    private static void addTwilightStrategistBadge(
-            List<PlayerDashboardResponse.BadgeAward> badges, NightWatchSignal nightWatchSignal) {
-        if (nightWatchSignal.totalCheckins() < TWILIGHT_STRATEGIST_MIN_ACTIVITY_CHECKINS) {
-            return;
-        }
-        double offHoursRatio = nightWatchSignal.offHoursCheckins() * 1.0 / nightWatchSignal.totalCheckins();
-        if (offHoursRatio < TWILIGHT_STRATEGIST_MIN_OFF_HOURS_RATIO) {
-            return;
-        }
-        String tier = offHoursRatio >= TWILIGHT_STRATEGIST_LEGENDARY_OFF_HOURS_RATIO
-                ? "LEGENDARY"
-                : offHoursRatio >= TWILIGHT_STRATEGIST_GOLD_OFF_HOURS_RATIO ? "GOLD" : "SILVER";
-        badges.add(new PlayerDashboardResponse.BadgeAward(
-                "twilight_strategist",
-                "Twilight Strategist",
-                tier,
-                "Regularly active in late-night strategic windows.",
-                new PlayerDashboardResponse.BadgeMetric("Off-hour activity share", offHoursRatio, "ratio"),
-                List.of(
-                        new PlayerDashboardResponse.BadgeRequirement(
-                                "Total activity check-ins",
-                                nightWatchSignal.totalCheckins(),
-                                TWILIGHT_STRATEGIST_MIN_ACTIVITY_CHECKINS,
-                                "check-ins",
-                                true),
-                        new PlayerDashboardResponse.BadgeRequirement(
-                                "Off-hour activity ratio",
-                                offHoursRatio,
-                                TWILIGHT_STRATEGIST_MIN_OFF_HOURS_RATIO,
-                                "ratio",
-                                true)),
-                "UTC activity concentrated in hours 22:00-05:59.",
-                "Legendary >=55%, Gold >=45%, Silver >=35%"));
     }
 
     private static void addGalacticMetamorphBadge(
@@ -472,5 +401,4 @@ final class DashboardBadgeEngine {
 
     private record PlayerTurnAggregate(int totalTurns, OptionalLong averageTurnTimeSeconds) {}
 
-    private record NightWatchSignal(int offHoursCheckins, int totalCheckins) {}
 }
