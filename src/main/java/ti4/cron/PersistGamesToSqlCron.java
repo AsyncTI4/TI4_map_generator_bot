@@ -11,16 +11,16 @@ public class PersistGamesToSqlCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                PersistGamesToSqlCron.class, PersistGamesToSqlCron::persistPayloads, 13, 15, ZoneId.of("UTC"));
+                PersistGamesToSqlCron.class, PersistGamesToSqlCron::persist, 00, 00, ZoneId.of("America/New_York"));
     }
 
-    private static void persistPayloads() {
-        BotLogger.logCron("Running PersistGameStatsDashboardPayloadsCron.");
+    private static void persist() {
+        BotLogger.logCron("Running PersistGamesToSqlCron.");
         try {
             SpringContext.getBean(StatisticsService.class).persistAllGames();
         } catch (Exception e) {
-            BotLogger.error("**PersistGameStatsDashboardPayloadsCron failed.**", e);
+            BotLogger.error("**PersistGamesToSqlCron failed.**", e);
         }
-        BotLogger.logCron("Finished PersistGameStatsDashboardPayloadsCron.");
+        BotLogger.logCron("Finished PersistGamesToSqlCron.");
     }
 }
