@@ -52,7 +52,6 @@ class DashboardService {
                             new PlayerDashboardResponse.PlayerInsights(
                                     new PlayerDashboardResponse.PlayerActivity(0, null),
                                     List.of(),
-                                    new PlayerDashboardResponse.ImperialDoctrine("Balanced High Command", List.of()),
                                     List.of()),
                             new PlayerDashboardResponse.PlayerAggregates(
                                     false,
@@ -125,8 +124,8 @@ class DashboardService {
 
         PlayerDashboardResponse.DashboardSummary dashboardSummary = new PlayerDashboardResponse.DashboardSummary(
                 gamesPlayed, activeGames, finishedGames, abandonedGames, wins, winPercent);
-        PlayerDashboardResponse.PlayerInsights insights = DashboardBadgeEngine.analyze(
-                userId, playerGames, games, dashboardSummary, titleSummary, diceLuckSummary);
+        PlayerDashboardResponse.PlayerInsights insights =
+                DashboardBadgeEngine.analyze(userId, playerGames, games, titleSummary);
         PlayerDashboardResponse.PlayerAggregates aggregates =
                 playerAggregatesService.getOrQueueRefresh(userId, playerGames);
 
