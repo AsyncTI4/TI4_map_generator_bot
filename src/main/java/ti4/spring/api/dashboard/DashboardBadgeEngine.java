@@ -32,18 +32,6 @@ final class DashboardBadgeEngine {
     private static final int SPEAKERS_HAND_GOLD_SIGNALS = 15;
     private static final int SPEAKERS_HAND_LEGENDARY_SIGNALS = 25;
 
-    private static final int IMPERIAL_DOCTRINE_MIN_FINISHED_GAMES = 8;
-    private static final double IMPERIAL_DOCTRINE_DECISIVE_WIN_RATE = 0.35;
-    private static final double IMPERIAL_DOCTRINE_CONTESTED_WIN_RATE = 0.2;
-    private static final int IMPERIAL_DOCTRINE_CLUTCH_WINS = 2;
-    private static final int IMPERIAL_DOCTRINE_LONG_HAUL_FINISHES = 2;
-    private static final int IMPERIAL_DOCTRINE_DIPLOMACY_SIGNALS = 2;
-    private static final int IMPERIAL_DOCTRINE_RELIABLE_PRESENCE_MIN_GAMES = 8;
-    private static final long IMPERIAL_DOCTRINE_FAST_TEMPO_SECONDS = 10_800;
-    private static final long IMPERIAL_DOCTRINE_MEASURED_TEMPO_SECONDS = 25_200;
-    private static final double IMPERIAL_DOCTRINE_LUCK_HIGH = 1.1;
-    private static final double IMPERIAL_DOCTRINE_LUCK_LOW = 0.9;
-
     private static final int GALACTIC_METAMORPH_MIN_DISTINCT_WIN_FACTIONS = 10;
     private static final int GALACTIC_METAMORPH_GOLD_DISTINCT_WIN_FACTIONS = 20;
     private static final int GALACTIC_METAMORPH_LEGENDARY_DISTINCT_WIN_FACTIONS = 30;
@@ -54,11 +42,9 @@ final class DashboardBadgeEngine {
             String userId,
             List<ManagedGame> managedGames,
             List<PlayerDashboardResponse.DashboardGame> games,
-            PlayerDashboardResponse.DashboardSummary summary,
-            PlayerDashboardResponse.TitleSummary titleSummary,
-            PlayerDashboardResponse.DiceLuckSummary diceLuck) {
+            PlayerDashboardResponse.TitleSummary titleSummary) {
         PlayerTurnAggregate turnAggregate = getTurnAggregate(userId, managedGames);
-        List<PlayerDashboardResponse.FavoredHouse> favoredHouses = getFavoredHouses(games);
+        List<PlayerDashboardResponse.FavoredFaction> favoredFactions = getFavoredFactions(games);
 
         int closeWins = getCloseWins(userId, games);
         int longHaulFinishes = getLongHaulFinishes(games);
@@ -71,14 +57,6 @@ final class DashboardBadgeEngine {
         addSpeakersHandBadge(badges, diplomacySignals);
         addGalacticMetamorphBadge(badges, games);
 
-        PlayerDashboardResponse.ImperialDoctrine doctrine = buildImperialDoctrine(
-                summary,
-                turnAggregate.averageTurnTimeSeconds(),
-                closeWins,
-                longHaulFinishes,
-                diplomacySignals,
-                diceLuck);
-
         return new PlayerDashboardResponse.PlayerInsights(
                 new PlayerDashboardResponse.PlayerActivity(
                         turnAggregate.totalTurns(),
@@ -86,8 +64,7 @@ final class DashboardBadgeEngine {
                                 ? turnAggregate.averageTurnTimeSeconds().getAsLong()
                                 : null),
                 badges,
-                doctrine,
-                favoredHouses);
+                favoredFactions);
     }
 
     private static PlayerTurnAggregate getTurnAggregate(String userId, List<ManagedGame> managedGames) {
@@ -114,21 +91,21 @@ final class DashboardBadgeEngine {
         return new PlayerTurnAggregate(totalTurns, averageTurnTimeSeconds);
     }
 
-    private static List<PlayerDashboardResponse.FavoredHouse> getFavoredHouses(
+    private static List<PlayerDashboardResponse.FavoredFaction> getFavoredFactions(
             List<PlayerDashboardResponse.DashboardGame> games) {
-        class HouseStats {
+        class FactionStats {
             int gamesPlayed;
             int wins;
         }
 
-        Map<String, HouseStats> houseStats = games.stream()
+        Map<String, FactionStats> factionStats = games.stream()
                 .map(PlayerDashboardResponse.DashboardGame::yourSeat)
                 .filter(Objects::nonNull)
                 .filter(seat -> seat.faction() != null && !seat.faction().isBlank())
                 .collect(Collectors.toMap(
                         PlayerDashboardResponse.YourSeat::faction,
                         seat -> {
-                            HouseStats stats = new HouseStats();
+                            FactionStats stats = new FactionStats();
                             stats.gamesPlayed = 1;
                             stats.wins = seat.isWinner() ? 1 : 0;
                             return stats;
@@ -139,18 +116,18 @@ final class DashboardBadgeEngine {
                             return left;
                         }));
 
-        return houseStats.entrySet().stream()
+        return factionStats.entrySet().stream()
                 .map(entry -> {
-                    HouseStats stats = entry.getValue();
+                    FactionStats stats = entry.getValue();
                     Double winPercent = stats.gamesPlayed == 0 ? null : (stats.wins * 100.0) / stats.gamesPlayed;
-                    return new PlayerDashboardResponse.FavoredHouse(
+                    return new PlayerDashboardResponse.FavoredFaction(
                             entry.getKey(), stats.gamesPlayed, stats.wins, winPercent);
                 })
-                .sorted(Comparator.comparingInt(PlayerDashboardResponse.FavoredHouse::gamesPlayed)
+                .sorted(Comparator.comparingInt(PlayerDashboardResponse.FavoredFaction::gamesPlayed)
                         .reversed()
                         .thenComparing(
                                 fh -> fh.winPercent() == null ? -1.0 : fh.winPercent(), Comparator.reverseOrder())
-                        .thenComparing(PlayerDashboardResponse.FavoredHouse::faction))
+                        .thenComparing(PlayerDashboardResponse.FavoredFaction::faction))
                 .limit(5)
                 .toList();
     }
@@ -329,74 +306,6 @@ final class DashboardBadgeEngine {
                         true)),
                 "Measures how many different factions you've won games with.",
                 "Legendary 30+, Gold 20+, Silver 10+"));
-    }
-
-    private static PlayerDashboardResponse.ImperialDoctrine buildImperialDoctrine(
-            PlayerDashboardResponse.DashboardSummary summary,
-            OptionalLong averageTurnTimeSeconds,
-            int closeWins,
-            int longHaulFinishes,
-            int diplomacySignals,
-            PlayerDashboardResponse.DiceLuckSummary diceLuck) {
-        List<String> traits = new ArrayList<>();
-
-        if (averageTurnTimeSeconds.isPresent()) {
-            long avg = averageTurnTimeSeconds.getAsLong();
-            if (avg <= IMPERIAL_DOCTRINE_FAST_TEMPO_SECONDS) {
-                traits.add("Fast Tempo");
-            } else if (avg <= IMPERIAL_DOCTRINE_MEASURED_TEMPO_SECONDS) {
-                traits.add("Measured Tempo");
-            } else {
-                traits.add("Deliberate Tempo");
-            }
-        }
-
-        if (summary.finishedGames() >= IMPERIAL_DOCTRINE_MIN_FINISHED_GAMES) {
-            double winRate = summary.finishedGames() == 0 ? 0 : (summary.wins() * 1.0) / summary.finishedGames();
-            if (winRate >= IMPERIAL_DOCTRINE_DECISIVE_WIN_RATE) {
-                traits.add("Decisive Endgame");
-            } else if (winRate >= IMPERIAL_DOCTRINE_CONTESTED_WIN_RATE) {
-                traits.add("Contested Endgame");
-            } else {
-                traits.add("Learning Endgame");
-            }
-        }
-
-        if (closeWins >= IMPERIAL_DOCTRINE_CLUTCH_WINS) {
-            traits.add("Clutch Finisher");
-        }
-        if (longHaulFinishes >= IMPERIAL_DOCTRINE_LONG_HAUL_FINISHES) {
-            traits.add("Long War Planner");
-        }
-        if (diplomacySignals >= IMPERIAL_DOCTRINE_DIPLOMACY_SIGNALS) {
-            traits.add("Council Broker");
-        }
-        if (summary.abandonedGames() == 0 && summary.gamesPlayed() >= IMPERIAL_DOCTRINE_RELIABLE_PRESENCE_MIN_GAMES) {
-            traits.add("Reliable Presence");
-        }
-
-        if (diceLuck != null && diceLuck.ratio() != null) {
-            if (diceLuck.ratio() >= IMPERIAL_DOCTRINE_LUCK_HIGH) {
-                traits.add("Fortune-Favored");
-            } else if (diceLuck.ratio() <= IMPERIAL_DOCTRINE_LUCK_LOW) {
-                traits.add("Storm-Tested");
-            } else {
-                traits.add("Even Odds");
-            }
-        }
-
-        String archetype = "Balanced High Command";
-        if (traits.contains("Fast Tempo") && traits.contains("Decisive Endgame")) {
-            archetype = "Lightning Executor";
-        } else if (traits.contains("Clutch Finisher")) {
-            archetype = "Edge-of-the-Seat Closer";
-        } else if (traits.contains("Long War Planner")) {
-            archetype = "Grand Campaign Architect";
-        } else if (traits.contains("Council Broker")) {
-            archetype = "Galactic Negotiator";
-        }
-
-        return new PlayerDashboardResponse.ImperialDoctrine(archetype, traits);
     }
 
     private record PlayerTurnAggregate(int totalTurns, OptionalLong averageTurnTimeSeconds) {}
