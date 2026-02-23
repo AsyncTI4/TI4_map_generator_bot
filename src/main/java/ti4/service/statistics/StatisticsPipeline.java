@@ -10,7 +10,6 @@ import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.TimedRunnable;
 import ti4.message.logging.BotLogger;
-import ti4.spring.service.persistence.StatisticsPersistenceLock;
 
 @UtilityClass
 public class StatisticsPipeline {
@@ -27,10 +26,7 @@ public class StatisticsPipeline {
                 .sendMessage("Your statistics are being processed, please hold...")
                 .setEphemeral(true)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
-        var timedRunnable = new TimedRunnable(
-                eventToString(event),
-                EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
-                () -> StatisticsPersistenceLock.runWithReadLock(runnable));
+        var timedRunnable = new TimedRunnable(eventToString(event), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, runnable);
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
