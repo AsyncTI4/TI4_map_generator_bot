@@ -4,24 +4,20 @@ import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 import ti4.message.logging.BotLogger;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.gamestats.GameStatsDashboardPayloadPersistenceService;
+import ti4.spring.service.statistics.StatisticsService;
 
 @UtilityClass
-public class PersistGameStatsDashboardPayloadsCron {
+public class PersistGamesToSqlCron {
 
     public static void register() {
         CronManager.schedulePeriodicallyAtTime(
-                PersistGameStatsDashboardPayloadsCron.class,
-                PersistGameStatsDashboardPayloadsCron::persistPayloads,
-                13,
-                15,
-                ZoneId.of("UTC"));
+                PersistGamesToSqlCron.class, PersistGamesToSqlCron::persistPayloads, 13, 15, ZoneId.of("UTC"));
     }
 
     private static void persistPayloads() {
         BotLogger.logCron("Running PersistGameStatsDashboardPayloadsCron.");
         try {
-            SpringContext.getBean(GameStatsDashboardPayloadPersistenceService.class).persistAllGames();
+            SpringContext.getBean(StatisticsService.class).persistAllGames();
         } catch (Exception e) {
             BotLogger.error("**PersistGameStatsDashboardPayloadsCron failed.**", e);
         }

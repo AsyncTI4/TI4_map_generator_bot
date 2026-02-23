@@ -1,6 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -140,17 +139,17 @@ public class Player extends PlayerProperties {
         this.game = game;
     }
 
-    @JsonIgnore
+    
     public Game getGame() {
         return game;
     }
 
-    @JsonIgnore
+    
     public String getDecalName() {
         return Mapper.getDecalName(getDecalSet());
     }
 
-    @JsonIgnore
+    
     public String getDecalFile(String unitType) {
         if (getDecalSet() == null) return null;
         // TODO: Eventually remove if we stop setting values to string literal null, which is not good...
@@ -289,8 +288,7 @@ public class Player extends PlayerProperties {
                 .orElse(null);
     }
 
-    @JsonIgnore
-    public Set<String> getActiveUnits() {
+    private Set<String> getActiveUnits() {
         Set<String> activeUnits = new HashSet<>(getUnitsOwned());
         if (hasActiveBreakthrough("naazbt")) {
             activeUnits.removeIf(unit -> "mf".equals(getUnitByID(unit).getAsyncId()));
@@ -361,10 +359,6 @@ public class Player extends PlayerProperties {
 
     public void addTransactionItem(String thing) {
         getTransactionItems().add(thing);
-    }
-
-    public void removeTransactionItem(String thing) {
-        getTransactionItems().remove(thing);
     }
 
     public void addBreakthrough(String bt) {
@@ -448,14 +442,14 @@ public class Player extends PlayerProperties {
         return hasUnlockedBreakthrough(bt) && isBreakthroughActive(bt);
     }
 
-    @JsonIgnore
+    
     @Nullable
     public BreakthroughModel getBreakthroughModel() {
         if (getBreakthroughID() == null || getBreakthroughID().isEmpty()) return null;
         return Mapper.getBreakthrough(getBreakthroughID());
     }
 
-    @JsonIgnore
+    
     public List<BreakthroughModel> getBreakthroughModels() {
         return getBreakthroughIDs().stream()
                 .map(Mapper::getBreakthrough)
@@ -463,14 +457,14 @@ public class Player extends PlayerProperties {
                 .toList();
     }
 
-    @JsonIgnore
+    
     @Nullable
     public BreakthroughModel getBreakthroughModel(String bt) {
         if (!hasBreakthrough(bt)) return null;
         return Mapper.getBreakthrough(bt);
     }
 
-    @JsonIgnore
+    
     public Set<TechnologyType> getSynergies() {
         Set<TechnologyType> synergies = EnumSet.noneOf(TechnologyType.class);
         for (String bt : getBreakthroughIDs()) {
@@ -488,7 +482,7 @@ public class Player extends PlayerProperties {
         return Collections.unmodifiableSet(synergies);
     }
 
-    @JsonIgnore
+    
     public int getSpentInfantryThisWindow() {
         for (String thing : getSpentThingsThisWindow()) {
             if (thing.contains("infantry_")) {
@@ -544,7 +538,7 @@ public class Player extends PlayerProperties {
     }
 
     @Nullable
-    @JsonIgnore
+    
     public Role getRoleForCommunity() {
         try {
             return JdaService.jda.getRoleById(getRoleIDForCommunity());
@@ -554,7 +548,7 @@ public class Player extends PlayerProperties {
     }
 
     @Nullable
-    @JsonIgnore
+    
     public MessageChannel getPrivateChannel() {
         try {
             return JdaService.jda.getTextChannelById(getPrivateChannelID());
@@ -570,7 +564,7 @@ public class Player extends PlayerProperties {
         return getFinsFactionCheckerPrefix();
     }
 
-    @JsonIgnore
+    
     public String getFinsFactionCheckerPrefix() {
         return "FFCC_" + getFaction() + "_";
     }
@@ -579,7 +573,7 @@ public class Player extends PlayerProperties {
         return "dummyPlayerSpoof" + getFaction() + "_";
     }
 
-    @JsonIgnore
+    
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2")
                 || getTechs().contains("pds2")
@@ -587,7 +581,7 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("dsmirvpds");
     }
 
-    @JsonIgnore
+    
     public boolean hasInf2Tech() { // "dszeliinf"
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
@@ -604,7 +598,7 @@ public class Player extends PlayerProperties {
                 || getUnitsOwned().contains("pharadn_infantry2");
     }
 
-    @JsonIgnore
+    
     public boolean hasWarsunTech() {
         return getUnitByBaseType("warsun") != null;
         // return getTechs().contains("pws2")
@@ -620,7 +614,7 @@ public class Player extends PlayerProperties {
         //         || hasUnit("rohdhna_warsun");
     }
 
-    @JsonIgnore
+    
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2")
                 || getTechs().contains("hcf2")
@@ -637,7 +631,7 @@ public class Player extends PlayerProperties {
                 || ownsUnit("eidolon_fighter2");
     }
 
-    @JsonIgnore
+    
     public boolean hasUpgradedUnit(String baseUpgradeID) {
         for (String tech : getTechs()) {
             TechnologyModel model = Mapper.getTech(tech);
@@ -653,7 +647,7 @@ public class Player extends PlayerProperties {
      * Searches for the Player's CardsInfo ThreadChannel, or will create a new one if an existing ThreadChannel cannot be retrieved.
      * @return ThreadChannel for the player's cards info
      */
-    @JsonIgnore
+    
     @Nullable
     public ThreadChannel getCardsInfoThread() {
         if (isNpc() || isDummy()) {
@@ -955,7 +949,7 @@ public class Player extends PlayerProperties {
         } else return game.getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
     }
 
-    @JsonIgnore
+    
     public Set<String> getSpecialUnitsOwned() {
         return getUnitsOwned().stream()
                 .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
@@ -991,7 +985,7 @@ public class Player extends PlayerProperties {
         return getUnitModels().stream().anyMatch(unit -> unit.getId().contains(unitIDSubstring));
     }
 
-    @JsonIgnore
+    
     public List<UnitModel> getUnitModels() {
         return getUnitsOwned().stream()
                 .map(Mapper::getUnit)
@@ -1080,7 +1074,7 @@ public class Player extends PlayerProperties {
         return null;
     }
 
-    @JsonIgnore
+    
     private Map<String, Integer> getUnitsOwnedByBaseType() {
         Map<String, Integer> unitCount = new HashMap<>();
         for (String unitID : getUnitsOwned()) {
@@ -1125,7 +1119,7 @@ public class Player extends PlayerProperties {
         trapCardsPlanets.remove(id);
     }
 
-    @JsonIgnore
+    
     private Set<String> getSpecialPromissoryNotesOwned() {
         return getPromissoryNotesOwned().stream()
                 .filter(pn -> Mapper.getPromissoryNotes().get(pn).isNotWellKnown())
@@ -1243,7 +1237,7 @@ public class Player extends PlayerProperties {
         removePromissoryNoteFromPlayArea(id);
     }
 
-    @JsonIgnore
+    
     public int getMaxSOCount() {
         int maxSOCount = game.getMaxSOCountPerPlayer();
         int bonus = 0;
@@ -1306,7 +1300,7 @@ public class Player extends PlayerProperties {
         return secretsScored;
     }
 
-    @JsonIgnore
+    
     public Map<String, Integer> getSecretsUnscored() {
         Map<String, Integer> secretsUnscored = new HashMap<>();
         for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
@@ -1351,7 +1345,7 @@ public class Player extends PlayerProperties {
         secretsScored.remove(idToRemove);
     }
 
-    @JsonIgnore
+    
     public boolean enoughFragsForRelic() {
         updateFragments();
         int haz = getHrf();
@@ -1547,7 +1541,7 @@ public class Player extends PlayerProperties {
         getExhaustedRelics().remove(relicID);
     }
 
-    @JsonIgnore
+    
     public Member getMember() {
         Game game = this.game;
         if (game == null) return null;
@@ -1556,7 +1550,7 @@ public class Player extends PlayerProperties {
         return guild.getMemberById(getUserID());
     }
 
-    @JsonIgnore
+    
     public User getUser() {
         return getUser(getUserID());
     }
@@ -1566,7 +1560,7 @@ public class Player extends PlayerProperties {
         return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
     }
 
-    @JsonIgnore
+    
     @Override
     public String getStatsTrackedUserName() {
         User statsTrackedUser = getUser(getStatsTrackedUserID());
@@ -1590,7 +1584,7 @@ public class Player extends PlayerProperties {
         return super.getUserName();
     }
 
-    @JsonIgnore
+    
     public FactionModel getFactionModel() {
         return Mapper.getFaction(getFaction());
     }
@@ -1604,7 +1598,7 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName]
      */
-    @JsonIgnore
+    
     public String getRepresentation() {
         return getRepresentation(false, true);
     }
@@ -1612,7 +1606,7 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name)
      */
-    @JsonIgnore
+    
     public String getRepresentationUnfogged() {
         return getRepresentation(true, true);
     }
@@ -1620,7 +1614,7 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName] - won't ping player
      */
-    @JsonIgnore
+    
     public String getRepresentationNoPing() {
         return getRepresentation(false, false);
     }
@@ -1628,22 +1622,22 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name) - won't ping player
      */
-    @JsonIgnore
+    
     public String getRepresentationUnfoggedNoPing() {
         return getRepresentation(true, false);
     }
 
-    @JsonIgnore
+    
     public String getRepresentation(boolean overrideFow, boolean ping) {
         return getRepresentation(overrideFow, ping, false);
     }
 
-    @JsonIgnore
+    
     public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor) {
         return getRepresentation(overrideFow, ping, noColor, false);
     }
 
-    @JsonIgnore
+    
     public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor, boolean noFactionIcon) {
         Game game = this.game;
         boolean privateGame = FoWHelper.isPrivateGame(game);
@@ -1697,7 +1691,7 @@ public class Player extends PlayerProperties {
         return sb.toString();
     }
 
-    @JsonIgnore
+    
     public String getPing() {
         User userById = getUser();
         if (userById == null) return "";
@@ -1737,14 +1731,14 @@ public class Player extends PlayerProperties {
         }
     }
 
-    @JsonIgnore
+    
     public String fogSafeEmoji() {
         if (game != null && game.isFowMode())
             return ColorEmojis.getColorEmoji(getColor()).toString();
         return getFactionEmoji();
     }
 
-    @JsonIgnore
+    
     public String getFactionEmojiOrColor() {
         if (game.isFowMode() || FoWHelper.isPrivateGame(game)) {
             return ColorEmojis.getColorEmojiWithName(getColor());
@@ -1752,7 +1746,7 @@ public class Player extends PlayerProperties {
         return getFactionEmoji();
     }
 
-    @JsonIgnore
+    
     public String getFactionNameOrColor() {
         if (game.isFowMode() || FoWHelper.isPrivateGame(game)) {
             return StringUtils.capitalize(getColor());
@@ -1760,7 +1754,7 @@ public class Player extends PlayerProperties {
         return Mapper.getFaction(getFaction()).getFactionName();
     }
 
-    @JsonIgnore
+    
     public String getColorIfCanSeeStats(Player viewingPlayer) {
         if (game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, this, viewingPlayer)) {
             return "???";
@@ -1768,7 +1762,7 @@ public class Player extends PlayerProperties {
         return getColor();
     }
 
-    @JsonIgnore
+    
     public String getFactionEmojiRaw() {
         return super.getFactionEmoji();
     }
@@ -1800,7 +1794,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    @JsonIgnore
+    
     public FactionModel getFactionSetupInfo() {
         if (getFaction() == null || "null".equals(getFaction()) || "keleres".equals(getFaction())) return null;
         FactionModel factionSetupInfo = Mapper.getFaction(getFaction());
@@ -1972,13 +1966,13 @@ public class Player extends PlayerProperties {
         super.setColor(Mapper.getColorName(color));
     }
 
-    @JsonIgnore
+    
     public String getColorID() {
         String color = getColor();
         return (color != null && !"null".equals(color)) ? Mapper.getColorID(color) : "null";
     }
 
-    @JsonIgnore
+    
     public String getColorDisplayName() {
         String color = getColor();
         return (color != null && !"null".equals(color)) ? Mapper.getColorDisplayName(color) : "null";
@@ -2020,7 +2014,7 @@ public class Player extends PlayerProperties {
         }
     }
 
-    @JsonIgnore
+    
     public String getCCRepresentation() {
         return getTacticalCC() + "/" + getFleetCC() + "/" + getStrategicCC();
     }
@@ -2042,7 +2036,7 @@ public class Player extends PlayerProperties {
         return String.format("(%d->%d)", i, getFleetCC());
     }
 
-    @JsonIgnore
+    
     public int getEffectiveFleetCC() {
         return getFleetCC() + getMahactCC().size();
     }
@@ -2052,12 +2046,12 @@ public class Player extends PlayerProperties {
         if (strategicCC >= 0) super.setStrategicCC(strategicCC);
     }
 
-    @JsonIgnore
+    
     public double getExpectedHits() {
         return getExpectedHitsTimes10() / 10.0;
     }
 
-    @JsonIgnore
+    
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game game = this.game;
         Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
@@ -2088,7 +2082,7 @@ public class Player extends PlayerProperties {
         return vpCount;
     }
 
-    @JsonIgnore
+    
     public int getSecretVictoryPoints() {
         Map<String, Integer> scoredSecrets = secretsScored;
         for (String id : game.getSoToPoList()) {
@@ -2097,7 +2091,7 @@ public class Player extends PlayerProperties {
         return scoredSecrets.size();
     }
 
-    @JsonIgnore
+    
     public int getSupportForTheThroneVictoryPoints() {
         List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
         int vpCount = 0;
@@ -2109,7 +2103,7 @@ public class Player extends PlayerProperties {
         return vpCount;
     }
 
-    @JsonIgnore
+    
     public int getTotalVictoryPoints() {
         return getPublicVictoryPoints(true) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
@@ -2119,14 +2113,14 @@ public class Player extends PlayerProperties {
         super.setTg(Math.max(0, tg));
     }
 
-    @JsonIgnore
+    
     public String gainTG(int count) {
         String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
         setTg(getTg() + count);
         return message;
     }
 
-    @JsonIgnore
+    
     public String gainTG(int count, boolean checkForPillage) {
         String message = gainTG(count);
         if (checkForPillage) {
@@ -2202,22 +2196,22 @@ public class Player extends PlayerProperties {
         getFollowedSCs().clear();
     }
 
-    @JsonIgnore
+    
     public int getAcCount() {
         return actionCards.size();
     }
 
-    @JsonIgnore
+    
     public int getPnCount() {
         return (promissoryNotes.size() - getPromissoryNotesInPlayArea().size());
     }
 
-    @JsonIgnore
+    
     public int getSo() {
         return secrets.size();
     }
 
-    @JsonIgnore
+    
     public int getSoScored() {
         return secretsScored.size();
     }
@@ -2234,7 +2228,7 @@ public class Player extends PlayerProperties {
         getSCs().clear();
     }
 
-    @JsonIgnore
+    
     public int getLowestSC() {
         try {
 
@@ -2270,7 +2264,7 @@ public class Player extends PlayerProperties {
         setCommodities(getCommodities() + commodities);
     }
 
-    @JsonIgnore
+    
     public String getCommoditiesRepresentation() {
         return getCommodities() + "/" + (getCommoditiesBase() + getCommoditiesBonus());
     }
@@ -2325,7 +2319,7 @@ public class Player extends PlayerProperties {
         return draftItemQueue;
     }
 
-    @JsonIgnore
+    
     public boolean hasIIHQ() {
         return hasTech("iihq") || hasUnlockedBreakthrough("keleresbt");
     }
@@ -2364,7 +2358,7 @@ public class Player extends PlayerProperties {
         return getAllianceMembers().contains(player2.getFaction());
     }
 
-    @JsonIgnore
+    
     public List<String> getPlanetsAllianceMode() {
         List<String> newPlanets = new ArrayList<>(getPlanets());
         if (!"".equalsIgnoreCase(getAllianceMembers())) {
@@ -2377,7 +2371,7 @@ public class Player extends PlayerProperties {
         return newPlanets;
     }
 
-    @JsonIgnore
+    
     public int getNumberOfRealPlanetsAllianceMode() {
         return (int) getPlanetsAllianceMode().stream()
                 .map(planet -> game.getPlanetsInfo().get(planet))
@@ -2465,7 +2459,7 @@ public class Player extends PlayerProperties {
         draftItemQueue.Contents.clear();
     }
 
-    @JsonIgnore
+    
     public List<String> getReadiedPlanets() {
         List<String> planets = new ArrayList<>(getPlanets());
         planets.removeAll(getExhaustedPlanets());
@@ -2480,12 +2474,12 @@ public class Player extends PlayerProperties {
         return hasRelic(relicID) && !getExhaustedRelics().contains(relicID);
     }
 
-    @JsonIgnore
+    
     public Set<String> getTradableRelics() {
         return SetUtils.intersection(getActualRelics(), Set.of("thesilverflame", "silverflame"));
     }
 
-    @JsonIgnore
+    
     public Set<String> getActualRelics() {
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
@@ -2493,7 +2487,7 @@ public class Player extends PlayerProperties {
                 .collect(Collectors.toSet());
     }
 
-    @JsonIgnore
+    
     public Set<String> getFakeRelics() {
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
@@ -2781,7 +2775,7 @@ public class Player extends PlayerProperties {
         fowCustomLabels.remove(position);
     }
 
-    @JsonIgnore
+    
     public Tile buildFogTile(String position, Player player) {
 
         String tileID = fowSeenTiles.get(position);
@@ -2805,17 +2799,17 @@ public class Player extends PlayerProperties {
         return fowCustomLabels;
     }
 
-    @JsonIgnore
+    
     public boolean isRealPlayer() {
         return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
     }
 
-    @JsonIgnore
+    
     public boolean isNeutral() {
         return "neutral".equals(getFaction());
     }
 
-    @JsonIgnore
+    
     public boolean isSpectator() {
         return !isRealPlayer() && !isDummy() && !isNpc();
     }
@@ -2841,7 +2835,7 @@ public class Player extends PlayerProperties {
         return getAutoCompleteRepresentation(false);
     }
 
-    @JsonIgnore
+    
     private String getAutoCompleteRepresentation(boolean reset) {
         if (reset || super.getAutoCompleteRepresentation() == null) {
             String faction = getFaction();
@@ -2988,7 +2982,7 @@ public class Player extends PlayerProperties {
         return false;
     }
 
-    @JsonIgnore
+    
     public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
         Game game = this.game;
         Set<Player> adjacentPlayers = new HashSet<>();
@@ -3022,7 +3016,7 @@ public class Player extends PlayerProperties {
         return getNeighbouringPlayers(true).contains(player);
     }
 
-    @JsonIgnore
+    
     public int getNeighbourCount() {
         return getNeighbouringPlayers(true).size();
     }
@@ -3073,7 +3067,7 @@ public class Player extends PlayerProperties {
         tempCombatModifiers.add(mod);
     }
 
-    @JsonIgnore
+    
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3082,7 +3076,7 @@ public class Player extends PlayerProperties {
         return count;
     }
 
-    @JsonIgnore
+    
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3091,7 +3085,7 @@ public class Player extends PlayerProperties {
         return count;
     }
 
-    @JsonIgnore
+    
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3100,7 +3094,7 @@ public class Player extends PlayerProperties {
         return Math.round(count * 10) / 10.0f;
     }
 
-    @JsonIgnore
+    
     public float getTotalUnitAbilityValueOfUnits() {
         float count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3109,17 +3103,17 @@ public class Player extends PlayerProperties {
         return Math.round(count * 10) / 10.0f;
     }
 
-    @JsonIgnore
+    
     public UserSettings getUserSettings() {
         return UserSettingsManager.get(getUserID());
     }
 
-    @JsonIgnore
+    
     public String getNextAvailableColour() {
         return getNextAvailableColorIgnoreCurrent();
     }
 
-    @JsonIgnore
+    
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = getUserSettings().getPreferredColors().stream()
@@ -3134,12 +3128,12 @@ public class Player extends PlayerProperties {
         return Mapper.getColorName(color);
     }
 
-    @JsonIgnore
+    
     public boolean isSpeaker() {
         return game.getSpeakerUserID().equals(getUserID());
     }
 
-    @JsonIgnore
+    
     public boolean isTyrant() {
         return game.getTyrantUserID().equals(getUserID());
     }
@@ -3147,7 +3141,7 @@ public class Player extends PlayerProperties {
     /**
      * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
-    @JsonIgnore
+    
     public MessageChannel getCorrectChannel() {
         if (game.isFowMode()) {
             if (getPrivateChannel() != null) {
@@ -3181,7 +3175,7 @@ public class Player extends PlayerProperties {
         return StringUtils.capitalize(name);
     }
 
-    @JsonIgnore
+    
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel faction = getFactionModel();
@@ -3282,7 +3276,7 @@ public class Player extends PlayerProperties {
         eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
     }
 
-    @JsonIgnore
+    
     public Tile getHomeSystemTile() {
         Game game = this.game;
         if (getFaction() == null) {
@@ -3323,7 +3317,7 @@ public class Player extends PlayerProperties {
         return ButtonHelper.getTileOfPlanetWithNoTrait(this, game);
     }
 
-    @JsonIgnore
+    
     public List<Integer> getUnfollowedSCs() {
         List<Integer> unfollowedSCs = new ArrayList<>();
         for (int sc : game.getPlayedSCsInOrder(this)) {
@@ -3334,7 +3328,7 @@ public class Player extends PlayerProperties {
         return unfollowedSCs;
     }
 
-    @JsonIgnore
+    
     public List<Integer> getExhaustedSCs() {
         List<Integer> exhaustedSCs = new ArrayList<>();
         for (int sc : getSCs()) {
@@ -3349,12 +3343,12 @@ public class Player extends PlayerProperties {
         CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
 
-    @JsonIgnore
+    
     public List<Player> getOtherRealPlayers() {
         return game.getRealPlayers().stream().filter(p -> !p.equals(this)).toList();
     }
 
-    @JsonIgnore
+    
     public boolean isActivePlayer() {
         return equals(game.getActivePlayer());
     }
@@ -3368,12 +3362,12 @@ public class Player extends PlayerProperties {
         removeDebtTokens(clearedPlayerColor, count, pool);
     }
 
-    @JsonIgnore
+    
     public boolean isGM() {
         return game.getPlayersWithGMRole().contains(this);
     }
 
-    @JsonIgnore
+    
     public boolean hasPriorityPosition() {
         return getPriorityPosition() != -1 && getPriorityPosition() != 0;
     }
