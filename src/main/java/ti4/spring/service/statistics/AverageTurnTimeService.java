@@ -58,7 +58,7 @@ public class AverageTurnTimeService {
     }
 
     private String toResultString(List<PlayerStatsAccumulator> sortedResults, boolean showMedian) {
-        StringBuilder sb = new StringBuilder("## __**Average Turn Time (Database Stats):**__\n");
+        StringBuilder sb = new StringBuilder("## __**Average Turn Time:**__\n");
         int index = 1;
         for (var stats : sortedResults) {
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
