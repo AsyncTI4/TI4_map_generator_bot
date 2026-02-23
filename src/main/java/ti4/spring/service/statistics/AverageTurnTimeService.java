@@ -24,15 +24,15 @@ public class AverageTurnTimeService {
     private final PlayerEntityRepository playerEntityRepository;
 
     @Transactional
-    public void tryToGetAverageTurnTime(SlashCommandInteractionEvent event) {
+    public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
         try {
-            getAverageTurnTime(event);
+            tryToGetAverageTurnTimes(event);
         } catch (Exception e) {
             BotLogger.error("Error getting average turn time", e);
         }
     }
 
-    private void getAverageTurnTime(SlashCommandInteractionEvent event) {
+    private void tryToGetAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);

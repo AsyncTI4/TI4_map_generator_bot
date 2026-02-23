@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.AverageTurnTimeService;
+import ti4.spring.service.statistics.AverageTurnTimeService;
 
 class AverageTurnTime extends Subcommand {
 
@@ -28,9 +28,6 @@ class AverageTurnTime extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        AverageTurnTimeService.queueReply(event);
-
-        var averageTurnTimeService2 = ti4.spring.service.statistics.AverageTurnTimeService.getBean();
-        averageTurnTimeService2.tryToGetAverageTurnTime(event);
+        AverageTurnTimeService.getBean().getAverageTurnTimes(event);
     }
 }
