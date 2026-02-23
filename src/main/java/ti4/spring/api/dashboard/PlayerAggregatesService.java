@@ -613,14 +613,13 @@ class PlayerAggregatesService {
         int gamesWithRoundStats = 0;
 
         for (GameAggregateSnapshot snapshot : snapshots) {
+            List<GameRoundPlayerStats> rows = roundStatsByGame.getOrDefault(snapshot.gameId(), List.of());
+            if (rows.isEmpty()) continue;
+            gamesWithRoundStats++;
+
             int combats = 0;
             int stolen = 0;
             int tacticals = 0;
-
-            List<GameRoundPlayerStats> rows = roundStatsByGame.getOrDefault(snapshot.gameId(), List.of());
-            if (!rows.isEmpty()) {
-                gamesWithRoundStats++;
-            }
 
             for (GameRoundPlayerStats row : rows) {
                 combats += zeroIfNull(row.getCombatsInitiated());
@@ -631,24 +630,30 @@ class PlayerAggregatesService {
             byGameInput.put(snapshot.gameId(), new AggressionInput(combats, stolen, tacticals));
         }
 
+        return buildAggressionProfileFromGameInputs(byGameInput, snapshots.size(), gamesWithRoundStats);
+    }
+
+    static PlayerDashboardResponse.AggressionProfile buildAggressionProfileFromGameInputs(
+            Map<String, AggressionInput> byGameInput, int completedGamesConsidered, int gamesWithRoundStats) {
+        Map<String, AggressionInput> gameInputs = byGameInput == null ? Map.of() : byGameInput;
         Map<String, Double> byGameScore = new LinkedHashMap<>();
         if (gamesWithRoundStats < 2) {
-            byGameInput.keySet().forEach(gameId -> byGameScore.put(gameId, 0.0));
+            gameInputs.keySet().forEach(gameId -> byGameScore.put(gameId, 0.0));
             return new PlayerDashboardResponse.AggressionProfile(
                     new PlayerDashboardResponse.AggressionWeights(
                             AGGRESSION_WEIGHT_COMBATS, AGGRESSION_WEIGHT_STOLEN, AGGRESSION_WEIGHT_TACTICALS),
                     byGameScore,
                     new PlayerDashboardResponse.AggressionSummary(0, 0, 0, 0, null),
-                    new PlayerDashboardResponse.Coverage(snapshots.size(), gamesWithRoundStats));
+                    new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
         }
 
-        List<Double> combatsValues = byGameInput.values().stream()
+        List<Double> combatsValues = gameInputs.values().stream()
                 .map(i -> (double) i.combatsInitiated())
                 .toList();
-        List<Double> stolenValues = byGameInput.values().stream()
+        List<Double> stolenValues = gameInputs.values().stream()
                 .map(i -> (double) i.planetsStolen())
                 .toList();
-        List<Double> tacticalsValues = byGameInput.values().stream()
+        List<Double> tacticalsValues = gameInputs.values().stream()
                 .map(i -> (double) i.tacticalsWithCombat())
                 .toList();
 
@@ -665,7 +670,7 @@ class PlayerAggregatesService {
         double max = Double.NEGATIVE_INFINITY;
         String mostAggressiveGameId = null;
 
-        for (Map.Entry<String, AggressionInput> entry : byGameInput.entrySet()) {
+        for (Map.Entry<String, AggressionInput> entry : gameInputs.entrySet()) {
             AggressionInput input = entry.getValue();
             double combatsZ = zScore(input.combatsInitiated(), combatsMean, combatsStd);
             double stolenZ = zScore(input.planetsStolen(), stolenMean, stolenStd);
@@ -700,7 +705,7 @@ class PlayerAggregatesService {
                         Double.isInfinite(max) ? 0 : max,
                         Double.isInfinite(min) ? 0 : min,
                         mostAggressiveGameId),
-                new PlayerDashboardResponse.Coverage(snapshots.size(), gamesWithRoundStats));
+                new PlayerDashboardResponse.Coverage(completedGamesConsidered, gamesWithRoundStats));
     }
 
     private static double mean(List<Double> values) {
@@ -1141,5 +1146,5 @@ class PlayerAggregatesService {
         private int nonWinsWithTech;
     }
 
-    private record AggressionInput(int combatsInitiated, int planetsStolen, int tacticalsWithCombat) {}
+    record AggressionInput(int combatsInitiated, int planetsStolen, int tacticalsWithCombat) {}
 }

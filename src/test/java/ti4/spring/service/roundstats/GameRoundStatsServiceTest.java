@@ -101,6 +101,20 @@ class GameRoundStatsServiceTest {
     }
 
     @Test
+    void restoreAfterUndoDoesNotDeleteCanonicalWhenSnapshotMissing() {
+        Game game = newGameWithPlayer();
+        game.setRound(2);
+        when(snapshotRepository.findByGameIdAndUndoIndex(GAME_NAME, 4)).thenReturn(List.of());
+
+        service.restoreAfterUndo(game, 4);
+
+        verify(canonicalRepository, never()).deleteByGameId(GAME_NAME);
+        verify(canonicalRepository, never()).saveAll(any(List.class));
+        verify(snapshotRepository).deleteByGameIdAndUndoIndexGreaterThan(GAME_NAME, 4);
+        verify(canonicalRepository).deleteByGameIdAndRoundGreaterThan(GAME_NAME, game.getRound());
+    }
+
+    @Test
     void finalizeTacticalIncrementsOnceWhenCombatHappened() {
         Game game = newGameWithPlayer();
         Player player = game.getRealPlayers().getFirst();

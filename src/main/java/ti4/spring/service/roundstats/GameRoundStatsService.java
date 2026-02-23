@@ -54,8 +54,8 @@ public class GameRoundStatsService {
         List<GameRoundPlayerStatsSnapshot> snapshotRows =
                 snapshotRepository.findByGameIdAndUndoIndex(gameId, targetUndoIndex);
 
-        canonicalRepository.deleteByGameId(gameId);
         if (!snapshotRows.isEmpty()) {
+            canonicalRepository.deleteByGameId(gameId);
             canonicalRepository.saveAll(
                     snapshotRows.stream().map(this::toCanonical).toList());
         }
