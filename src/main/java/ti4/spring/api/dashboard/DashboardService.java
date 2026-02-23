@@ -59,11 +59,28 @@ class DashboardService {
                                     "",
                                     0,
                                     0,
-                                    2,
+                                    3,
                                     null,
                                     List.of(),
                                     new PlayerDashboardResponse.TechStats(Map.of()),
-                                    new PlayerDashboardResponse.FactionWinStats(Map.of()))),
+                                    new PlayerDashboardResponse.FactionWinStats(Map.of()),
+                                    new PlayerDashboardResponse.StrategyCardStats(
+                                            Map.of(), new PlayerDashboardResponse.StrategyCardStatsMeta(0, 0)),
+                                    new PlayerDashboardResponse.CombatProfile(
+                                            new PlayerDashboardResponse.CombatTotals(0, 0, 0, 0, 0),
+                                            new PlayerDashboardResponse.CombatAverages(0, 0, 0, 0, 0),
+                                            new PlayerDashboardResponse.Coverage(0, 0)),
+                                    new PlayerDashboardResponse.EconomyProfile(0, 0, 0),
+                                    new PlayerDashboardResponse.FactionTechSynergy(Map.of()),
+                                    new PlayerDashboardResponse.SpeakerImpact(
+                                            new PlayerDashboardResponse.SpeakerBucket(0, 0, 0),
+                                            new PlayerDashboardResponse.SpeakerBucket(0, 0, 0),
+                                            0),
+                                    new PlayerDashboardResponse.AggressionProfile(
+                                            new PlayerDashboardResponse.AggressionWeights(0.45, 0.35, 0.20),
+                                            Map.of(),
+                                            new PlayerDashboardResponse.AggressionSummary(0, 0, 0, 0, null),
+                                            new PlayerDashboardResponse.Coverage(0, 0)))),
                     new PlayerDashboardResponse.DashboardSummary(0, 0, 0, 0, 0, null),
                     List.of());
         }

@@ -47,11 +47,62 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
             Long computedAtEpochMs,
             List<String> completedGameIds,
             TechStats techStats,
-            FactionWinStats factionWinStats) {}
+            FactionWinStats factionWinStats,
+            StrategyCardStats strategyCardStats,
+            CombatProfile combatProfile,
+            EconomyProfile economyProfile,
+            FactionTechSynergy factionTechSynergy,
+            SpeakerImpact speakerImpact,
+            AggressionProfile aggressionProfile) {}
 
     public record TechStats(java.util.Map<String, TechStat> byTech) {}
 
     public record FactionWinStats(java.util.Map<String, Integer> byFaction) {}
+
+    public record StrategyCardStats(java.util.Map<Integer, StrategyCardStat> bySc, StrategyCardStatsMeta meta) {}
+
+    public record StrategyCardStat(int totalPicks, int gamesPicked, int winsInGamesPicked, double winRateWhenPicked) {}
+
+    public record StrategyCardStatsMeta(int completedGamesConsidered, int gamesWithRoundStats) {}
+
+    public record Coverage(int completedGamesConsidered, int gamesWithRoundStats) {}
+
+    public record CombatProfile(CombatTotals totals, CombatAverages averagesPerCompletedGame, Coverage coverage) {}
+
+    public record CombatTotals(
+            int combatsInitiated, int tacticalsWithCombat, int planetsTaken, int planetsStolen, int diceRolled) {}
+
+    public record CombatAverages(
+            double combatsInitiated,
+            double tacticalsWithCombat,
+            double planetsTaken,
+            double planetsStolen,
+            double diceRolled) {}
+
+    public record EconomyProfile(double totalExpensesSum, double avgTotalExpenses, int completedGamesConsidered) {}
+
+    public record FactionTechSynergy(java.util.Map<String, FactionSynergyStat> byFaction) {}
+
+    public record FactionSynergyStat(
+            int games, int wins, int nonWins, java.util.Map<String, FactionTechSynergyStat> byTech) {}
+
+    public record FactionTechSynergyStat(
+            int gamesWithTech, int winsWithTech, int nonWinsWithTech, double winRateWhenTech) {}
+
+    public record SpeakerImpact(SpeakerBucket speaker, SpeakerBucket nonSpeaker, double deltaWinRate) {}
+
+    public record SpeakerBucket(int games, int wins, double winRate) {}
+
+    public record AggressionProfile(
+            AggressionWeights weights,
+            java.util.Map<String, Double> byGame,
+            AggressionSummary summary,
+            Coverage coverage) {}
+
+    public record AggressionWeights(double combatsInitiated, double planetsStolen, double tacticalsWithCombat) {}
+
+    public record AggressionSummary(
+            double avgScore, double medianScore, double maxScore, double minScore, String mostAggressiveGameId) {}
 
     public record TechStat(int gamesWithTech, double percentInEligibleGames) {}
 
