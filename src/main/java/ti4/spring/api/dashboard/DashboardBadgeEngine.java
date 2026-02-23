@@ -400,5 +400,4 @@ final class DashboardBadgeEngine {
     }
 
     private record PlayerTurnAggregate(int totalTurns, OptionalLong averageTurnTimeSeconds) {}
-
 }

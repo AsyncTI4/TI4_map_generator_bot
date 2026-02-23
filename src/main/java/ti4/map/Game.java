@@ -2577,8 +2577,7 @@ public class Game extends GameProperties {
 
         if (discardedEvents.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                getActionsChannel(),
-                "Unable to draw an event: both the deck and discard pile are empty.");
+                    getActionsChannel(), "Unable to draw an event: both the deck and discard pile are empty.");
             return null;
         }
 

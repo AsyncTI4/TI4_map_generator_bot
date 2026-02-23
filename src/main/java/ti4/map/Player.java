@@ -144,17 +144,14 @@ public class Player extends PlayerProperties {
         this.game = game;
     }
 
-    
     public Game getGame() {
         return game;
     }
 
-    
     public String getDecalName() {
         return Mapper.getDecalName(getDecalSet());
     }
 
-    
     public String getDecalFile(String unitType) {
         if (getDecalSet() == null) return null;
         // TODO: Eventually remove if we stop setting values to string literal null, which is not good...
@@ -447,14 +444,12 @@ public class Player extends PlayerProperties {
         return hasUnlockedBreakthrough(bt) && isBreakthroughActive(bt);
     }
 
-    
     @Nullable
     public BreakthroughModel getBreakthroughModel() {
         if (getBreakthroughID() == null || getBreakthroughID().isEmpty()) return null;
         return Mapper.getBreakthrough(getBreakthroughID());
     }
 
-    
     public List<BreakthroughModel> getBreakthroughModels() {
         return getBreakthroughIDs().stream()
                 .map(Mapper::getBreakthrough)
@@ -462,14 +457,12 @@ public class Player extends PlayerProperties {
                 .toList();
     }
 
-    
     @Nullable
     public BreakthroughModel getBreakthroughModel(String bt) {
         if (!hasBreakthrough(bt)) return null;
         return Mapper.getBreakthrough(bt);
     }
 
-    
     public Set<TechnologyType> getSynergies() {
         Set<TechnologyType> synergies = EnumSet.noneOf(TechnologyType.class);
         for (String bt : getBreakthroughIDs()) {
@@ -487,7 +480,6 @@ public class Player extends PlayerProperties {
         return Collections.unmodifiableSet(synergies);
     }
 
-    
     public int getSpentInfantryThisWindow() {
         for (String thing : getSpentThingsThisWindow()) {
             if (thing.contains("infantry_")) {
@@ -543,7 +535,6 @@ public class Player extends PlayerProperties {
     }
 
     @Nullable
-    
     public Role getRoleForCommunity() {
         try {
             return JdaService.jda.getRoleById(getRoleIDForCommunity());
@@ -553,7 +544,6 @@ public class Player extends PlayerProperties {
     }
 
     @Nullable
-    
     public MessageChannel getPrivateChannel() {
         try {
             return JdaService.jda.getTextChannelById(getPrivateChannelID());
@@ -569,7 +559,6 @@ public class Player extends PlayerProperties {
         return getFinsFactionCheckerPrefix();
     }
 
-    
     public String getFinsFactionCheckerPrefix() {
         return "FFCC_" + getFaction() + "_";
     }
@@ -578,7 +567,6 @@ public class Player extends PlayerProperties {
         return "dummyPlayerSpoof" + getFaction() + "_";
     }
 
-    
     public boolean hasPDS2Tech() {
         return getTechs().contains("ht2")
                 || getTechs().contains("pds2")
@@ -586,7 +574,6 @@ public class Player extends PlayerProperties {
                 || getTechs().contains("dsmirvpds");
     }
 
-    
     public boolean hasInf2Tech() { // "dszeliinf"
         return getTechs().contains("cl2")
                 || getTechs().contains("so2")
@@ -603,7 +590,6 @@ public class Player extends PlayerProperties {
                 || getUnitsOwned().contains("pharadn_infantry2");
     }
 
-    
     public boolean hasWarsunTech() {
         return getUnitByBaseType("warsun") != null;
         // return getTechs().contains("pws2")
@@ -619,7 +605,6 @@ public class Player extends PlayerProperties {
         //         || hasUnit("rohdhna_warsun");
     }
 
-    
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2")
                 || getTechs().contains("hcf2")
@@ -636,7 +621,6 @@ public class Player extends PlayerProperties {
                 || ownsUnit("eidolon_fighter2");
     }
 
-    
     public boolean hasUpgradedUnit(String baseUpgradeID) {
         for (String tech : getTechs()) {
             TechnologyModel model = Mapper.getTech(tech);
@@ -652,7 +636,6 @@ public class Player extends PlayerProperties {
      * Searches for the Player's CardsInfo ThreadChannel, or will create a new one if an existing ThreadChannel cannot be retrieved.
      * @return ThreadChannel for the player's cards info
      */
-    
     @Nullable
     public ThreadChannel getCardsInfoThread() {
         if (isNpc() || isDummy()) {
@@ -991,7 +974,6 @@ public class Player extends PlayerProperties {
         } else return game.getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
     }
 
-    
     public Set<String> getSpecialUnitsOwned() {
         return getUnitsOwned().stream()
                 .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
@@ -1027,7 +1009,6 @@ public class Player extends PlayerProperties {
         return getUnitModels().stream().anyMatch(unit -> unit.getId().contains(unitIDSubstring));
     }
 
-    
     public List<UnitModel> getUnitModels() {
         return getUnitsOwned().stream()
                 .map(Mapper::getUnit)
@@ -1116,7 +1097,6 @@ public class Player extends PlayerProperties {
         return null;
     }
 
-    
     private Map<String, Integer> getUnitsOwnedByBaseType() {
         Map<String, Integer> unitCount = new HashMap<>();
         for (String unitID : getUnitsOwned()) {
@@ -1161,7 +1141,6 @@ public class Player extends PlayerProperties {
         trapCardsPlanets.remove(id);
     }
 
-    
     private Set<String> getSpecialPromissoryNotesOwned() {
         return getPromissoryNotesOwned().stream()
                 .filter(pn -> Mapper.getPromissoryNotes().get(pn).isNotWellKnown())
@@ -1279,7 +1258,6 @@ public class Player extends PlayerProperties {
         removePromissoryNoteFromPlayArea(id);
     }
 
-    
     public int getMaxSOCount() {
         int maxSOCount = game.getMaxSOCountPerPlayer();
         int bonus = 0;
@@ -1342,7 +1320,6 @@ public class Player extends PlayerProperties {
         return secretsScored;
     }
 
-    
     public Map<String, Integer> getSecretsUnscored() {
         Map<String, Integer> secretsUnscored = new HashMap<>();
         for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
@@ -1387,7 +1364,6 @@ public class Player extends PlayerProperties {
         secretsScored.remove(idToRemove);
     }
 
-    
     public boolean enoughFragsForRelic() {
         updateFragments();
         int haz = getHrf();
@@ -1586,7 +1562,6 @@ public class Player extends PlayerProperties {
         getExhaustedRelics().remove(relicID);
     }
 
-    
     public Member getMember() {
         Game game = this.game;
         if (game == null) return null;
@@ -1595,7 +1570,6 @@ public class Player extends PlayerProperties {
         return guild.getMemberById(getUserID());
     }
 
-    
     public User getUser() {
         return getUser(getUserID());
     }
@@ -1605,7 +1579,6 @@ public class Player extends PlayerProperties {
         return JdaService.jda == null ? null : JdaService.jda.getUserById(userId);
     }
 
-    
     @Override
     public String getStatsTrackedUserName() {
         User statsTrackedUser = getUser(getStatsTrackedUserID());
@@ -1629,7 +1602,6 @@ public class Player extends PlayerProperties {
         return super.getUserName();
     }
 
-    
     public FactionModel getFactionModel() {
         return Mapper.getFaction(getFaction());
     }
@@ -1643,7 +1615,6 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName]
      */
-    
     public String getRepresentation() {
         return getRepresentation(false, true);
     }
@@ -1651,7 +1622,6 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name)
      */
-    
     public String getRepresentationUnfogged() {
         return getRepresentation(true, true);
     }
@@ -1659,7 +1629,6 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName] - won't ping player
      */
-    
     public String getRepresentationNoPing() {
         return getRepresentation(false, false);
     }
@@ -1667,22 +1636,18 @@ public class Player extends PlayerProperties {
     /**
      * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name) - won't ping player
      */
-    
     public String getRepresentationUnfoggedNoPing() {
         return getRepresentation(true, false);
     }
 
-    
     public String getRepresentation(boolean overrideFow, boolean ping) {
         return getRepresentation(overrideFow, ping, false);
     }
 
-    
     public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor) {
         return getRepresentation(overrideFow, ping, noColor, false);
     }
 
-    
     public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor, boolean noFactionIcon) {
         Game game = this.game;
         boolean privateGame = FoWHelper.isPrivateGame(game);
@@ -1736,7 +1701,6 @@ public class Player extends PlayerProperties {
         return sb.toString();
     }
 
-    
     public String getPing() {
         User userById = getUser();
         if (userById == null) return "";
@@ -1776,14 +1740,12 @@ public class Player extends PlayerProperties {
         }
     }
 
-    
     public String fogSafeEmoji() {
         if (game != null && game.isFowMode())
             return ColorEmojis.getColorEmoji(getColor()).toString();
         return getFactionEmoji();
     }
 
-    
     public String getFactionEmojiOrColor() {
         if (game.isFowMode() || FoWHelper.isPrivateGame(game)) {
             return ColorEmojis.getColorEmojiWithName(getColor());
@@ -1791,7 +1753,6 @@ public class Player extends PlayerProperties {
         return getFactionEmoji();
     }
 
-    
     public String getFactionNameOrColor() {
         if (game.isFowMode() || FoWHelper.isPrivateGame(game)) {
             return StringUtils.capitalize(getColor());
@@ -1799,7 +1760,6 @@ public class Player extends PlayerProperties {
         return Mapper.getFaction(getFaction()).getFactionName();
     }
 
-    
     public String getColorIfCanSeeStats(Player viewingPlayer) {
         if (game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, this, viewingPlayer)) {
             return "???";
@@ -1807,7 +1767,6 @@ public class Player extends PlayerProperties {
         return getColor();
     }
 
-    
     public String getFactionEmojiRaw() {
         return super.getFactionEmoji();
     }
@@ -1840,7 +1799,6 @@ public class Player extends PlayerProperties {
         }
     }
 
-    
     public FactionModel getFactionSetupInfo() {
         if (getFaction() == null || "null".equals(getFaction()) || "keleres".equals(getFaction())) return null;
         FactionModel factionSetupInfo = Mapper.getFaction(getFaction());
@@ -2012,13 +1970,11 @@ public class Player extends PlayerProperties {
         super.setColor(Mapper.getColorName(color));
     }
 
-    
     public String getColorID() {
         String color = getColor();
         return (color != null && !"null".equals(color)) ? Mapper.getColorID(color) : "null";
     }
 
-    
     public String getColorDisplayName() {
         String color = getColor();
         return (color != null && !"null".equals(color)) ? Mapper.getColorDisplayName(color) : "null";
@@ -2060,7 +2016,6 @@ public class Player extends PlayerProperties {
         }
     }
 
-    
     public String getCCRepresentation() {
         return getTacticalCC() + "/" + getFleetCC() + "/" + getStrategicCC();
     }
@@ -2082,7 +2037,6 @@ public class Player extends PlayerProperties {
         return String.format("(%d->%d)", i, getFleetCC());
     }
 
-    
     public int getEffectiveFleetCC() {
         return getFleetCC() + getMahactCC().size();
     }
@@ -2092,12 +2046,10 @@ public class Player extends PlayerProperties {
         if (strategicCC >= 0) super.setStrategicCC(strategicCC);
     }
 
-    
     public double getExpectedHits() {
         return getExpectedHitsTimes10() / 10.0;
     }
 
-    
     public int getPublicVictoryPoints(boolean countCustoms) {
         Game game = this.game;
         Map<String, List<String>> scoredPOs = game.getScoredPublicObjectives();
@@ -2128,7 +2080,6 @@ public class Player extends PlayerProperties {
         return vpCount;
     }
 
-    
     public int getSecretVictoryPoints() {
         Map<String, Integer> scoredSecrets = secretsScored;
         for (String id : game.getSoToPoList()) {
@@ -2137,7 +2088,6 @@ public class Player extends PlayerProperties {
         return scoredSecrets.size();
     }
 
-    
     public int getSupportForTheThroneVictoryPoints() {
         List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
         int vpCount = 0;
@@ -2149,7 +2099,6 @@ public class Player extends PlayerProperties {
         return vpCount;
     }
 
-    
     public int getTotalVictoryPoints() {
         return getPublicVictoryPoints(true) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
@@ -2159,14 +2108,12 @@ public class Player extends PlayerProperties {
         super.setTg(Math.max(0, tg));
     }
 
-    
     public String gainTG(int count) {
         String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
         setTg(getTg() + count);
         return message;
     }
 
-    
     public String gainTG(int count, boolean checkForPillage) {
         String message = gainTG(count);
         if (checkForPillage) {
@@ -2242,22 +2189,18 @@ public class Player extends PlayerProperties {
         getFollowedSCs().clear();
     }
 
-    
     public int getAcCount() {
         return actionCards.size();
     }
 
-    
     public int getPnCount() {
         return (promissoryNotes.size() - getPromissoryNotesInPlayArea().size());
     }
 
-    
     public int getSo() {
         return secrets.size();
     }
 
-    
     public int getSoScored() {
         return secretsScored.size();
     }
@@ -2274,7 +2217,6 @@ public class Player extends PlayerProperties {
         getSCs().clear();
     }
 
-    
     public int getLowestSC() {
         try {
 
@@ -2310,7 +2252,6 @@ public class Player extends PlayerProperties {
         setCommodities(getCommodities() + commodities);
     }
 
-    
     public String getCommoditiesRepresentation() {
         return getCommodities() + "/" + (getCommoditiesBase() + getCommoditiesBonus());
     }
@@ -2365,7 +2306,6 @@ public class Player extends PlayerProperties {
         return draftItemQueue;
     }
 
-    
     public boolean hasIIHQ() {
         return hasTech("iihq") || hasUnlockedBreakthrough("keleresbt");
     }
@@ -2404,7 +2344,6 @@ public class Player extends PlayerProperties {
         return getAllianceMembers().contains(player2.getFaction());
     }
 
-    
     public List<String> getPlanetsAllianceMode() {
         List<String> newPlanets = new ArrayList<>(getPlanets());
         if (!"".equalsIgnoreCase(getAllianceMembers())) {
@@ -2417,7 +2356,6 @@ public class Player extends PlayerProperties {
         return newPlanets;
     }
 
-    
     public int getNumberOfRealPlanetsAllianceMode() {
         return (int) getPlanetsAllianceMode().stream()
                 .map(planet -> game.getPlanetsInfo().get(planet))
@@ -2505,7 +2443,6 @@ public class Player extends PlayerProperties {
         draftItemQueue.Contents.clear();
     }
 
-    
     public List<String> getReadiedPlanets() {
         List<String> planets = new ArrayList<>(getPlanets());
         planets.removeAll(getExhaustedPlanets());
@@ -2520,12 +2457,10 @@ public class Player extends PlayerProperties {
         return hasRelic(relicID) && !getExhaustedRelics().contains(relicID);
     }
 
-    
     public Set<String> getTradableRelics() {
         return SetUtils.intersection(getActualRelics(), Set.of("thesilverflame", "silverflame"));
     }
 
-    
     public Set<String> getActualRelics() {
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
@@ -2533,7 +2468,6 @@ public class Player extends PlayerProperties {
                 .collect(Collectors.toSet());
     }
 
-    
     public Set<String> getFakeRelics() {
         return getRelics().stream()
                 .filter(Mapper::isValidRelic)
@@ -2821,7 +2755,6 @@ public class Player extends PlayerProperties {
         fowCustomLabels.remove(position);
     }
 
-    
     public Tile buildFogTile(String position, Player player) {
 
         String tileID = fowSeenTiles.get(position);
@@ -2845,17 +2778,14 @@ public class Player extends PlayerProperties {
         return fowCustomLabels;
     }
 
-    
     public boolean isRealPlayer() {
         return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
     }
 
-    
     public boolean isNeutral() {
         return "neutral".equals(getFaction());
     }
 
-    
     public boolean isSpectator() {
         return !isRealPlayer() && !isDummy() && !isNpc();
     }
@@ -2881,7 +2811,6 @@ public class Player extends PlayerProperties {
         return getAutoCompleteRepresentation(false);
     }
 
-    
     private String getAutoCompleteRepresentation(boolean reset) {
         if (reset || super.getAutoCompleteRepresentation() == null) {
             String faction = getFaction();
@@ -3028,7 +2957,6 @@ public class Player extends PlayerProperties {
         return false;
     }
 
-    
     public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
         Game game = this.game;
         Set<Player> adjacentPlayers = new HashSet<>();
@@ -3062,7 +2990,6 @@ public class Player extends PlayerProperties {
         return getNeighbouringPlayers(true).contains(player);
     }
 
-    
     public int getNeighbourCount() {
         return getNeighbouringPlayers(true).size();
     }
@@ -3113,7 +3040,6 @@ public class Player extends PlayerProperties {
         tempCombatModifiers.add(mod);
     }
 
-    
     public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3122,7 +3048,6 @@ public class Player extends PlayerProperties {
         return count;
     }
 
-    
     public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3131,7 +3056,6 @@ public class Player extends PlayerProperties {
         return count;
     }
 
-    
     public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3140,7 +3064,6 @@ public class Player extends PlayerProperties {
         return Math.round(count * 10) / 10.0f;
     }
 
-    
     public float getTotalUnitAbilityValueOfUnits() {
         float count = 0;
         for (Tile tile : game.getTileMap().values()) {
@@ -3149,17 +3072,14 @@ public class Player extends PlayerProperties {
         return Math.round(count * 10) / 10.0f;
     }
 
-    
     public UserSettings getUserSettings() {
         return UserSettingsManager.get(getUserID());
     }
 
-    
     public String getNextAvailableColour() {
         return getNextAvailableColorIgnoreCurrent();
     }
 
-    
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ColorChangeHelper.colorIsExclusive(cm.getAlias(), this);
         String color = getUserSettings().getPreferredColors().stream()
@@ -3174,12 +3094,10 @@ public class Player extends PlayerProperties {
         return Mapper.getColorName(color);
     }
 
-    
     public boolean isSpeaker() {
         return game.getSpeakerUserID().equals(getUserID());
     }
 
-    
     public boolean isTyrant() {
         return game.getTyrantUserID().equals(getUserID());
     }
@@ -3187,7 +3105,6 @@ public class Player extends PlayerProperties {
     /**
      * @return Player's private channel if Fog of War game, otherwise the GM channel
      */
-    
     public MessageChannel getCorrectChannel() {
         if (game.isFowMode()) {
             if (getPrivateChannel() != null) {
@@ -3221,7 +3138,6 @@ public class Player extends PlayerProperties {
         return StringUtils.capitalize(name);
     }
 
-    
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel faction = getFactionModel();
@@ -3416,7 +3332,6 @@ public class Player extends PlayerProperties {
         return ButtonHelper.getTileOfPlanetWithNoTrait(this, game);
     }
 
-    
     public List<Integer> getUnfollowedSCs() {
         List<Integer> unfollowedSCs = new ArrayList<>();
         for (int sc : game.getPlayedSCsInOrder(this)) {
@@ -3427,7 +3342,6 @@ public class Player extends PlayerProperties {
         return unfollowedSCs;
     }
 
-    
     public List<Integer> getExhaustedSCs() {
         List<Integer> exhaustedSCs = new ArrayList<>();
         for (int sc : getSCs()) {
@@ -3466,7 +3380,7 @@ public class Player extends PlayerProperties {
     public void addToStoredList(String key, String... vals) {
         String safeKey = StringHelper.escape(key);
         List<String> vs = getStoredList(key);
-        for (String v : vals) vs.add(v);
+        Collections.addAll(vs, vals);
         String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
         getStoredValueMap().put(safeKey, ls);
     }
@@ -3500,12 +3414,10 @@ public class Player extends PlayerProperties {
         CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
 
-    
     public List<Player> getOtherRealPlayers() {
         return game.getRealPlayers().stream().filter(p -> !p.equals(this)).toList();
     }
 
-    
     public boolean isActivePlayer() {
         return equals(game.getActivePlayer());
     }
@@ -3519,12 +3431,10 @@ public class Player extends PlayerProperties {
         removeDebtTokens(clearedPlayerColor, count, pool);
     }
 
-    
     public boolean isGM() {
         return game.getPlayersWithGMRole().contains(this);
     }
 
-    
     public boolean hasPriorityPosition() {
         return getPriorityPosition() != -1 && getPriorityPosition() != 0;
     }
