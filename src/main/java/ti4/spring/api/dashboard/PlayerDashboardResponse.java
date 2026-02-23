@@ -15,9 +15,7 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
             PlayerAggregates aggregates) {}
 
     public record PlayerInsights(
-            PlayerActivity activity,
-            List<BadgeAward> badges,
-            List<FavoredFaction> favoredFactions) {}
+            PlayerActivity activity, List<BadgeAward> badges, List<FavoredFaction> favoredFactions) {}
 
     public record PlayerActivity(int totalTurns, Long averageTurnTimeSeconds) {}
 

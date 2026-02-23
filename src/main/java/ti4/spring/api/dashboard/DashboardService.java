@@ -50,9 +50,7 @@ class DashboardService {
                             new PlayerDashboardResponse.TitleSummary(0, List.of()),
                             new PlayerDashboardResponse.DiceLuckSummary(0, 0, null),
                             new PlayerDashboardResponse.PlayerInsights(
-                                    new PlayerDashboardResponse.PlayerActivity(0, null),
-                                    List.of(),
-                                    List.of()),
+                                    new PlayerDashboardResponse.PlayerActivity(0, null), List.of(), List.of()),
                             new PlayerDashboardResponse.PlayerAggregates(
                                     false,
                                     "",
