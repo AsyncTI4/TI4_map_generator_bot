@@ -68,15 +68,15 @@ public class AverageTurnTimeService {
             if (showMedian) {
                 long median = Helper.median(stats.gameAverages.stream().sorted().toList());
                 sb.append(" (median: ")
-                    .append(DateTimeHelper.getTimeRepresentationToSeconds(median))
-                    .append(")");
+                        .append(DateTimeHelper.getTimeRepresentationToSeconds(median))
+                        .append(")");
             }
 
             sb.append("` ")
-                .append(stats.username)
-                .append("   [")
-                .append(stats.totalTurns)
-                .append(" total turns]\n");
+                    .append(stats.username)
+                    .append("   [")
+                    .append(stats.totalTurns)
+                    .append(" total turns]\n");
         }
         return sb.toString();
     }
