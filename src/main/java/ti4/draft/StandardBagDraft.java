@@ -10,8 +10,7 @@ import ti4.draft.items.RedTileDraftItem;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
@@ -22,13 +21,18 @@ public class StandardBagDraft extends BagDraft {
     }
 
     @Override
-    public int getItemLimitForCategory(DraftItem.Category category) {
+    public int getItemLimitForCategory(DraftCategory category) {
         return switch (category) {
             case BLUETILE -> 3;
             case REDTILE -> 2;
             case DRAFTORDER, HOMESYSTEM -> 1;
             default -> 0;
         };
+    }
+
+    @Override
+    public int getKeptItemLimitForCategory(DraftCategory category) {
+        return getItemLimitForCategory(category);
     }
 
     @Override
@@ -67,25 +71,26 @@ public class StandardBagDraft extends BagDraft {
 
     @Override
     public List<DraftBag> generateBags(Game game) {
-        Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
+        Map<DraftCategory, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
         allDraftableItems.put(
-                DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
-        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
+                DraftCategory.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions));
+        allDraftableItems.put(DraftCategory.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         MiltyDraftHelper.initDraftTiles(draftManager, game);
-        allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
-        allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
+        allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
+        allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
 
         List<DraftBag> bags = new ArrayList<>();
 
+        Map<DraftCategory, Integer> missingItems = new HashMap<>();
         for (int i = 0; i < game.getRealPlayers().size(); i++) {
             DraftBag bag = new DraftBag();
 
             // Walk through each type of draftable...
-            for (Map.Entry<DraftItem.Category, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
-                DraftItem.Category category = draftableCollection.getKey();
+            for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
+                DraftCategory category = draftableCollection.getKey();
                 int categoryLimit = getItemLimitForCategory(category);
                 // ... and pull out the appropriate number of items from its collection...
                 for (int j = 0; j < categoryLimit; j++) {
@@ -93,14 +98,20 @@ public class StandardBagDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.warning(
-                                new LogOrigin(game),
-                                "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
-                                        + category.name());
+                        missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
                     }
                 }
             }
 
+            if (!missingItems.isEmpty()) {
+                String issue = game.getPing() + " an issue was encountered while building the draft.";
+                issue += "\nOne or more bags are missing components.";
+                for (var e : missingItems.entrySet()) {
+                    issue += "\n> " + e.getKey().toString() + " is missing " + e.getValue() + " components.";
+                }
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue);
+                return null;
+            }
             bags.add(bag);
         }
 

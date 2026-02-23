@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -23,6 +25,11 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.section.Section;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
+import net.dv8tion.jda.api.components.thumbnail.Thumbnail;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -35,6 +42,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +58,7 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -62,6 +71,7 @@ import ti4.message.logging.LogOrigin;
 import ti4.model.AbilityModel;
 import ti4.model.BreakthroughModel;
 import ti4.model.ColorModel;
+import ti4.model.EmbeddableModel;
 import ti4.model.FactionModel;
 import ti4.model.GenericCardModel;
 import ti4.model.LeaderModel;
@@ -110,12 +120,6 @@ public class Player extends PlayerProperties {
     private @Getter @Setter TIGLRank playerTIGLRankAtGameStart;
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
-
-    @Getter
-    private final Map<String, Integer> plotCards = new LinkedHashMap<>();
-
-    @Getter
-    private final Map<String, List<String>> plotCardsFactions = new LinkedHashMap<>();
 
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
     private final Map<String, Integer> events = new LinkedHashMap<>();
@@ -890,32 +894,68 @@ public class Player extends PlayerProperties {
         return events;
     }
 
+    public Map<String, Integer> getPlotCardsRaw() {
+        return super.getPlotCards();
+    }
+
+    @Override
+    public Map<String, Integer> getPlotCards() {
+        Map<String, Integer> plots = new LinkedHashMap<>();
+        for (String plot : getPlotCardsRaw().keySet()) {
+            if (plot.startsWith("mutated")) {
+                String other = plot.replace("mutated_", "");
+                if (getPlotCardsRaw().containsKey(other)) continue;
+            }
+            plots.put(plot, getPlotCardsRaw().get(plot));
+        }
+        return MapUtils.unmodifiableMap(plots);
+    }
+
+    public Map<String, List<String>> getPlotCardsFactionsRaw() {
+        return super.getPlotCardsFactions();
+    }
+
+    @Override
+    public Map<String, List<String>> getPlotCardsFactions() {
+        Map<String, List<String>> plots = new LinkedHashMap<>();
+        for (String plot : getPlotCards().keySet()) {
+            List<String> puppets = getPlotCardsFactionsRaw().get(plot);
+            if (puppets == null) puppets = List.of();
+            plots.put(plot, puppets);
+        }
+        return MapUtils.unmodifiableMap(plots);
+    }
+
     public void setPlotCard(String id, Integer identifier) {
-        plotCards.put(id, identifier);
+        getPlotCardsRaw().put(id, identifier);
     }
 
     public void setPlotCard(String id) {
-        if (plotCards.containsKey(id)) return;
+        if (getPlotCardsRaw().containsKey(id)) return;
 
-        Collection<Integer> values = plotCards.values();
+        Collection<Integer> values = getPlotCardsRaw().values();
         int identifier = ThreadLocalRandom.current().nextInt(100);
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(100);
         }
-        plotCards.put(id, identifier);
+        getPlotCardsRaw().put(id, identifier);
     }
 
     public void setPlotCardFaction(String id, String faction) {
-        if (!plotCardsFactions.containsKey(id)) plotCardsFactions.put(id, new ArrayList<>());
-        plotCardsFactions.get(id).add(faction);
+        if (!getPlotCardsFactionsRaw().containsKey(id))
+            getPlotCardsFactionsRaw().put(id, new ArrayList<>());
+        getPlotCardsFactionsRaw().get(id).add(faction);
     }
 
     public void removePlotCardFaction(String id) {
-        plotCardsFactions.remove(id);
+        getPlotCardsFactionsRaw().remove(id);
     }
 
     public boolean isOtherPlayerPuppeted(Player p2) {
-        for (List<String> puppets : plotCardsFactions.values()) {
+        for (List<String> puppets : getPlotCardsFactions().values()) {
+            if (puppets == null) {
+                return false;
+            }
             if (puppets.contains(p2.getFaction())) {
                 return true;
             }
@@ -924,7 +964,8 @@ public class Player extends PlayerProperties {
     }
 
     public List<String> getPuppetedFactionsForPlot(String plot) {
-        return plotCardsFactions.getOrDefault(plot, List.of());
+        List<String> puppets = getPlotCardsFactions().get(plot);
+        return puppets == null ? List.of() : puppets;
     }
 
     public Map<String, Integer> getTrapCards() {
@@ -1474,6 +1515,9 @@ public class Player extends PlayerProperties {
         if (game.playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
         }
+        if (hasAbility("harmony") && getStarbalanceCounter() != getSteelbalanceCounter()) {
+            bonus -= 2;
+        }
 
         if (hasAbility("necrophage")) {
             bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(
@@ -1788,8 +1832,9 @@ public class Player extends PlayerProperties {
             List<GenericCardModel> allTraps = new ArrayList<>(Mapper.getTraps().values());
             allTraps.forEach(trap -> setTrapCard(trap.getAlias()));
         }
-        if (hasAbility("puppetsoftheblade")) {
-            List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values());
+        if (hasAbility("puppetsoftheblade") && !game.isFrankenGame()) {
+            List<GenericCardModel> allPlots = new ArrayList<>(Mapper.getPlots().values())
+                    .stream().filter(p -> !p.getAlias().startsWith("mutated")).toList();
             allPlots.forEach(plot -> setPlotCard(plot.getAlias()));
         }
     }
@@ -3181,33 +3226,12 @@ public class Player extends PlayerProperties {
         FactionModel faction = getFactionModel();
 
         // TITLE
-        StringBuilder title = new StringBuilder();
-        title.append(getFactionEmoji()).append(" ");
-        if (!"null".equals(getDisplayName())) {
-            title.append(getDisplayName()).append(" ");
-        }
-        if (faction == null) {
-            title.append("No Faction");
-        } else {
-            title.append(faction.getFactionNameWithSourceEmoji());
-        }
-        eb.setTitle(title.toString());
+        eb.setTitle(getContainerTitle());
 
         if (faction == null) {
-            eb.setDescription(ColorEmojis.getColorEmojiWithName(getColor()));
             applyEmbedDefaults(eb);
             return eb.build();
         }
-
-        // // ICON
-        // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
-        // if (emoji instanceof CustomEmoji customEmoji) {
-        // eb.setThumbnail(customEmoji.getImageUrl());
-        // }
-
-        // DESCRIPTION
-        String desc = ColorEmojis.getColorEmojiWithName(getColor()) + "\n" + MiscEmojis.comm(getCommoditiesTotal());
-        eb.setDescription(desc);
 
         // FIELDS
         // Abilities
@@ -3276,7 +3300,82 @@ public class Player extends PlayerProperties {
         eb.setColor(Mapper.getColor(getColor()).getPrimaryColor());
     }
 
-    
+    public String getContainerTitle() {
+        FactionModel model = getFactionModel();
+
+        String displayName = getDisplayName();
+        String faction = model == null ? "No Faction" : model.getFactionNameWithSourceEmoji();
+        String name = !"null".equals(displayName) ? displayName + " " + faction : faction;
+
+        String emoji = getFactionEmoji();
+        String color = ColorEmojis.getColorEmojiWithName(getColor());
+        String commods = getCommoditiesTotal() + " Commodities " + MiscEmojis.comm(getCommoditiesTotal());
+
+        return String.format("%s %s\n%s\n%s", emoji, name, color, commods);
+    }
+
+    @JsonIgnore
+    public Container getRepresentationContainer() {
+        List<ContainerChildComponent> components = new ArrayList<>();
+        Color accent = Mapper.getColor(getColor()).getPrimaryColor();
+
+        // TITLE SECTION
+        String title = getContainerTitle();
+        Thumbnail thumbnail = Thumbnail.fromUrl(getUser().getEffectiveAvatarUrl());
+        components.add(Section.of(thumbnail, TextDisplay.of(title)));
+
+        if (getFactionModel() == null) {
+            return Container.of(components).withAccentColor(accent);
+        }
+
+        // FIELDS
+        List<String> abilities = getModelNames(getAbilities(), Mapper::getAbility);
+        components.add(getComponentsTextDisplay("__Abilities__", abilities));
+
+        List<String> factionTechs = getModelNames(getFactionTechs(), Mapper::getTech);
+        components.add(getComponentsTextDisplay("__Faction Technologies__", factionTechs));
+
+        List<String> techs = getModelNames(getTechs(), Mapper::getTech);
+        components.add(getComponentsTextDisplay("__Technologies__", techs));
+
+        List<String> specialUnits = getModelNames(getSpecialUnitsOwned(), Mapper::getUnit);
+        components.add(getComponentsTextDisplay("__Units__", specialUnits));
+
+        List<String> proms = getModelNames(getSpecialPromissoryNotesOwned(), Mapper::getPromissoryNote);
+        components.add(getComponentsTextDisplay("__Promissory Notes__", proms));
+
+        List<String> leaders = getModelNames(getLeaderIDs(), Mapper::getLeader);
+        components.add(getComponentsTextDisplay("__Leaders__", leaders));
+
+        List<String> breakthroughs = getModelNames(getBreakthroughIDs(), Mapper::getBreakthrough);
+        components.add(getComponentsTextDisplay("__Breakthroughs__", breakthroughs));
+
+        List<String> plots = getModelNames(getPlotCards().keySet(), Mapper::getPlot);
+        if (!plots.isEmpty()) {
+            components.add(getComponentsTextDisplay("__Plot Cards__", plots));
+        }
+
+        return Container.of(components).withAccentColor(accent);
+    }
+
+    private List<String> getModelNames(Collection<String> ids, Function<String, EmbeddableModel> mapper) {
+        return ids.stream()
+                .map(mapper)
+                .map(EmbeddableModel::getNameRepresentation)
+                .toList();
+    }
+
+    private TextDisplay getComponentsTextDisplay(String title, List<String> descrs) {
+        if (descrs.isEmpty()) {
+            return TextDisplay.of(title + "\n> -none-");
+        } else {
+            StringBuilder descr = new StringBuilder(title);
+            for (String x : descrs) descr.append("\n> ").append(x);
+            return TextDisplay.of(descr.toString());
+        }
+    }
+
+    @JsonIgnore
     public Tile getHomeSystemTile() {
         Game game = this.game;
         if (getFaction() == null) {
@@ -3337,6 +3436,64 @@ public class Player extends PlayerProperties {
             }
         }
         return exhaustedSCs;
+    }
+
+    @JsonIgnore
+    public void addStoredValue(String key, String val) {
+        String safeKey = StringHelper.escape(key);
+        getStoredValueMap().put(safeKey, StringHelper.escape(val));
+    }
+
+    @JsonIgnore
+    public String removeStoredValue(String key) {
+        String safeKey = StringHelper.escape(key);
+        return StringHelper.unescape(getStoredValueMap().remove(safeKey));
+    }
+
+    @JsonIgnore
+    public String getStoredValue(String key) {
+        String safeKey = StringHelper.escape(key);
+        return StringHelper.unescape(getStoredValueMap().getOrDefault(safeKey, ""));
+    }
+
+    @JsonIgnore
+    public boolean hasStoredValue(String key) {
+        String safeKey = StringHelper.escape(key);
+        return getStoredValueMap().containsKey(safeKey);
+    }
+
+    @JsonIgnore
+    public void addToStoredList(String key, String... vals) {
+        String safeKey = StringHelper.escape(key);
+        List<String> vs = getStoredList(key);
+        for (String v : vals) vs.add(v);
+        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
+        getStoredValueMap().put(safeKey, ls);
+    }
+
+    public void removeFromStoredList(String key, String... vals) {
+        String safeKey = StringHelper.escape(key);
+        List<String> vs = getStoredList(key);
+        for (String v : vals) vs.remove(v);
+        if (vs.isEmpty()) {
+            getStoredValueMap().remove(safeKey);
+            return;
+        }
+        String ls = String.join("|", vs.stream().map(StringHelper::escape).toList());
+        getStoredValueMap().put(safeKey, ls);
+    }
+
+    @JsonIgnore
+    public List<String> getStoredList(String key) {
+        String safeKey = StringHelper.escape(key);
+        String listVal = getStoredValueMap().get(safeKey);
+
+        List<String> values = new ArrayList<>();
+        if (listVal == null) return values;
+        for (String val : listVal.split("\\|")) {
+            values.add(StringHelper.unescape(val));
+        }
+        return values;
     }
 
     public void checkCommanderUnlock(String factionToCheck) {

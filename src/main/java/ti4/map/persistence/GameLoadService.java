@@ -249,7 +249,7 @@ class GameLoadService {
                             if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                 BotLogger.warning(
                                         new LogOrigin(game),
-                                        game.getName() + ": Not valid unitholder detected: " + unitHolderName);
+                                        "Invalid UnitHolder detected: " + unitHolderName);
                             }
                         }
                         continue;
@@ -257,7 +257,7 @@ class GameLoadService {
                     if (ENDUNITS.equals(data)) {
                         break;
                     }
-                    readUnit(tile, data, unitHolderName);
+                    readUnit(game, tile, data, unitHolderName);
                 }
 
                 while (gameFileLines.hasNext()) {
@@ -791,6 +791,18 @@ class GameLoadService {
         return output;
     }
 
+    private static Map<String, String> getParsedStrStrMap(String tokenizer) {
+        StringTokenizer mapdata = new StringTokenizer(tokenizer, ";");
+        Map<String, String> data = new LinkedHashMap<>();
+        while (mapdata.hasMoreTokens()) {
+            StringTokenizer entry = new StringTokenizer(mapdata.nextToken(), ",");
+            String id = entry.nextToken();
+            String val = entry.nextToken();
+            data.put(id, val);
+        }
+        return data;
+    }
+
     private static Map<String, Boolean> getParsedStrBoolMap(String tokenizer) {
         StringTokenizer mapdata = new StringTokenizer(tokenizer, ";");
         Map<String, Boolean> cards = new LinkedHashMap<>();
@@ -906,7 +918,7 @@ class GameLoadService {
                     StringTokenizer split = new StringTokenizer(tokenizer.nextToken(), "|");
                     String pool = split.nextToken().replace("_", " ");
                     StringTokenizer debtToken = new StringTokenizer(split.nextToken(), ";");
-                    LinkedHashMap<String, Integer> debtTokens = new LinkedHashMap<String, Integer>();
+                    Map<String, Integer> debtTokens = new LinkedHashMap<>();
                     while (debtToken.hasMoreTokens()) {
                         StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
                         String color = debtInfo.nextToken();
@@ -926,29 +938,9 @@ class GameLoadService {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                // OLD - DELETE THESE
-                case Constants.BREAKTHROUGH -> player.setBreakthroughIDs(getCardList(tokenizer.nextToken()));
-                case Constants.BREAKTHROUGH_EXH -> {
-                    String bt = player.getBreakthroughID();
-                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
-                    player.getBreakthroughExhausted().put(bt, stuff);
+                case Constants.PLAYER_STORED_VALUES -> {
+                    player.setStoredValueMap(getParsedStrStrMap(tokenizer.nextToken()));
                 }
-                case Constants.BREAKTHROUGH_UNL -> {
-                    String bt = player.getBreakthroughID();
-                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
-                    player.getBreakthroughUnlocked().put(bt, stuff);
-                }
-                case Constants.BREAKTHROUGH_ACTV -> {
-                    String bt = player.getBreakthroughID();
-                    Boolean stuff = Boolean.parseBoolean(tokenizer.nextToken());
-                    player.getBreakthroughActive().put(bt, stuff);
-                }
-                case Constants.BREAKTHROUGH_TGS -> {
-                    String bt = player.getBreakthroughID();
-                    Integer stuff = Integer.parseInt(tokenizer.nextToken());
-                    player.getBreakthroughTGs().put(bt, stuff);
-                }
-                // END DELETE
                 case Constants.BREAKTHROUGHS -> player.setBreakthroughIDs(getParsedStrList(tokenizer.nextToken()));
                 case Constants.BREAKTHROUGH_EXH_MAP ->
                     player.setBreakthroughExhausted(getParsedStrBoolMap(tokenizer.nextToken()));
@@ -1226,7 +1218,7 @@ class GameLoadService {
         return new Tile(tileID, position);
     }
 
-    private static void readUnit(Tile tile, String data, String spaceHolder) {
+    private static void readUnit(Game game, Tile tile, String data, String unitHolderName) {
         if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         UnitKey uk = Units.parseID(tokenizer.nextToken());
@@ -1236,11 +1228,13 @@ class GameLoadService {
             if (isNotBlank(val)) counts.add(Integer.parseInt(val));
         }
         for (int x = counts.size(); x < UnitState.values().length; x++) counts.add(0);
-        if (!tile.getUnitHolders().containsKey(spaceHolder)) {
-            BotLogger.error("Invalid unitHolder detected during load: " + tile.getTileID() + " / " + spaceHolder);
+        if (!tile.getUnitHolders().containsKey(unitHolderName)) {
+            BotLogger.error(
+                    new LogOrigin(game),
+                    "Invalid UnitHolder detected during load: " + tile.getTileID() + " / " + unitHolderName);
             return;
         }
-        tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
+        tile.getUnitHolders().get(unitHolderName).getUnitsByState().put(uk, counts);
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

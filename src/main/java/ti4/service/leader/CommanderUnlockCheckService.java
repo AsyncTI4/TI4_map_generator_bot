@@ -51,7 +51,7 @@ public class CommanderUnlockCheckService {
             case "sol" -> {
                 int resources = 0;
                 for (String planet : player.getPlanets()) {
-                    if (planet.equalsIgnoreCase("triad")
+                    if ("triad".equalsIgnoreCase(planet)
                             || (game.getUnitHolderFromPlanet(planet) != null
                                     && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
                                             || game.getUnitHolderFromPlanet(planet)
@@ -108,7 +108,7 @@ public class CommanderUnlockCheckService {
             case "xxcha" -> {
                 int influence = 0;
                 for (String planet : player.getPlanets()) {
-                    if (planet.equalsIgnoreCase("triad")
+                    if ("triad".equalsIgnoreCase(planet)
                             || (game.getUnitHolderFromPlanet(planet) != null
                                     && (game.getUnitHolderFromPlanet(planet).isSpaceStation()
                                             || game.getUnitHolderFromPlanet(planet)

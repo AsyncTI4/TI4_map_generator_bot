@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
 import org.reflections.Reflections;
@@ -54,6 +55,8 @@ public class AnnotationHandler {
             if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class))
                 continue;
             if (param.getType().equals(StringSelectInteractionEvent.class)
+                    && contextClass.equals(SelectionMenuContext.class)) continue;
+            if (param.getType().equals(EntitySelectInteractionEvent.class)
                     && contextClass.equals(SelectionMenuContext.class)) continue;
 
             // string parameters
@@ -127,6 +130,8 @@ public class AnnotationHandler {
                     args.add(ctx.getEvent());
                 if (param.getType().equals(StringSelectInteractionEvent.class)
                         && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
+                if (param.getType().equals(EntitySelectInteractionEvent.class)
+                        && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
                 if (param.getType().equals(MessageChannel.class))
                     args.add(ctx.getEvent().getMessageChannel());
 
@@ -197,7 +202,7 @@ public class AnnotationHandler {
                         origin,
                         "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName()
                                 + "\":",
-                        e);
+                        e.getCause());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters())
                         .map(param -> param.getType().getSimpleName())

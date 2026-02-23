@@ -66,16 +66,11 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class MessageHelper {
 
-    private static MessageFunction pin(MessageChannel channel) {
-        return msg -> msg.pin()
-                .queue(
-                        null,
-                        error -> BotLogger.error(
-                                getRestActionFailureMessage(channel, "Failed to pin message", null, error), error));
-    }
-
-    public interface MessageFunction {
-        void run(Message msg);
+    public static Consumer<Message> pin() {
+        return msg -> msg.pin().queue(null, error -> {
+            String err = getRestActionFailureMessage(msg.getChannel(), "Failed to pin message", null, error);
+            BotLogger.error(err, error);
+        });
     }
 
     public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -130,7 +125,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithEmbedsAndPin(
             MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
-        splitAndSentWithAction(messageText, channel, pin(channel), embeds, null);
+        splitAndSentWithAction(messageText, channel, pin(), embeds, null);
     }
 
     public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
@@ -145,11 +140,27 @@ public class MessageHelper {
         }
     }
 
+    public static void sendEphemeralMessageToEventChannel(GenericInteractionCreateEvent event, String msg) {
+        if (event instanceof ButtonInteractionEvent b) {
+            sendEphemeralMessageToEventChannel(b, msg);
+        } else if (event instanceof SlashCommandInteractionEvent s) {
+            sendEphemeralMessageToEventChannel(s, msg);
+        } else if (event instanceof ModalInteractionEvent m) {
+            sendEphemeralMessageToEventChannel(m, msg);
+        } else {
+            sendMessageToEventChannel(event, msg);
+        }
+    }
+
     public static void sendEphemeralMessageToEventChannel(ButtonInteractionEvent event, String message) {
         event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void sendEphemeralMessageToEventChannel(ModalInteractionEvent event, String message) {
+        event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    public static void sendEphemeralMessageToEventChannel(SlashCommandInteractionEvent event, String message) {
         event.getHook().setEphemeral(true).sendMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
@@ -245,7 +256,7 @@ public class MessageHelper {
             List<MessageEmbed> embeds,
             List<Button> buttons,
             boolean saboable) {
-        MessageFunction addFactionReact = (message) -> {
+        Consumer<Message> addFactionReact = (message) -> {
             if (saboable) {
                 GameMessageManager.add(
                         game.getName(), message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
@@ -267,7 +278,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithPersistentReacts(
             MessageChannel channel, String messageText, Game game, List<Button> buttons, GameMessageType messageType) {
-        MessageFunction addFactionReact = (message) -> {
+        Consumer<Message> addFactionReact = (message) -> {
             StringTokenizer players =
                     switch (messageType) {
                         case STATUS_SCORING -> {
@@ -339,7 +350,7 @@ public class MessageHelper {
     }
 
     public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
-        splitAndSentWithAction(messageText, channel, pin(channel));
+        splitAndSentWithAction(messageText, channel, pin());
     }
 
     public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -558,19 +569,20 @@ public class MessageHelper {
         splitAndSentWithAction(messageText, channel, null, embeds, buttons);
     }
 
-    public static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
+    public static void splitAndSentWithAction(
+            String messageText, MessageChannel channel, Consumer<Message> restAction) {
         splitAndSentWithAction(messageText, channel, restAction, null, null);
     }
 
     public static void splitAndSentWithAction(
-            String messageText, MessageChannel channel, List<Button> buttons, MessageFunction restAction) {
+            String messageText, MessageChannel channel, List<Button> buttons, Consumer<Message> restAction) {
         splitAndSentWithAction(messageText, channel, restAction, null, buttons);
     }
 
     private static void splitAndSentWithAction(
             String messageText,
             MessageChannel channel,
-            MessageFunction restAction,
+            Consumer<Message> restAction,
             List<MessageEmbed> embeds,
             List<Button> buttons) {
         if (channel == null) {
@@ -649,7 +661,7 @@ public class MessageHelper {
                             }
 
                             if (restAction != null) {
-                                restAction.run(message);
+                                restAction.accept(message);
                             }
                         },
                         finalMessageText,
@@ -661,7 +673,7 @@ public class MessageHelper {
     public static void sendMessagesWithRetry(
             MessageChannel channel,
             List<MessageCreateData> messageCreateDataList,
-            MessageFunction successAction,
+            Consumer<Message> successAction,
             String errorHeader,
             int remainingAttempts) {
         Iterator<MessageCreateData> iterator = messageCreateDataList.iterator();
@@ -679,14 +691,14 @@ public class MessageHelper {
     private static void sendMessageWithRetry(
             MessageChannel channel,
             MessageCreateData messageCreateData,
-            MessageFunction successAction,
+            Consumer<Message> successAction,
             String errorHeader,
             int remainingAttempts) {
         channel.sendMessage(messageCreateData)
                 .queue(
                         message -> {
                             if (successAction != null) {
-                                successAction.run(message);
+                                successAction.accept(message);
                             }
                         },
                         error -> {
@@ -951,10 +963,21 @@ public class MessageHelper {
         // ADD REMAINING EMBEDS IF THEY EXIST
         while (embedsIterator.hasNext()) {
             List<MessageEmbed> messageEmbeds = embedsIterator.next();
+            MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
             if (messageEmbeds != null && !messageEmbeds.isEmpty()) {
-                messageCreateDataList.add(
-                        new MessageCreateBuilder().addEmbeds(messageEmbeds).build());
+                messageCreateBuilder.addEmbeds(messageEmbeds);
+            } else {
+                break;
             }
+
+            // Add the first set of buttons if we're done with embeds
+            if (buttonIterator.hasNext() && !embedsIterator.hasNext()) {
+                List<ActionRow> actionRows = buttonIterator.next();
+                if (actionRows != null && !actionRows.isEmpty()) {
+                    messageCreateBuilder.addComponents(actionRows);
+                }
+            }
+            messageCreateDataList.add(messageCreateBuilder.build());
         }
 
         // ADD REMAINING BUTTONS IF THEY EXIST

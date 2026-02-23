@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1152,8 +1155,11 @@ public class ButtonHelper {
         if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")) {
             return true;
         }
+        if (player.hasTech("tf-mr") && tile.getSpaceUnitHolder().getUnitCount(UnitType.Warsun, player) > 0) {
+            return true;
+        }
 
-        return player.hasTech("mr") && tile.getTileModel().isSupernova();
+        return (player.hasTech("mr")) && tile.getTileModel().isSupernova();
     }
 
     @ButtonHandler("forceARefresh_")
@@ -1468,7 +1474,7 @@ public class ButtonHelper {
     public static void resolveMinisterOfCommerceCheck(Game game, Player player, GenericInteractionCreateEvent event) {
         resolveTACheck(game, player);
         for (String law : game.getLaws().keySet()) {
-            if ("minister_commrece".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
+            if ("minister_commerce".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
                         || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     MessageChannel channel = event.getMessageChannel();
@@ -3853,7 +3859,6 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(
             Player player, Game game, Tile tile, boolean ignoreFighters, boolean issuePing) {
-        CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal");
         TeHelperGeneral.addStationsToPlayArea(null, game, tile);
         String tileRepresentation = tile.getRepresentation();
         int[] values = {0, 0, 0, 0};
@@ -3996,7 +4001,6 @@ public class ButtonHelper {
                 tooManyPDS = p.getRepresentation(game);
             }
         }
-        // System.out.println(fightersIgnored);
         int ignoredFs = 0;
 
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
@@ -4349,6 +4353,43 @@ public class ButtonHelper {
         Tile tile = game.getTileByPosition(pos);
         ExploreService.expFront(event, tile, game, player, true);
         deleteButtonAndDeleteMessageIfEmpty(event);
+    }
+
+    public static List<Button> getBalanceButtons(Player player) {
+        List<Button> buttons2 = new ArrayList<>();
+        if (player.getStarbalanceCounter() + player.getSteelbalanceCounter() < 8) {
+            buttons2.add(Buttons.green("balanceToken_gain_star", "Gain 1 Star"));
+            buttons2.add(Buttons.green("balanceToken_gain_steel", "Gain 1 Steel"));
+        }
+        if (player.getSteelbalanceCounter() > 1) {
+            buttons2.add(Buttons.gray("balanceToken_flip_star", "Flip 1 Steel to Star"));
+        }
+        if (player.getStarbalanceCounter() > 1) {
+            buttons2.add(Buttons.gray("balanceToken_flip_steel", "Flip 1 Star to Steel"));
+        }
+        return buttons2;
+    }
+
+    @ButtonHandler("balanceToken_")
+    public static void balanceToken(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String action = buttonID.split("_")[1];
+        String type = buttonID.split("_")[2];
+        String msg = player.getRepresentation() + " gained 1 " + type + " balance token.";
+        if ("steel".equalsIgnoreCase(type)) {
+            player.setSteelbalanceCounter(player.getSteelbalanceCounter() + 1);
+            if ("flip".equalsIgnoreCase(action)) {
+                msg += " They lost 1 star token";
+                player.setStarbalanceCounter(player.getStarbalanceCounter() - 1);
+            }
+        } else {
+            player.setStarbalanceCounter(player.getStarbalanceCounter() + 1);
+            if ("flip".equalsIgnoreCase(action)) {
+                msg += " They lost 1 steel token";
+                player.setSteelbalanceCounter(player.getSteelbalanceCounter() - 1);
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        deleteMessage(event);
     }
 
     public static Button getEndTurnButton(Game game, Player player) {

@@ -77,7 +77,7 @@ public class RoundOneService {
                 game.setupNeutralPlayer(color);
             }
             game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-            game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_te"));
+            game.validateAndSetActionCardDeck(event, Mapper.getDeck(getTeActionCardDeckAlias(game)));
             game.setStrategyCardSet("te");
         }
         if (game.isTwilightsFallMode()) {
@@ -179,7 +179,7 @@ public class RoundOneService {
                             }
                         }
                     }
-                    if (buttons.size() > 0) {
+                    if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(
                                 target.getCorrectChannel(),
                                 target.getRepresentation() + ", please choose a planet on which to place a Shrine.",
@@ -188,5 +188,12 @@ public class RoundOneService {
                 }
             }
         }
+    }
+
+    static String getTeActionCardDeckAlias(Game game) {
+        if (!game.isAcd2()) {
+            return game.isProphecyOfKings() ? "action_cards_te" : "action_cards_basete";
+        }
+        return game.isProphecyOfKings() ? "action_deck_2_pok_te" : "action_deck_2_te";
     }
 }

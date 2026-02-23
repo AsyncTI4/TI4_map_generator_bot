@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import ti4.draft.DraftCategory;
 import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
@@ -18,11 +19,17 @@ import ti4.service.emoji.UnitEmojis;
 public class MechDraftItem extends DraftItem {
 
     public MechDraftItem(String itemId) {
-        super(Category.MECH, itemId);
+        super(DraftCategory.MECH, itemId);
     }
 
     private UnitModel getUnit() {
-        return Mapper.getUnit(ItemId);
+        return Mapper.getUnit(getItemId());
+    }
+
+    @JsonIgnore
+    @Override
+    public String getTitle(Game game) {
+        return getUnit().getNameRepresentation();
     }
 
     @JsonIgnore
@@ -34,7 +41,7 @@ public class MechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return "Mech - " + getUnit().getName();
+        return getUnit().getName();
     }
 
     @JsonIgnore
@@ -78,7 +85,7 @@ public class MechDraftItem extends DraftItem {
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MECH);
         return allItems;
     }
 
@@ -88,14 +95,14 @@ public class MechDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(Category.MECH, units.getFirst()));
+            allItems.add(generate(DraftCategory.MECH, units.getFirst()));
         }
         return allItems;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftCategory.MECH);
         return allItems;
     }
 
@@ -109,7 +116,7 @@ public class MechDraftItem extends DraftItem {
             }
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(generate(Category.MECH, units.getFirst()));
+            allItems.add(generate(DraftCategory.MECH, units.getFirst()));
         }
         return allItems;
     }

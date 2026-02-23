@@ -1,8 +1,453 @@
 [
     {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "crimson",
+        "undraftable": true,
+        "additionalComponents": [
+            "ABILITY:sorrow",
+            "ABILITY:sundered"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "sundered",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "incursion",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "sorrow",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "crimsoncommander",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "exile2",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "crimson_mech",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "crimsonbt",
+        "additionalComponents": [
+            "ABILITY:incursion"
+        ],
+        "optionalSwaps": [
+            "HOMESYSTEM:crimson",
+            "FLAGSHIP:crimson_flagship",
+            "COMMANDER:crimsoncommander",
+            "MECH:crimson_mech",
+            "TECH:exile2"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "researchteam",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "oceanbound",
+        "additionalComponents": [
+            "ABILITY:researchteam"
+        ],
+        "optionalSwaps": [
+            "TECH:hydrothermal",
+            "FLAGSHIP:deepwrought_flagship",
+            "AGENT:deepwroughtagent",
+            "COMMANDER:deepwroughtcommander"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "hydrothermal",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "deepwrought_flagship",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "deepwroughtagent",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "deepwroughtcommander",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "deepwrought_mech",
+        "additionalComponents": [
+            "ABILITY:researchteam"
+        ],
+        "source": "thunders_edge"
+    },
+
+    
+
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "galvanize",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "phoenixstandard",
+        "additionalComponents": [
+            "ABILITY:galvanize"
+        ],
+        "optionalSwaps": [
+            "MECH:bastion_mech",
+            "AGENT:bastionagent",
+            "COMMANDER:bastioncommander",
+            "HERO:bastionhero"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "raisethestandard",
+        "additionalComponents": [
+            "ABILITY:galvanize"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "bastionagent",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "bastioncommander",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "bastionhero",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMODITIES",
+        "itemId": "bastion",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "bastion_mech",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+
+    
+
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "firmament",
+        "additionalComponents": [
+            "PN:blackops",
+            "PLOT:mutated_enervate",
+            "ABILITY:plotsplots",
+            "ABILITY:puppetsoftheblade"        
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "HOMESYSTEM",
+        "itemId": "obsidian",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "enervate",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "siphon",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "seethe",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "assail",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "extract",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "mutated_enervate",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "mutated_siphon",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "mutated_seethe",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "mutated_assail",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PLOT",
+        "itemId": "mutated_extract",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "plotsplots",
+        "additionalComponents": [
+            "PLOT:enervate",
+            "PLOT:siphon",
+            "PLOT:seethe",
+            "PLOT:assail",
+            "PLOT:extract",
+            "ABILITY:puppetsoftheblade"
+        ],
+        "optionalSwaps": [
+            "AGENT:firmamentagent",
+            "COMMANDER:firmamentcommander",
+            "HERO:firmamenthero",
+            "FLAGSHIP:firmament_flagship"
+        ],
+        "source": "thunders_edge"
+    }, 
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "puppetsoftheblade",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
         "itemCategory": "ABILITY",
         "itemId": "nocturne",
         "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "bladesorchestra",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "marionettes",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "blackops",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "PN",
+        "itemId": "malevolency",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "planesplitter-firm",
+        "additionalComponents": [
+            "PLOT:enervate",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "planesplitter-obs",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "parasite-firm",
+        "additionalComponents": [
+            "PLOT:enervate",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "parasite-obs",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "firmament_flagship",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "FLAGSHIP",
+        "itemId": "obsidian_flagship",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "firmamentagent",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "AGENT",
+        "itemId": "obsidianagent",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "firmamentcommander",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMANDER",
+        "itemId": "obsidiancommander",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "firmamenthero",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "HERO",
+        "itemId": "obsidianhero",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "COMMODITIES",
+        "itemId": "obsidian",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "firmament_mech",
+        "additionalComponents": [
+            "PLOT:siphon",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "MECH",
+        "itemId": "obsidian_mech",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "firmamentbt",
+        "additionalComponents": [
+            "PLOT:assail",
+            "PLOT:mutated_enervate",
+            "PLOT:mutated_siphon",
+            "PLOT:mutated_seethe",
+            "PLOT:mutated_extract",
+            "ABILITY:puppetsoftheblade",
+            "ABILITY:plotsplots"
+        ],
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "BREAKTHROUGH",
+        "itemId": "obsidianbt",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "STARTINGTECH",
+        "itemId": "obsidian",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "ABILITY",
+        "itemId": "miniaturization",
+        "undraftable": true,
+        "source": "thunders_edge"
+    },
+    {
+        "itemCategory": "TECH",
+        "itemId": "linkship2",
+        "additionalComponents": [
+            "ABILITY:miniaturization"
+        ],
         "source": "thunders_edge"
     }
 ]

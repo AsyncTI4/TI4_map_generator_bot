@@ -47,6 +47,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.blue("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
             buttons.add(Buttons.blue("bestowTitleStep1_Shard Fumbler", "Shard Fumbler"));
             buttons.add(Buttons.blue("bestowTitleStep1_Rules Master", "Rules Master"));
+            buttons.add(Buttons.blue("bestowTitleStep1_Loose Cannon", "Loose Cannon"));
             buttons.add(Buttons.gray("bestowTitleStep1_Observer", "Observer"));
 
             buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));

@@ -289,6 +289,7 @@ public class MessageListener extends ListenerAdapter {
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode()
+                && !managedGame.getGame().getStoredValue("executiveOrder").isEmpty()
                 && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
             if (player == null

@@ -213,7 +213,7 @@ public class SilverFlameService {
             FractureService.spawnFracture(null, game);
             FractureService.spawnIngressTokens(null, game, player, null);
         }
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteAllButtons(event);
 
         if (controlsAPlanet && player.getSecretsUnscored().containsKey("bam")) {
             List<Button> scoreButtons = new ArrayList<>();

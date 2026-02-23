@@ -62,7 +62,7 @@ class SetPreferredSettings extends Subcommand {
         Boolean activityTracking = event.getOption("activity_tracking", null, OptionMapping::getAsBoolean);
         if (activityTracking != null) {
             userSettings.setActivityTracking(activityTracking);
-            if (activityTracking == false) {
+            if (!activityTracking) {
                 userSettings.setActiveHours("0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0");
             }
         }

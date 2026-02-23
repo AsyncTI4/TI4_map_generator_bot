@@ -1715,6 +1715,17 @@ public class TileGenerator {
             Point position = new Point(
                     centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
             tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y, null);
+            if ("99".equals(tile.getTileID())) {
+                tokenImage = ImageHelper.readScaled(tokenPath, scale * 0.2526f);
+                tileGraphics.drawImage(
+                        tokenImage, TILE_PADDING + position.x + 172, TILE_PADDING + position.y + 148, null);
+                tokenImage = ImageHelper.readScaled(tokenPath, scale * 0.1421f);
+                tileGraphics.drawImage(
+                        tokenImage, TILE_PADDING + position.x - 19, TILE_PADDING + position.y + 13, null);
+                tokenImage = ImageHelper.readScaled(tokenPath, scale * 0.0842f);
+                tileGraphics.drawImage(
+                        tokenImage, TILE_PADDING + position.x - 7, TILE_PADDING + position.y + 195, null);
+            }
         }
         boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
         for (String tokenID : tokenList) {

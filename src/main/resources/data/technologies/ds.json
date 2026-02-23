@@ -985,6 +985,51 @@
         "text": "When another player activates a system that contains 1 of your structures, you may capture 2 of their infantry on the game board, unless they spend 1 influence. You may spend your captured infantry as if they were trade goods."
     },
     {
+        "alias": "dssarcdd",
+        "name": "Ravager II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "RR",
+        "faction": "sarcosa",
+        "baseUpgrade": "dd2",
+        "source": "ds",
+        "text": "After you win a space combat in this system, take up to 1 of your opponent’s trade goods. 1, 7, 3, 1; ANTI-FIGHTER BARRAGE 5(x3)"
+    },
+    {
+        "alias": "dssarcg",
+        "name": "Infiltration Networks",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "sarcosa",
+        "source": "ds",
+        "text": "ACTION: Exhaust this card; for each planet that contains your coexisting units, you may destroy 1 infantry on that planet or take up to 2 trade goods or commodities from the player who controls that planet."
+    },
+    {
+        "alias": "dsxing",
+        "name": "Astromantic Cloak",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "xin",
+        "source": "ds",
+        "text": "Steel: Other players cannot look at your hand of action cards, promissory notes, or secret objectives. Other players cannot take or force you to give them your action cards, promissory notes, or secret objectives.\n\nStar: After you commit units to a planet, you may choose for those units to coexist. When a player ends coexistence with your units on a planet, you may look at their hand of action cards, promissory notes, or secret objectives."
+    },
+    {
+        "alias": "dsxiny",
+        "name": "Astromantic Cloak",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "xin",
+        "source": "ds",
+        "text": "Steel: During the agenda phase, when an outcome would be resolved, if you voted for or predicted another outcome, you may spend 1 token from your strategy pool to discard the agenda instead; the agenda is resolved with no effect and it is not replaced.\n\nStar: Your blockaded units can produce ships in adjacent systems that contain your command tokens and no other player's ships. Your units cannot lose their unit abilities or text abilities."
+    },
+    {
         "alias": "dsbelky",
         "name": "Synchrony Matrix",
         "types": [

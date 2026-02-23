@@ -9,6 +9,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperUnits;
@@ -172,7 +173,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
         TI4Emoji unitEmoji = getUnitEmoji();
         String name = this.name == null ? "" : this.name;
-        return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
+        return factionEmoji + " " + unitEmoji + " _" + name + "_ " + getSourceEmoji();
     }
 
     private String getSourceEmoji() {
@@ -211,7 +212,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return 1;
         }
         if (afbDieCount == 0
-                && getAlias().equalsIgnoreCase("pinktf_flagship")
+                && "pinktf_flagship".equalsIgnoreCase(id)
                 && (player.ownsUnit("tf-swa") || player.ownsUnit("tf-exile") || player.ownsUnit("tf-linkship"))) {
             return 3;
         }
@@ -274,7 +275,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return 5;
         }
         if (afbDieCount == 0
-                && getAlias().equalsIgnoreCase("pinktf_flagship")
+                && "pinktf_flagship".equalsIgnoreCase(id)
                 && (player.ownsUnit("tf-swa") || player.ownsUnit("tf-exile") || player.ownsUnit("tf-linkship"))) {
             return 6;
         }
@@ -283,7 +284,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getBombardDieCount(Player player) {
 
-        if (getAlias().equalsIgnoreCase("pinktf_flagship")) {
+        if ("pinktf_flagship".equalsIgnoreCase(id)) {
             if (player.ownsUnit("tf-dawncrusher") || player.ownsUnit("tf-superdread")) {
                 return 1;
             }
@@ -308,7 +309,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private int getBombardHitsOn(Player player) {
-        if (getAlias().equalsIgnoreCase("pinktf_flagship")) {
+        if ("pinktf_flagship".equalsIgnoreCase(id)) {
             if (player.ownsUnit("tf-dawncrusher") || player.ownsUnit("tf-superdread")) {
                 return 5;
             }
@@ -500,7 +501,15 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
         }
         if (player.hasUnit("ralnel_destroyer2") && "destroyer".equalsIgnoreCase(baseType)) {
-            return player.hasTech("pds2");
+            Game game = player.getGame();
+            if (Helper.getDateDifference(
+                            Helper.getDateRepresentation(game.getCreationDateTime()),
+                            Helper.getDateRepresentation(1771475738353L))
+                    < 0) {
+                return player.hasTech("pds2");
+            } else {
+                return false;
+            }
         }
         return getDeepSpaceCannon();
     }

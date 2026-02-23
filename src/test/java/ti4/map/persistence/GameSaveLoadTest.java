@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.testUtils.BaseTi4Test;
 
 class GameSaveLoadTest extends BaseTi4Test {
@@ -50,6 +51,25 @@ class GameSaveLoadTest extends BaseTi4Test {
                         "draftManager.game.name")
                 .isEqualTo(game);
 
+        assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
+        assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
+        assertThat(game.getName()).isNotEqualTo(game2.getName());
+    }
+
+    @Test
+    void shouldHandleSaveLoadOfPlayers() {
+        Game game = GameLoadService.load("game-with-displaced-units");
+        game.setName("game-with-displaced-units-test-save");
+        GameSaveService.save(game, "test");
+
+        // reload game, and that new file we just created
+        game = GameLoadService.load("game-with-displaced-units");
+        Game game2 = GameLoadService.load("game-with-displaced-units-test-save");
+
+        for (Player p2 : game2.getPlayers().values()) {
+            Player p = game.getPlayer(p2.getUserID());
+            assertThat(p2).usingRecursiveComparison().ignoringFields("game").isEqualTo(p);
+        }
         assertThat(game.getLatestCommand()).isNotEqualTo(game2.getLatestCommand());
         assertThat(game.getLastModifiedDate()).isNotEqualTo(game2.getLastModifiedDate());
         assertThat(game.getName()).isNotEqualTo(game2.getName());

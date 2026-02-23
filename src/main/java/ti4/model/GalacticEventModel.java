@@ -51,6 +51,10 @@ public class GalacticEventModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(flavorText).orElse("");
     }
 
+    public String getNameRepresentation() {
+        return CardEmojis.Event + " _" + getName() + "_ " + complexityString();
+    }
+
     public String getRepresentation() {
         return getRepresentation(null);
     }

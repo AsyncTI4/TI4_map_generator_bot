@@ -1,12 +1,15 @@
 package ti4.draft;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.BreakthroughDraftItem;
 import ti4.draft.items.CommanderDraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
 import ti4.draft.items.FlagshipDraftItem;
@@ -24,8 +27,7 @@ import ti4.draft.items.UnitDraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
+import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.service.milty.MiltyDraftHelper;
 import ti4.service.milty.MiltyDraftManager;
@@ -37,81 +39,37 @@ public class FrankenDraft extends BagDraft {
     }
 
     @Override
-    public int getItemLimitForCategory(DraftItem.Category category) {
-        int limit = 0;
-        switch (category) {
-            case ABILITY, BLUETILE -> limit = 3;
-            case TECH,
-                    REDTILE,
-                    STARTINGFLEET,
-                    STARTINGTECH,
-                    HOMESYSTEM,
-                    PN,
-                    COMMODITIES,
-                    FLAGSHIP,
-                    MECH,
-                    HERO,
-                    COMMANDER,
-                    AGENT -> limit = 2;
-            case DRAFTORDER -> limit = 1;
-        }
-        return limit;
+    public int getItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case ABILITY, BLUETILE -> 3;
+            case TECH, REDTILE, STARTINGFLEET -> 2;
+            case STARTINGTECH, HOMESYSTEM, PN -> 2;
+            case COMMODITIES, FLAGSHIP, MECH -> 2;
+            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 2;
+            case DRAFTORDER -> 1;
+            case UNIT, PLOT, MAHACTKING -> 0;
+        };
     }
 
-    public static int getItemLimitForCategory(DraftItem.Category category, Game game) {
-        int limit = 0;
+    @Override
+    public int getKeptItemLimitForCategory(DraftCategory category) {
+        return switch (category) {
+            case ABILITY, BLUETILE -> 3;
+            case TECH, REDTILE -> 2;
+            case STARTINGTECH, HOMESYSTEM, PN -> 1;
+            case COMMODITIES, FLAGSHIP, MECH -> 1;
+            case HERO, COMMANDER, AGENT, BREAKTHROUGH -> 1;
+            case DRAFTORDER, STARTINGFLEET -> 1;
+            case UNIT, PLOT, MAHACTKING -> 0;
+        };
+    }
+
+    public static int getItemLimitForCategory(DraftCategory category, Game game) {
         if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
             return Integer.parseInt(game.getStoredValue("frankenLimit" + category));
         } else {
             return game.getActiveBagDraft().getItemLimitForCategory(category);
         }
-        // switch (category) {
-        //     case ABILITY, BLUETILE -> {
-        //         if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
-        //             limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
-        //         } else {
-        //             if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
-        //                     || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
-        //                 if (category == DraftItem.Category.ABILITY) {
-        //                     limit = 4;
-        //                 } else {
-        //                     limit = 3;
-        //                 }
-        //             } else {
-        //                 limit = 3;
-        //             }
-        //         }
-        //     }
-        //     case TECH,
-        //             REDTILE,
-        //             STARTINGFLEET,
-        //             STARTINGTECH,
-        //             HOMESYSTEM,
-        //             PN,
-        //             COMMODITIES,
-        //             FLAGSHIP,
-        //             MECH,
-        //             HERO,
-        //             COMMANDER,
-        //             AGENT -> {
-        //         if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
-        //             limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
-        //         } else {
-        //             if (game.getActiveBagDraft() instanceof PoweredFrankenDraft
-        //                     || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
-        //                 if (category == DraftItem.Category.TECH) {
-        //                     limit = 3;
-        //                 } else {
-        //                     limit = 2;
-        //                 }
-        //             } else {
-        //                 limit = 2;
-        //             }
-        //         }
-        //     }
-        //     case DRAFTORDER -> limit = 1;
-        // }
-        // return limit;
     }
 
     @Override
@@ -120,15 +78,25 @@ public class FrankenDraft extends BagDraft {
     }
 
     private static final String[] excludedFactions = {
-        "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "kaltrim"
+        "lazax",
+        "admins",
+        "franken",
+        "keleresm",
+        "keleresx",
+        "miltymod",
+        "qulane",
+        "neutral",
+        "kaltrim",
+        "xin",
+        "sarcosa"
     };
 
     private static List<FactionModel> getDraftableFactionsForGame(Game game) {
-        List<FactionModel> factionSet = getAllFrankenLegalFactions();
+        List<FactionModel> factionSet = getAllFrankenLegalFactions(game);
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedFactions"));
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel ->
-                    factionModel.getSource().isDs() && !factionModel.getSource().isPok());
+                    factionModel.getSource().isDs() && !factionModel.getSource().isTe());
         }
         factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
 
@@ -144,74 +112,94 @@ public class FrankenDraft extends BagDraft {
         return false;
     }
 
-    public static List<FactionModel> getAllFrankenLegalFactions() {
+    public static List<FactionModel> getAllFrankenLegalFactions(@Nullable Game game) {
         List<FactionModel> factionSet = Mapper.getFactionsValues();
+        List<String> excludedFactions = Arrays.asList(FrankenDraft.excludedFactions);
+
         factionSet.removeIf((FactionModel model) -> {
-            if (model.getSource().isPok() || model.getSource().isDs()) {
-                for (String excludedFaction : excludedFactions) {
-                    if (model.getAlias().contains(excludedFaction)) {
-                        return true;
-                    }
-                }
+            if (excludedFactions.contains(model.getAlias())) {
+                return true;
+            }
+            if ((game == null || game.isThundersEdge()) && model.getSource().isTe()) {
                 return false;
             }
-            return true;
+            if ((game == null || game.isDiscordantStarsMode())
+                    && model.getSource().isDs()) {
+                return false;
+            }
+            return !model.getSource().isPok();
         });
         return factionSet;
     }
 
     @Override
     public List<DraftBag> generateBags(Game game) {
-        Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
+        Map<DraftCategory, List<DraftItem>> allDraftableItems = new HashMap<>();
         List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
 
-        allDraftableItems.put(
-                DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.AGENT, AgentDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.COMMANDER, CommanderDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.HERO, HeroDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.COMMODITIES,
-                CommoditiesDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.FLAGSHIP, FlagshipDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.MECH, MechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.HOMESYSTEM, HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(DraftItem.Category.PN, PNDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.STARTINGFLEET,
-                StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions, game));
-        allDraftableItems.put(
-                DraftItem.Category.STARTINGTECH,
-                StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game));
+        var abilities = AbilityDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.ABILITY, abilities);
 
-        allDraftableItems.put(DraftItem.Category.UNIT, UnitDraftItem.buildAllDraftableItems());
-        allDraftableItems.put(DraftItem.Category.MAHACTKING, MahactKingDraftItem.buildAllDraftableItems());
+        var techs = TechDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.TECH, techs);
 
-        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
+        var bts = BreakthroughDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.BREAKTHROUGH, bts);
+
+        var agents = AgentDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.AGENT, agents);
+
+        var commanders = CommanderDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.COMMANDER, commanders);
+
+        var heroes = HeroDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.HERO, heroes);
+
+        var comms = CommoditiesDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.COMMODITIES, comms);
+
+        var flags = FlagshipDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.FLAGSHIP, flags);
+
+        var mechs = MechDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.MECH, mechs);
+
+        var homes = HomeSystemDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.HOMESYSTEM, homes);
+
+        var pns = PNDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.PN, pns);
+
+        var fleet = StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.STARTINGFLEET, fleet);
+
+        var stTechs = StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game);
+        allDraftableItems.put(DraftCategory.STARTINGTECH, stTechs);
+
+        var units = UnitDraftItem.buildAllDraftableItems();
+        allDraftableItems.put(DraftCategory.UNIT, units);
+
+        var kings = MahactKingDraftItem.buildAllDraftableItems();
+        allDraftableItems.put(DraftCategory.MAHACTKING, kings);
+
+        var positions = SpeakerOrderDraftItem.buildAllDraftableItems(game);
+        allDraftableItems.put(DraftCategory.DRAFTORDER, positions);
 
         MiltyDraftManager draftManager = game.getMiltyDraftManager();
         draftManager.clear();
         MiltyDraftHelper.initDraftTiles(draftManager, game);
-        allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
-        allDraftableItems.put(
-                DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
+        allDraftableItems.put(DraftCategory.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager, game));
+        allDraftableItems.put(DraftCategory.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager, game));
 
         List<DraftBag> bags = new ArrayList<>();
 
+        Map<DraftCategory, Integer> missingItems = new HashMap<>();
         for (int i = 0; i < game.getRealPlayers().size(); i++) {
             DraftBag bag = new DraftBag();
 
             // Walk through each type of draftable...
-            for (Map.Entry<DraftItem.Category, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
-                DraftItem.Category category = draftableCollection.getKey();
+            for (Map.Entry<DraftCategory, List<DraftItem>> draftableCollection : allDraftableItems.entrySet()) {
+                DraftCategory category = draftableCollection.getKey();
                 int categoryLimit = getItemLimitForCategory(category, game);
                 // ... and pull out the appropriate number of items from its collection...
                 for (int j = 0; j < categoryLimit; j++) {
@@ -219,14 +207,21 @@ public class FrankenDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.warning(
-                                new LogOrigin(game),
-                                "Game: `" + game.getName() + "` error - empty franken draftableCollection: "
-                                        + category.name());
+                        System.out.println("bag number " + i + " - item number " + j);
+                        missingItems.compute(category, (c, x) -> x == null ? 1 : x + 1);
                     }
                 }
             }
 
+            if (!missingItems.isEmpty()) {
+                String issue = game.getPing() + " an issue was encountered while building the franken draft.";
+                issue += "\nOne or more bags are missing components.";
+                for (var e : missingItems.entrySet()) {
+                    issue += "\n> " + e.getKey().toString() + " is missing " + e.getValue() + " components.";
+                }
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), issue);
+                return null;
+            }
             bags.add(bag);
         }
 
@@ -235,6 +230,6 @@ public class FrankenDraft extends BagDraft {
 
     @Override
     public int getBagSize() {
-        return 31;
+        return 33;
     }
 }
