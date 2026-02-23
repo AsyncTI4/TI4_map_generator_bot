@@ -21,21 +21,25 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.game.GameUndoNameService;
 import ti4.service.info.CardsInfoService;
+import ti4.service.statistics.round.RoundStatsTracker;
 
 @UtilityClass
 class GameUndoService {
 
-    static void createUndoCopy(String gameName) {
-        GameFileLockManager.wrapWithReadLock(gameName, () -> {
+    static int createUndoCopy(String gameName) {
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
             int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(gameName);
-            if (latestIndex < 0) return;
+            if (latestIndex < 0) return -1;
             File gameFile = Storage.getGameFile(gameName + Constants.TXT);
-            if (!gameFile.exists()) return;
+            if (!gameFile.exists()) return -1;
             try {
-                Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, latestIndex + 1));
+                int createdUndoIndex = latestIndex + 1;
+                Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, createdUndoIndex));
                 Files.copy(gameFile.toPath(), mapUndoStorage, StandardCopyOption.REPLACE_EXISTING);
+                return createdUndoIndex;
             } catch (Exception e) {
                 BotLogger.error("Error copying undo file for " + gameName, e);
+                return -1;
             }
         });
     }
@@ -46,7 +50,8 @@ class GameUndoService {
             if (undoNumbers.isEmpty()) return 0;
 
             int maxUndoNumber = undoNumbers.getLast();
-            int maxUndoFilesPerGame = GameManager.getManagedGame(gameName).isHasEnded() ? 10 : 100;
+            ManagedGame managedGame = GameManager.getManagedGame(gameName);
+            int maxUndoFilesPerGame = managedGame != null && managedGame.isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;
 
             undoNumbers.stream()
@@ -99,6 +104,7 @@ class GameUndoService {
             generateSavedButtons(gameToUndo);
             sendAnyChangedCardsInfo(gameToUndo, loadedGame);
             GameMessageManager.removeAfter(gameName, loadedGame.getLastModifiedDate());
+            RoundStatsTracker.restoreAfterUndo(loadedGame, undoIndex);
 
             sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
             return loadedGame;

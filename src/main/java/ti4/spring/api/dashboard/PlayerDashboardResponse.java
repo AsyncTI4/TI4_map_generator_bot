@@ -46,9 +46,12 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
             int aggregatesVersion,
             Long computedAtEpochMs,
             List<String> completedGameIds,
-            TechStats techStats) {}
+            TechStats techStats,
+            FactionWinStats factionWinStats) {}
 
     public record TechStats(java.util.Map<String, TechStat> byTech) {}
+
+    public record FactionWinStats(java.util.Map<String, Integer> byFaction) {}
 
     public record TechStat(int gamesWithTech, double percentInEligibleGames) {}
 
