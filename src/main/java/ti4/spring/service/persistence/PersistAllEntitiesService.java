@@ -30,8 +30,10 @@ public class PersistAllEntitiesService {
     private final UserEntityRepository userEntityRepository;
 
     public void persistAll() {
-        Map<String, UserEntity> userCache = persistAllUsers();
-        persistAllGames(userCache);
+        StatisticsPersistenceLock.runWithWriteLock(() -> {
+            Map<String, UserEntity> userCache = persistAllUsers();
+            persistAllGames(userCache);
+        });
     }
 
     private Map<String, UserEntity> persistAllUsers() {

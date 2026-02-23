@@ -19,6 +19,7 @@ import ti4.spring.context.SpringContext;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
 import ti4.spring.persistence.UserEntity;
+import ti4.spring.service.persistence.StatisticsPersistenceLock;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +32,13 @@ public class AverageTurnTimeService {
 
     @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
-        try {
-            tryToGetAverageTurnTimes(event);
-        } catch (Exception e) {
-            BotLogger.error("Error getting average turn time", e);
-        }
+        StatisticsPersistenceLock.runWithReadLock(() -> {
+            try {
+                tryToGetAverageTurnTimes(event);
+            } catch (Exception e) {
+                BotLogger.error("Error getting average turn time", e);
+            }
+        });
     }
 
     private void tryToGetAverageTurnTimes(SlashCommandInteractionEvent event) {
