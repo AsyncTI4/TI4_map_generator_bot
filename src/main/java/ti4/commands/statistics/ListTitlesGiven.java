@@ -9,7 +9,7 @@ import ti4.service.statistics.ListTitlesGivenService;
 
 class ListTitlesGiven extends Subcommand {
 
-    public ListTitlesGiven() {
+    ListTitlesGiven() {
         super(Constants.LIST_TITLES_GIVEN, "List the frequency with which slash commands are used");
         addOptions(new OptionData(OptionType.STRING, Constants.TITLE, "Breakdown for a specific title"));
     }

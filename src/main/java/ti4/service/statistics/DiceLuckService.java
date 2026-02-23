@@ -38,7 +38,7 @@ public class DiceLuckService {
         AtomicInteger index = new AtomicInteger(1);
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumExpectedHits =
-                event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 10, OptionMapping::getAsInt);
+                event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 50, OptionMapping::getAsInt);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## __**Dice Luck**__\n");
