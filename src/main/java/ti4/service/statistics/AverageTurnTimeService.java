@@ -65,7 +65,7 @@ public class AverageTurnTimeService {
         };
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
+        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 100, OptionMapping::getAsInt);
         List<Map.Entry<String, Map.Entry<Integer, Long>>> turnTimes = playerTurnTimes.entrySet().stream()
                 .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
                 .sorted(comparator)
