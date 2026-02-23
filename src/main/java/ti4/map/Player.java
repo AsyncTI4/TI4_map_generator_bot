@@ -1,5 +1,6 @@
 package ti4.map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -3314,7 +3315,6 @@ public class Player extends PlayerProperties {
         return String.format("%s %s\n%s\n%s", emoji, name, color, commods);
     }
 
-    @JsonIgnore
     public Container getRepresentationContainer() {
         List<ContainerChildComponent> components = new ArrayList<>();
         Color accent = Mapper.getColor(getColor()).getPrimaryColor();
