@@ -27,15 +27,18 @@ class PlayerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "discord_user_id")
-    private String discordUserId;
+    @Column(name = "user_id")
+    private String userId;
+
+    @Column(name = "stats_tracked_user_id")
+    private String statsTrackedUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_name", nullable = false)
     private GameEntity game;
 
-    @Column(name = "discord_username")
-    private String discordUsername;
+    @Column(name = "username")
+    private String username;
 
     @Column(name = "faction_name")
     private String factionName;
@@ -62,8 +65,9 @@ class PlayerEntity {
     private boolean winner;
 
     PlayerEntity(Game game, Player player) {
-        setDiscordUserId(player.getUserID());
-        setDiscordUsername(player.getUserName());
+        setUserId(player.getUserID());
+        setUsername(player.getUserName());
+        setStatsTrackedUserId(player.getStatsTrackedUserID());
 
         setFactionName(player.getFaction());
 

@@ -86,7 +86,7 @@ class GameEntity {
         setProphecyOfKings(game.isProphecyOfKings());
         setThundersEdge(game.isThundersEdge());
 
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getRealAndEliminatedPlayers()) {
             var playerEntity = new PlayerEntity(game, player);
             playerEntity.setGame(this);
             players.add(playerEntity);

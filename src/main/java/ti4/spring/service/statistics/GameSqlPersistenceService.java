@@ -1,8 +1,8 @@
 package ti4.spring.service.statistics;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
@@ -10,7 +10,7 @@ import ti4.message.logging.BotLogger;
 
 @Service
 @RequiredArgsConstructor
-public class StatisticsService {
+public class GameSqlPersistenceService {
 
     private final GameEntityRepository gameEntityRepository;
 

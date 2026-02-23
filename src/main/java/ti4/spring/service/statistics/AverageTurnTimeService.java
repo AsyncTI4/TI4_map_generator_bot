@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.spring.context.SpringContext;
+import ti4.spring.jda.JdaService;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +32,7 @@ public class AverageTurnTimeService {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        int minTurns = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
+        int minTurns = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 100, OptionMapping::getAsInt);
 
         Iterable<PlayerEntity> players = ignoreEndedGames
                 ? playerEntityRepository.findAllPlayersOfActiveGames()
@@ -41,9 +43,12 @@ public class AverageTurnTimeService {
             if (player.getTotalNumberOfTurns() == 0) {
                 continue;
             }
-            statsMap.computeIfAbsent(
-                            player.getDiscordUserId(), id -> new PlayerStatsAccumulator(player.getDiscordUsername()))
-                    .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
+            statsMap.computeIfAbsent(player.getStatsTrackedUserId(),
+                        id -> {
+                            User user = JdaService.jda.getUserById(id);
+                            return new PlayerStatsAccumulator(user.getEffectiveName());
+                        })
+                .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
         }
 
         List<PlayerStatsAccumulator> sortedResults = statsMap.values().stream()
