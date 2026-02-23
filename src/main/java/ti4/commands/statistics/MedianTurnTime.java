@@ -9,7 +9,7 @@ import ti4.service.statistics.MedianTurnTimeService;
 
 class MedianTurnTime extends Subcommand {
 
-    public MedianTurnTime() {
+    MedianTurnTime() {
         super(Constants.MEDIAN_TURN_TIME, "Median turn time across all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(

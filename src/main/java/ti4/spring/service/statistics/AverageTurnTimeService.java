@@ -16,10 +16,16 @@ import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.spring.context.SpringContext;
+import ti4.spring.persistence.PlayerEntity;
+import ti4.spring.persistence.PlayerEntityRepository;
+import ti4.spring.persistence.UserEntity;
 
 @Service
 @RequiredArgsConstructor
 public class AverageTurnTimeService {
+
+    private static final int DEFAULT_PLAYER_LIMIT = 50;
+    private static final int DEFAULT_MINIMUM_NUMBER_OF_TURNS = 100;
 
     private final PlayerEntityRepository playerEntityRepository;
 
@@ -35,8 +41,9 @@ public class AverageTurnTimeService {
     private void tryToGetAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
-        int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        int minTurns = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 100, OptionMapping::getAsInt);
+        int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
+        int minTurns = event.getOption(
+                Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
         List<PlayerEntity> players = ignoreEndedGames
                 ? playerEntityRepository.findAllPlayersOfActiveGames()

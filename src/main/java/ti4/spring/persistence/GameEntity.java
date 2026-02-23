@@ -1,4 +1,4 @@
-package ti4.spring.service.statistics;
+package ti4.spring.persistence;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "game")
-class GameEntity {
+public class GameEntity {
 
     @Id
     @Column(name = "game_name", nullable = false)

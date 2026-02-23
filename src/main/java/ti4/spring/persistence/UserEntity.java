@@ -1,4 +1,4 @@
-package ti4.spring.service.statistics;
+package ti4.spring.persistence;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "discord_user")
-class UserEntity {
+public class UserEntity {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -29,7 +29,7 @@ class UserEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<PlayerEntity> players;
 
-    UserEntity(String id, String name) {
+    public UserEntity(String id, String name) {
         this.id = id;
         this.name = name;
     }

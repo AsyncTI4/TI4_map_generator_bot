@@ -4,7 +4,7 @@ import java.time.ZoneId;
 import lombok.experimental.UtilityClass;
 import ti4.message.logging.BotLogger;
 import ti4.spring.context.SpringContext;
-import ti4.spring.service.statistics.SqlPersistenceService;
+import ti4.spring.service.persistence.PersistAllEntitiesService;
 
 @UtilityClass
 public class PersistToSqlCron {
@@ -17,7 +17,7 @@ public class PersistToSqlCron {
     private static void persist() {
         BotLogger.logCron("Running PersistToSqlCron.");
         try {
-            SpringContext.getBean(SqlPersistenceService.class).persistAll();
+            SpringContext.getBean(PersistAllEntitiesService.class).persistAll();
         } catch (Exception e) {
             BotLogger.error("**PersistToSqlCron failed.**", e);
         }

@@ -1,4 +1,4 @@
-package ti4.spring.service.statistics;
+package ti4.spring.service.persistence;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +15,16 @@ import ti4.map.persistence.ManagedGame;
 import ti4.message.logging.BotLogger;
 import ti4.service.map.FractureService;
 import ti4.spring.jda.JdaService;
+import ti4.spring.persistence.GameEntity;
+import ti4.spring.persistence.GameEntityRepository;
+import ti4.spring.persistence.PlayerEntity;
+import ti4.spring.persistence.PlayerEntityRepository;
+import ti4.spring.persistence.UserEntity;
+import ti4.spring.persistence.UserEntityRepository;
 
 @Service
 @RequiredArgsConstructor
-public class SqlPersistenceService {
+public class PersistAllEntitiesService {
 
     private final GameEntityRepository gameEntityRepository;
     private final PlayerEntityRepository playerEntityRepository;

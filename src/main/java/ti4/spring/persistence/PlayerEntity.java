@@ -1,4 +1,4 @@
-package ti4.spring.service.statistics;
+package ti4.spring.persistence;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "player", uniqueConstraints = @UniqueConstraint(columnNames = {"game_name", "user_id"}))
-class PlayerEntity {
+public class PlayerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
