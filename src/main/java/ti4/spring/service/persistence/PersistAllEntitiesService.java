@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -30,7 +29,6 @@ public class PersistAllEntitiesService {
     private final PlayerEntityRepository playerEntityRepository;
     private final UserEntityRepository userEntityRepository;
 
-    @Transactional
     public void persistAll() {
         Map<String, UserEntity> userCache = persistAllUsers();
         persistAllGames(userCache);
