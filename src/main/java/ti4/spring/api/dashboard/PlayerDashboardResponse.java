@@ -15,10 +15,7 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
             PlayerAggregates aggregates) {}
 
     public record PlayerInsights(
-            PlayerActivity activity,
-            List<BadgeAward> badges,
-            ImperialDoctrine imperialDoctrine,
-            List<FavoredHouse> favoredHouses) {}
+            PlayerActivity activity, List<BadgeAward> badges, List<FavoredFaction> favoredFactions) {}
 
     public record PlayerActivity(int totalTurns, Long averageTurnTimeSeconds) {}
 
@@ -36,9 +33,7 @@ public record PlayerDashboardResponse(PlayerProfile profile, DashboardSummary su
 
     public record BadgeRequirement(String label, double current, double target, String unit, boolean met) {}
 
-    public record ImperialDoctrine(String archetype, List<String> traits) {}
-
-    public record FavoredHouse(String faction, int gamesPlayed, int wins, Double winPercent) {}
+    public record FavoredFaction(String faction, int gamesPlayed, int wins, Double winPercent) {}
 
     public record TitleSummary(int totalCount, List<TitleItem> items) {}
 
