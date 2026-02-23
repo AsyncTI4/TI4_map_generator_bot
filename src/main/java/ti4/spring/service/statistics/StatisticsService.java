@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ti4.map.Game;
@@ -13,6 +14,7 @@ public class StatisticsService {
 
     private final GameEntityRepository gameEntityRepository;
 
+    @Transactional
     public void persistAllGames() {
         gameEntityRepository.deleteAll();
 

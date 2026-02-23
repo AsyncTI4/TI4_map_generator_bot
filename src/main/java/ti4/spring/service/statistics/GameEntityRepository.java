@@ -1,5 +1,5 @@
 package ti4.spring.service.statistics;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-interface GameEntityRepository extends CrudRepository<GameEntity, String> {}
+interface GameEntityRepository extends JpaRepository<GameEntity, String> {}

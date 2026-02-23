@@ -83,6 +83,8 @@ class GameEntity {
         setFrankenMode(game.isFrankenGame());
         setAllianceMode(game.isAllianceMode());
         setTwilightImperiumGlobalLeague(game.isCompetitiveTIGLGame());
+        setProphecyOfKings(game.isProphecyOfKings());
+        setThundersEdge(game.isThundersEdge());
 
         for (Player player : game.getPlayers().values()) {
             var playerEntity = new PlayerEntity(game, player);

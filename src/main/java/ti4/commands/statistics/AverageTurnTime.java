@@ -9,7 +9,7 @@ import ti4.service.statistics.AverageTurnTimeService;
 
 class AverageTurnTime extends Subcommand {
 
-    public AverageTurnTime() {
+    AverageTurnTime() {
         super(Constants.AVERAGE_TURN_TIME, "Average turn time across all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(

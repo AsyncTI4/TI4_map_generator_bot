@@ -95,6 +95,9 @@ public class AverageTurnTimeService {
         }
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", sb.toString());
+
+        var averageTurnTimeService2 = ti4.spring.service.statistics.AverageTurnTimeService.getBean();
+        averageTurnTimeService2.queueReply(event);
     }
 
     public static void getAverageTurnTimeForGame(
