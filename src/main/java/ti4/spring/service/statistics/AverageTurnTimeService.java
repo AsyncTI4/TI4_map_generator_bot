@@ -93,6 +93,10 @@ public class AverageTurnTimeService {
         return sb.toString();
     }
 
+    public static AverageTurnTimeService getBean() {
+        return SpringContext.getBean(AverageTurnTimeService.class);
+    }
+
     private static class PlayerStatsAccumulator {
         String username;
         int totalTurns;
@@ -112,9 +116,5 @@ public class AverageTurnTimeService {
         long getAverage() {
             return totalTurns == 0 ? 0 : totalTime / totalTurns;
         }
-    }
-
-    public static AverageTurnTimeService getBean() {
-        return SpringContext.getBean(AverageTurnTimeService.class);
     }
 }
