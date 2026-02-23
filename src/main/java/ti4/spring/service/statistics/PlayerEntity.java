@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,18 +21,19 @@ import ti4.map.Player;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "player")
+@Table(
+    name = "player",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"game_name", "user_id"})
+)
 class PlayerEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "user_id")
-    private String userId;
-
-    @Column(name = "stats_tracked_user_id")
-    private String statsTrackedUserId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_name", nullable = false)
@@ -65,10 +67,8 @@ class PlayerEntity {
     private boolean winner;
 
     PlayerEntity(Game game, Player player) {
-        setUserId(player.getUserID());
+        setUser(new UserEntity(player.getStatsTrackedUserID()));
         setUsername(player.getUserName());
-        setStatsTrackedUserId(player.getStatsTrackedUserID());
-
         setFactionName(player.getFaction());
 
         setScore(player.getTotalVictoryPoints());
@@ -90,6 +90,6 @@ class PlayerEntity {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Objects.hash(id);
     }
 }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
@@ -14,9 +13,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.spring.context.SpringContext;
-import ti4.spring.jda.JdaService;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +24,15 @@ public class AverageTurnTimeService {
     private final PlayerEntityRepository playerEntityRepository;
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> getAverageTurnTime(event));
+        StatisticsPipeline.queue(event, () -> tryToGetAverageTurnTime(event));
+    }
+
+    private void tryToGetAverageTurnTime(SlashCommandInteractionEvent event) {
+        try {
+            getAverageTurnTime(event);
+        } catch (Exception e) {
+            BotLogger.error("Error getting average turn time", e);
+        }
     }
 
     private void getAverageTurnTime(SlashCommandInteractionEvent event) {
@@ -34,20 +41,17 @@ public class AverageTurnTimeService {
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minTurns = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 100, OptionMapping::getAsInt);
 
-        Iterable<PlayerEntity> players = ignoreEndedGames
+        List<PlayerEntity> players = ignoreEndedGames
                 ? playerEntityRepository.findAllPlayersOfActiveGames()
                 : playerEntityRepository.findAll();
 
-        Map<String, PlayerStatsAccumulator> statsMap = new HashMap<>();
+        Map<UserEntity, PlayerStatsAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
             if (player.getTotalNumberOfTurns() == 0) {
                 continue;
             }
-            statsMap.computeIfAbsent(player.getStatsTrackedUserId(),
-                        id -> {
-                            User user = JdaService.jda.getUserById(id);
-                            return new PlayerStatsAccumulator(user.getEffectiveName());
-                        })
+            statsMap.computeIfAbsent(player.getUser(),
+                        user -> new PlayerStatsAccumulator(user.getName()))
                 .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
         }
 
