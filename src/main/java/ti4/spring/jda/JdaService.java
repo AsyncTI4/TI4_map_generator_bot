@@ -1,5 +1,6 @@
 package ti4.spring.jda;
 
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -571,6 +574,15 @@ public class JdaService {
 
     public static boolean isValidGuild(String guildId) {
         return guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+    }
+
+    @Nullable
+    public static String getUsername(String userId) {
+        Member member = guildPrimary.getMemberById(userId);
+        if (member != null) return member.getEffectiveName();
+        User user = jda.getUserById(userId);
+        if (user != null) return user.getEffectiveName();
+        return null;
     }
 
     @PreDestroy

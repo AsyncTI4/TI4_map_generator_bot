@@ -109,6 +109,7 @@ public class Player extends PlayerProperties {
 
     private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
 
+    @Getter
     private final Game game;
 
     private DraftBag draftHand = new DraftBag();
@@ -143,10 +144,6 @@ public class Player extends PlayerProperties {
         setStatsTrackedUserID(userID);
         setStatsTrackedUserName(userName);
         this.game = game;
-    }
-
-    public Game getGame() {
-        return game;
     }
 
     public String getDecalName() {
@@ -206,20 +203,6 @@ public class Player extends PlayerProperties {
         }
 
         return singularities;
-    }
-
-    public int numberOfSpaceStations() {
-        return (int) getPlanets().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
-                .filter(Planet::isSpaceStation)
-                .count();
-    }
-
-    public int numberOfFakePlanets() {
-        return (int) getPlanets().stream()
-                .map(planet -> game.getPlanetsInfo().get(planet))
-                .filter(planet -> planet.getPlanetModel().getPlanetTypes().contains(PlanetType.FAKE))
-                .count();
     }
 
     public boolean hasUnplayedSCs() {

@@ -31,6 +31,6 @@ class AverageTurnTime extends Subcommand {
         AverageTurnTimeService.queueReply(event);
 
         var averageTurnTimeService2 = ti4.spring.service.statistics.AverageTurnTimeService.getBean();
-        averageTurnTimeService2.queueReply(event);
+        averageTurnTimeService2.tryToGetAverageTurnTime(event);
     }
 }

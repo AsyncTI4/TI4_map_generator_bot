@@ -1,9 +1,5 @@
 server:
   port: 8081
-  error:
-    include-message: always
-    include-binding-errors: never
-    include-stacktrace: never
 
 management:
   endpoints:
@@ -26,6 +22,17 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-      hibernate.jdbc.time_zone: UTC
-      hibernate.format_sql: true
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+          batch_size: 100
+          order_inserts: true
+          order_updates: true
+          generate_statistics: false
     open-in-view: false
+  web:
+    error:
+      include-stacktrace: never
+      include-binding-errors: never
+      include-message: always

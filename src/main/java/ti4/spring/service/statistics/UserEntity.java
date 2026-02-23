@@ -19,35 +19,31 @@ import lombok.Setter;
 @Table(name = "discord_user")
 class UserEntity {
 
-  @Id
-  @Column(name = "id", nullable = false)
-  private String id;
+    @Id
+    @Column(name = "id", nullable = false)
+    private String id;
 
-  @Column(name = "name")
-  private String name;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-  private List<PlayerEntity> players;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<PlayerEntity> players;
 
-  UserEntity(String id) {
-    this.id = id;
-  }
+    UserEntity(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-  UserEntity(String id, String name) {
-    this.id = id;
-    this.name = name;
-  }
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        UserEntity that = (UserEntity) other;
+        return Objects.equals(id, that.id);
+    }
 
-  @Override
-  public boolean equals(Object other) {
-    if (this == other) return true;
-    if (other == null || getClass() != other.getClass()) return false;
-    UserEntity that = (UserEntity) other;
-    return Objects.equals(id, that.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

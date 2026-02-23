@@ -14,17 +14,12 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ti4.map.Game;
-import ti4.map.Player;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(
-    name = "player",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"game_name", "user_id"})
-)
+@Table(name = "player", uniqueConstraints = @UniqueConstraint(columnNames = {"game_name", "user_id"}))
 class PlayerEntity {
 
     @Id
@@ -65,20 +60,6 @@ class PlayerEntity {
 
     @Column(name = "is_winner")
     private boolean winner;
-
-    PlayerEntity(Game game, Player player) {
-        setUser(new UserEntity(player.getStatsTrackedUserID()));
-        setUsername(player.getUserName());
-        setFactionName(player.getFaction());
-
-        setScore(player.getTotalVictoryPoints());
-        setTotalNumberOfTurns(player.getNumberOfTurns());
-        setTotalTurnTime(player.getTotalTurnTime());
-        setExpectedHits(player.getExpectedHits());
-        setActualHits(player.getActualHits());
-        setEliminated(player.isEliminated());
-        setWinner(game.getWinners().contains(player));
-    }
 
     @Override
     public boolean equals(Object other) {

@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.service.statistics.StatisticsPipeline;
 import ti4.spring.context.SpringContext;
 
 @Service
@@ -23,11 +23,8 @@ public class AverageTurnTimeService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> tryToGetAverageTurnTime(event));
-    }
-
-    private void tryToGetAverageTurnTime(SlashCommandInteractionEvent event) {
+    @Transactional
+    public void tryToGetAverageTurnTime(SlashCommandInteractionEvent event) {
         try {
             getAverageTurnTime(event);
         } catch (Exception e) {
@@ -50,9 +47,8 @@ public class AverageTurnTimeService {
             if (player.getTotalNumberOfTurns() == 0) {
                 continue;
             }
-            statsMap.computeIfAbsent(player.getUser(),
-                        user -> new PlayerStatsAccumulator(user.getName()))
-                .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
+            statsMap.computeIfAbsent(player.getUser(), user -> new PlayerStatsAccumulator(user.getName()))
+                    .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
         }
 
         List<PlayerStatsAccumulator> sortedResults = statsMap.values().stream()

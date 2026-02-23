@@ -13,9 +13,6 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.service.map.FractureService;
 
 @Getter
 @Setter
@@ -69,29 +66,6 @@ class GameEntity {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
-
-    GameEntity(Game game) {
-        setGameName(game.getName());
-        setRound(game.getRound());
-        setCreationEpochMilliseconds(game.getCreationDateTime());
-        setEndedEpochMilliseconds(game.getEndedDate());
-        setCompleted(game.getWinner().isPresent() && game.isHasEnded());
-        setFractureInPlay(FractureService.isFractureInPlay(game));
-        setHomebrew(game.isHomebrew());
-        setDiscordantStarsMode(game.isDiscordantStarsMode());
-        setAbsolMode(game.isAbsolMode());
-        setFrankenMode(game.isFrankenGame());
-        setAllianceMode(game.isAllianceMode());
-        setTwilightImperiumGlobalLeague(game.isCompetitiveTIGLGame());
-        setProphecyOfKings(game.isProphecyOfKings());
-        setThundersEdge(game.isThundersEdge());
-
-        for (Player player : game.getRealAndEliminatedPlayers()) {
-            var playerEntity = new PlayerEntity(game, player);
-            playerEntity.setGame(this);
-            players.add(playerEntity);
-        }
-    }
 
     @Override
     public boolean equals(Object other) {
