@@ -8,4 +8,6 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
 
     @Query("SELECT p FROM PlayerEntity p JOIN p.game g WHERE g.endedEpochMilliseconds IS NULL")
     List<PlayerEntity> findAllPlayersOfActiveGames();
+
+    List<PlayerEntity> findAllByUser_IdIn(List<String> userIds);
 }
