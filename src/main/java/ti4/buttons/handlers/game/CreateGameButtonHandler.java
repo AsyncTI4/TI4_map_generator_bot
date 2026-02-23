@@ -34,9 +34,9 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.game.CreateGameService;
-import ti4.service.statistics.AverageTurnTimeService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
+import ti4.spring.service.statistics.AverageTurnTimeService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -58,7 +58,7 @@ public class CreateGameButtonHandler {
 
         Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+            AverageTurnTimeService.getBean().getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
         }
         boolean owner = false;
         if (event.getChannel() instanceof ThreadChannel threadChannel) {
@@ -221,7 +221,7 @@ public class CreateGameButtonHandler {
 
         Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+            AverageTurnTimeService.getBean().getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
         }
         if (gameFunName == null || gameFunName.isEmpty()) {
             memberList.append("## Players Signed Up:\n");

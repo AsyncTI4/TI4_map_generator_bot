@@ -23,6 +23,7 @@ import ti4.map.persistence.GamesPage;
 import ti4.map.persistence.ManagedGame;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
+import ti4.spring.service.statistics.AverageTurnTimeService;
 
 @UtilityClass
 public class DiceLuckService {
@@ -75,7 +76,8 @@ public class DiceLuckService {
         }
         Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+            AverageTurnTimeService.getBean()
+                    .getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
         }
 
         StringBuilder sb = new StringBuilder();
