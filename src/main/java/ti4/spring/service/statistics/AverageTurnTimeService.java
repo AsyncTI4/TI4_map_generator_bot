@@ -29,7 +29,7 @@ public class AverageTurnTimeService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
         try {
             tryToGetAverageTurnTimes(event);
