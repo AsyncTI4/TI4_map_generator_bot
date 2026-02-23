@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.MedianTurnTimeService;
+import ti4.spring.service.statistics.MedianTurnTimeService;
 
 class MedianTurnTime extends Subcommand {
 
@@ -24,6 +24,6 @@ class MedianTurnTime extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MedianTurnTimeService.queueReply(event);
+        MedianTurnTimeService.getBean().getMedianTurnTimes(event);
     }
 }
