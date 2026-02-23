@@ -97,6 +97,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.spring.jda.JdaService;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -1357,11 +1358,15 @@ public class Game extends GameProperties {
             elapsedTime = 60000; // if for some reason the last Active player change was never set, ignore the time
         }
         if (prevPlayer != null) {
+            long effectiveTurnTime = elapsedTime;
             if (!factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
                 prevPlayer.updateTurnStats(elapsedTime);
             } else {
+                effectiveTurnTime =
+                        Math.min(elapsedTime, prevPlayer.getTotalTurnTime() / (prevPlayer.getNumberOfTurns() + 1));
                 prevPlayer.updateTurnStatsWithAverage(elapsedTime);
             }
+            RoundStatsTracker.recordTurnTime(this, prevPlayer, effectiveTurnTime);
         }
 
         setStoredValue("factionsInCombat", "");
@@ -2577,8 +2582,7 @@ public class Game extends GameProperties {
 
         if (discardedEvents.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                getActionsChannel(),
-                "Unable to draw an event: both the deck and discard pile are empty.");
+                    getActionsChannel(), "Unable to draw an event: both the deck and discard pile are empty.");
             return null;
         }
 

@@ -40,6 +40,7 @@ import ti4.service.fow.BlindSelectionService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -603,6 +604,7 @@ public class ButtonHelperActionCards {
             }
 
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+            RoundStatsTracker.recordDiceRolled(game, player, numRolls);
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
             player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
             int hitRolls = DiceHelper.countSuccesses(resultRolls);
@@ -651,6 +653,7 @@ public class ButtonHelperActionCards {
                             .append(key.getColor())
                             .append(".\n");
                     int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                    RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                     List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));

@@ -1153,7 +1153,7 @@
         "name": "Invasion",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system that contains no non-neutral ships and place 1 neutral cruiser and 2 neutral fighters in that system.",
+        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system outside of The Fracture that contains no ships and place 2 neutral cruisers in that system.",
         "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
