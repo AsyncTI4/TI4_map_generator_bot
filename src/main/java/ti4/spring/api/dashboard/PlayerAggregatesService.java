@@ -40,7 +40,7 @@ import tools.jackson.databind.json.JsonMapper;
  */
 class PlayerAggregatesService {
 
-    private static final int CURRENT_AGGREGATES_VERSION = 1;
+    private static final int CURRENT_AGGREGATES_VERSION = 2;
     private static final int FAILED_AGGREGATES_VERSION = -1;
     private static final String HASH_DELIMITER = "\u001F";
     private static final JsonMapper mapper = ti4.json.JsonMapperManager.basic();
@@ -68,7 +68,7 @@ class PlayerAggregatesService {
      * Builds the cache context used for refresh and response decisions.
      */
     private CacheContext buildCacheContext(String userId, List<ManagedGame> playerGames) {
-        List<String> completedGameIds = getCompletedGameIds(playerGames);
+        List<String> completedGameIds = getTrackedCompletedGameIds(playerGames);
         String completedGamesHash = hashCompletedGameIds(completedGameIds);
         PlayerAggregatesCache cached = repository.findById(userId).orElse(null);
         boolean shouldRecompute = shouldRecompute(cached, completedGamesHash, completedGameIds.size());
@@ -122,6 +122,8 @@ class PlayerAggregatesService {
         int eligibleGameCount = Optional.ofNullable(stored.eligibleGameCount()).orElse(0);
         PlayerDashboardResponse.TechStats techStats = new PlayerDashboardResponse.TechStats(
                 Optional.ofNullable(stored.techById()).orElse(Map.of()));
+        PlayerDashboardResponse.FactionWinStats factionWinStats = new PlayerDashboardResponse.FactionWinStats(
+                Optional.ofNullable(stored.factionWinsById()).orElse(Map.of()));
 
         return new PlayerDashboardResponse.PlayerAggregates(
                 true,
@@ -131,13 +133,15 @@ class PlayerAggregatesService {
                 CURRENT_AGGREGATES_VERSION,
                 context.cached().getComputedAtEpochMs(),
                 context.completedGameIds(),
-                techStats);
+                techStats,
+                factionWinStats);
     }
 
     private static boolean isStoredAggregateUsable(StoredAggregates stored) {
         return stored.version() == CURRENT_AGGREGATES_VERSION
                 && stored.techById() != null
-                && stored.eligibleGameCount() != null;
+                && stored.eligibleGameCount() != null
+                && stored.factionWinsById() != null;
     }
 
     private static PlayerDashboardResponse.PlayerAggregates emptyAggregates(
@@ -155,21 +159,26 @@ class PlayerAggregatesService {
                 CURRENT_AGGREGATES_VERSION,
                 computedAtEpochMs,
                 completedGameIds,
-                new PlayerDashboardResponse.TechStats(Map.of()));
+                new PlayerDashboardResponse.TechStats(Map.of()),
+                new PlayerDashboardResponse.FactionWinStats(Map.of()));
     }
 
     /**
      * Determines the canonical completed-game ID set used by hash and recompute logic.
      *
-     * <p>Only ended games are included. IDs are deduplicated and sorted so the resulting hash is
-     * stable and independent of iteration order.
+     * <p>Only ended games that pass {@link #isValidGameForAggregates(ManagedGame, Game)} are included.
+     * IDs are deduplicated and sorted so the resulting hash is stable and independent of iteration order.
      */
-    private static List<String> getCompletedGameIds(List<ManagedGame> playerGames) {
+    private static List<String> getTrackedCompletedGameIds(List<ManagedGame> playerGames) {
         if (playerGames == null || playerGames.isEmpty()) {
             return Collections.emptyList();
         }
         return playerGames.stream()
                 .filter(ManagedGame::isHasEnded)
+                .filter(managedGame -> {
+                    Game game = managedGame.getGame();
+                    return game != null && isValidGameForAggregates(managedGame, game);
+                })
                 .map(ManagedGame::getName)
                 .filter(Objects::nonNull)
                 .distinct()
@@ -211,13 +220,14 @@ class PlayerAggregatesService {
     private void recomputeAndPersist(String userId, List<String> completedGameIds, String completedGamesHash) {
         long startedAt = System.currentTimeMillis();
         try {
-            ComputedTechStats computedTech = computeTechStats(userId, completedGameIds);
+            ComputedAggregates computed = computeAggregates(userId, completedGameIds);
             StoredAggregates aggregates = new StoredAggregates(
                     CURRENT_AGGREGATES_VERSION,
                     userId,
                     completedGameIds,
-                    computedTech.eligibleGameCount(),
-                    computedTech.byTech());
+                    computed.eligibleGameCount(),
+                    computed.byTech(),
+                    computed.factionWinsById());
 
             PlayerAggregatesCache row = repository.findById(userId).orElseGet(PlayerAggregatesCache::new);
             row.setUserId(userId);
@@ -270,21 +280,23 @@ class PlayerAggregatesService {
      * {@code homebrewReplacesID} chain traversal. {@code gamesWithTech} counts completed games where
      * the player had that tech in final state.
      *
-     * <p>{@code percentInEligibleGames} uses the denominator of completed games excluding Franken and
-     * Twilight's Fall games. Numerator also counts only eligible games.
+     * <p>{@code percentInEligibleGames} uses the denominator of games that are globally valid and not
+     * Twilight's Fall.
      */
-    private static ComputedTechStats computeTechStats(String userId, Collection<String> completedGameIds) {
-        List<GameTechSnapshot> snapshots = loadPlayerTechsPerGame(userId, completedGameIds);
+    private static ComputedAggregates computeAggregates(String userId, Collection<String> completedGameIds) {
+        List<GameAggregateSnapshot> snapshots = loadPlayerSnapshotsPerGame(userId, completedGameIds);
         TechCountAccumulator counts = accumulateEligibleCounts(snapshots);
         Map<String, PlayerDashboardResponse.TechStat> byTech = toTechStatMap(counts);
-        return new ComputedTechStats(counts.eligibleGameCount(), byTech);
+        Map<String, Integer> factionWinsById = countFactionWins(snapshots);
+        return new ComputedAggregates(counts.eligibleGameCount(), byTech, factionWinsById);
     }
 
     /**
      * Loads canonical player tech sets for each completed game.
      */
-    private static List<GameTechSnapshot> loadPlayerTechsPerGame(String userId, Collection<String> completedGameIds) {
-        List<GameTechSnapshot> snapshots = new ArrayList<>();
+    private static List<GameAggregateSnapshot> loadPlayerSnapshotsPerGame(
+            String userId, Collection<String> completedGameIds) {
+        List<GameAggregateSnapshot> snapshots = new ArrayList<>();
         for (String gameId : completedGameIds) {
             if (gameId == null) {
                 continue;
@@ -297,16 +309,133 @@ class PlayerAggregatesService {
             if (game == null) {
                 continue;
             }
+            if (!isValidGameForAggregates(managedGame, game)) {
+                continue;
+            }
             Player player = game.getPlayer(userId);
             if (player == null) {
                 continue;
             }
 
-            boolean eligibleForPercent = !managedGame.isTwilightsFallMode() && !game.isFrankenGame();
             Set<String> canonicalTechsForGame = canonicalTechsForPlayer(player);
-            snapshots.add(new GameTechSnapshot(eligibleForPercent, canonicalTechsForGame));
+            boolean includeInTechAggregates = !managedGame.isTwilightsFallMode();
+            String canonicalFactionId = normalizeToCanonicalFactionId(player.getFaction());
+            boolean playerWon = game.hasWinner()
+                    && game.getWinners().stream().anyMatch(winner -> userId.equals(winner.getUserID()));
+            snapshots.add(new GameAggregateSnapshot(
+                    includeInTechAggregates,
+                    includeInTechAggregates,
+                    canonicalTechsForGame,
+                    canonicalFactionId,
+                    playerWon));
         }
         return snapshots;
+    }
+
+    /**
+     * Global filter for dashboard aggregate tracking.
+     *
+     * <p>Whitelist policy:
+     * - Exclude Franken.
+     * - Exclude all homebrew unless it is extra-secret-only.
+     * - Allow no-swap and VP/SO target configuration changes.
+     */
+    private static boolean isValidGameForAggregates(ManagedGame managedGame, Game game) {
+        if (game.isFrankenGame()) {
+            return false;
+        }
+
+        if (!game.hasHomebrew()) {
+            return true;
+        }
+
+        // Homebrew whitelist: only extra-secret-only games are allowed.
+        if (!game.isExtraSecretMode()) {
+            return false;
+        }
+
+        // Deny all currently-known non-whitelisted homebrew reasons.
+        if (game.isHomebrew()
+                || game.isFowMode()
+                || game.isFacilitiesMode()
+                || game.isLightFogMode()
+                || game.isRedTapeMode()
+                || game.isDiscordantStarsMode()
+                || game.isMiltyModMode()
+                || game.isThundersEdgeDemo()
+                || game.isAbsolMode()
+                || game.isVotcMode()
+                || game.isPromisesPromisesMode()
+                || game.isFlagshippingMode()
+                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
+                || game.isHomebrewSCMode()
+                || game.isCommunityMode()) {
+            return false;
+        }
+
+        // Mirror structural/source checks from Game#hasHomebrew.
+        if (game.getRealAndEliminatedPlayers().size() < 3
+                || game.getRealAndEliminatedPlayers().size() > 8) {
+            return false;
+        }
+
+        if (!allDecksOfficial(game)
+                || !allTilesOfficial(game)
+                || !allFactionsOfficial(game)
+                || !allLeadersOfficial(game)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean allDecksOfficial(Game game) {
+        List<String> deckIds = List.of(
+                game.getAcDeckID(),
+                game.getSoDeckID(),
+                game.getStage1PublicDeckID(),
+                game.getStage2PublicDeckID(),
+                game.getRelicDeckID(),
+                game.getAgendaDeckID(),
+                game.getExplorationDeckID(),
+                game.getTechnologyDeckID(),
+                game.getEventDeckID());
+
+        boolean decksOfficial = deckIds.stream().allMatch(deckId -> {
+            if (deckId == null || "null".equals(deckId)) {
+                return true;
+            }
+            var deck = Mapper.getDeck(deckId);
+            return deck == null || deck.getSource().isOfficial();
+        });
+
+        var scSet = Mapper.getStrategyCardSets().get(game.getScSetID());
+        return decksOfficial && scSet != null && scSet.getSource().isOfficial();
+    }
+
+    private static boolean allTilesOfficial(Game game) {
+        return game.getTileMap().values().stream().allMatch(tile -> {
+            if (tile == null || tile.getTileModel() == null) {
+                return true;
+            }
+            return tile.getTileModel().getSource().isOfficial();
+        });
+    }
+
+    private static boolean allFactionsOfficial(Game game) {
+        return game.getFactions().stream()
+                .map(Mapper::getFaction)
+                .filter(Objects::nonNull)
+                .allMatch(faction -> faction.getSource().isOfficial());
+    }
+
+    private static boolean allLeadersOfficial(Game game) {
+        return game.getRealAndEliminatedAndDummyPlayers().stream()
+                .map(Player::getLeaderIDs)
+                .flatMap(Collection::stream)
+                .map(Mapper::getLeader)
+                .filter(Objects::nonNull)
+                .allMatch(leader -> leader.getSource().isOfficial());
     }
 
     /**
@@ -326,12 +455,15 @@ class PlayerAggregatesService {
     /**
      * Accumulates completed and eligible tech counters from game snapshots.
      */
-    private static TechCountAccumulator accumulateEligibleCounts(List<GameTechSnapshot> snapshots) {
+    private static TechCountAccumulator accumulateEligibleCounts(List<GameAggregateSnapshot> snapshots) {
         Map<String, Integer> gamesWithTech = new HashMap<>();
         Map<String, Integer> eligibleGamesWithTech = new HashMap<>();
         int eligibleGameCount = 0;
 
-        for (GameTechSnapshot snapshot : snapshots) {
+        for (GameAggregateSnapshot snapshot : snapshots) {
+            if (!snapshot.includeInTechAggregates()) {
+                continue;
+            }
             if (snapshot.eligibleForPercent()) {
                 eligibleGameCount++;
             }
@@ -343,6 +475,28 @@ class PlayerAggregatesService {
         }
 
         return new TechCountAccumulator(gamesWithTech, eligibleGamesWithTech, eligibleGameCount);
+    }
+
+    /**
+     * Counts completed wins by canonical faction ID.
+     */
+    private static Map<String, Integer> countFactionWins(List<GameAggregateSnapshot> snapshots) {
+        Map<String, Integer> winsByFaction = new HashMap<>();
+        for (GameAggregateSnapshot snapshot : snapshots) {
+            if (!snapshot.playerWon()) {
+                continue;
+            }
+            String factionId = snapshot.canonicalFactionId();
+            if (factionId == null || factionId.isBlank()) {
+                continue;
+            }
+            winsByFaction.merge(factionId, 1, Integer::sum);
+        }
+
+        return winsByFaction.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(java.util.stream.Collectors.toMap(
+                        Map.Entry::getKey, Map.Entry::getValue, (a, b) -> a, java.util.LinkedHashMap::new));
     }
 
     /**
@@ -395,6 +549,31 @@ class PlayerAggregatesService {
     }
 
     /**
+     * Maps a potentially homebrew faction ID to its canonical/original faction ID.
+     */
+    private static String normalizeToCanonicalFactionId(String factionId) {
+        if (factionId == null || factionId.isBlank() || "null".equalsIgnoreCase(factionId)) {
+            return null;
+        }
+
+        String current = factionId;
+        Set<String> visited = new HashSet<>();
+        while (visited.add(current)) {
+            var model = Mapper.getFaction(current);
+            if (model == null) {
+                return current;
+            }
+            String replacement = model.getHomebrewReplacesID().orElse(null);
+            if (replacement == null || replacement.isBlank()) {
+                String alias = model.getAlias();
+                return alias == null || alias.isBlank() ? current : alias;
+            }
+            current = replacement;
+        }
+        return factionId;
+    }
+
+    /**
      * Parses persisted aggregate JSON into a typed record.
      */
     private static Optional<StoredAggregates> parseStoredAggregates(String json) {
@@ -438,17 +617,26 @@ class PlayerAggregatesService {
             PlayerAggregatesCache cached,
             boolean shouldRecompute) {}
 
-    private record GameTechSnapshot(boolean eligibleForPercent, Set<String> canonicalTechs) {}
+    private record GameAggregateSnapshot(
+            boolean includeInTechAggregates,
+            boolean eligibleForPercent,
+            Set<String> canonicalTechs,
+            String canonicalFactionId,
+            boolean playerWon) {}
 
     private record TechCountAccumulator(
             Map<String, Integer> gamesWithTech, Map<String, Integer> eligibleGamesWithTech, int eligibleGameCount) {}
 
-    private record ComputedTechStats(int eligibleGameCount, Map<String, PlayerDashboardResponse.TechStat> byTech) {}
+    private record ComputedAggregates(
+            int eligibleGameCount,
+            Map<String, PlayerDashboardResponse.TechStat> byTech,
+            Map<String, Integer> factionWinsById) {}
 
     private record StoredAggregates(
             int version,
             String userId,
             List<String> completedGameIds,
             Integer eligibleGameCount,
-            Map<String, PlayerDashboardResponse.TechStat> techById) {}
+            Map<String, PlayerDashboardResponse.TechStat> techById,
+            Map<String, Integer> factionWinsById) {}
 }

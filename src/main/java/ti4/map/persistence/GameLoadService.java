@@ -248,8 +248,7 @@ class GameLoadService {
                             }
                             if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                 BotLogger.warning(
-                                        new LogOrigin(game),
-                                        "Invalid UnitHolder detected: " + unitHolderName);
+                                        new LogOrigin(game), "Invalid UnitHolder detected: " + unitHolderName);
                             }
                         }
                         continue;

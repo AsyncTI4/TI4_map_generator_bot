@@ -59,10 +59,11 @@ class DashboardService {
                                     "",
                                     0,
                                     0,
-                                    1,
+                                    2,
                                     null,
                                     List.of(),
-                                    new PlayerDashboardResponse.TechStats(Map.of()))),
+                                    new PlayerDashboardResponse.TechStats(Map.of()),
+                                    new PlayerDashboardResponse.FactionWinStats(Map.of()))),
                     new PlayerDashboardResponse.DashboardSummary(0, 0, 0, 0, 0, null),
                     List.of());
         }

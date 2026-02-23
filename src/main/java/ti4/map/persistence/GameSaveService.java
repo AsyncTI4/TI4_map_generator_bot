@@ -67,6 +67,7 @@ import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.statistics.round.RoundStatsTracker;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 
@@ -110,7 +111,8 @@ class GameSaveService {
             deleteTemporaryFileIfNeeded(temporarySavePath);
         }
 
-        GameUndoService.createUndoCopy(game.getName());
+        int undoIndex = GameUndoService.createUndoCopy(game.getName());
+        RoundStatsTracker.refreshOnSave(game, undoIndex);
         return true;
     }
 
