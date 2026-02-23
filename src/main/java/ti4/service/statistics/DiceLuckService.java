@@ -35,10 +35,10 @@ public class DiceLuckService {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
         var comparator = getDiceLuckComparator(sortOrderAscending);
-        AtomicInteger index = new AtomicInteger(1);
+        var index = new AtomicInteger(1);
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumExpectedHits =
-                event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 10, OptionMapping::getAsInt);
+                event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 50, OptionMapping::getAsInt);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## __**Dice Luck**__\n");

@@ -15,7 +15,7 @@ class DiceLuck extends Subcommand {
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS,
-                "Minimum number of expected hits to show (Default = 10)"));
+                "Minimum number of expected hits to show (Default = 50)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.IGNORE_ENDED_GAMES,
