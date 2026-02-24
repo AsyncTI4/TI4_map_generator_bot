@@ -29,7 +29,7 @@ public class TurnCountService {
             if (player.getTotalNumberOfTurns() <= 0) {
                 continue;
             }
-            usersToTurnCounts.merge(player.getUser().getId(), 1, Integer::sum);
+            usersToTurnCounts.merge(player.getUser().getId(), player.getTotalNumberOfTurns(), Integer::sum);
         }
 
         return usersToTurnCounts;
