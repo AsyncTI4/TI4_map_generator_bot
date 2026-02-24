@@ -52,9 +52,7 @@ public class AverageTurnTimeService {
             List<PlayerEntity> players, int minTurns, int topLimit) {
         Map<UserEntity, UserAverageTurnTimeAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
-            if (player.getTotalNumberOfTurns() == 0) {
-                continue;
-            }
+            if (player.getTotalNumberOfTurns() == 0) continue;
             statsMap.computeIfAbsent(
                             player.getUser(), user -> new UserAverageTurnTimeAccumulator(user.getId(), user.getName()))
                     .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
@@ -76,7 +74,7 @@ public class AverageTurnTimeService {
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(stats.getAverage()));
 
             if (showMedian) {
-                long median = Helper.median(stats.gameAverages);
+                long median = (long) Helper.median(stats.gameAverages);
                 sb.append(" (median: ")
                         .append(DateTimeHelper.getTimeRepresentationToSeconds(median))
                         .append(")");
@@ -121,11 +119,11 @@ public class AverageTurnTimeService {
     }
 
     private static class UserAverageTurnTimeAccumulator {
-        String userId;
-        String username;
-        int totalTurns;
-        long totalTime;
-        List<Long> gameAverages = new ArrayList<>();
+        private final String userId;
+        private final String username;
+        private int totalTurns;
+        private long totalTime;
+        private final List<Long> gameAverages = new ArrayList<>();
 
         UserAverageTurnTimeAccumulator(String userId, String username) {
             this.userId = userId;

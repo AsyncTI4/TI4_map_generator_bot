@@ -1331,6 +1331,7 @@ public class Constants {
     public static final String REPLACEMENT_MADE = "replacement_made";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
     public static final String DICE_LUCK = "dice_luck";
+    public static final String HITS_PER_TURN = "hits_per_turn";
     public static final String LIFETIME_RECORD = "lifetime_record";
     public static final String FACTION_RECORD_OF_TECH = "faction_record_of_tech";
     public static final String FACTION_RECORD_OF_SCPICK = "faction_record_of_scpick";
