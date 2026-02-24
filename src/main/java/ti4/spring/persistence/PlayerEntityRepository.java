@@ -10,6 +10,9 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
     @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u")
     List<PlayerEntity> findAllWithUsers();
 
+    @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g WHERE g.completed IS TRUE")
+    List<PlayerEntity> findAllWithUsersByCompletedGame();
+
     @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN p.game g WHERE g.endedEpochMilliseconds IS NULL")
     List<PlayerEntity> findAllWithUsersByActiveGame();
 

@@ -23,44 +23,39 @@ import ti4.spring.persistence.UserEntity;
 
 @Service
 @RequiredArgsConstructor
-public class HitsPerTurnService {
+public class AverageHitsPerTurnService {
 
     private static final int DEFAULT_PLAYER_LIMIT = 50;
-    private static final int DEFAULT_MINIMUM_EXPECTED_HITS = 50;
     private static final int DEFAULT_MINIMUM_TURNS = 100;
+    private static final int ANOMALOUS_NUMBER_OF_HITS_THRESHOLD = 200;
 
     private final PlayerEntityRepository playerEntityRepository;
 
     @Transactional(readOnly = true)
     public void getExpectedHitsPerTurn(SlashCommandInteractionEvent event) {
-        boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
-        int minimumExpectedHits = event.getOption(
-                Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, DEFAULT_MINIMUM_EXPECTED_HITS, OptionMapping::getAsInt);
         int minimumTurns =
                 event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_TURNS, OptionMapping::getAsInt);
 
-        List<PlayerEntity> players = ignoreEndedGames
-                ? playerEntityRepository.findAllWithUsersByActiveGame()
-                : playerEntityRepository.findAllWithUsers();
+        List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByCompletedGame();
 
         Map<UserEntity, HitsPerTurnAccumulator> usersToAccumulators = getUsersToHitsPerTurnAccumulators(players);
 
-        List<HitsPerTurnAccumulator> filteredResults = usersToAccumulators.values().stream()
-                .filter(s -> s.expectedHits >= minimumExpectedHits && s.turns >= minimumTurns)
+        List<HitsPerTurnAccumulator> filteredAccumulators = usersToAccumulators.values().stream()
+                .filter(accumulator -> accumulator.totalNumberOfTurns >= minimumTurns)
                 .toList();
 
-        Map<HitsPerTurnAccumulator, String> tiers = getTiers(filteredResults);
-        List<HitsPerTurnAccumulator> sortedResults = filteredResults.stream()
+        Map<HitsPerTurnAccumulator, String> tiers = getTiers(usersToAccumulators.values());
+        List<HitsPerTurnAccumulator> sortedResults = filteredAccumulators.stream()
                 .sorted((a, b) -> sortOrderAscending
-                        ? Double.compare(a.getExpectedHitsOutOfTurns(), b.getExpectedHitsOutOfTurns())
-                        : Double.compare(b.getExpectedHitsOutOfTurns(), a.getExpectedHitsOutOfTurns()))
+                        ? Double.compare(a.getAverageExpectedHitsPerTurn(), b.getAverageExpectedHitsPerTurn())
+                        : Double.compare(b.getAverageExpectedHitsPerTurn(), a.getAverageExpectedHitsPerTurn()))
                 .limit(topLimit)
                 .toList();
 
         MessageHelper.sendMessageToThread(
-                event.getChannel(), "Expected Hits Per Turn Record", toResultString(sortedResults, tiers));
+                event.getChannel(), "Average Expected Hits Per Turn", toResultString(sortedResults, tiers));
     }
 
     @NotNull
@@ -69,8 +64,8 @@ public class HitsPerTurnService {
         Map<UserEntity, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
             if (player.getTotalNumberOfTurns() == 0) continue;
-            // ignore anomalies, like nearly infinite battles
-            if (5 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
+            // Ignore anomaly games (infinite combats, spamming buttons, Franken/TF madness)
+            if (player.getExpectedHits() >= ANOMALOUS_NUMBER_OF_HITS_THRESHOLD) continue;
             userToAccumulators
                     .computeIfAbsent(player.getUser(), user -> new HitsPerTurnAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getTotalNumberOfTurns());
@@ -79,46 +74,57 @@ public class HitsPerTurnService {
     }
 
     @Transactional(readOnly = true)
-    public String getHitsPerTurn(List<String> userIds) {
+    public String getAverageHitsPerTurn(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
         Map<UserEntity, HitsPerTurnAccumulator> usersToAccumulators = getUsersToHitsPerTurnAccumulators(players);
         Collection<HitsPerTurnAccumulator> accumulators = usersToAccumulators.values();
 
-        Map<HitsPerTurnAccumulator, String> tiers = getTiers(accumulators);
         List<HitsPerTurnAccumulator> sortedResults = accumulators.stream()
-                .sorted((a, b) -> Double.compare(b.getExpectedHitsOutOfTurns(), a.getExpectedHitsOutOfTurns()))
+                .sorted((a, b) -> Double.compare(b.getAverageExpectedHitsPerTurn(), a.getAverageExpectedHitsPerTurn()))
                 .toList();
 
-        return toResultString(sortedResults, tiers);
+        return toResultString(sortedResults, null);
     }
 
     private String toResultString(
-            Iterable<HitsPerTurnAccumulator> accumulators, Map<HitsPerTurnAccumulator, String> tiers) {
-        StringBuilder sb = new StringBuilder("## __**Expected Hits Per Turn**__\n");
+            Collection<HitsPerTurnAccumulator> accumulators, Map<HitsPerTurnAccumulator, String> tiers) {
+        StringBuilder sb = new StringBuilder("## __**Average Expected Hits Per Turn**__\n");
         int index = 1;
         for (var accumulator : accumulators) {
             sb.append("`")
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
-                    .append(String.format("%.2f", accumulator.getExpectedHitsOutOfTurns()))
+                    .append(String.format("%.2f", accumulator.getAverageExpectedHitsPerTurn()))
                     .append("` ")
                     .append(accumulator.username)
-                    .append(" **[")
-                    .append(tiers.getOrDefault(accumulator, "NORMAL"))
-                    .append("]**   [")
-                    .append(String.format("%.1f", accumulator.expectedHits))
-                    .append("/")
-                    .append(accumulator.turns)
-                    .append(" expected hits/turns]\n");
+                    .append(" [")
+                    .append(String.format("%.1f", accumulator.totalExpectedHits))
+                    .append(" expected hits / ")
+                    .append(accumulator.totalNumberOfTurns)
+                    .append(" total turns]");
+            if (tiers != null && tiers.containsKey(accumulator)) {
+                sb.append(" [").append(tiers.get(accumulator)).append("]");
+            }
+            sb.append("\n");
             index++;
         }
+
+        double overallAverage = accumulators.stream()
+                .map(HitsPerTurnAccumulator::getAverageExpectedHitsPerTurn)
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0);
+
+        sb.append("\nThe overall average is ").append(String.format("%.1f", overallAverage));
         return sb.toString();
     }
 
     private static Map<HitsPerTurnAccumulator, String> getTiers(Collection<HitsPerTurnAccumulator> accumulators) {
         List<HitsPerTurnAccumulator> ascendingResults = accumulators.stream()
-                .sorted(Comparator.comparingDouble(HitsPerTurnAccumulator::getExpectedHitsOutOfTurns))
+                // for percentiles, we want to filter out low turn users
+                .filter(accumulator -> accumulator.totalNumberOfTurns >= DEFAULT_MINIMUM_TURNS)
+                .sorted(Comparator.comparingDouble(HitsPerTurnAccumulator::getAverageExpectedHitsPerTurn))
                 .toList();
         int totalPlayers = ascendingResults.size();
         return IntStream.range(0, totalPlayers)
@@ -127,45 +133,30 @@ public class HitsPerTurnService {
     }
 
     private static String getTier(int index, int totalPlayers) {
-        if (totalPlayers < 100) {
-            return "UNKNOWN TIER";
-        }
-        double percentile = (double) index / totalPlayers;
-        if (percentile <= 0.10) {
-            return "VERY LOW";
-        }
-        if (percentile <= 0.30) {
-            return "LOW";
-        }
-        if (percentile <= 0.70) {
-            return "NORMAL";
-        }
-        if (percentile <= 0.90) {
-            return "HIGH";
-        }
-        return "VERY HIGH";
+        double percentile = (1 - (double) index / totalPlayers) * 100;
+        return String.format("%.2f Percentile", percentile);
     }
 
-    public static HitsPerTurnService getBean() {
-        return SpringContext.getBean(HitsPerTurnService.class);
+    public static AverageHitsPerTurnService getBean() {
+        return SpringContext.getBean(AverageHitsPerTurnService.class);
     }
 
     private static class HitsPerTurnAccumulator {
         private final String username;
-        private double expectedHits;
-        private int turns;
+        private double totalExpectedHits;
+        private int totalNumberOfTurns;
 
         HitsPerTurnAccumulator(String username) {
             this.username = username;
         }
 
         void addGame(double expectedHits, int turns) {
-            this.expectedHits += expectedHits;
-            this.turns += turns;
+            totalExpectedHits += expectedHits;
+            totalNumberOfTurns += turns;
         }
 
-        double getExpectedHitsOutOfTurns() {
-            return turns == 0 ? 0 : expectedHits / turns;
+        double getAverageExpectedHitsPerTurn() {
+            return totalNumberOfTurns == 0 ? 0 : totalExpectedHits / totalNumberOfTurns;
         }
     }
 }

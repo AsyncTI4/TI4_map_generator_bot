@@ -74,7 +74,7 @@ public class AverageTurnTimeService {
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(stats.getAverage()));
 
             if (showMedian) {
-                long median = Helper.median(stats.gameAverages);
+                long median = (long) Helper.median(stats.gameAverages);
                 sb.append(" (median: ")
                         .append(DateTimeHelper.getTimeRepresentationToSeconds(median))
                         .append(")");
