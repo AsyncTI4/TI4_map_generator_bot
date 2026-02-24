@@ -86,8 +86,8 @@ public class DiceLuckService {
             if (expectedHitsToActualHits == null) continue;
             double expectedHits = expectedHitsToActualHits.getKey();
             int actualHits = expectedHitsToActualHits.getValue();
-            int turnCount = userIdsToTurnCounts.get(user.getId());
-            if (expectedHits != 0 && actualHits != 0) {
+            int turnCount = userIdsToTurnCounts.getOrDefault(user.getId(), 0);
+            if (expectedHits != 0 && actualHits != 0 && turnCount != 0) {
                 appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits, false);
                 appendDicePerTurn(sb, index, user.getEffectiveName(), expectedHits, turnCount);
             }

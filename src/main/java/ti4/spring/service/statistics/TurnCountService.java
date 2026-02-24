@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.spring.context.SpringContext;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
@@ -18,6 +19,7 @@ public class TurnCountService {
 
     private final PlayerEntityRepository playerEntityRepository;
 
+    @Transactional(readOnly = true)
     public Map<String, Integer> getUserIdsToTurnCounts(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllPlayersForUsers(userIds);
 
@@ -35,8 +37,7 @@ public class TurnCountService {
             if (player.getTotalNumberOfTurns() <= 0) {
                 continue;
             }
-            statsMap.computeIfAbsent(
-                            player.getUser(), user -> new UserTurnCountAccumulator(user.getId(), user.getName()))
+            statsMap.computeIfAbsent(player.getUser(), user -> new UserTurnCountAccumulator(user.getId()))
                     .addTurns(player.getTotalNumberOfTurns());
         }
 
@@ -52,12 +53,10 @@ public class TurnCountService {
 
     private static class UserTurnCountAccumulator {
         String userId;
-        String username;
         int totalTurns;
 
-        UserTurnCountAccumulator(String userId, String username) {
+        UserTurnCountAccumulator(String userId) {
             this.userId = userId;
-            this.username = username;
         }
 
         void addTurns(int turns) {

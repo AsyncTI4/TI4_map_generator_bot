@@ -91,6 +91,7 @@ public class AverageTurnTimeService {
         return sb.toString();
     }
 
+    @Transactional(readOnly = true)
     public String getAverageTurnTimesString(List<String> userIds) {
         List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
         return toResultString(averageTurnTimes, true);
@@ -104,6 +105,7 @@ public class AverageTurnTimeService {
         return getAverageTurnTimes(players, minimumTurns, maximumResults);
     }
 
+    @Transactional(readOnly = true)
     public Map<String, Long> getUserIdsToAverageTurnTimes(List<String> userIds) {
         List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
 
@@ -133,7 +135,9 @@ public class AverageTurnTimeService {
         void addGame(int turns, long time) {
             totalTurns += turns;
             totalTime += time;
-            gameAverages.add(time / turns);
+            if (turns > 0) {
+                gameAverages.add(time / turns);
+            }
         }
 
         long getAverage() {
