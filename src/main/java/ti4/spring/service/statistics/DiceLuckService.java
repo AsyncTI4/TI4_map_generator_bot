@@ -70,15 +70,16 @@ public class DiceLuckService {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (DiceLuckAccumulator diceLuckAccumulator : userIdsToDiceLuckAccumulators.values()) {
-            if (diceLuckAccumulator == null
-                    || diceLuckAccumulator.expectedHits == 0
-                    || diceLuckAccumulator.actualHits == 0) {
+            if (diceLuckAccumulator.expectedHits == 0 || diceLuckAccumulator.actualHits == 0) {
                 continue;
             }
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
-            sb.append(String.format("%.2f", diceLuckAccumulator.getDiceLuck()));
-            sb.append("` ").append(diceLuckAccumulator.username);
-            sb.append("   [")
+            sb.append("`")
+                    .append(Helper.leftpad(String.valueOf(index), 3))
+                    .append(". ")
+                    .append(String.format("%.2f", diceLuckAccumulator.getDiceLuck()))
+                    .append("` ")
+                    .append(diceLuckAccumulator.username)
+                    .append("   [")
                     .append(diceLuckAccumulator.actualHits)
                     .append("/")
                     .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
