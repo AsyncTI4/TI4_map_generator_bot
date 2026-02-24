@@ -65,9 +65,8 @@ public class DiceLuckService {
     }
 
     @Transactional(readOnly = true)
-    public String getDiceLuck(List<User> users) {
-        List<String> userIds = users.stream().map(User::getId).distinct().toList();
-        List<PlayerEntity> players = playerEntityRepository.findAllByUser_IdIn(userIds);
+    public String getDiceLuck(List<String> userIds) {
+        List<PlayerEntity> players = playerEntityRepository.findAllPlayersForUsers(userIds);
 
         Map<String, DiceLuckAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
