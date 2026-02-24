@@ -26,7 +26,7 @@ public class DiceLuckService {
     private final PlayerEntityRepository playerEntityRepository;
 
     @Transactional(readOnly = true)
-    public void getDiceLuck(SlashCommandInteractionEvent event) {
+    public void getActualVersusExpectedHits(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
@@ -41,14 +41,14 @@ public class DiceLuckService {
         for (PlayerEntity player : players) {
             userIdsToDiceLuckAccumulators
                     .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits());
+                    .addGame(player.getExpectedHits(), player.getActualHits(), player.getTotalNumberOfTurns());
         }
 
         List<DiceLuckAccumulator> sortedResults = userIdsToDiceLuckAccumulators.values().stream()
                 .filter(s -> s.expectedHits > minimumExpectedHits && s.actualHits > 0)
                 .sorted((a, b) -> sortOrderAscending
-                        ? Double.compare(a.getDiceLuck(), b.getDiceLuck())
-                        : Double.compare(b.getDiceLuck(), a.getDiceLuck()))
+                        ? Double.compare(a.getActualHitsOutOfExpected(), b.getActualHitsOutOfExpected())
+                        : Double.compare(b.getActualHitsOutOfExpected(), a.getActualHitsOutOfExpected()))
                 .limit(topLimit)
                 .toList();
 
@@ -64,45 +64,62 @@ public class DiceLuckService {
             UserEntity user = player.getUser();
             userIdsToDiceLuckAccumulators
                     .computeIfAbsent(user.getId(), key -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits());
+                    .addGame(player.getExpectedHits(), player.getActualHits(), player.getTotalNumberOfTurns());
         }
 
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (DiceLuckAccumulator diceLuckAccumulator : userIdsToDiceLuckAccumulators.values()) {
-            if (diceLuckAccumulator.expectedHits == 0 || diceLuckAccumulator.actualHits == 0) {
+            if (diceLuckAccumulator.expectedHits == 0
+                    || diceLuckAccumulator.actualHits == 0
+                    || diceLuckAccumulator.turns == 0) {
                 continue;
             }
             sb.append("`")
                     .append(Helper.leftpad(String.valueOf(index), 3))
                     .append(". ")
-                    .append(String.format("%.2f", diceLuckAccumulator.getDiceLuck()))
+                    .append(String.format("%.2f", diceLuckAccumulator.getActualHitsOutOfExpected()))
                     .append("` ")
                     .append(diceLuckAccumulator.username)
                     .append("   [")
                     .append(diceLuckAccumulator.actualHits)
                     .append("/")
                     .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
-                    .append(" actual/expected]\n");
+                    .append(" actual/expected hits]\n");
+            index++;
+
+            sb.append("`")
+                    .append(Helper.leftpad(String.valueOf(index), 3))
+                    .append(". ")
+                    .append(String.format("%.2f", diceLuckAccumulator.getExpectedHitsOutOfTurns()))
+                    .append("` ")
+                    .append(diceLuckAccumulator.username)
+                    .append("   [")
+                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
+                    .append("/")
+                    .append(diceLuckAccumulator.turns)
+                    .append(" expected hits/turns]\n");
             index++;
         }
         return sb.toString();
     }
 
-    private String toResultString(List<DiceLuckAccumulator> sortedResults) {
+    private String toResultString(List<DiceLuckAccumulator> diceLuckAccumulators) {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
-        for (var stats : sortedResults) {
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
-            index++;
-            sb.append(String.format("%.2f", stats.getDiceLuck()));
-            sb.append("` ")
-                    .append(stats.username)
+        for (var diceLuckAccumulator : diceLuckAccumulators) {
+            sb.append("`")
+                    .append(Helper.leftpad(String.valueOf(index), 3))
+                    .append(". ")
+                    .append(String.format("%.2f", diceLuckAccumulator.getActualHitsOutOfExpected()))
+                    .append("` ")
+                    .append(diceLuckAccumulator.username)
                     .append("   [")
-                    .append(stats.actualHits)
+                    .append(diceLuckAccumulator.actualHits)
                     .append("/")
-                    .append(String.format("%.1f", stats.expectedHits))
-                    .append(" actual/expected]\n");
+                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
+                    .append(" actual/expected hits]\n");
+            index++;
         }
         return sb.toString();
     }
@@ -115,18 +132,24 @@ public class DiceLuckService {
         String username;
         double expectedHits;
         int actualHits;
+        int turns;
 
         DiceLuckAccumulator(String username) {
             this.username = username;
         }
 
-        void addGame(double gameExpectedHits, int gameActualHits) {
-            expectedHits += gameExpectedHits;
-            actualHits += gameActualHits;
+        void addGame(double expectedHits, int actualHits, int turns) {
+            this.expectedHits += expectedHits;
+            this.actualHits += actualHits;
+            this.turns += turns;
         }
 
-        double getDiceLuck() {
+        double getActualHitsOutOfExpected() {
             return expectedHits == 0 ? 0 : actualHits / expectedHits;
+        }
+
+        double getExpectedHitsOutOfTurns() {
+            return turns == 0 ? 0 : expectedHits / turns;
         }
     }
 }

@@ -28,6 +28,6 @@ class DiceLuck extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        DiceLuckService.getBean().getDiceLuck(event);
+        DiceLuckService.getBean().getActualVersusExpectedHits(event);
     }
 }
