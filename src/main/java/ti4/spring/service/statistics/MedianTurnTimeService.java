@@ -41,7 +41,7 @@ public class MedianTurnTimeService {
 
         Map<UserEntity, PlayerStatsAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
-            if (player.getTotalNumberOfTurns() == 0 || player.getTotalTurnTime() == 0) continue;
+            if (player.getTotalNumberOfTurns() == 0) continue;
             statsMap.computeIfAbsent(player.getUser(), user -> new PlayerStatsAccumulator(user.getName()))
                     .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
         }

@@ -67,7 +67,7 @@ public class HitsPerTurnService {
             List<PlayerEntity> players) {
         Map<UserEntity, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
-            if (player.getExpectedHits() == 0 || player.getActualHits() == 0) continue;
+            if (player.getTotalNumberOfTurns() == 0) continue;
             // ignore anomalies, like nearly infinite battles
             if (2 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
             userToAccumulators

@@ -55,7 +55,7 @@ public class DiceLuckService {
     private static Map<UserEntity, DiceLuckAccumulator> getUsersToDiceLuckAccumulator(List<PlayerEntity> players) {
         Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
-            if (player.getExpectedHits() == 0 || player.getActualHits() == 0) continue;
+            if (player.getExpectedHits() == 0) continue;
             // ignore anomalies, like nearly infinite battles
             if (2 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
             userIdsToDiceLuckAccumulators
