@@ -37,9 +37,8 @@ public class AverageTurnTimeService {
         int minTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
-        List<PlayerEntity> players = ignoreEndedGames
-                ? playerEntityRepository.findAllPlayersOfActiveGames()
-                : playerEntityRepository.findAll();
+        List<PlayerEntity> players =
+                ignoreEndedGames ? playerEntityRepository.findAllByActiveGame() : playerEntityRepository.findAll();
 
         List<UserAverageTurnTimeAccumulator> sortedResults = getAverageTurnTimes(players, minTurns, topLimit);
 
@@ -76,7 +75,7 @@ public class AverageTurnTimeService {
             sb.append(DateTimeHelper.getTimeRepresentationToSeconds(stats.getAverage()));
 
             if (showMedian) {
-                long median = Helper.median(stats.gameAverages.stream().sorted().toList());
+                long median = Helper.median(stats.gameAverages);
                 sb.append(" (median: ")
                         .append(DateTimeHelper.getTimeRepresentationToSeconds(median))
                         .append(")");
@@ -98,7 +97,7 @@ public class AverageTurnTimeService {
     }
 
     private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(List<String> userIds) {
-        List<PlayerEntity> players = playerEntityRepository.findAllPlayersForUsers(userIds);
+        List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
         int minimumTurns = 0;
         int maximumResults = userIds.size();
