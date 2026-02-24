@@ -32,7 +32,7 @@ public class MedianTurnTimeService {
     public void getMedianTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
-        int minTurns = event.getOption(
+        int minimumTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
         List<PlayerEntity> players = ignoreEndedGames
@@ -50,7 +50,7 @@ public class MedianTurnTimeService {
         }
 
         List<PlayerStatsAccumulator> sortedResults = statsMap.values().stream()
-                .filter(s -> s.totalTurns >= minTurns)
+                .filter(s -> s.totalTurns >= minimumTurns)
                 .sorted(Comparator.comparingLong(PlayerStatsAccumulator::getMedian))
                 .limit(topLimit)
                 .toList();

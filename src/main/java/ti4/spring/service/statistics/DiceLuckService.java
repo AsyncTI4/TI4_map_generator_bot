@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
@@ -37,15 +38,10 @@ public class DiceLuckService {
                 ? playerEntityRepository.findAllWithUsersByActiveGame()
                 : playerEntityRepository.findAllWithUsers();
 
-        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
-            userIdsToDiceLuckAccumulators
-                    .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits());
-        }
+        Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = getUsersToDiceLuckAccumulator(players);
 
-        List<DiceLuckAccumulator> sortedResults = userIdsToDiceLuckAccumulators.values().stream()
-                .filter(s -> s.expectedHits > minimumExpectedHits && s.actualHits > 0)
+        List<DiceLuckAccumulator> sortedResults = usersToDiceLuckAccumulators.values().stream()
+                .filter(s -> s.expectedHits >= minimumExpectedHits && s.actualHits > 0)
                 .sorted((a, b) -> sortOrderAscending
                         ? Double.compare(a.getActualHitsOutOfExpected(), b.getActualHitsOutOfExpected())
                         : Double.compare(b.getActualHitsOutOfExpected(), a.getActualHitsOutOfExpected()))
@@ -55,41 +51,29 @@ public class DiceLuckService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Dice Luck Record", toResultString(sortedResults));
     }
 
+    @NotNull
+    private static Map<UserEntity, DiceLuckAccumulator> getUsersToDiceLuckAccumulator(List<PlayerEntity> players) {
+        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
+        for (PlayerEntity player : players) {
+            // ignore anomalies, like nearly infinite battles
+            if (2 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
+            userIdsToDiceLuckAccumulators
+                    .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
+                    .addGame(player.getExpectedHits(), player.getActualHits());
+        }
+        return userIdsToDiceLuckAccumulators;
+    }
+
     @Transactional(readOnly = true)
     public String getDiceLuck(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
-        Map<String, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
-            UserEntity user = player.getUser();
-            userIdsToDiceLuckAccumulators
-                    .computeIfAbsent(user.getId(), key -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits());
-        }
+        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = getUsersToDiceLuckAccumulator(players);
 
-        StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
-        int index = 1;
-        for (DiceLuckAccumulator diceLuckAccumulator : userIdsToDiceLuckAccumulators.values()) {
-            if (diceLuckAccumulator.expectedHits == 0 || diceLuckAccumulator.actualHits == 0) {
-                continue;
-            }
-            sb.append("`")
-                    .append(Helper.leftpad(String.valueOf(index), 3))
-                    .append(". ")
-                    .append(String.format("%.2f", diceLuckAccumulator.getActualHitsOutOfExpected()))
-                    .append("` ")
-                    .append(diceLuckAccumulator.username)
-                    .append("   [")
-                    .append(diceLuckAccumulator.actualHits)
-                    .append("/")
-                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
-                    .append(" actual/expected hits]\n");
-            index++;
-        }
-        return sb.toString();
+        return toResultString(userIdsToDiceLuckAccumulators.values());
     }
 
-    private String toResultString(List<DiceLuckAccumulator> diceLuckAccumulators) {
+    private String toResultString(Iterable<DiceLuckAccumulator> diceLuckAccumulators) {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (var diceLuckAccumulator : diceLuckAccumulators) {
@@ -130,6 +114,5 @@ public class DiceLuckService {
         double getActualHitsOutOfExpected() {
             return expectedHits == 0 ? 0 : actualHits / expectedHits;
         }
-
     }
 }

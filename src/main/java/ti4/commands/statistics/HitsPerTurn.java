@@ -17,6 +17,10 @@ class HitsPerTurn extends Subcommand {
                 Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS,
                 "Minimum number of expected hits to show (Default = 50)"));
         addOptions(new OptionData(
+                OptionType.INTEGER,
+                Constants.MINIMUM_NUMBER_OF_TURNS,
+                "Minimum number of turns to show (Default = 100)"));
+        addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.IGNORE_ENDED_GAMES,
                 "True to exclude ended games from the calculation (default = false)"));
@@ -31,4 +35,3 @@ class HitsPerTurn extends Subcommand {
         HitsPerTurnService.getBean().getExpectedHitsPerTurn(event);
     }
 }
-

@@ -1,12 +1,15 @@
 package ti4.spring.service.statistics;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
@@ -23,6 +26,7 @@ public class HitsPerTurnService {
 
     private static final int DEFAULT_PLAYER_LIMIT = 50;
     private static final int DEFAULT_MINIMUM_EXPECTED_HITS = 50;
+    private static final int DEFAULT_MINIMUM_TURNS = 100;
 
     private final PlayerEntityRepository playerEntityRepository;
 
@@ -33,20 +37,17 @@ public class HitsPerTurnService {
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minimumExpectedHits = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, DEFAULT_MINIMUM_EXPECTED_HITS, OptionMapping::getAsInt);
+        int minimumTurns =
+                event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_TURNS, OptionMapping::getAsInt);
 
         List<PlayerEntity> players = ignoreEndedGames
                 ? playerEntityRepository.findAllWithUsersByActiveGame()
                 : playerEntityRepository.findAllWithUsers();
 
-        Map<UserEntity, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
-            userToAccumulators
-                    .computeIfAbsent(player.getUser(), user -> new HitsPerTurnAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getTotalNumberOfTurns());
-        }
+        Map<UserEntity, HitsPerTurnAccumulator> usersToAccumulators = getUsersToHitsPerTurnAccumulators(players);
 
-        List<HitsPerTurnAccumulator> filteredResults = userToAccumulators.values().stream()
-                .filter(s -> s.expectedHits > minimumExpectedHits && s.turns > 0)
+        List<HitsPerTurnAccumulator> filteredResults = usersToAccumulators.values().stream()
+                .filter(s -> s.expectedHits >= minimumExpectedHits && s.turns >= minimumTurns)
                 .toList();
 
         Map<HitsPerTurnAccumulator, String> tiers = getTiers(filteredResults);
@@ -61,19 +62,27 @@ public class HitsPerTurnService {
                 event.getChannel(), "Expected Hits Per Turn Record", toResultString(sortedResults, tiers));
     }
 
+    @NotNull
+    private static Map<UserEntity, HitsPerTurnAccumulator> getUsersToHitsPerTurnAccumulators(
+            List<PlayerEntity> players) {
+        Map<UserEntity, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
+        for (PlayerEntity player : players) {
+            // ignore anomalies, like nearly infinite battles
+            if (2 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
+            userToAccumulators
+                    .computeIfAbsent(player.getUser(), user -> new HitsPerTurnAccumulator(user.getName()))
+                    .addGame(player.getExpectedHits(), player.getTotalNumberOfTurns());
+        }
+        return userToAccumulators;
+    }
+
     @Transactional(readOnly = true)
     public String getHitsPerTurn(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
-        Map<String, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
-            UserEntity user = player.getUser();
-            userToAccumulators
-                    .computeIfAbsent(user.getId(), key -> new HitsPerTurnAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getTotalNumberOfTurns());
-        }
+        Map<UserEntity, HitsPerTurnAccumulator> usersToAccumulators = getUsersToHitsPerTurnAccumulators(players);
 
-        List<HitsPerTurnAccumulator> filteredResults = userToAccumulators.values().stream()
+        List<HitsPerTurnAccumulator> filteredResults = usersToAccumulators.values().stream()
                 .filter(s -> s.expectedHits > 0 && s.turns > 0)
                 .toList();
 
@@ -110,10 +119,10 @@ public class HitsPerTurnService {
 
     private static Map<HitsPerTurnAccumulator, String> getTiers(List<HitsPerTurnAccumulator> accumulators) {
         List<HitsPerTurnAccumulator> ascendingResults = accumulators.stream()
-                .sorted((a, b) -> Double.compare(a.getExpectedHitsOutOfTurns(), b.getExpectedHitsOutOfTurns()))
+                .sorted(Comparator.comparingDouble(HitsPerTurnAccumulator::getExpectedHitsOutOfTurns))
                 .toList();
         int totalPlayers = ascendingResults.size();
-        return java.util.stream.IntStream.range(0, totalPlayers)
+        return IntStream.range(0, totalPlayers)
                 .boxed()
                 .collect(Collectors.toMap(ascendingResults::get, i -> getTier(i + 1, totalPlayers)));
     }
