@@ -14,7 +14,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
@@ -31,14 +30,6 @@ public class MedianTurnTimeService {
 
     @Transactional(readOnly = true)
     public void getMedianTurnTimes(SlashCommandInteractionEvent event) {
-        try {
-            tryToGetMedianTurnTimes(event);
-        } catch (Exception e) {
-            BotLogger.error("Error getting median turn time", e);
-        }
-    }
-
-    private void tryToGetMedianTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
         int minTurns = event.getOption(
