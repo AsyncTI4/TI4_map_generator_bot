@@ -41,7 +41,7 @@ public class DiceLuckService {
         for (PlayerEntity player : players) {
             userIdsToDiceLuckAccumulators
                     .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits(), player.getTotalNumberOfTurns());
+                    .addGame(player.getExpectedHits(), player.getActualHits());
         }
 
         List<DiceLuckAccumulator> sortedResults = userIdsToDiceLuckAccumulators.values().stream()
@@ -64,15 +64,13 @@ public class DiceLuckService {
             UserEntity user = player.getUser();
             userIdsToDiceLuckAccumulators
                     .computeIfAbsent(user.getId(), key -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits(), player.getTotalNumberOfTurns());
+                    .addGame(player.getExpectedHits(), player.getActualHits());
         }
 
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (DiceLuckAccumulator diceLuckAccumulator : userIdsToDiceLuckAccumulators.values()) {
-            if (diceLuckAccumulator.expectedHits == 0
-                    || diceLuckAccumulator.actualHits == 0
-                    || diceLuckAccumulator.turns == 0) {
+            if (diceLuckAccumulator.expectedHits == 0 || diceLuckAccumulator.actualHits == 0) {
                 continue;
             }
             sb.append("`")
@@ -86,19 +84,6 @@ public class DiceLuckService {
                     .append("/")
                     .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
                     .append(" actual/expected hits]\n");
-            index++;
-
-            sb.append("`")
-                    .append(Helper.leftpad(String.valueOf(index), 3))
-                    .append(". ")
-                    .append(String.format("%.2f", diceLuckAccumulator.getExpectedHitsOutOfTurns()))
-                    .append("` ")
-                    .append(diceLuckAccumulator.username)
-                    .append("   [")
-                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
-                    .append("/")
-                    .append(diceLuckAccumulator.turns)
-                    .append(" expected hits/turns]\n");
             index++;
         }
         return sb.toString();
@@ -132,24 +117,19 @@ public class DiceLuckService {
         String username;
         double expectedHits;
         int actualHits;
-        int turns;
 
         DiceLuckAccumulator(String username) {
             this.username = username;
         }
 
-        void addGame(double expectedHits, int actualHits, int turns) {
+        void addGame(double expectedHits, int actualHits) {
             this.expectedHits += expectedHits;
             this.actualHits += actualHits;
-            this.turns += turns;
         }
 
         double getActualHitsOutOfExpected() {
             return expectedHits == 0 ? 0 : actualHits / expectedHits;
         }
 
-        double getExpectedHitsOutOfTurns() {
-            return turns == 0 ? 0 : expectedHits / turns;
-        }
     }
 }

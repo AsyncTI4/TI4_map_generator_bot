@@ -10,6 +10,7 @@ import ti4.helpers.SearchGameHelper;
 import ti4.message.MessageHelper;
 import ti4.spring.service.statistics.AverageTurnTimeService;
 import ti4.spring.service.statistics.DiceLuckService;
+import ti4.spring.service.statistics.HitsPerTurnService;
 
 @UtilityClass
 public class LifeTimeRecordService {
@@ -31,6 +32,7 @@ public class LifeTimeRecordService {
 
         var userIds = users.stream().map(User::getId).toList();
         String records = DiceLuckService.getBean().getDiceLuck(userIds)
+                + HitsPerTurnService.getBean().getHitsPerTurn(userIds)
                 + AverageTurnTimeService.getBean().getAverageTurnTimesString(userIds)
                 + SearchGameHelper.getTotalCompletedNOngoingGames(users, event);
 
