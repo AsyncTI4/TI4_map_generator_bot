@@ -83,6 +83,7 @@ public class MedianTurnTimeService {
     private static class PlayerStatsAccumulator {
         String username;
         int totalTurns;
+        long median;
         List<Long> gameAverages = new ArrayList<>();
 
         PlayerStatsAccumulator(String username) {
@@ -95,7 +96,10 @@ public class MedianTurnTimeService {
         }
 
         long getMedian() {
-            return Helper.median(gameAverages);
+            if (median == 0 && totalTurns > 0) {
+                median = Helper.median(gameAverages);
+            }
+            return median;
         }
     }
 }
