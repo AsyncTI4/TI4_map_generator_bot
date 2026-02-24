@@ -26,16 +26,13 @@ public class PlayerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_name", nullable = false)
     private GameEntity game;
-
-    @Column(name = "username")
-    private String username;
 
     @Column(name = "faction_name")
     private String factionName;
