@@ -54,8 +54,25 @@ public class AverageHitsPerTurnService {
                 .limit(topLimit)
                 .toList();
 
-        MessageHelper.sendMessageToThread(
-                event.getChannel(), "Average Expected Hits Per Turn", toResultString(sortedResults, tiers));
+        String result = toResultString(sortedResults, tiers) + getOverallAverageString(usersToAccumulators.values());
+
+        MessageHelper.sendMessageToThread(event.getChannel(), "Average Expected Hits Per Turn", result);
+    }
+
+    private static String getOverallAverageString(Collection<HitsPerTurnAccumulator> accumulators) {
+        List<HitsPerTurnAccumulator> accumulatorsForOverallAverage = accumulators.stream()
+                // for percentiles, we want to filter out low turn users
+                .filter(accumulator -> accumulator.totalNumberOfTurns >= DEFAULT_MINIMUM_TURNS)
+                .toList();
+        double totalExpectedHits = accumulatorsForOverallAverage.stream()
+                .mapToDouble(accumulator -> accumulator.totalExpectedHits)
+                .sum();
+        int totalNumberOfTurns = accumulatorsForOverallAverage.stream()
+                .mapToInt(accumulator -> accumulator.totalNumberOfTurns)
+                .sum();
+        double overallAverage = totalNumberOfTurns == 0 ? 0 : totalExpectedHits / totalNumberOfTurns;
+
+        return String.format("\nThe overall average is %.1f", overallAverage);
     }
 
     @NotNull
@@ -109,14 +126,6 @@ public class AverageHitsPerTurnService {
             sb.append("\n");
             index++;
         }
-
-        double overallAverage = accumulators.stream()
-                .map(HitsPerTurnAccumulator::getAverageExpectedHitsPerTurn)
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElse(0);
-
-        sb.append("\nThe overall average is ").append(String.format("%.1f", overallAverage));
         return sb.toString();
     }
 
@@ -129,12 +138,12 @@ public class AverageHitsPerTurnService {
         int totalPlayers = ascendingResults.size();
         return IntStream.range(0, totalPlayers)
                 .boxed()
-                .collect(Collectors.toMap(ascendingResults::get, i -> getTier(i + 1, totalPlayers)));
+                .collect(Collectors.toMap(ascendingResults::get, i -> getPercentile(i + 1, totalPlayers)));
     }
 
-    private static String getTier(int index, int totalPlayers) {
-        double percentile = (1 - (double) index / totalPlayers) * 100;
-        return String.format("%.2f Percentile", percentile);
+    private static String getPercentile(int index, int totalPlayers) {
+        double percentile = ((double) index / totalPlayers) * 100;
+        return String.format("Top %.2f%%", percentile);
     }
 
     public static AverageHitsPerTurnService getBean() {
