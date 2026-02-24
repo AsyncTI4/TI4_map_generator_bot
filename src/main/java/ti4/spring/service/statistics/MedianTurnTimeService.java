@@ -41,7 +41,8 @@ public class MedianTurnTimeService {
     private void tryToGetMedianTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
-        int minTurns = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
+        int minTurns = event.getOption(
+                Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
         List<PlayerEntity> players = ignoreEndedGames
                 ? playerEntityRepository.findAllPlayersOfActiveGames()
@@ -103,7 +104,7 @@ public class MedianTurnTimeService {
         }
 
         long getMedian() {
-            return Helper.median(gameAverages.stream().sorted().toList());
+            return Helper.median(gameAverages);
         }
     }
 }
