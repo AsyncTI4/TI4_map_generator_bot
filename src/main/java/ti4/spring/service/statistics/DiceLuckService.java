@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
@@ -37,15 +38,10 @@ public class DiceLuckService {
                 ? playerEntityRepository.findAllWithUsersByActiveGame()
                 : playerEntityRepository.findAllWithUsers();
 
-        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
-            userIdsToDiceLuckAccumulators
-                    .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits(), player.getTotalNumberOfTurns());
-        }
+        Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = getUsersToDiceLuckAccumulator(players);
 
-        List<DiceLuckAccumulator> sortedResults = userIdsToDiceLuckAccumulators.values().stream()
-                .filter(s -> s.expectedHits > minimumExpectedHits && s.actualHits > 0)
+        List<DiceLuckAccumulator> sortedResults = usersToDiceLuckAccumulators.values().stream()
+                .filter(s -> s.expectedHits >= minimumExpectedHits && s.actualHits > 0)
                 .sorted((a, b) -> sortOrderAscending
                         ? Double.compare(a.getActualHitsOutOfExpected(), b.getActualHitsOutOfExpected())
                         : Double.compare(b.getActualHitsOutOfExpected(), a.getActualHitsOutOfExpected()))
@@ -55,56 +51,28 @@ public class DiceLuckService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Dice Luck Record", toResultString(sortedResults));
     }
 
+    @NotNull
+    private static Map<UserEntity, DiceLuckAccumulator> getUsersToDiceLuckAccumulator(List<PlayerEntity> players) {
+        Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = new HashMap<>();
+        for (PlayerEntity player : players) {
+            if (player.getExpectedHits() == 0) continue;
+            usersToDiceLuckAccumulators
+                    .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
+                    .addGame(player.getExpectedHits(), player.getActualHits());
+        }
+        return usersToDiceLuckAccumulators;
+    }
+
     @Transactional(readOnly = true)
     public String getDiceLuck(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
-        Map<String, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
-        for (PlayerEntity player : players) {
-            UserEntity user = player.getUser();
-            userIdsToDiceLuckAccumulators
-                    .computeIfAbsent(user.getId(), key -> new DiceLuckAccumulator(user.getName()))
-                    .addGame(player.getExpectedHits(), player.getActualHits(), player.getTotalNumberOfTurns());
-        }
+        Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = getUsersToDiceLuckAccumulator(players);
 
-        StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
-        int index = 1;
-        for (DiceLuckAccumulator diceLuckAccumulator : userIdsToDiceLuckAccumulators.values()) {
-            if (diceLuckAccumulator.expectedHits == 0
-                    || diceLuckAccumulator.actualHits == 0
-                    || diceLuckAccumulator.turns == 0) {
-                continue;
-            }
-            sb.append("`")
-                    .append(Helper.leftpad(String.valueOf(index), 3))
-                    .append(". ")
-                    .append(String.format("%.2f", diceLuckAccumulator.getActualHitsOutOfExpected()))
-                    .append("` ")
-                    .append(diceLuckAccumulator.username)
-                    .append("   [")
-                    .append(diceLuckAccumulator.actualHits)
-                    .append("/")
-                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
-                    .append(" actual/expected hits]\n");
-            index++;
-
-            sb.append("`")
-                    .append(Helper.leftpad(String.valueOf(index), 3))
-                    .append(". ")
-                    .append(String.format("%.2f", diceLuckAccumulator.getExpectedHitsOutOfTurns()))
-                    .append("` ")
-                    .append(diceLuckAccumulator.username)
-                    .append("   [")
-                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
-                    .append("/")
-                    .append(diceLuckAccumulator.turns)
-                    .append(" expected hits/turns]\n");
-            index++;
-        }
-        return sb.toString();
+        return toResultString(usersToDiceLuckAccumulators.values());
     }
 
-    private String toResultString(List<DiceLuckAccumulator> diceLuckAccumulators) {
+    private String toResultString(Iterable<DiceLuckAccumulator> diceLuckAccumulators) {
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
         for (var diceLuckAccumulator : diceLuckAccumulators) {
@@ -129,27 +97,21 @@ public class DiceLuckService {
     }
 
     private static class DiceLuckAccumulator {
-        String username;
-        double expectedHits;
-        int actualHits;
-        int turns;
+        private final String username;
+        private double expectedHits;
+        private int actualHits;
 
         DiceLuckAccumulator(String username) {
             this.username = username;
         }
 
-        void addGame(double expectedHits, int actualHits, int turns) {
+        void addGame(double expectedHits, int actualHits) {
             this.expectedHits += expectedHits;
             this.actualHits += actualHits;
-            this.turns += turns;
         }
 
         double getActualHitsOutOfExpected() {
             return expectedHits == 0 ? 0 : actualHits / expectedHits;
-        }
-
-        double getExpectedHitsOutOfTurns() {
-            return turns == 0 ? 0 : expectedHits / turns;
         }
     }
 }
