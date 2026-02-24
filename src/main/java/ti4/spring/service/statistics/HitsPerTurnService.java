@@ -128,8 +128,8 @@ public class HitsPerTurnService {
     }
 
     private static String getTier(int index, int totalPlayers) {
-        if (totalPlayers == 0) {
-            return "NORMAL";
+        if (totalPlayers < 100) {
+            return "UNKNOWN TIER";
         }
         double percentile = (double) index / totalPlayers;
         if (percentile <= 0.10) {
