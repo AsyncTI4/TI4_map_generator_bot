@@ -35,9 +35,8 @@ public class MedianTurnTimeService {
         int minTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
-        List<PlayerEntity> players = ignoreEndedGames
-                ? playerEntityRepository.findAllPlayersOfActiveGames()
-                : playerEntityRepository.findAll();
+        List<PlayerEntity> players =
+                ignoreEndedGames ? playerEntityRepository.findAllByActiveGame() : playerEntityRepository.findAll();
 
         Map<UserEntity, PlayerStatsAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
