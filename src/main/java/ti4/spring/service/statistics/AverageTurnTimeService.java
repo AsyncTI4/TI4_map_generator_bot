@@ -124,8 +124,7 @@ public class AverageTurnTimeService {
                     statsTrackedUserId,
                     playerTurnTime,
                     (oldEntry, newEntry) -> Map.entry(
-                            oldEntry.getKey() + playerTurnTime.getKey(),
-                            oldEntry.getValue() + playerTurnTime.getValue()));
+                            oldEntry.getKey() + newEntry.getKey(), oldEntry.getValue() + newEntry.getValue()));
 
             if (playerTurnTime.getKey() == 0) {
                 continue;
