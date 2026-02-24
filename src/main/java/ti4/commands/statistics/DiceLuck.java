@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.DiceLuckService;
+import ti4.spring.service.statistics.DiceLuckService;
 
 class DiceLuck extends Subcommand {
 
@@ -28,6 +28,6 @@ class DiceLuck extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        DiceLuckService.queueReply(event);
+        DiceLuckService.getBean().getActualVersusExpectedHits(event);
     }
 }

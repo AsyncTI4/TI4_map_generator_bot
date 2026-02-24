@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.helpers.SearchGameHelper;
 import ti4.message.MessageHelper;
 import ti4.spring.service.statistics.AverageTurnTimeService;
+import ti4.spring.service.statistics.DiceLuckService;
 
 @UtilityClass
 public class LifeTimeRecordService {
@@ -27,8 +28,9 @@ public class LifeTimeRecordService {
             User user = event.getOption("player" + i).getAsUser();
             users.add(user);
         }
+
         var userIds = users.stream().map(User::getId).toList();
-        String records = DiceLuckService.getDiceLuck(users)
+        String records = DiceLuckService.getBean().getDiceLuck(userIds)
                 + AverageTurnTimeService.getBean().getAverageTurnTimesString(userIds)
                 + SearchGameHelper.getTotalCompletedNOngoingGames(users, event);
 

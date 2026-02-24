@@ -37,8 +37,9 @@ public class AverageTurnTimeService {
         int minTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
-        List<PlayerEntity> players =
-                ignoreEndedGames ? playerEntityRepository.findAllByActiveGame() : playerEntityRepository.findAll();
+        List<PlayerEntity> players = ignoreEndedGames
+                ? playerEntityRepository.findAllWithUsersByActiveGame()
+                : playerEntityRepository.findAllWithUsers();
 
         List<UserAverageTurnTimeAccumulator> sortedResults = getAverageTurnTimes(players, minTurns, topLimit);
 
