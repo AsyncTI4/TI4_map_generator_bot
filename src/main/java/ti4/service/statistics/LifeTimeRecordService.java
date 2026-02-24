@@ -18,18 +18,19 @@ public class LifeTimeRecordService {
     }
 
     private void getLifeTimeRecords(SlashCommandInteractionEvent event) {
-        List<User> members = new ArrayList<>();
+        List<User> users = new ArrayList<>();
 
         for (int i = 1; i <= 8; i++) {
             if (!Objects.nonNull(event.getOption("player" + i))) {
                 break;
             }
-            User member = event.getOption("player" + i).getAsUser();
-            members.add(member);
+            User user = event.getOption("player" + i).getAsUser();
+            users.add(user);
         }
-        String records = DiceLuckService.getDiceLuck(members)
-                + AverageTurnTimeService.getBean().getAverageTurnTime(members)
-                + SearchGameHelper.getTotalCompletedNOngoingGames(members, event);
+        var userIds = users.stream().map(User::getId).toList();
+        String records = DiceLuckService.getDiceLuck(users)
+                + AverageTurnTimeService.getBean().getAverageTurnTimesString(userIds)
+                + SearchGameHelper.getTotalCompletedNOngoingGames(users, event);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);
     }

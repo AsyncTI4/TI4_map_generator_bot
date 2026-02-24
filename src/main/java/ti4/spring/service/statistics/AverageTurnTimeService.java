@@ -1,14 +1,12 @@
 package ti4.spring.service.statistics;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
@@ -16,13 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
@@ -39,14 +31,6 @@ public class AverageTurnTimeService {
 
     @Transactional(readOnly = true)
     public void getAverageTurnTimes(SlashCommandInteractionEvent event) {
-        try {
-            tryToGetAverageTurnTimes(event);
-        } catch (Exception e) {
-            BotLogger.error("Error getting average turn time", e);
-        }
-    }
-
-    private void tryToGetAverageTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
@@ -57,27 +41,33 @@ public class AverageTurnTimeService {
                 ? playerEntityRepository.findAllPlayersOfActiveGames()
                 : playerEntityRepository.findAll();
 
-        Map<UserEntity, PlayerStatsAccumulator> statsMap = new HashMap<>();
-        for (PlayerEntity player : players) {
-            if (player.getTotalNumberOfTurns() == 0) {
-                continue;
-            }
-            statsMap.computeIfAbsent(player.getUser(), user -> new PlayerStatsAccumulator(user.getName()))
-                    .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
-        }
-
-        List<PlayerStatsAccumulator> sortedResults = statsMap.values().stream()
-                .filter(s -> s.totalTurns >= minTurns)
-                .sorted(Comparator.comparingLong(PlayerStatsAccumulator::getAverage))
-                .limit(topLimit)
-                .toList();
+        List<UserAverageTurnTimeAccumulator> sortedResults = getAverageTurnTimes(players, minTurns, topLimit);
 
         String result = toResultString(sortedResults, showMedian);
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", result);
     }
 
-    private String toResultString(List<PlayerStatsAccumulator> sortedResults, boolean showMedian) {
+    private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(
+            List<PlayerEntity> players, int minTurns, int topLimit) {
+        Map<UserEntity, UserAverageTurnTimeAccumulator> statsMap = new HashMap<>();
+        for (PlayerEntity player : players) {
+            if (player.getTotalNumberOfTurns() == 0) {
+                continue;
+            }
+            statsMap.computeIfAbsent(
+                            player.getUser(), user -> new UserAverageTurnTimeAccumulator(user.getId(), user.getName()))
+                    .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
+        }
+
+        return statsMap.values().stream()
+                .filter(s -> s.totalTurns >= minTurns)
+                .sorted(Comparator.comparingLong(UserAverageTurnTimeAccumulator::getAverage))
+                .limit(topLimit)
+                .toList();
+    }
+
+    private String toResultString(List<UserAverageTurnTimeAccumulator> sortedResults, boolean showMedian) {
         StringBuilder sb = new StringBuilder("## __**Average Turn Time:**__\n");
         int index = 1;
         for (var stats : sortedResults) {
@@ -101,89 +91,42 @@ public class AverageTurnTimeService {
         return sb.toString();
     }
 
+    public String getAverageTurnTimesString(List<String> userIds) {
+        List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
+        return toResultString(averageTurnTimes, true);
+    }
+
+    private List<UserAverageTurnTimeAccumulator> getAverageTurnTimes(List<String> userIds) {
+        List<PlayerEntity> players = playerEntityRepository.findAllPlayersForUsers(userIds);
+
+        int minimumTurns = 0;
+        int maximumResults = userIds.size();
+        return getAverageTurnTimes(players, minimumTurns, maximumResults);
+    }
+
+    public Map<String, Long> getUserIdsToAverageTurnTimes(List<String> userIds) {
+        List<UserAverageTurnTimeAccumulator> averageTurnTimes = getAverageTurnTimes(userIds);
+
+        return averageTurnTimes.stream()
+                .collect(Collectors.toMap(
+                        acc -> acc.userId,
+                        UserAverageTurnTimeAccumulator::getAverage,
+                        (existing, replacement) -> existing));
+    }
+
     public static AverageTurnTimeService getBean() {
         return SpringContext.getBean(AverageTurnTimeService.class);
     }
 
-    public Map<String, Map.Entry<Integer, Long>> getAverageTurnTimeForGames(List<ManagedGame> managedGames) {
-        Map<String, Map.Entry<Integer, Long>> turnTimes = new HashMap<>();
-        for (ManagedGame managedGame : managedGames) {
-            getAverageTurnTimeForGame(managedGame.getGame(), turnTimes);
-        }
-        return turnTimes;
-    }
-
-    private void getAverageTurnTimeForGame(Game game, Map<String, Map.Entry<Integer, Long>> turnTimes) {
-        var averageTurnTimes = new HashMap<String, List<Long>>();
-        for (Player player : game.getRealPlayers()) {
-            Integer totalTurns = player.getNumberOfTurns();
-            Long totalTurnTime = player.getTotalTurnTime();
-            Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
-            String statsTrackedUserId = player.getStatsTrackedUserID();
-            turnTimes.merge(
-                    statsTrackedUserId,
-                    playerTurnTime,
-                    (oldEntry, newEntry) -> Map.entry(
-                            oldEntry.getKey() + newEntry.getKey(), oldEntry.getValue() + newEntry.getValue()));
-
-            if (playerTurnTime.getKey() == 0) {
-                continue;
-            }
-            Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-            averageTurnTimes.compute(statsTrackedUserId, (key, value) -> {
-                if (value == null) {
-                    value = new ArrayList<>();
-                }
-                value.add(averageTurnTime);
-                return value;
-            });
-        }
-    }
-
-    public String getAverageTurnTime(List<User> users) {
-        List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
-
-        Map<String, Map.Entry<Integer, Long>> turnTimes = getAverageTurnTimeForGames(userGames);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("## __**Average Turn Time:**__\n");
-        int index = 1;
-        for (User user : users) {
-            if (!turnTimes.containsKey(user.getId())) {
-                continue;
-            }
-            int turnCount = turnTimes.get(user.getId()).getKey();
-            long totalMillis = turnTimes.get(user.getId()).getValue();
-
-            if (turnCount == 0 || totalMillis == 0) {
-                continue;
-            }
-
-            long averageTurnTime = totalMillis / turnCount;
-
-            sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
-            sb.append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime));
-            sb.append("` ").append(user.getEffectiveName());
-            sb.append("   [").append(turnCount).append(" total turns]");
-            sb.append("\n");
-            index++;
-        }
-        return sb.toString();
-    }
-
-    private static class PlayerStatsAccumulator {
+    private static class UserAverageTurnTimeAccumulator {
+        String userId;
         String username;
         int totalTurns;
         long totalTime;
         List<Long> gameAverages = new ArrayList<>();
 
-        PlayerStatsAccumulator(String username) {
+        UserAverageTurnTimeAccumulator(String userId, String username) {
+            this.userId = userId;
             this.username = username;
         }
 
