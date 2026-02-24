@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
-import ti4.message.logging.BotLogger;
 import ti4.spring.context.SpringContext;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
@@ -29,14 +27,6 @@ public class DiceLuckService {
 
     @Transactional(readOnly = true)
     public void getDiceLuck(SlashCommandInteractionEvent event) {
-        try {
-            tryToGetDiceLuck(event);
-        } catch (Exception e) {
-            BotLogger.error("Error getting dice luck", e);
-        }
-    }
-
-    private void tryToGetDiceLuck(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
@@ -47,13 +37,13 @@ public class DiceLuckService {
                 ? playerEntityRepository.findAllPlayersOfActiveGames()
                 : playerEntityRepository.findAll();
 
-        Map<UserEntity, DiceLuckAccumulator> statsMap = new HashMap<>();
+        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
-            statsMap.computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
+            userIdsToDiceLuckAccumulators.computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getActualHits());
         }
 
-        List<DiceLuckAccumulator> sortedResults = statsMap.values().stream()
+        List<DiceLuckAccumulator> sortedResults = userIdsToDiceLuckAccumulators.values().stream()
                 .filter(s -> s.expectedHits > minimumExpectedHits && s.actualHits > 0)
                 .sorted((a, b) -> sortOrderAscending
                         ? Double.compare(a.getDiceLuck(), b.getDiceLuck())
@@ -68,27 +58,26 @@ public class DiceLuckService {
     public String getDiceLuck(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllPlayersForUsers(userIds);
 
-        Map<String, DiceLuckAccumulator> statsMap = new HashMap<>();
+        Map<String, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
             UserEntity user = player.getUser();
-            statsMap.computeIfAbsent(user.getId(), key -> new DiceLuckAccumulator(user.getName()))
+            userIdsToDiceLuckAccumulators.computeIfAbsent(user.getId(), key -> new DiceLuckAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getActualHits());
         }
 
         StringBuilder sb = new StringBuilder("## __**Dice Luck**__\n");
         int index = 1;
-        for (User user : users) {
-            DiceLuckAccumulator stats = statsMap.get(user.getId());
-            if (stats == null || stats.expectedHits == 0 || stats.actualHits == 0) {
+        for (DiceLuckAccumulator diceLuckAccumulator : userIdsToDiceLuckAccumulators.values()) {
+            if (diceLuckAccumulator == null || diceLuckAccumulator.expectedHits == 0 || diceLuckAccumulator.actualHits == 0) {
                 continue;
             }
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 3)).append(". ");
-            sb.append(String.format("%.2f", stats.getDiceLuck()));
-            sb.append("` ").append(user.getEffectiveName());
+            sb.append(String.format("%.2f", diceLuckAccumulator.getDiceLuck()));
+            sb.append("` ").append(diceLuckAccumulator.username);
             sb.append("   [")
-                    .append(stats.actualHits)
+                    .append(diceLuckAccumulator.actualHits)
                     .append("/")
-                    .append(String.format("%.1f", stats.expectedHits))
+                    .append(String.format("%.1f", diceLuckAccumulator.expectedHits))
                     .append(" actual/expected]\n");
             index++;
         }
