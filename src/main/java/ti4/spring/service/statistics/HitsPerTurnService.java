@@ -1,5 +1,6 @@
 package ti4.spring.service.statistics;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -64,12 +65,12 @@ public class HitsPerTurnService {
 
     @NotNull
     private static Map<UserEntity, HitsPerTurnAccumulator> getUsersToHitsPerTurnAccumulators(
-            List<PlayerEntity> players) {
+            Iterable<PlayerEntity> players) {
         Map<UserEntity, HitsPerTurnAccumulator> userToAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
             if (player.getTotalNumberOfTurns() == 0) continue;
             // ignore anomalies, like nearly infinite battles
-            if (2 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
+            if (5 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
             userToAccumulators
                     .computeIfAbsent(player.getUser(), user -> new HitsPerTurnAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getTotalNumberOfTurns());
@@ -82,13 +83,10 @@ public class HitsPerTurnService {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
         Map<UserEntity, HitsPerTurnAccumulator> usersToAccumulators = getUsersToHitsPerTurnAccumulators(players);
+        Collection<HitsPerTurnAccumulator> accumulators = usersToAccumulators.values();
 
-        List<HitsPerTurnAccumulator> filteredResults = usersToAccumulators.values().stream()
-                .filter(s -> s.expectedHits > 0 && s.turns > 0)
-                .toList();
-
-        Map<HitsPerTurnAccumulator, String> tiers = getTiers(filteredResults);
-        List<HitsPerTurnAccumulator> sortedResults = filteredResults.stream()
+        Map<HitsPerTurnAccumulator, String> tiers = getTiers(accumulators);
+        List<HitsPerTurnAccumulator> sortedResults = accumulators.stream()
                 .sorted((a, b) -> Double.compare(b.getExpectedHitsOutOfTurns(), a.getExpectedHitsOutOfTurns()))
                 .toList();
 
@@ -96,7 +94,7 @@ public class HitsPerTurnService {
     }
 
     private String toResultString(
-            List<HitsPerTurnAccumulator> accumulators, Map<HitsPerTurnAccumulator, String> tiers) {
+            Iterable<HitsPerTurnAccumulator> accumulators, Map<HitsPerTurnAccumulator, String> tiers) {
         StringBuilder sb = new StringBuilder("## __**Expected Hits Per Turn**__\n");
         int index = 1;
         for (var accumulator : accumulators) {
@@ -118,7 +116,7 @@ public class HitsPerTurnService {
         return sb.toString();
     }
 
-    private static Map<HitsPerTurnAccumulator, String> getTiers(List<HitsPerTurnAccumulator> accumulators) {
+    private static Map<HitsPerTurnAccumulator, String> getTiers(Collection<HitsPerTurnAccumulator> accumulators) {
         List<HitsPerTurnAccumulator> ascendingResults = accumulators.stream()
                 .sorted(Comparator.comparingDouble(HitsPerTurnAccumulator::getExpectedHitsOutOfTurns))
                 .toList();

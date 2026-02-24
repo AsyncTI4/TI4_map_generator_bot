@@ -57,7 +57,7 @@ public class DiceLuckService {
         for (PlayerEntity player : players) {
             if (player.getExpectedHits() == 0) continue;
             // ignore anomalies, like nearly infinite battles
-            if (2 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
+            if (5 * player.getExpectedHits() >= player.getTotalNumberOfTurns()) continue;
             userIdsToDiceLuckAccumulators
                     .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getActualHits());
