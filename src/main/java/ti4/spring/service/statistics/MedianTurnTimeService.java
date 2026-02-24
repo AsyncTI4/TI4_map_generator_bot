@@ -78,10 +78,10 @@ public class MedianTurnTimeService {
     }
 
     private static class PlayerStatsAccumulator {
-        String username;
-        int totalTurns;
-        long median;
-        List<Long> gameAverages = new ArrayList<>();
+        private final String username;
+        private int totalTurns;
+        private long median;
+        private final List<Long> gameAverages = new ArrayList<>();
 
         PlayerStatsAccumulator(String username) {
             this.username = username;

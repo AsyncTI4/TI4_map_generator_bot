@@ -119,11 +119,11 @@ public class AverageTurnTimeService {
     }
 
     private static class UserAverageTurnTimeAccumulator {
-        String userId;
-        String username;
-        int totalTurns;
-        long totalTime;
-        List<Long> gameAverages = new ArrayList<>();
+        private final String userId;
+        private final String username;
+        private int totalTurns;
+        private long totalTime;
+        private final List<Long> gameAverages = new ArrayList<>();
 
         UserAverageTurnTimeAccumulator(String userId, String username) {
             this.userId = userId;

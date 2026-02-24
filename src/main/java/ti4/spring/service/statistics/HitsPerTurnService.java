@@ -151,9 +151,9 @@ public class HitsPerTurnService {
     }
 
     private static class HitsPerTurnAccumulator {
-        String username;
-        double expectedHits;
-        int turns;
+        private final String username;
+        private double expectedHits;
+        private int turns;
 
         HitsPerTurnAccumulator(String username) {
             this.username = username;

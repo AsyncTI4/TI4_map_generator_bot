@@ -99,9 +99,9 @@ public class DiceLuckService {
     }
 
     private static class DiceLuckAccumulator {
-        String username;
-        double expectedHits;
-        int actualHits;
+        private final String username;
+        private double expectedHits;
+        private int actualHits;
 
         DiceLuckAccumulator(String username) {
             this.username = username;
