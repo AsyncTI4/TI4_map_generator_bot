@@ -2,7 +2,6 @@ package ti4.buttons.handlers.game;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,19 +46,7 @@ public class CreateGameButtonHandler {
         List<Member> members = new ArrayList<>();
         members.add(event.getMember());
         Member member = event.getMember();
-        List<User> users = members.stream().map(Member::getUser).toList();
-        List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getBean().getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
         boolean owner = false;
         if (event.getChannel() instanceof ThreadChannel threadChannel) {
             if (threadChannel.getOwnerId().equals(member.getId())) {
@@ -163,7 +150,7 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
+    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
@@ -177,7 +164,7 @@ public class CreateGameButtonHandler {
         return members;
     }
 
-    public static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
+    private static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
@@ -191,20 +178,16 @@ public class CreateGameButtonHandler {
         return members;
     }
 
-    public static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
+    private static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         return gameSillyName;
     }
 
-    public static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
+    private static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         return gameSillyName;
-    }
-
-    public static String generateMemberListMessage(List<Member> members) {
-        return generateMemberListMessage(members, "");
     }
 
     public static String generateMemberListMessage(List<Member> members, String gameFunName) {
@@ -219,10 +202,9 @@ public class CreateGameButtonHandler {
                 .distinct()
                 .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getBean().getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
+        Map<String, Map.Entry<Integer, Long>> playerTurnTimes =
+                AverageTurnTimeService.getBean().getAverageTurnTimeForGames(userGames);
+
         if (gameFunName == null || gameFunName.isEmpty()) {
             memberList.append("## Players Signed Up:\n");
         } else {

@@ -74,11 +74,9 @@ public class DiceLuckService {
         for (ManagedGame game : userGames) {
             getDiceLuckForGame(game.getGame(), playerDiceLucks, new HashMap<>());
         }
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getBean()
-                    .getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
+
+        Map<String, Map.Entry<Integer, Long>> playerTurnTimes =
+                AverageTurnTimeService.getBean().getAverageTurnTimeForGames(userGames);
 
         StringBuilder sb = new StringBuilder();
         AtomicInteger index = new AtomicInteger(1);

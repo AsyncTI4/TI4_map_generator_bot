@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -107,16 +105,22 @@ public class AverageTurnTimeService {
         return SpringContext.getBean(AverageTurnTimeService.class);
     }
 
-    public void getAverageTurnTimeForGame(
-            Game game,
-            Map<String, Map.Entry<Integer, Long>> playerTurnTimes,
-            Map<String, Set<Long>> playerAverageTurnTimes) {
+    public Map<String, Map.Entry<Integer, Long>> getAverageTurnTimeForGames(List<ManagedGame> managedGames) {
+        Map<String, Map.Entry<Integer, Long>> turnTimes = new HashMap<>();
+        for (ManagedGame managedGame : managedGames) {
+            getAverageTurnTimeForGame(managedGame.getGame(), turnTimes);
+        }
+        return turnTimes;
+    }
+
+    private void getAverageTurnTimeForGame(Game game, Map<String, Map.Entry<Integer, Long>> turnTimes) {
+        var averageTurnTimes = new HashMap<String, List<Long>>();
         for (Player player : game.getRealPlayers()) {
             Integer totalTurns = player.getNumberOfTurns();
             Long totalTurnTime = player.getTotalTurnTime();
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             String statsTrackedUserId = player.getStatsTrackedUserID();
-            playerTurnTimes.merge(
+            turnTimes.merge(
                     statsTrackedUserId,
                     playerTurnTime,
                     (oldEntry, newEntry) -> Map.entry(
@@ -127,9 +131,9 @@ public class AverageTurnTimeService {
                 continue;
             }
             Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-            playerAverageTurnTimes.compute(statsTrackedUserId, (key, value) -> {
+            averageTurnTimes.compute(statsTrackedUserId, (key, value) -> {
                 if (value == null) {
-                    value = new HashSet<>();
+                    value = new ArrayList<>();
                 }
                 value.add(averageTurnTime);
                 return value;
@@ -146,20 +150,17 @@ public class AverageTurnTimeService {
                 .distinct()
                 .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
+        Map<String, Map.Entry<Integer, Long>> turnTimes = getAverageTurnTimeForGames(userGames);
 
         StringBuilder sb = new StringBuilder();
         sb.append("## __**Average Turn Time:**__\n");
         int index = 1;
         for (User user : users) {
-            if (!playerTurnTimes.containsKey(user.getId())) {
+            if (!turnTimes.containsKey(user.getId())) {
                 continue;
             }
-            int turnCount = playerTurnTimes.get(user.getId()).getKey();
-            long totalMillis = playerTurnTimes.get(user.getId()).getValue();
+            int turnCount = turnTimes.get(user.getId()).getKey();
+            long totalMillis = turnTimes.get(user.getId()).getValue();
 
             if (turnCount == 0 || totalMillis == 0) {
                 continue;
