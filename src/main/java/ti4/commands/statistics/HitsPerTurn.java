@@ -18,10 +18,6 @@ class HitsPerTurn extends Subcommand {
                 "Minimum number of turns to show (Default = 100)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
-                Constants.IGNORE_ENDED_GAMES,
-                "True to exclude ended games from the calculation (default = false)"));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
                 "ascending",
                 "True to sort the values in ascending order, lowest to highest (default = true)"));
     }

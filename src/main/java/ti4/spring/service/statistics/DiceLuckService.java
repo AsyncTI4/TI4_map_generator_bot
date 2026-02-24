@@ -53,23 +53,23 @@ public class DiceLuckService {
 
     @NotNull
     private static Map<UserEntity, DiceLuckAccumulator> getUsersToDiceLuckAccumulator(List<PlayerEntity> players) {
-        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = new HashMap<>();
+        Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = new HashMap<>();
         for (PlayerEntity player : players) {
             if (player.getExpectedHits() == 0) continue;
-            userIdsToDiceLuckAccumulators
+            usersToDiceLuckAccumulators
                     .computeIfAbsent(player.getUser(), user -> new DiceLuckAccumulator(user.getName()))
                     .addGame(player.getExpectedHits(), player.getActualHits());
         }
-        return userIdsToDiceLuckAccumulators;
+        return usersToDiceLuckAccumulators;
     }
 
     @Transactional(readOnly = true)
     public String getDiceLuck(List<String> userIds) {
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
 
-        Map<UserEntity, DiceLuckAccumulator> userIdsToDiceLuckAccumulators = getUsersToDiceLuckAccumulator(players);
+        Map<UserEntity, DiceLuckAccumulator> usersToDiceLuckAccumulators = getUsersToDiceLuckAccumulator(players);
 
-        return toResultString(userIdsToDiceLuckAccumulators.values());
+        return toResultString(usersToDiceLuckAccumulators.values());
     }
 
     private String toResultString(Iterable<DiceLuckAccumulator> diceLuckAccumulators) {

@@ -3364,7 +3364,7 @@ public class Helper {
 
     public static double median(Collection<? extends Number> numbers) {
         if (numbers == null || numbers.isEmpty()) {
-            throw new IllegalArgumentException("List cannot be empty");
+            throw new IllegalArgumentException("Cannot calculate median because no numbers were provided.");
         }
 
         double[] sorted =
