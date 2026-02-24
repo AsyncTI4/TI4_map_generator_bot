@@ -24,7 +24,7 @@ import ti4.spring.persistence.UserEntity;
 public class MedianTurnTimeService {
 
     private static final int DEFAULT_PLAYER_LIMIT = 50;
-    private static final int DEFAULT_MINIMUM_NUMBER_OF_TURNS = 1;
+    private static final int DEFAULT_MINIMUM_NUMBER_OF_TURNS = 100;
 
     private final PlayerEntityRepository playerEntityRepository;
 
