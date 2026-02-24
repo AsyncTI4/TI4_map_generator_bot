@@ -23,6 +23,7 @@ import ti4.map.persistence.GamesPage;
 import ti4.map.persistence.ManagedGame;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
+import ti4.spring.service.statistics.TurnCountService;
 
 @UtilityClass
 public class DiceLuckService {
@@ -73,10 +74,9 @@ public class DiceLuckService {
         for (ManagedGame game : userGames) {
             getDiceLuckForGame(game.getGame(), playerDiceLucks, new HashMap<>());
         }
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
+
+        List<String> userIds = users.stream().map(User::getId).toList();
+        Map<String, Integer> userIdsToTurnCounts = TurnCountService.getBean().getUserIdsToTurnCounts(userIds);
 
         StringBuilder sb = new StringBuilder();
         AtomicInteger index = new AtomicInteger(1);
@@ -86,8 +86,8 @@ public class DiceLuckService {
             if (expectedHitsToActualHits == null) continue;
             double expectedHits = expectedHitsToActualHits.getKey();
             int actualHits = expectedHitsToActualHits.getValue();
-            int turnCount = playerTurnTimes.get(user.getId()).getKey();
-            if (expectedHits != 0 && actualHits != 0) {
+            int turnCount = userIdsToTurnCounts.getOrDefault(user.getId(), 0);
+            if (expectedHits != 0 && actualHits != 0 && turnCount != 0) {
                 appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits, false);
                 appendDicePerTurn(sb, index, user.getEffectiveName(), expectedHits, turnCount);
             }

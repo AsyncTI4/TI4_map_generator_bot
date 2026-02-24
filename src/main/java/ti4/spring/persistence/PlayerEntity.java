@@ -34,9 +34,6 @@ public class PlayerEntity {
     @JoinColumn(name = "game_name", nullable = false)
     private GameEntity game;
 
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "faction_name")
     private String factionName;
 
