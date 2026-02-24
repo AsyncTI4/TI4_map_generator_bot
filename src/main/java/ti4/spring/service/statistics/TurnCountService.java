@@ -18,7 +18,7 @@ public class TurnCountService {
 
     @Transactional(readOnly = true)
     public Map<String, Integer> getUserIdsToTurnCounts(List<String> userIds) {
-        List<PlayerEntity> players = playerEntityRepository.findAllPlayersForUsers(userIds);
+        List<PlayerEntity> players = playerEntityRepository.findAllWithUsersByUserIdIn(userIds);
         return getTurnCounts(players);
     }
 
