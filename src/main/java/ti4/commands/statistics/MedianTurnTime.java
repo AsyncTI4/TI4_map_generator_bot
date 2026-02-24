@@ -15,7 +15,7 @@ class MedianTurnTime extends Subcommand {
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.MINIMUM_NUMBER_OF_TURNS,
-                "Minimum number of turns to show (Default = 1)"));
+                "Minimum number of turns to show (Default = 100)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.IGNORE_ENDED_GAMES,
