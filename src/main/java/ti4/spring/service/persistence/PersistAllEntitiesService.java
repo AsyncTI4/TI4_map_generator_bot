@@ -96,7 +96,6 @@ public class PersistAllEntitiesService {
     private PlayerEntity toEntity(Player player, GameEntity gameEntity, Map<String, UserEntity> userCache) {
         var playerEntity = new PlayerEntity();
 
-        playerEntity.setUsername(player.getUserName());
         playerEntity.setFactionName(player.getFaction());
         playerEntity.setScore(player.getTotalVictoryPoints());
         playerEntity.setTotalNumberOfTurns(player.getNumberOfTurns());

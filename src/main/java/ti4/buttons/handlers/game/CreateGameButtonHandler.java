@@ -1,11 +1,8 @@
 package ti4.buttons.handlers.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.components.selections.EntitySelectMenu;
@@ -13,7 +10,6 @@ import net.dv8tion.jda.api.components.selections.EntitySelectMenu.SelectTarget;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -28,15 +24,13 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
-import ti4.map.persistence.ManagedGame;
-import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.game.CreateGameService;
-import ti4.service.statistics.AverageTurnTimeService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.spring.jda.JdaService;
+import ti4.spring.service.statistics.AverageTurnTimeService;
 
 @UtilityClass
 public class CreateGameButtonHandler {
@@ -47,19 +41,7 @@ public class CreateGameButtonHandler {
         List<Member> members = new ArrayList<>();
         members.add(event.getMember());
         Member member = event.getMember();
-        List<User> users = members.stream().map(Member::getUser).toList();
-        List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
         boolean owner = false;
         if (event.getChannel() instanceof ThreadChannel threadChannel) {
             if (threadChannel.getOwnerId().equals(member.getId())) {
@@ -163,7 +145,7 @@ public class CreateGameButtonHandler {
         event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    public static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
+    private static List<Member> fetchMembersFromMessage(ButtonInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
@@ -177,7 +159,7 @@ public class CreateGameButtonHandler {
         return members;
     }
 
-    public static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
+    private static List<Member> fetchMembersFromMessage(ModalInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
         List<Member> members = new ArrayList<>();
         for (int i = 0; i < StringUtils.countMatches(buttonMsg, "<@"); i++) {
@@ -191,38 +173,19 @@ public class CreateGameButtonHandler {
         return members;
     }
 
-    public static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
+    private static String fetchSillyNameFromMessage(ModalInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
-        return gameSillyName;
+        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
     }
 
-    public static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
+    private static String fetchSillyNameFromMessage(ButtonInteractionEvent event) {
         String buttonMsg = event.getMessage().getContentRaw();
-        String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
-        return gameSillyName;
-    }
-
-    public static String generateMemberListMessage(List<Member> members) {
-        return generateMemberListMessage(members, "");
+        return StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
     }
 
     public static String generateMemberListMessage(List<Member> members, String gameFunName) {
         StringBuilder memberList = new StringBuilder();
-        int x = 1;
-        List<User> users = members.stream().map(Member::getUser).toList();
-        List<ManagedGame> userGames = users.stream()
-                .map(user -> GameManager.getManagedPlayer(user.getId()))
-                .filter(Objects::nonNull)
-                .map(ManagedPlayer::getGames)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
-        for (ManagedGame game : userGames) {
-            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
-        }
         if (gameFunName == null || gameFunName.isEmpty()) {
             memberList.append("## Players Signed Up:\n");
         } else {
@@ -231,10 +194,15 @@ public class CreateGameButtonHandler {
                     .append(gameFunName.replace(":", ""))
                     .append("\n\nPlayers:");
         }
+
+        var userIds = members.stream().map(Member::getId).toList();
+        Map<String, Long> userIdsToAverageTurnTimes =
+                AverageTurnTimeService.getBean().getUserIdsToAverageTurnTimes(userIds);
+        int playerNumber = 1;
         for (Member member : members) {
             memberList
                     .append("\n")
-                    .append(x)
+                    .append(playerNumber)
                     .append(". ")
                     .append(member.getUser().getAsMention());
 
@@ -253,12 +221,9 @@ public class CreateGameButtonHandler {
             } else {
                 memberList.append("\n  - ").append(completedGames).append(" games completed. ");
             }
-            if (playerTurnTimes.containsKey(member.getUser().getId())) {
-                User user = member.getUser();
-                int turnCount = playerTurnTimes.get(user.getId()).getKey();
-                long totalMillis = playerTurnTimes.get(user.getId()).getValue();
-                if (turnCount == 0 || totalMillis == 0) continue;
-                long averageTurnTime = totalMillis / turnCount;
+            if (userIdsToAverageTurnTimes.containsKey(member.getUser().getId())) {
+                long averageTurnTime =
+                        userIdsToAverageTurnTimes.get(member.getUser().getId());
                 memberList
                         .append("\n  - `")
                         .append(DateTimeHelper.getTimeRepresentationToSeconds(averageTurnTime))
@@ -274,7 +239,7 @@ public class CreateGameButtonHandler {
             } else {
                 memberList.append("\n  - Insufficient data for active hours.");
             }
-            x++;
+            playerNumber++;
         }
         return memberList.toString();
     }
