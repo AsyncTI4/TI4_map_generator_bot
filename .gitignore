@@ -29,3 +29,4 @@ runlocally.ps1
 *.log
 *test-save.txt
 src/test/resources/maps/undo
+tibot.db
