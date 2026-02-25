@@ -18,6 +18,8 @@ import ti4.spring.persistence.GameEntity;
 import ti4.spring.persistence.GameEntityRepository;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
+import ti4.spring.persistence.TitleEntity;
+import ti4.spring.persistence.TitleEntityRepository;
 import ti4.spring.persistence.UserEntity;
 import ti4.spring.persistence.UserEntityRepository;
 
@@ -27,6 +29,7 @@ public class PersistAllEntitiesService {
 
     private final GameEntityRepository gameEntityRepository;
     private final PlayerEntityRepository playerEntityRepository;
+    private final TitleEntityRepository titleEntityRepository;
     private final UserEntityRepository userEntityRepository;
 
     public void persistAll() {
@@ -53,18 +56,24 @@ public class PersistAllEntitiesService {
 
     private void persistAllGames(Map<String, UserEntity> userCache) {
         BotLogger.info("Starting persistAllGames.");
+        titleEntityRepository.deleteAllInBatch();
         playerEntityRepository.deleteAllInBatch();
         gameEntityRepository.deleteAllInBatch();
         BotLogger.info("Deleted all persisted games.");
 
         List<GameEntity> gameEntities = new ArrayList<>();
+        List<TitleEntity> titleEntities = new ArrayList<>();
         for (ManagedGame managedGame : GameManager.getManagedGames()) {
             Game game = managedGame.getGame();
-            gameEntities.add(toEntity(game, userCache));
+            var gameEntity = toEntity(game, userCache);
+            gameEntities.add(gameEntity);
+            titleEntities.addAll(toTitleEntities(game, gameEntity, userCache));
         }
 
         gameEntityRepository.saveAll(gameEntities);
+        titleEntityRepository.saveAll(titleEntities);
         BotLogger.info(String.format("Persisted %,d game rows.", gameEntities.size()));
+        BotLogger.info(String.format("Persisted %,d title rows.", titleEntities.size()));
     }
 
     private GameEntity toEntity(Game game, Map<String, UserEntity> userCache) {
@@ -122,5 +131,33 @@ public class PersistAllEntitiesService {
         if (username == null) username = "UNKNOWN USER " + statsTrackedUserId;
         var userEntity = new UserEntity(statsTrackedUserId, username);
         return userEntityRepository.save(userEntity);
+    }
+
+    private List<TitleEntity> toTitleEntities(Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
+        List<TitleEntity> titles = new ArrayList<>();
+        for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
+            if (!storedValue.contains("TitlesFor")) {
+                continue;
+            }
+
+            String userId = storedValue.replace("TitlesFor", "");
+            UserEntity user = userCache.get(userId);
+            if (user == null) {
+                continue;
+            }
+
+            String storedTitles = game.getStoredValue(storedValue);
+            for (String title : storedTitles.split("_")) {
+                if (title.isBlank()) {
+                    continue;
+                }
+                var titleEntity = new TitleEntity();
+                titleEntity.setGame(gameEntity);
+                titleEntity.setUser(user);
+                titleEntity.setTitle(title);
+                titles.add(titleEntity);
+            }
+        }
+        return titles;
     }
 }

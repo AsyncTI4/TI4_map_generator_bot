@@ -1,36 +1,49 @@
-package ti4.service.statistics;
+package ti4.spring.service.statistics;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.experimental.UtilityClass;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
-import ti4.map.Game;
-import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.StatisticsPipeline;
+import ti4.spring.context.SpringContext;
+import ti4.spring.persistence.TitleEntity;
+import ti4.spring.persistence.TitleEntityRepository;
 
-@UtilityClass
+@Service
+@RequiredArgsConstructor
 public class ListTitlesGivenService {
+
+    private final TitleEntityRepository titleEntityRepository;
 
     public void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> listTitlesGiven(event));
     }
 
-    private void listTitlesGiven(SlashCommandInteractionEvent event) {
-        boolean titleOnly = false;
+    @Transactional(readOnly = true)
+    public void listTitlesGiven(SlashCommandInteractionEvent event) {
         String specificTitle = event.getOption(Constants.TITLE, null, OptionMapping::getAsString);
-        if (specificTitle != null) {
-            titleOnly = true;
-        }
+        boolean titleOnly = specificTitle != null;
 
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
 
-        GamesPage.consumeAllGames(game ->
-                aggregateTitles(game, timesTitleHasBeenBestowed, titlesAPersonHas, timesPersonHasGottenSpecificTitle));
+        for (TitleEntity titleEntity : titleEntityRepository.findAllWithUsers()) {
+            String title = titleEntity.getTitle();
+            String userId = titleEntity.getUser().getId();
+
+            timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
+            titlesAPersonHas.put(userId, 1 + titlesAPersonHas.getOrDefault(userId, 0));
+            String userAndTitle = userId + "_" + title;
+            timesPersonHasGottenSpecificTitle.put(
+                    userAndTitle, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userAndTitle, 0));
+        }
 
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
         Map<String, Integer> sortedTitlesMapAsc = SortHelper.sortByValue(timesTitleHasBeenBestowed, false);
@@ -73,23 +86,7 @@ public class ListTitlesGivenService {
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
-    private void aggregateTitles(
-            Game game,
-            Map<String, Integer> timesTitleHasBeenBestowed,
-            Map<String, Integer> titlesAPersonHas,
-            Map<String, Integer> timesPersonHasGottenSpecificTitle) {
-        for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
-            if (!storedValue.contains("TitlesFor")) {
-                continue;
-            }
-            String userID = storedValue.replace("TitlesFor", "");
-            for (String title : game.getStoredValue(storedValue).split("_")) {
-                timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
-                titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
-                timesPersonHasGottenSpecificTitle.put(
-                        userID + "_" + title,
-                        1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
-            }
-        }
+    public static ListTitlesGivenService getBean() {
+        return SpringContext.getBean(ListTitlesGivenService.class);
     }
 }
