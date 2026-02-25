@@ -22,6 +22,7 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           envs: DISCORD_WEBHOOK_URL
           script: |
+            whoami
             set -eu
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
