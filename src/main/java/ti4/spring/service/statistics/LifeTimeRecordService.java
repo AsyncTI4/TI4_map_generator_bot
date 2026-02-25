@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.springframework.stereotype.Service;
 import ti4.message.MessageHelper;
-import ti4.spring.context.SpringContext;
 import ti4.service.statistics.StatisticsPipeline;
+import ti4.spring.context.SpringContext;
 
 @Service
 @RequiredArgsConstructor
