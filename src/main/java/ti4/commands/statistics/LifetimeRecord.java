@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.LifeTimeRecordService;
+import ti4.spring.service.statistics.LifeTimeRecordService;
 
 class LifetimeRecord extends Subcommand {
 
@@ -23,6 +23,6 @@ class LifetimeRecord extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        LifeTimeRecordService.queueReply(event);
+        LifeTimeRecordService.getBean().getLifeTimeRecords(event);
     }
 }
