@@ -3362,15 +3362,16 @@ public class Helper {
         return "Whoops invalid url. Have one of the players on the server generate an invite";
     }
 
-    public static long median(List<Long> turnTimes) {
-        List<Long> turnTimesSorted = new ArrayList<>(turnTimes);
-        Collections.sort(turnTimesSorted);
-        int middle = turnTimesSorted.size() / 2;
-        if (turnTimesSorted.size() % 2 == 1) {
-            return turnTimesSorted.get(middle);
-        } else {
-            return (turnTimesSorted.get(middle - 1) + turnTimesSorted.get(middle)) / 2;
+    public static double median(Collection<? extends Number> numbers) {
+        if (numbers == null || numbers.isEmpty()) {
+            throw new IllegalArgumentException("Cannot calculate median because no numbers were provided.");
         }
+
+        double[] sorted =
+                numbers.stream().mapToDouble(Number::doubleValue).sorted().toArray();
+
+        int n = sorted.length;
+        return n % 2 != 0 ? sorted[n / 2] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0;
     }
 
     public static String getUnitListEmojis(String unitList) {

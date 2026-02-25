@@ -5,21 +5,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.spring.service.statistics.DiceLuckService;
+import ti4.spring.service.statistics.AverageHitsPerTurnService;
 
-class DiceLuck extends Subcommand {
+class HitsPerTurn extends Subcommand {
 
-    DiceLuck() {
-        super(Constants.DICE_LUCK, "Dice luck as recorded by the bot");
+    HitsPerTurn() {
+        super(Constants.HITS_PER_TURN, "Expected hits per turn as recorded by the bot");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(
                 OptionType.INTEGER,
-                Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS,
-                "Minimum number of expected hits to show (Default = 50)"));
-        addOptions(new OptionData(
-                OptionType.BOOLEAN,
-                Constants.IGNORE_ENDED_GAMES,
-                "True to exclude ended games from the calculation (default = false)"));
+                Constants.MINIMUM_NUMBER_OF_TURNS,
+                "Minimum number of turns to show (Default = 100)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 "ascending",
@@ -28,6 +24,6 @@ class DiceLuck extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        DiceLuckService.getBean().getActualVersusExpectedHits(event);
+        AverageHitsPerTurnService.getBean().getExpectedHitsPerTurn(event);
     }
 }
