@@ -21,16 +21,20 @@ public class UserGameInfoService {
     private final PlayerEntityRepository playerEntityRepository;
 
     @Transactional(readOnly = true)
-    public String getTotalCompletedNOngoingGames(List<User> users) {
+    public String getUserGameInfo(List<User> users) {
         List<String> userIds = users.stream().map(User::getId).toList();
         List<PlayerEntity> players = playerEntityRepository.findAllWithUsersAndGamesByUserIdIn(userIds);
 
-        Map<String, UserGameStatsAccumulator> statsByUserId = initStats(users);
+        Map<String, UserGameStatsAccumulator> statsByUserId = buildUserStats(players);
+        return toResultString(users, statsByUserId);
+    }
+
+    private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
+        Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
-            UserGameStatsAccumulator stats = statsByUserId.get(player.getUser().getId());
-            if (stats == null) {
-                continue;
-            }
+            UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
+                    player.getUser().getId(),
+                    k -> new UserGameStatsAccumulator(player.getUser().getName()));
 
             if (player.getGame().getEndedEpochMilliseconds() == null) {
                 stats.ongoingGames++;
@@ -40,29 +44,16 @@ public class UserGameInfoService {
             if (!player.getGame().isCompleted()) {
                 continue;
             }
-
             stats.completedGames++;
+
             if (player.isWinner()) {
                 stats.wins++;
             }
 
             long creation = player.getGame().getCreationEpochMilliseconds();
-            Long ended = player.getGame().getEndedEpochMilliseconds();
-            if (creation > 0 && ended != null && ended > creation) {
-                long days = Duration.ofMillis(ended - creation).toDays();
-                if (days > 0) {
-                    stats.completedGameDays.add((int) days);
-                }
-            }
-        }
-
-        return toResultString(users, statsByUserId);
-    }
-
-    private static Map<String, UserGameStatsAccumulator> initStats(List<User> users) {
-        Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
-        for (User user : users) {
-            statsByUserId.put(user.getId(), new UserGameStatsAccumulator(user.getEffectiveName()));
+            long ended = player.getGame().getEndedEpochMilliseconds();
+            int days = (int) Duration.ofMillis(ended - creation).toDays();
+            stats.completedGameDays.add(days);
         }
         return statsByUserId;
     }

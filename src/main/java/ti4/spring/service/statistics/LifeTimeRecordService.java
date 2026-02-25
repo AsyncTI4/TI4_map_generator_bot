@@ -38,7 +38,7 @@ public class LifeTimeRecordService {
         String records = diceLuckService.getDiceLuck(userIds)
                 + averageHitsPerTurnService.getAverageHitsPerTurn(userIds)
                 + averageTurnTimeService.getAverageTurnTimesString(userIds)
-                + userGameInfoService.getTotalCompletedNOngoingGames(users);
+                + userGameInfoService.getUserGameInfo(users);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);
     }
