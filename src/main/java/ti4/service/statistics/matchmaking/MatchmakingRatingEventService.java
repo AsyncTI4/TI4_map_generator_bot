@@ -41,7 +41,9 @@ public class MatchmakingRatingEventService {
     private List<MatchmakingGame> getMatchmakingGames(List<PlayerEntity> players) {
         Map<GameEntity, List<PlayerEntity>> gamePlayers = new LinkedHashMap<>();
         for (PlayerEntity player : players) {
-            gamePlayers.computeIfAbsent(player.getGame(), game -> new ArrayList<>()).add(player);
+            gamePlayers
+                    .computeIfAbsent(player.getGame(), game -> new ArrayList<>())
+                    .add(player);
         }
 
         return gamePlayers.entrySet().stream()
@@ -53,7 +55,8 @@ public class MatchmakingRatingEventService {
         List<MatchmakingPlayer> matchmakingPlayers = players.stream()
                 .map(player -> {
                     int rank = calculatePlayerRank(player.isWinner(), game.getVictoryPointGoal(), player.getScore());
-                    return new MatchmakingPlayer(player.getUser().getId(), player.getUser().getName(), rank);
+                    return new MatchmakingPlayer(
+                            player.getUser().getId(), player.getUser().getName(), rank);
                 })
                 .toList();
         long endedDate = game.getEndedEpochMilliseconds();
