@@ -241,7 +241,11 @@ public class EndGameService {
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
-                                    triggerVideoCreation(game, t.getId());
+                                    try {
+                                        triggerVideoCreation(game, t.getId());
+                                    } catch (Exception e) {
+                                        BotLogger.error(new LogOrigin(event), "Error triggering video creation", e);
+                                    }
                                 });
                                 MessageHelper.sendMessageToChannel(
                                         event.getMessageChannel(),
