@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.ListTitlesGivenService;
+import ti4.spring.service.statistics.ListTitlesGivenService;
 
 class ListTitlesGiven extends Subcommand {
 
@@ -15,6 +15,6 @@ class ListTitlesGiven extends Subcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        ListTitlesGivenService.queueReply(event);
+        ListTitlesGivenService.getBean().listTitlesGiven(event);
     }
 }
