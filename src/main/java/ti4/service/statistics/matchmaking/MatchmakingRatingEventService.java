@@ -1,42 +1,73 @@
 package ti4.service.statistics.matchmaking;
 
-import static java.util.function.Predicate.not;
-
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Predicate;
-import lombok.experimental.UtilityClass;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.statistics.GameStatisticsFilterer;
-import ti4.map.Game;
-import ti4.map.persistence.GamesPage;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ti4.message.MessageHelper;
-import ti4.service.statistics.StatisticsPipeline;
+import ti4.spring.context.SpringContext;
+import ti4.spring.persistence.GameEntity;
+import ti4.spring.persistence.PlayerEntity;
+import ti4.spring.persistence.PlayerEntityRepository;
 
-@UtilityClass
+@Service
+@RequiredArgsConstructor
 public class MatchmakingRatingEventService {
 
     private static final int MAX_LIST_SIZE = 50;
 
-    public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> calculateRatings(event));
-    }
+    private final PlayerEntityRepository playerEntityRepository;
 
-    private static void calculateRatings(SlashCommandInteractionEvent event) {
-        List<MatchmakingGame> games = new ArrayList<>();
+    @Transactional(readOnly = true)
+    public void calculateRatings(SlashCommandInteractionEvent event) {
         boolean onlyTiglGames = event.getOption("tigl_only", false, OptionMapping::getAsBoolean);
         boolean showRating = event.getOption("show_my_rating", false, OptionMapping::getAsBoolean);
-        Predicate<Game> filter =
-                GameStatisticsFilterer.getFinishedGamesFilter(6, null).and(not(Game::isAllianceMode));
-        if (onlyTiglGames) {
-            filter = filter.and(Game::isCompetitiveTIGLGame).and(Game::isNormalGame);
-        }
-        GamesPage.consumeAllGames(filter, game -> games.add(MatchmakingGame.from(game)));
+
+        List<PlayerEntity> players =
+                playerEntityRepository.findAllWithUsersByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
+        List<MatchmakingGame> games = getMatchmakingGames(players);
 
         List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games);
         sendMessage(event, playerRatings, showRating);
+    }
+
+    private List<MatchmakingGame> getMatchmakingGames(List<PlayerEntity> players) {
+        Map<GameEntity, List<PlayerEntity>> gamePlayers = new LinkedHashMap<>();
+        for (PlayerEntity player : players) {
+            gamePlayers.computeIfAbsent(player.getGame(), game -> new ArrayList<>()).add(player);
+        }
+
+        return gamePlayers.entrySet().stream()
+                .map(entry -> toMatchmakingGame(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    private static MatchmakingGame toMatchmakingGame(GameEntity game, List<PlayerEntity> players) {
+        List<MatchmakingPlayer> matchmakingPlayers = players.stream()
+                .map(player -> {
+                    int rank = calculatePlayerRank(player.isWinner(), game.getVictoryPointGoal(), player.getScore());
+                    return new MatchmakingPlayer(player.getUser().getId(), player.getUser().getName(), rank);
+                })
+                .toList();
+        long endedDate = game.getEndedEpochMilliseconds();
+        return new MatchmakingGame(game.getGameName(), endedDate, matchmakingPlayers);
+    }
+
+    private static int calculatePlayerRank(boolean isWinner, int gameVictoryPointGoal, int playerScore) {
+        if (isWinner) {
+            return 1;
+        }
+        int pointsAwayFromVictory = gameVictoryPointGoal - playerScore;
+        if (pointsAwayFromVictory <= 3) {
+            return 2;
+        }
+        return 3 + pointsAwayFromVictory;
     }
 
     private static void sendMessage(
@@ -86,5 +117,9 @@ public class MatchmakingRatingEventService {
 
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Player Matchmaking Ratings", sb.toString());
+    }
+
+    public static MatchmakingRatingEventService getBean() {
+        return SpringContext.getBean(MatchmakingRatingEventService.class);
     }
 }
