@@ -30,3 +30,4 @@ runlocally.ps1
 *test-save.txt
 src/test/resources/maps/undo
 tibot.db
+scripts/__pycache__/
