@@ -143,11 +143,11 @@ public class PersistAllEntitiesService {
     private List<TitleEntity> toTitleEntities(Game game, GameEntity gameEntity, Map<String, UserEntity> userCache) {
         List<TitleEntity> titles = new ArrayList<>();
         for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
-            if (!storedValue.contains("TitlesFor")) {
+            if (!storedValue.startsWith("TitlesFor")) {
                 continue;
             }
 
-            String userId = storedValue.replace("TitlesFor", "");
+            String userId = storedValue.substring("TitlesFor".length());
             UserEntity user = userCache.get(userId);
             if (user == null) {
                 continue;
