@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -12,6 +13,10 @@ import ti4.model.FactionModel;
 public class UnusedCommanderHelper {
 
     public static String getUnusedCommander(Game game) {
+        return getUnusedCommander(game, Set.of());
+    }
+
+    public static String getUnusedCommander(Game game, Set<String> excludedCommanders) {
         List<String> commanders = new ArrayList<>();
         List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(f -> game.isDiscordantStarsMode()
@@ -32,6 +37,7 @@ public class UnusedCommanderHelper {
                     || "unknown"
                             .equalsIgnoreCase(Mapper.getLeader(commanderName).getAbilityText())
                     || game.getStoredValue("mercCommander").contains(commanderName)
+                    || excludedCommanders.contains(commanderName)
                     || Mapper.getLeader(commanderName)
                             .getAbilityText()
                             .toLowerCase()

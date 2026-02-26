@@ -462,8 +462,8 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("allianceRiderRandomAlly")
     public static void resolveAllianceRiderRandomAlly(Player player, Game game, ButtonInteractionEvent event) {
-        Set<String> excludedAllies = new HashSet<>(getStoredCommanderList(game, ALLIANCE_RIDER_PURGED_ALLIES));
-        String allyCommander = UnusedCommanderHelper.getUnusedCommander(game);
+        Set<String> purgedAllies = new HashSet<>(getStoredCommanderList(game, ALLIANCE_RIDER_PURGED_ALLIES));
+        String allyCommander = UnusedCommanderHelper.getUnusedCommander(game, purgedAllies);
         if (allyCommander == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
