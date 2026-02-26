@@ -26,7 +26,7 @@ on:
         default: "bot"
         type: string
       post_to_thread_id:
-        description: "Discord thread ID to post the generated video to (optional)"
+        description: "Discord thread ID to post the finished video into (optional)"
         required: false
         type: string
 
@@ -44,6 +44,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/video/requirements.txt
 
       - name: Install system dependencies
         run: |
@@ -65,7 +68,7 @@ jobs:
             echo "Can't generate videos for Fog of War at this time"
             exit 1
           fi
-          output="$(bash scripts/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
+          output="$(bash scripts/video/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
           echo "$output" >> "$GITHUB_OUTPUT"
 
       - name: Upload map video artifact
@@ -80,9 +83,11 @@ jobs:
         if: ${{ inputs.post_to_thread_id != '' }}
         env:
           POST_TO_THREAD_ID: ${{ inputs.post_to_thread_id }}
-          OUTPUT_FILE: ${{ steps.generate.outputs.output_file }}
+          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type }}
         run: |
           set -euo pipefail
-          python3 scripts/post_to_discord_thread.py \
+          python3 scripts/video/post_to_discord_thread.py \
             --thread-id "$POST_TO_THREAD_ID" \
-            --file "$OUTPUT_FILE"
+            --file "${{ steps.generate.outputs.output_file }}" \
+            --token-env "DISCORD_TOKEN" \
+            --auth-type "$DISCORD_AUTH_TYPE"
