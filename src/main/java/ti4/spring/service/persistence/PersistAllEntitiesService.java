@@ -73,7 +73,7 @@ public class PersistAllEntitiesService {
         gameEntity.setRound(game.getRound());
         gameEntity.setVictoryPointGoal(game.getVp());
         gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());
-        gameEntity.setEndedEpochMilliseconds(game.getEndedDate());
+        gameEntity.setEndedEpochMilliseconds(getEndedDate(game));
         gameEntity.setCompleted(game.getWinner().isPresent() && game.isHasEnded());
         gameEntity.setFractureInPlay(FractureService.isFractureInPlay(game));
         gameEntity.setHomebrew(game.isHomebrew());
@@ -93,6 +93,11 @@ public class PersistAllEntitiesService {
         }
 
         return gameEntity;
+    }
+
+    private Long getEndedDate(Game game) {
+        long endedDate = game.getEndedDate();
+        return endedDate == 0 ? null : endedDate;
     }
 
     private PlayerEntity toEntity(Player player, GameEntity gameEntity, Map<String, UserEntity> userCache) {
