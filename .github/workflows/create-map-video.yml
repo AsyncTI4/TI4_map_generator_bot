@@ -25,10 +25,6 @@ on:
         required: false
         default: "bot"
         type: string
-      post_to_thread_id:
-        description: "Discord thread ID to post the generated video to (optional)"
-        required: false
-        type: string
 
 jobs:
   create-map-video:
@@ -75,14 +71,3 @@ jobs:
           path: ${{ steps.generate.outputs.output_file }}
           if-no-files-found: error
           retention-days: 14
-
-      - name: Post video to Discord thread
-        if: ${{ inputs.post_to_thread_id != '' }}
-        env:
-          POST_TO_THREAD_ID: ${{ inputs.post_to_thread_id }}
-          OUTPUT_FILE: ${{ steps.generate.outputs.output_file }}
-        run: |
-          set -euo pipefail
-          python3 scripts/post_to_discord_thread.py \
-            --thread-id "$POST_TO_THREAD_ID" \
-            --file "$OUTPUT_FILE"
