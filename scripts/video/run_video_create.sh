@@ -9,7 +9,7 @@ MAX_MESSAGES="${4:-500}"
 DISCORD_AUTH_TYPE="${5:-${DISCORD_AUTH_TYPE:-bot}}"
 
 if [[ -z "$MAP_ID" ]]; then
-  echo "Error: map_id is required. Usage: scripts/run_video_create.sh <map_id> <channel_id> <thread_id> [max_messages]" >&2
+  echo "Error: map_id is required. Usage: scripts/video/run_video_create.sh <map_id> <channel_id> <thread_id> [max_messages]" >&2
   exit 1
 fi
 
@@ -61,7 +61,7 @@ mkdir -p "$FRAMES_DIR" "$OUTPUT_DIR"
 find "$FRAMES_DIR" -maxdepth 1 -type f -delete
 
 echo "Downloading frames for map_id '$MAP_ID' from Discord source '$SOURCE_ID'..." >&2
-python3 scripts/fetch_discord_frames.py \
+python3 scripts/video/fetch_discord_frames.py \
   --channel-id "$SOURCE_ID" \
   --output-dir "$FRAMES_DIR" \
   --max-messages "$MAX_MESSAGES" \
@@ -75,11 +75,11 @@ if [[ "$initial_frame_count" -eq 0 ]]; then
 fi
 
 echo "Downloaded $initial_frame_count frame(s). Detecting player-area cutoff, cropping, and normalising frames..." >&2
-python3 scripts/crop_frames.py "$FRAMES_DIR" >&2
+python3 scripts/video/crop_frames.py "$FRAMES_DIR" >&2
 find "$FRAMES_DIR" -maxdepth 1 -type f ! -name '*.png' -delete
 
 echo "Sanitizing frame filenames..." >&2
-python3 scripts/conv.py "$FRAMES_DIR" >&2
+python3 scripts/video/conv.py "$FRAMES_DIR" >&2
 
 final_frame_count="$(find "$FRAMES_DIR" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d ' ')"
 if [[ "$final_frame_count" -eq 0 ]]; then
