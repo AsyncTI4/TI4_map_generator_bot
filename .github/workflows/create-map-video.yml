@@ -42,7 +42,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Python dependencies
-        run: pip install -r scripts/requirements.txt
+        run: pip install -r scripts/video/requirements.txt
 
       - name: Install system dependencies
         run: |
@@ -64,7 +64,7 @@ jobs:
             echo "Can't generate videos for Fog of War at this time"
             exit 1
           fi
-          output="$(bash scripts/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
+          output="$(bash scripts/video/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
           echo "$output" >> "$GITHUB_OUTPUT"
 
       - name: Upload map video artifact
