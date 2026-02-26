@@ -22,9 +22,6 @@ public class ListTitlesGivenService {
 
     @Transactional(readOnly = true)
     public void listTitlesGiven(SlashCommandInteractionEvent event) {
-        String specificTitle = event.getOption(Constants.TITLE, null, OptionMapping::getAsString);
-        boolean titleOnly = specificTitle != null;
-
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
@@ -57,8 +54,9 @@ public class ListTitlesGivenService {
                     .append(entry.getValue())
                     .append(" \n");
         }
-
-        if (titleOnly) {
+        
+        String specificTitle = event.getOption(Constants.TITLE, null, OptionMapping::getAsString);
+        if (specificTitle != null) {
             Map<String, Integer> sortedMapAscPlayersNTitles =
                     SortHelper.sortByValue(timesPersonHasGottenSpecificTitle, false);
             longMsg.append("\nThe number of titles each player has for the title of ")
