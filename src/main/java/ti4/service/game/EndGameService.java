@@ -22,6 +22,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.ThreadGetter;
+import ti4.helpers.WorkflowDispatchHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
@@ -241,6 +242,7 @@ public class EndGameService {
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
+                                    triggerVideoCreation(game, t.getId());
                                 });
                                 MessageHelper.sendMessageToChannel(
                                         event.getMessageChannel(),
@@ -265,6 +267,18 @@ public class EndGameService {
                 sendRoundSummariesToThread(t, game);
             });
         }
+    }
+
+    private static void triggerVideoCreation(Game game, String chroniclesThreadId) {
+        String botUpdatesThreadId = game.getBotMapUpdatesThreadID();
+        if (botUpdatesThreadId == null || botUpdatesThreadId.isBlank()) return;
+        new WorkflowDispatchHelper(
+                "create-map-video.yml",
+                Map.of(
+                        "map_id", game.getName(),
+                        "thread_id", botUpdatesThreadId,
+                        "post_to_thread_id", chroniclesThreadId))
+                .sendDispatch();
     }
 
     private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
