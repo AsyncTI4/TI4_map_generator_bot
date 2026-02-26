@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -45,7 +46,7 @@ public class MatchmakingRatingEventService {
 
         return gamePlayers.entrySet().stream()
                 .map(entry -> toMatchmakingGame(entry.getKey(), entry.getValue()))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private static MatchmakingGame toMatchmakingGame(GameEntity game, List<PlayerEntity> players) {
