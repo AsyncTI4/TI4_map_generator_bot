@@ -18,7 +18,7 @@ class CommunityStatsService {
     static final Duration STATS_TTL = Duration.ofHours(4);
     private static final String CACHE_NAME = "communityStatsCache";
     private static final String CACHE_KEY = "global";
-    private static final List<String> UNAVAILABLE_METRICS = List.of("turnsThisWeek");
+    private static final List<String> UNAVAILABLE_METRICS = List.of();
 
     private final Cache<String, CommunityStatsResponse> statsCache = createCache();
 
@@ -51,7 +51,6 @@ class CommunityStatsService {
 
         return new CommunityStatsResponse(
                 activeGames,
-                null,
                 players,
                 gamesCompleted,
                 System.currentTimeMillis(),
