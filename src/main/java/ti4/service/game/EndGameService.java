@@ -241,7 +241,6 @@ public class EndGameService {
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
-                                    triggerVideoCreation(game, t.getId());
                                 });
                                 MessageHelper.sendMessageToChannel(
                                         event.getMessageChannel(),
@@ -266,17 +265,6 @@ public class EndGameService {
                 sendRoundSummariesToThread(t, game);
             });
         }
-    }
-
-    private static void triggerVideoCreation(Game game, String chroniclesThreadId) {
-        String botUpdatesThreadId = game.getBotMapUpdatesThreadID();
-        if (botUpdatesThreadId == null || botUpdatesThreadId.isBlank()) return;
-        RepositoryDispatchEvent.dispatchWorkflow(
-                "create-map-video.yml",
-                Map.of(
-                        "map_id", game.getName(),
-                        "thread_id", botUpdatesThreadId,
-                        "post_to_thread_id", chroniclesThreadId));
     }
 
     private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
