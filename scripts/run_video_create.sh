@@ -74,8 +74,8 @@ if [[ "$initial_frame_count" -eq 0 ]]; then
   exit 1
 fi
 
-echo "Downloaded $initial_frame_count frame(s). Applying image transforms and PNG normalization..." >&2
-mogrify -verbose -crop x2400+0+0 -resize 800x800 -format png "$FRAMES_DIR"/* >&2
+echo "Downloaded $initial_frame_count frame(s). Detecting player-area cutoff, cropping, and normalising frames..." >&2
+python3 scripts/crop_frames.py "$FRAMES_DIR" >&2
 find "$FRAMES_DIR" -maxdepth 1 -type f ! -name '*.png' -delete
 
 echo "Sanitizing frame filenames..." >&2
