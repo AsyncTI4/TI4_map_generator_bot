@@ -31,7 +31,7 @@ public class MatchmakingRatingEventService {
         boolean showRating = event.getOption("show_my_rating", false, OptionMapping::getAsBoolean);
 
         List<PlayerEntity> players =
-                playerEntityRepository.findAllWithUsersByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
+                playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
         List<MatchmakingGame> games = getMatchmakingGames(players);
 
         List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games);
