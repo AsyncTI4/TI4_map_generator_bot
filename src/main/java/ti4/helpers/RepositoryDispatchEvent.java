@@ -26,6 +26,20 @@ public class RepositoryDispatchEvent {
         payload = new RespositoryDispatchClientPayload(payloadMap);
     }
 
+    /**
+     * Triggers the video generation workflow, which will compile images from the game's bot thread
+     * into a video and publish it to the chronicles thread for the game.
+     *
+     * @param chroniclesThreadId - ID of the thread in the chronicles channel where the video will be posted
+     * @param botThreadId - ID of the bot-map-updates thread used as the image source
+     */
+    public static void generateVideo(String chroniclesThreadId, String botThreadId) {
+        new RepositoryDispatchEvent("generate_video", Map.of(
+            "chronicles_thread", chroniclesThreadId,
+            "bot_thread", botThreadId
+        )).sendEvent();
+    }
+
     public void sendEvent() {
         if (System.getenv("TESTING") != null || REPO_DISPATCH_TOKEN == null || REPO_DISPATCH_TOKEN.isEmpty()) return;
         try {
