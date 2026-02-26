@@ -57,6 +57,10 @@ jobs:
           DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type }}
         run: |
           set -euo pipefail
+          if [[ "${MAP_ID,,}" == fow* ]]; then
+            echo "Can't generate videos for Fog of War at this time"
+            exit 1
+          fi
           output="$(bash scripts/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
           echo "$output" >> "$GITHUB_OUTPUT"
 
