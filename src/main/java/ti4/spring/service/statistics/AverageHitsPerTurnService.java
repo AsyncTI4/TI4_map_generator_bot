@@ -143,7 +143,7 @@ public class AverageHitsPerTurnService {
 
     private static String getPercentile(int index, int totalPlayers) {
         double percentile = ((double) index / totalPlayers) * 100;
-        return String.format("%.2f%% have higher", percentile);
+        return String.format("%.2f%% have lower", percentile);
     }
 
     public static AverageHitsPerTurnService getBean() {
