@@ -15,6 +15,6 @@ class ListTitlesGiven extends Subcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        ListTitlesGivenService.getBean().queueReply(event);
+        ListTitlesGivenService.getBean().listTitlesGiven(event);
     }
 }

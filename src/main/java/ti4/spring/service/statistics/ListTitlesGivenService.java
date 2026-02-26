@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
 import ti4.message.MessageHelper;
-import ti4.service.statistics.StatisticsPipeline;
 import ti4.spring.context.SpringContext;
 import ti4.spring.persistence.TitleEntity;
 import ti4.spring.persistence.TitleEntityRepository;
@@ -20,10 +19,6 @@ import ti4.spring.persistence.TitleEntityRepository;
 public class ListTitlesGivenService {
 
     private final TitleEntityRepository titleEntityRepository;
-
-    public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(event, () -> listTitlesGiven(event));
-    }
 
     @Transactional(readOnly = true)
     public void listTitlesGiven(SlashCommandInteractionEvent event) {
@@ -38,11 +33,10 @@ public class ListTitlesGivenService {
             String title = titleEntity.getTitle();
             String userId = titleEntity.getUser().getId();
 
-            timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
-            titlesAPersonHas.put(userId, 1 + titlesAPersonHas.getOrDefault(userId, 0));
+            timesTitleHasBeenBestowed.merge(title, 1, Integer::sum);
+            titlesAPersonHas.merge(userId, 1, Integer::sum);
             String userAndTitle = userId + "_" + title;
-            timesPersonHasGottenSpecificTitle.put(
-                    userAndTitle, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userAndTitle, 0));
+            timesPersonHasGottenSpecificTitle.merge(userAndTitle, 1, Integer::sum);
         }
 
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
@@ -50,6 +44,7 @@ public class ListTitlesGivenService {
         for (Map.Entry<String, Integer> entry : sortedTitlesMapAsc.entrySet()) {
             longMsg.append(entry.getKey()).append(": ").append(entry.getValue()).append(" \n");
         }
+
         longMsg.append("\nThe number of titles each player has: \n");
         Map<String, Integer> sortedMapAscPlayers = SortHelper.sortByValue(titlesAPersonHas, false);
         for (Map.Entry<String, Integer> entry : sortedMapAscPlayers.entrySet()) {
@@ -62,6 +57,7 @@ public class ListTitlesGivenService {
                     .append(entry.getValue())
                     .append(" \n");
         }
+
         if (titleOnly) {
             Map<String, Integer> sortedMapAscPlayersNTitles =
                     SortHelper.sortByValue(timesPersonHasGottenSpecificTitle, false);
@@ -69,11 +65,11 @@ public class ListTitlesGivenService {
                     .append(specificTitle)
                     .append(": \n");
             for (Map.Entry<String, Integer> entry : sortedMapAscPlayersNTitles.entrySet()) {
-                String personNTitle = entry.getKey();
-                if (!personNTitle.toLowerCase().contains(specificTitle.toLowerCase())) {
+                String personAndTitle = entry.getKey();
+                if (!personAndTitle.toLowerCase().contains(specificTitle.toLowerCase())) {
                     continue;
                 }
-                String person = personNTitle.split("_")[0];
+                String person = personAndTitle.split("_")[0];
                 if (event.getGuild().getMemberById(person) == null) {
                     continue;
                 }
