@@ -5,7 +5,7 @@ For each frame:
   1. Convert to PNG (handling webp/jpg/etc).
   2. Detect the y-coordinate where the first player-area starts.
      The player-area begins with a gradient rectangle border that spans
-     nearly the full image width (x≈10 to x≈imageWidth-15).  The region
+     nearly the full image width (x≈10 to x≈imageWidth-5).  The region
      just above it (objectives / laws section) contains no content in the
      far-right portion of the image, creating a detectable gap.
   3. Crop the image to just above that player-area border.
@@ -73,7 +73,9 @@ def find_player_area_top(arr: np.ndarray) -> int:
         else:
             if run_start is not None:
                 run_length = y - run_start
-                if run_length >= _MIN_GAP_ROWS and run_length > best_run_length:
+                # Use >= so that when two runs share the same length the later
+                # one (closer to the player areas at the bottom) is preferred.
+                if run_length >= _MIN_GAP_ROWS and run_length >= best_run_length:
                     best_run_length = run_length
                     best_run_end = y
                 run_start = None
@@ -81,7 +83,7 @@ def find_player_area_top(arr: np.ndarray) -> int:
     # Handle a run that reaches the very bottom of the image.
     if run_start is not None:
         run_length = height - run_start
-        if run_length >= _MIN_GAP_ROWS and run_length > best_run_length:
+        if run_length >= _MIN_GAP_ROWS and run_length >= best_run_length:
             best_run_end = height  # no player area below
 
     return best_run_end
@@ -103,7 +105,14 @@ def process_frames(frames_dir: Path) -> None:
     crop_info: list[tuple[Path, int, int, int]] = []  # (path, crop_y, h, w)
 
     for img_path in image_files:
-        img = Image.open(img_path).convert("RGB")
+        try:
+            img = Image.open(img_path).convert("RGB")
+        except (OSError, Image.DecompressionBombError) as exc:
+            print(
+                f"Warning: skipping {img_path.name}: could not open image: {exc}",
+                file=sys.stderr,
+            )
+            continue
         arr = np.array(img)
         h, w = arr.shape[:2]
         crop_y = find_player_area_top(arr)
@@ -113,6 +122,10 @@ def process_frames(frames_dir: Path) -> None:
             file=sys.stderr,
         )
         del arr
+
+    if not crop_info:
+        print("Error: no valid image files could be processed", file=sys.stderr)
+        raise SystemExit(1)
 
     # Target dimensions: largest crop height and width across all frames.
     # Round up to the nearest even number (required by H.264).
@@ -128,8 +141,17 @@ def process_frames(frames_dir: Path) -> None:
     )
 
     # --- Pass 2: crop, pad, and save as PNG ---
+    # Track non-PNG originals to delete only after all conversions succeed.
+    originals_to_delete: list[Path] = []
     for img_path, crop_y, _h, _w in crop_info:
-        img = Image.open(img_path).convert("RGB")
+        try:
+            img = Image.open(img_path).convert("RGB")
+        except (OSError, Image.DecompressionBombError) as exc:
+            print(
+                f"Warning: skipping {img_path.name} in pass 2: {exc}",
+                file=sys.stderr,
+            )
+            continue
         arr = np.array(img)
 
         # Crop from the top down to just above the player area.
@@ -140,13 +162,40 @@ def process_frames(frames_dir: Path) -> None:
         out[: cropped.shape[0], : cropped.shape[1]] = cropped
 
         out_path = img_path.with_suffix(".png")
-        Image.fromarray(out).save(out_path, "PNG")
+        # Write to a temporary file first, then rename atomically so that the
+        # original is never left in a partially-overwritten state on failure.
+        tmp_path = out_path.with_name(out_path.name + ".tmp")
+        try:
+            Image.fromarray(out).save(tmp_path, "PNG")
+            tmp_path.replace(out_path)
+        except OSError as exc:
+            print(
+                f"Error: failed to save {out_path.name}: {exc}; "
+                f"original file preserved.",
+                file=sys.stderr,
+            )
+            try:
+                tmp_path.unlink(missing_ok=True)
+            except OSError:
+                pass
+            del arr
+            continue
 
-        # Remove the original if it was in a different format.
+        # Queue the original non-PNG for deletion after all saves complete.
         if img_path.suffix.lower() != ".png":
-            img_path.unlink()
+            originals_to_delete.append(img_path)
 
         del arr
+
+    # Delete non-PNG originals only after all conversions have finished.
+    for orig in originals_to_delete:
+        try:
+            orig.unlink()
+        except OSError as exc:
+            print(
+                f"Warning: could not delete original {orig.name}: {exc}",
+                file=sys.stderr,
+            )
 
     print(
         f"Done. {len(crop_info)} frame(s) saved at {max_width}x{max_height}.",
