@@ -21,4 +21,16 @@ public interface PlayerEntityRepository extends JpaRepository<PlayerEntity, Long
 
     @Query("SELECT p FROM PlayerEntity p JOIN FETCH p.user u JOIN FETCH p.game g WHERE u.id IN (:userIds)")
     List<PlayerEntity> findAllWithUsersAndGamesByUserIdIn(@Param("userIds") List<String> userIds);
+
+    @Query("""
+            SELECT p FROM PlayerEntity p
+            JOIN FETCH p.user u
+            JOIN FETCH p.game g
+            WHERE g.completed IS TRUE
+              AND g.allianceMode IS FALSE
+              AND g.playerCount = 6
+              AND (:onlyTiglGames IS FALSE OR g.twilightImperiumGlobalLeague IS TRUE)
+            """)
+    List<PlayerEntity> findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(
+            @Param("onlyTiglGames") boolean onlyTiglGames);
 }

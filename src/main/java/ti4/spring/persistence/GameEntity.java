@@ -34,6 +34,9 @@ public class GameEntity {
     @Column(name = "round_number")
     private int round;
 
+    @Column(name = "victory_point_goal")
+    private int victoryPointGoal;
+
     @Column(name = "is_completed")
     private boolean completed;
 
@@ -63,6 +66,9 @@ public class GameEntity {
 
     @Column(name = "is_twilight_imperium_global_league")
     private boolean twilightImperiumGlobalLeague;
+
+    @Column(name = "player_count")
+    private int playerCount;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PlayerEntity> players = new ArrayList<>();
