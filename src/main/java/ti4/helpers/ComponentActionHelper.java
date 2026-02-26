@@ -86,7 +86,7 @@ public class ComponentActionHelper {
         }
         if (game.isMercenariesForHireMode()) {
             if (game.getStoredValue("mercCommander").isEmpty()) {
-                game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+                game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
             }
             String commanderName =
                     StringUtils.capitalize(game.getStoredValue("mercCommander").replace("commander", " Commander"));
@@ -874,7 +874,7 @@ public class ComponentActionHelper {
                             p1.getRepresentation() + " acquired a new commander, "
                                     + Mapper.getLeader(leaderID).getName() + "!");
                     UnlockLeaderService.unlockLeader(leaderID, game, p1);
-                    game.setStoredValue("mercCommander", BreakthroughHelper.getUnusedCommander(game));
+                    game.setStoredValue("mercCommander", UnusedCommanderHelper.getUnusedCommander(game));
                     if (!game.getStoredValue("mercCommander").isEmpty()) {
                         LeaderModel led = Mapper.getLeader(game.getStoredValue("mercCommander"));
                         if (led != null) {
