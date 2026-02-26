@@ -71,6 +71,7 @@ public class PersistAllEntitiesService {
         var gameEntity = new GameEntity();
         gameEntity.setGameName(game.getName());
         gameEntity.setRound(game.getRound());
+        gameEntity.setVictoryPointGoal(game.getVp());
         gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());
         gameEntity.setEndedEpochMilliseconds(game.getEndedDate());
         gameEntity.setCompleted(game.getWinner().isPresent() && game.isHasEnded());
@@ -83,6 +84,7 @@ public class PersistAllEntitiesService {
         gameEntity.setTwilightImperiumGlobalLeague(game.isCompetitiveTIGLGame());
         gameEntity.setProphecyOfKings(game.isProphecyOfKings());
         gameEntity.setThundersEdge(game.isThundersEdge());
+        gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
 
         var players = gameEntity.getPlayers();
         for (Player player : game.getRealAndEliminatedPlayers()) {

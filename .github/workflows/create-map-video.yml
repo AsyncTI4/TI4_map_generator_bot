@@ -1,0 +1,73 @@
+name: Create Map Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      map_id:
+        description: "Map ID to render into MP4"
+        required: true
+        type: string
+      channel_id:
+        description: "Discord channel ID to scan for image attachments (set either channel_id or thread_id)"
+        required: false
+        type: string
+      thread_id:
+        description: "Discord thread ID to scan for image attachments (set either thread_id or channel_id)"
+        required: false
+        type: string
+      max_messages:
+        description: "Maximum messages to scan (newest backward); default 500"
+        required: false
+        default: "500"
+        type: string
+      discord_auth_type:
+        description: "Discord token auth mode: bot or user"
+        required: false
+        default: "bot"
+        type: string
+
+jobs:
+  create-map-video:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y imagemagick ffmpeg
+
+      - name: Generate map video
+        id: generate
+        env:
+          MAP_ID: ${{ inputs.map_id }}
+          CHANNEL_ID: ${{ inputs.channel_id }}
+          THREAD_ID: ${{ inputs.thread_id }}
+          MAX_MESSAGES: ${{ inputs.max_messages }}
+          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type }}
+        run: |
+          set -euo pipefail
+          if [[ "${MAP_ID,,}" == fow* ]]; then
+            echo "Can't generate videos for Fog of War at this time"
+            exit 1
+          fi
+          output="$(bash scripts/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
+          echo "$output" >> "$GITHUB_OUTPUT"
+
+      - name: Upload map video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.generate.outputs.artifact_name }}
+          path: ${{ steps.generate.outputs.output_file }}
+          if-no-files-found: error
+          retention-days: 14
