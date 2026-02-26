@@ -34,7 +34,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
-
 @UtilityClass
 class ActionCardDeck2ButtonHandler {
 
@@ -464,7 +463,7 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("allianceRiderRandomAlly")
     public static void resolveAllianceRiderRandomAlly(Player player, Game game, ButtonInteractionEvent event) {
         Set<String> excludedAllies = new HashSet<>(getStoredCommanderList(game, ALLIANCE_RIDER_PURGED_ALLIES));
-        String allyCommander = UnusedCommanderHelper.getUnusedCommander(game, excludedAllies);
+        String allyCommander = UnusedCommanderHelper.getUnusedCommander(game);
         if (allyCommander == null) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -500,8 +499,7 @@ class ActionCardDeck2ButtonHandler {
 
         if (player.hasLeader(allyCommander)) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " already has this ally ability in play.");
+                    player.getCorrectChannel(), player.getRepresentation() + " already has this ally ability in play.");
             game.setStoredValue(ALLIANCE_RIDER_CURRENT_ALLY, "");
             return;
         }

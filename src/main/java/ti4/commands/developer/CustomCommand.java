@@ -42,8 +42,7 @@ class CustomCommand extends Subcommand {
         Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Unable to determine which player should receive the Alliance Rider buttons.");
+                    event.getChannel(), "Unable to determine which player should receive the Alliance Rider buttons.");
             return;
         }
 
@@ -58,7 +57,7 @@ class CustomCommand extends Subcommand {
 
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Spawned _Alliance Rider_ buttons for " + player.getRepresentationUnfogged() + " in "
-                        + game.getName() + ".");
+                "Spawned _Alliance Rider_ buttons for " + player.getRepresentationUnfogged() + " in " + game.getName()
+                        + ".");
     }
 }

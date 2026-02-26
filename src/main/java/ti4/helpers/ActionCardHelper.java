@@ -1019,8 +1019,8 @@ public class ActionCardHelper {
             }
 
             if ("alliance_rider".equals(automationID)) {
-                codedButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "allianceRiderRandomAlly", "Random Ally"));
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "allianceRiderRandomAlly", "Random Ally"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
