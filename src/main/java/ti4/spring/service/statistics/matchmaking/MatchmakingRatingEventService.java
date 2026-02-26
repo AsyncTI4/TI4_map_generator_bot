@@ -1,10 +1,6 @@
-package ti4.service.statistics.matchmaking;
+package ti4.spring.service.statistics.matchmaking;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -13,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
-import ti4.spring.persistence.GameEntity;
 import ti4.spring.persistence.PlayerEntity;
 import ti4.spring.persistence.PlayerEntityRepository;
 
@@ -32,46 +27,10 @@ public class MatchmakingRatingEventService {
 
         List<PlayerEntity> players =
                 playerEntityRepository.findAllWithUsersAndGamesByCompletedSixPlayerNonAllianceGame(onlyTiglGames);
-        List<MatchmakingGame> games = getMatchmakingGames(players);
+        List<MatchmakingGame> games = MatchmakingGame.getMatchmakingGames(players);
 
         List<MatchmakingRating> playerRatings = TrueSkillMatchmakingRatingService.calculateRatings(games);
         sendMessage(event, playerRatings, showRating);
-    }
-
-    private List<MatchmakingGame> getMatchmakingGames(List<PlayerEntity> players) {
-        Map<GameEntity, List<PlayerEntity>> gamePlayers = new LinkedHashMap<>();
-        for (PlayerEntity player : players) {
-            gamePlayers
-                    .computeIfAbsent(player.getGame(), game -> new ArrayList<>())
-                    .add(player);
-        }
-
-        return gamePlayers.entrySet().stream()
-                .map(entry -> toMatchmakingGame(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
-
-    private static MatchmakingGame toMatchmakingGame(GameEntity game, List<PlayerEntity> players) {
-        List<MatchmakingPlayer> matchmakingPlayers = players.stream()
-                .map(player -> {
-                    int rank = calculatePlayerRank(player.isWinner(), game.getVictoryPointGoal(), player.getScore());
-                    return new MatchmakingPlayer(
-                            player.getUser().getId(), player.getUser().getName(), rank);
-                })
-                .toList();
-        long endedDate = game.getEndedEpochMilliseconds();
-        return new MatchmakingGame(game.getGameName(), endedDate, matchmakingPlayers);
-    }
-
-    private static int calculatePlayerRank(boolean isWinner, int gameVictoryPointGoal, int playerScore) {
-        if (isWinner) {
-            return 1;
-        }
-        int pointsAwayFromVictory = gameVictoryPointGoal - playerScore;
-        if (pointsAwayFromVictory <= 3) {
-            return 2;
-        }
-        return 3 + pointsAwayFromVictory;
     }
 
     private static void sendMessage(

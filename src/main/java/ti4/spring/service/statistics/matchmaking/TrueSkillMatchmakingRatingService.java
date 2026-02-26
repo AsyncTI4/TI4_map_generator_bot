@@ -1,4 +1,4 @@
-package ti4.service.statistics.matchmaking;
+package ti4.spring.service.statistics.matchmaking;
 
 import de.gesundkrank.jskills.GameInfo;
 import de.gesundkrank.jskills.IPlayer;
