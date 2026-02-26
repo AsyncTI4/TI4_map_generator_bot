@@ -18,6 +18,8 @@ import ti4.spring.persistence.TitleEntityRepository;
 @RequiredArgsConstructor
 public class ListTitlesGivenService {
 
+    private static final int MAX_PLAYERS_TO_SHOW = 25;
+
     private final TitleEntityRepository titleEntityRepository;
 
     @Transactional(readOnly = true)
@@ -25,15 +27,18 @@ public class ListTitlesGivenService {
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
+        Map<String, String> userNamesById = new HashMap<>();
 
         for (TitleEntity titleEntity : titleEntityRepository.findAllWithUsers()) {
             String title = titleEntity.getTitle();
             String userId = titleEntity.getUser().getId();
+            String userName = titleEntity.getUser().getName();
 
             timesTitleHasBeenBestowed.merge(title, 1, Integer::sum);
             titlesAPersonHas.merge(userId, 1, Integer::sum);
             String userAndTitle = userId + "_" + title;
             timesPersonHasGottenSpecificTitle.merge(userAndTitle, 1, Integer::sum);
+            userNamesById.put(userId, userName);
         }
 
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
@@ -44,15 +49,20 @@ public class ListTitlesGivenService {
 
         longMsg.append("\nThe number of titles each player has: \n");
         Map<String, Integer> sortedMapAscPlayers = SortHelper.sortByValue(titlesAPersonHas, false);
+        int playersShown = 0;
         for (Map.Entry<String, Integer> entry : sortedMapAscPlayers.entrySet()) {
-            String person = entry.getKey();
-            if (event.getGuild().getMemberById(person) == null) {
+            if (playersShown >= MAX_PLAYERS_TO_SHOW) {
+                break;
+            }
+            String person = userNamesById.get(entry.getKey());
+            if (person == null) {
                 continue;
             }
-            longMsg.append(event.getGuild().getMemberById(person).getEffectiveName())
+            longMsg.append(person)
                     .append(": ")
                     .append(entry.getValue())
                     .append(" \n");
+            playersShown++;
         }
         
         String specificTitle = event.getOption(Constants.TITLE, null, OptionMapping::getAsString);
@@ -62,19 +72,24 @@ public class ListTitlesGivenService {
             longMsg.append("\nThe number of titles each player has for the title of ")
                     .append(specificTitle)
                     .append(": \n");
+            int playersShownForSpecificTitle = 0;
             for (Map.Entry<String, Integer> entry : sortedMapAscPlayersNTitles.entrySet()) {
-                String personAndTitle = entry.getKey();
-                if (!personAndTitle.toLowerCase().contains(specificTitle.toLowerCase())) {
+                if (playersShownForSpecificTitle >= MAX_PLAYERS_TO_SHOW) {
+                    break;
+                }
+                String[] personAndTitle = entry.getKey().split("_", 2);
+                if (personAndTitle.length < 2 || !personAndTitle[1].equalsIgnoreCase(specificTitle)) {
                     continue;
                 }
-                String person = personAndTitle.split("_")[0];
-                if (event.getGuild().getMemberById(person) == null) {
+                String person = userNamesById.get(personAndTitle[0]);
+                if (person == null) {
                     continue;
                 }
-                longMsg.append(event.getGuild().getMemberById(person).getEffectiveName())
+                longMsg.append(person)
                         .append(": ")
                         .append(entry.getValue())
                         .append(" \n");
+                playersShownForSpecificTitle++;
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
