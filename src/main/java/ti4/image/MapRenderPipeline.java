@@ -28,6 +28,7 @@ public class MapRenderPipeline {
 
     private static void render(RenderEvent renderEvent) {
         if (CircuitBreaker.isOpen()) {
+            BotLogger.warning(new LogOrigin(renderEvent.game), "MapRenderPipeline: circuit breaker is open, skipping render for game " + renderEvent.game.getName());
             return;
         }
 

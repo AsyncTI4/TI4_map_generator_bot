@@ -61,7 +61,13 @@ public class EndGameService {
         }
 
         // Do not publish games that never really took off
-        if (game.getRealPlayers().isEmpty() || game.getRound() == 1) publish = false;
+        if (shouldSuppressPublish(game)) {
+            if (publish) {
+                BotLogger.info(new LogOrigin(game),
+                    "Game `" + gameName + "` publish suppressed: realPlayers=" + game.getRealPlayers().size() + ", round=" + game.getRound());
+            }
+            publish = false;
+        }
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), gameName);
@@ -207,6 +213,7 @@ public class EndGameService {
         String gameEndText = getGameEndText(game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         TextChannel summaryChannel = getGameSummaryChannel(game);
+        BotLogger.info(new LogOrigin(game), "writeChronicle: game=" + game.getName() + " publish=" + publish + " isFow=" + game.isFowMode() + " summaryChannel=" + (summaryChannel == null ? "null" : summaryChannel.getName()));
         if (!game.isFowMode()) {
             MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
                 MessageHelper.replyToMessage(event, fileUpload);
@@ -219,6 +226,7 @@ public class EndGameService {
                         return;
                     }
 
+                    BotLogger.info(new LogOrigin(game), "Posting game end summary to chronicles: " + summaryChannel.getName());
                     // INFORM PLAYERS
                     MessageHelper.splitAndSentWithAction(
                             gameEndText,
@@ -241,6 +249,7 @@ public class EndGameService {
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
+                                    triggerVideoCreation(game, t.getId());
                                 });
                                 MessageHelper.sendMessageToChannel(
                                         event.getMessageChannel(),
@@ -265,6 +274,21 @@ public class EndGameService {
                 sendRoundSummariesToThread(t, game);
             });
         }
+    }
+
+    private static void triggerVideoCreation(Game game, String chroniclesThreadId) {
+        String botUpdatesThreadId = game.getBotMapUpdatesThreadID();
+        if (botUpdatesThreadId == null || botUpdatesThreadId.isBlank()) {
+            BotLogger.info(new LogOrigin(game), "triggerVideoCreation: skipping for game " + game.getName() + " - no bot map updates thread ID");
+            return;
+        }
+        BotLogger.info(new LogOrigin(game), "triggerVideoCreation: dispatching workflow for game " + game.getName() + " to chronicles thread " + chroniclesThreadId);
+        RepositoryDispatchEvent.dispatchWorkflow(
+                "create-map-video.yml",
+                Map.of(
+                        "map_id", game.getName(),
+                        "thread_id", botUpdatesThreadId,
+                        "post_to_thread_id", chroniclesThreadId));
     }
 
     private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
@@ -388,6 +412,10 @@ public class EndGameService {
         }
 
         return sb.toString();
+    }
+
+    static boolean shouldSuppressPublish(Game game) {
+        return game.getRealPlayers().isEmpty() || game.getRound() == 1;
     }
 
     private static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
