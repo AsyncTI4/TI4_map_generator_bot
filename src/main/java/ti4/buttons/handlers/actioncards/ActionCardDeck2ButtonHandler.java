@@ -1,6 +1,7 @@
 package ti4.buttons.handlers.actioncards;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -17,6 +18,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -32,8 +34,12 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
 
+
 @UtilityClass
 class ActionCardDeck2ButtonHandler {
+
+    private static final String ALLIANCE_RIDER_CURRENT_ALLY = "allianceRiderCurrentAlly";
+    private static final String ALLIANCE_RIDER_PURGED_ALLIES = "allianceRiderPurgedAllies";
 
     @ButtonHandler("resolveDataArchive")
     public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
@@ -453,6 +459,85 @@ class ActionCardDeck2ButtonHandler {
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("allianceRiderRandomAlly")
+    public static void resolveAllianceRiderRandomAlly(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        Set<String> excludedAllies = new HashSet<>(getStoredCommanderList(game, ALLIANCE_RIDER_PURGED_ALLIES));
+        String allyCommander = UnusedCommanderHelper.getUnusedCommander(game, excludedAllies);
+        if (allyCommander == null) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " cannot reveal a new ally because none are available.");
+            return;
+        }
+
+        game.setStoredValue(ALLIANCE_RIDER_CURRENT_ALLY, allyCommander);
+        MessageHelper.sendMessageToChannelWithEmbed(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " revealed this ally for _Alliance Rider_.",
+                Mapper.getLeader(allyCommander).getRepresentationEmbed());
+    }
+
+    @ButtonHandler("allianceRiderGainAlly")
+    public static void resolveAllianceRiderGainAlly(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        String allyCommander = game.getStoredValue(ALLIANCE_RIDER_CURRENT_ALLY);
+        if (allyCommander.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no revealed ally to gain. Use _Random Ally_ first.");
+            return;
+        }
+
+        if (player.hasLeader(allyCommander)) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " already has this ally ability in play.");
+            game.setStoredValue(ALLIANCE_RIDER_CURRENT_ALLY, "");
+            return;
+        }
+
+        player.addLeader(allyCommander);
+        game.addFakeCommander(allyCommander);
+        player.getLeader(allyCommander).ifPresent(leader -> leader.setLocked(false));
+        game.setStoredValue(ALLIANCE_RIDER_CURRENT_ALLY, "");
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " gained the _Alliance Rider_ ally ability: "
+                        + Mapper.getLeader(allyCommander).getName() + ".");
+    }
+
+    @ButtonHandler("allianceRiderPurgeAlly")
+    public static void resolveAllianceRiderPurgeAlly(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        String allyCommander = game.getStoredValue(ALLIANCE_RIDER_CURRENT_ALLY);
+        if (allyCommander.isEmpty()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " has no revealed ally to purge. Use _Random Ally_ first.");
+            return;
+        }
+
+        Set<String> purgedAllies = new HashSet<>(getStoredCommanderList(game, ALLIANCE_RIDER_PURGED_ALLIES));
+        purgedAllies.add(allyCommander);
+        game.setStoredValue(ALLIANCE_RIDER_PURGED_ALLIES, String.join(",", purgedAllies));
+        game.setStoredValue(ALLIANCE_RIDER_CURRENT_ALLY, "");
+
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " purged the _Alliance Rider_ ally: "
+                        + Mapper.getLeader(allyCommander).getName() + ".");
+    }
+
+    private static List<String> getStoredCommanderList(Game game, String storageKey) {
+        String storedValue = game.getStoredValue(storageKey);
+        if (storedValue.isBlank()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(List.of(storedValue.split(",")));
     }
 
     @ButtonHandler("brutalOccupationStep2_")

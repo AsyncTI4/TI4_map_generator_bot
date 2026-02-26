@@ -1018,6 +1018,16 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("alliance_rider".equals(automationID)) {
+                codedButtons.add(Buttons.green(
+                        player.getFinsFactionCheckerPrefix() + "allianceRiderRandomAlly", "Random Ally"));
+                codedButtons.add(
+                        Buttons.blue(player.getFinsFactionCheckerPrefix() + "allianceRiderGainAlly", "Gain Ally"));
+                codedButtons.add(
+                        Buttons.red(player.getFinsFactionCheckerPrefix() + "allianceRiderPurgeAlly", "Purge Ally"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("innovation".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
