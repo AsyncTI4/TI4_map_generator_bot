@@ -5,6 +5,7 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -13,6 +14,7 @@ from urllib.request import Request, urlopen
 
 DISCORD_API_BASE = "https://discord.com/api/v10"
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+_MAX_RETRIES = 5
 
 
 def _auth_header(token: str, auth_type: str) -> str:
@@ -30,14 +32,25 @@ def _api_get_json(url: str, token: str, auth_type: str) -> list[dict[str, Any]]:
         },
         method="GET",
     )
-    try:
-        with urlopen(request, timeout=60) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Discord API request failed ({exc.code}): {body}") from exc
-    except URLError as exc:
-        raise RuntimeError(f"Discord API request failed: {exc.reason}") from exc
+    for attempt in range(_MAX_RETRIES):
+        try:
+            with urlopen(request, timeout=60) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            if exc.code == 429:
+                try:
+                    retry_after = float(json.loads(body).get("retry_after", 1))
+                except Exception:
+                    retry_after = 1.0
+                if attempt < _MAX_RETRIES - 1:
+                    print(f"Rate limited by Discord API; retrying in {retry_after}s (attempt {attempt + 1}/{_MAX_RETRIES})", file=sys.stderr)
+                    time.sleep(retry_after)
+                    continue
+            raise RuntimeError(f"Discord API request failed ({exc.code}): {body}") from exc
+        except URLError as exc:
+            raise RuntimeError(f"Discord API request failed: {exc.reason}") from exc
+    raise RuntimeError(f"Discord API request failed: exceeded {_MAX_RETRIES} retries due to rate limiting")
 
 
 def _download_file(url: str, token: str, auth_type: str, target_path: Path) -> None:
@@ -49,14 +62,26 @@ def _download_file(url: str, token: str, auth_type: str, target_path: Path) -> N
         },
         method="GET",
     )
-    try:
-        with urlopen(request, timeout=120) as response:
-            target_path.write_bytes(response.read())
-    except HTTPError as exc:
-        body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Attachment download failed ({exc.code}) for {url}: {body}") from exc
-    except URLError as exc:
-        raise RuntimeError(f"Attachment download failed for {url}: {exc.reason}") from exc
+    for attempt in range(_MAX_RETRIES):
+        try:
+            with urlopen(request, timeout=120) as response:
+                target_path.write_bytes(response.read())
+            return
+        except HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            if exc.code == 429:
+                try:
+                    retry_after = float(json.loads(body).get("retry_after", 1))
+                except Exception:
+                    retry_after = 1.0
+                if attempt < _MAX_RETRIES - 1:
+                    print(f"Rate limited downloading {url}; retrying in {retry_after}s (attempt {attempt + 1}/{_MAX_RETRIES})", file=sys.stderr)
+                    time.sleep(retry_after)
+                    continue
+            raise RuntimeError(f"Attachment download failed ({exc.code}) for {url}: {body}") from exc
+        except URLError as exc:
+            raise RuntimeError(f"Attachment download failed for {url}: {exc.reason}") from exc
+    raise RuntimeError(f"Attachment download failed for {url}: exceeded {_MAX_RETRIES} retries due to rate limiting")
 
 
 def _is_image_attachment(attachment: dict[str, Any]) -> bool:
