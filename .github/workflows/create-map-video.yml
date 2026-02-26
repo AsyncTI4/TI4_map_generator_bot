@@ -41,6 +41,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install Python dependencies
+        run: pip install -r scripts/requirements.txt
+
       - name: Install system dependencies
         run: |
           set -euo pipefail
