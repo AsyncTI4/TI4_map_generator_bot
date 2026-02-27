@@ -245,7 +245,7 @@
         "sustainDamage": true,
         "isShip": true,
         "ability": "This unit cannot be destroyed by “Direct Hit” action cards. When this unit produces a hit, you may repair it. While this unit is not damaged, you may reroll its combat roll.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/ds/tribune.webp?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/faction/tribune.webp?raw=true"
     },
     {
         "id": "cheiran_flagship",
