@@ -1,6 +1,8 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -2131,7 +2133,7 @@ public class UnfiledButtonHandlers {
                                             + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons
                                             + ".");
                         } else {
-                            if (netGain == properGain && netGain > 2 && cyber) {
+                            if (netGain > 2 && cyber) {
                                 PromissoryNoteHelper.resolvePNPlay("ce", player, game, event);
                             }
                         }

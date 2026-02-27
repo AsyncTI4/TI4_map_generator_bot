@@ -91,6 +91,10 @@ public class PersistAllEntitiesService {
         gameEntity.setFrankenMode(game.isFrankenGame());
         gameEntity.setAllianceMode(game.isAllianceMode());
         gameEntity.setTwilightImperiumGlobalLeague(game.isCompetitiveTIGLGame());
+        gameEntity.setTwilightImperiumGlobalLeagueRank(
+                game.getMinimumTIGLRankAtGameStart() == null
+                        ? null
+                        : game.getMinimumTIGLRankAtGameStart().toString());
         gameEntity.setProphecyOfKings(game.isProphecyOfKings());
         gameEntity.setThundersEdge(game.isThundersEdge());
         gameEntity.setPlayerCount(game.getRealAndEliminatedPlayers().size());
