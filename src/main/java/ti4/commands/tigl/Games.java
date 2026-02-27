@@ -23,6 +23,10 @@ class Games extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         boolean showGameIds = event.getOption(Constants.SHOW_GAME_IDS, false, OptionMapping::getAsBoolean);
         String message = TiglGamesInfoService.getBean().getOngoingGamesByRankMessage(showGameIds);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        if (!showGameIds) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        } else {
+            MessageHelper.sendMessageToThread(event.getChannel(), "Ongoing TIGL games", message);
+        }
     }
 }
