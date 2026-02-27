@@ -62,7 +62,7 @@ jobs:
           MAP_ID: ${{ inputs.map_id || github.event.client_payload.map_id }}
           CHANNEL_ID: ${{ inputs.channel_id || github.event.client_payload.channel_id }}
           THREAD_ID: ${{ inputs.thread_id || github.event.client_payload.thread_id }}
-          MAX_MESSAGES: ${{ inputs.max_messages || github.event.client_payload.max_messages || '500' }}
+          MAX_MESSAGES: ${{ inputs.max_messages || github.event.client_payload.max_messages || '1500' }}
           DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type || github.event.client_payload.discord_auth_type || 'bot' }}
         run: |
           set -euo pipefail
