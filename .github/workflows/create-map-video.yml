@@ -18,9 +18,9 @@ on:
         required: false
         type: string
       max_messages:
-        description: "Maximum messages to scan (newest backward); default 1000"
+        description: "Maximum messages to scan (newest backward); default 1500"
         required: false
-        default: "1000"
+        default: "1500"
         type: string
       discord_auth_type:
         description: "Discord token auth mode: bot or user"
