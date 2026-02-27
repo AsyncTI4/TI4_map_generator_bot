@@ -95,7 +95,7 @@ if [[ "$final_frame_count" -eq 0 ]]; then
 fi
 
 echo "Creating MP4 from $final_frame_count frame(s)..." >&2
-ffmpeg -y -framerate 5 -pattern_type glob -i "$FRAMES_DIR/*.png" -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -pix_fmt yuv420p "$OUTPUT_FILE" >&2
+ffmpeg -y -framerate 5 -pattern_type glob -i "$FRAMES_DIR/*.png" -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" -c:v libx264 -crf 28 -preset slow -tune animation -pix_fmt yuv420p "$OUTPUT_FILE" >&2
 
 if [[ ! -s "$OUTPUT_FILE" ]]; then
   echo "Error: video output was not created or is empty: $OUTPUT_FILE" >&2
