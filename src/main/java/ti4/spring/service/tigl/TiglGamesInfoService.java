@@ -34,6 +34,9 @@ public class TiglGamesInfoService {
         sb.append("Total ongoing TIGL games: `").append(ongoingTiglGames.size()).append("`\n");
 
         for (TIGLRank rank : TIGLRank.getSortedRanks()) {
+            if (rank == TIGLRank.EMPEROR) {
+                continue;
+            }
             List<String> gamesForRank = rankToGames.getOrDefault(rank, List.of());
             sb.append("- **")
                     .append(rank.getShortName())
