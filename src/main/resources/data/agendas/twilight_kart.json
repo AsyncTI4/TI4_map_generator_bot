@@ -1,0 +1,7 @@
+[
+{"alias":"tk-endorse","name":"Endorse","category":"agenda","type":"Directive","target":"Edict","text1":"Choose 1 player and place their control token on this card. That player does not have to spend a command token to resolve the secondary ability of any strategy card. Discard this card at the end of the status phase.","source":"twilight_kart"},
+{"alias":"tk-enfilade","name":"Enfilade","category":"agenda","type":"Directive","target":"Edict","text1":"Place 1 structure on a planet you control, or destroy 1 structure, twice. Then, each other player may place 1 PDS on a planet they control.","source":"twilight_kart"},
+{"alias":"tk-sanctuary","name":"Sanctuary","category":"agenda","type":"Directive","target":"Edict","text1":"Choose 1 system that contains a planet you control. Each other player places a command token from their reinforcements in that system.","source":"twilight_kart"},
+{"alias":"tk-spoil","name":"Spoil","category":"agenda","type":"Directive","target":"Edict","text1":"Each other player loses trade goods equal to their commodity value. Then, replenish your commodities.","source":"twilight_kart"},
+{"alias":"tk-spite","name":"Spite","category":"agenda","type":"Directive","target":"Edict","text1":"Choose tactic pool, fleet pool, or strategy pool; each other player removes 1 command token from that pool and returns that token to their reinforcements.","source":"twilight_kart"}
+]
