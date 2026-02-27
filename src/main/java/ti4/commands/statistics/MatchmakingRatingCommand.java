@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
-import ti4.service.statistics.matchmaking.MatchmakingRatingEventService;
+import ti4.spring.service.statistics.matchmaking.MatchmakingRatingEventService;
 
 class MatchmakingRatingCommand extends Subcommand {
 
