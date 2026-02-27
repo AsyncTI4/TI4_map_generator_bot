@@ -259,8 +259,8 @@ public class PlayerStatsDashboardPayload {
                 "techs",
                 Map.of(
                         "blue", blueCount.get(),
-                        "green", redCount.get(),
-                        "red", greenCount.get(),
+                        "green", greenCount.get(),
+                        "red", redCount.get(),
                         "yellow", yellowCount.get()));
 
         return planetTotals;
