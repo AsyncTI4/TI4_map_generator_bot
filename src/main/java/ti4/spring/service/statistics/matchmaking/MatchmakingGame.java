@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import ti4.spring.persistence.GameEntity;
-import ti4.spring.persistence.PlayerEntity;
+import ti4.spring.service.persistence.GameEntity;
+import ti4.spring.service.persistence.PlayerEntity;
 
 record MatchmakingGame(String name, long endedDate, List<MatchmakingPlayer> players) {
 
