@@ -174,7 +174,7 @@ def main() -> int:
     )
     parser.add_argument("--guild-id", required=True, help="Discord guild (server) ID")
     parser.add_argument("--channel-id", required=True, help="Discord channel or thread ID to scan")
-    parser.add_argument("--author-id", default=None, help="Filter messages by this author (user) ID")
+    parser.add_argument("--author-id", default="947763140517560331", help="Filter messages by this author (user) ID (default: 947763140517560331)")
     parser.add_argument("--output-dir", required=True, help="Directory to write downloaded frames")
     parser.add_argument(
         "--max-messages",
