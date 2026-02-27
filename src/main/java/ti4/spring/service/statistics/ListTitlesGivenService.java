@@ -58,13 +58,10 @@ public class ListTitlesGivenService {
             if (person == null) {
                 continue;
             }
-            longMsg.append(person)
-                    .append(": ")
-                    .append(entry.getValue())
-                    .append(" \n");
+            longMsg.append(person).append(": ").append(entry.getValue()).append(" \n");
             playersShown++;
         }
-        
+
         String specificTitle = event.getOption(Constants.TITLE, null, OptionMapping::getAsString);
         if (specificTitle != null) {
             Map<String, Integer> sortedMapAscPlayersNTitles =
@@ -85,10 +82,7 @@ public class ListTitlesGivenService {
                 if (person == null) {
                     continue;
                 }
-                longMsg.append(person)
-                        .append(": ")
-                        .append(entry.getValue())
-                        .append(" \n");
+                longMsg.append(person).append(": ").append(entry.getValue()).append(" \n");
                 playersShownForSpecificTitle++;
             }
         }

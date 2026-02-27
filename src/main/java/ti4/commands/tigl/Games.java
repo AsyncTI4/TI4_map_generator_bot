@@ -52,7 +52,9 @@ class Games extends Subcommand {
 
         for (TIGLRank rank : rankedTiglRanks) {
             List<String> gamesForRank = rankToGames.getOrDefault(rank, List.of());
-            sb.append("- **").append(rank.getShortName()).append("**: `")
+            sb.append("- **")
+                    .append(rank.getShortName())
+                    .append("**: `")
                     .append(gamesForRank.size())
                     .append("` game");
             if (gamesForRank.size() != 1) {
