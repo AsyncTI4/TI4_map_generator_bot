@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.helpers.Constants;
@@ -47,7 +46,7 @@ public class Planet extends UnitHolder {
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         super(name, holderCenterPosition);
         PlanetModel planetInfo = Mapper.getPlanet(name);
-        if (Optional.ofNullable(planetInfo).isPresent()) {
+        if (planetInfo != null) {
             if (planetInfo.getPlanetTypes() != null) {
                 planetType.addAll(planetInfo.getPlanetTypes().stream()
                         .map(PlanetTypeModel.PlanetType::toString)
@@ -63,12 +62,10 @@ public class Planet extends UnitHolder {
             if (planetInfo.getContrastColor() != null) {
                 contrastColor = planetInfo.getContrastColor();
             }
-            if (!Optional.ofNullable(planetInfo.getTechSpecialties())
-                    .orElse(new ArrayList<>())
-                    .isEmpty()) {
-                originalTechSpeciality =
-                        planetInfo.getTechSpecialties().getFirst().toString();
-                techSpeciality.addAll(planetInfo.getTechSpecialties().stream()
+            List<TechSpecialtyModel.TechSpecialty> techSpecialties = planetInfo.getTechSpecialties();
+            if (techSpecialties != null && !techSpecialties.isEmpty()) {
+                originalTechSpeciality = techSpecialties.getFirst().toString();
+                techSpeciality.addAll(techSpecialties.stream()
                         .map(TechSpecialtyModel.TechSpecialty::toString)
                         .toList());
             }
@@ -80,10 +77,23 @@ public class Planet extends UnitHolder {
 
     private void resetOriginalPlanetResInf() {
         PlanetModel planetInfo = Mapper.getPlanet(getName());
-        if (Optional.ofNullable(planetInfo).isPresent()) {
+        if (planetInfo != null) {
             resourcesOriginal = planetInfo.getResources();
             influenceOriginal = planetInfo.getInfluence();
         }
+    }
+
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
+    private boolean isRealAttachmentToken(String token) {
+        AttachmentModel attach = Mapper.getAttachmentInfo(token);
+        if (attach != null && attach.isFakeAttachment()) return false;
+        if (token.contains("superweapon")) return false;
+        if (token.contains("token_tomb")) return false;
+        if (token.contains("facility")) return false;
+        if (token.contains("sleeper")) return false;
+        if (token.contains("dmz_large")) return false;
+        if (token.contains("custodiavigilia")) return false;
+        return !Helper.isFakeAttachment(token);
     }
 
     private void addTechSpec(String techSpec) {
@@ -97,17 +107,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public boolean hasAttachment() {
-        return tokenList.stream().anyMatch(token -> {
-            AttachmentModel attach = Mapper.getAttachmentInfo(token);
-            if (attach != null && attach.isFakeAttachment()) return false;
-            if (token.contains("superweapon")) return false;
-            if (token.contains("token_tomb")) return false;
-            if (token.contains("facility")) return false;
-            if (token.contains("sleeper")) return false;
-            if (token.contains("dmz_large")) return false;
-            if (token.contains("custodiavigilia")) return false;
-            return !Helper.isFakeAttachment(token);
-        });
+        return tokenList.stream().anyMatch(this::isRealAttachmentToken);
     }
 
     public void updateTriadStats(Player player) {
@@ -137,17 +137,7 @@ public class Planet extends UnitHolder {
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
         return tokenList.stream()
-                .filter(token -> {
-                    AttachmentModel attach = Mapper.getAttachmentInfo(token);
-                    if (attach != null && attach.isFakeAttachment()) return false;
-                    if (token.contains("superweapon")) return false;
-                    if (token.contains("token_tomb")) return false;
-                    if (token.contains("facility")) return false;
-                    if (token.contains("sleeper")) return false;
-                    if (token.contains("dmz_large")) return false;
-                    if (token.contains("custodiavigilia")) return false;
-                    return !Helper.isFakeAttachment(token);
-                })
+                .filter(this::isRealAttachmentToken)
                 .toList();
     }
 
