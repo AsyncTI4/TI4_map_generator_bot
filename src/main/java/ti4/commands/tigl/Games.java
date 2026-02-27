@@ -1,6 +1,5 @@
 package ti4.commands.tigl;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,11 +12,12 @@ import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 
 class Games extends Subcommand {
 
-    public Games() {
+    Games() {
         super(Constants.GAMES, "Show ongoing TIGL games grouped by rank");
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
@@ -30,7 +30,7 @@ class Games extends Subcommand {
         boolean showGameIds = event.getOption(Constants.SHOW_GAME_IDS, false, OptionMapping::getAsBoolean);
 
         List<Game> ongoingTiglGames = GameManager.getManagedGames().stream()
-                .map(managedGame -> managedGame.getGame())
+                .map(ManagedGame::getGame)
                 .filter(Game::isCompetitiveTIGLGame)
                 .filter(game -> !game.isHasEnded())
                 .toList();
@@ -45,10 +45,7 @@ class Games extends Subcommand {
         StringBuilder sb = new StringBuilder("## Ongoing TIGL games by rank\n");
         sb.append("Total ongoing TIGL games: `").append(ongoingTiglGames.size()).append("`\n");
 
-        List<TIGLRank> rankedTiglRanks = List.of(TIGLRank.values()).stream()
-                .filter(rank -> rank.getIndex() >= 0)
-                .sorted(Comparator.comparing(TIGLRank::getIndex))
-                .toList();
+        List<TIGLRank> rankedTiglRanks = TIGLRank.getSortedRanks();
 
         for (TIGLRank rank : rankedTiglRanks) {
             List<String> gamesForRank = rankToGames.getOrDefault(rank, List.of());

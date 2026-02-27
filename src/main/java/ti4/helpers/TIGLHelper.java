@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -102,6 +103,13 @@ public class TIGLHelper {
                 case HERO, EMPEROR -> EMPEROR;
                 default -> null;
             };
+        }
+
+        public static List<TIGLRank> getSortedRanks() {
+            return Stream.of(values())
+                    .filter(rank -> rank.index >= 0)
+                    .sorted(Comparator.comparing(TIGLRank::getIndex))
+                    .toList();
         }
 
         /**
