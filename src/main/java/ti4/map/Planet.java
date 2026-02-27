@@ -136,9 +136,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
-        return tokenList.stream()
-                .filter(this::isRealAttachmentToken)
-                .toList();
+        return tokenList.stream().filter(this::isRealAttachmentToken).toList();
     }
 
     public String getRepresentation(Game game) {
