@@ -35,11 +35,13 @@ public class RepositoryDispatchEvent {
      * @param chroniclesThreadId - ID of the thread in the chronicles channel where the video will be posted
      */
     public static void generateVideo(String mapId, String botThreadId, String chroniclesThreadId) {
-        new RepositoryDispatchEvent("generate_video", Map.of(
-            "map_id", mapId,
-            "thread_id", botThreadId,
-            "post_to_thread_id", chroniclesThreadId
-        )).sendEvent();
+        new RepositoryDispatchEvent(
+                        "generate_video",
+                        Map.of(
+                                "map_id", mapId,
+                                "thread_id", botThreadId,
+                                "post_to_thread_id", chroniclesThreadId))
+                .sendEvent();
     }
 
     public void sendEvent() {
