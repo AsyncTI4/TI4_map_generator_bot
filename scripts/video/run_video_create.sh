@@ -7,9 +7,15 @@ CHANNEL_ID="${2:-}"
 THREAD_ID="${3:-}"
 MAX_MESSAGES="${4:-500}"
 DISCORD_AUTH_TYPE="${5:-${DISCORD_AUTH_TYPE:-bot}}"
+GUILD_ID="${6:-${GUILD_ID:-}}"
 
 if [[ -z "$MAP_ID" ]]; then
-  echo "Error: map_id is required. Usage: scripts/video/run_video_create.sh <map_id> <channel_id> <thread_id> [max_messages]" >&2
+  echo "Error: map_id is required. Usage: scripts/video/run_video_create.sh <map_id> <channel_id> <thread_id> [max_messages] [discord_auth_type] [guild_id]" >&2
+  exit 1
+fi
+
+if [[ -z "$GUILD_ID" ]]; then
+  echo "Error: guild_id is required. Pass it as the 6th argument or set the GUILD_ID environment variable." >&2
   exit 1
 fi
 
@@ -62,6 +68,7 @@ find "$FRAMES_DIR" -maxdepth 1 -type f -delete
 
 echo "Downloading frames for map_id '$MAP_ID' from Discord source '$SOURCE_ID'..." >&2
 python3 scripts/video/fetch_discord_frames.py \
+  --guild-id "$GUILD_ID" \
   --channel-id "$SOURCE_ID" \
   --output-dir "$FRAMES_DIR" \
   --max-messages "$MAX_MESSAGES" \

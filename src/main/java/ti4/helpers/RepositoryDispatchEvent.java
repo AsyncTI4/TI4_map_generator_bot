@@ -33,14 +33,16 @@ public class RepositoryDispatchEvent {
      * @param mapId - the game/map ID (game name)
      * @param botThreadId - ID of the bot-map-updates thread used as the image source
      * @param chroniclesThreadId - ID of the thread in the chronicles channel where the video will be posted
+     * @param guildId - ID of the Discord guild (server) that contains the bot thread
      */
-    public static void generateVideo(String mapId, String botThreadId, String chroniclesThreadId) {
+    public static void generateVideo(String mapId, String botThreadId, String chroniclesThreadId, String guildId) {
         new RepositoryDispatchEvent(
                         "generate_video",
                         Map.of(
                                 "map_id", mapId,
                                 "thread_id", botThreadId,
-                                "post_to_thread_id", chroniclesThreadId))
+                                "post_to_thread_id", chroniclesThreadId,
+                                "guild_id", guildId))
                 .sendEvent();
     }
 

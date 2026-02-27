@@ -38,6 +38,6 @@ class RepositoryDispatchEventTest {
     @Test
     void testGenerateVideoDoesNotThrow() {
         // sendEvent() is a no-op when REPO_DISPATCH_TOKEN is not set (as in test environments)
-        assertDoesNotThrow(() -> RepositoryDispatchEvent.generateVideo("pbd1234", "111", "222"));
+        assertDoesNotThrow(() -> RepositoryDispatchEvent.generateVideo("pbd1234", "111", "222", "333"));
     }
 }
