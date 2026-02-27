@@ -148,7 +148,7 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnIsNormal(Boolean.TRUE, game));
     }
 
-    public static Predicate<Game> getFinishedGamesFilter(Integer playerCountFilter, Integer victoryPointGoalFilter) {
+    private static Predicate<Game> getFinishedGamesFilter(Integer playerCountFilter, Integer victoryPointGoalFilter) {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
                 .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
@@ -195,6 +195,7 @@ public class GameStatisticsFilterer {
             case "te" -> game.isThundersEdge();
             case "tf" -> game.isTwilightsFallMode();
             case "tedemo" -> game.isThundersEdgeDemo();
+            case "noswap" -> game.isNoSwapMode();
             default -> false;
         };
     }

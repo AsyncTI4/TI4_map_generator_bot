@@ -14,8 +14,8 @@ class RunSql extends Subcommand {
 
     RunSql() {
         super("run_sql", "Run SQL directly against the SQLite database.");
-        addOptions(new OptionData(OptionType.STRING, "sql", "The SQL query or statement to execute.")
-                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, "sql", "The SQL query or statement to execute.").setRequired(true));
     }
 
     @Override
