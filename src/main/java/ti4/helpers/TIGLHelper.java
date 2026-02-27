@@ -1,11 +1,15 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -60,16 +64,14 @@ public class TIGLHelper {
         HERO_YIN("TIGL - Dannel of the Tenth", -1), //
         HERO_YSSARIL("TIGL - Kyver, Blade and Key", -1);
 
+        @Getter
         private final String name;
+
         private final Integer index;
 
         TIGLRank(String name, int index) {
             this.name = name;
             this.index = index;
-        }
-
-        public String getName() {
-            return name;
         }
 
         public String getShortName() {
@@ -104,6 +106,13 @@ public class TIGLHelper {
             };
         }
 
+        public static List<TIGLRank> getSortedRanks() {
+            return Stream.of(values())
+                    .filter(rank -> rank.index >= 0)
+                    .sorted(Comparator.comparing(TIGLRank::getIndex))
+                    .toList();
+        }
+
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
          *
@@ -111,6 +120,7 @@ public class TIGLHelper {
          * @return the SimpleStatistics enum value, or null if not found
          */
         public static TIGLRank fromString(String id) {
+            if (isBlank(id)) return null;
             for (TIGLRank rank : values()) {
                 if (id.equals(rank.toString())) {
                     return rank;

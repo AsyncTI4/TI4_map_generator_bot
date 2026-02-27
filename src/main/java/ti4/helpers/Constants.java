@@ -1526,6 +1526,7 @@ public class Constants {
     public static final String TIGL_NICKNAME = "nickname";
     public static final String TIGL_FRACTURED_TAG = "TIGL Fractured";
     public static final String IS_FRACTURED = "is_fractured";
+    public static final String SHOW_GAME_IDS = "show_game_ids";
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
