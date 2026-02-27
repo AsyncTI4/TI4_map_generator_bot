@@ -1,4 +1,4 @@
-package ti4.spring.persistence;
+package ti4.spring.service.persistence;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

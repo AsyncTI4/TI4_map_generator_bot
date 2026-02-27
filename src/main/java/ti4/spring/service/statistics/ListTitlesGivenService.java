@@ -11,8 +11,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
-import ti4.spring.persistence.TitleEntity;
-import ti4.spring.persistence.TitleEntityRepository;
+import ti4.spring.service.persistence.TitleEntity;
+import ti4.spring.service.persistence.TitleEntityRepository;
 
 @Service
 @RequiredArgsConstructor

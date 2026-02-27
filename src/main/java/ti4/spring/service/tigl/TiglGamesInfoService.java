@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.spring.context.SpringContext;
-import ti4.spring.persistence.GameEntity;
-import ti4.spring.persistence.GameEntityRepository;
+import ti4.spring.service.persistence.GameEntity;
+import ti4.spring.service.persistence.GameEntityRepository;
 
 @Service
 @RequiredArgsConstructor
