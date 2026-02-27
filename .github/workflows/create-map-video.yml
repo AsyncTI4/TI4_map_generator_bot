@@ -79,6 +79,7 @@ jobs:
           echo "$output" >> "$GITHUB_OUTPUT"
 
       - name: Upload map video artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.generate.outputs.artifact_name }}
@@ -91,10 +92,12 @@ jobs:
         env:
           POST_TO_THREAD_ID: ${{ inputs.post_to_thread_id || github.event.client_payload.post_to_thread_id }}
           DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type || github.event.client_payload.discord_auth_type || 'bot' }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
         run: |
           set -euo pipefail
           python3 scripts/video/post_to_discord_thread.py \
             --thread-id "$POST_TO_THREAD_ID" \
             --file "${{ steps.generate.outputs.output_file }}" \
             --token-env "DISCORD_TOKEN" \
-            --auth-type "$DISCORD_AUTH_TYPE"
+            --auth-type "$DISCORD_AUTH_TYPE" \
+            --artifact-url "$ARTIFACT_URL"

@@ -44,14 +44,66 @@ def _build_multipart(boundary: str, filename: str, file_bytes: bytes) -> bytes:
     return b"".join(parts)
 
 
+def post_message_to_thread(
+    thread_id: str,
+    content: str,
+    token: str,
+    auth_type: str,
+) -> None:
+    url = f"{DISCORD_API_BASE}/channels/{thread_id}/messages"
+    body = json.dumps({"content": content}).encode()
+    request = Request(
+        url,
+        data=body,
+        headers={
+            "Authorization": _auth_header(token, auth_type),
+            "Content-Type": "application/json",
+            "User-Agent": "ti4-map-video-poster/1.0",
+        },
+        method="POST",
+    )
+    for attempt in range(_MAX_RETRIES):
+        try:
+            with urlopen(request, timeout=120) as response:
+                response.read()
+            return
+        except HTTPError as exc:
+            body_text = exc.read().decode("utf-8", errors="replace")
+            if exc.code == 429:
+                try:
+                    retry_after = float(json.loads(body_text).get("retry_after", 1))
+                except Exception:
+                    retry_after = 1.0
+                if attempt < _MAX_RETRIES - 1:
+                    print(
+                        f"Rate limited by Discord API; retrying in {retry_after}s (attempt {attempt + 1}/{_MAX_RETRIES})",
+                        file=sys.stderr,
+                    )
+                    time.sleep(retry_after)
+                    continue
+            raise RuntimeError(f"Discord API request failed ({exc.code}): {body_text}") from exc
+        except URLError as exc:
+            raise RuntimeError(f"Discord API request failed: {exc.reason}") from exc
+    raise RuntimeError(f"Discord API request failed: exceeded {_MAX_RETRIES} retries due to rate limiting")
+
+
 def post_video_to_thread(
     thread_id: str,
     file_path: Path,
     token: str,
     auth_type: str,
+    artifact_url: str | None = None,
 ) -> None:
     file_bytes = file_path.read_bytes()
     if len(file_bytes) > _MAX_FILE_SIZE_BYTES:
+        if artifact_url:
+            msg = (
+                f"The video for `{file_path.name}` is too large to upload directly to Discord "
+                f"({len(file_bytes):,} bytes, limit is {_MAX_FILE_SIZE_BYTES:,} bytes).\n"
+                f"Download it from the GitHub Actions artifact instead:\n{artifact_url}"
+            )
+            post_message_to_thread(thread_id, msg, token, auth_type)
+            return
         raise ValueError(
             f"File '{file_path}' is {len(file_bytes)} bytes, exceeding the {_MAX_FILE_SIZE_BYTES}-byte Discord limit."
         )
@@ -114,6 +166,11 @@ def main() -> int:
         default="bot",
         help="Authorization mode: 'bot' prefixes token with 'Bot ', 'user' uses raw token (default: bot)",
     )
+    parser.add_argument(
+        "--artifact-url",
+        default=None,
+        help="GitHub Actions artifact URL to include in Discord message when the file is too large to upload directly",
+    )
     args = parser.parse_args()
 
     token = os.getenv(args.token_env)
@@ -124,7 +181,7 @@ def main() -> int:
     if not file_path.is_file():
         raise RuntimeError(f"File not found: {file_path}")
 
-    post_video_to_thread(args.thread_id, file_path, token, args.auth_type)
+    post_video_to_thread(args.thread_id, file_path, token, args.auth_type, args.artifact_url)
     print(f"Posted '{file_path.name}' to Discord thread {args.thread_id}")
     return 0
 
