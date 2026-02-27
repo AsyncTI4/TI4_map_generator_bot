@@ -23,7 +23,7 @@ def _auth_header(token: str, auth_type: str) -> str:
     return token
 
 
-def _api_get_json(url: str, token: str, auth_type: str) -> list[dict[str, Any]]:
+def _api_get_json(url: str, token: str, auth_type: str) -> Any:
     request = Request(
         url,
         headers={
@@ -104,30 +104,47 @@ def _normalize_name(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9._-]", "_", value)
 
 
+_SEARCH_PAGE_SIZE = 25
+
+
 def collect_image_attachments(
+    guild_id: str,
     channel_id: str,
     token: str,
     max_messages: int,
     auth_type: str,
+    author_id: str | None = None,
 ) -> list[tuple[str, str, str, str]]:
-    before: str | None = None
+    offset = 0
     scanned = 0
     collected: list[tuple[str, str, str, str]] = []
 
     while scanned < max_messages:
         remaining = max_messages - scanned
-        limit = 100 if remaining > 100 else remaining
-        query = {"limit": str(limit)}
-        if before:
-            query["before"] = before
+        limit = min(_SEARCH_PAGE_SIZE, remaining)
+        query: dict[str, str] = {
+            "channel_id": channel_id,
+            "has": "image",
+            "offset": str(offset),
+            "limit": str(limit),
+        }
+        if author_id:
+            query["author_id"] = author_id
 
-        url = f"{DISCORD_API_BASE}/channels/{channel_id}/messages?{urlencode(query)}"
-        messages = _api_get_json(url, token, auth_type)
-        if not messages:
+        url = f"{DISCORD_API_BASE}/guilds/{guild_id}/messages/search?{urlencode(query)}"
+        response = _api_get_json(url, token, auth_type)
+
+        messages_groups = response.get("messages") or []
+        if not messages_groups:
             break
 
-        scanned += len(messages)
-        for message in messages:
+        for group in messages_groups:
+            # Each group is [matched_message, ...context_messages]; first item is the match
+            if not isinstance(group, list) or not group:
+                continue
+            message = group[0]
+            if not message:
+                continue
             message_id = str(message.get("id") or "")
             attachments = message.get("attachments") or []
             for attachment in attachments:
@@ -140,10 +157,12 @@ def collect_image_attachments(
                     continue
                 collected.append((message_id, attachment_id, filename, attachment_url))
 
-        oldest_message_id = str(messages[-1].get("id") or "")
-        if not oldest_message_id:
+        scanned += len(messages_groups)
+        offset += len(messages_groups)
+
+        total_results = int(response.get("total_results") or 0)
+        if offset >= total_results:
             break
-        before = oldest_message_id
 
     collected.sort(key=lambda entry: (int(entry[0]), int(entry[1])))
     return collected
@@ -153,7 +172,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Download image attachments from a Discord channel/thread for map video rendering"
     )
+    parser.add_argument("--guild-id", required=True, help="Discord guild (server) ID")
     parser.add_argument("--channel-id", required=True, help="Discord channel or thread ID to scan")
+    parser.add_argument("--author-id", default=None, help="Filter messages by this author (user) ID")
     parser.add_argument("--output-dir", required=True, help="Directory to write downloaded frames")
     parser.add_argument(
         "--max-messages",
@@ -184,10 +205,17 @@ def main() -> int:
     output_dir = Path(args.output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    attachments = collect_image_attachments(args.channel_id, token, args.max_messages, args.auth_type)
+    attachments = collect_image_attachments(
+        guild_id=args.guild_id,
+        channel_id=args.channel_id,
+        token=token,
+        max_messages=args.max_messages,
+        auth_type=args.auth_type,
+        author_id=args.author_id,
+    )
     if not attachments:
         raise RuntimeError(
-            f"No image attachments found in channel/thread '{args.channel_id}' within {args.max_messages} message(s)."
+            f"No image attachments found in channel/thread '{args.channel_id}' (guild '{args.guild_id}') within {args.max_messages} message(s)."
         )
 
     for index, (message_id, attachment_id, filename, attachment_url) in enumerate(attachments, start=1):
