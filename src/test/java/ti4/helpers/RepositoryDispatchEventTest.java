@@ -12,7 +12,7 @@ class RepositoryDispatchEventTest {
     @Test
     void testPayloadIsValidWithEntries() {
         RespositoryDispatchClientPayload payload = new RespositoryDispatchClientPayload(
-            Map.of("map_id", "pbd1234", "thread_id", "111", "post_to_thread_id", "222"));
+                Map.of("map_id", "pbd1234", "thread_id", "111", "post_to_thread_id", "222"));
         assertTrue(payload.isValid());
     }
 
@@ -25,7 +25,7 @@ class RepositoryDispatchEventTest {
     @Test
     void testPayloadToJsonContainsVideoGenerationKeys() {
         RespositoryDispatchClientPayload payload = new RespositoryDispatchClientPayload(
-            Map.of("map_id", "pbd1234", "thread_id", "111", "post_to_thread_id", "222"));
+                Map.of("map_id", "pbd1234", "thread_id", "111", "post_to_thread_id", "222"));
         String json = payload.toJson();
         assertTrue(json.contains("\"map_id\""));
         assertTrue(json.contains("\"thread_id\""));
