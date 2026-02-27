@@ -12,7 +12,7 @@ class RepositoryDispatchEventTest {
     @Test
     void testPayloadIsValidWithEntries() {
         RespositoryDispatchClientPayload payload = new RespositoryDispatchClientPayload(
-            Map.of("chronicles_thread", "111", "bot_thread", "222"));
+            Map.of("map_id", "pbd1234", "thread_id", "111", "post_to_thread_id", "222"));
         assertTrue(payload.isValid());
     }
 
@@ -25,10 +25,12 @@ class RepositoryDispatchEventTest {
     @Test
     void testPayloadToJsonContainsVideoGenerationKeys() {
         RespositoryDispatchClientPayload payload = new RespositoryDispatchClientPayload(
-            Map.of("chronicles_thread", "111", "bot_thread", "222"));
+            Map.of("map_id", "pbd1234", "thread_id", "111", "post_to_thread_id", "222"));
         String json = payload.toJson();
-        assertTrue(json.contains("\"chronicles_thread\""));
-        assertTrue(json.contains("\"bot_thread\""));
+        assertTrue(json.contains("\"map_id\""));
+        assertTrue(json.contains("\"thread_id\""));
+        assertTrue(json.contains("\"post_to_thread_id\""));
+        assertTrue(json.contains("\"pbd1234\""));
         assertTrue(json.contains("\"111\""));
         assertTrue(json.contains("\"222\""));
     }
@@ -36,6 +38,6 @@ class RepositoryDispatchEventTest {
     @Test
     void testGenerateVideoDoesNotThrow() {
         // sendEvent() is a no-op when REPO_DISPATCH_TOKEN is not set (as in test environments)
-        assertDoesNotThrow(() -> RepositoryDispatchEvent.generateVideo("111", "222"));
+        assertDoesNotThrow(() -> RepositoryDispatchEvent.generateVideo("pbd1234", "111", "222"));
     }
 }

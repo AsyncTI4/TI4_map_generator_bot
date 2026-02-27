@@ -242,7 +242,7 @@ public class EndGameService {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
                                     if (game.getBotMapUpdatesThreadID() != null) {
-                                        RepositoryDispatchEvent.generateVideo(t.getId(), game.getBotMapUpdatesThreadID());
+                                        RepositoryDispatchEvent.generateVideo(game.getName(), game.getBotMapUpdatesThreadID(), t.getId());
                                     }
                                 });
                                 MessageHelper.sendMessageToChannel(
