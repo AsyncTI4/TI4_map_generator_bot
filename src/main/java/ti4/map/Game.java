@@ -1116,8 +1116,8 @@ public class Game extends GameProperties {
         return StringHelper.unescape(value);
     }
 
-    public void removeStoredValue(String key) {
-        checkingForAllReacts.remove(key);
+    public String removeStoredValue(String key) {
+        return checkingForAllReacts.remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
@@ -4347,16 +4347,16 @@ public class Game extends GameProperties {
         return player;
     }
 
-    @Nullable
-    public Player getPlayerFromBreakthrough(String bt) {
+    public List<Player> getPlayersFromBreakthrough(String bt) {
+        List<Player> hasbt = new ArrayList<>();
         if (bt != null) {
             for (Player player : players.values()) {
                 if (player.hasBreakthrough(bt)) {
-                    return player;
+                    hasbt.add(player);
                 }
             }
         }
-        return null;
+        return hasbt;
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {

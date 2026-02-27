@@ -30,6 +30,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -594,7 +595,6 @@ public class ComponentActionHelper {
                             Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
-                } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage =
                             p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Muaat
                                     + UnitEmojis.flagship + "The Inferno (" + (p1.getStrategicCC()) + "->"
@@ -694,6 +694,7 @@ public class ComponentActionHelper {
 
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
+                    DeepgloomService.spendOneDebt(game, p1, "stall_tactics");
                     if (!acButtons.isEmpty()) {
                         MessageHelper.sendMessageToChannel(
                                 p1.getCorrectChannel(),
@@ -901,8 +902,7 @@ public class ComponentActionHelper {
                 boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
                 if (!implemented) {
-                    String unimplemented =
-                            "IDK how to do this yet. " + Constants.jazzPing() + " please implement this breakthrough.";
+                    String unimplemented = "IDK how to do this yet. Please resolve manually.";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
                 }
             }

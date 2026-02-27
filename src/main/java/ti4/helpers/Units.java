@@ -230,6 +230,13 @@ public class Units {
         public static final int DMG = 0b0000001;
         public static final int GLV = 0b0000010;
 
+        public static UnitState of(boolean damaged, boolean galvanized) {
+            int ord = 0;
+            ord |= damaged ? DMG : 0;
+            ord |= galvanized ? GLV : 0;
+            return values()[ord];
+        }
+
         public boolean isDamaged() {
             return (ordinal() & DMG) > 0;
         }
@@ -267,8 +274,8 @@ public class Units {
         public String humanDescr() {
             return switch (this) {
                 case none -> "";
-                case dmg -> "damaged";
-                case glv -> "galvanized";
+                case dmg -> "Damaged";
+                case glv -> "Galvanized";
                 case dmg_glv -> "Dmg+Glv";
             };
         }

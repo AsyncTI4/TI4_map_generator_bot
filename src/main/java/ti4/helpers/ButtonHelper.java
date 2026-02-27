@@ -1339,115 +1339,66 @@ public class ButtonHelper {
                     "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
             return;
         }
-        String message = "";
+        List<String> modifiers = new ArrayList<>();
         int amount = 1;
         boolean hadPoliticalStability = player.getPlayableActionCards().contains("stability");
-        if (player.hasAbility("autonetic_memory")) {
-            if (player.hasTech("nm")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 2);
-            } else {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            }
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            if (isLawInPlay(game, "absol_minspolicy")) {
-                amount -= 1;
-                message = " _Minister of Policy_ has been accounted for, causing everyone to draw 1 fewer action card.";
-            } else {
-                game.drawActionCard(player.getUserID());
-            }
 
-            if (player.hasTech("nm")) {
-                message = " _Neural Motivator_ has been accounted for.";
-                game.drawActionCard(player.getUserID());
-                amount = 2;
-            }
-            if (player.hasTech("tf-inheritancesystems")) {
-                message = " _Inheritance Systems_ has been accounted for.";
-                game.drawActionCard(player.getUserID());
-                amount = 2;
-            }
-            if (player.hasAbility("scheming")) {
-                message +=
-                        " **Scheming** has been accounted for, please use the blue buttons inside your `#cards-info` thread to discard 1 action card.";
-                game.drawActionCard(player.getUserID());
-                amount += 1;
-            }
-            Player titans = Helper.getPlayerFromUnlockedBreakthrough(game, "titansbt");
-            if (titans != null) {
-                int slumberBonus = 0;
-                Predicate<Planet> countPlanetForSlumber =
-                        p -> player.getPlanets().contains(p.getName());
-                if (player == titans) countPlanetForSlumber = countPlanetForSlumber.negate();
-
-                List<String> colorsCoexisting = game.getTileMap().values().stream()
-                        .flatMap(t -> t.getPlanetUnitHolders().stream())
-                        .filter(countPlanetForSlumber)
-                        .filter(p -> p.getUnitColorsOnHolder().contains(player.getColorID()))
-                        .flatMap(p -> p.getUnitColorsOnHolder().stream())
-                        .toList();
-                List<String> seenColors = new ArrayList<>();
-
-                for (String col : colorsCoexisting) {
-                    Player p2 = game.getPlayerFromColorOrFaction(col);
-                    if (player == p2 || player.getAllianceMembers().contains(p2.getFaction())) {
-                        continue;
-                    } else if (player == titans && !seenColors.contains(col)) {
-                        slumberBonus++;
-                        seenColors.add(col);
-                        game.drawActionCard(player.getUserID());
-                    } else if (p2 == titans) {
-                        slumberBonus++;
-                        game.drawActionCard(player.getUserID());
-                        break;
-                    }
-                }
-                if (slumberBonus > 0) {
-                    message += " Drew " + slumberBonus + " additional card" + (slumberBonus == 1 ? "" : "s") + " for "
-                            + FactionEmojis.Titans + " _Slumberstate Computing_.";
-                    amount += slumberBonus;
-                }
-            }
+        if (player.hasTech("nm")) {
+            modifiers.add(TechEmojis.BioticTech + " _Neural Motivator_ (+1 action card)");
+            amount++;
         }
+        if (player.hasTech("tf-inheritancesystems")) {
+            modifiers.add(MiscEmojis.tf_ability + " _Inheritance Systems_ (+1 action card)");
+            amount++;
+        }
+        if (isLawInPlay(game, "absol_minspolicy")) {
+            modifiers.add(CardEmojis.AgendaAlt + " _Minister of Policy_ (-1 action card)");
+            amount--;
+        }
+        int slumberBonus = getSlumberstateBonusACs(game, player);
+        if (slumberBonus > 0) {
+            String howmany = "(+" + slumberBonus + " action card" + (slumberBonus > 0 ? "s)" : ")");
+            modifiers.add(FactionEmojis.Titans + " _Slumberstate Computing_ " + howmany);
+            amount += slumberBonus;
+        }
+
+        int displayAmt = amount;
+        if (player.hasAbility("scheming")) {
+            displayAmt++;
+            modifiers.add(FactionEmojis.Yssaril + " _Scheming_ (+1 action card, must discard 1)");
+        }
+        String msg = "Drawing `" + displayAmt + "` action cards for status phase.";
+        if (!modifiers.isEmpty()) {
+            msg += " The following modifiers have been accounted for:\n> ";
+            msg += String.join("\n> ", modifiers);
+        }
+        ReactionService.addReaction(event, game, player, true, false, msg);
+        ActionCardHelper.drawActionCardsSilent(player, amount);
 
         if (IsPlayerElectedService.isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
-            String acAlias = null;
-            for (Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(game.drawActionCard(player.getUserID()))
-                    .entrySet()) {
-                acAlias = ac.getKey();
+            msg = player.getFactionEmoji() + " is drawing 1 additional action card with _Minister of Policy_.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+            boolean hasStabilityPreMinister = player.getPlayableActionCards().contains("stability");
+            ActionCardHelper.drawActionCardsSilent(player, 1);
+            boolean hasStabilityPostMinister = player.getPlayableActionCards().contains("stability");
+
+            if (!hadPoliticalStability && hasStabilityPreMinister) {
+                String ministerMsg = player.getRepresentation()
+                        + ", you drew _Political Stability_ off of your regular action card draw,";
+                ministerMsg +=
+                        " and __not__ from _Minister of Policy_. You may play _Political Stability_ this round if you wish";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ministerMsg);
+            } else if (!hadPoliticalStability && hasStabilityPostMinister) {
+                String ministerMsg =
+                        player.getRepresentation() + ", you drew _Political Stability_ off of _Minister of Policy_.";
+                ministerMsg +=
+                        " However, as _Minister of Policy_ triggers __after__ strategy cards are returned, this means ";
+                ministerMsg += "you can't play _Political Stability_ this round.";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), ministerMsg);
             }
-            message += " _Minister of Policy_ has been accounted for.";
-            if ("stability".equals(acAlias)) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + ", you drew _Political Stability_ off of _Minister of Policy_."
-                                + " However, as _Minister of Policy_ triggers __after__ strategy cards are returned, this means you can't play _Political Stability_ this round.");
-            } else if (!hadPoliticalStability && player.getPlayableActionCards().contains("stability")) {
-                MessageHelper.sendMessageToChannel(
-                        player.getCardsInfoThread(),
-                        player.getRepresentation()
-                                + ", you drew _Political Stability_ off of your regular action card draw, and __not__ from _Minister of Policy_, "
-                                + "so you may play _Political Stability_ this round.");
-            }
-            amount += 1;
         }
 
-        if (!player.hasAbility("autonetic_memory")) {
-            message = " drew " + amount + " action card" + (amount == 1 ? "" : "s") + "." + message;
-        }
-
-        ActionCardHelper.sendActionCardInfo(game, player, event);
-        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        if (player.hasAbility("scheming")) {
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", use buttons to discard for **Scheming**.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
-        }
-
-        ReactionService.addReaction(event, game, player, true, false, message);
-        checkACLimit(game, player);
         game.setCurrentACDrawStatusInfo(game.getCurrentACDrawStatusInfo() + "_" + player.getFaction());
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
@@ -1469,6 +1420,38 @@ public class ButtonHelper {
                 AgendaHelper.offerPlayerPassOnWhensNAfters(player);
             }
         }
+    }
+
+    private static int getSlumberstateBonusACs(Game game, Player player) {
+        Player titans = Helper.getPlayerFromUnlockedBreakthrough(game, "titansbt");
+        if (titans != null) {
+            int slumberBonus = 0;
+            Predicate<Planet> countPlanetForSlumber = p -> player.getPlanets().contains(p.getName());
+            if (player == titans) countPlanetForSlumber = countPlanetForSlumber.negate();
+
+            List<String> colorsCoexisting = game.getTileMap().values().stream()
+                    .flatMap(t -> t.getPlanetUnitHolders().stream())
+                    .filter(countPlanetForSlumber)
+                    .filter(p -> p.getUnitColorsOnHolder().contains(player.getColorID()))
+                    .flatMap(p -> p.getUnitColorsOnHolder().stream())
+                    .toList();
+            List<String> seenColors = new ArrayList<>();
+
+            for (String col : colorsCoexisting) {
+                Player p2 = game.getPlayerFromColorOrFaction(col);
+                if (player == p2 || player.getAllianceMembers().contains(p2.getFaction())) {
+                    continue;
+                } else if (player == titans && !seenColors.contains(col)) {
+                    slumberBonus++;
+                    seenColors.add(col);
+                } else if (p2 == titans) {
+                    slumberBonus++;
+                    break;
+                }
+            }
+            return slumberBonus;
+        }
+        return 0;
     }
 
     public static void resolveMinisterOfCommerceCheck(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -6442,7 +6425,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    private static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
+    public static boolean unitCanSustainDamage(Game game, Player player, Tile tile, UnitModel unitModel) {
         String unitBaseType = unitModel.getBaseType();
         return unitModel.getSustainDamage()
                 || ("warsun".equalsIgnoreCase(unitBaseType) && !isLawInPlay(game, "schematics"))
@@ -8292,28 +8275,6 @@ public class ButtonHelper {
         deleteMessage(event);
         sendMessageToRightStratThread(player, game, msg1, warfareOrNot);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
-    }
-
-    public static String resolveACDraw(Player p2, Game game, GenericInteractionCreateEvent event) {
-        String message;
-        if (p2.hasAbility("scheming")) {
-            game.drawActionCard(p2.getUserID());
-            game.drawActionCard(p2.getUserID());
-            message = p2.getFactionEmoji()
-                    + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-            MessageHelper.sendMessageToChannelWithButtons(
-                    p2.getCardsInfoThread(),
-                    p2.getRepresentationUnfogged() + " use buttons to discard",
-                    ActionCardHelper.getDiscardActionCardButtons(p2, false));
-        } else if (p2.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
-            message = p2.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            game.drawActionCard(p2.getUserID());
-            message = p2.getFactionEmoji() + " drew 1 action card.";
-            ActionCardHelper.sendActionCardInfo(game, p2, event);
-        }
-        return message;
     }
 
     public static int getNumberOfStarCharts(Player player) {
