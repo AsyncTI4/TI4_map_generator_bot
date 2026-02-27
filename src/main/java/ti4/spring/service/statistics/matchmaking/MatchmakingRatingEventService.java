@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
-import ti4.spring.persistence.PlayerEntity;
-import ti4.spring.persistence.PlayerEntityRepository;
+import ti4.spring.service.persistence.PlayerEntity;
+import ti4.spring.service.persistence.PlayerEntityRepository;
 
 @Service
 @RequiredArgsConstructor

@@ -2674,38 +2674,21 @@ public class Game extends GameProperties {
         List<String> deck = getExplores(reqType, explore);
         String result = null;
 
-        // MIGRATION CODE TODO: Remove this once we are fairly certain no exising games
-        // have an existing empty deck - implemented 2023-07
-        if (deck.isEmpty()) {
-            shuffleDiscardsIntoExploreDeck(reqType);
-            deck = getExplores(reqType, explore);
-            BotLogger.warning(
-                    new LogOrigin(this),
-                    "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
-                            + " deck was empty, shuffling discards into deck.");
-        } // end of migration code
-
         if (!deck.isEmpty()) {
             String id = deck.getFirst();
             discardExplore(id);
             result = id;
         }
 
-        // If deck is empty after draw, auto refresh deck from discard
         if (getExplores(reqType, explore).isEmpty()) {
-            if ("pbd1000".equalsIgnoreCase(getName())) {
-                resetExploresOfCertainType(reqType);
-            } else {
-                shuffleDiscardsIntoExploreDeck(reqType);
-            }
+            shuffleDiscardsIntoExploreDeck(reqType);
         }
         return result;
     }
 
     private void shuffleDiscardsIntoExploreDeck(String reqType) {
         List<String> discardsOfType = getExplores(reqType, discardExplore);
-        List<String> anotherList = new ArrayList<>(discardsOfType);
-        for (String explore : anotherList) {
+        for (String explore : discardsOfType) {
             addExplore(explore);
         }
     }
