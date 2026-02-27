@@ -62,7 +62,7 @@ public class VisionariaSelectService {
                 MessageHelper.sendMessageToChannel(
                         player_.getCardsInfoThread(),
                         player_.getRepresentationUnfogged()
-                                + ", this is a notice that the Deepwrought Visionaria Select breakthrough was played, in case you would like to research a technology.");
+                                + ", this is a notice that Visionaria Select was played, in case you would like to research a technology.");
             }
         }
     }
