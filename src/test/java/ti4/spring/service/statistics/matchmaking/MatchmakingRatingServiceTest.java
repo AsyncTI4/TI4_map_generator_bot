@@ -1,4 +1,4 @@
-package ti4.service.statistics.matchmaking;
+package ti4.spring.service.statistics.matchmaking;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;

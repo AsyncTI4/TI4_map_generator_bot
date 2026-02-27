@@ -23,7 +23,8 @@ public class DeveloperCommand implements ParentCommand {
                     new RunAgainstAllGames(),
                     new CustomCommand(),
                     new RunAgainstSpecificGame(),
-                    new ProduceNucleusGenStats())
+                    new ProduceNucleusGenStats(),
+                    new RunSql())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
