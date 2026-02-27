@@ -1,6 +1,8 @@
 name: Create Map Video
 
 on:
+  repository_dispatch:
+    types: [generate_video]
   workflow_dispatch:
     inputs:
       map_id:
@@ -57,11 +59,11 @@ jobs:
       - name: Generate map video
         id: generate
         env:
-          MAP_ID: ${{ inputs.map_id }}
-          CHANNEL_ID: ${{ inputs.channel_id }}
-          THREAD_ID: ${{ inputs.thread_id }}
-          MAX_MESSAGES: ${{ inputs.max_messages }}
-          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type }}
+          MAP_ID: ${{ inputs.map_id || github.event.client_payload.map_id }}
+          CHANNEL_ID: ${{ inputs.channel_id || github.event.client_payload.channel_id }}
+          THREAD_ID: ${{ inputs.thread_id || github.event.client_payload.thread_id }}
+          MAX_MESSAGES: ${{ inputs.max_messages || github.event.client_payload.max_messages || '500' }}
+          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type || github.event.client_payload.discord_auth_type || 'bot' }}
         run: |
           set -euo pipefail
           if [[ "${MAP_ID,,}" == fow* ]]; then
@@ -80,10 +82,10 @@ jobs:
           retention-days: 14
 
       - name: Post video to Discord thread
-        if: ${{ inputs.post_to_thread_id != '' }}
+        if: ${{ inputs.post_to_thread_id != '' || github.event.client_payload.post_to_thread_id != '' }}
         env:
-          POST_TO_THREAD_ID: ${{ inputs.post_to_thread_id }}
-          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type }}
+          POST_TO_THREAD_ID: ${{ inputs.post_to_thread_id || github.event.client_payload.post_to_thread_id }}
+          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type || github.event.client_payload.discord_auth_type || 'bot' }}
         run: |
           set -euo pipefail
           python3 scripts/video/post_to_discord_thread.py \
