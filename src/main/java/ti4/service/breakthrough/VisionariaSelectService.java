@@ -57,6 +57,14 @@ public class VisionariaSelectService {
                 "End Turn After All Have Reacted",
                 (!game.isFowMode() ? player.getFactionEmoji() : null)));
         MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(), message, game, player, buttons);
+        for (Player player_ : game.getRealPlayers()) {
+            if (!player_.equals(player)) {
+                MessageHelper.sendMessageToChannel(
+                        player_.getCardsInfoThread(),
+                        player_.getRepresentationUnfogged()
+                                + ", this is a notice that the Deepwrought Visionaria Select breakthrough was played, in case you would like to research a technology.");
+            }
+        }
     }
 
     @ButtonHandler("giveVisionariaPN")
