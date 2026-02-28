@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -18,13 +19,14 @@ import ti4.service.statistics.StatisticsPipeline;
 @UtilityClass
 class ExpeditionWinRateStatisticsService {
 
+    private static final Set<String> FIRMAMENT_AND_OBSIDIAN_FACTION_NAMES = Set.of("obsidian", "firmament");
     private static final String THUNDERS_EDGE = "thundersedge";
 
     public void queueReply(SlashCommandInteractionEvent event) {
         StatisticsPipeline.queue(event, () -> showExpeditionWinRates(event));
     }
 
-    static void showExpeditionWinRates(SlashCommandInteractionEvent event) {
+    private static void showExpeditionWinRates(SlashCommandInteractionEvent event) {
         Map<String, Map<String, WinRateCount>> factionExpeditionStats = new LinkedHashMap<>();
         Map<String, WinRateCount> expeditionFollowStats = new LinkedHashMap<>();
         Map<Integer, WinRateCount> expeditionCountStats = new LinkedHashMap<>();
@@ -63,7 +65,7 @@ class ExpeditionWinRateStatisticsService {
         sb.append("- ").append(thundersEdgeControlStats).append("\n");
 
         sb.append("\n**Expedition win rate by faction**\n");
-        addCombinedObsidianFirmament(factionExpeditionStats);
+        combineObsidianFirmament(factionExpeditionStats);
         factionExpeditionStats.forEach((faction, expeditionMap) -> {
             sb.append("- **").append(faction).append("**:\n");
             expeditionMap.forEach((expedition, stats) -> sb.append("  - ")
@@ -90,12 +92,9 @@ class ExpeditionWinRateStatisticsService {
                 (MessageChannelUnion) event.getMessageChannel(), "Thunder's Edge expedition win rates", sb.toString());
     }
 
-    private static void addCombinedObsidianFirmament(Map<String, Map<String, WinRateCount>> factionExpeditionStats) {
-        Map<String, WinRateCount> obsidianStats = factionExpeditionStats.get("obsidian");
-        Map<String, WinRateCount> firmamentStats = factionExpeditionStats.get("firmament");
-        if (obsidianStats == null || firmamentStats == null) {
-            return;
-        }
+    private static void combineObsidianFirmament(Map<String, Map<String, WinRateCount>> factionExpeditionStats) {
+        Map<String, WinRateCount> obsidianStats = factionExpeditionStats.remove("obsidian");
+        Map<String, WinRateCount> firmamentStats = factionExpeditionStats.remove("firmament");
 
         Map<String, WinRateCount> combined = new LinkedHashMap<>();
 
@@ -139,7 +138,7 @@ class ExpeditionWinRateStatisticsService {
             WinRateCount count = expeditionFollowStats.computeIfAbsent(
                     toExpeditionLabel(expedition.getKey()), key -> new WinRateCount());
             count.total++;
-            if (faction.equals(winner.getFaction())) {
+            if (checkFactionsEqual(faction, winner.getFaction())) {
                 count.wins++;
             }
         }
@@ -154,7 +153,7 @@ class ExpeditionWinRateStatisticsService {
         // and faction expeditions
         for (Player player : game.getRealAndEliminatedPlayers()) {
             String faction = player.getFaction();
-            boolean isWinner = faction.equals(winner.getFaction());
+            boolean isWinner = checkFactionsEqual(faction, winner.getFaction());
             if (player.hasPlanet(THUNDERS_EDGE)) {
                 thundersEdgeControlStats.total++;
                 if (isWinner) {
@@ -163,10 +162,9 @@ class ExpeditionWinRateStatisticsService {
             }
 
             List<String> completedExpeditions = expeditions.getExpeditionFactions().entrySet().stream()
-                    .filter(entry -> faction.equals(entry.getValue()))
+                    .filter(entry -> checkFactionsEqual(faction, entry.getValue()))
                     .map(Map.Entry::getKey)
                     .toList();
-            if (completedExpeditions.isEmpty()) continue;
 
             WinRateCount count =
                     expeditionCountStats.computeIfAbsent(completedExpeditions.size(), key -> new WinRateCount());
@@ -186,7 +184,7 @@ class ExpeditionWinRateStatisticsService {
                 }
             });
 
-            if (faction.equals(lastExpeditionFaction)) {
+            if (checkFactionsEqual(faction, lastExpeditionFaction)) {
                 lastExpeditionStats.total++;
                 if (isWinner) {
                     lastExpeditionStats.wins++;
@@ -194,7 +192,6 @@ class ExpeditionWinRateStatisticsService {
             }
         }
     }
-
 
     private static boolean isEligibleGame(Game game) {
         return game.getWinner().isPresent()
@@ -231,6 +228,16 @@ class ExpeditionWinRateStatisticsService {
                 || game.isTotalWarMode()
                 || game.isAgeOfCommerceMode()
                 || game.isMinorFactionsMode();
+    }
+
+    private static boolean checkFactionsEqual(String faction1, String faction2) {
+        if (faction1 == null || faction2 == null)
+            return false;
+        if (faction1.equals(faction2))
+            return true;
+
+        Set<String> factions = Set.of(faction1, faction2);
+        return FIRMAMENT_AND_OBSIDIAN_FACTION_NAMES.equals(factions);
     }
 
     private static String toExpeditionLabel(String expeditionKey) {
