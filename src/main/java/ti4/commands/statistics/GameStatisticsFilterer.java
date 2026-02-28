@@ -262,7 +262,7 @@ public class GameStatisticsFilterer {
         if (scenarioFilter == null) {
             return true;
         }
-        boolean hasScenario = game.isLiberationC4Mode() || game.isOrdinianC1Mode();
+        boolean hasScenario = game.isLiberationC4Mode() || game.isOrdinianC1Mode() || game.isAllianceMode();
         return scenarioFilter == hasScenario;
     }
 
