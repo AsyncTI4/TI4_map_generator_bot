@@ -198,22 +198,16 @@ class ExpeditionWinRateStatisticsService {
 
     private static boolean isEligibleGame(Game game) {
         return game.getWinner().isPresent()
-                && game.getPlayerCountForMap() == 6
+                && game.getRealAndEliminatedPlayers().size() == 6
                 && game.getVp() == 10
                 && game.isThundersEdge()
-                && !isFogGame(game)
                 && !game.hasHomebrew()
                 && !hasGalacticEvent(game)
-                && !hasScenario(game)
-                && !game.isAllianceMode();
-    }
-
-    private static boolean isFogGame(Game game) {
-        return game.isFowMode() || game.isLightFogMode();
+                && !hasScenario(game);
     }
 
     private static boolean hasScenario(Game game) {
-        return game.isLiberationC4Mode() || game.isOrdinianC1Mode();
+        return game.isLiberationC4Mode() || game.isOrdinianC1Mode() || game.isAllianceMode();
     }
 
     private static boolean hasGalacticEvent(Game game) {

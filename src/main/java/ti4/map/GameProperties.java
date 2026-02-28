@@ -30,6 +30,7 @@ public class GameProperties {
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";
     private @ExportableField int maxSOCountPerPlayer = 3;
+    @Deprecated
     private @ExportableField int playerCountForMap = 6;
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
