@@ -665,7 +665,9 @@ public class MessageHelper {
         String id = message.getId();
         long date = managedGame.getLastModifiedDate();
 
-        if (text.contains("Use buttons to do your turn") || text.contains("Use buttons to end turn")) {
+        if (text.contains("Use buttons to do your turn")
+                || text.contains("Use buttons to end turn")
+                || text.contains("Use the buttons to end turn")) {
             String old = GameMessageManager.replace(name, id, GameMessageType.TURN, date);
             if (old != null && !managedGame.isFowMode()) {
                 message.getChannel().deleteMessageById(id).queue(Consumers.nop(), BotLogger::catchRestError);
