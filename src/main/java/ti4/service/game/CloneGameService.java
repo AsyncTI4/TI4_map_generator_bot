@@ -25,7 +25,7 @@ public class CloneGameService {
         String newActionsChannelName = cloneName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = cloneName + Constants.BOT_CHANNEL_SUFFIX;
 
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         Role gameRole =
                 guild.createRole().setName(cloneName).setMentionable(true).complete();

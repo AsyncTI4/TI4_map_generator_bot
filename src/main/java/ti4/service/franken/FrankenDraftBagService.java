@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.draft.BagDraft;
@@ -293,7 +292,7 @@ public class FrankenDraftBagService {
             } else {
                 // ... Or add buttons to the container
                 List<Button> buttons = getSelectionButtons(player, cat);
-                if (!buttons.isEmpty()) components.add(ActionRow.of(buttons));
+                if (!buttons.isEmpty()) components.addAll(ActionRow.partitionOf(buttons));
             }
         }
         return Container.of(components);
@@ -332,8 +331,7 @@ public class FrankenDraftBagService {
                 components.addAll(item.getTextDisplays(game, player, true));
             }
 
-            List<List<Button>> buttons = ListUtils.partition(getApplyButtons(player, cat), 5);
-            components.addAll(buttons.stream().map(ActionRow::of).toList());
+            components.addAll(ActionRow.partitionOf(getApplyButtons(player, cat)));
         }
         return Container.of(components);
     }

@@ -405,14 +405,8 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolvePreparation")
     public static void resolvePreparation(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        String message;
-        if (player.hasAbility("scheming")) {
-            message = "Use button to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
-            buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-        } else {
-            message = "Use button to draw 1 action card.";
-            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-        }
+        String message = "Use button to draw 1 action card.";
+        buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 

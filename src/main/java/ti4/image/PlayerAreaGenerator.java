@@ -1413,6 +1413,14 @@ public class PlayerAreaGenerator {
                 Emoji bankEmoji = Emoji.fromFormatted(bankSource);
                 if (bankEmoji instanceof CustomEmoji factionCustomEmoji) {
                     bankImage = ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), 120, 120);
+                    if (bankImage == null) {
+                        bankEmoji = TI4Emoji.findEmojiFromJustName(factionCustomEmoji.getName())
+                                .asEmoji();
+                        game.setDebtPoolIcon(pool.getKey(), bankEmoji.getFormatted());
+                        if (bankEmoji instanceof CustomEmoji e) {
+                            bankImage = ImageHelper.readURLScaled(e.getImageUrl(), 120, 120);
+                        }
+                    }
                 } else if (bankEmoji instanceof UnicodeEmoji uni) {
                     BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
                     Graphics2D g3 = img.createGraphics();
