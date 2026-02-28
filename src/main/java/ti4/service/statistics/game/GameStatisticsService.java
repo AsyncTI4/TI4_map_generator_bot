@@ -42,7 +42,6 @@ public class GameStatisticsService {
                 case WINNING_PATH -> WinningPathsStatisticsService.showWinningPaths(event);
                 case SUPPORT_WIN_COUNT -> WinningPathsStatisticsService.showWinsWithSupport(event);
                 case ENDING_ROUND_PHASE -> EndingRoundPhaseStatisticsService.showEndingRoundPhaseStatistics(event);
-                case EXPEDITION_WIN_RATES -> ExpeditionWinRateStatisticsService.showExpeditionWinRates(event);
                 default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
             }
         } catch (Exception e) {
