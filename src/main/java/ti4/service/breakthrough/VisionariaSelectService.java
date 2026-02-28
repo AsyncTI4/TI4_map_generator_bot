@@ -28,34 +28,36 @@ import ti4.service.turn.StartTurnService;
 @UtilityClass
 public class VisionariaSelectService {
 
-    private String visionariaRep() {
+    public String initialButtonHeader() {
+        return " - _" + visionariaName() + "_ was exhausted";
+    }
+
+    public String visionariaRep() {
         return Mapper.getBreakthrough("deepwroughtbt").getNameRepresentation();
     }
 
-    private String visionariaName() {
+    public String visionariaName() {
         return Mapper.getBreakthrough("deepwroughtbt").getName();
     }
 
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        String message = game.getPing() + " - " + visionariaName() + " breakthrough was exhausted"
+        String message = game.getPing() + initialButtonHeader()
                 + (!game.isFowMode() ? " by " + player.getRepresentationNoPing() : "") + ".";
         message += "\n> Use the buttons to research non-faction, non-unit upgrade technology, or decline.";
         message +=
                 "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a promissory note of your choice.";
 
         game.removeStoredValue("VisionariaResponded");
+
+        String factionEmoji = game.isFowMode() ? null : player.getFactionEmoji();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("acquireATechWithDwsBt", "Research For 3 Trade Goods", MiscEmojis.tg));
         buttons.add(Buttons.green("giveVisionariaPN", "Give Promissory Note", CardEmojis.PN));
         buttons.add(Buttons.red("declineVisionaria", "Decline"));
         buttons.add(Buttons.gray(
-                player.finChecker() + "fleetLogAfterVisionaria",
-                "Wait Until All Have Reacted",
-                (!game.isFowMode() ? player.getFactionEmoji() : null)));
+                player.finChecker() + "fleetLogAfterVisionaria", "Wait Until All Have Reacted", factionEmoji));
         buttons.add(Buttons.gray(
-                player.finChecker() + "endTurnAfterVisionaria",
-                "End Turn After All Have Reacted",
-                (!game.isFowMode() ? player.getFactionEmoji() : null)));
+                player.finChecker() + "endTurnAfterVisionaria", "End Turn After All Have Reacted", factionEmoji));
         MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(), message, game, player, buttons);
         for (Player player_ : game.getRealPlayers()) {
             if (!player_.equals(player)) {
@@ -147,13 +149,14 @@ public class VisionariaSelectService {
     }
 
     private boolean readyToMoveOn(Game game) {
-        String value = game.getStoredValue("VisionariaResponded");
-        for (Player p : game.getRealPlayers()) {
-            if (p.hasBreakthrough("deepwroughtbt")) continue;
-            if (value.contains("|" + p.getFaction())) continue;
-            return false;
-        }
-        return true;
+        return game.getRealPlayers().stream().allMatch(p -> hasRespondedToVisionaria(game, p));
+    }
+
+    public boolean hasRespondedToVisionaria(Game game, Player player) {
+        String val = game.getStoredValue("VisionariaResponded");
+        if (player.hasBreakthrough("deepwroughtbt")) return true;
+        if (val.contains("|" + player.getFaction())) return true;
+        return false;
     }
 
     private void moveOnWhenDone(ButtonInteractionEvent event, Game game) {
