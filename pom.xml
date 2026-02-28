@@ -23,6 +23,12 @@
     <webp-imageio.version>0.10.2</webp-imageio.version>
     <jemoji.version>1.7.5</jemoji.version>
     <spotless.version>3.2.1</spotless.version>
+    <errorprone.version>2.48.0</errorprone.version>
+    <spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
+    <findsecbugs.version>1.14.0</findsecbugs.version>
+    <sb-contrib.version>7.7.4</sb-contrib.version>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencyManagement>
@@ -154,6 +160,7 @@
           </excludes>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -164,6 +171,7 @@
           </environmentVariables>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
@@ -183,6 +191,69 @@
             <palantirJavaFormat/>
             <toggleOffOn/>
           </java>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs-maven-plugin.version}</version>
+        <configuration>
+          <effort>Max</effort>
+          <!-- Start at Medium to avoid drowning in low-priority noise; tighten later -->
+          <threshold>Medium</threshold>
+          <failOnError>true</failOnError>
+          <xmlOutput>true</xmlOutput>
+          <htmlOutput>true</htmlOutput>
+          <sarifOutput>true</sarifOutput>
+          <plugins>
+            <plugin>
+              <groupId>com.h3xstream.findsecbugs</groupId>
+              <artifactId>findsecbugs-plugin</artifactId>
+              <version>${findsecbugs.version}</version>
+            </plugin>
+            <plugin>
+              <groupId>com.mebigfatguy.sb-contrib</groupId>
+              <artifactId>sb-contrib</artifactId>
+              <version>${sb-contrib.version}</version>
+            </plugin>
+          </plugins>
+        </configuration>
+        <executions>
+          <execution>
+            <id>spotbugs-check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${java.version}</release>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <compilerArgs>
+            <arg>-XDcompilePolicy=simple</arg>
+            <arg>--should-stop=ifError=FLOW</arg>
+            <arg>-Xplugin:ErrorProne -XepDisableWarningsInGeneratedCode -XepIgnoreUnknownCheckNames</arg>
+            <!-- JDK 21 note from Error Prone docs -->
+            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+          </compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>com.google.errorprone</groupId>
+              <artifactId>error_prone_core</artifactId>
+              <version>${errorprone.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
     </plugins>
