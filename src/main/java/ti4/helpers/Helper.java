@@ -2844,7 +2844,6 @@ public class Helper {
             addRolePermissionsToGameChannel(guild, game.getTableTalkChannel(), role.getIdLong());
             addRolePermissionsToGameChannel(guild, game.getActionsChannel(), role.getIdLong());
             addGameRoleToMapPlayers(guild, role, game);
-            addPlayerPermissionsToPrivateChannels(game);
         }
     }
 
