@@ -928,13 +928,6 @@
         "source": "ds"
     },
     {
-        "id": "raider_coves",
-        "name": "Raider Coves",
-        "faction": "sarcosa",
-        "permanentEffect": "When you commit units to a planet another player controls, you may choose for your units to coexist; if you do, gain 2 trade goods.",
-        "source": "ds"
-    },
-    {
         "id": "matters_of_state",
         "name": "Matters of State",
         "faction": "xin",

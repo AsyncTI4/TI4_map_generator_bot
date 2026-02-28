@@ -785,24 +785,14 @@ public class ButtonHelperCommanders {
                             .isEmpty()
                     || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
-                if (player.hasAbility("scheming")) {
-                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-                    buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you gained a technology while having Nekro Acidos, the Nekro commander."
-                                    + " Use the buttons to draw 2 action cards (**Scheming** increases this from the normal 1 action card).",
-                            buttons);
-                } else {
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                    buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCorrectChannel(),
-                            player.getRepresentationUnfogged()
-                                    + ", you gained a technology while having Nekro Acidos, the Nekro commander. Use the buttons to draw 1 action card.",
-                            buttons);
-                }
+
+                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
+                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", you gained a technology while having Nekro Acidos, the Nekro commander. Use the buttons to draw 1 action card.",
+                        buttons);
             } else {
                 if (player.hasAbility("technological_singularity")) {
                     MessageHelper.sendMessageToChannel(

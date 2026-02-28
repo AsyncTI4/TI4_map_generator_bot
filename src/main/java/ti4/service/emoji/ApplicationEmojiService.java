@@ -195,7 +195,7 @@ public class ApplicationEmojiService {
                     .flatMap(v -> JdaService.jda.createApplicationEmoji(name, emojiIcon))
                     .complete();
         } catch (Exception e) {
-            BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
+            BotLogger.error("Failed to upload emoji file: " + name, e);
             return null;
         }
     }
@@ -204,11 +204,13 @@ public class ApplicationEmojiService {
         if (toReupload.isEmpty()) return true;
         try {
             boolean success = true;
+            int fails = 0;
             for (EmojiFileData f : toReupload) {
                 ApplicationEmoji emoji = reuploadAppEmoji(f);
                 Thread.sleep(50);
                 if (emoji == null) {
                     success = false;
+                    if (++fails > 10) break;
                     continue;
                 }
                 CachedEmoji cached = new CachedEmoji(emoji);
@@ -216,7 +218,7 @@ public class ApplicationEmojiService {
             }
             return success;
         } catch (Exception e) {
-            BotLogger.error(Constants.jazzPing() + " Failed to upload emoji files: ", e);
+            BotLogger.error("Failed to upload emoji files", e);
             return false;
         }
     }
@@ -303,7 +305,7 @@ public class ApplicationEmojiService {
     private static void pushEmojiListToCache(boolean isHealthy) {
         if (spoofing) return;
         if (!isHealthy) {
-            BotLogger.warning(Constants.jazzPing() + " - Uploading failed, reinitializing cache from Discord.");
+            BotLogger.warning(Constants.jazzPing() + " - Uploading is failing, reinitializing cache from Discord.");
             resetCacheFromDiscord();
         } else {
             pushEmojiListToCache();

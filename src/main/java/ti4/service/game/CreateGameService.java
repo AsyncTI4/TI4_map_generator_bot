@@ -158,7 +158,7 @@ public class CreateGameService {
         String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+        long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)

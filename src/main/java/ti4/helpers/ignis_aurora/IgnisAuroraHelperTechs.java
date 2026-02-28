@@ -25,7 +25,7 @@ public class IgnisAuroraHelperTechs {
             GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         boolean deleteMsg = true, deleteButton = true;
         switch (tech) {
-            case "baldrick_nm" -> ActionCardHelper.drawActionCards(game, player, 1, true);
+            case "baldrick_nm" -> ActionCardHelper.drawActionCards(player, 1);
             case "baldrick_hm" -> ButtonHelperStats.sendGainCCButtons(game, player, false);
             case "baldrick_lwd" -> deleteMsg = false;
             case "baldrick_gd" -> {

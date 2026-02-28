@@ -1321,15 +1321,6 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
-    @ButtonHandler("autoneticMemoryStep3")
-    public static void autoneticMemoryStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (buttonID.contains("autoneticMemoryStep3a")) {
-            ButtonHelperAbilities.autoneticMemoryStep3a(game, player, event);
-        } else {
-            ButtonHelperAbilities.autoneticMemoryStep3b(game, player, event);
-        }
-    }
-
     @ButtonHandler("cymiaeHeroAutonetic")
     public static void cymiaeHeroAutonetic(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
@@ -3303,29 +3294,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getFactionEmoji() + " is drawing their _Minister of Policy_ action card.");
-        String message;
-        if (player.hasAbility("scheming")) {
-            game.drawActionCard(player.getUserID());
-            game.drawActionCard(player.getUserID());
-            message =
-                    player.getFactionEmoji() + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + ", please use buttons to discard.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
-
-        } else if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            game.drawActionCard(player.getUserID());
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = player.getFactionEmoji() + " drew 1 action card.";
-        }
-        player.checkCommanderUnlock("yssaril");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, player);
+        ActionCardHelper.drawActionCards(player, 1);
         ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 

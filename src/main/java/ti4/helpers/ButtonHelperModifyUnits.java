@@ -1374,21 +1374,12 @@ public class ButtonHelperModifyUnits {
     }
 
     public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-
-        String exo = "";
-        if (exoHit) {
-            exo = "exo";
-        }
+        String exo = exoHit ? "exo" : "";
         List<Button> buttons = new ArrayList<>();
-        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            UnitHolder unitHolder = entry.getValue();
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet && !game.isTwilightsFallMode()) continue;
+            for (UnitKey unitKey : unitHolder.getUnitsByState().keySet()) {
 
-            Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
-            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
-                UnitKey unitKey = unitEntry.getKey();
                 if (player.unitBelongsToPlayer(unitKey)) continue;
                 Player p2 = game.getPlayerFromColorOrFaction(unitKey.getColor());
                 if (p2 == null) {
@@ -1399,29 +1390,25 @@ public class ButtonHelperModifyUnits {
                     continue;
                 }
 
-                String prettyName = unitModel.getName();
                 String unitName = unitKey.unitName();
-                int totalUnits = unitEntry.getValue();
-                int damagedUnits = 0;
+                String prettyName = unitKey.humanReadableName();
+                boolean canSustain = ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel);
+                for (UnitState state : UnitState.defaultRemoveOrder()) {
+                    int amt = unitHolder.getUnitCountForState(unitKey, state);
+                    if (amt == 0) continue;
+                    boolean sustain = canSustain && !state.isDamaged() && !exoHit;
 
-                if (unitHolder.getUnitDamage() != null) {
-                    damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
-                }
+                    String idState = unitName;
+                    idState += state.isDamaged() ? "damaged" : "";
+                    idState += state.isGalvanized() ? "galvanized" : "";
 
-                for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                    String buttonID = finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName + "damaged"
-                            + "_" + unitKey.getColor() + "_" + exo;
-                    Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName, unitKey.unitEmoji());
-                    buttons.add(validTile2);
-                }
-                totalUnits -= damagedUnits;
-                for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
-                    Button validTile2 = Buttons.red(
-                            finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName + "_" + unitKey.getColor()
-                                    + "_" + exo,
-                            prettyName,
-                            unitKey.unitEmoji());
-                    buttons.add(validTile2);
+                    String buttonID = player.finChecker() + "hitOpponent_" + tile.getPosition();
+                    buttonID += "_" + idState + "_" + unitKey.getColor() + "_" + exo;
+
+                    String label = sustain ? "Sustain 1 " : "Destroy 1 ";
+                    label += state.humanDescr() + " " + prettyName;
+
+                    buttons.add(Buttons.red(buttonID, label, unitKey.unitEmoji()));
                 }
             }
         }
@@ -1454,49 +1441,35 @@ public class ButtonHelperModifyUnits {
 
     public static List<Button> getOpposingUnitsToHitOnGround(
             Player player, Game game, Tile tile, String planet, String source) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
-
         List<Button> buttons = new ArrayList<>();
-
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
-        Map<UnitKey, Integer> units = unitHolder.getUnits();
-
-        Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
-        for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
-            UnitKey unitKey = unitEntry.getKey();
+        for (UnitKey unitKey : unitHolder.getUnitKeys()) {
             if (player.unitBelongsToPlayer(unitKey)) continue;
+
             Player p2 = game.getPlayerFromColorOrFaction(unitKey.getColor());
-            if (p2 == null) {
-                continue;
-            }
+            if (p2 == null) continue;
+
             UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
-
-            String prettyName = game.isFowMode() ? unitModel.getBaseType() : unitModel.getName();
             String unitName = unitKey.unitName();
-            int totalUnits = unitEntry.getValue();
-            int damagedUnits = 0;
+            String prettyName = unitKey.humanReadableName();
+            boolean canSustain = ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel);
+            for (UnitState state : UnitState.defaultRemoveOrder()) {
+                int amt = unitHolder.getUnitCountForState(unitKey, state);
+                if (amt == 0) continue;
+                boolean sustain = canSustain && !state.isDamaged();
 
-            if (unitHolder.getUnitDamage() != null) {
-                damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
-            }
+                String idState = unitName;
+                idState += state.isDamaged() ? "damaged" : "";
+                idState += state.isGalvanized() ? "galvanized" : "";
 
-            for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                String buttonID = finChecker + "hitOpponentGround_" + planet + "_" + unitName + "damaged" + "_"
-                        + unitKey.getColor() + "_" + source;
-                Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName, unitKey.unitEmoji());
-                buttons.add(validTile2);
-            }
-            totalUnits -= damagedUnits;
-            for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
-                Button validTile2 = Buttons.red(
-                        finChecker + "hitOpponentGround_" + planet + "_" + unitName + "_" + unitKey.getColor() + "_"
-                                + source,
-                        prettyName,
-                        unitKey.unitEmoji());
-                buttons.add(validTile2);
+                String buttonID = player.finChecker() + "hitOpponentGround_" + planet + "_" + idState;
+                buttonID += "_" + unitKey.getColor() + "_" + source;
+
+                String label = sustain ? "Sustain 1 " : "Destroy 1 ";
+                label += state.humanDescr() + " " + prettyName;
+                buttons.add(Buttons.red(buttonID, label, unitKey.unitEmoji()));
             }
         }
-
         return buttons;
     }
 
@@ -1505,9 +1478,14 @@ public class ButtonHelperModifyUnits {
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         boolean damaged = false;
+        boolean galvanized = false;
         if (unit.contains("damaged")) {
             damaged = true;
             unit = unit.replace("damaged", "");
+        }
+        if (unit.contains("galvanized")) {
+            galvanized = true;
+            unit = unit.replace("galvanized", "");
         }
         String playerColor = buttonID.split("_")[3];
         String source = buttonID.split("_")[4];
@@ -1524,30 +1502,17 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = new ArrayList<>();
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         UnitModel unitModel = player.getUnitFromUnitKey(key);
-        UnitState state = UnitState.none;
-        if (damaged) {
-            state = UnitState.dmg;
+
+        UnitState state = UnitState.of(damaged, galvanized);
+        Tile tile = game.getTileFromPlanet(planet);
+        UnitHolder uh = game.getUnitHolderFromPlanet(planet);
+
+        Button destroy = ButtonHelper.buildAssignHitButton(player, tile, uh, state, key, 1, false);
+        buttons.add(destroy.withCustomId(destroy.getCustomId() + "deleteThisMessage"));
+        if (!damaged && ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel)) {
+            Button sustain = ButtonHelper.buildAssignHitButton(player, tile, uh, state, key, 1, true);
+            buttons.add(sustain.withCustomId(sustain.getCustomId() + "deleteThisMessage"));
         }
-
-        buttons.add(ButtonHelper.buildAssignHitButton(
-                        player,
-                        game.getTileFromPlanet(planet),
-                        game.getUnitHolderFromPlanet(planet),
-                        state,
-                        key,
-                        1,
-                        !damaged && unitModel.getSustainDamage())
-                .withCustomId(ButtonHelper.buildAssignHitButton(
-                                        player,
-                                        game.getTileFromPlanet(planet),
-                                        game.getUnitHolderFromPlanet(planet),
-                                        state,
-                                        key,
-                                        1,
-                                        !damaged && unitModel.getSustainDamage())
-                                .getCustomId()
-                        + "deleteThisMessage"));
-
         buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1559,11 +1524,18 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(pos);
         String unit = buttonID.split("_")[2];
         boolean damaged = false;
+        boolean galvanized = false;
         boolean exo = buttonID.contains("exo");
         if (unit.contains("damaged")) {
             damaged = true;
             unit = unit.replace("damaged", "");
         }
+        if (unit.contains("galvanized")) {
+            galvanized = true;
+            unit = unit.replace("galvanized", "");
+        }
+        UnitHolder space = tile.getSpaceUnitHolder();
+        UnitState state = UnitState.of(damaged, galvanized);
         String playerColor = buttonID.split("_")[3];
         Player player = game.getPlayerFromColorOrFaction(playerColor);
         MessageChannel channel = event.getChannel();
@@ -1578,39 +1550,20 @@ public class ButtonHelperModifyUnits {
 
         UnitModel unitModel = player.getUnitFromUnitKey(key);
 
-        String unitName = key.unitName();
         if (exo) {
-            String dmg = "";
-            if (damaged) {
-                dmg = "damaged ";
-            }
+            String dmg = state.humanDescr();
             msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType()
                     + " to your opponent's ability.";
             var parsedUnit = new ParsedUnit(key, 1, Constants.SPACE);
-            DestroyUnitService.destroyUnit(event, tile, game, parsedUnit, true, damaged);
+            DestroyUnitService.destroyUnit(event, tile, game, parsedUnit, true, state);
             MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
             event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
-        int x = 1;
-        String id;
-        String label;
-        if (damaged) {
-            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName + "_damaged"
-                    + "deleteThisMessage";
-            label = "Remove " + x + " damaged " + unitModel.getBaseType();
-        } else {
-            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName
-                    + "deleteThisMessage";
-            label = "Remove " + x + " " + unitModel.getBaseType();
-        }
-        buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
-        if (!damaged && unitModel.getSustainDamage()) {
-            id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + "_" + unitName
-                    + "deleteThisMessage";
-            label = "Sustain 1 " + unitModel.getBaseType();
-            buttons.add(Buttons.blue(id, label, unitModel.getUnitEmoji()));
+        buttons.add(ButtonHelper.buildAssignHitButton(player, tile, space, state, key, 1, false));
+        if (!damaged && ButtonHelper.unitCanSustainDamage(game, player, tile, unitModel)) {
+            buttons.add(ButtonHelper.buildAssignHitButton(player, tile, space, state, key, 1, true));
         }
 
         buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));

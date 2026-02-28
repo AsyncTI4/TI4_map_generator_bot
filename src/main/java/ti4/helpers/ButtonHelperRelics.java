@@ -44,28 +44,7 @@ public class ButtonHelperRelics {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), player.getFactionEmoji() + " is exhausting _The Prophet's Tears_.");
         if (buttonID.contains("AC")) {
-            String message;
-            if (player.hasAbility("scheming")) {
-                game.drawActionCard(player.getUserID());
-                game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji()
-                        + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            } else if (player.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-                message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
-            } else {
-                game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " drew 1 action card.";
-                ActionCardHelper.sendActionCardInfo(game, player, event);
-            }
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.checkACLimit(game, player);
+            ActionCardHelper.drawActionCards(player, 1);
             ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
             String msg = " exhausted _The Prophet's Tears_.";

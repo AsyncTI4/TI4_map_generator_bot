@@ -86,6 +86,7 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -784,23 +785,16 @@ public class Player extends PlayerProperties {
     }
 
     public boolean hasAbility(String ability) {
+        if (getAbilities().contains(ability)) return true;
+
         if ("researchteam".equalsIgnoreCase(ability) && getTechs().contains("tf-pacifist")) {
             return true;
         }
         if (getTechs().contains("tf-" + ability.replace("_", ""))) {
             return true;
         }
-        if ("scheming".equalsIgnoreCase(ability)) {
-            if (game.getStoredValue("schemingFactions").contains(getFaction())) {
-                return true;
-            }
-        }
-        if ("stall_tactics".equalsIgnoreCase(ability)) {
-            if (game.getStoredValue("stalltacticsFactions").contains(getFaction())) {
-                return true;
-            }
-        }
-        return getAbilities().contains(ability);
+
+        return DeepgloomService.playerHasAccessToAbility(this, ability);
     }
 
     public boolean addExhaustedAbility(String ability) {
@@ -3113,6 +3107,11 @@ public class Player extends PlayerProperties {
             return getDisplayName().toUpperCase();
         }
         return name;
+    }
+
+    public String getFogSafeDisplayName() {
+        if (game.isFowMode() || FoWHelper.isPrivateGame(game)) return getFactionNameOrColor();
+        return getFlexibleDisplayName();
     }
 
     public String getFlexibleDisplayName() {

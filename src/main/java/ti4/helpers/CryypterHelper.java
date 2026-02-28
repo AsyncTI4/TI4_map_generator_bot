@@ -54,36 +54,8 @@ public class CryypterHelper {
     }
 
     private static void drawXPickYActionCards(Game game, Player player, int draw, boolean addScheming) {
-        if (draw > 10) {
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
-            return;
-        }
-        String message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") + ".";
-        if (addScheming && player.hasAbility("scheming")) {
-            draw++;
-            message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s")
-                    + " (**Scheming** increases this from the normal " + (draw - 1) + " action card"
-                    + (draw == 2 ? "" : "s") + ").";
-        }
-
-        for (int i = 0; i < draw; i++) {
-            game.drawActionCard(player.getUserID());
-        }
-        ActionCardHelper.sendActionCardInfo(game, player);
-
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard 1 of the " + draw + " cards just drawn.",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
-
-        ButtonHelper.checkACLimit(game, player);
-        if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ActionCardHelper.drawActionCards(player, draw);
+        ActionCardHelper.sendACDiscardButtons(player);
     }
 
     // VotC Setup
