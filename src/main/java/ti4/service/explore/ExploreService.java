@@ -576,11 +576,11 @@ public class ExploreService {
                                         .orElse(new ArrayList<>())
                                         .isEmpty()
                                 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
-                            if ((attachment.equals(Constants.WARFARE)
-                                    || attachment.equals(Constants.PROPULSION)
-                                    || attachment.equals(Constants.CYBERNETIC)
-                                    || attachment.equals(Constants.BIOTIC)
-                                    || attachment.equals(Constants.WEAPON))) {
+                            if ((Constants.WARFARE.equals(attachment)
+                                    || Constants.PROPULSION.equals(attachment)
+                                    || Constants.CYBERNETIC.equals(attachment)
+                                    || Constants.BIOTIC.equals(attachment)
+                                    || Constants.WEAPON.equals(attachment))) {
                                 attachment += "stat";
                                 String attachmentID = Mapper.getAttachmentImagePath(attachment);
                                 if (attachmentID != null) {
@@ -594,7 +594,7 @@ public class ExploreService {
                     tile.addToken(attachmentFilename, planetID);
                     message = new StringBuilder("Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".");
-                    if (attachment.equals(Constants.DMZ)) {
+                    if (Constants.DMZ.equals(attachment)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();

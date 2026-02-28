@@ -590,7 +590,7 @@ public class PlayStrategyCardService {
             ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName, message.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
-                if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
+                if (Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity()) && scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(m5, scModel.getImageFileUrl());
                     if (ShouldPrintFollowOrder(game, scModel)) {
                         List<Player> playersInOrder = getPlayersInFollowOrder(game, player);

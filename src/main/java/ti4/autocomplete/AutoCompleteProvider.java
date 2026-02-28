@@ -768,7 +768,7 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                if (Constants.ADD_FOG_TILE.equals(subcommandName) && optionName.equals(Constants.TILE_NAME)) {
+                if (Constants.ADD_FOG_TILE.equals(subcommandName) && Constants.TILE_NAME.equals(optionName)) {
                     var options = searchModels(event, TileHelper.getAllTileModels(), null);
                     event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
                 } else if (game.isFowMode()) {
@@ -875,7 +875,7 @@ public class AutoCompleteProvider {
                         break;
                     }
                 }
-                if (event.getName().equals(Constants.FRANKEN)) {
+                if (Constants.FRANKEN.equals(event.getName())) {
                     btSet = Mapper.getBreakthroughs().values().stream().collect(Collectors.toSet());
                     addAllOpt = false;
                 }
@@ -951,13 +951,13 @@ public class AutoCompleteProvider {
                 try {
                     Player player = CommandHelper.getPlayerFromGame(
                             game, event.getMember(), event.getUser().getId());
-                    if (player != null && subcommandName != null && subcommandName.equals(Constants.ABILITY_REMOVE)) {
+                    if (player != null && subcommandName != null && Constants.ABILITY_REMOVE.equals(subcommandName)) {
                         for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }
                     } else if (player != null
                             && subcommandName != null
-                            && subcommandName.equals(Constants.ABILITY_ADD)) {
+                            && Constants.ABILITY_ADD.equals(subcommandName)) {
                         abilities = Mapper.getAbilities();
                         for (String abilityID : player.getAbilities()) {
                             abilities.remove(abilityID);
@@ -1323,7 +1323,7 @@ public class AutoCompleteProvider {
             @NotNull String subCommandName,
             @NotNull String optionName,
             @NotNull String gameName) {
-        if (!optionName.equals(Constants.ACTION_CARD_ID)) return;
+        if (!Constants.ACTION_CARD_ID.equals(optionName)) return;
         switch (subCommandName) {
             case Constants.PICK_AC_FROM_DISCARD, Constants.SHUFFLE_AC_BACK_INTO_DECK -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -1360,7 +1360,7 @@ public class AutoCompleteProvider {
                 }
             }
             case Constants.RUN_CRON -> {
-                if (!optionName.equals(Constants.CRON_NAME)) return;
+                if (!Constants.CRON_NAME.equals(optionName)) return;
                 replyWith25ChoicesThatContainValue(event, CronManager.getCronNames());
             }
             default -> {}
@@ -1371,7 +1371,7 @@ public class AutoCompleteProvider {
             @NotNull CommandAutoCompleteInteractionEvent event,
             @NotNull String subCommandName,
             @NotNull String optionName) {
-        if (!optionName.equals(Constants.SEARCH)) return;
+        if (!Constants.SEARCH.equals(optionName)) return;
         ComponentSource source =
                 ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         List<Command.Choice> options = null;
@@ -1507,12 +1507,12 @@ public class AutoCompleteProvider {
             @NotNull String gameName) {
         switch (subCommandName) {
             case Constants.ADD_TILE -> {
-                if (!optionName.equals(Constants.TILE_NAME)) return;
+                if (!Constants.TILE_NAME.equals(optionName)) return;
                 var options = searchModels(event, TileHelper.getAllTileModels(), null);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.REMOVE_TILE -> {
-                if (!optionName.equals(Constants.POSITION)) return;
+                if (!Constants.POSITION.equals(optionName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = game.getTileMap().entrySet().stream()
@@ -1523,7 +1523,7 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.PRESET -> {
-                if (!optionName.equals(Constants.MAP_TEMPLATE)) return;
+                if (!Constants.MAP_TEMPLATE.equals(optionName)) return;
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = mapTo25ChoicesThatContain(MapPresetService.templates, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
@@ -1533,8 +1533,8 @@ public class AutoCompleteProvider {
 
     private static void resolveEventAutoComplete(
             CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, String gameName) {
-        if (!subCommandName.equals(Constants.EVENT_PLAY)) return;
-        if (!optionName.equals(Constants.EVENT_ID)) return;
+        if (!Constants.EVENT_PLAY.equals(subCommandName)) return;
+        if (!Constants.EVENT_ID.equals(optionName)) return;
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = CommandHelper.getPlayerFromGame(
                 game, event.getMember(), event.getUser().getId());
@@ -1553,8 +1553,8 @@ public class AutoCompleteProvider {
             @NotNull String subCommandName,
             @NotNull String optionName,
             @NotNull String gameName) {
-        if (!subCommandName.equals(Constants.USE)) return;
-        if (!optionName.equals(Constants.EXPLORE_CARD_ID)) return;
+        if (!Constants.USE.equals(subCommandName)) return;
+        if (!Constants.EXPLORE_CARD_ID.equals(optionName)) return;
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.isFowMode()) {
             event.replyChoice("You cannot see the autocomplete in Fog of War", "[error]")
@@ -1581,12 +1581,12 @@ public class AutoCompleteProvider {
             @NotNull String subCommandName,
             @NotNull String optionName,
             @NotNull String gameName) {
-        if (!subCommandName.equals(Constants.SHUFFLE_OBJECTIVE_BACK)
-                && !subCommandName.equals(Constants.SCORE_OBJECTIVE)
-                && !subCommandName.equals(Constants.UNSCORE_OBJECTIVE)) {
+        if (!Constants.SHUFFLE_OBJECTIVE_BACK.equals(subCommandName)
+                && !Constants.SCORE_OBJECTIVE.equals(subCommandName)
+                && !Constants.UNSCORE_OBJECTIVE.equals(subCommandName)) {
             return;
         }
-        if (!optionName.equals(Constants.PO_ID)) {
+        if (!Constants.PO_ID.equals(optionName)) {
             return;
         }
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();

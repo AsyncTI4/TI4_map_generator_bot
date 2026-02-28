@@ -3008,7 +3008,7 @@ public class ButtonHelperFactionSpecific {
     public static boolean vortexButtonAvailable(Game game, UnitKey unitKey) {
         int baseUnitCap =
                 switch (unitKey.getUnitType()) {
-                    case Infantry, Fighter -> 10000;
+                    case Infantry, Fighter -> 10_000;
                     case Destroyer, Cruiser -> 8;
                     case Dreadnought -> 5;
                     case Mech, Carrier -> 4;

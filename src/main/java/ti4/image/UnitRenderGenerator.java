@@ -109,7 +109,7 @@ class UnitRenderGenerator {
     }
 
     void render() {
-        boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        boolean isSpace = Constants.SPACE.equals(unitHolder.getName());
         boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
         if (isSpace && displayType == DisplayType.shipless) return;
 
@@ -535,7 +535,7 @@ class UnitRenderGenerator {
     }
 
     private SystemContext buildSystemContext(Tile tile, UnitHolder unitHolder, Player frogPlayer) {
-        boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        boolean isSpace = Constants.SPACE.equals(unitHolder.getName());
         boolean isTokenPlanet = Constants.TOKEN_PLANETS.contains(unitHolder.getName());
         boolean hasTokenPlanet =
                 unitHolder.getTokenList().stream().map(Mapper::getTokenKey).anyMatch(Constants.TOKEN_PLANETS::contains);

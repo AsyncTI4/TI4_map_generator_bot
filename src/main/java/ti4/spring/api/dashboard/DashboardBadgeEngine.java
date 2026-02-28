@@ -15,9 +15,9 @@ import ti4.map.persistence.ManagedGame;
 final class DashboardBadgeEngine {
 
     private static final int FLEET_LOGISTICS_MIN_TURNS = 60;
-    private static final long FLEET_LOGISTICS_LEGENDARY_MAX_AVG_SECONDS = 1_800;
-    private static final long FLEET_LOGISTICS_GOLD_MAX_AVG_SECONDS = 3_600;
-    private static final long FLEET_LOGISTICS_SILVER_MAX_AVG_SECONDS = 7_200;
+    private static final long FLEET_LOGISTICS_LEGENDARY_MAX_AVG_SECONDS = 1800;
+    private static final long FLEET_LOGISTICS_GOLD_MAX_AVG_SECONDS = 3600;
+    private static final long FLEET_LOGISTICS_SILVER_MAX_AVG_SECONDS = 7200;
 
     private static final int FROM_THE_BRINK_MIN_CLOSE_WINS = 2;
     private static final int FROM_THE_BRINK_GOLD_CLOSE_WINS = 4;

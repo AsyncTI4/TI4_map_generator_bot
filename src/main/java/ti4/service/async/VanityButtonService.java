@@ -97,7 +97,7 @@ public class VanityButtonService {
     private static List<FactionModel> getFactionsForSources(List<ComponentSource> sources) {
         return Mapper.getFactionsValues().stream()
                 .filter(f -> sources.contains(f.getSource()))
-                .filter(f -> !f.getAlias().equals("keleresa") && !f.getAlias().equals("keleresx"))
+                .filter(f -> !"keleresa".equals(f.getAlias()) && !"keleresx".equals(f.getAlias()))
                 .sorted(Comparator.comparing(FactionModel::getShortName))
                 .toList();
     }

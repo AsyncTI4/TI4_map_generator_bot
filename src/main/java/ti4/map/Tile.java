@@ -311,7 +311,7 @@ public class Tile {
             tileName = "S15_Cucumber.png";
         }
         if (("43".equals(tileID) || "80".equals(tileID))) {
-            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10000;
+            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
             if (RandomHelper.isOneInX(baubleChance)) {
                 tileName = tileName.replace(".png", "_xmas.png");
             }

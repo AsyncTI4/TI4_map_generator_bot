@@ -178,7 +178,17 @@
         </executions>
         <configuration>
           <java>
-            <cleanthat/>
+            <cleanthat>
+              <sourceJdk>${java.version}</sourceJdk>
+              <mutators>
+                <mutator>SafeAndConsensual</mutator>
+                <mutator>SafeButNotConsensual</mutator>
+                <mutator>SafeButControversial</mutator>
+              </mutators>
+              <excludedMutators>
+                <excludedMutator>AvoidInlineConditionals</excludedMutator>
+              </excludedMutators>
+            </cleanthat>
             <removeUnusedImports/>
             <palantirJavaFormat/>
             <toggleOffOn/>

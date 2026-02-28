@@ -33,7 +33,7 @@ public class GameHelper {
         int hours = random.nextInt(24);
         int minutes = random.nextInt(60);
         int seconds = random.nextInt(60);
-        int nanoseconds = random.nextInt(1000000000);
+        int nanoseconds = random.nextInt(1_000_000_000);
         LocalDateTime newCreationTime = creationDate.atTime(hours, minutes, seconds, nanoseconds);
         game.setCreationDateTime(newCreationTime.toInstant(ZoneOffset.UTC).toEpochMilli());
         BotLogger.error("Had to update a " + game.getName() + " creationDateTime field from " + creationDateTime

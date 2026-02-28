@@ -62,8 +62,8 @@ class SystemInfo extends GameStateSubcommand {
         Game game = getGame();
         for (OptionMapping tileOption : event.getOptions()) {
             if (tileOption == null
-                    || tileOption.getName().equals(Constants.EXTRA_RINGS)
-                    || tileOption.getName().equals(Constants.JUST_UNITS)) {
+                    || Constants.EXTRA_RINGS.equals(tileOption.getName())
+                    || Constants.JUST_UNITS.equals(tileOption.getName())) {
                 continue;
             }
             String tileID = tileOption.getAsString().toLowerCase();
