@@ -313,10 +313,10 @@ public class CombatModHelper {
                                         .anyMatch("sigma_tekklar_legion"::equals))) {
                     meetsCondition = opponent.getTempCombatModifiers().stream()
                                     .anyMatch(mod -> "tekklar".equals(mod.getRelatedID())
-                                            && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES))
+                                            && Constants.PROMISSORY_NOTES.equals(mod.getRelatedType()))
                             || opponent.getNewTempCombatModifiers().stream()
                                     .anyMatch(mod -> "tekklar".equals(mod.getRelatedID())
-                                            && mod.getRelatedType().equals(Constants.PROMISSORY_NOTES));
+                                            && Constants.PROMISSORY_NOTES.equals(mod.getRelatedType()));
                 }
             }
             case Constants.MOD_OPPONENT_FRAG -> {

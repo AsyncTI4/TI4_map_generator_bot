@@ -662,11 +662,11 @@ public class ButtonHelperHeroes {
                             .orElse(new ArrayList<>())
                             .isEmpty()
                     || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planet)) {
-                if ((attachment.equals(Constants.WARFARE)
-                        || attachment.equals(Constants.PROPULSION)
-                        || attachment.equals(Constants.CYBERNETIC)
-                        || attachment.equals(Constants.BIOTIC)
-                        || attachment.equals(Constants.WEAPON))) {
+                if ((Constants.WARFARE.equals(attachment)
+                        || Constants.PROPULSION.equals(attachment)
+                        || Constants.CYBERNETIC.equals(attachment)
+                        || Constants.BIOTIC.equals(attachment)
+                        || Constants.WEAPON.equals(attachment))) {
                     attachment += "stat";
                 }
             }

@@ -156,7 +156,7 @@ public class FrankenDraftBagService {
     public static Container getFrankenPlayerSummaryContainer(Player player) {
         Container summary = player.getRepresentationContainer();
         List<Button> buttons = new ArrayList<>(List.of(Buttons.FACTION_EMBED));
-        if (player.getStoredValue("frankenBuilt").equals("n")) {
+        if ("n".equals(player.getStoredValue("frankenBuilt"))) {
             buttons.add(Buttons.red("finishedBuilding", "Finished Building Faction"));
         }
         return ContainerHelper.appendComponents(summary, ActionRow.of(buttons));

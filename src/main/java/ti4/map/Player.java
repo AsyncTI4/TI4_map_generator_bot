@@ -1044,8 +1044,8 @@ public class Player extends PlayerProperties {
         if (StringUtils.isNotBlank(unit.getFaction().orElse(""))) score += 3;
         if (StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse(""))) score += 2;
         if (unitHolder != null
-                && ((unitHolder.getName().equals(Constants.SPACE) && Boolean.TRUE.equals(unit.getIsShip()))
-                        || (!unitHolder.getName().equals(Constants.SPACE) && !Boolean.TRUE.equals(unit.getIsShip()))))
+                && ((Constants.SPACE.equals(unitHolder.getName()) && Boolean.TRUE.equals(unit.getIsShip()))
+                        || (!Constants.SPACE.equals(unitHolder.getName()) && !Boolean.TRUE.equals(unit.getIsShip()))))
             score++;
         if (unit.getID().contains("tf-")
                 && (unit.getUnitType() == UnitType.Flagship || unit.getUnitType() == UnitType.Mech)) {

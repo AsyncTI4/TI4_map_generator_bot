@@ -373,7 +373,7 @@ public abstract class BagDraft {
         String key = "frankenBuilt";
         for (Player player : owner.getRealPlayers()) {
 
-            String finished = player.getStoredValue(key).equals("n") ? "❌" : "✅";
+            String finished = "n".equals(player.getStoredValue(key)) ? "❌" : "✅";
             String ident =
                     owner.getRealPlayers().size() > 10 ? player.getFactionEmoji() : player.getRepresentationNoPing();
 

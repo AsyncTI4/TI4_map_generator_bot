@@ -665,7 +665,7 @@ public class TileGenerator {
 
                 for (UnitHolder unitHolder : unitHolders) {
                     int radius =
-                            unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
+                            Constants.SPACE.equals(unitHolder.getName()) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                     if (unitHolder != spaceUnitHolder) {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
@@ -1554,7 +1554,7 @@ public class TileGenerator {
             arrow.setColor(Color.BLACK);
 
             if (direction >= 2 && direction <= 4) { // all the south directions
-                arrow.rotate(3.141592653589793, imageCenterX, imageCenterY);
+                arrow.rotate(3.141_592_653_589_793, imageCenterX, imageCenterY);
                 textOffsetY = 25;
             }
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);

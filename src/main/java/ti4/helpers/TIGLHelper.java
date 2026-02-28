@@ -146,7 +146,7 @@ public class TIGLHelper {
             BotLogger.warning("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
             tiglProblem = true;
         }
-        if (!JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
+        if (!Constants.ASYNCTI4_HUB_SERVER_ID.equals(JdaService.guildPrimaryID)) {
             return tiglProblem;
         }
         for (TIGLRank rank : TIGLRank.values()) {

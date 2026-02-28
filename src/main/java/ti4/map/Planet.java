@@ -190,7 +190,7 @@ public class Planet extends UnitHolder {
     }
 
     private void addTokenData(String tokenFileName) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+        if (Constants.GLEDGE_CORE_PNG.equals(tokenFileName)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
             resourcesOriginal = 2;
             influenceOriginal = 0;
         }
@@ -226,7 +226,7 @@ public class Planet extends UnitHolder {
     }
 
     private void removeTokenData(String tokenFileName) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) {
+        if (Constants.GLEDGE_CORE_PNG.equals(tokenFileName)) {
             resetOriginalPlanetResInf();
         }
 

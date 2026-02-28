@@ -33,7 +33,7 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class BotLogger {
 
-    private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10008;
+    private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10_008;
     private static final Object LAST_SCHEDULED_WEBHOOK_LOCK = new Object();
     private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
     private static final int MAX_DISCORD_MESSAGE_SIZE = 2000;

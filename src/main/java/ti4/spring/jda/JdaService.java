@@ -403,7 +403,7 @@ public class JdaService {
         // are still in
         if (guild == null) return false;
         if (System.getenv("TESTING") != null) return false;
-        if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
+        if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
 
         // Disable this for now
         if (true) return false;

@@ -54,7 +54,7 @@ public class DrawingUtil {
     }
 
     private static final int DELTA_Y = 26;
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.570_796_326_794_896_6;
 
     public static void superDrawString(
             Graphics g,
