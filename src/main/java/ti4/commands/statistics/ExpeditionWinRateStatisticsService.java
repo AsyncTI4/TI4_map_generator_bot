@@ -231,10 +231,8 @@ class ExpeditionWinRateStatisticsService {
     }
 
     private static boolean checkFactionsEqual(String faction1, String faction2) {
-        if (faction1 == null || faction2 == null)
-            return false;
-        if (faction1.equals(faction2))
-            return true;
+        if (faction1 == null || faction2 == null) return false;
+        if (faction1.equals(faction2)) return true;
 
         Set<String> factions = Set.of(faction1, faction2);
         return FIRMAMENT_AND_OBSIDIAN_FACTION_NAMES.equals(factions);
