@@ -20,6 +20,7 @@ import ti4.service.statistics.StatisticsPipeline;
 class ExpeditionWinRateStatisticsService {
 
     private static final Set<String> FIRMAMENT_AND_OBSIDIAN_FACTION_NAMES = Set.of("obsidian", "firmament");
+    private static final String NO_EXPEDITIONS = "No expeditions";
     private static final String THUNDERS_EDGE = "thundersedge";
 
     public void queueReply(SlashCommandInteractionEvent event) {
@@ -48,8 +49,11 @@ class ExpeditionWinRateStatisticsService {
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
 
         sb.append("\n**By expedition followed**\n");
-        expeditionFollowStats.forEach((expedition, counts) ->
-                sb.append("- ").append(expedition).append(": ").append(counts).append("\n"));
+        expeditionFollowStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(e -> sb.append("- ")
+                .append(e.getKey())
+                .append(": ")
+                .append(e.getValue())
+                .append("\n"));
 
         sb.append("\n**By number of expeditions completed**\n");
         expeditionCountStats.entrySet().stream().sorted(Entry.comparingByKey()).forEach(entry -> sb.append("- ")
@@ -66,14 +70,22 @@ class ExpeditionWinRateStatisticsService {
 
         sb.append("\n**Expedition win rate by faction**\n");
         combineObsidianFirmament(factionExpeditionStats);
-        factionExpeditionStats.forEach((faction, expeditionMap) -> {
-            sb.append("- **").append(faction).append("**:\n");
-            expeditionMap.forEach((expedition, stats) -> sb.append("  - ")
-                    .append(expedition)
-                    .append(": ")
-                    .append(stats)
-                    .append("\n"));
-        });
+        factionExpeditionStats.entrySet().stream()
+                .sorted(Entry.comparingByKey())
+                .forEach(e -> {
+                    sb.append("- **").append(e.getKey()).append("**:\n");
+                    e.getValue().entrySet().stream()
+                            .sorted((a, b) -> {
+                                if (NO_EXPEDITIONS.equals(a.getKey())) return -1;
+                                if (NO_EXPEDITIONS.equals(b.getKey())) return 1;
+                                return a.getKey().compareTo(b.getKey());
+                            })
+                            .forEach(e2 -> sb.append("  - ")
+                                    .append(e2.getKey())
+                                    .append(": ")
+                                    .append(e2.getValue())
+                                    .append("\n"));
+                });
 
         sb.append("\n**Expedition completion rate**\n");
         int uncompletedExpeditions = gamesThatDidNotFinishExpeditionsVersusDid[0];
@@ -173,16 +185,25 @@ class ExpeditionWinRateStatisticsService {
                 count.wins++;
             }
 
-            completedExpeditions.forEach(expedition -> {
-                Map<String, WinRateCount> expeditionWinRates =
-                        factionExpeditionStats.computeIfAbsent(faction, k -> new LinkedHashMap<>());
-                WinRateCount count2 =
-                        expeditionWinRates.computeIfAbsent(toExpeditionLabel(expedition), k -> new WinRateCount());
-                count2.total++;
+            Map<String, WinRateCount> expeditionWinRates =
+                    factionExpeditionStats.computeIfAbsent(faction, k -> new LinkedHashMap<>());
+            if (completedExpeditions.isEmpty()) {
+                WinRateCount noExpeditionsCount =
+                        expeditionWinRates.computeIfAbsent(NO_EXPEDITIONS, k -> new WinRateCount());
+                noExpeditionsCount.total++;
                 if (isWinner) {
-                    count2.wins++;
+                    noExpeditionsCount.wins++;
                 }
-            });
+            } else {
+                completedExpeditions.forEach(expedition -> {
+                    WinRateCount count2 =
+                            expeditionWinRates.computeIfAbsent(toExpeditionLabel(expedition), k -> new WinRateCount());
+                    count2.total++;
+                    if (isWinner) {
+                        count2.wins++;
+                    }
+                });
+            }
 
             if (checkFactionsEqual(faction, lastExpeditionFaction)) {
                 lastExpeditionStats.total++;
