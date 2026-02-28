@@ -119,10 +119,11 @@ public class PlayerFactionSettings extends SettingsMenu {
     protected void updateTransientSettings() {
         if (parent instanceof MiltySettings m) {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
+            List<String> nonDraftable = List.of("obsidian", "neutral", "keleresa", "keleresx");
+
             Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                     .filter(model -> sources.contains(model.getSource()))
-                    .filter(model -> !model.getAlias().contains("keleres")
-                            || "keleresm".equals(model.getAlias())) // Limit the pool to only 1 keleres flavor
+                    .filter(model -> !nonDraftable.contains(model.getAlias()))
                     .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);
@@ -142,10 +143,7 @@ public class PlayerFactionSettings extends SettingsMenu {
                 ls.add(Buttons.red(
                         idPrefix + "dsFactionsOnly", "Only DS and BR Factions", SourceEmojis.DiscordantStars));
         }
-        if (parent != null && parent instanceof MiltySettings ms) {
-            // if (ms.getSourceSettings().getBetaTestMode().isVal())
-            ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
-        }
+        ls.add(Buttons.green(idPrefix + "teFactions", "Prioritize Thunder's Edge Factions"));
         return ls;
     }
 
@@ -182,9 +180,6 @@ public class PlayerFactionSettings extends SettingsMenu {
 
             List<String> newKeys = new ArrayList<>();
             for (FactionModel model : priFactions.getAllValues().values()) {
-                if ("obsidian".equalsIgnoreCase(model.getAlias())) {
-                    continue;
-                }
                 if (model.getSource() == ComponentSource.thunders_edge) newKeys.add(model.getAlias());
             }
             priFactions.setKeys(newKeys);
