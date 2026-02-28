@@ -27,6 +27,7 @@ public class StatisticsCommand implements ParentCommand {
                     new FactionRecordOfSCPick(),
                     new GameWinsWithOtherFactions(),
                     new StellarConverterStatistics(),
+                    new ExpeditionWinRates(),
                     new ListTitlesGiven(),
                     new ExportToCSV(),
                     new FactionGames(),

@@ -1,4 +1,4 @@
-package ti4.service.statistics.game;
+package ti4.commands.statistics;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,17 +8,21 @@ import java.util.function.Consumer;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.StatisticsPipeline;
 
 @UtilityClass
 class ExpeditionWinRateStatisticsService {
 
     private static final String THUNDERS_EDGE = "thundersedge";
+
+    public void queueReply(SlashCommandInteractionEvent event) {
+        StatisticsPipeline.queue(event, () -> showExpeditionWinRates(event));
+    }
 
     static void showExpeditionWinRates(SlashCommandInteractionEvent event) {
         Map<String, Map<String, WinRateCount>> factionExpeditionStats = new LinkedHashMap<>();
@@ -29,7 +33,7 @@ class ExpeditionWinRateStatisticsService {
         int[] gamesThatDidNotFinishExpeditionsVersusDid = {0, 0};
 
         GamesPage.consumeAllGames(
-                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(Game::isThundersEdge),
+                ExpeditionWinRateStatisticsService::isEligibleGame,
                 game -> consumeGame(
                         game,
                         factionExpeditionStats,
@@ -189,6 +193,50 @@ class ExpeditionWinRateStatisticsService {
                 }
             }
         }
+    }
+
+
+    private static boolean isEligibleGame(Game game) {
+        return game.getWinner().isPresent()
+                && game.getPlayerCountForMap() == 6
+                && game.getVp() == 10
+                && game.isThundersEdge()
+                && !isFogGame(game)
+                && !game.hasHomebrew()
+                && !hasGalacticEvent(game)
+                && !hasScenario(game)
+                && !game.isAllianceMode();
+    }
+
+    private static boolean isFogGame(Game game) {
+        return game.isFowMode() || game.isLightFogMode();
+    }
+
+    private static boolean hasScenario(Game game) {
+        return game.isLiberationC4Mode() || game.isOrdinianC1Mode();
+    }
+
+    private static boolean hasGalacticEvent(Game game) {
+        return game.isAdventOfTheWarsunMode()
+                || game.isStellarAtomicsMode()
+                || game.isAgeOfFightersMode()
+                || game.isCivilizedSocietyMode()
+                || game.isDangerousWildsMode()
+                || game.isCallOfTheVoidMode()
+                || game.isHiddenAgendaMode()
+                || game.isWildWildGalaxyMode()
+                || game.isCulturalExchangeProgramMode()
+                || game.isCosmicPhenomenaeMode()
+                || game.isMercenariesForHireMode()
+                || game.isRapidMobilizationMode()
+                || game.isWeirdWormholesMode()
+                || game.isMonumentToTheAgesMode()
+                || game.isZealousOrthodoxyMode()
+                || game.isConventionsOfWarAbandonedMode()
+                || game.isAgeOfExplorationMode()
+                || game.isTotalWarMode()
+                || game.isAgeOfCommerceMode()
+                || game.isMinorFactionsMode();
     }
 
     private static String toExpeditionLabel(String expeditionKey) {
