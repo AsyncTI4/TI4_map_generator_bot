@@ -52,7 +52,7 @@ public enum TechEmojis implements TI4Emoji {
     @NotNull
     public static TI4Emoji getBasicTechEmoji(String type) {
         type = type.toLowerCase();
-        if (type.endsWith("tech")) type.replace("tech", "");
+        if (type.endsWith("tech")) type = type.replace("tech", "");
         return switch (type) {
             case "propulsion" -> PropulsionTech;
             case "biotic" -> BioticTech;

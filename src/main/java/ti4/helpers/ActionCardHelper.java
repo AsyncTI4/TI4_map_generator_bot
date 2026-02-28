@@ -1959,10 +1959,6 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find action card in your hand.");
             return;
         }
-        if (p2 == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find other player.");
-            return;
-        }
 
         player.removeActionCard(handIndex);
         p2.setActionCard(acID);

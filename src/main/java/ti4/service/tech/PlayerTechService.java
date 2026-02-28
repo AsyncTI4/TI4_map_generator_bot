@@ -677,6 +677,7 @@ public class PlayerTechService {
                 if (tile == null) {
                     MessageHelper.sendMessageToChannel(
                             player.getCardsInfoThread(), "Could not find your home system, sorry bro.");
+                    return;
                 }
                 buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "obsessivedesigns", "place");
                 int val = Helper.getProductionValue(player, game, tile, true);
