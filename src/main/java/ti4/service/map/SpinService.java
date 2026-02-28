@@ -122,7 +122,7 @@ public class SpinService {
             this.trigger = trigger;
             this.toSpin = toSpin;
             if (game != null) {
-                id = String.valueOf(((game.getName() + this).hashCode() & 0x7FFFFFFF) % 1_000); // positive 3-digit ID
+                id = String.valueOf(((game.getName() + this).hashCode() & 0x7FFFFFFF) % 1000); // positive 3-digit ID
             }
         }
 

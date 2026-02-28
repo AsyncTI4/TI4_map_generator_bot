@@ -60,7 +60,7 @@ public class CombatTempModHelper {
         for (TemporaryCombatModifierModel mod : tempMods) {
             currentRoundResults.add(new NamedCombatModifierModel(
                     mod.getModifier(), Mapper.getRelatedName(mod.getRelatedID(), mod.getRelatedType())));
-            if (mod.getModifier().getPersistenceType().equals(Constants.MOD_TEMP_ONE_ROUND)
+            if (Constants.MOD_TEMP_ONE_ROUND.equals(mod.getModifier().getPersistenceType())
                     && rollType != CombatRollType.AFB) {
                 player.removeTempMod(mod);
             }
@@ -79,9 +79,9 @@ public class CombatTempModHelper {
         var combatModifiers = Mapper.getCombatModifiers();
         Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()
                 .filter(modifier -> modifier.isRelevantTo(relatedType, relatedID)
-                        && (modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_ROUND)
-                                || modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_COMBAT)
-                                || modifier.getPersistenceType().equals(Constants.MOD_TEMP_ONE_TACTICAL_ACTION)))
+                        && (Constants.MOD_TEMP_ONE_ROUND.equals(modifier.getPersistenceType())
+                                || Constants.MOD_TEMP_ONE_COMBAT.equals(modifier.getPersistenceType())
+                                || Constants.MOD_TEMP_ONE_TACTICAL_ACTION.equals(modifier.getPersistenceType())))
                 .findFirst();
         if (relevantMod.isPresent()) {
             result = new TemporaryCombatModifierModel(relatedType, relatedID, relevantMod.get(), currentTurnCount);

@@ -145,7 +145,7 @@ public class DeepgloomService {
 
     private static List<Button> getButtonsForAllowRevoke(Game game, Player yssaril, String ability) {
         AbilityModel model = Mapper.getAbility(ability);
-        String abilityPart = ability.equals("scheming") ? "scheming" : "stalltactics";
+        String abilityPart = "scheming".equals(ability) ? "scheming" : "stalltactics";
 
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(yssaril)) {

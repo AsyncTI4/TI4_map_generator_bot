@@ -629,7 +629,7 @@ public class TransactionHelper {
             "Hwat's This‽ A Transaction Proposal Woefully Underpopulated By Bees‽ My Briefcase Full Of Bees Ought To Put A Stop To That!");
 
     public static String getNothingMessage() {
-        if (RandomHelper.isOneInX(1000000)) {
+        if (RandomHelper.isOneInX(1_000_000)) {
             return "The joy of sharing a one in a million empty transaction offer message";
         }
 

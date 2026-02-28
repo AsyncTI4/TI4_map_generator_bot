@@ -1354,8 +1354,8 @@ public class Game extends GameProperties {
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
-        if (lastActivePlayerChange.getTime() < 1000000) {
-            elapsedTime = 60000; // if for some reason the last Active player change was never set, ignore the time
+        if (lastActivePlayerChange.getTime() < 1_000_000) {
+            elapsedTime = 60_000; // if for some reason the last Active player change was never set, ignore the time
         }
         if (prevPlayer != null) {
             long effectiveTurnTime = elapsedTime;

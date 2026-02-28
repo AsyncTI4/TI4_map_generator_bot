@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 
 public class URLReaderHelper {
 
-    private static final int MAX_FILE_SIZE_BYTES = 500000; // 500 kB
+    private static final int MAX_FILE_SIZE_BYTES = 500_000; // 500 kB
 
     public static String readFromURL(String url, MessageChannel feedbackChannel) {
         try {
