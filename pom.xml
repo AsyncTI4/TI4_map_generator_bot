@@ -179,6 +179,7 @@
         <configuration>
           <java>
             <cleanthat>
+              <sourceJdk>${java.version}</sourceJdk>
               <mutators>
                 <mutator>SafeAndConsensual</mutator>
                 <mutator>SafeButNotConsensual</mutator>
