@@ -1,22 +1,25 @@
 package ti4.commands.developer;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.buttons.handlers.actioncards.ActionCardDeck2ButtonHandler;
-import ti4.commands.Subcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
-class CustomCommand extends Subcommand {
+class CustomCommand extends GameStateSubcommand {
 
     CustomCommand() {
-        super("custom_command", "Custom command written for a custom purpose.");
+        super("custom_command", "Custom command written for a custom purpose.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game to run the command against.")
                 .setRequired(true)
                 .setAutoComplete(true));
@@ -31,29 +34,36 @@ class CustomCommand extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String gameName = event.getOption(Constants.GAME_NAME, null, OptionMapping::getAsString);
-        String factionColor = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
-
-        if (gameName == null || factionColor == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Missing required options.");
-            return;
-        }
         if (!GameManager.isValid(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
             return;
         }
 
         Game game = GameManager.getManagedGame(gameName).getGame();
-        Player player = Helper.getGamePlayer(game, null, event, factionColor);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(
-                    event.getChannel(),
-                    "Player not found for faction/color `" + factionColor + "` in game `" + gameName + "`.");
-            return;
+        Player player = getPlayer();
+
+        List<MessageEmbed> embeds = new ArrayList<>();
+
+        for (String objectiveId : game.getPublicObjectives1Peekable()) {
+            embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
         }
 
-        ActionCardDeck2ButtonHandler.resolveOracle(player, game, event.getChannel());
+        for (String objectiveId : game.getPublicObjectives2Peekable()) {
+            embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
+        }
+
+        for (String secretId : game.peekAtSecrets(5)) {
+            embeds.add(Mapper.getSecretObjective(secretId).getRepresentationEmbed(true));
+        }
+
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(
+            player,
+            "Showing all unrevealed public objectives and the top 5 secret objectives from the deck.",
+            embeds);
+        Collections.shuffle(game.getSecretObjectives());
         MessageHelper.sendMessageToChannel(
-                event.getChannel(),
-                "Triggered _Oracle_ resolution for " + player.getRepresentationNoPing() + " in game `" + gameName + "`.");
+            event.getMessageChannel(),
+            "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
+                + " `#cards-info` thread and shuffled the secret objective deck.");
     }
 }

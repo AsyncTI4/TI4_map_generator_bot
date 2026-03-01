@@ -1612,7 +1612,6 @@ public class ButtonHelperActionCards {
                 buttons);
     }
 
-
     @ButtonHandler("resolveInsiderInformation")
     public static void resolveInsiderInformation(Player player, Game game, ButtonInteractionEvent event) {
         AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player, 3);
