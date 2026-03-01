@@ -312,7 +312,7 @@ class ActionCardDeck2ButtonHandler {
         EndTurnService.endTurnAndUpdateMap(event, game, activePlayer);
         ButtonHelper.deleteMessage(event);
     }
-  
+
     @ButtonHandler("resolveSimulacrum")
     public static void resolveSimulacrum(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
