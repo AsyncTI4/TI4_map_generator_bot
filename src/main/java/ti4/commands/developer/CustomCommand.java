@@ -1,17 +1,14 @@
 package ti4.commands.developer;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.buttons.Buttons;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
@@ -39,31 +36,14 @@ class CustomCommand extends GameStateSubcommand {
             return;
         }
 
-        Game game = getGame();
         Player player = getPlayer();
 
-        List<MessageEmbed> embeds = new ArrayList<>();
-
-        for (String objectiveId : game.getPublicObjectives1Peekable()) {
-            embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
-        }
-
-        for (String objectiveId : game.getPublicObjectives2Peekable()) {
-            embeds.add(Mapper.getPublicObjective(objectiveId).getRepresentationEmbed());
-        }
-
-        for (String secretId : game.peekAtSecrets(5)) {
-            embeds.add(Mapper.getSecretObjective(secretId).getRepresentationEmbed(true));
-        }
-
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(
-                player,
-                "Showing all unrevealed public objectives and the top 5 secret objectives from the deck.",
-                embeds);
-        Collections.shuffle(game.getSecretObjectives());
-        MessageHelper.sendMessageToChannel(
+        List<Button> buttons = List.of(
+                Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveOracle", "Resolve Oracle"));
+        MessageHelper.sendMessageToChannelWithButtons(
                 event.getMessageChannel(),
-                "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
-                        + " `#cards-info` thread and shuffled the secret objective deck.");
+                player.getRepresentation()
+                        + " may use this button to resolve _Oracle_.",
+                buttons);
     }
 }
