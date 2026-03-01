@@ -661,21 +661,19 @@ public class MessageHelper {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (text == null || message == null || managedGame == null || managedGame.isFowMode()) return;
 
-        String name = managedGame.getName();
         String id = message.getId();
         long date = managedGame.getLastModifiedDate();
 
         if (text.contains("Use buttons to do your turn")
                 || text.contains("Use buttons to end turn")
                 || text.contains("Use the buttons to end turn")) {
-            String old = GameMessageManager.replace(name, id, GameMessageType.TURN, date);
+            String old = GameMessageManager.replace(gameName, id, GameMessageType.TURN, date);
             if (old != null) {
                 message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
 
         if (text.contains(VisionariaSelectService.initialButtonHeader())) {
-            message.getJumpUrl();
             GameMessageManager.replace(gameName, id, GameMessageType.VISIONARIA, date);
         }
     }
