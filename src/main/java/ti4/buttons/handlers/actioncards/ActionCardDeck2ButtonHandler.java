@@ -303,9 +303,9 @@ class ActionCardDeck2ButtonHandler {
         RemoveCommandCounterService.fromTile(activePlayer.getColor(), activeTile, game);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " played _Armistice_. Removed " + activePlayer.getFactionEmoji()
-                        + " command token from " + activeTile.getRepresentationForButtons(game, player)
-                        + " and ended their turn.");
+                player.getRepresentationUnfogged() + " played _Armistice_. Removed "
+                        + activePlayer.getFactionEmojiOrColor() + " command token from "
+                        + activeTile.getRepresentationForButtons(game, player) + " and ended their turn.");
         EndTurnService.endTurnAndUpdateMap(event, game, activePlayer);
         ButtonHelper.deleteMessage(event);
     }
