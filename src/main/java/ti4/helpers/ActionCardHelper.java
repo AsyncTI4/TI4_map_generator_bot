@@ -1279,7 +1279,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
-          
+
             if ("simulacrum".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSimulacrum", buttonLabel));

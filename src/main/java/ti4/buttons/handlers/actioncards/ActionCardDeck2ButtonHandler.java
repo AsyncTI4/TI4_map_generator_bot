@@ -25,8 +25,8 @@ import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -338,7 +338,7 @@ class ActionCardDeck2ButtonHandler {
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game)
                         + " and gained " + tgGain + " trade good" + (tgGain == 1 ? "" : "s") + " from _Cache_.");
     }
-  
+
     @ButtonHandler("resolveSimulacrum")
     public static void resolveSimulacrum(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
