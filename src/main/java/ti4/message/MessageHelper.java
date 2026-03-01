@@ -646,7 +646,7 @@ public class MessageHelper {
                         channel,
                         messageCreateData,
                         message -> {
-                            checkForManagedMessages(finalMessageText, message, gameName);
+                            updateManagedMessages(finalMessageText, message, gameName);
                             if (restAction != null) {
                                 restAction.accept(message);
                             }
@@ -657,7 +657,7 @@ public class MessageHelper {
         }
     }
 
-    private static void checkForManagedMessages(String text, Message message, String gameName) {
+    private static void updateManagedMessages(String text, Message message, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (text == null || managedGame == null || message == null) return;
 
