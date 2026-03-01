@@ -1213,6 +1213,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
+            if ("oracle".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveOracle", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("ancient_trade_routes".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAncientTradeRoutes", buttonLabel));
