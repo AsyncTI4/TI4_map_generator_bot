@@ -659,7 +659,7 @@ public class MessageHelper {
 
     private static void updateManagedMessages(String text, Message message, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (text == null || managedGame == null || message == null) return;
+        if (text == null || message == null || managedGame == null || managedGame.isFowMode()) return;
 
         String name = managedGame.getName();
         String id = message.getId();
@@ -669,7 +669,7 @@ public class MessageHelper {
                 || text.contains("Use buttons to end turn")
                 || text.contains("Use the buttons to end turn")) {
             String old = GameMessageManager.replace(name, id, GameMessageType.TURN, date);
-            if (old != null && !managedGame.isFowMode()) {
+            if (old != null) {
                 message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
