@@ -24,6 +24,7 @@ import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -34,6 +35,8 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.ExhaustLeaderService;
+import ti4.service.leader.RefreshLeaderService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.unit.AddUnitService;
@@ -308,6 +311,70 @@ class ActionCardDeck2ButtonHandler {
                         + activeTile.getRepresentationForButtons(game, player) + " and ended their turn.");
         EndTurnService.endTurnAndUpdateMap(event, game, activePlayer);
         ButtonHelper.deleteMessage(event);
+    }
+  
+    @ButtonHandler("resolveSimulacrum")
+    public static void resolveSimulacrum(Player player, Game game, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            for (String leaderID : p2.getLeaderIDs()) {
+                var leaderModel = Mapper.getLeader(leaderID);
+                if (leaderModel == null || !"agent".equals(leaderModel.getType())) {
+                    continue;
+                }
+
+                Leader agent = p2.getLeader(leaderID).orElse(null);
+                if (agent == null) {
+                    continue;
+                }
+
+                String buttonPrefix = agent.isExhausted() ? "Ready " : "Exhaust ";
+                buttons.add(Buttons.gray(
+                        "simulacrumToggleAgent_" + p2.getFaction() + "_" + leaderID,
+                        buttonPrefix + leaderModel.getName()));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", choose an agent to ready or exhaust.",
+                buttons);
+    }
+
+    @ButtonHandler("simulacrumToggleAgent_")
+    public static void resolveSimulacrumToggleAgent(
+            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String[] buttonParts = buttonID.split("_", 3);
+        if (buttonParts.length < 3) {
+            return;
+        }
+        String faction = buttonParts[1];
+        String agentID = buttonParts[2];
+        Player agentOwner = game.getPlayerFromColorOrFaction(faction);
+        if (agentOwner == null) {
+            return;
+        }
+
+        Leader agent = agentOwner.getLeader(agentID).orElse(null);
+        if (agent == null) {
+            return;
+        }
+
+        String ownerName = Mapper.getLeader(agentID).getName() + " (" + agentOwner.getRepresentationNoPing() + ")";
+        if (agent.isExhausted()) {
+            RefreshLeaderService.refreshLeader(agentOwner, agent, game);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " readied " + ownerName + " using _Simulacrum_.");
+        } else {
+            ExhaustLeaderService.exhaustLeader(game, agentOwner, agent);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " exhausted " + ownerName + " using _Simulacrum_.");
+        }
+
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("armsDealStep2_")
