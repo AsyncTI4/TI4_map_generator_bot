@@ -3,6 +3,7 @@ package ti4.service.map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
@@ -66,7 +67,7 @@ public class SpinService {
         }
 
         public static List<String> valuesAsStringList() {
-            return List.of(values()).stream().map(Enum::toString).collect(Collectors.toList());
+            return Stream.of(values()).map(Enum::toString).collect(Collectors.toList());
         }
     }
 
@@ -93,7 +94,7 @@ public class SpinService {
         }
 
         public static List<String> valuesAsStringList() {
-            return List.of(values()).stream().map(Enum::toString).collect(Collectors.toList());
+            return Stream.of(values()).map(Enum::toString).collect(Collectors.toList());
         }
     }
 
@@ -134,11 +135,11 @@ public class SpinService {
             AutoTrigger trigger = AutoTrigger.STATUS;
             ToSpin toSpin = ToSpin.ALL;
             try {
-                ring = List.of(parts[0].split(LIST_SEPARATOR)).stream()
+                ring = Stream.of(parts[0].split(LIST_SEPARATOR))
                         .map(Integer::parseInt)
                         .collect(Collectors.toList());
                 direction = Direction.valueOf(parts[1]);
-                steps = List.of(parts[2].split(LIST_SEPARATOR)).stream()
+                steps = Stream.of(parts[2].split(LIST_SEPARATOR))
                         .map(Integer::parseInt)
                         .collect(Collectors.toList());
 
@@ -311,9 +312,8 @@ public class SpinService {
         if (settings.isEmpty()) {
             game.setSpinMode("OFF");
         } else {
-            game.setSpinMode(String.join(
-                    SETTING_SEPARATOR,
-                    settings.stream().map(SpinSetting::toString).collect(Collectors.toList())));
+            game.setSpinMode(
+                    settings.stream().map(SpinSetting::toString).collect(Collectors.joining(SETTING_SEPARATOR)));
         }
     }
 
@@ -329,7 +329,7 @@ public class SpinService {
                 || "OFF".equals(game.getSpinMode())) {
             return List.of();
         }
-        return List.of(game.getSpinMode().split(SETTING_SEPARATOR)).stream()
+        return Stream.of(game.getSpinMode().split(SETTING_SEPARATOR))
                 .map(s -> SpinSetting.fromString(s, game))
                 .collect(Collectors.toList());
     }

@@ -3368,9 +3368,8 @@ public class Helper {
         int middle = turnTimesSorted.size() / 2;
         if (turnTimesSorted.size() % 2 == 1) {
             return turnTimesSorted.get(middle);
-        } else {
-            return (turnTimesSorted.get(middle - 1) + turnTimesSorted.get(middle)) / 2;
         }
+        return (turnTimesSorted.get(middle - 1) + turnTimesSorted.get(middle)) / 2;
     }
 
     public static String getUnitListEmojis(String unitList) {

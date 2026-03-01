@@ -54,6 +54,7 @@ import ti4.model.UnitModel;
 import ti4.service.breakthrough.ValefarZService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.CheckUnitContainmentService;
 import ti4.service.unit.DestroyUnitService;
 
@@ -856,6 +857,7 @@ public class CombatRollService {
                 if (numRolls == 0) {
                     continue;
                 }
+                RoundStatsTracker.recordDiceRolled(game, player, numRolls);
                 List<DiceHelper.Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                 int mult = 1;
 
@@ -883,6 +885,7 @@ public class CombatRollService {
                         || "sigma_jolnar_flagship_2".equalsIgnoreCase(unitModel.getId())) {
                     int additionalDice = hitRolls;
                     while (hitRolls < 100 && additionalDice > 0) {
+                        RoundStatsTracker.recordDiceRolled(game, player, additionalDice);
                         List<DiceHelper.Die> additionalResultRolls =
                                 DiceHelper.rollDice(toHit - modifierToHit, additionalDice);
                         additionalDice = DiceHelper.countSuccesses(additionalResultRolls);
@@ -993,6 +996,7 @@ public class CombatRollService {
                                 || player.hasTech("tf-tacticalbrilliance"))
                         && rollType != CombatRollType.combatround
                         && numMisses > 0) {
+                    RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
@@ -1075,6 +1079,7 @@ public class CombatRollService {
                         }
                     }
                     if (num1s > 0) {
+                        RoundStatsTracker.recordDiceRolled(game, player, num1s);
                         resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, num1s);
                         player.setExpectedHitsTimes10(
                                 player.getExpectedHitsTimes10() + (num1s * (11 - toHit + modifierToHit)));
@@ -1102,6 +1107,7 @@ public class CombatRollService {
                 if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction())
                         && rollType == CombatRollType.combatround
                         && numMisses > 0) {
+                    RoundStatsTracker.recordDiceRolled(game, player, numMisses);
                     resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numMisses);
                     player.setExpectedHitsTimes10(
                             player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));

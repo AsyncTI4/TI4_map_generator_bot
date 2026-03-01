@@ -1,6 +1,9 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.countMatches;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1471,7 +1474,7 @@ public class ButtonHelper {
     public static void resolveMinisterOfCommerceCheck(Game game, Player player, GenericInteractionCreateEvent event) {
         resolveTACheck(game, player);
         for (String law : game.getLaws().keySet()) {
-            if ("minister_commrece".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
+            if ("minister_commerce".equalsIgnoreCase(law) || "absol_minscomm".equalsIgnoreCase(law)) {
                 if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
                         || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     MessageChannel channel = event.getMessageChannel();
@@ -3998,7 +4001,6 @@ public class ButtonHelper {
                 tooManyPDS = p.getRepresentation(game);
             }
         }
-        // System.out.println(fightersIgnored);
         int ignoredFs = 0;
 
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
@@ -4373,15 +4375,15 @@ public class ButtonHelper {
         String action = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
         String msg = player.getRepresentation() + " gained 1 " + type + " balance token.";
-        if (type.equalsIgnoreCase("steel")) {
+        if ("steel".equalsIgnoreCase(type)) {
             player.setSteelbalanceCounter(player.getSteelbalanceCounter() + 1);
-            if (action.equalsIgnoreCase("flip")) {
+            if ("flip".equalsIgnoreCase(action)) {
                 msg += " They lost 1 star token";
                 player.setStarbalanceCounter(player.getStarbalanceCounter() - 1);
             }
         } else {
             player.setStarbalanceCounter(player.getStarbalanceCounter() + 1);
-            if (action.equalsIgnoreCase("flip")) {
+            if ("flip".equalsIgnoreCase(action)) {
                 msg += " They lost 1 steel token";
                 player.setSteelbalanceCounter(player.getSteelbalanceCounter() - 1);
             }
