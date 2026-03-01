@@ -212,9 +212,6 @@
         "itemCategory": "ABILITY",
         "itemId": "galactic_threat",
         "optionalSwaps": [
-            "BREAKTHROUGH:nekrobt"
-        ],
-        "optionalSwaps": [
             "TECH:vay"
         ],
         "source": "pok"
@@ -229,7 +226,8 @@
         "itemCategory": "ABILITY",
         "itemId": "technological_singularity",
         "optionalSwaps": [
-            "TECH:vax"
+            "TECH:vax",
+            "BREAKTHROUGH:nekrobt"
         ],
         "source": "pok"
     },
