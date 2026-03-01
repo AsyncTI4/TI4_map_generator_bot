@@ -1275,7 +1275,8 @@ public class ActionCardHelper {
             }
 
             if ("simulacrum".equals(automationID)) {
-                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSimulacrum", buttonLabel));
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSimulacrum", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
