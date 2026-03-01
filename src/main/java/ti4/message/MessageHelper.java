@@ -670,7 +670,7 @@ public class MessageHelper {
                 || text.contains("Use the buttons to end turn")) {
             String old = GameMessageManager.replace(name, id, GameMessageType.TURN, date);
             if (old != null && !managedGame.isFowMode()) {
-                message.getChannel().deleteMessageById(id).queue(Consumers.nop(), BotLogger::catchRestError);
+                message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
 
