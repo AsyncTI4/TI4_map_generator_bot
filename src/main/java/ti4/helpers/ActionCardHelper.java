@@ -1267,6 +1267,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
+            if ("armistice".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveArmistice", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("defense_installation".equals(automationID)) {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveDefenseInstallation", buttonLabel));

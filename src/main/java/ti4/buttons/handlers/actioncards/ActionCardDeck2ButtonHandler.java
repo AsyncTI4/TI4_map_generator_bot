@@ -29,11 +29,13 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.model.ExploreModel;
+import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.turn.EndTurnService;
 import ti4.service.unit.AddUnitService;
 
 @UtilityClass
@@ -276,6 +278,36 @@ class ActionCardDeck2ButtonHandler {
                 player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + ", please choose which neighbor gets 1 cruiser and 1 destroyer.",
                 buttons);
+    }
+
+    @ButtonHandler("resolveArmistice")
+    public static void resolveArmistice(Player player, Game game, ButtonInteractionEvent event) {
+        Player activePlayer = game.getActivePlayer();
+        String activeSystem = game.getActiveSystem();
+        if (activePlayer == null || activeSystem == null || activeSystem.isBlank()) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Could not find the active player or active system. Resolve _Armistice_ manually.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        Tile activeTile = game.getTileByPosition(activeSystem);
+        if (activeTile == null) {
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "Could not find the active system tile. Resolve _Armistice_ manually.");
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+
+        RemoveCommandCounterService.fromTile(activePlayer.getColor(), activeTile, game);
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + " played _Armistice_. Removed " + activePlayer.getFactionEmoji()
+                        + " command token from " + activeTile.getRepresentationForButtons(game, player)
+                        + " and ended their turn.");
+        EndTurnService.endTurnAndUpdateMap(event, game, activePlayer);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("armsDealStep2_")
