@@ -312,7 +312,8 @@ class ActionCardDeck2ButtonHandler {
         String planetName = buttonID.split("_")[1];
         Planet planet = game.getPlanetsInfo().get(planetName);
         if (planet == null || !player.hasPlanet(planetName) || planet.isHomePlanet(game)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve _Cache_ for that planet.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), "Could not resolve _Cache_ for that planet.");
             return;
         }
         if (!player.hasPlanetReady(planetName)) {
