@@ -5,17 +5,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.service.statistics.MedianTurnTimeService;
+import ti4.spring.service.statistics.MedianTurnTimeService;
 
 class MedianTurnTime extends Subcommand {
 
-    public MedianTurnTime() {
+    MedianTurnTime() {
         super(Constants.MEDIAN_TURN_TIME, "Median turn time across all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)"));
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 Constants.MINIMUM_NUMBER_OF_TURNS,
-                "Minimum number of turns to show (Default = 1)"));
+                "Minimum number of turns to show (Default = 100)"));
         addOptions(new OptionData(
                 OptionType.BOOLEAN,
                 Constants.IGNORE_ENDED_GAMES,
@@ -24,6 +24,6 @@ class MedianTurnTime extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MedianTurnTimeService.queueReply(event);
+        MedianTurnTimeService.getBean().getMedianTurnTimes(event);
     }
 }

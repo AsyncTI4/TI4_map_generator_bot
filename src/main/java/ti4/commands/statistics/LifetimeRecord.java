@@ -9,7 +9,7 @@ import ti4.service.statistics.LifeTimeRecordService;
 
 class LifetimeRecord extends Subcommand {
 
-    public LifetimeRecord() {
+    LifetimeRecord() {
         super(Constants.LIFETIME_RECORD, "Dice luck and average turn time for all games of specific players");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));

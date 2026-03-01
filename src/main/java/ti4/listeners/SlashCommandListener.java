@@ -21,7 +21,7 @@ import ti4.spring.jda.JdaService;
 
 public class SlashCommandListener extends ListenerAdapter {
 
-    private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
+    private static final long DELAY_THRESHOLD_MILLISECONDS = 2000;
 
     private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(
             Constants.ADD_TILE_LIST,
