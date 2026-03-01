@@ -295,10 +295,11 @@ class ExpeditionWinRateStatisticsService {
     }
 
     private static boolean hasTheirBreakthrough(Player player) {
-        if (player.getFactionModel() == null) {
+        var factionModel = player.getFactionModel();
+        if (factionModel == null) {
             return false;
         }
-        return player.hasBreakthrough(player.getFactionModel().getBreakthrough());
+        return player.hasBreakthrough(factionModel.getBreakthrough());
     }
 
     private static String toExpeditionLabel(String expeditionKey) {
