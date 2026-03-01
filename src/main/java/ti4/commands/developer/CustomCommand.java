@@ -39,7 +39,7 @@ class CustomCommand extends GameStateSubcommand {
             return;
         }
 
-        Game game = GameManager.getManagedGame(gameName).getGame();
+        Game game = getGame();
         Player player = getPlayer();
 
         List<MessageEmbed> embeds = new ArrayList<>();
