@@ -540,7 +540,7 @@ public class StartTurnService {
         }
 
         // Send notifications for exhausted SCs & other important things
-        if (!game.isFowMode()) {
+        if (!doneActionThisTurn && !game.isFowMode()) {
             for (Player p2 : game.getRealPlayers()) {
                 for (int sc : player.getSCs()) {
                     if (!player.getExhaustedSCs().contains(sc) || p2.hasFollowedSC(sc)) continue;
