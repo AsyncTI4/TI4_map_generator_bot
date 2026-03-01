@@ -183,7 +183,7 @@
     {
         "itemCategory": "HERO",
         "itemId": "naaluhero",
-        "additionalComponents": [
+        "optionalSwaps": [
             "BREAKTHROUGH:naalubt"
         ],
         "source": "pok"
@@ -211,7 +211,7 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "galactic_threat",
-        "additionalComponents": [
+        "optionalSwaps": [
             "BREAKTHROUGH:nekrobt"
         ],
         "optionalSwaps": [
@@ -435,7 +435,10 @@
         "itemCategory": "ABILITY",
         "itemId": "crafty",
         "additionalComponents": [
-            "ABILITY:scheming",
+            "ABILITY:scheming"
+        ], 
+        "optionalSwaps": [
+            "MECH:yssaril_mech",
             "BREAKTHROUGH:yssarilbt"
         ],
         "source": "pok"
