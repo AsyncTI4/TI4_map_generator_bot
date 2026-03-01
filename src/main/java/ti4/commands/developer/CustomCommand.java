@@ -57,13 +57,13 @@ class CustomCommand extends GameStateSubcommand {
         }
 
         MessageHelper.sendMessageEmbedsToCardsInfoThread(
-            player,
-            "Showing all unrevealed public objectives and the top 5 secret objectives from the deck.",
-            embeds);
+                player,
+                "Showing all unrevealed public objectives and the top 5 secret objectives from the deck.",
+                embeds);
         Collections.shuffle(game.getSecretObjectives());
         MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
-                + " `#cards-info` thread and shuffled the secret objective deck.");
+                event.getMessageChannel(),
+                "Sent _Oracle_ results to " + player.getFactionEmojiOrColor()
+                        + " `#cards-info` thread and shuffled the secret objective deck.");
     }
 }
