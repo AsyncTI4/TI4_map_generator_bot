@@ -475,7 +475,7 @@
     {
         "itemCategory": "ABILITY",
         "itemId": "meteor_slings",
-        "additionalComponents": [
+        "optionalSwaps": [
             "BREAKTHROUGH:khraskbt"
         ],
         "source": "ds"
@@ -508,7 +508,9 @@
         "itemCategory": "TECH",
         "itemId": "dsmirvpds",
         "additionalComponents": [
-            "ABILITY:privileged_citizenry",
+            "ABILITY:privileged_citizenry"
+        ],
+        "optionalSwaps": [
             "BREAKTHROUGH:mirvedabt"
         ],
         "source": "ds"
@@ -522,7 +524,7 @@
     {
         "itemCategory": "TECH",
         "itemId": "dsmykosd",
-        "additionalComponents": [
+        "optionalSwaps": [
             "BREAKTHROUGH:mykomentoribt"
         ],
         "source": "ds"
@@ -592,12 +594,12 @@
         "itemCategory": "MECH",
         "itemId": "nivyn_mech",
         "additionalComponents": [
-            "ABILITY:singularity_point",
-            "BREAKTHROUGH:nivynbt"
+            "ABILITY:singularity_point"
         ],
         "optionalSwaps": [
             "TECH:dsnivymf",
-            "HERO:nivynhero"
+            "HERO:nivynhero",
+            "BREAKTHROUGH:nivynbt"
         ],
         "source": "ds"
     },
@@ -617,11 +619,11 @@
         "itemCategory": "ABILITY",
         "itemId": "hired_guns",
         "additionalComponents": [
-            "ABILITY:desperados",
-            "BREAKTHROUGH:nokarbt"
+            "ABILITY:desperados"
         ],
         "optionalSwaps": [
-            "COMMANDER:nokarcommander"
+            "COMMANDER:nokarcommander",
+            "BREAKTHROUGH:nokarbt"
         ],
         "source": "ds"
     },
