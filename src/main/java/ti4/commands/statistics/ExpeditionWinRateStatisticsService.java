@@ -20,6 +20,7 @@ import ti4.service.statistics.StatisticsPipeline;
 class ExpeditionWinRateStatisticsService {
 
     private static final Set<String> FIRMAMENT_AND_OBSIDIAN_FACTION_NAMES = Set.of("obsidian", "firmament");
+    private static final String ANY_EXPEDITIONS = "Any expeditions";
     private static final String NO_EXPEDITIONS = "No expeditions";
     private static final String THUNDERS_EDGE = "thundersedge";
 
@@ -78,6 +79,8 @@ class ExpeditionWinRateStatisticsService {
                             .sorted((a, b) -> {
                                 if (NO_EXPEDITIONS.equals(a.getKey())) return -1;
                                 if (NO_EXPEDITIONS.equals(b.getKey())) return 1;
+                                if (ANY_EXPEDITIONS.equals(a.getKey())) return -1;
+                                if (ANY_EXPEDITIONS.equals(b.getKey())) return 1;
                                 return a.getKey().compareTo(b.getKey());
                             })
                             .forEach(e2 -> sb.append("  - ")
@@ -195,6 +198,13 @@ class ExpeditionWinRateStatisticsService {
                     noExpeditionsCount.wins++;
                 }
             } else {
+                WinRateCount anyExpeditionsCount =
+                        expeditionWinRates.computeIfAbsent(ANY_EXPEDITIONS, k -> new WinRateCount());
+                anyExpeditionsCount.total++;
+                if (isWinner) {
+                    anyExpeditionsCount.wins++;
+                }
+
                 completedExpeditions.forEach(expedition -> {
                     WinRateCount count2 =
                             expeditionWinRates.computeIfAbsent(toExpeditionLabel(expedition), k -> new WinRateCount());
