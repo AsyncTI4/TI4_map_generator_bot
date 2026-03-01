@@ -15,7 +15,7 @@
 
   <properties>
     <java.version>21</java.version>
-    <jda.version>6.3.0</jda.version>
+    <jda.version>6.3.1</jda.version>
     <aws.sdk.version>2.41.24</aws.sdk.version>
     <hibernate-dialects.version>${hibernate.version}</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
