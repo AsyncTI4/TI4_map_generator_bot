@@ -149,19 +149,19 @@ public class PlayStrategyCardService {
                 player2.removeFollowedSC(scToPlay);
                 player2.getCardsInfoThread(); // force thread to open if closed
             }
-        }
 
-        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
+            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
 
-        // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
-        if (!winnuHero && !isOverrule) {
-            if (scModel.hasImageFile()) {
-                MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
-            } else {
-                baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
+            // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
+            if (!winnuHero) {
+                if (scModel.hasImageFile()) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
+                } else {
+                    baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
+                }
             }
+            baseMessageObject.addContent(message.toString());
         }
-        baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, player));
