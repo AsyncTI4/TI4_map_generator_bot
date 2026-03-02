@@ -20,7 +20,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.Units;
 import ti4.helpers.UnusedCommanderHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -99,12 +98,8 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("resolveDefenseInstallation")
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = player.getPlanets().stream()
-                .map(planetName -> ButtonHelper.getUnitHolderFromPlanetName(planetName, game))
-                .filter(Objects::nonNull)
-                .filter(planet -> planet.getUnitCount(Units.UnitType.Pds, player.getColor()) == 0)
                 .map(planet -> Buttons.green(
-                        "defenseInstallationStep2_" + planet.getName(),
-                        Helper.getPlanetRepresentation(planet.getName(), game)))
+                        "defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
                 .toList();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
