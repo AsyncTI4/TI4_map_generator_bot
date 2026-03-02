@@ -185,8 +185,8 @@ public class PlayStrategyCardService {
             Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
             if (propagationPlayer != null) {
                 boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology")
-                    && !game.isFowMode()
-                    && !player.equals(propagationPlayer);
+                        && !game.isFowMode()
+                        && !player.equals(propagationPlayer);
                 if (shouldAddNekroTechButton) {
                     String ffcc = propagationPlayer.getFinsFactionCheckerPrefix();
                     scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
@@ -196,16 +196,16 @@ public class PlayStrategyCardService {
             Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
             if (titansMechPlayer != null) {
                 boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
-                    || scModel.usesAutomationForSCID("te4construction"))
-                    && !game.isFowMode()
-                    && !ButtonHelper.isLawInPlay(game, "articles_war")
-                    && !player.equals(titansMechPlayer);
+                                || scModel.usesAutomationForSCID("te4construction"))
+                        && !game.isFowMode()
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")
+                        && !player.equals(titansMechPlayer);
                 if (shouldAddTitansMechDeployButton) {
                     String ffcc = titansMechPlayer.getFinsFactionCheckerPrefix();
                     scButtons.add(Buttons.gray(
-                        ffcc + "titansConstructionMechDeployStep1",
-                        "Deploy Titan Mech + Infantry",
-                        FactionEmojis.Titans));
+                            ffcc + "titansConstructionMechDeployStep1",
+                            "Deploy Titan Mech + Infantry",
+                            FactionEmojis.Titans));
                 }
             }
 
