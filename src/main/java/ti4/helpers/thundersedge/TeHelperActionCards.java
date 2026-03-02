@@ -78,7 +78,7 @@ public class TeHelperActionCards {
         return false;
     }
 
-    public static List<Button> getOverruleButtons(Game game) {
+    private static List<Button> getOverruleButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {
             if (sc <= 0

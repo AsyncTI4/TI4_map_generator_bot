@@ -31,7 +31,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.breakthrough.MindsieveService;
@@ -56,7 +55,7 @@ public class PlayStrategyCardService {
             Game game,
             MessageChannel mainGameChannel,
             Player player) {
-        playSC(event, scToPlay, game, mainGameChannel, player, false);
+        playSC(event, scToPlay, game, mainGameChannel, player, false, false);
     }
 
     public static void playSC(
@@ -65,16 +64,8 @@ public class PlayStrategyCardService {
             Game game,
             MessageChannel mainGameChannel,
             Player player,
-            boolean winnuHero) {
-        StrategyCardModel scModel =
-                game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
-        if (scModel == null) { // Temporary Error Reporting
-            BotLogger.warning(
-                    new LogOrigin(player),
-                    "`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `"
-                            + scToPlay + "` from set `" + game.getScSetID() + "`");
-        }
-
+            boolean winnuHero,
+            boolean isOverrule) {
         String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(
@@ -83,7 +74,7 @@ public class PlayStrategyCardService {
         }
 
         // HANDLE COUP
-        if (!winnuHero && game.getStoredValue("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && !isOverrule && game.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("Coup").contains(p2.getFaction())
                         && p2.getPlayableActionCards().contains("coup")) {
@@ -114,77 +105,110 @@ public class PlayStrategyCardService {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
                         + game.getSCEmojiWordRepresentation(scToPlay));
 
-        if (!winnuHero) {
-            game.setSCPlayed(scToPlay, true);
-        }
         StringBuilder message = new StringBuilder();
-        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? " overruled" : " played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
         message.append(".\n\n");
 
-        StringBuilder gamePing = new StringBuilder(game.getPing());
-        List<Player> playersToFollow = game.getRealPlayers();
-        if (!"All".equals(scModel.getGroup().orElse(""))
-                && ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName()))) {
-            playersToFollow = new ArrayList<>();
-            String num = scToPlay + "";
-            num = num.substring(num.length() - 1);
-            gamePing = new StringBuilder();
-            for (Player p2 : game.getRealPlayers()) {
-                for (Integer sc : p2.getSCs()) {
-                    String num2 = sc + "";
-                    num2 = num2.substring(num2.length() - 1);
-                    if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
-                        gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
-                        playersToFollow.add(p2);
+        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
+
+        StrategyCardModel scModel =
+                game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
+        List<Player> playersToFollow = isOverrule ? Collections.emptyList() : game.getRealPlayers();
+        if (!isOverrule) {
+            StringBuilder gamePing = new StringBuilder(game.getPing());
+            if (!"All".equals(scModel.getGroup().orElse(""))
+                    && ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName()))) {
+                playersToFollow = new ArrayList<>();
+                String num = scToPlay + "";
+                num = num.substring(num.length() - 1);
+                gamePing = new StringBuilder();
+                for (Player p2 : game.getRealPlayers()) {
+                    for (Integer sc : p2.getSCs()) {
+                        String num2 = sc + "";
+                        num2 = num2.substring(num2.length() - 1);
+                        if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
+                            gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
+                            playersToFollow.add(p2);
+                        }
                     }
                 }
             }
-        }
-        if (!gamePing.isEmpty()) {
-            message.append(gamePing).append(", please indicate your choice with these buttons.");
-        } else {
-            message.append("Please indicate your choice with these buttons.");
-        }
 
-        for (Player player2 : playersToFollow) {
-            if (winnuHero) {
-                continue;
-            }
-            player2.removeFollowedSC(scToPlay);
-            player2.getCardsInfoThread(); // force thread to open if closed
-        }
-
-        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
-
-        // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
-        if (!winnuHero) {
-            if (scModel.hasImageFile()) {
-                MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
+            if (!gamePing.isEmpty()) {
+                message.append(gamePing).append(", please indicate your choice with these buttons.");
             } else {
-                baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
+                message.append("Please indicate your choice with these buttons.");
+            }
+
+            for (Player player2 : playersToFollow) {
+                player2.removeFollowedSC(scToPlay);
+                player2.getCardsInfoThread(); // force thread to open if closed
+            }
+
+            if (!winnuHero) {
+                game.setSCPlayed(scToPlay, true);
+                // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
+                if (scModel.hasImageFile()) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
+                } else {
+                    baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
+                }
             }
         }
+
         baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, player));
-        if (scModel.usesAutomationForSCID("pok7technology")
-                && !game.isFowMode()
-                && Helper.getPlayerFromAbility(game, "propagation") != null) {
-            scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
-        }
+        if (isOverrule) {
+            scButtons.removeIf(button -> {
+                String id = button.getCustomId();
+                return id != null
+                        && (id.startsWith("sc_follow_")
+                                || "sc_trade_follow".equals(id)
+                                || id.startsWith("sc_no_follow_"));
+            });
+            String ffcc = player.getFinsFactionCheckerPrefix();
+            scButtons.replaceAll(button -> {
+                String id = button.getCustomId();
+                if (id != null && !id.startsWith(ffcc)) {
+                    return button.withCustomId(ffcc + id);
+                }
+                return button;
+            });
+        } else {
+            Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
+            if (propagationPlayer != null) {
+                boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology")
+                        && !game.isFowMode()
+                        && !player.equals(propagationPlayer);
+                if (shouldAddNekroTechButton) {
+                    String ffcc = propagationPlayer.getFinsFactionCheckerPrefix();
+                    scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
+                }
+            }
 
-        if ((scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
-                && !game.isFowMode()
-                && !ButtonHelper.isLawInPlay(game, "articles_war")
-                && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
-            scButtons.add(Buttons.gray(
-                    "titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));
+            Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
+            if (titansMechPlayer != null) {
+                boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
+                                || scModel.usesAutomationForSCID("te4construction"))
+                        && !game.isFowMode()
+                        && !ButtonHelper.isLawInPlay(game, "articles_war")
+                        && !player.equals(titansMechPlayer);
+                if (shouldAddTitansMechDeployButton) {
+                    String ffcc = titansMechPlayer.getFinsFactionCheckerPrefix();
+                    scButtons.add(Buttons.gray(
+                            ffcc + "titansConstructionMechDeployStep1",
+                            "Deploy Titan Mech + Infantry",
+                            FactionEmojis.Titans));
+                }
+            }
+
+            scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
         }
-        scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
@@ -262,7 +286,7 @@ public class PlayStrategyCardService {
             TeHelperTechs.initializePlanesplitterStep1(game, player);
         }
 
-        if (scModel.usesAutomationForSCID("pok5trade")) {
+        if (!isOverrule && scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                     + " This is not required, and not advised if you are offering them a conditional replenishment.";
@@ -318,7 +342,7 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
+        if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
@@ -337,8 +361,7 @@ public class PlayStrategyCardService {
                             empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent")
-                        && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()
-                        && !winnuHero) {
+                        && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()) {
                     if (scModel.usesAutomationForSCID("pok6warfare")
                             && ButtonHelper.getTilesWithYourCC(player, game, event)
                                             .size()
@@ -405,7 +428,10 @@ public class PlayStrategyCardService {
                             + "a tactical action, we advise you just click the \"Do Another Action\" button, and when you do the primary of **Warfare**, gain an extra command token "
                             + "into your tactic pool, to account for the tactical action spending from reinforcements.");
         }
-        if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
+        if (player.ownsPromissoryNote("acq")
+                && !scModel.usesAutomationForSCID("pok1leadership")
+                && !winnuHero
+                && !isOverrule) {
             for (Player player2 : playersToFollow) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
@@ -422,6 +448,7 @@ public class PlayStrategyCardService {
                 }
             }
         }
+
         if (player.isNpc()) {
             EndTurnService.endTurnAndUpdateMap(event, game, player);
         }
