@@ -45,10 +45,12 @@ class RunAgainstAllGames extends Subcommand {
         if (game.getEndedDate() != 0) return false;
         if (!game.isHasEnded()) return false;
 
-        LocalDateTime createdDate = Instant.ofEpochMilli(game.getCreationDateTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        long fakedEndDate = createdDate.plusMonths(3).toInstant(ZoneOffset.UTC).toEpochMilli();
+        Instant creationInstant = Instant.ofEpochMilli(game.getCreationDateTime());
+        long fakedEndDate = creationInstant
+                .atZone(ZoneOffset.UTC)
+                .plusMonths(3)
+                .toInstant()
+                .toEpochMilli();
         game.setEndedDate(fakedEndDate);
 
         changedGames.add(game.getName());
