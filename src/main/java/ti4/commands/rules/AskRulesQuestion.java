@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
@@ -39,14 +38,17 @@ class AskRulesQuestion extends Subcommand {
                 .addContent(message)
                 .setAllowedMentions(Collections.emptyList())
                 .build();
-        rulesChannel.sendMessage(messageData).queue(
-                sentMessage -> MessageHelper.sendMessageToEventChannel(
-                        event, "Your question has been sent to the " + rulesChannel.getJumpUrl() + " channel."),
-                throwable -> {
-                    BotLogger.catchRestError(throwable);
-                    MessageHelper.sendMessageToEventChannel(
-                            event,
-                            "Failed to send your question to the " + RULES_CHANNEL_NAME + " channel: " + throwable.getMessage());
-                });
+        rulesChannel
+                .sendMessage(messageData)
+                .queue(
+                        sentMessage -> MessageHelper.sendMessageToEventChannel(
+                                event, "Your question has been sent to the " + rulesChannel.getJumpUrl() + " channel."),
+                        throwable -> {
+                            BotLogger.catchRestError(throwable);
+                            MessageHelper.sendMessageToEventChannel(
+                                    event,
+                                    "Failed to send your question to the " + RULES_CHANNEL_NAME + " channel: "
+                                            + throwable.getMessage());
+                        });
     }
 }

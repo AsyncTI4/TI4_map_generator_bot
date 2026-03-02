@@ -99,8 +99,7 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = player.getPlanets().stream()
                 .map(planet -> Buttons.green(
-                        "defenseInstallationStep2_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)))
+                        "defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)))
                 .toList();
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannelWithButtons(
