@@ -17,7 +17,7 @@
     <java.version>21</java.version>
     <jda.version>6.3.0</jda.version>
     <aws.sdk.version>2.42.4</aws.sdk.version>
-    <hibernate-dialects.version>${hibernate.version}</hibernate-dialects.version>
+    <hibernate-dialects.version>7.2.6.Final</hibernate-dialects.version>
     <reflections.version>0.10.2</reflections.version>
     <jskills.version>1.1</jskills.version>
     <webp-imageio.version>0.10.2</webp-imageio.version>
