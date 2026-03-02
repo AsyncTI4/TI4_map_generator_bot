@@ -66,9 +66,6 @@ public class PlayStrategyCardService {
             Player player,
             boolean winnuHero,
             boolean isOverrule) {
-        StrategyCardModel scModel =
-                game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
-
         String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
             MessageHelper.sendMessageToChannel(
@@ -77,7 +74,7 @@ public class PlayStrategyCardService {
         }
 
         // HANDLE COUP
-        if (!winnuHero && game.getStoredValue("Coup").contains("_" + scToPlay)) {
+        if (!winnuHero && !isOverrule && game.getStoredValue("Coup").contains("_" + scToPlay)) {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("Coup").contains(p2.getFaction())
                         && p2.getPlayableActionCards().contains("coup")) {
@@ -108,20 +105,20 @@ public class PlayStrategyCardService {
                 game.getStoredValue("currentActionSummary" + player.getFaction()) + " played "
                         + game.getSCEmojiWordRepresentation(scToPlay));
 
-        if (!winnuHero) {
-            game.setSCPlayed(scToPlay, true);
-        }
-
         StringBuilder message = new StringBuilder();
-        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? "overruled" : " played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
         message.append(".\n\n");
 
+        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
+
+        StrategyCardModel scModel =
+                game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
+        List<Player> playersToFollow = isOverrule ? Collections.emptyList() : game.getRealPlayers();
         if (!isOverrule) {
             StringBuilder gamePing = new StringBuilder(game.getPing());
-            List<Player> playersToFollow = game.getRealPlayers();
             if (!"All".equals(scModel.getGroup().orElse(""))
                     && ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName()))) {
                 playersToFollow = new ArrayList<>();
@@ -139,6 +136,7 @@ public class PlayStrategyCardService {
                     }
                 }
             }
+
             if (!gamePing.isEmpty()) {
                 message.append(gamePing).append(", please indicate your choice with these buttons.");
             } else {
@@ -150,18 +148,18 @@ public class PlayStrategyCardService {
                 player2.getCardsInfoThread(); // force thread to open if closed
             }
 
-            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
-
-            // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
             if (!winnuHero) {
+                game.setSCPlayed(scToPlay, true);
+                // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
                 if (scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
                 } else {
                     baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
                 }
             }
-            baseMessageObject.addContent(message.toString());
         }
+
+        baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, player));
@@ -288,7 +286,7 @@ public class PlayStrategyCardService {
             TeHelperTechs.initializePlanesplitterStep1(game, player);
         }
 
-        if (scModel.usesAutomationForSCID("pok5trade")) {
+        if (!isOverrule && scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                     + " you may force players to replenish commodities. This is normally done in order to trigger a _Trade Agreement_ or because of a pre-existing deal."
                     + " This is not required, and not advised if you are offering them a conditional replenishment.";
@@ -344,7 +342,7 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
+        if (!scModel.usesAutomationForSCID("pok1leadership") && !winnuHero && !isOverrule) {
             Button emelpar = Buttons.red("scepterE_follow_" + scToPlay, "Exhaust " + RelicHelper.sillySpelling());
             for (Player player3 : playersToFollow) {
                 if (player3 == player) {
@@ -363,8 +361,7 @@ public class PlayStrategyCardService {
                             empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent")
-                        && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()
-                        && !winnuHero) {
+                        && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty()) {
                     if (scModel.usesAutomationForSCID("pok6warfare")
                             && ButtonHelper.getTilesWithYourCC(player, game, event)
                                             .size()
@@ -431,7 +428,10 @@ public class PlayStrategyCardService {
                             + "a tactical action, we advise you just click the \"Do Another Action\" button, and when you do the primary of **Warfare**, gain an extra command token "
                             + "into your tactic pool, to account for the tactical action spending from reinforcements.");
         }
-        if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
+        if (player.ownsPromissoryNote("acq")
+                && !scModel.usesAutomationForSCID("pok1leadership")
+                && !winnuHero
+                && !isOverrule) {
             for (Player player2 : playersToFollow) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
@@ -448,6 +448,7 @@ public class PlayStrategyCardService {
                 }
             }
         }
+
         if (player.isNpc()) {
             EndTurnService.endTurnAndUpdateMap(event, game, player);
         }
