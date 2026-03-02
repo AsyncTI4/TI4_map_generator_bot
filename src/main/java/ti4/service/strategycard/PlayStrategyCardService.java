@@ -31,7 +31,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.message.logging.LogOrigin;
 import ti4.model.StrategyCardModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.breakthrough.MindsieveService;
@@ -65,26 +64,10 @@ public class PlayStrategyCardService {
             Game game,
             MessageChannel mainGameChannel,
             Player player,
-            boolean winnuHero) {
-        playSC(event, scToPlay, game, mainGameChannel, player, winnuHero, false);
-    }
-
-    public static void playSC(
-            GenericInteractionCreateEvent event,
-            Integer scToPlay,
-            Game game,
-            MessageChannel mainGameChannel,
-            Player player,
             boolean winnuHero,
             boolean isOverrule) {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
-        if (scModel == null) { // Temporary Error Reporting
-            BotLogger.warning(
-                    new LogOrigin(player),
-                    "`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `"
-                            + scToPlay + "` from set `" + game.getScSetID() + "`");
-        }
 
         String stratCardName = Helper.getSCName(scToPlay, game);
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
@@ -193,21 +176,19 @@ public class PlayStrategyCardService {
             String ffcc = player.getFinsFactionCheckerPrefix();
             scButtons.replaceAll(button -> {
                 String id = button.getCustomId();
-                if (id != null && !id.startsWith("FFCC_")) {
+                if (id != null && !id.startsWith(ffcc)) {
                     return button.withCustomId(ffcc + id);
                 }
                 return button;
             });
         }
-        if (!isOverrule && scModel.usesAutomationForSCID("pok7technology")
+        if (scModel.usesAutomationForSCID("pok7technology")
                 && !game.isFowMode()
                 && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
 
-        if (!isOverrule
-                && (scModel.usesAutomationForSCID("pok4construction")
-                        || scModel.usesAutomationForSCID("te4construction"))
+        if ((scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
                 && !game.isFowMode()
                 && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && Helper.getPlayerFromUnit(game, "titans_mech") != null) {

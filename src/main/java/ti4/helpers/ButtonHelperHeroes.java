@@ -2703,8 +2703,7 @@ public class ButtonHelperHeroes {
     public static void resolveWinnuHeroSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int sc = Integer.parseInt(buttonID.split("_")[1]);
         boolean isOverrule = buttonID.contains("overrule");
-        PlayStrategyCardService.playSC(
-                event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
+        PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
         if (isOverrule) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
