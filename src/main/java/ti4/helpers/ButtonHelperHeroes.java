@@ -2704,16 +2704,12 @@ public class ButtonHelperHeroes {
         int sc = Integer.parseInt(buttonID.split("_")[1]);
         boolean isOverrule = buttonID.contains("overrule");
         PlayStrategyCardService.playSC(event, sc, game, game.getMainGameChannel(), player, true, isOverrule);
-        if (isOverrule) {
+        if (isOverrule && sc == 5 && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
-                    game.getPing()
-                            + ", only the _Overrule_ player resolves the strategy card. Other players cannot perform the secondary."
-                            + (sc == 5 && !game.isFowMode()
-                                    ? "\n" + player.getRepresentationUnfogged()
-                                            + ", you __cannot__ replenish other players' commodities."
-                                    : ""));
-        } else {
+                    player.getRepresentationUnfogged() + ", you __cannot__ replenish other players' commodities.");
+        }
+        if (!isOverrule) {
             if ("leadership".equalsIgnoreCase(Helper.getSCName(sc, game))) {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),

@@ -162,7 +162,7 @@ public class PlayStrategyCardService {
         baseMessageObject.addContent(message.toString());
 
         // GET BUTTONS
-        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, player));
+        List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, isOverrule, player));
         if (isOverrule) {
             scButtons.removeIf(button -> {
                 String id = button.getCustomId();
@@ -706,7 +706,7 @@ public class PlayStrategyCardService {
         }
     }
 
-    private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, Player player) {
+    private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, boolean isOverrule, Player player) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {
             return getGenericButtons(sc);
@@ -715,7 +715,7 @@ public class PlayStrategyCardService {
         String scAutomationID = scModel.getBotSCAutomationID();
 
         // Handle Special Cases
-        if ("pok8imperial".equals(scAutomationID)) {
+        if (!isOverrule && "pok8imperial".equals(scAutomationID)) {
             handleSOQueueing(game, winnuHero);
         }
 
