@@ -199,13 +199,15 @@ public class PlayStrategyCardService {
                 return button;
             });
         }
-        if (scModel.usesAutomationForSCID("pok7technology")
+        if (!isOverrule && scModel.usesAutomationForSCID("pok7technology")
                 && !game.isFowMode()
                 && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
 
-        if ((scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
+        if (!isOverrule
+                && (scModel.usesAutomationForSCID("pok4construction")
+                        || scModel.usesAutomationForSCID("te4construction"))
                 && !game.isFowMode()
                 && !ButtonHelper.isLawInPlay(game, "articles_war")
                 && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
