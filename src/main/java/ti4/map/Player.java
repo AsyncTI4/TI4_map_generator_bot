@@ -2579,9 +2579,17 @@ public class Player extends PlayerProperties {
                     + ". Your _Extract_ plot card allows you to gain this technology for yourself by paying 4 resources.";
 
             List<Button> buttons2 = new ArrayList<>();
-            buttons2.add(Buttons.green("acquireATechdeleteThisMessage", "Get a Technology"));
+            buttons2.add(Buttons.green(
+                    "getTech_" + Mapper.getTech(techID).getAlias() + "__noPay",
+                    Mapper.getTech(techID).getName()));
             buttons2.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCorrectChannel(), msg, buttons2);
+            MessageHelper.sendMessageToChannelWithButtons(obsidian.getCardsInfoThread(), msg, buttons2);
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, obsidian, "res");
+            Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+            buttons.add(doneExhausting);
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    obsidian.getCardsInfoThread(), "You can use these buttons to pay the 4 resources.", buttons);
         }
     }
 

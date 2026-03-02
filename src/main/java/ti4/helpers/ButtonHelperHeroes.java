@@ -2796,7 +2796,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         String message =
                 player.getRepresentation() + ", please choose the objective that you wish to attach your hero to."
-                        + " You will gain two command tokens whenever another player scores it, and the player(s) with the fewest victory points will not need to meet its requirements in order to score it.";
+                        + " You will draw 1 secret objective whenever another player scores it, and the player(s) with the fewest victory points will not need to meet its requirements in order to score it.";
         for (String obj : game.getRevealedPublicObjectives().keySet()) {
             if (Mapper.getPublicObjective(obj) != null) {
                 buttons.add(Buttons.gray(

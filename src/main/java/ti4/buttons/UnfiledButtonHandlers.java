@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.countMatches;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -2318,7 +2316,22 @@ public class UnfiledButtonHandlers {
                 if (player.hasUnlockedBreakthrough("ghostbt")
                         && tile != null
                         && !tile.getWormholes(game).isEmpty()) {
-                    player.addSpentThing("ghostbt" + tile.getWormholes(game).size());
+                    Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
+                    int adjust = 0;
+                    for (Map.Entry<String, Integer> entry : producedUnits.entrySet()) {
+                        String unit2 = entry.getKey().split("_")[0];
+                        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit2), player.getColor());
+                        UnitModel producedUnit =
+                                player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
+
+                        if (UnitType.Flagship == producedUnit.getUnitType() && player.ownsUnit("creuss_flagship")) {
+                            adjust = 1;
+                        }
+                    }
+                    if (tile.getWormholes(game).size() - adjust > 0) {
+                        player.addSpentThing(
+                                "ghostbt" + (tile.getWormholes(game).size() - adjust));
+                    }
                 }
                 // ButtonHelper.updateMap(game, event,
                 // "Result of build on turn " + player.getInRoundTurnCount() + " for " +

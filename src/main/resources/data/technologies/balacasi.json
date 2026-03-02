@@ -54,7 +54,7 @@
         "requirements": "GGG",
         "faction": "arachian",
         "source": "other",
-        "text": "ACTION: Exhaust this card to perform a tactical action in a non-home system that contains your units and one of your Command Tokens. "
+        "text": "During your tactical actions, you can activate systems that contain your command tokens and no other player’s ships. Your systems can contain more than one of your command tokens."
     },
     {
         "alias": "araracy",
@@ -65,7 +65,7 @@
         "requirements": "Y",
         "faction": "arachian",
         "source": "other",
-        "text": "At the end of your turn, you may exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens. "
+        "text": "ACTION: Exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens."
     },
     {
         "alias": "arzooig",

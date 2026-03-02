@@ -220,6 +220,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
+        "notes": "Other players can allow the sleepers to be placed at any time, without a transaction or explore necessary.",
         "text": "When COALESCENCE results in a ground combat, if you commit no other units, you may choose for your units to coexist instead. During the status phase, for each player you are coexisting with, you and that player each draw 1 additional action card. \nOther players may allow you to place a sleeper token on a planet they control.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/titansbt.png?raw=true",
         "source": "thunders_edge"
@@ -259,6 +260,7 @@
             "BIOTIC",
             "CYBERNETIC"
         ],
+        "notes": "This ability is affected by Jol Nar's synergy. Greens count as yellow and vice versa.",
         "text": "When you research technology using the 'Technology' strategy card, you may exhaust a planet that has a technology specialty instead of spending resources; if you do, you must research a technology of that color.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/jolnarbt.png?raw=true",
         "source": "thunders_edge"
@@ -284,6 +286,7 @@
             "CYBERNETIC",
             "WARFARE"
         ],
+        "notes": "The ships placed are only checked against fleet and capacity limits in the final system, not the original system.",
         "text": "When you produce ships, you may exhaust this card to place those ships in a system that contains 1 of your command tokens, at least 1 of your ground forces, and no other player's ships.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/bastionbt.png?raw=true",
         "source": "thunders_edge"
@@ -297,6 +300,7 @@
             "PROPULSION",
             "WARFARE"
         ],
+        "notes": "If you run out of breaches in your reinforcements, you can pull inactive breaches from the board to use instead. You cannot pull active breaches.",
         "text": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system or in a system that contains an active breach.\nACTION: Exhaust this card to flip any breach or to place an active breach in a non-home system that contains your units.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/crimsonbt.png?raw=true",
         "source": "thunders_edge"
@@ -311,7 +315,7 @@
             "BIOTIC"
         ],
         "text": "When you have 4 mechs in the same system, you may return 3 of those mechs to your reinforcements to flip this card and place it on top of your mech card.\nEidolon Maximum: [Combat 4 (x4), Move 3, Sustain Damage] This unit is both a ship and ground force. It cannot be assigned hits from unit abilities. Repair it at the start of every combat round. Game effects cannot place or produce your mechs. When this unit is destroyed or removed, flip this card and return it to your play area.",
-        "notes": "The Eidolon Maximum will participate in space combat even while on a planet if its owner has ships in the system.",
+        "notes": "The Eidolon Maximum will participate in space combat even while on a planet if its owner has ships in the system. Async is currently ruling it can be moved around with transit diodes, and is unaffected by the agenda Articles of War.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/breakthrough/naazbt.png?raw=true",
         "source": "thunders_edge"
     },

@@ -635,7 +635,7 @@ public class StartCombatService {
                 false);
     }
 
-    private static void offerRedGhostCommanderButtons(
+    public static void offerRedGhostCommanderButtons(
             Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")
                 || game.playerHasLeaderUnlockedOrAlliance(player, "crimsoncommander")) {
@@ -644,8 +644,7 @@ public class StartCombatService {
                     + " with Ahk Siever, the Rebellion commander."
                     + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
     }
 
@@ -1539,7 +1538,7 @@ public class StartCombatService {
         if (p1.hasUnlockedBreakthrough("sardakkbt")) {
             buttons.add(Buttons.gray(
                     p1.getFinsFactionCheckerPrefix() + "sardakkbtRes",
-                    "Resolve N'orr Breakthrough (Upon Win)",
+                    "Resolve Sardakk Breakthrough (Upon Win)",
                     FactionEmojis.Sardakk));
         }
         if (p1.hasUnit("pinktf_mech") && isGroundCombat) {
@@ -1552,7 +1551,7 @@ public class StartCombatService {
         if (p2.hasUnlockedBreakthrough("sardakkbt") && !game.isFowMode()) {
             buttons.add(Buttons.gray(
                     p2.getFinsFactionCheckerPrefix() + "sardakkbtRes",
-                    "Resolve N'orr Breakthrough (Upon Win)",
+                    "Resolve Sardakk Breakthrough (Upon Win)",
                     FactionEmojis.Sardakk));
         }
         if (p2.hasUnit("pinktf_mech") && isGroundCombat && !game.isFowMode()) {

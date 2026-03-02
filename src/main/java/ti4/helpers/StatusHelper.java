@@ -586,7 +586,7 @@ public class StatusHelper {
 
     public static void sendRemoveBreachButtons(Game game) {
         Predicate<Tile> hasBreach = t -> t.getSpaceUnitHolder().getTokenList().contains(Constants.TOKEN_BREACH_ACTIVE);
-        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasShipsInSystem(p, t));
+        Function<Player, Predicate<Tile>> hasPlayerShips = p -> (t -> FoWHelper.playerHasActualShipsInSystem(p, t));
         for (Player p : game.getRealPlayers()) {
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(
                     p, game, "statusRemoveBreach", hasBreach.and(hasPlayerShips.apply(p)), false);
