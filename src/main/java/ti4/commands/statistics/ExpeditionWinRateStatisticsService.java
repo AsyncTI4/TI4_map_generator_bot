@@ -35,6 +35,7 @@ class ExpeditionWinRateStatisticsService {
         WinRateCount lastExpeditionStats = new WinRateCount();
         WinRateCount thundersEdgeControlStats = new WinRateCount();
         int[] gamesThatDidNotFinishExpeditionsVersusDid = {0, 0};
+        int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough = {0, 0};
 
         GamesPage.consumeAllGames(
                 ExpeditionWinRateStatisticsService::isEligibleGame,
@@ -45,7 +46,8 @@ class ExpeditionWinRateStatisticsService {
                         expeditionCountStats,
                         lastExpeditionStats,
                         thundersEdgeControlStats,
-                        gamesThatDidNotFinishExpeditionsVersusDid));
+                        gamesThatDidNotFinishExpeditionsVersusDid,
+                        playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough));
 
         StringBuilder sb = new StringBuilder("__**Thunder's Edge Win Rate Correlations**__\n");
 
@@ -103,6 +105,21 @@ class ExpeditionWinRateStatisticsService {
                 .append(percent)
                 .append("%)\n");
 
+        sb.append("\n**Players with their breakthrough but no expedition followed**\n");
+        int playersWithBreakthroughWithoutExpedition =
+                playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough[0];
+        int playersWithBreakthrough = playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough[1];
+        long playerPercent = playersWithBreakthrough > 0
+                ? Math.round(playersWithBreakthroughWithoutExpedition * 100.0 / playersWithBreakthrough)
+                : 0;
+        sb.append("- ")
+                .append(playersWithBreakthroughWithoutExpedition)
+                .append("/")
+                .append(playersWithBreakthrough)
+                .append(" (")
+                .append(playerPercent)
+                .append("%)\n");
+
         MessageHelper.sendMessageToThread(
                 (MessageChannelUnion) event.getMessageChannel(), "Thunder's Edge expedition win rates", sb.toString());
     }
@@ -135,7 +152,8 @@ class ExpeditionWinRateStatisticsService {
             Map<Integer, WinRateCount> expeditionCountStats,
             WinRateCount lastExpeditionStats,
             WinRateCount thundersEdgeControlStats,
-            int[] gamesThatDidNotFinishExpeditionsVersusDid) {
+            int[] gamesThatDidNotFinishExpeditionsVersusDid,
+            int[] playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough) {
 
         Player winner = game.getWinner().orElse(null);
         if (winner == null) {
@@ -180,6 +198,13 @@ class ExpeditionWinRateStatisticsService {
                     .filter(entry -> checkFactionsEqual(faction, entry.getValue()))
                     .map(Map.Entry::getKey)
                     .toList();
+
+            if (hasTheirBreakthrough(player)) {
+                playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough[1] += 1;
+                if (completedExpeditions.isEmpty()) {
+                    playersWithBreakthroughWithoutExpeditionVersusWithBreakthrough[0] += 1;
+                }
+            }
 
             WinRateCount count =
                     expeditionCountStats.computeIfAbsent(completedExpeditions.size(), key -> new WinRateCount());
@@ -267,6 +292,14 @@ class ExpeditionWinRateStatisticsService {
 
         Set<String> factions = Set.of(faction1, faction2);
         return FIRMAMENT_AND_OBSIDIAN_FACTION_NAMES.equals(factions);
+    }
+
+    private static boolean hasTheirBreakthrough(Player player) {
+        var factionModel = player.getFactionModel();
+        if (factionModel == null) {
+            return false;
+        }
+        return player.hasBreakthrough(factionModel.getBreakthrough());
     }
 
     private static String toExpeditionLabel(String expeditionKey) {
