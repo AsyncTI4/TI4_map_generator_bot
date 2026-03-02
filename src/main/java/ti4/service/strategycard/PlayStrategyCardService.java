@@ -190,6 +190,14 @@ public class PlayStrategyCardService {
                                 || "sc_trade_follow".equals(id)
                                 || id.startsWith("sc_no_follow_"));
             });
+            String ffcc = player.getFinsFactionCheckerPrefix();
+            scButtons.replaceAll(button -> {
+                String id = button.getCustomId();
+                if (id != null && !id.startsWith("FFCC_")) {
+                    return button.withCustomId(ffcc + id);
+                }
+                return button;
+            });
         }
         if (scModel.usesAutomationForSCID("pok7technology")
                 && !game.isFowMode()
