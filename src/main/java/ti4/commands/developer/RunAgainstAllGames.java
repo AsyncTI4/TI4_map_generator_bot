@@ -1,10 +1,7 @@
 package ti4.commands.developer;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,8 +26,7 @@ class RunAgainstAllGames extends Subcommand {
 
         Set<String> changedGames = new HashSet<>();
         GamesPage.consumeAllGames(game -> {
-            boolean changed = makeChanges(game, changedGames);
-            if (changed) {
+            if (makeChanges(game)) {
                 changedGames.add(game.getName());
                 GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
             }
@@ -41,19 +37,15 @@ class RunAgainstAllGames extends Subcommand {
                 + " games: " + String.join(", ", changedGames));
     }
 
-    private static boolean makeChanges(Game game, Collection<String> changedGames) {
+    private static boolean makeChanges(Game game) {
         if (game.getEndedDate() != 0) return false;
         if (!game.isHasEnded()) return false;
 
         Instant creationInstant = Instant.ofEpochMilli(game.getCreationDateTime());
-        long fakedEndDate = creationInstant
-                .atZone(ZoneOffset.UTC)
-                .plusMonths(3)
-                .toInstant()
-                .toEpochMilli();
+        long fakedEndDate =
+                creationInstant.atZone(ZoneOffset.UTC).plusMonths(3).toInstant().toEpochMilli();
         game.setEndedDate(fakedEndDate);
 
-        changedGames.add(game.getName());
         return true;
     }
 }
