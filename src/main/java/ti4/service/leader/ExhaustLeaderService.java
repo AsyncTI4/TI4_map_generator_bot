@@ -21,7 +21,7 @@ public class ExhaustLeaderService {
     public static void exhaustLeader(Game game, Player player, Leader leader, Integer tgCount) {
         leader.setExhausted(true);
         LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
-        String message = player.getRepresentation() + " exhausted: ";
+        String message = "Exhausted: ";
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),

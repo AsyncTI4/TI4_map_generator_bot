@@ -38,6 +38,7 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -501,9 +502,15 @@ public class ActionCardHelper {
         return acButtons;
     }
 
-    public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
-        List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
-        String msg = player.getRepresentationUnfogged() + " use buttons to discard an action card.";
+    public static void sendACDiscardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtons(player, false);
+        String msg = player.getRepresentationUnfogged() + ", discard 1 action card.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void sendSchemingDiscardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtons(player, false);
+        String msg = player.getRepresentationUnfogged() + ", discard an action card due to **Scheming**.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -602,30 +609,54 @@ public class ActionCardHelper {
         sendActionCardInfo(game, player);
     }
 
-    public static void drawActionCards(Game game, Player player, int count, boolean resolveAbilities) {
+    public static void drawActionCards(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, true, true, false);
+    }
+
+    public static void drawActionCardsNoAutonetic(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, true, false, false);
+    }
+
+    public static void drawActionCardsNoAbilities(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, false, false, false);
+    }
+
+    public static void drawActionCardsSilent(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, true, true, true);
+    }
+
+    private static void drawActionCards(
+            Game game, Player player, int count, boolean scheming, boolean autonetic, boolean silent) {
         if (count > 10) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
+        if (autonetic && player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            return;
+        }
+
         String message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s") + ".";
-        if (resolveAbilities && player.hasAbility("scheming")) {
+        if (scheming && player.hasAbility("scheming")) {
             count++;
             message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s")
                     + " (including one extra because of **Scheming**).";
-        }
-        if (resolveAbilities && player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-            return;
         }
         game.drawActionCard(player.getUserID(), count);
 
         sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, player);
-        if (resolveAbilities && player.hasAbility("scheming")) sendDiscardActionCardButtons(player, false);
+        if (scheming && player.hasAbility("scheming")) {
+            DeepgloomService.spendOneDebt(game, player, "scheming");
+            sendSchemingDiscardButtons(player);
+        }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+
+        if (!silent) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
     }
 
     public static String resolveActionCard(
@@ -1018,6 +1049,12 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("alliance_rider".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "allianceRiderRandomAlly", "Random Ally"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("innovation".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1176,6 +1213,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
+            if ("oracle".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveOracle", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("ancient_trade_routes".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAncientTradeRoutes", buttonLabel));
@@ -1230,6 +1272,18 @@ public class ActionCardHelper {
                         player.getFinsFactionCheckerPrefix() + "resolveDefenseInstallation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("cache".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCache", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("simulacrum".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSimulacrum", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
             if ("harness".equals(automationID)) {

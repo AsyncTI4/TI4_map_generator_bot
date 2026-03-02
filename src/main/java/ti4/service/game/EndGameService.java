@@ -241,6 +241,13 @@ public class EndGameService {
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
+                                    if (game.getBotMapUpdatesThreadID() != null && game.getGuild() != null) {
+                                        RepositoryDispatchEvent.generateVideo(
+                                                game.getName(),
+                                                game.getBotMapUpdatesThreadID(),
+                                                t.getId(),
+                                                game.getGuild().getId());
+                                    }
                                 });
                                 MessageHelper.sendMessageToChannel(
                                         event.getMessageChannel(),

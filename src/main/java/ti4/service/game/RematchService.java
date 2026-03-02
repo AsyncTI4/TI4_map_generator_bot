@@ -69,7 +69,7 @@ public class RematchService {
                 }
             }
 
-            Set<Permission> allow = Set.of(Permission.MESSAGE_MANAGE, Permission.VIEW_CHANNEL);
+            Set<Permission> allow = Set.of(Permission.PIN_MESSAGES, Permission.VIEW_CHANNEL);
             tableTalkChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
             actionsChannel.getManager().putRolePermissionOverride(gameRole.getIdLong(), allow, null);
         }

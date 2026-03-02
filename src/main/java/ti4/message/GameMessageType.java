@@ -9,5 +9,6 @@ public enum GameMessageType {
     TURN,
     BAG_DRAFT,
     STATUS_SCORING,
-    STATUS_END
+    STATUS_END,
+    VISIONARIA
 }

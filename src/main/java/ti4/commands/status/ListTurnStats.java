@@ -46,7 +46,7 @@ class ListTurnStats extends GameStateSubcommand {
             message.append("\n").append(turnString);
             if (min.map(player::is).orElse(false)) message.append(" 🐇");
             else if (max.map(player::is).orElse(false)) message.append(" 🐢");
-            else if (maxTime != null && maxTime < 30 * 60000) message.append(" 🐢"); // 30 minutes
+            else if (maxTime != null && maxTime < 30 * 60_000) message.append(" 🐢"); // 30 minutes
         }
         if (players.isEmpty()) {
             message.append("\n> Nobody has taken a turn yet :)");

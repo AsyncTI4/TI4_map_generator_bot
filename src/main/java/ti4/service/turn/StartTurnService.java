@@ -1,9 +1,13 @@
 package ti4.service.turn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -26,6 +30,7 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.GameMessageManager;
+import ti4.message.GameMessageManager.GameMessage;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
@@ -34,6 +39,7 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.breakthrough.EidolonMaximumService;
+import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
@@ -337,6 +343,8 @@ public class StartTurnService {
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
+
+        Map<Long, String> thingsToFollow = new LinkedHashMap<>();
         for (int sc : game.getPlayedSCsInOrder(player)) {
             if (game.getStrategyCardModelByInitiative(sc)
                     .map(strat -> "te6warfare".equals(strat.getAlias()))
@@ -357,15 +365,43 @@ public class StartTurnService {
                     }
                 }
             }
+
             if (!player.hasFollowedSC(sc)) {
-                sb.append("> ").append(game.getSCEmojiWordRepresentation(sc));
-                if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                    sb.append(" ").append(game.getStoredValue("scPlay" + sc));
+                String msg = "> " + game.getSCEmojiWordRepresentation(sc);
+                String jumplink = game.getStoredValue("scPlay" + sc);
+                if (!jumplink.isEmpty()) {
+                    msg += " " + jumplink + "\n";
+                    Long id = Long.parseLong(Arrays.asList(jumplink.split("/")).getLast());
+                    thingsToFollow.put(id, msg);
+                } else {
+                    sb.append(msg).append("\n");
                 }
-                sb.append("\n");
                 sendReminder = true;
             }
         }
+        for (Player dws : game.getPlayersFromBreakthrough("deepwroughtbt")) {
+            if (dws.isBreakthroughExhausted("deepwroughtbt")) {
+                if (!VisionariaSelectService.hasRespondedToVisionaria(game, player)) {
+                    GameMessage gm = GameMessageManager.getOne(game.getName(), GameMessageType.VISIONARIA)
+                            .orElse(null);
+                    String msgPart = "> " + VisionariaSelectService.visionariaRep();
+                    if (gm != null) {
+                        Long id = Long.parseLong(gm.messageId());
+                        String jumplink = gm.asJumpLink(game.getMainGameChannel());
+                        thingsToFollow.put(id, msgPart + " " + jumplink + "\n");
+                    } else {
+                        sb.append(msgPart).append("\n");
+                    }
+                    sendReminder = true;
+                }
+                break;
+            }
+        }
+
+        thingsToFollow.entrySet().stream()
+                .sorted(Comparator.comparing(Entry::getKey))
+                .map(Entry::getValue)
+                .forEach(sb::append);
         sb.append("You currently have ")
                 .append(player.getStrategicCC())
                 .append(" command token")
@@ -501,29 +537,51 @@ public class StartTurnService {
             }
 
             startButtons.add(ButtonHelper.getPassButton(game, player));
-            if (!game.isFowMode()) {
-                for (Player p2 : game.getRealPlayers()) {
-                    for (int sc : player.getSCs()) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(p2.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because **")
-                                .append(Helper.getSCName(sc, game))
-                                .append(
-                                        "** has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone.");
+        }
 
-                        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                            sb.append(" Message link is: ")
-                                    .append(game.getStoredValue("scPlay" + sc))
-                                    .append(".\n");
-                        }
-                        sb.append("You currently have ")
-                                .append(p2.getStrategicCC())
-                                .append(" command token")
-                                .append(p2.getStrategicCC() == 1 ? "" : "s")
-                                .append(" in your strategy pool.");
-                        if (!p2.hasFollowedSC(sc)) {
-                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
-                        }
+        // Send notifications for exhausted SCs & other important things
+        if (!doneActionThisTurn && !game.isFowMode()) {
+            for (Player p2 : game.getRealPlayers()) {
+                for (int sc : player.getSCs()) {
+                    if (!player.getExhaustedSCs().contains(sc) || p2.hasFollowedSC(sc)) continue;
+
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(p2.getRepresentationUnfogged());
+                    sb.append(" You are getting this ping because **")
+                            .append(Helper.getSCName(sc, game))
+                            .append("** has been played and now it is their turn again and you haven't reacted.")
+                            .append(" If you already reacted, check if your reaction got undone.");
+
+                    if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
+                        sb.append(" Message link is: ")
+                                .append(game.getStoredValue("scPlay" + sc))
+                                .append(".\n");
+                    }
+                    sb.append("You currently have ")
+                            .append(p2.getStrategicCC())
+                            .append(" command token")
+                            .append(p2.getStrategicCC() == 1 ? "" : "s")
+                            .append(" in your strategy pool.");
+                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
+                }
+                if (player.hasBreakthrough("deepwroughtbt") && player.isBreakthroughExhausted("deepwroughtbt")) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(p2.getRepresentationUnfogged());
+                    sb.append(" You are getting this ping because ")
+                            .append(VisionariaSelectService.visionariaRep())
+                            .append(" has been played and now it is their turn again and you haven't reacted.")
+                            .append(" If you already reacted, check if your reaction got undone.");
+
+                    GameMessage gm = GameMessageManager.getOne(game.getName(), GameMessageType.VISIONARIA)
+                            .orElse(null);
+                    if (gm != null) {
+                        sb.append(" Message link is: ")
+                                .append(gm.asJumpLink(game.getMainGameChannel()))
+                                .append(".\n");
+                    }
+                    sb.append("You currently have ").append(p2.getTg()).append(" trade goods.");
+                    if (!VisionariaSelectService.hasRespondedToVisionaria(game, p2)) {
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                     }
                 }
             }

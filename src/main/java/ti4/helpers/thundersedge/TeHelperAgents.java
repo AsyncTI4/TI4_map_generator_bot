@@ -55,7 +55,7 @@ public class TeHelperAgents {
 
     public static void postRalNelAgentStep1(Game game, Player player) {
         Map<String, Integer> acsBefore = new HashMap<>(player.getActionCards());
-        ActionCardHelper.drawActionCards(game, player, 2, true);
+        ActionCardHelper.drawActionCards(player, 2);
         Map<String, Integer> acsAfter = new HashMap<>(player.getActionCards());
 
         List<Button> buttons = new ArrayList<>();

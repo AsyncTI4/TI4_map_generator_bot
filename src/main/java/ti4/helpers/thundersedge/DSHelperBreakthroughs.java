@@ -225,8 +225,7 @@ public class DSHelperBreakthroughs {
         boolean implemented = TeHelperBreakthroughs.handleBreakthroughExhaust(event, game, p1, buttonID);
 
         if (!implemented) {
-            String unimplemented =
-                    "IDK how to do this yet. " + Constants.jazzPing() + " please implement this breakthrough.";
+            String unimplemented = "IDK how to do this yet. Please resolve manually.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), unimplemented);
         }
     }

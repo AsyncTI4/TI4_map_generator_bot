@@ -132,14 +132,14 @@ public class DeorbitBarrageService {
                 if (p2.hasAbility("data_recovery")) {
                     ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
                 }
+                buttons.add(Buttons.red(
+                        "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
+                        "Assign Hit" + (hits == 1 ? "" : "s")));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                        p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s") + ".",
+                        buttons);
             }
-            buttons.add(Buttons.red(
-                    "getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_bombardment",
-                    "Assign Hit" + (hits == 1 ? "" : "s")));
-            MessageHelper.sendMessageToChannelWithButtons(
-                    game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
-                    p2.getRepresentation() + ", please assign the hits" + (hits == 1 ? "" : "s") + ".",
-                    buttons);
             buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
             Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
             buttons.add(DoneExhausting);

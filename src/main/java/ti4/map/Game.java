@@ -1116,8 +1116,8 @@ public class Game extends GameProperties {
         return StringHelper.unescape(value);
     }
 
-    public void removeStoredValue(String key) {
-        checkingForAllReacts.remove(key);
+    public String removeStoredValue(String key) {
+        return checkingForAllReacts.remove(key);
     }
 
     public void resetCurrentAgendaVotes() {
@@ -1354,8 +1354,8 @@ public class Game extends GameProperties {
         String prevFaction =
                 (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
-        if (lastActivePlayerChange.getTime() < 1000000) {
-            elapsedTime = 60000; // if for some reason the last Active player change was never set, ignore the time
+        if (lastActivePlayerChange.getTime() < 1_000_000) {
+            elapsedTime = 60_000; // if for some reason the last Active player change was never set, ignore the time
         }
         if (prevPlayer != null) {
             long effectiveTurnTime = elapsedTime;
@@ -2674,38 +2674,21 @@ public class Game extends GameProperties {
         List<String> deck = getExplores(reqType, explore);
         String result = null;
 
-        // MIGRATION CODE TODO: Remove this once we are fairly certain no exising games
-        // have an existing empty deck - implemented 2023-07
-        if (deck.isEmpty()) {
-            shuffleDiscardsIntoExploreDeck(reqType);
-            deck = getExplores(reqType, explore);
-            BotLogger.warning(
-                    new LogOrigin(this),
-                    "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
-                            + " deck was empty, shuffling discards into deck.");
-        } // end of migration code
-
         if (!deck.isEmpty()) {
             String id = deck.getFirst();
             discardExplore(id);
             result = id;
         }
 
-        // If deck is empty after draw, auto refresh deck from discard
         if (getExplores(reqType, explore).isEmpty()) {
-            if ("pbd1000".equalsIgnoreCase(getName())) {
-                resetExploresOfCertainType(reqType);
-            } else {
-                shuffleDiscardsIntoExploreDeck(reqType);
-            }
+            shuffleDiscardsIntoExploreDeck(reqType);
         }
         return result;
     }
 
     private void shuffleDiscardsIntoExploreDeck(String reqType) {
         List<String> discardsOfType = getExplores(reqType, discardExplore);
-        List<String> anotherList = new ArrayList<>(discardsOfType);
-        for (String explore : anotherList) {
+        for (String explore : discardsOfType) {
             addExplore(explore);
         }
     }
@@ -4364,16 +4347,16 @@ public class Game extends GameProperties {
         return player;
     }
 
-    @Nullable
-    public Player getPlayerFromBreakthrough(String bt) {
+    public List<Player> getPlayersFromBreakthrough(String bt) {
+        List<Player> hasbt = new ArrayList<>();
         if (bt != null) {
             for (Player player : players.values()) {
                 if (player.hasBreakthrough(bt)) {
-                    return player;
+                    hasbt.add(player);
                 }
             }
         }
-        return null;
+        return hasbt;
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {

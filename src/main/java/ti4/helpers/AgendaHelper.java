@@ -2173,28 +2173,12 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Keleres Rider")) {
-                            boolean scheming = winningR.hasAbility("scheming");
-                            if (winningR.hasAbility("autonetic_memory")) {
-                                ButtonHelperAbilities.autoneticMemoryStep1(game, winningR, 1);
-                            } else {
-                                game.drawActionCard(winningR.getUserID());
-
-                                if (scheming) {
-                                    game.drawActionCard(winningR.getUserID());
-                                    MessageHelper.sendMessageToChannelWithButtons(
-                                            winningR.getCardsInfoThread(),
-                                            winningR.getRepresentationUnfogged() + " use buttons to discard.",
-                                            ActionCardHelper.getDiscardActionCardButtons(winningR, false));
-                                }
-                                ButtonHelper.checkACLimit(game, winningR);
-                                ActionCardHelper.sendActionCardInfo(game, winningR, event);
-                            }
-
                             StringBuilder sb = new StringBuilder(identity);
                             sb.append(" due to having a winning _Keleres Rider_, you have been given");
-                            if (scheming) {
-                                sb.append(
-                                        " 2 action cards  (**Scheming** increases this from the normal 1 action card; discard buttons have been sent to your `#cards-info` thread)");
+                            if (winningR.hasAbility("scheming")) {
+                                sb.append(" 2 action cards  (**Scheming** increases this from the normal")
+                                        .append(" 1 action card; discard buttons have been sent to")
+                                        .append(" your `#cards-info` thread)");
                             } else {
                                 sb.append(" 1 action card");
                             }
@@ -2202,42 +2186,23 @@ public class AgendaHelper {
                                     .append(winningR.gainTG(2))
                                     .append(".");
                             MessageHelper.sendMessageToChannel(channel, sb.toString());
+                            ActionCardHelper.drawActionCardsSilent(winningR, 1);
                             ButtonHelperAbilities.pillageCheck(winningR, game);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, 2);
                         }
                         if (specificVote.contains("Politics Rider")) {
-                            int amount = 3;
-
-                            if (winningR.hasAbility("autonetic_memory")) {
-                                ButtonHelperAbilities.autoneticMemoryStep1(game, winningR, 3);
+                            String message =
+                                    identity + " due to having a winning _Politics Rider_, you have been given ";
+                            if (winningR.hasAbility("scheming")) {
+                                message += "4 action cards (**Scheming** increases this from the normal 1 action ";
+                                message += "card; discard buttons have been sent to your `#cards-info` thread)";
                             } else {
-                                game.drawActionCard(winningR.getUserID());
-                                game.drawActionCard(winningR.getUserID());
-                                game.drawActionCard(winningR.getUserID());
-                                ButtonHelper.checkACLimit(game, winningR);
-                                if (winningR.hasAbility("scheming")) {
-                                    amount = 4;
-                                    game.drawActionCard(winningR.getUserID());
-                                    ActionCardHelper.sendActionCardInfo(game, winningR, event);
-                                    MessageHelper.sendMessageToChannelWithButtons(
-                                            winningR.getCardsInfoThread(),
-                                            winningR.getRepresentationUnfogged() + " use buttons to discard.",
-                                            ActionCardHelper.getDiscardActionCardButtons(winningR, false));
-
-                                } else {
-                                    ActionCardHelper.sendActionCardInfo(game, winningR, event);
-                                }
+                                message += "3 action cards";
                             }
-
+                            message += " and the " + MiscEmojis.SpeakerToken + " Speaker Token";
                             game.setSpeakerUserID(winningR.getUserID());
-                            MessageHelper.sendMessageToChannel(
-                                    channel,
-                                    identity + " due to having a winning _Politics Rider_, you have been given "
-                                            + amount + " action cards"
-                                            + (winningR.hasAbility("scheming")
-                                                    ? " (**Scheming** increases this from the normal 1 action card; discard buttons have been sent to your `#cards-info` thread)"
-                                                    : "")
-                                            + " and the " + MiscEmojis.SpeakerToken + " Speaker Token");
+                            MessageHelper.sendMessageToChannel(channel, message);
+                            ActionCardHelper.drawActionCardsSilent(winningR, 3);
                         }
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity

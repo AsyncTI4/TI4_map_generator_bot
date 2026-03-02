@@ -576,11 +576,11 @@ public class ExploreService {
                                         .orElse(new ArrayList<>())
                                         .isEmpty()
                                 || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
-                            if ((attachment.equals(Constants.WARFARE)
-                                    || attachment.equals(Constants.PROPULSION)
-                                    || attachment.equals(Constants.CYBERNETIC)
-                                    || attachment.equals(Constants.BIOTIC)
-                                    || attachment.equals(Constants.WEAPON))) {
+                            if ((Constants.WARFARE.equals(attachment)
+                                    || Constants.PROPULSION.equals(attachment)
+                                    || Constants.CYBERNETIC.equals(attachment)
+                                    || Constants.BIOTIC.equals(attachment)
+                                    || Constants.WEAPON.equals(attachment))) {
                                 attachment += "stat";
                                 String attachmentID = Mapper.getAttachmentImagePath(attachment);
                                 if (attachmentID != null) {
@@ -594,7 +594,7 @@ public class ExploreService {
                     tile.addToken(attachmentFilename, planetID);
                     message = new StringBuilder("Attachment _" + aModel.getName() + "_ added to "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".");
-                    if (attachment.equals(Constants.DMZ)) {
+                    if (Constants.DMZ.equals(attachment)) {
                         String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
                         tile.addToken(dmzLargeFilename, planetID);
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -746,66 +746,16 @@ public class ExploreService {
                 MessageHelper.sendMessageToEventChannel(event, message.toString());
             }
             case "lc1", "lc2" -> {
-                boolean hasSchemingAbility = player.hasAbility("scheming");
-                message = new StringBuilder(
-                        hasSchemingAbility
-                                ? "Drew 3 action cards (**Scheming**) - please discard 1 action card from your hand"
-                                : "Drew 2 action cards");
-                int count = hasSchemingAbility ? 3 : 2;
-                if (player.hasAbility("autonetic_memory")) {
-                    ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = new StringBuilder(player.getFactionEmoji() + " triggered **Autonetic Memory** option.");
-                } else {
-                    for (int i = 0; i < count; i++) {
-                        game.drawActionCard(player.getUserID());
-                    }
-
-                    if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
-                    }
-                    ActionCardHelper.sendActionCardInfo(game, player, event);
+                ActionCardHelper.drawActionCards(player, 2);
+                if (game.isFowMode()) {
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
                 }
-
-                if (hasSchemingAbility) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(),
-                            player.getRepresentationUnfogged() + " use buttons to discard",
-                            ActionCardHelper.getDiscardActionCardButtons(player, false));
-                }
-                MessageHelper.sendMessageToEventChannel(event, message.toString());
-                ButtonHelper.checkACLimit(game, player);
-                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
             case "fiveac1", "fiveac2", "fiveac3" -> {
-                boolean hasSchemingAbility = player.hasAbility("scheming");
-                message = new StringBuilder(
-                        hasSchemingAbility
-                                ? "Drew 6 action cards (**Scheming**) - please discard 1 action card from your hand"
-                                : "Drew 5 action cards");
-                int count = hasSchemingAbility ? 6 : 5;
-                if (player.hasAbility("autonetic_memory")) {
-                    ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-                    message = new StringBuilder(player.getFactionEmoji() + " triggered **Autonetic Memory** option.");
-                } else {
-                    for (int i = 0; i < count; i++) {
-                        game.drawActionCard(player.getUserID());
-                    }
-
-                    if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 action cards.");
-                    }
-                    ActionCardHelper.sendActionCardInfo(game, player, event);
+                ActionCardHelper.drawActionCards(player, 5);
+                if (game.isFowMode()) {
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 5 action cards.");
                 }
-
-                if (hasSchemingAbility) {
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(),
-                            player.getRepresentationUnfogged() + " use buttons to discard",
-                            ActionCardHelper.getDiscardActionCardButtons(player, false));
-                }
-                MessageHelper.sendMessageToEventChannel(event, message.toString());
-                ButtonHelper.checkACLimit(game, player);
-                CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             }
             case "dv1", "dv2" -> {
                 message = new StringBuilder("Drew a secret objective.");

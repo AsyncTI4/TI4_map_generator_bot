@@ -1,6 +1,6 @@
 package ti4.service.tech;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,9 +117,8 @@ public class BastionTechService {
             }
 
             var units = CombatRollService.getProximaBombardUnit(p1);
-            Player player = p1;
             String planetN = planet.getName();
-            game.setStoredValue("bombardmentTarget" + player.getFaction(), planetN);
+            game.setStoredValue("bombardmentTarget" + p1.getFaction(), planetN);
             for (Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
                 for (int x = 0; x < entry.getValue(); x++) {
                     String name = entry.getKey().getAsyncId() + "_" + x;
@@ -130,17 +129,16 @@ public class BastionTechService {
                             game.getStoredValue("assignedBombardment" + p1.getFaction()) + assignedUnit + ";");
                 }
             }
-            if (player.hasTech("ps") || player.hasTech("absol_ps")) {
+            if (p1.hasTech("ps") || p1.hasTech("absol_ps")) {
                 game.setStoredValue(
-                        "assignedBombardment" + player.getFaction(),
-                        game.getStoredValue("assignedBombardment" + player.getFaction()) + "plasma_99_" + planetN
-                                + ";");
+                        "assignedBombardment" + p1.getFaction(),
+                        game.getStoredValue("assignedBombardment" + p1.getFaction()) + "plasma_99_" + planetN + ";");
             }
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+            if (game.playerHasLeaderUnlockedOrAlliance(p1, "argentcommander")) {
                 game.setStoredValue(
-                        "assignedBombardment" + player.getFaction(),
-                        game.getStoredValue("assignedBombardment" + player.getFaction()) + "argentcommander_99_"
-                                + planetN + ";");
+                        "assignedBombardment" + p1.getFaction(),
+                        game.getStoredValue("assignedBombardment" + p1.getFaction()) + "argentcommander_99_" + planetN
+                                + ";");
             }
 
             var rollMods = CombatModHelper.getModifiers(
@@ -172,7 +170,7 @@ public class BastionTechService {
             tempMods.addAll(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(
                     p2, tile.getTileModel(), planet, true, CombatRollType.bombardment));
 
-            String message = CombatMessageHelper.displayCombatSummary(player, tile, planet, CombatRollType.bombardment);
+            String message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
             message += CombatRollService.rollForUnits(
                     units, rollMods, flatMods, tempMods, p1, p2, game, CombatRollType.bombardment, event, tile, planet);
             String hits = substringAfter(message, "Total hits ");
@@ -194,7 +192,7 @@ public class BastionTechService {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
-            message = CombatMessageHelper.displayCombatSummary(player, tile, planet, CombatRollType.bombardment);
+            message = CombatMessageHelper.displayCombatSummary(p1, tile, planet, CombatRollType.bombardment);
             message += CombatRollService.rollForUnits(
                     units, rollMods, flatMods, tempMods, p1, p1, game, CombatRollType.bombardment, event, tile, planet);
             hits = substringAfter(message, "Total hits ");
@@ -203,13 +201,13 @@ public class BastionTechService {
             if (message.endsWith(";\n")) {
                 message = message.substring(0, message.length() - 2);
             }
-            if (player.hasTech("tf-proxima") && h > 0) {
+            if (p1.hasTech("tf-proxima") && h > 0) {
                 message += "\n_Proxima Targeting VI_ canceled 1 hit automatically.";
                 h--;
             } else {
-                if (planet.getGalvanizedUnitCount(player.getColorID()) > 0 && h > 0) {
+                if (planet.getGalvanizedUnitCount(p1.getColorID()) > 0 && h > 0) {
                     int oldH = h;
-                    h = Math.max(0, h - planet.getGalvanizedUnitCount(player.getColorID()));
+                    h = Math.max(0, h - planet.getGalvanizedUnitCount(p1.getColorID()));
                     message += "\n_Proxima Targeting VI_ canceled " + (oldH - h) + " hit" + (oldH - h == 1 ? "" : "s")
                             + " automatically.";
                 }

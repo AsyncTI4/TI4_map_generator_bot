@@ -1,6 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -97,9 +98,49 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("autoneticMemoryStep2_" + count, "Use Autonetic Memory"));
         buttons.add(Buttons.red("autoneticMemoryDecline_" + count, "Decline"));
-        String msg = player.getRepresentationUnfogged()
-                + ", you may draw 1 fewer action card and utilize your **Autonetic Memory** ability. Please use or decline to use.";
+        String instead = (count - 1) + " (instead of " + count + ") ";
+        String msg = player.getRepresentationUnfogged() + ", you may draw " + instead;
+        msg += " action card(s) and utilize your **Autonetic Memory** ability.";
+        if (player.hasAbility("scheming")) msg += " **Scheming** will still let you draw 1 additional card.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    @ButtonHandler("autoneticMemoryStep2_")
+    public static void autoneticMemoryStep2(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        int count = Integer.parseInt(buttonID.split("_")[1]);
+        ActionCardHelper.drawActionCards(player, count - 1);
+
+        String msg2 = player.getRepresentationNoPing() + " is choosing to resolve their **Autonetic Memory** ability.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick A Card From the Discard"));
+        buttons.add(Buttons.blue("autoneticMemoryStep3b", "Drop 1 infantry"));
+        String msg = player.getRepresentationUnfogged()
+                + " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("autoneticMemoryStep3a")
+    public static void autoneticMemoryStep3a(ButtonInteractionEvent event, Game game, Player player) {
+        ActionCardHelper.pickACardFromDiscardStep1(game, player);
+        ActionCardHelper.sendACDiscardButtons(player);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("autoneticMemoryStep3b")
+    public static void autoneticMemoryStep3b(ButtonInteractionEvent event, Game game, Player player) {
+        List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "gf", "placeOneNDone_skipbuild");
+        String message = player.getRepresentationUnfogged() + " Use buttons to drop 1 infantry on a planet";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("autoneticMemoryDecline_")
+    public static void autoneticMemoryDecline(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        int count = Integer.parseInt(buttonID.split("_")[1]);
+        ActionCardHelper.drawActionCardsNoAutonetic(player, count);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("startFacsimile_")
@@ -424,15 +465,6 @@ public class ButtonHelperAbilities {
         }
     }
 
-    @ButtonHandler("autoneticMemoryDecline_")
-    public static void autoneticMemoryDecline(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        int count = Integer.parseInt(buttonID.split("_")[1]);
-        game.drawActionCard(player.getUserID(), count);
-        ActionCardHelper.sendActionCardInfo(game, player, event);
-        ButtonHelper.checkACLimit(game, player);
-    }
-
     private static List<String> getTrapNames() {
         List<String> trapNames = new ArrayList<>();
         trapNames.add("Minefields");
@@ -696,34 +728,6 @@ public class ButtonHelperAbilities {
                 tile.removeToken(tokenName, uH.getName());
             }
         }
-    }
-
-    @ButtonHandler("autoneticMemoryStep2_")
-    public static void autoneticMemoryStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        int count = Integer.parseInt(buttonID.split("_")[1]);
-        game.drawActionCard(player.getUserID(), count - 1);
-        ActionCardHelper.sendActionCardInfo(game, player, event);
-        String msg2 = player.getRepresentationNoPing() + " is choosing to resolve their **Autonetic Memory** ability.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick A Card From the Discard"));
-        buttons.add(Buttons.blue("autoneticMemoryStep3b", "Drop 1 infantry"));
-        String msg = player.getRepresentationUnfogged()
-                + " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-    }
-
-    public static void autoneticMemoryStep3b(Game game, Player player, ButtonInteractionEvent event) {
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "gf", "placeOneNDone_skipbuild");
-        String message = player.getRepresentationUnfogged() + " Use buttons to drop 1 infantry on a planet";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-    }
-
-    public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
-        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
-        ActionCardHelper.pickACardFromDiscardStep1(game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {
@@ -1977,119 +1981,6 @@ public class ButtonHelperAbilities {
                         + game.getActivePlayer().getRepresentation() + ".");
         // MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use
         // buttons to move ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
-    }
-
-    @ButtonHandler("startYssarilbt")
-    public static void startYssarilbt(Player player, Game game) {
-        List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
-                buttons.add(Buttons.red(
-                        "yssarilbtStep2_scheming_" + p2.getFaction(),
-                        "Revoke Scheming For " + p2.getFactionNameOrColor(),
-                        p2.fogSafeEmoji()));
-            } else {
-                buttons.add(Buttons.green(
-                        "yssarilbtStep2_scheming_" + p2.getFaction(),
-                        "Allow Scheming For " + p2.getFactionNameOrColor(),
-                        p2.fogSafeEmoji()));
-            }
-        }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationNoPing()
-                        + ", please use these buttons to allow other players to use **Scheming**, or to revoke this allowance.",
-                buttons);
-        buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
-                buttons.add(Buttons.red(
-                        "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                        "Revoke Stall Tactics For " + p2.getFactionNameOrColor(),
-                        p2.fogSafeEmoji()));
-            } else {
-                buttons.add(Buttons.green(
-                        "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                        "Allow Stall Tactics For " + p2.getFactionNameOrColor(),
-                        p2.fogSafeEmoji()));
-            }
-        }
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtons(
-                player.getCardsInfoThread(),
-                player.getRepresentationNoPing()
-                        + ", please use these buttons to allow other players to use **Stall Tactics**, or to revoke this allowance.",
-                buttons);
-    }
-
-    @ButtonHandler("yssarilbtStep2_")
-    public static void yssarilbtStep2_(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String type = buttonID.split("_")[1];
-        String faction = buttonID.split("_")[2];
-        List<Button> buttons = new ArrayList<>();
-        if ("scheming".equalsIgnoreCase(type)) {
-            if (game.getStoredValue("schemingFactions").contains(faction)) {
-                game.setStoredValue(
-                        "schemingFactions",
-                        game.getStoredValue("schemingFactions").replace(faction, ""));
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " revoked **Scheming** for "
-                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
-            } else {
-                game.setStoredValue("schemingFactions", game.getStoredValue("schemingFactions") + faction + "_");
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " allowed **Scheming** for "
-                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
-            }
-            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                if (game.getStoredValue("schemingFactions").contains(p2.getFaction())) {
-                    buttons.add(Buttons.red(
-                            "yssarilbtStep2_scheming_" + p2.getFaction(),
-                            "Revoke Scheming For " + p2.getFactionNameOrColor(),
-                            p2.fogSafeEmoji()));
-                } else {
-                    buttons.add(Buttons.green(
-                            "yssarilbtStep2_scheming_" + p2.getFaction(),
-                            "Allow Scheming For " + p2.getFactionNameOrColor(),
-                            p2.fogSafeEmoji()));
-                }
-            }
-        }
-        if ("stalltactics".equalsIgnoreCase(type)) {
-            if (game.getStoredValue("stalltacticsFactions").contains(faction)) {
-                game.setStoredValue(
-                        "stalltacticsFactions",
-                        game.getStoredValue("stalltacticsFactions").replace(faction, ""));
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " revoked **Stall Tactics** for "
-                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
-            } else {
-                game.setStoredValue(
-                        "stalltacticsFactions", game.getStoredValue("stalltacticsFactions") + faction + "_");
-                MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(),
-                        player.getRepresentationNoPing() + " allowed **Stall Tactics** for "
-                                + game.getPlayerFromColorOrFaction(faction).getFactionNameOrColor() + ".");
-            }
-            for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-                if (game.getStoredValue("stalltacticsFactions").contains(p2.getFaction())) {
-                    buttons.add(Buttons.red(
-                            "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                            "Revoke Stall Tactics For " + p2.getFactionNameOrColor()));
-                } else {
-                    buttons.add(Buttons.green(
-                            "yssarilbtStep2_stalltactics_" + p2.getFaction(),
-                            "Allow Stall Tactics For " + p2.getFactionNameOrColor()));
-                }
-            }
-        }
-
-        buttons.add(Buttons.gray("deleteButtons", "Done"));
-        MessageHelper.editMessageButtons(event, buttons);
     }
 
     public static void pillageCheck(Player player, Game game) {

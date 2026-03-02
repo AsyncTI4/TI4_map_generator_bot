@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,6 +19,7 @@ import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
+@UtilityClass
 public class PlayerTitleHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {

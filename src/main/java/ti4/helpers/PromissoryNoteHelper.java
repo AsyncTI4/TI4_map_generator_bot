@@ -260,13 +260,13 @@ public class PromissoryNoteHelper {
             ButtonHelperFactionSpecific.resolveOlradinPN(player, game, event);
         }
         if ("terraform".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerTerraformButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerTerraformButtons(player, game);
         }
         if ("sigma_cyber".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.resolveSigmaLizixPN(player, game, event);
         }
         if ("dspnrohd".equalsIgnoreCase(id)) {
-            ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game, event);
+            ButtonHelperFactionSpecific.offerAutomatonsButtons(player, game);
         }
         if ("dspnbent".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerBentorPNButtons(player, game);

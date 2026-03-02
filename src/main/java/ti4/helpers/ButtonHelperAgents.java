@@ -571,8 +571,8 @@ public class ButtonHelperAgents {
     @ButtonHandler("vaylerianAgent_")
     public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String message = ButtonHelper.resolveACDraw(p2, game, event);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
+        ActionCardHelper.drawActionCards(p2, 1);
+
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
@@ -675,8 +675,8 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             if (rest.contains("_")) {
                 Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
-                message = ButtonHelper.resolveACDraw(p2, game, event);
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
+                ActionCardHelper.drawActionCards(p2, 1);
+
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
@@ -1096,39 +1096,7 @@ public class ButtonHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
 
-            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card due to " + ssruuClever
-                    + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent";
-            if (p2.hasAbility("scheming")) {
-                game.drawActionCard(p2.getUserID());
-                successMessage2 += ", then drew another action card for **Scheming**. Please now discard 1 action card";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p2.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", please choose the action care you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            }
-            successMessage2 += ". ";
-            if (p2.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
-                successMessage2 += p2.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
-            } else {
-                game.drawActionCard(p2.getUserID());
-            }
-            ButtonHelper.checkACLimit(game, p2);
-            String headerText2 = p2.getRepresentationUnfogged() + " you drew 1 action card due to " + ssruuClever
-                    + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent";
-            if (p2.hasAbility("scheming")) {
-                headerText2 += ", then drew another action card for **Scheming**. Please now discard 1 action card";
-            }
-            headerText2 += ". ";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
-            ActionCardHelper.sendActionCardInfo(game, p2);
-            if (p2.hasAbility("scheming")) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p2.getCardsInfoThread(),
-                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
-            }
-            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), successMessage2);
+            ActionCardHelper.drawActionCards(p2, 1);
         }
 
         if ("mentakagent".equalsIgnoreCase(agent)) {
@@ -1138,68 +1106,9 @@ public class ButtonHelperAgents {
             String faction = rest.replace("mentakagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
-            String successMessage = player.getFactionEmoji() + " drew 1 action card";
-            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card";
-            if (player.hasAbility("scheming")) {
-                game.drawActionCard(player.getUserID());
-                successMessage += ", then drew another action card for **Scheming**. Please now discard 1 action card";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard an action card.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            }
-            successMessage += ". ";
-            if (p2.hasAbility("scheming")) {
-                game.drawActionCard(p2.getUserID());
-                successMessage2 += ", then drew another action card for **Scheming**. Please now discard 1 action card";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p2.getCardsInfoThread(),
-                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
-            }
-            successMessage2 += ". ";
-            if (player.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            } else {
-                game.drawActionCard(player.getUserID());
-            }
 
-            if (p2.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
-            } else {
-                game.drawActionCard(p2.getUserID());
-            }
-
-            ButtonHelper.checkACLimit(game, player);
-            ButtonHelper.checkACLimit(game, p2);
-            String headerText = player.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
-                    + "Suffi An, the Mentak" + ssruuSlash + " agent";
-            headerText += player.hasAbility("scheming")
-                    ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
-                    : ".";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-            ActionCardHelper.sendActionCardInfo(game, player);
-            String headerText2 = p2.getRepresentationUnfogged() + " you got 1 action card from " + ssruuClever
-                    + "Suffi An, the Mentak" + ssruuSlash + " agent";
-            headerText2 += p2.hasAbility("scheming")
-                    ? ", then drew another action card for **Scheming**. Please now discard 1 action card."
-                    : ".";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
-            ActionCardHelper.sendActionCardInfo(game, p2);
-            if (player.hasAbility("scheming")) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            }
-            if (p2.hasAbility("scheming")) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p2.getCardsInfoThread(),
-                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
-            }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
-            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), successMessage2);
+            ActionCardHelper.drawActionCards(player, 1);
+            ActionCardHelper.drawActionCards(p2, 1);
         }
 
         if ("hyperagent".equalsIgnoreCase(agent)) {
@@ -1208,65 +1117,28 @@ public class ButtonHelperAgents {
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null) return;
-            String successMessage = player.getFactionEmoji() + " drew 1 action card";
-            String successMessage2 = p2.getFactionEmoji() + " drew 1 action card";
+
+            String successMessage = player.getRepresentation() + " drew 1 action card";
+            if (player.hasAbility("scheming"))
+                successMessage = player.getRepresentation() + " drew 2 action cards (Scheming).";
+
+            String successMessage2 = p2.getRepresentation() + " drew 1 action card";
+            if (p2.hasAbility("scheming")) successMessage = p2.getRepresentation() + " drew 2 action cards (Scheming)";
+
             if (p2.getTg() > 0) {
                 p2.setTg(p2.getTg() - 1);
                 player.gainTG(1, true);
-                successMessage2 += " and gave 1 TG to " + player.getRepresentation();
-            }
-            if (player.hasAbility("scheming")) {
-                game.drawActionCard(player.getUserID());
-                successMessage += ", then drew another action card for _Scheming_. Please now discard 1 action card.";
-            }
-            successMessage += ". ";
-            if (p2.hasAbility("scheming")) {
-                game.drawActionCard(p2.getUserID());
-                successMessage2 += ", then drew another action card for _Scheming_. Please now discard 1 action card";
-            }
-            successMessage2 += ". ";
-            if (player.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
+                successMessage2 += " and gave 1 TG to " + player.getFactionEmoji() + ".";
+                successMessage += " and took 1 TG from " + p2.getFactionEmoji() + ".";
             } else {
-                game.drawActionCard(player.getUserID());
+                successMessage += ".";
+                successMessage2 += ".";
             }
 
-            if (p2.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
-            } else {
-                game.drawActionCard(p2.getUserID());
-            }
-
-            ButtonHelper.checkACLimit(game, player);
-            ButtonHelper.checkACLimit(game, p2);
-            String headerText = player.getRepresentationUnfogged() + ", you got 1 action card from the " + ssruuClever
-                    + "_Hyper Genome_.";
-            headerText += player.hasAbility("scheming")
-                    ? ", then drew another action card for _Scheming_. Please now discard 1 action card."
-                    : ".";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
-            ActionCardHelper.sendActionCardInfo(game, player);
-            String headerText2 = p2.getRepresentationUnfogged() + ", you got 1 action card from the " + ssruuClever
-                    + "_Hyper Genome_.";
-            headerText2 += p2.hasAbility("scheming")
-                    ? ", then drew another action card for _Scheming_. Please now discard 1 action card."
-                    : ".";
-            MessageHelper.sendMessageToPlayerCardsInfoThread(p2, headerText2);
-            ActionCardHelper.sendActionCardInfo(game, p2);
-            if (player.hasAbility("scheming")) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            }
-            if (p2.hasAbility("scheming")) {
-                MessageHelper.sendMessageToChannelWithButtons(
-                        p2.getCardsInfoThread(),
-                        p2.getRepresentationUnfogged() + ", please choose the action card you wish to discard.",
-                        ActionCardHelper.getDiscardActionCardButtons(p2, false));
-            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), successMessage2);
+            ActionCardHelper.drawActionCardsSilent(player, 1);
+            ActionCardHelper.drawActionCardsSilent(p2, 1);
         }
 
         if ("sardakkagent".equalsIgnoreCase(agent)) {

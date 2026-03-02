@@ -44,7 +44,7 @@ public class CreateFoWGameService {
     private static final int MAX_ROLE_COUNT = 250;
 
     private static final long PERMISSIONS =
-            Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
     @ButtonHandler("createFoWGameChannels")
     public static void createFoWGameChannels(ButtonInteractionEvent event) {
@@ -175,6 +175,7 @@ public class CreateFoWGameService {
         // CREATE CATEGORY
         Role everyone = guild.getRolesByName("@everyone", true).getFirst();
         long permission2 = Permission.MESSAGE_MANAGE.getRawValue()
+                | Permission.PIN_MESSAGES.getRawValue()
                 | Permission.VIEW_CHANNEL.getRawValue()
                 | Permission.MANAGE_PERMISSIONS.getRawValue()
                 | Permission.MANAGE_THREADS.getRawValue();

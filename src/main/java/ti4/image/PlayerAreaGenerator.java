@@ -95,7 +95,7 @@ public class PlayerAreaGenerator {
     private static final Stroke stroke4 = new BasicStroke(4.0f);
     private static final Stroke stroke5 = new BasicStroke(5.0f);
     private static final Stroke stroke8 = new BasicStroke(8.0f);
-    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.5707963267948966;
+    private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -1.570_796_326_794_896_6;
 
     private final Graphics graphics;
     private final Game game;
@@ -563,7 +563,7 @@ public class PlayerAreaGenerator {
         // Draw the SC number
         if (sc == ButtonHelper.getKyroHeroSC(game)) sc = 9;
         DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke4, Color.black);
-        if (scColor.equals(Color.GRAY)) {
+        if (Color.GRAY.equals(scColor)) {
             int off = big ? 15 : 8;
             DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 2 * off, big);
         }
@@ -730,7 +730,7 @@ public class PlayerAreaGenerator {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .flatMap(uh -> uh.getTokenList().stream())
                     .filter(tok ->
-                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                            Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                     .count();
             if (totalBreaches > maxBreachTokens) {
                 String msg = player.getRepresentation()
@@ -1413,6 +1413,14 @@ public class PlayerAreaGenerator {
                 Emoji bankEmoji = Emoji.fromFormatted(bankSource);
                 if (bankEmoji instanceof CustomEmoji factionCustomEmoji) {
                     bankImage = ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), 120, 120);
+                    if (bankImage == null) {
+                        bankEmoji = TI4Emoji.findEmojiFromJustName(factionCustomEmoji.getName())
+                                .asEmoji();
+                        game.setDebtPoolIcon(pool.getKey(), bankEmoji.getFormatted());
+                        if (bankEmoji instanceof CustomEmoji e) {
+                            bankImage = ImageHelper.readURLScaled(e.getImageUrl(), 120, 120);
+                        }
+                    }
                 } else if (bankEmoji instanceof UnicodeEmoji uni) {
                     BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
                     Graphics2D g3 = img.createGraphics();

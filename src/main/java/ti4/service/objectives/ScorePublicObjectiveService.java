@@ -168,9 +168,7 @@ public class ScorePublicObjectiveService {
                         player.getCorrectChannel(),
                         player.getRepresentation()
                                 + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
-                game.drawActionCard(player.getUserID());
-                ButtonHelper.checkACLimit(game, player);
-                ActionCardHelper.sendActionCardInfo(game, player, event);
+                ActionCardHelper.drawActionCardsSilent(player, 1);
             }
         }
         if (game.isOmegaPhaseMode()) {

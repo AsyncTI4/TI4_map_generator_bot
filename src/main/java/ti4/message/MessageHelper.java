@@ -57,6 +57,7 @@ import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.VisionariaSelectService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.game.GameNameService;
@@ -645,21 +646,7 @@ public class MessageHelper {
                         channel,
                         messageCreateData,
                         message -> {
-                            ManagedGame managedGame = GameManager.getManagedGame(gameName);
-                            if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
-                                if (finalMessageText.contains("Use buttons to do your turn")
-                                        || finalMessageText.contains("Use buttons to end turn")) {
-                                    String old = GameMessageManager.replace(
-                                            gameName,
-                                            message.getId(),
-                                            GameMessageType.TURN,
-                                            managedGame.getLastModifiedDate());
-                                    if (old != null)
-                                        channel.deleteMessageById(old)
-                                                .queue(Consumers.nop(), BotLogger::catchRestError);
-                                }
-                            }
-
+                            updateManagedMessages(finalMessageText, message, gameName);
                             if (restAction != null) {
                                 restAction.accept(message);
                             }
@@ -667,6 +654,27 @@ public class MessageHelper {
                         finalMessageText,
                         1);
             }
+        }
+    }
+
+    private static void updateManagedMessages(String text, Message message, String gameName) {
+        ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (text == null || message == null || managedGame == null || managedGame.isFowMode()) return;
+
+        String id = message.getId();
+        long date = managedGame.getLastModifiedDate();
+
+        if (text.contains("Use buttons to do your turn")
+                || text.contains("Use buttons to end turn")
+                || text.contains("Use the buttons to end turn")) {
+            String old = GameMessageManager.replace(gameName, id, GameMessageType.TURN, date);
+            if (old != null) {
+                message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
+            }
+        }
+
+        if (text.contains(VisionariaSelectService.initialButtonHeader())) {
+            GameMessageManager.replace(gameName, id, GameMessageType.VISIONARIA, date);
         }
     }
 

@@ -46,7 +46,7 @@ class SampleDecals extends Subcommand {
 
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
         if (input != null
-                && !input.getAsString().equals(Constants.ALL)
+                && !Constants.ALL.equals(input.getAsString())
                 && !input.getAsString().isEmpty()) {
             if ("Other".equals(input.getAsString())) {
                 List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
