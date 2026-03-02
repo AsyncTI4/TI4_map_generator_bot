@@ -111,6 +111,7 @@ public class PlayStrategyCardService {
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }
+
         StringBuilder message = new StringBuilder();
         message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(" played");
         if (!game.isFowMode()) {
@@ -118,43 +119,42 @@ public class PlayStrategyCardService {
         }
         message.append(".\n\n");
 
-        StringBuilder gamePing = new StringBuilder(game.getPing());
-        List<Player> playersToFollow = game.getRealPlayers();
-        if (!"All".equals(scModel.getGroup().orElse(""))
-                && ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName()))) {
-            playersToFollow = new ArrayList<>();
-            String num = scToPlay + "";
-            num = num.substring(num.length() - 1);
-            gamePing = new StringBuilder();
-            for (Player p2 : game.getRealPlayers()) {
-                for (Integer sc : p2.getSCs()) {
-                    String num2 = sc + "";
-                    num2 = num2.substring(num2.length() - 1);
-                    if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
-                        gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
-                        playersToFollow.add(p2);
+        if (!isOverrule) {
+            StringBuilder gamePing = new StringBuilder(game.getPing());
+            List<Player> playersToFollow = game.getRealPlayers();
+            if (!"All".equals(scModel.getGroup().orElse(""))
+                    && ("pbd1000".equalsIgnoreCase(game.getName()) || "pbd100two".equalsIgnoreCase(game.getName()))) {
+                playersToFollow = new ArrayList<>();
+                String num = scToPlay + "";
+                num = num.substring(num.length() - 1);
+                gamePing = new StringBuilder();
+                for (Player p2 : game.getRealPlayers()) {
+                    for (Integer sc : p2.getSCs()) {
+                        String num2 = sc + "";
+                        num2 = num2.substring(num2.length() - 1);
+                        if (num2.equalsIgnoreCase(num) || "0".equalsIgnoreCase(num) || "0".equalsIgnoreCase(num2)) {
+                            gamePing.append(gamePing.isEmpty() ? "" : ", ").append(p2.getRepresentation());
+                            playersToFollow.add(p2);
+                        }
                     }
                 }
             }
-        }
-        if (!gamePing.isEmpty()) {
-            message.append(gamePing).append(", please indicate your choice with these buttons.");
-        } else {
-            message.append("Please indicate your choice with these buttons.");
-        }
-
-        for (Player player2 : playersToFollow) {
-            if (winnuHero) {
-                continue;
+            if (!gamePing.isEmpty()) {
+                message.append(gamePing).append(", please indicate your choice with these buttons.");
+            } else {
+                message.append("Please indicate your choice with these buttons.");
             }
-            player2.removeFollowedSC(scToPlay);
-            player2.getCardsInfoThread(); // force thread to open if closed
+
+            for (Player player2 : playersToFollow) {
+                player2.removeFollowedSC(scToPlay);
+                player2.getCardsInfoThread(); // force thread to open if closed
+            }
         }
 
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
 
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
-        if (!winnuHero) {
+        if (!winnuHero && !isOverrule) {
             if (scModel.hasImageFile()) {
                 MessageHelper.sendMessageToChannel(mainGameChannel, scModel.getImageFileUrl());
             } else {
