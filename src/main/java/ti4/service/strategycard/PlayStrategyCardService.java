@@ -182,19 +182,27 @@ public class PlayStrategyCardService {
                 return button;
             });
         }
-        if (scModel.usesAutomationForSCID("pok7technology")
-                && !game.isFowMode()
-                && Helper.getPlayerFromAbility(game, "propagation") != null) {
+
+        boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode();
+        shouldAddNekroTechButton &= isOverrule
+                ? player.equals(Helper.getPlayerFromAbility(game, "propagation"))
+                : Helper.getPlayerFromAbility(game, "propagation") != null;
+        if (shouldAddNekroTechButton) {
             scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
         }
 
-        if ((scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
-                && !game.isFowMode()
-                && !ButtonHelper.isLawInPlay(game, "articles_war")
-                && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
+        boolean shouldAddTitansMechDeployButton =
+                (scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
+                        && !game.isFowMode()
+                        && !ButtonHelper.isLawInPlay(game, "articles_war");
+        shouldAddTitansMechDeployButton &= isOverrule
+                ? player.equals(Helper.getPlayerFromUnit(game, "titans_mech"))
+                : Helper.getPlayerFromUnit(game, "titans_mech") != null;
+        if (shouldAddTitansMechDeployButton) {
             scButtons.add(Buttons.gray(
                     "titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));
         }
+
         if (!isOverrule) {
             scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
         }
