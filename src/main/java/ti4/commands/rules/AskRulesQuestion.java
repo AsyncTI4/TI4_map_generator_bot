@@ -39,8 +39,14 @@ class AskRulesQuestion extends Subcommand {
                 .addContent(message)
                 .setAllowedMentions(Collections.emptyList())
                 .build();
-        rulesChannel.sendMessage(messageData).queue(Consumers.nop(), BotLogger::catchRestError);
-        MessageHelper.sendMessageToEventChannel(
-                event, "Your question has been sent to the " + rulesChannel.getJumpUrl() + " channel.");
+        rulesChannel.sendMessage(messageData).queue(
+                sentMessage -> MessageHelper.sendMessageToEventChannel(
+                        event, "Your question has been sent to the " + rulesChannel.getJumpUrl() + " channel."),
+                throwable -> {
+                    BotLogger.catchRestError(throwable);
+                    MessageHelper.sendMessageToEventChannel(
+                            event,
+                            "Failed to send your question to the " + RULES_CHANNEL_NAME + " channel: " + throwable.getMessage());
+                });
     }
 }
