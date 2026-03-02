@@ -183,24 +183,31 @@ public class PlayStrategyCardService {
             });
         }
 
-        boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode();
-        shouldAddNekroTechButton &= isOverrule
-                ? player.equals(Helper.getPlayerFromAbility(game, "propagation"))
-                : Helper.getPlayerFromAbility(game, "propagation") != null;
-        if (shouldAddNekroTechButton) {
-            scButtons.add(Buttons.gray("nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
+        Player propagationPlayer = Helper.getPlayerFromAbility(game, "propagation");
+        if (propagationPlayer != null) {
+            boolean shouldAddNekroTechButton = scModel.usesAutomationForSCID("pok7technology")
+                    && !game.isFowMode()
+                    && (!isOverrule || player.equals(propagationPlayer));
+            if (shouldAddNekroTechButton) {
+                String ffcc = propagationPlayer.getFinsFactionCheckerPrefix();
+                scButtons.add(Buttons.gray(ffcc + "nekroFollowTech", "Get Command Tokens", FactionEmojis.Nekro));
+            }
         }
 
-        boolean shouldAddTitansMechDeployButton =
-                (scModel.usesAutomationForSCID("pok4construction") || scModel.usesAutomationForSCID("te4construction"))
-                        && !game.isFowMode()
-                        && !ButtonHelper.isLawInPlay(game, "articles_war");
-        shouldAddTitansMechDeployButton &= isOverrule
-                ? player.equals(Helper.getPlayerFromUnit(game, "titans_mech"))
-                : Helper.getPlayerFromUnit(game, "titans_mech") != null;
-        if (shouldAddTitansMechDeployButton) {
-            scButtons.add(Buttons.gray(
-                    "titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));
+        Player titansMechPlayer = Helper.getPlayerFromUnit(game, "titans_mech");
+        if (titansMechPlayer != null) {
+            boolean shouldAddTitansMechDeployButton = (scModel.usesAutomationForSCID("pok4construction")
+                            || scModel.usesAutomationForSCID("te4construction"))
+                    && !game.isFowMode()
+                    && !ButtonHelper.isLawInPlay(game, "articles_war")
+                    && (!isOverrule || player.equals(titansMechPlayer));
+            if (shouldAddTitansMechDeployButton) {
+                String ffcc = titansMechPlayer.getFinsFactionCheckerPrefix();
+                scButtons.add(Buttons.gray(
+                        ffcc + "titansConstructionMechDeployStep1",
+                        "Deploy Titan Mech + Infantry",
+                        FactionEmojis.Titans));
+            }
         }
 
         if (!isOverrule) {
