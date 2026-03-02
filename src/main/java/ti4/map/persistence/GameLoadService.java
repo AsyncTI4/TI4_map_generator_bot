@@ -1,25 +1,7 @@
 package ti4.map.persistence;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.TILE;
-import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.UNITS;
+import static org.apache.commons.lang3.StringUtils.*;
+import static ti4.map.persistence.GamePersistenceKeys.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -1183,6 +1165,10 @@ class GameLoadService {
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.DISHONOR_COUNT -> player.setDishonorCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STEELBALANCE_COUNT ->
+                    player.setSteelbalanceCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STARBALANCE_COUNT ->
+                    player.setStarbalanceCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HARVEST_COUNT -> player.setHarvestCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());

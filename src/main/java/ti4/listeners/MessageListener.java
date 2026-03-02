@@ -67,7 +67,7 @@ public class MessageListener extends ListenerAdapter {
                 .ifPresent(moderationLogChannel -> MessageHelper.sendMessageToChannel(moderationLogChannel, msg));
     }
 
-    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop", "nazi");
+    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop");
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {

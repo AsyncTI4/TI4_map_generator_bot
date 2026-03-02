@@ -162,7 +162,7 @@ public class CardsInfoService {
         if (player.hasUnlockedBreakthrough("yssarilbt")) {
             buttons.add(Buttons.green("startYssarilbt", "Use Yssaril Breakthrough", FactionEmojis.Yssaril));
         }
-        if (player.hasAbility("pillage")) {
+        if (player.hasAbility("pillage") && !game.isTwilightsFallMode()) {
             if (game.getStoredValue("willPillageOwnTransactions" + player.getFaction())
                     .isEmpty()) {
                 buttons.add(Buttons.green(

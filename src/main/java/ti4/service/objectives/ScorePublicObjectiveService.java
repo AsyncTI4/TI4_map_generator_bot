@@ -152,11 +152,8 @@ public class ScorePublicObjectiveService {
                 Player p2 = game.getPlayerFromColorOrFaction(game.getStoredValue("toldarHeroPlayer"));
                 MessageHelper.sendMessageToChannel(
                         p2.getCorrectChannel(),
-                        p2.getRepresentation() + " gains 2 command tokens due to their Concord Renewed hero ability.");
-                List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
-                String message2 = p2.getRepresentationUnfogged() + ", your current command tokens are "
-                        + p2.getCCRepresentation() + ". Use buttons to gain 2 command tokens.";
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message2, buttons);
+                        p2.getRepresentation() + " draws 1 secret objective due to their Toldar hero ability.");
+                DrawSecretService.drawSO(event, game, p2);
             }
         }
         if (player.hasAbility("reflect")) {

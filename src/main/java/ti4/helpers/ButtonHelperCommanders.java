@@ -954,7 +954,7 @@ public class ButtonHelperCommanders {
         String planetRepresentation = Helper.getPlanetRepresentation(planet1, game);
 
         String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2
-                + " to " + planetRepresentation + " using G'hom Sek'kus, the N'orr Commander.";
+                + " to " + planetRepresentation + " using G'hom Sek'kus, the Sardakk Commander.";
         RemoveUnitService.removeUnits(
                 event, game.getTileFromPlanet(planet2), game, player.getColor(), "1 " + mechorInf + " " + planet2);
 
