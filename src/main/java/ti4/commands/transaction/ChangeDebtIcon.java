@@ -70,6 +70,6 @@ class ChangeDebtIcon extends GameStateSubcommand {
 
     @Override
     public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
+        return false;
     }
 }

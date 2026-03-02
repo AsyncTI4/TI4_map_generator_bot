@@ -104,7 +104,7 @@ public class MapTemplateModel implements ModelInterface {
     public List<Point> tileDisplayCoords() {
         List<String> emulate = emulatedTiles();
         List<Point> displayCoords = new ArrayList<>();
-        int minx = 10000, miny = 10000;
+        int minx = 10_000, miny = 10_000;
         for (String pos : emulate) {
             Point p = PositionMapper.getTilePosition(pos);
             if (p == null) continue;

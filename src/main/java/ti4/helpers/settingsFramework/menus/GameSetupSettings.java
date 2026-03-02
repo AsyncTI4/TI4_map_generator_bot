@@ -89,7 +89,9 @@ public class GameSetupSettings extends SettingsMenu {
         gamePlayers.setShow(Player::getUserName);
 
         // Load JSON if applicable
-        if (json != null && json.has("menuId") && json.get("menuId").asText("").equals(MENU_ID)) {
+        if (json != null
+                && json.has("menuId")
+                && MENU_ID.equals(json.get("menuId").asText(""))) {
             pointTotal.initialize(json.get("pointTotal"));
             stage1s.initialize(json.get("stage1s"));
             stage2s.initialize(json.get("stage2s"));

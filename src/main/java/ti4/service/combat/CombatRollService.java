@@ -1293,7 +1293,7 @@ public class CombatRollService {
                         player.getPriorityUnitByAsyncID(entry.getKey(), unitHolder), entry.getValue()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         HashMap<UnitModel, Integer> output;
-        if (unitHolder.getName().equals(Constants.SPACE)) {
+        if (Constants.SPACE.equals(unitHolder.getName())) {
             if (unitsByAsyncId.containsKey("fs")
                     && (player.hasUnit("nekro_flagship") || player.hasUnit("sigma_nekro_flagship_2"))) {
                 output = new HashMap<>(unitsInCombat.entrySet().stream()

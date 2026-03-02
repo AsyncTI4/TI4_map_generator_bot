@@ -133,7 +133,6 @@
       <version>${jemoji.version}</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -169,9 +168,27 @@
         <groupId>com.diffplug.spotless</groupId>
         <artifactId>spotless-maven-plugin</artifactId>
         <version>${spotless.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
         <configuration>
           <java>
-            <cleanthat/>
+            <cleanthat>
+              <sourceJdk>${java.version}</sourceJdk>
+              <mutators>
+                <mutator>SafeAndConsensual</mutator>
+                <mutator>SafeButNotConsensual</mutator>
+                <mutator>SafeButControversial</mutator>
+              </mutators>
+              <excludedMutators>
+                <excludedMutator>AvoidInlineConditionals</excludedMutator>
+              </excludedMutators>
+            </cleanthat>
             <removeUnusedImports/>
             <palantirJavaFormat/>
             <toggleOffOn/>

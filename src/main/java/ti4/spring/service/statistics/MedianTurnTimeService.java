@@ -15,9 +15,9 @@ import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 import ti4.spring.context.SpringContext;
-import ti4.spring.persistence.PlayerEntity;
-import ti4.spring.persistence.PlayerEntityRepository;
-import ti4.spring.persistence.UserEntity;
+import ti4.spring.service.persistence.PlayerEntity;
+import ti4.spring.service.persistence.PlayerEntityRepository;
+import ti4.spring.service.persistence.UserEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class MedianTurnTimeService {
     public void getMedianTurnTimes(SlashCommandInteractionEvent event) {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         int topLimit = event.getOption(Constants.TOP_LIMIT, DEFAULT_PLAYER_LIMIT, OptionMapping::getAsInt);
-        int minTurns = event.getOption(
+        int minimumTurns = event.getOption(
                 Constants.MINIMUM_NUMBER_OF_TURNS, DEFAULT_MINIMUM_NUMBER_OF_TURNS, OptionMapping::getAsInt);
 
         List<PlayerEntity> players = ignoreEndedGames
@@ -41,16 +41,13 @@ public class MedianTurnTimeService {
 
         Map<UserEntity, PlayerStatsAccumulator> statsMap = new HashMap<>();
         for (PlayerEntity player : players) {
-            if (player.getTotalNumberOfTurns() == 0 || player.getTotalTurnTime() == 0) {
-                continue;
-            }
-
+            if (player.getTotalNumberOfTurns() == 0) continue;
             statsMap.computeIfAbsent(player.getUser(), user -> new PlayerStatsAccumulator(user.getName()))
                     .addGame(player.getTotalNumberOfTurns(), player.getTotalTurnTime());
         }
 
         List<PlayerStatsAccumulator> sortedResults = statsMap.values().stream()
-                .filter(s -> s.totalTurns >= minTurns)
+                .filter(s -> s.totalTurns >= minimumTurns)
                 .sorted(Comparator.comparingLong(PlayerStatsAccumulator::getMedian))
                 .limit(topLimit)
                 .toList();
@@ -81,10 +78,10 @@ public class MedianTurnTimeService {
     }
 
     private static class PlayerStatsAccumulator {
-        String username;
-        int totalTurns;
-        long median;
-        List<Long> gameAverages = new ArrayList<>();
+        private final String username;
+        private int totalTurns;
+        private long median = -1;
+        private final List<Long> gameAverages = new ArrayList<>();
 
         PlayerStatsAccumulator(String username) {
             this.username = username;
@@ -96,8 +93,9 @@ public class MedianTurnTimeService {
         }
 
         long getMedian() {
-            if (median == 0 && totalTurns > 0) {
-                median = Helper.median(gameAverages);
+            if (totalTurns == 0) return 0;
+            if (median == -1) {
+                median = (long) Helper.median(gameAverages);
             }
             return median;
         }

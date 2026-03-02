@@ -50,7 +50,7 @@ class SampleColors extends Subcommand {
         List<String> hues = new ArrayList<>();
         int fewer = 0;
         if (input == null
-                || input.getAsString().equals(Constants.ALL)
+                || Constants.ALL.equals(input.getAsString())
                 || input.getAsString().isEmpty()) {
             hues = Arrays.asList(
                     "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2", "MULTI3");

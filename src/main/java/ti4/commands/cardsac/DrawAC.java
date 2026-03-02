@@ -22,7 +22,7 @@ class DrawAC extends GameStateSubcommand {
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         count = Math.max(count, 1);
         count = Math.min(count, 10);
-        ActionCardHelper.drawActionCards(getGame(), getPlayer(), count, false);
+        ActionCardHelper.drawActionCardsNoAbilities(getPlayer(), count);
     }
 
     @Override

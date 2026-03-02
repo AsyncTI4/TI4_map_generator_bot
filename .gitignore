@@ -29,3 +29,6 @@ runlocally.ps1
 *.log
 *test-save.txt
 src/test/resources/maps/undo
+tibot.db
+scripts/__pycache__/
+scripts/**/__pycache__/

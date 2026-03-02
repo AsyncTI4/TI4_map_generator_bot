@@ -74,16 +74,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.add(Buttons.green("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {
-                if (player.hasAbility("scheming")) {
-                    output =
-                            "Use buttons to drop 1 mech on a planet or to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
-                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-                } else {
-                    output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
-                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                }
+                output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
+                buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
             }
             case "primor" -> {
                 output = "Use buttons to drop 2 infantry on a planet.";
@@ -104,7 +97,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
             case "ordinianc4", "ordinian" -> {
-                ActionCardHelper.drawActionCards(game, player, 1, true);
+                ActionCardHelper.drawActionCards(player, 1);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain 1 command token.";
                 MessageHelper.sendMessageToChannelWithButtons(

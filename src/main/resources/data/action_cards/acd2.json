@@ -431,6 +431,7 @@
         "phase": "Any",
         "window": "When or after you research a technology",
         "text": "Ready up to 2 of your planets that have a technology specialty.",
+        "notes": "Nekro can use this card.",
         "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
         "source": "action_deck_2"
     },
@@ -873,9 +874,9 @@
         "alias": "swindle",
         "name": "Swindle",
         "phase": "Action",
-        "window": "When another player gains 3 or more trade goods",
+        "window": "When another player gains 2 or more trade goods",
         "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
-        "notes": "This works at any time such a quantity could be PILLAGE'd. The additional trade good gained does not open another PILLAGE window.",
+        "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
         "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"
     },
@@ -935,6 +936,7 @@
         "phase": "Action",
         "window": "When you research a technology",
         "text": "Discard 1 of your relic fragments to ignore 1 of that technology's prerequisites and gain 3 trade goods.",
+        "notes" : "Nekro can use this card.",
         "flavorText": "\"I don't feel any different,\" Dart said, his eyes blazing with the fire of a thousand dying worlds. \"What do you mean 'oh god your eyes'?\"",
         "source": "action_deck_2"
     },
@@ -1034,6 +1036,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Ready or exhaust any agent.",
+        "automationID": "simulacrum",
         "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
         "source": "action_deck_2"
     },
@@ -1043,7 +1046,7 @@
         "phase": "Action",
         "window": "When you research a technology",
         "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2"
@@ -1054,7 +1057,7 @@
         "phase": "Action",
         "window": "When you research a technology",
         "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "A projection showed four individuals competing in a task, with one participant fiercely outpacing the others as he interfaced with the device through thought alone. The council murmured approvingly.",
         "source": "action_deck_2"
@@ -1065,7 +1068,7 @@
         "phase": "Action",
         "window": "When you research a technology",
         "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi, where did you even find the time to organize this project?\"",
         "source": "action_deck_2"
@@ -1076,7 +1079,7 @@
         "phase": "Action",
         "window": "When you research a technology",
         "text": "Gain a technology that has no prerequisites.",
-        "notes": "This may be used as a prerequisite of the technology you are researching.",
+        "notes": "This may be used as a prerequisite of the technology you are researching. Nekro can use this card.",
         "automationID": "side_project",
         "flavorText": "Suffi parted her hair, revealing a small metal plate indicative of a neural implant. Xander gasped, realizing she must have had the surgery long ago. \"You did this before the trials were completed?\" Suffi shrugged. \"Before the trials even began.\"",
         "source": "action_deck_2"

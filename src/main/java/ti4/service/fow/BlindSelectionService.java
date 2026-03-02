@@ -74,7 +74,7 @@ public class BlindSelectionService {
             validTargets.append(target).append(VALID_SEPARATOR);
 
             boolean keep;
-            if (TYPE.equals(POSITION)) {
+            if (POSITION.equals(TYPE)) {
                 // position selection: visible tile only
                 keep = visibleTilePositions.contains(target);
             } else {
@@ -132,7 +132,7 @@ public class BlindSelectionService {
 
         boolean invalidTarget = false;
         // Check for position
-        if (type.equals(POSITION)) {
+        if (POSITION.equals(type)) {
             if (!PositionMapper.isTilePositionValid(target)) {
                 invalidTarget = true;
             }
@@ -193,7 +193,7 @@ public class BlindSelectionService {
         if (!originalButtonPrefix.contains(TBD_FACTION)) return originalButtonPrefix;
 
         Player owner;
-        if (type.equals(POSITION)) {
+        if (POSITION.equals(type)) {
             owner = game.getPlayerThatControlsTile(game.getTileByPosition(target));
         } else {
             owner = game.getPlayerThatControlsPlanet(target);

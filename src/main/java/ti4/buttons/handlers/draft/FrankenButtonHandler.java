@@ -149,7 +149,7 @@ public class FrankenButtonHandler {
 
         FrankenDraftBagService.updateFinishedBuildingMessage(game);
         for (Player p : game.getRealPlayers()) {
-            if (p.getStoredValue(key).equals("n")) return;
+            if ("n".equals(p.getStoredValue(key))) return;
         }
 
         MessageChannel channel = game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel();
