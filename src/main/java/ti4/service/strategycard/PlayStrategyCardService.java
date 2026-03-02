@@ -106,7 +106,7 @@ public class PlayStrategyCardService {
                         + game.getSCEmojiWordRepresentation(scToPlay));
 
         StringBuilder message = new StringBuilder();
-        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? "overruled" : " played");
+        message.append(game.getSCEmojiWordRepresentation(scToPlay)).append(isOverrule ? " overruled" : " played");
         if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
