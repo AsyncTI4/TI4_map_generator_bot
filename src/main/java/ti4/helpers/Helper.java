@@ -1073,20 +1073,35 @@ public class Helper {
                 count = Integer.parseInt(thing.split("_")[1]);
             }
             if (flavor.contains("tg") && !flavor.contains("dsgh")) {
-                votes += count * 2;
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
+                    votes += count * 2;
+                } else {
+                    votes += count;
+                }
             } else {
                 votes += count;
             }
             msg.append("> ");
             switch (flavor) {
-                case "tg" ->
-                    msg.append("Spent ")
-                            .append(tg)
-                            .append(" trade good")
-                            .append(tg == 1 ? "" : "s")
-                            .append(" for ")
-                            .append(tg * 2)
-                            .append(" votes.\n");
+                case "tg" -> {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
+                        msg.append("Spent ")
+                                .append(tg)
+                                .append(" trade good")
+                                .append(tg == 1 ? "" : "s")
+                                .append(" for ")
+                                .append(tg * 2)
+                                .append(" votes.\n");
+                    } else {
+                        msg.append("Spent ")
+                                .append(tg)
+                                .append(" trade good")
+                                .append(tg == 1 ? "" : "s")
+                                .append(" for ")
+                                .append(tg)
+                                .append(" votes.\n");
+                    }
+                }
                 case "infantry" ->
                     msg.append("Spent ")
                             .append(player.getSpentInfantryThisWindow())

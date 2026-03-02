@@ -176,9 +176,11 @@ public class TransactionHelper {
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
             if ((p1.hasAbility("pillage")
+                            && !game.isTwilightsFallMode()
                             && !game.getStoredValue("willPillageOwnTransactions" + p1.getFaction())
                                     .isEmpty())
                     || (p2.hasAbility("pillage")
+                            && !game.isTwilightsFallMode()
                             && !game.getStoredValue("willPillageOwnTransactions" + p2.getFaction())
                                     .isEmpty())) {
 

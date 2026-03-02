@@ -18,6 +18,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.combat.StartCombatService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -28,11 +29,14 @@ public class ResonanceGeneratorService {
     }
 
     public void checkCrimsonCommanderUnlock(Game game, Player player, Tile tile) {
-        if (player.hasLeader("crimsoncommander")) {
-            for (Player p2 : game.getRealPlayers()) {
+        if (player.hasLeader("crimsoncommander") && !player.hasLeaderUnlocked("crimsoncommander")) {
+            for (Player p2 : game.getRealPlayersNNeutral()) {
                 if (p2 == player) continue;
                 if (tile.containsPlayersUnits(p2)) {
                     CommanderUnlockCheckService.checkPlayer(player, "crimson");
+                    for (Player p : game.getRealPlayers()) {
+                        StartCombatService.offerRedGhostCommanderButtons(p, game, tile, null);
+                    }
                     break;
                 }
             }

@@ -190,7 +190,7 @@ public class StatusCleanupService {
                         player.removeTech(sharedKnowledge);
                         String msg = player.getRepresentation() + ", " + tech.getRepresentation(false)
                                 + " has been removed, and _Share Knowledge_ has been returned to "
-                                + (game.isFrankenGame() ? "the owner" : "the Deeprought player") + ".";
+                                + (game.isFrankenGame() ? "the owner" : "the Deepwrought player") + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
                 }
