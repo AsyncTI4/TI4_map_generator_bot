@@ -1,27 +1,202 @@
 [
-{"alias":"tk-amalgamate","name":"Amalgamate","phase":"action","window":"Action:","text":"Draw 1 genome.","source":"twilight_kart"},
-{"alias":"tk-avenge","name":"Avenge","phase":"action","window":"After 1 of your units is destroyed during combat:","text":"Roll 2 dice. For each result equal to or greater than that unit’s combat value, your opponent must choose and destroy 1 of their units.","source":"twilight_kart"},
-{"alias":"tk-bestow","name":"Bestow","phase":"action","window":"Action:","text":"Choose up to 4 of your infantry on the game board; replace each of those infantry with mechs.","source":"twilight_kart"},
-{"alias":"tk-commission","name":"Commission","phase":"action","window":"Action:","text":"Place 1 neutral mech on any non-home planet that contains no non-neutral units; if that planet was owned by another player, they return its planet card to the planet card deck.","source":"twilight_kart"},
-{"alias":"tk-conscript","name":"Conscript","phase":"action","window":"Action:","text":"Place 1 neutral destroyer and 2 neutral fighters in a non-home system that contains no non-neutral ships.","source":"twilight_kart"},
-{"alias":"tk-contract","name":"Contract","phase":"action","window":"Action:","text":"Choose a system that contains no more than 3 of your non-fighter ships. Replace each ship in that system with a neutral ship of the same type; gain trade goods equal to the combined cost of those non-fighter ships.","source":"twilight_kart"},
-{"alias":"tk-daunt","name":"Daunt","phase":"action","window":"At the start of the \"Announce Retreats\" step of space combat:","text":"If you are the defender, your opponent must announce a retreat, if able. If you are the attacker, your opponent cannot retreat during this round of space combat.","source":"twilight_kart"},
-{"alias":"tk-evade","name":"Evade","phase":"action","window":"Before you assign hits produced by another player's unit ability roll:","text":"Cancel each of those hits.","source":"twilight_kart"},
-{"alias":"tk-evade","name":"Evade","phase":"action","window":"Before you assign hits produced by another player's unit ability roll:","text":"Cancel each of those hits.","source":"twilight_kart"},
-{"alias":"tk-exhort","name":"Exhort","phase":"action","window":"At the start of a combat round:","text":"Apply +2 to the result of each of your unit's combat rolls during this combat round.","source":"twilight_kart"},
-{"alias":"tk-exhort","name":"Exhort","phase":"action","window":"At the start of a combat round:","text":"Apply +2 to the result of each of your unit's combat rolls during this combat round.","source":"twilight_kart"},
-{"alias":"tk-fortify","name":"Fortify","phase":"action","window":"Action:","text":"Place 1 structure from your reinforcements on a planet you control.","source":"twilight_kart"},
-{"alias":"tk-graft","name":"Graft","phase":"action","window":"When you are negotiating a transaction:","text":"You and the other player can include relics and spliced cards as part of the transaction. This card cannot be cancelled.","source":"twilight_kart"},
-{"alias":"tk-incubate","name":"Incubate","phase":"action","window":"After a player activates a system that contains 1 or more of your ships:","text":"Replace one of your non-fighter ships in that system with one of your dreadnoughts from your reinforcements.","source":"twilight_kart"},
-{"alias":"tk-initiate","name":"Initiate","phase":"action","window":"Action:","text":"Choose 1 planet you control. Either ready each planet you control of that type, or gain 1 trade good for each planet you control of that type.","source":"twilight_kart"},
-{"alias":"tk-oppress","name":"Oppress","phase":"action","window":"Action:","text":"Choose 1 player and look at their hand of action cards.  Choose 1 of those cards and add it to your hand. ","source":"twilight_kart"},
-{"alias":"tk-orchestrate","name":"Orchestrate","phase":"strategy","window":"At the start of the Strategy Phase:","text":"Place a total of 3 trade goods from the supply on strategy cards of your choice; you must place these tokens on at least 2 different cards. Then, gain 2 command tokens.","source":"twilight_kart"},
-{"alias":"tk-ordain","name":"Ordain","phase":"action","window":"Action:","text":"Ready 1 of your planets that has a technology specialty. Then, you may discard 1 of your neighbors' abilities that has a matching technology type.","source":"twilight_kart"},
-{"alias":"tk-posture","name":"Posture","phase":"action","window":"Action:","text":"Draw 1 secret objective.","source":"twilight_kart"},
-{"alias":"tk-preside","name":"Preside","phase":"action","window":"Action:","text":"Reveal and resolve 1 edict.","source":"twilight_kart"},
-{"alias":"tk-raze","name":"Raze","phase":"action","window":"At the start of an invasion:","text":"Each of your non-fighter ships in the active system that do not have BOMBARDMENT gain BOMBARDMENT 5 until the end of the invasion. During this invasion, double the hits produced by your units' BOMBARDMENT rolls.","source":"twilight_kart"},
-{"alias":"tk-riposte","name":"Riposte","phase":"action","window":"After a player activates a system that contains 1 of your command tokens:","text":"Return that command token to your tactic pool. Then, you may remove 1 token from that player's tactic pool and return it to their reinforcements.","source":"twilight_kart"},
-{"alias":"tk-spite","name":"Spite","phase":"action","window":"Action:","text":"Destroy 1 dreadnought, cruiser, destroyer, or carrier in a system adjacent to a planet you control.","source":"twilight_kart"},
-{"alias":"tk-succor","name":"Succor","phase":"action","window":"After another player commits units to land on a planet you control:","text":"Move any number of ground forces from planets you control in the active system or adjacent systems, to planets you control in the active system.","source":"twilight_kart"},
-{"alias":"tk-thwart","name":"Thwart","phase":"action","window":"After another player moves ships into a system that contains your ships:","text":"You may move 1 of your ships into the active system from any system, including systems that contain your command tokens.","source":"twilight_kart"}
+    {
+        "alias": "tk-amalgamate",
+        "name": "Amalgamate",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Draw 1 genome.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-avenge",
+        "name": "Avenge",
+        "phase": "action",
+        "window": "After 1 of your units is destroyed during combat:",
+        "text": "Roll 2 dice. For each result equal to or greater than that unit’s combat value, your opponent must choose and destroy 1 of their units.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-bestow",
+        "name": "Bestow",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Choose up to 4 of your infantry on the game board; replace each of those infantry with mechs.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-commission",
+        "name": "Commission",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Place 1 neutral mech on any non-home planet that contains no non-neutral units; if that planet was owned by another player, they return its planet card to the planet card deck.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-conscript",
+        "name": "Conscript",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Place 1 neutral destroyer and 2 neutral fighters in a non-home system that contains no non-neutral ships.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-contract",
+        "name": "Contract",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Choose a system that contains no more than 3 of your non-fighter ships. Replace each ship in that system with a neutral ship of the same type; gain trade goods equal to the combined cost of those non-fighter ships.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-daunt",
+        "name": "Daunt",
+        "phase": "action",
+        "window": "At the start of the \"Announce Retreats\" step of space combat:",
+        "text": "If you are the defender, your opponent must announce a retreat, if able. If you are the attacker, your opponent cannot retreat during this round of space combat.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-evade",
+        "name": "Evade",
+        "phase": "action",
+        "window": "Before you assign hits produced by another player's unit ability roll:",
+        "text": "Cancel each of those hits.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-evade",
+        "name": "Evade",
+        "phase": "action",
+        "window": "Before you assign hits produced by another player's unit ability roll:",
+        "text": "Cancel each of those hits.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-exhort",
+        "name": "Exhort",
+        "phase": "action",
+        "window": "At the start of a combat round:",
+        "text": "Apply +2 to the result of each of your unit's combat rolls during this combat round.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-exhort",
+        "name": "Exhort",
+        "phase": "action",
+        "window": "At the start of a combat round:",
+        "text": "Apply +2 to the result of each of your unit's combat rolls during this combat round.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-fortify",
+        "name": "Fortify",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Place 1 structure from your reinforcements on a planet you control.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-graft",
+        "name": "Graft",
+        "phase": "action",
+        "window": "When you are negotiating a transaction:",
+        "text": "You and the other player can include relics and spliced cards as part of the transaction. This card cannot be cancelled.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-incubate",
+        "name": "Incubate",
+        "phase": "action",
+        "window": "After a player activates a system that contains 1 or more of your ships:",
+        "text": "Replace one of your non-fighter ships in that system with one of your dreadnoughts from your reinforcements.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-initiate",
+        "name": "Initiate",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Choose 1 planet you control. Either ready each planet you control of that type, or gain 1 trade good for each planet you control of that type.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-oppress",
+        "name": "Oppress",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Choose 1 player and look at their hand of action cards.  Choose 1 of those cards and add it to your hand. ",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-orchestrate",
+        "name": "Orchestrate",
+        "phase": "strategy",
+        "window": "At the start of the Strategy Phase:",
+        "text": "Place a total of 3 trade goods from the supply on strategy cards of your choice; you must place these tokens on at least 2 different cards. Then, gain 2 command tokens.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-ordain",
+        "name": "Ordain",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Ready 1 of your planets that has a technology specialty. Then, you may discard 1 of your neighbors' abilities that has a matching technology type.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-posture",
+        "name": "Posture",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Draw 1 secret objective.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-preside",
+        "name": "Preside",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Reveal and resolve 1 edict.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-raze",
+        "name": "Raze",
+        "phase": "action",
+        "window": "At the start of an invasion:",
+        "text": "Each of your non-fighter ships in the active system that do not have BOMBARDMENT gain BOMBARDMENT 5 until the end of the invasion. During this invasion, double the hits produced by your units' BOMBARDMENT rolls.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-riposte",
+        "name": "Riposte",
+        "phase": "action",
+        "window": "After a player activates a system that contains 1 of your command tokens:",
+        "text": "Return that command token to your tactic pool. Then, you may remove 1 token from that player's tactic pool and return it to their reinforcements.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-spite",
+        "name": "Spite",
+        "phase": "action",
+        "window": "Action:",
+        "text": "Destroy 1 dreadnought, cruiser, destroyer, or carrier in a system adjacent to a planet you control.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-succor",
+        "name": "Succor",
+        "phase": "action",
+        "window": "After another player commits units to land on a planet you control:",
+        "text": "Move any number of ground forces from planets you control in the active system or adjacent systems, to planets you control in the active system.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-thwart",
+        "name": "Thwart",
+        "phase": "action",
+        "window": "After another player moves ships into a system that contains your ships:",
+        "text": "You may move 1 of your ships into the active system from any system, including systems that contain your command tokens.",
+        "source": "twilight_kart"
+    }
 ]
