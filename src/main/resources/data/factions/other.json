@@ -96,7 +96,7 @@
         "alias": "arachian",
         "factionName": "Arachian Weave",
         "homeSystem": "ar1",
-        "startingFleet": "1 cv, 1 dn, 1 dd, 1 inf a, 1 inf k, 3 ff, 1 sd a",
+        "startingFleet": "1 cv, 2 cr, 2 inf a, 1 inf k, 4 ff, 1 sd a",
         "commodities": 3,
         "factionTech": [
             "araracg",

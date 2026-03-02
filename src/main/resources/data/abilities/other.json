@@ -49,7 +49,7 @@
         "id": "predatory_ambush",
         "name": "Predatory Ambush",
         "faction": "arachian",
-        "permanentEffect": "After a player moves ships into a system that contains one of your Command Tokens and your units: Choose up to 2 adjacent systems. Move 1 of your non-fighter ships from each of those systems into the activated system.",
+        "permanentEffect": "At the start of each round of space combat where you are the defending player: If the system contains one of your command tokens, you may move one of your ships from an adjacent system into this system.",
         "source": "other"
     },
     {

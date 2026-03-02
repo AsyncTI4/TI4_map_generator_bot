@@ -40,7 +40,7 @@
         "name": "Qekob",
         "title": "The Weaver",
         "abilityWindow": "Action",
-        "abilityText": "Choose a system with a player’s command token. That player may remove one of their ships from that system and place it in that player’s home system if it contains no other player’s ships.",
+        "abilityText": "Choose a system with a player’s command token. That player may move one of their ships from that system to that player’s home system if it contains no other player’s ships.",
         "unlockCondition": "Always Unlocked",
         "source": "other"
     },
@@ -51,7 +51,7 @@
         "name": "Zraaqu",
         "title": "The Spinner",
         "abilityWindow": "At the start of a space combat in a system with your command token:",
-        "abilityText": "If you are the defender, you may choose up to 2 of your opponent’s units. Those units roll 1 less combat die during the first round of this combat.",
+        "abilityText": "For each of your command tokens in this system and adjacent systems, you may choose one of your opponent’s units. Those units roll 1 less combat die during the first round of this combat",
         "unlockCondition": "Have 6 of your Command Tokens on the game board",
         "source": "other"
     },

@@ -708,12 +708,11 @@ public class PromissoryNoteHelper {
         if (promissoryNotes.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Promissory Notes in hand");
         }
+        for (String pn : sourcePlayer.getPromissoryNotesInPlayArea()) {
+            promissoryNotes.remove(pn);
+        }
         Collections.shuffle(promissoryNotes);
         String promissoryNoteId = promissoryNotes.getFirst();
-        if (game.isFowMode()) {
-            FoWHelper.pingPlayersTransaction(
-                    game, event, sourcePlayer, targetPlayer, CardEmojis.getACEmoji(game) + " Action Card", null);
-        }
 
         sourcePlayer.removePromissoryNote(promissoryNoteCounts.get(promissoryNoteId));
         sendPromissoryNoteInfo(game, sourcePlayer, false);

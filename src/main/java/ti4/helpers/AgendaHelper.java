@@ -2884,6 +2884,12 @@ public class AgendaHelper {
                 planetButtons.add(Buttons.gray(
                         "exhaustForVotes_hacanCommanderTg", "Spend Trade Goods for 2 Votes Each", FactionEmojis.Hacan));
             }
+            if (player.isSpeaker() && !game.getStoredValue("executiveOrder").isEmpty()) {
+                planetButtons.add(Buttons.gray(
+                        "exhaustForVotes_hacanCommanderTg",
+                        "Spend Trade Goods for 1 Vote Each",
+                        FactionEmojis.Keleres));
+            }
 
             if (game.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")) {
                 planetButtons.add(Buttons.gray(
