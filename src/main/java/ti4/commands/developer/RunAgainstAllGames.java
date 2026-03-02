@@ -24,35 +24,26 @@ class RunAgainstAllGames extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
-        Set<Long> usedCreationDateTimes = new HashSet<>();
+        Set<String> gamesWithMissingEndDates = new HashSet<>();
 
         List<String> changedGames = new ArrayList<>();
         GamesPage.consumeAllGames(game -> {
-            boolean changed = makeChanges(game, usedCreationDateTimes);
+            boolean changed = makeChanges(game, gamesWithMissingEndDates);
             if (changed) {
                 changedGames.add(game.getName());
                 GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
             }
         });
 
+        BotLogger.info(String.join(", ", gamesWithMissingEndDates));
+
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
         BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()
                 + " games: " + String.join(", ", changedGames));
     }
 
-    private static boolean makeChanges(Game game, Set<Long> usedCreationDateTimes) {
-        long creationDateTime = game.getCreationDateTime();
-        if (usedCreationDateTimes.add(creationDateTime)) {
-            return false;
-        }
-
-        long updatedCreationDateTime = creationDateTime + ONE_SECOND_MILLIS;
-        while (usedCreationDateTimes.contains(updatedCreationDateTime)) {
-            updatedCreationDateTime += ONE_SECOND_MILLIS;
-        }
-
-        game.setCreationDateTime(updatedCreationDateTime);
-        usedCreationDateTimes.add(updatedCreationDateTime);
-        return true;
+    private static boolean makeChanges(Game game, Set<String> gamesWithMissingEndDates) {
+        if (game.isHasEnded() && game.getEndedDate() == 0) gamesWithMissingEndDates.add(game.getName());
+        return false;
     }
 }

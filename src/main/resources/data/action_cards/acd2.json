@@ -213,7 +213,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control.",
         "automationID": "defense_installation",
         "flavorText": "Tellurian had heard rumors of their kind roaming to the far corners of the galaxy. However, many such tales had led them to nothing more than decrepit defense systems. Alas, no stone could be left unturned.",
         "source": "action_deck_2"
@@ -223,7 +223,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control.",
         "automationID": "defense_installation",
         "flavorText": "The native folk had enshrined the ancient structure as if it were a deity. They called it a guardian, as the old texts described it, but they did not understand its true nature.",
         "source": "action_deck_2"
@@ -233,7 +233,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control.",
         "automationID": "defense_installation",
         "flavorText": "Tellurian raised their arms above their head and emitted a strange noise that the locals presumed to be joyous. In the near distance, one of its kind broke through the earth, shattering the landscape.",
         "source": "action_deck_2"
@@ -243,7 +243,7 @@
         "name": "Defense Installation",
         "phase": "Action",
         "window": "ACTION",
-        "text": "Place 1 PDS from your reinforcements on a planet you control that does not contain 1 of your PDS.",
+        "text": "Place 1 PDS from your reinforcements on a planet you control.",
         "automationID": "defense_installation",
         "flavorText": "Tellurian declared that the planet was under the protection of Ul, for the sleepers had awoken and would not rest until peace was assured.",
         "source": "action_deck_2"
@@ -875,7 +875,7 @@
         "name": "Swindle",
         "phase": "Action",
         "window": "When another player gains 2 or more trade goods",
-        "text": "That player gains 1 additional trade good. Then, take 3 of those trade goods.",
+        "text": "Take 2 of those trade goods and gain 1 trade good.",
         "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
         "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"

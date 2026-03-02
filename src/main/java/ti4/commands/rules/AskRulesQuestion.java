@@ -41,6 +41,6 @@ class AskRulesQuestion extends Subcommand {
                 .build();
         rulesChannel.sendMessage(messageData).queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(
-                event, "Your question has been sent to the " + RULES_CHANNEL_NAME + " channel.");
+                event, "Your question has been sent to the " + rulesChannel.getJumpUrl() + " channel.");
     }
 }
