@@ -1,7 +1,47 @@
 [
-{"alias":"tk-catalyze","name":"Catalyze","category":"agenda","type":"Directive","target":"Edict","text1":"Draw 1 card from any splice deck. Then, roll 1 die. On a result of a 1 or 10, put the Fracture into play, otherwise, destroy each unit in the Styx system and place neutral units in that system as indicated on the back of its system tile. If Styx was owned by a player, they return its planet card to the planet card deck.","source":"twilight_kart"},
-{"alias":"tk-endorse","name":"Endorse","category":"agenda","type":"Directive","target":"Edict","text1":"Place any player’s control token on this card. That player does not have to spend a command token to resolve the secondary ability of any strategy card. Discard this card at the end of the status phase.","source":"twilight_kart"},
-{"alias":"tk-enfilade","name":"Enfilade","category":"agenda","type":"Directive","target":"Edict","text1":"Perform the following effect, twice: Place 1 structure on a planet you control or destroy 1 structure. Then, each other player may place 1 PDS on a planet they control.","source":"twilight_kart"},
-{"alias":"tk-sanctuary","name":"Sanctuary","category":"agenda","type":"Directive","target":"Edict","text1":"Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from their reinforcements in the chosen system.","source":"twilight_kart"},
-{"alias":"tk-spoil","name":"Spoil","category":"agenda","type":"Directive","target":"Edict","text1":"Gain 5 trade goods. Then, each other player loses trade goods equal to their commodity value.","source":"twilight_kart"}
+    {
+        "alias": "tk-catalyze",
+        "name": "Catalyze",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Draw 1 card from any splice deck. Then, roll 1 die. On a result of a 1 or 10, put the Fracture into play, otherwise, destroy each unit in the Styx system and place neutral units in that system as indicated on the back of its system tile. If Styx was owned by a player, they return its planet card to the planet card deck.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-endorse",
+        "name": "Endorse",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Place any player’s control token on this card. That player does not have to spend a command token to resolve the secondary ability of any strategy card. Discard this card at the end of the status phase.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-enfilade",
+        "name": "Enfilade",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Perform the following effect, twice: Place 1 structure on a planet you control or destroy 1 structure. Then, each other player may place 1 PDS on a planet they control.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-sanctuary",
+        "name": "Sanctuary",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Choose 1 system other than the Mecatol Rex system that contains a planet you control; each other player places a command token from their reinforcements in the chosen system.",
+        "source": "twilight_kart"
+    },
+    {
+        "alias": "tk-spoil",
+        "name": "Spoil",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Edict",
+        "text1": "Gain 5 trade goods. Then, each other player loses trade goods equal to their commodity value.",
+        "source": "twilight_kart"
+    }
 ]
