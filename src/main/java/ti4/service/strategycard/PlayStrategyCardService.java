@@ -56,7 +56,7 @@ public class PlayStrategyCardService {
             Game game,
             MessageChannel mainGameChannel,
             Player player) {
-        playSC(event, scToPlay, game, mainGameChannel, player, false);
+        playSC(event, scToPlay, game, mainGameChannel, player, false, false);
     }
 
     public static void playSC(
@@ -66,6 +66,17 @@ public class PlayStrategyCardService {
             MessageChannel mainGameChannel,
             Player player,
             boolean winnuHero) {
+        playSC(event, scToPlay, game, mainGameChannel, player, winnuHero, false);
+    }
+
+    public static void playSC(
+            GenericInteractionCreateEvent event,
+            Integer scToPlay,
+            Game game,
+            MessageChannel mainGameChannel,
+            Player player,
+            boolean winnuHero,
+            boolean isOverrule) {
         StrategyCardModel scModel =
                 game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
         if (scModel == null) { // Temporary Error Reporting
@@ -171,6 +182,15 @@ public class PlayStrategyCardService {
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero, player));
+        if (isOverrule) {
+            scButtons.removeIf(button -> {
+                String id = button.getCustomId();
+                return id != null
+                        && (id.startsWith("sc_follow_")
+                                || "sc_trade_follow".equals(id)
+                                || id.startsWith("sc_no_follow_"));
+            });
+        }
         if (scModel.usesAutomationForSCID("pok7technology")
                 && !game.isFowMode()
                 && Helper.getPlayerFromAbility(game, "propagation") != null) {
@@ -184,7 +204,9 @@ public class PlayStrategyCardService {
             scButtons.add(Buttons.gray(
                     "titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));
         }
-        scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
+        if (!isOverrule) {
+            scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
+        }
 
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
