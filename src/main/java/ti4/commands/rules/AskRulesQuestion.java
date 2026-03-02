@@ -1,12 +1,16 @@
 package ti4.commands.rules;
 
+import java.util.Collections;
 import java.util.List;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 class AskRulesQuestion extends Subcommand {
@@ -31,7 +35,11 @@ class AskRulesQuestion extends Subcommand {
 
         TextChannel rulesChannel = channels.getFirst();
         String message = "A player asked, \"" + question + "\"";
-        MessageHelper.sendMessageToChannel(rulesChannel, message);
+        var messageData = new MessageCreateBuilder()
+                .addContent(message)
+                .setAllowedMentions(Collections.emptyList())
+                .build();
+        rulesChannel.sendMessage(messageData).queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToEventChannel(
                 event, "Your question has been sent to the " + RULES_CHANNEL_NAME + " channel.");
     }
