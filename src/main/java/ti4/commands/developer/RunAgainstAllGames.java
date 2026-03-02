@@ -1,8 +1,8 @@
 package ti4.commands.developer;
 
-import java.util.ArrayList;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
@@ -24,26 +24,28 @@ class RunAgainstAllGames extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Running custom command against all games.");
 
-        Set<String> gamesWithMissingEndDates = new HashSet<>();
-
-        List<String> changedGames = new ArrayList<>();
+        Set<String> changedGames = new HashSet<>();
         GamesPage.consumeAllGames(game -> {
-            boolean changed = makeChanges(game, gamesWithMissingEndDates);
+            boolean changed = makeChanges(game);
             if (changed) {
                 changedGames.add(game.getName());
                 GameManager.save(game, "Developer ran custom command against this game, probably migration related.");
             }
         });
 
-        BotLogger.info(String.join(", ", gamesWithMissingEndDates));
-
         MessageHelper.sendMessageToChannel(event.getChannel(), "Finished custom command against all games.");
         BotLogger.info("Changes made to " + changedGames.size() + " games out of " + GameManager.getGameCount()
                 + " games: " + String.join(", ", changedGames));
     }
 
-    private static boolean makeChanges(Game game, Set<String> gamesWithMissingEndDates) {
-        if (game.isHasEnded() && game.getEndedDate() == 0) gamesWithMissingEndDates.add(game.getName());
-        return false;
+    private static boolean makeChanges(Game game) {
+        if (game.getEndedDate() != 0) return false;
+        if (!game.isHasEnded()) return false;
+
+        Instant creationInstant = Instant.ofEpochMilli(game.getCreationDateTime());
+        long fakedEndDate =
+                creationInstant.atZone(ZoneOffset.UTC).plusMonths(3).toInstant().toEpochMilli();
+        game.setEndedDate(fakedEndDate);
+        return true;
     }
 }
