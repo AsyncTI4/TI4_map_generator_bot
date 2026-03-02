@@ -37,6 +37,9 @@ public class GameEntity {
     @Column(name = "victory_point_goal")
     private int victoryPointGoal;
 
+    @Column(name = "is_has_ended")
+    private boolean hasEnded;
+
     @Column(name = "is_completed")
     private boolean completed;
 

@@ -75,6 +75,7 @@ public class PersistAllEntitiesService {
         gameEntity.setVictoryPointGoal(game.getVp());
         gameEntity.setCreationEpochMilliseconds(game.getCreationDateTime());
         gameEntity.setEndedEpochMilliseconds(getEndedDate(game));
+        gameEntity.setHasEnded(game.isHasEnded());
         gameEntity.setCompleted(game.getWinner().isPresent() && game.isHasEnded());
         gameEntity.setFractureInPlay(FractureService.isFractureInPlay(game));
         gameEntity.setHomebrew(game.isHomebrew());

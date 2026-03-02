@@ -29,14 +29,14 @@ public class UserGameInfoService {
         return toResultString(users, statsByUserId);
     }
 
-    private static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
+    static Map<String, UserGameStatsAccumulator> buildUserStats(List<PlayerEntity> players) {
         Map<String, UserGameStatsAccumulator> statsByUserId = new HashMap<>();
         for (PlayerEntity player : players) {
             UserGameStatsAccumulator stats = statsByUserId.computeIfAbsent(
                     player.getUser().getId(),
                     k -> new UserGameStatsAccumulator(player.getUser().getName()));
 
-            if (player.getGame().getEndedEpochMilliseconds() == null) {
+            if (!player.getGame().isHasEnded()) {
                 stats.ongoingGames++;
                 continue;
             }
@@ -50,10 +50,12 @@ public class UserGameInfoService {
                 stats.wins++;
             }
 
-            long creation = player.getGame().getCreationEpochMilliseconds();
-            long ended = player.getGame().getEndedEpochMilliseconds();
-            int days = (int) Duration.ofMillis(ended - creation).toDays();
-            stats.completedGameDays.add(days);
+            Long ended = player.getGame().getEndedEpochMilliseconds();
+            if (ended != null) {
+                long creation = player.getGame().getCreationEpochMilliseconds();
+                int days = (int) Duration.ofMillis(ended - creation).toDays();
+                stats.completedGameDays.add(days);
+            }
         }
         return statsByUserId;
     }
@@ -95,12 +97,12 @@ public class UserGameInfoService {
         return sb.toString();
     }
 
-    private static class UserGameStatsAccumulator {
-        private final String username;
-        private int completedGames;
-        private int ongoingGames;
-        private int wins;
-        private final List<Integer> completedGameDays = new ArrayList<>();
+    static class UserGameStatsAccumulator {
+        final String username;
+        int completedGames;
+        int ongoingGames;
+        int wins;
+        final List<Integer> completedGameDays = new ArrayList<>();
 
         UserGameStatsAccumulator(String username) {
             this.username = username;
