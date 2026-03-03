@@ -63,9 +63,9 @@ public class FrankenAbilityService {
                         player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                                 + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
-                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
-                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
-                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player);
             }
             if ("industrialists".equalsIgnoreCase(abilityID)) {
                 String unitID = AliasHandler.resolveUnit("spacedock");
