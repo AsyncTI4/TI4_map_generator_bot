@@ -678,9 +678,9 @@ public class MiltyService {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                             + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
-            ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
-            ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
-            ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
+            ButtonHelperHeroes.offerOlradinHeroFlips(player);
+            ButtonHelperHeroes.offerOlradinHeroFlips(player);
+            ButtonHelperHeroes.offerOlradinHeroFlips(player);
         }
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(
