@@ -875,7 +875,7 @@
         "name": "Swindle",
         "phase": "Action",
         "window": "When another player gains 2 or more trade goods",
-        "text": "Take 2 of those trade goods and gain 1 trade good.",
+        "text": "Take 2 of those trade goods and gain 2 commodities.",
         "notes": "Gaining trade goods includes any time your number of trade goods go up, other than converting your own commodities. This includes from transactions.",
         "flavorText": "\"Yeah, nah—we didn't nick that hull off the Baron,\" Ipswitch cut in with a smirk. \"We pinched it off some right stinkin' void-rats—who pinched it off 'im. Lucky for us, the dogs ate the paperwork. Possession's nine-tenths and all.\"",
         "source": "action_deck_2"

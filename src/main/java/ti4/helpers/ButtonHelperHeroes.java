@@ -1939,16 +1939,17 @@ public class ButtonHelperHeroes {
 
     public static List<Button> getEmpyHeroButtons(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
-        List<Button> empties = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (!tile.getPlanetUnitHolders().isEmpty() || !FoWHelper.playerHasShipsInSystem(player, tile)) {
-                continue;
-            }
-            empties.add(Buttons.blue(
-                    finChecker + "exploreFront_" + tile.getPosition(),
-                    "Explore " + tile.getRepresentationForButtons(game, player)));
-        }
-        return empties;
+        var frontierTokenId = Mapper.getTokenID(Constants.FRONTIER);
+        return game.getTileMap().values().stream()
+                .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
+                .filter(tile -> tile.getUnitHolders()
+                        .get("space")
+                        .getTokenList()
+                        .contains(frontierTokenId))
+                .map(tile -> Buttons.blue(
+                        finChecker + "exploreFront_" + tile.getPosition(),
+                        "Explore " + tile.getRepresentationForButtons(game, player)))
+                .toList();
     }
 
     @ButtonHandler("naaluHeroSend")
