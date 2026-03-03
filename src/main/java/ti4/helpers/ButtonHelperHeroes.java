@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -63,6 +64,7 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
+@UtilityClass
 public class ButtonHelperHeroes {
 
     public static void argentHeroStep1(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -96,7 +98,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("argentHeroStep2_")
-    public static void argentHeroStep2(Game game, Player player, GenericInteractionCreateEvent event, String buttonID) {
+    public static void argentHeroStep2(Game game, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String pos1 = buttonID.split("_")[1];
         Tile destination = game.getTileByPosition(pos1);
@@ -113,7 +115,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    public static void xxchaHeroTEStart(Game game, Player player) {
+    public static void xxchaHeroTEStart(Player player) {
         List<Button> buttons = new ArrayList<>();
 
         String msg = player.getRepresentation() + ", please choose whether you want to place a mech or a PDS.";
@@ -294,7 +296,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("khraskHeroStep2_")
-    public static void resolveKhraskHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveKhraskHeroStep2(Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String faction = buttonID.split("_")[1];
         buttons.add(Buttons.green("khraskHeroStep3Ready_" + faction, "Ready a Planet"));
@@ -344,7 +346,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveAxisHeroStep1(Player player, Game game) {
+    public static void resolveAxisHeroStep1(Player player) {
         List<Button> buttons = new ArrayList<>();
         String message = player.getRepresentation() + ", please choose _Axis Order_ you wish to send.";
         for (String shipOrder : ButtonHelper.getPlayersShipOrders(player)) {
@@ -800,7 +802,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getTilesToGhotiHeroIn(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static List<Button> getTilesToGhotiHeroIn(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -817,8 +819,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static List<Button> getUnitsToGlimmersHero(
-            Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
+    public static List<Button> getUnitsToGlimmersHero(Player player, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(
                 UnitType.Destroyer,
@@ -857,7 +858,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static List<Button> getTilesToGlimmersHeroIn(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static List<Button> getTilesToGlimmersHeroIn(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -994,7 +995,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static List<Button> getPossibleTechForVeldyrToGainFromPlayer(Player veldyr, Player victim, Game game) {
+    public static List<Button> getPossibleTechForVeldyrToGainFromPlayer(Player veldyr, Player victim) {
         List<Button> techToGain = new ArrayList<>();
         List<String> techs = new ArrayList<>();
         for (String tech : victim.getTechs()) {
@@ -1198,7 +1199,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("purgeMentakHero_")
-    public static void purgeMentakHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void purgeMentakHero(Player player, Game game, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("mentakhero");
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(
@@ -1229,7 +1230,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("refreshBelkoseaHero")
-    public static void refreshBelkoseaHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void refreshBelkoseaHero(Player player, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("belkoseahero");
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(
@@ -1245,7 +1246,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("exhaustBelkoseaHero")
-    public static void exhaustBelkoseaHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void exhaustBelkoseaHero(Player player, ButtonInteractionEvent event) {
         Leader playerLeader = player.unsafeGetLeader("belkoseahero");
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(
@@ -1264,7 +1265,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("purgeTech_")
-    public static void purgeTech(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void purgeTech(Player player, ButtonInteractionEvent event, String buttonID) {
         String techID = buttonID.replace("purgeTech_", "");
         player.purgeTech(techID);
         String msg = player.getRepresentationUnfogged() + " purged _"
@@ -1311,7 +1312,6 @@ public class ButtonHelperHeroes {
                 continue;
             }
 
-            Set<UnitKey> uk = unitHolder.getUnitKeys();
             StringBuilder emoji = new StringBuilder();
             for (UnitKey key : unitHolder.getUnitKeys()) {
                 if (!p2.getColor().equals(key.getColor())) continue;
@@ -1319,7 +1319,7 @@ public class ButtonHelperHeroes {
                 unitHolder.removeUnit(key, amt);
                 emoji.append(key.unitEmoji().emojiString().repeat(amt));
             }
-            if (emoji.length() > 0) {
+            if (!emoji.isEmpty()) {
                 message.append(p2.getRepresentation())
                         .append(", your ")
                         .append(emoji)
@@ -1583,7 +1583,6 @@ public class ButtonHelperHeroes {
 
                     int[] capNCap = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false);
                     int fleetUsed = capNCap[0];
-                    int capacityNDockUsed = capNCap[1];
                     int capacity = capNCap[2];
                     int dockedFighters = capNCap[3];
                     int fighter2s = capNCap[4];
@@ -1939,16 +1938,15 @@ public class ButtonHelperHeroes {
 
     public static List<Button> getEmpyHeroButtons(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
-        List<Button> empties = new ArrayList<>();
-        for (Tile tile : game.getTileMap().values()) {
-            if (!tile.getPlanetUnitHolders().isEmpty() || !FoWHelper.playerHasShipsInSystem(player, tile)) {
-                continue;
-            }
-            empties.add(Buttons.blue(
-                    finChecker + "exploreFront_" + tile.getPosition(),
-                    "Explore " + tile.getRepresentationForButtons(game, player)));
-        }
-        return empties;
+        var frontierTokenId = Mapper.getTokenID(Constants.FRONTIER);
+        return game.getTileMap().values().stream()
+                .filter(tile -> FoWHelper.playerHasShipsInSystem(player, tile))
+                .filter(tile ->
+                        tile.getUnitHolders().get("space").getTokenList().contains(frontierTokenId))
+                .map(tile -> Buttons.blue(
+                        finChecker + "exploreFront_" + tile.getPosition(),
+                        "Explore " + tile.getRepresentationForButtons(game, player)))
+                .toList();
     }
 
     @ButtonHandler("naaluHeroSend")
@@ -2195,7 +2193,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void offerOlradinHeroFlips(Game game, Player player) {
+    public static void offerOlradinHeroFlips(Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("olradinHeroFlip_people", "People Policy"));
         buttons.add(Buttons.green("olradinHeroFlip_environment", "Environment Policy"));
@@ -2751,7 +2749,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("yssarilHeroRejection_")
-    public static void yssarilHeroRejection(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void yssarilHeroRejection(Game game, ButtonInteractionEvent event, String buttonID) {
         String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
         Player notYssaril = game.getPlayerFromColorOrFaction(playerFaction);
         if (notYssaril != null) {
@@ -2806,7 +2804,7 @@ public class ButtonHelperHeroes {
     }
 
     @ButtonHandler("toldarHero_")
-    public static void toldarHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+    public static void toldarHero(Game game, Player player, String buttonID) {
         String obj = buttonID.replace("toldarHero_", "");
         game.setStoredValue("toldarHeroObj", obj);
         game.setStoredValue("toldarHeroPlayer", player.getFaction());

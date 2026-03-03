@@ -42,7 +42,7 @@ public class VaultsOfTheHeirService {
     private static void resolveVaultsOfTheHeir(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String tech = buttonID.replace("purgeTechVaults_", "");
-        ButtonHelperHeroes.purgeTech(player, game, event, tech); // deletes message
+        ButtonHelperHeroes.purgeTech(player, event, tech); // deletes message
         RelicHelper.drawRelicAndNotify(player, event, game);
         ButtonHelper.deleteMessage(event);
     }
