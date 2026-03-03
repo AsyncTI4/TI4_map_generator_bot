@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import math
 import os
 import sys
 import time
@@ -14,7 +15,8 @@ from urllib.request import Request, urlopen
 DISCORD_API_BASE = "https://discord.com/api/v10"
 _MAX_RETRIES = 5
 _MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024  # 25 MB Discord default limit
-_NITRO_MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024  # 500 MB Discord Nitro limit
+# Upper limit for direct Discord uploads; configurable to match the guild's actual boost tier.
+_MAX_DISCORD_UPLOAD_BYTES = int(os.getenv("DISCORD_MAX_UPLOAD_BYTES", str(500 * 1024 * 1024)))
 
 
 def _auth_header(token: str, auth_type: str) -> str:
@@ -94,24 +96,44 @@ def _request_upload_url(
 def _upload_file_to_url(upload_url: str, file_bytes: bytes) -> None:
     """Upload file bytes to a pre-signed Discord upload URL via HTTP PUT."""
     # Allow at least 60 s per 10 MB (assumes ~170 KB/s minimum), with a 120 s floor.
-    timeout = max(120, len(file_bytes) // (10 * 1024 * 1024) * 60)
-    request = Request(
-        upload_url,
-        data=file_bytes,
-        headers={
-            "Content-Type": "video/mp4",
-            "Content-Length": str(len(file_bytes)),
-        },
-        method="PUT",
-    )
-    try:
-        with urlopen(request, timeout=timeout) as response:
-            response.read()
-    except HTTPError as exc:
-        body_text = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"File upload to pre-signed URL failed ({exc.code}): {body_text}") from exc
-    except URLError as exc:
-        raise RuntimeError(f"File upload to pre-signed URL failed: {exc.reason}") from exc
+    timeout = max(120, math.ceil(len(file_bytes) / (10 * 1024 * 1024)) * 60)
+    for attempt in range(_MAX_RETRIES):
+        request = Request(
+            upload_url,
+            data=file_bytes,
+            headers={
+                "Content-Type": "video/mp4",
+                "Content-Length": str(len(file_bytes)),
+            },
+            method="PUT",
+        )
+        try:
+            with urlopen(request, timeout=timeout) as response:
+                response.read()
+            return
+        except HTTPError as exc:
+            body_text = exc.read().decode("utf-8", errors="replace")
+            if 500 <= exc.code < 600 and attempt < _MAX_RETRIES - 1:
+                backoff = 2 ** attempt
+                print(
+                    f"Transient error during file upload ({exc.code}); retrying in {backoff}s "
+                    f"(attempt {attempt + 1}/{_MAX_RETRIES})",
+                    file=sys.stderr,
+                )
+                time.sleep(backoff)
+                continue
+            raise RuntimeError(f"File upload to pre-signed URL failed ({exc.code}): {body_text}") from exc
+        except URLError as exc:
+            if attempt < _MAX_RETRIES - 1:
+                backoff = 2 ** attempt
+                print(
+                    f"Network error during file upload ({exc.reason}); retrying in {backoff}s "
+                    f"(attempt {attempt + 1}/{_MAX_RETRIES})",
+                    file=sys.stderr,
+                )
+                time.sleep(backoff)
+                continue
+            raise RuntimeError(f"File upload to pre-signed URL failed: {exc.reason}") from exc
 
 
 def _post_uploaded_attachment(
@@ -214,17 +236,17 @@ def post_video_to_thread(
     file_bytes = file_path.read_bytes()
     file_size = len(file_bytes)
 
-    if file_size > _NITRO_MAX_FILE_SIZE_BYTES:
+    if file_size > _MAX_DISCORD_UPLOAD_BYTES:
         if artifact_url:
             msg = (
                 f"The video for `{file_path.name}` is too large to upload directly to Discord "
-                f"({file_size:,} bytes, limit is {_NITRO_MAX_FILE_SIZE_BYTES:,} bytes).\n"
+                f"({file_size:,} bytes, limit is {_MAX_DISCORD_UPLOAD_BYTES:,} bytes).\n"
                 f"Download it from the GitHub Actions artifact instead:\n{artifact_url}"
             )
             post_message_to_thread(thread_id, msg, token, auth_type)
             return
         raise ValueError(
-            f"File '{file_path}' is {file_size} bytes, exceeding the {_NITRO_MAX_FILE_SIZE_BYTES}-byte Discord Nitro limit."
+            f"File '{file_path}' is {file_size} bytes, exceeding the {_MAX_DISCORD_UPLOAD_BYTES}-byte Discord upload limit."
         )
 
     if file_size > _MAX_FILE_SIZE_BYTES:
