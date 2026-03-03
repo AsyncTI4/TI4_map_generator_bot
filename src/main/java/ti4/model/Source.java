@@ -35,6 +35,7 @@ public class Source {
         uncharted_space,
         monuments,
         blue_reverie,
+        twilight_kart,
 
         // lil homebrew
         lazax,
@@ -171,6 +172,7 @@ public class Source {
                         case lazax -> FactionEmojis.Lazax;
                         case salliance -> SourceEmojis.StrategicAlliance;
                         case monuments -> SourceEmojis.Monuments;
+                        case twilight_kart -> SourceEmojis.TwilightKart;
                         default -> null;
                     };
             return emoji == null ? "" : emoji.toString();
