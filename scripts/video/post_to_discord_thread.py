@@ -16,7 +16,7 @@ DISCORD_API_BASE = "https://discord.com/api/v10"
 _MAX_RETRIES = 5
 _MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024  # 25 MB Discord default limit
 # Upper limit for direct Discord uploads; configurable to match the guild's actual boost tier.
-_MAX_DISCORD_UPLOAD_BYTES = int(os.getenv("DISCORD_MAX_UPLOAD_BYTES", str(500 * 1024 * 1024)))
+_MAX_DISCORD_UPLOAD_BYTES = int(os.getenv("DISCORD_MAX_UPLOAD_BYTES", str(100 * 1024 * 1024)))
 
 
 def _auth_header(token: str, auth_type: str) -> str:
