@@ -64,7 +64,7 @@
         "source": "twilight_kart"
     },
     {
-        "alias": "tk-evade",
+        "alias": "tk-evade2",
         "name": "Evade",
         "phase": "action",
         "window": "Before you assign hits produced by another player's unit ability roll:",
@@ -80,7 +80,7 @@
         "source": "twilight_kart"
     },
     {
-        "alias": "tk-exhort",
+        "alias": "tk-exhort2",
         "name": "Exhort",
         "phase": "action",
         "window": "At the start of a combat round:",
