@@ -83,8 +83,7 @@ public interface TwilightFallDeckFuncs {
                 }
             }
             if (shouldRemove) {
-                if ("hacanhero".equalsIgnoreCase(card))
-                    allCards.remove("sanctionhero");
+                if ("hacanhero".equalsIgnoreCase(card)) allCards.remove("sanctionhero");
                 allCards.remove(card);
             }
         }
