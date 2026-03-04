@@ -44,7 +44,7 @@ public class SusSlashCommandService {
                 && !isSinglePlayerGame
                 && (isPrivateThread || isNotGameChannel)
                 && !isPublicThread) {
-            reportToSusSlashCommandLog(event, jumpUrl);
+            reportToSusSlashCommandLog(event, jumpUrl, gameName);
             String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
                     + event.getFullCommandName() + "`";
             MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
@@ -76,17 +76,19 @@ public class SusSlashCommandService {
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        String message = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 
-    private static void reportToSusSlashCommandLog(SlashCommandInteractionEvent event, String jumpUrl) {
+    private static void reportToSusSlashCommandLog(
+            SlashCommandInteractionEvent event, String jumpUrl, String gameName) {
         TextChannel moderationLogChannel =
                 JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        String message = event.getUser().getEffectiveName() + " (" + gameName + ") `" + event.getCommandString() + "` "
+                + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 }
