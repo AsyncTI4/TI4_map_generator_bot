@@ -118,8 +118,8 @@ public class ButtonHelperTwilightsFall {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you are #" + number
-                + " pick in this splice and so can queue " + number + " cards."
+        StringBuilder msg = new StringBuilder(player.getRepresentationNoPing() + " you have " + number
+                + " people ahead of you to pick in this splice and so can queue " + number + " cards."
                 + " So far you have queued " + numQueued + " cards. ");
         if (numQueued > 0) {
             msg.append(
@@ -186,7 +186,20 @@ public class ButtonHelperTwilightsFall {
         game.setStoredValue(
                 player.getFaction() + "splicequeue",
                 game.getStoredValue(player.getFaction() + "splicequeue") + spliceCard + "_");
+
         String alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
+        for (String spliceCard2 : alreadyQueued.split("_")) {
+            List<String> cards = getSpliceCards(game);
+            boolean held = !cards.contains(spliceCard2)
+                    && !"antimatter".equalsIgnoreCase(spliceCard2)
+                    && !"wavelength".equalsIgnoreCase(spliceCard2);
+            if (held) {
+                game.setStoredValue(
+                        player.getFaction() + "splicequeue",
+                        game.getStoredValue(player.getFaction() + "splicequeue").replace(spliceCard2 + "_", ""));
+            }
+        }
+        alreadyQueued = game.getStoredValue(player.getFaction() + "splicequeue");
         int number = getParticipantsList(game).indexOf(player) + 1;
         int numQueued = alreadyQueued.split("_").length;
         if (alreadyQueued.isEmpty()) {
