@@ -1,15 +1,17 @@
 package ti4.listeners;
 
-import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
-import net.dv8tion.jda.api.audit.ActionType;
-import net.dv8tion.jda.api.audit.AuditLogEntry;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.executors.ExecutorServiceManager;
+import ti4.map.Game;
+import ti4.map.persistence.GameManager;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
+import ti4.service.game.GameNameService;
 import ti4.spring.jda.JdaService;
 
 public class DeletionListener extends ListenerAdapter {
@@ -17,8 +19,7 @@ public class DeletionListener extends ListenerAdapter {
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
         if (!validateEvent(event)) {}
-        // ExecutorServiceManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
-        // reinstate this when it works/someone has time to make it work.
+        ExecutorServiceManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
     }
 
     private static boolean validateEvent(MessageDeleteEvent event) {
@@ -37,30 +38,25 @@ public class DeletionListener extends ListenerAdapter {
                             .orElse(null);
             if (deletionLogChannel == null) return;
             long messageId = event.getMessageIdLong();
-            long channelId = event.getChannel().getIdLong();
-            Guild guild = event.getGuild();
-
-            guild.retrieveAuditLogs()
-                    .type(ActionType.MESSAGE_DELETE)
-                    .limit(10)
-                    .queueAfter(10, TimeUnit.SECONDS, auditLogs -> {
-                        AuditLogEntry relevantLog = auditLogs.stream()
-                                .filter(log -> log.getTargetIdLong() == messageId)
-                                .findFirst()
-                                .orElse(null);
-
-                        if (relevantLog != null) {
-                            String deleter = relevantLog.getUser().getName();
-                            String deletedMessageAuthor = event.getJDA()
-                                    .getUserById(relevantLog.getChanges().get(0).getOldValue())
-                                    .getName();
+            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            if (GameManager.isValid(gameName)) {
+                Game game = GameManager.getManagedGame(gameName).getGame();
+                GameMessageManager.getAll(gameName, GameMessageType.COMMAND_EVIDENCE).stream()
+                        .filter(gameMessage -> gameMessage.messageId().equals(String.valueOf(messageId)))
+                        .findFirst()
+                        .ifPresent(gameMessage -> {
+                            GameMessageManager.remove(gameName, gameMessage.messageId());
                             MessageHelper.sendMessageToChannel(
                                     deletionLogChannel,
-                                    "Message " + messageId + " deleted in channel " + channelId + " by " + deleter
-                                            + " message was authored by " + deletedMessageAuthor + "\nHere: "
-                                            + event.getJumpUrl());
-                        }
-                    });
+                                    "A command string message was deleted in game " + gameName + "."
+                                            + game.getMainGameChannel().getJumpUrl()
+                                            + ". Check audit logs for the culprit.");
+                            MessageHelper.sendMessageToChannel(
+                                    game.getActionsChannel(),
+                                    "A command string message was deleted. If someone confesses to doing this intentionally, nothing further needs to be done. The admins have been alerted.");
+                        });
+            }
+
         } catch (Exception e) {
             BotLogger.error("Error in handMessageDelete", e);
         }

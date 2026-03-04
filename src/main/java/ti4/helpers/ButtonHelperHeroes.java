@@ -1,8 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2980,7 +2978,7 @@ public class ButtonHelperHeroes {
         String faction = buttonID.replace("yinHeroTarget_", "");
         List<Button> buttons = new ArrayList<>();
         Player target = game.getPlayerFromColorOrFaction(faction);
-        if (target != null) {
+        if (target != null && !"unowned".equalsIgnoreCase(faction)) {
             for (String planet : target.getPlanets()) {
                 if (game.getTileFromPlanet(planet) == null
                         || game.getTileFromPlanet(planet).isHomeSystem(game)
@@ -3018,6 +3016,8 @@ public class ButtonHelperHeroes {
                     }
                 }
             }
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(), "Please choose which planet to invade.", buttons);
         }
     }
 

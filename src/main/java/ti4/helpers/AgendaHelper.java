@@ -2058,7 +2058,6 @@ public class AgendaHelper {
                         keleres.setTg(keleres.getTg() + size);
                         String msg2 = "Gained " + size + " trade good" + (size == 1 ? "" : "s") + " ("
                                 + (keleres.getTg() - size) + " -> **" + keleres.getTg() + "**).";
-                        ButtonHelperAbilities.pillageCheck(keleres, game);
                         ButtonHelperAgents.resolveArtunoCheck(keleres, size);
                         MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), msg2);
                         List<Button> buttons = ButtonHelper.getGainCCButtons(keleres);
@@ -2068,6 +2067,9 @@ public class AgendaHelper {
                                 + ". Use buttons to gain command tokens.";
                         game.setStoredValue("originalCCsFor" + keleres.getFaction(), keleres.getCCRepresentation());
                         MessageHelper.sendMessageToChannelWithButtons(keleres.getCorrectChannel(), msg3, buttons);
+                        for (int x = 0; x < size; x++) {
+                            ButtonHelperAbilities.pillageCheck(keleres, game);
+                        }
                     }
                 }
             }

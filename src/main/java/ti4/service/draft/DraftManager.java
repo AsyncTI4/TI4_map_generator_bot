@@ -44,7 +44,8 @@ public class DraftManager extends DraftPlayerManager {
     public enum CommandSource {
         BUTTON,
         SLASH_COMMAND,
-        DETERMINISTIC_PICK
+        DETERMINISTIC_PICK,
+        QUEUED_PICK
     }
 
     public static boolean hasDraftManager(Game game) {

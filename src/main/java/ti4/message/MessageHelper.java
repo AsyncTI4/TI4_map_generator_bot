@@ -1,6 +1,6 @@
 package ti4.message;
 
-import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+import static ti4.helpers.discord.DiscordHelper.*;
 
 import java.io.File;
 import java.net.SocketTimeoutException;
@@ -671,6 +671,12 @@ public class MessageHelper {
             if (old != null) {
                 message.getChannel().deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
             }
+        }
+
+        if (text.contains("privately used the command:")
+                || text.contains("A command string message was deleted.")
+                || text.contains("```fix")) {
+            GameMessageManager.add(gameName, id, GameMessageType.COMMAND_EVIDENCE, date);
         }
 
         if (text.contains(VisionariaSelectService.initialButtonHeader())) {

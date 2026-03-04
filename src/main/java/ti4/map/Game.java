@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -666,6 +666,22 @@ public class Game extends GameProperties {
         }
 
         return winners;
+    }
+
+    public void storeCommandMessageID(String id) {
+        String currentCommandRecords = getStoredValue("commandRecords");
+        if (currentCommandRecords.isEmpty()) {
+            setStoredValue("commandRecords", id);
+        } else {
+            setStoredValue("commandRecords", currentCommandRecords + "_" + id);
+        }
+        List<String> commandRecordIds = List.of(getStoredValue("commandRecords").split("_"));
+        if (commandRecordIds.size() > 100) {
+            // Prevent the command record string from getting too long.
+            setStoredValue(
+                    "commandRecords",
+                    String.join("_", commandRecordIds.subList(commandRecordIds.size() - 100, commandRecordIds.size())));
+        }
     }
 
     private boolean meetsVictoryRequirement(Player player) {

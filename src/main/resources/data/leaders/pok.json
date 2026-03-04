@@ -581,7 +581,7 @@
         "id": "jolnarcommander",
         "faction": "jolnar",
         "type": "commander",
-        "name": "Anglan Oln",
+        "name": "Agnlan Oln",
         "title": "Advisor Adjunct",
         "abilityWindow": "After you roll dice for a unit ability:",
         "abilityText": "You may reroll any of those dice.",
