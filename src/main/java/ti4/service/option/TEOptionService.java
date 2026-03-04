@@ -12,6 +12,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
 @UtilityClass
@@ -35,11 +36,12 @@ public class TEOptionService {
         buttons.add(Buttons.gray("startDraftSystem_andcatPresetMilty", "Start Milty Draft + Later Inaugural Splice"));
         buttons.add(
                 Buttons.gray("startDraftSystem_andcatPresetNucleus", "Start Nucleus Draft + Later Inaugural Splice"));
+        buttons.add(Buttons.red("editTFHomebrew", "Enable TF Homebrew options"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
     @ButtonHandler("startTFDraft")
-    public static void startTFDraft(Game game, ButtonInteractionEvent event) {
+    public static void startTFDraft(ButtonInteractionEvent event, Game game) {
         game.setupTwilightsFallMode(event);
         FrankenDraftBagService.setUpFrankenFactions(game, event, true);
         FrankenDraftBagService.clearPlayerHands(game);
@@ -48,8 +50,33 @@ public class TEOptionService {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("editTFHomebrew")
+    private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
+        String msg = "Use the buttons to enable or disable various homebrew options:";
+        List<Button> buttons = getTFHomebrewButtons(game);
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
+    }
+
+    private static List<Button> getTFHomebrewButtons(Game game) {
+        String idPre = "toggleTFHomebrew_";
+        List<Button> bs = new ArrayList<>();
+        bs.add(Buttons.rgToggle(game.isTwilightKart(), idPre + "tk", "Twilight Kart", SourceEmojis.TwilightKart));
+        bs.add(Buttons.DONE_DELETE_BUTTONS);
+        return bs;
+    }
+
+    @ButtonHandler("toggleTFHomebrew")
+    private static void toggleTFHomebrew(ButtonInteractionEvent event, Game game, String buttonID) {
+        String homebrew = buttonID.split("_")[1];
+        switch (homebrew) {
+            case "twilightkart" -> game.setTwilightKart(!game.isTwilightKart());
+        }
+        postTwilightFallHomebrewOptions(event, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("chooseExp_")
-    public static void chooseExp(Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void chooseExp(ButtonInteractionEvent event, Game game, String buttonID) {
         String choice = buttonID.split("_")[1];
         switch (choice.toLowerCase()) {
             case "newpok" -> {

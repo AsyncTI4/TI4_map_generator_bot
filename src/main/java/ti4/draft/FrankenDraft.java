@@ -176,7 +176,7 @@ public class FrankenDraft extends BagDraft {
         var stTechs = StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions, game);
         allDraftableItems.put(DraftCategory.STARTINGTECH, stTechs);
 
-        var units = UnitDraftItem.buildAllDraftableItems();
+        var units = UnitDraftItem.buildAllDraftableItems(game);
         allDraftableItems.put(DraftCategory.UNIT, units);
 
         var kings = MahactKingDraftItem.buildAllDraftableItems();

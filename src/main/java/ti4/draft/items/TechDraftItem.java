@@ -9,9 +9,9 @@ import ti4.draft.DraftItem;
 import ti4.helpers.PatternHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.model.DeckModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
-import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
 import ti4.service.emoji.TI4Emoji;
 
@@ -83,11 +83,9 @@ public class TechDraftItem extends DraftItem {
     private static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
         List<DraftItem> allItems = new ArrayList<>();
         if (game.isTwilightsFallMode()) {
-            for (TechnologyModel tech : Mapper.getTechs().values()) {
-                if (tech.getSource() == ComponentSource.twilights_fall
-                        && tech.getFaction().isPresent()) {
-                    allItems.add(generate(DraftCategory.TECH, tech.getID()));
-                }
+            DeckModel deck = Mapper.getDeck(game.getAbilitySpliceDeckID());
+            for (String id : deck.getCardIDs()) {
+                allItems.add(generate(DraftCategory.TECH, id));
             }
         } else {
             String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedTechs"));

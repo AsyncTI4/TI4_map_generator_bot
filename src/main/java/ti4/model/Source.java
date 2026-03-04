@@ -140,6 +140,13 @@ public class Source {
             };
         }
 
+        public boolean isTwilightFallish() {
+            return switch (this) {
+                case twilights_fall, twilight_kart -> true;
+                default -> false;
+            };
+        }
+
         public boolean isHiddenFromSearch() {
             return switch (this) {
                 case deprecated, miltymod, lazax, little_omega, admins, dane_leaks -> true;
