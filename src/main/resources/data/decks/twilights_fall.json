@@ -252,5 +252,45 @@
             "tf-planesplitter"
         ],
         "source": "twilights_fall"
+    },
+    {
+        "alias": "tf_units",
+        "name": "Twilight's Fall's Units",
+        "type": "OTHER",
+        "description": "All unit upgrades available in Twilight's Fall.",
+        "cardIDs": [
+            "tf-yssarilinfantry",
+            "tf-lataniwarrior",
+            "tf-yinclone",
+            "tf-valefarprime",
+            "tf-eidolonterminus",
+            "tf-eidolonlandwaster",
+            "tf-hcf",
+            "tf-triune",
+            "tf-morphwing",
+            "tf-swa",
+            "tf-exile",
+            "tf-linkship",
+            "tf-corsair",
+            "tf-ahksylfier",
+            "tf-saggitaria",
+            "tf-vortexer",
+            "tf-advancedcarrier",
+            "tf-ambassador",
+            "tf-dawncrusher",
+            "tf-exotrireme",
+            "tf-superdread",
+            "tf-pws",
+            "tf-universitywarsun",
+            "tf-dragonfreed",
+            "tf-heltitan",
+            "tf-keepermatrix",
+            "tf-justicerrail",
+            "tf-productionbiomes",
+            "tf-floatingfactory",
+            "tf-heliosentity",
+            "tf-echoofascension"
+        ],
+        "source": "twilights_fall"
     }
 ]
