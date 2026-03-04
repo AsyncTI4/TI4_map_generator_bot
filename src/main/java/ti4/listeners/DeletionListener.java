@@ -62,6 +62,8 @@ public class DeletionListener extends ListenerAdapter {
         String mainChannelLink = Optional.ofNullable(game.getMainGameChannel())
                 .map(TextChannel::getJumpUrl)
                 .orElse("Unavailable");
+        // prevent @'ing anyone.
+        String sanitizedCachedMessage = cachedMessage.replace("@", "@\u200B");
 
         String logMessage =
                 String.format("""
@@ -70,7 +72,8 @@ public class DeletionListener extends ListenerAdapter {
                 Game: %s
                 Deleted from: %s
                 Table talk: %s
-                Main game: %s""", cachedMessage, game.getName(), channelLink, tableTalkLink, mainChannelLink);
+                Main game: %s
+                """, sanitizedCachedMessage, game.getName(), channelLink, tableTalkLink, mainChannelLink);
 
         MessageHelper.sendMessageToChannel(deletionLogChannel, logMessage);
 
