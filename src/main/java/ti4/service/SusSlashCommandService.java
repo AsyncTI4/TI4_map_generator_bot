@@ -76,8 +76,8 @@ public class SusSlashCommandService {
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        String message = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 
     private static void reportToSusSlashCommandLog(
@@ -87,8 +87,8 @@ public class SusSlashCommandService {
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " (" + gameName + ") `" + event.getCommandString() + "` "
+        String message = event.getUser().getEffectiveName() + " (" + gameName + ") `" + event.getCommandString() + "` "
                 + jumpUrl;
-        MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        MessageHelper.sendMessageToChannel(moderationLogChannel, message);
     }
 }
