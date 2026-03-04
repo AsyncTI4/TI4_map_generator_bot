@@ -69,6 +69,7 @@
         "phase": "action",
         "window": "Before you assign hits produced by another player's unit ability roll:",
         "text": "Cancel each of those hits.",
+        "automationID": "tk-evade",
         "source": "twilight_kart"
     },
     {
@@ -85,6 +86,7 @@
         "phase": "action",
         "window": "At the start of a combat round:",
         "text": "Apply +2 to the result of each of your unit's combat rolls during this combat round.",
+        "automationID": "tk-exhort",
         "source": "twilight_kart"
     },
     {
