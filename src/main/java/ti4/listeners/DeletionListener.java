@@ -48,7 +48,7 @@ public class DeletionListener extends ListenerAdapter {
                         GameMessageManager.remove(gameName, gameMessage.messageId());
                         MessageHelper.sendMessageToChannel(
                                 deletionLogChannel,
-                                "A command string message was deleted in game " + gameName + "."
+                                "A command string message was deleted in game " + gameName + ". "
                                         + game.getMainGameChannel().getJumpUrl()
                                         + ". Check audit logs for the culprit.");
                         MessageHelper.sendMessageToChannel(
