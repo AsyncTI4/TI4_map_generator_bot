@@ -92,10 +92,6 @@ public class GMService {
         return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
     }
 
-    public static void sendMessageToGMChannel(Game game, String msg) {
-        sendMessageToGMChannel(game, msg, false);
-    }
-
     public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
         if (ping) {
             msg += " - " + gmPing(game);
