@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.executors.ExecutorServiceManager;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -37,11 +37,11 @@ public class ModalListener extends ListenerAdapter {
         if (!JdaService.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
                     .setEphemeral(true)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 
-        event.deferEdit().queue();
+        event.deferEdit().queue(Consumers.nop(), BotLogger::catchRestError);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
         ExecutorServiceManager.runAsync(
@@ -90,19 +90,23 @@ public class ModalListener extends ListenerAdapter {
         if (handleKnownModals(context)) return;
 
         if (modalID.startsWith("jmfA_")) {
+            // Detect new settings menu navId() to route to the correct handler.
+            String draftSystemNavPart = ".*_draft[._].*";
+            if (modalID.matches(draftSystemNavPart)) {
+                game.initializeDraftSystemSettings().parseInput(context);
+                return;
+            }
             game.initializeMiltySettings().parseInput(context);
         }
     }
 
     public static String getModalDebugText(ModalInteractionEvent event) {
-        StringBuilder output = new StringBuilder("INPUT:\n```\n" + "MenuID: " + event.getModalId());
-        for (ModalMapping field : event.getValues()) {
-            output.append("\n> Field: ")
-                    .append(field.getCustomId())
-                    .append(" => ")
-                    .append(field.getAsString());
-        }
-        output.append("\n```");
-        return output.toString();
+        // for (ModalMapping field : event.getValues()) {
+        //     output.append("\n> Field: ")
+        //             .append(field.getCustomId())
+        //             .append(" => ")
+        //             .append(field.getAsString());
+        // }
+        return "INPUT:\n```\n" + "MenuID: " + event.getModalId() + "\n```";
     }
 }

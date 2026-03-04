@@ -7,6 +7,7 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.ExploreEmojis;
 
 @Data
 public class AttachmentModel implements ModelInterface, EmbeddableModel {
@@ -37,6 +38,10 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
     public String getName() {
         return Optional.ofNullable(name).orElse(id);
+    }
+
+    public String getNameRepresentation() {
+        return ExploreEmojis.Chevrons + " _" + getName() + "_ " + source.emoji();
     }
 
     public boolean isFakeAttachment() {

@@ -273,7 +273,8 @@
         "name": "Suldhan Wraeg",
         "title": "Shrouded Advisor",
         "abilityWindow": "When a player would use 1 unit's non-PRODUCTION unit ability in a system that contains or is adjacent to an anomaly:",
-        "abilityText": "You may exhaust this card to prevent that unit from using that unit ability. [Note: Mech and flagship powers are not unit abilities]",
+        "abilityText": "You may exhaust this card to prevent that unit from using that unit ability.",
+        "notes": "Mech and flagship powers are not unit abilities.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -382,8 +383,8 @@
         "type": "agent",
         "name": "Garstil",
         "title": "Recruitment Officer",
-        "abilityWindow": "When a player produces 1 or more infantry",
-        "abilityText": "You may exhaust this card. If you do, up to 3 of those units do not count against their PRODUCTION limit.",
+        "abilityWindow": "When a player draws a card",
+        "abilityText": "You may exhaust this card to allow that player to place that card on the bottom of corresponding deck and draw another card from the top of that deck instead. If that player is another player, gain 1 commodity.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -404,8 +405,8 @@
         "type": "agent",
         "name": "Zhroth Khuvad",
         "title": "Khuvad Arms C.E.O.",
-        "abilityWindow": "After a player activates a non-home system that contains another player’s units",
-        "abilityText": "You may exhaust this card to apply +2 to the move value of 1 of the active player's ships during this tactical action.",
+        "abilityWindow": "After a system is activated",
+        "abilityText": "You may exhaust this card to allow the active player to gain 1 non-faction unit upgrade technology until the end of this tactical action. At the end of this tactical action, they must return that card to their technology deck.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -415,8 +416,8 @@
         "type": "agent",
         "name": "Maertin Donaais",
         "title": "Esteemed Philanthropist",
-        "abilityWindow": "When another player gains any number of commodities",
-        "abilityText": "You may exhaust this card to gain an equal number of commodities and convert that player's commodities to trade goods.",
+        "abilityWindow": "After a player gains commodities",
+        "abilityText": "You may exhaust this card to convert that player's commodities to trade goods; if that player was another player, gain 2 commodities or draw 1 action card.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -438,7 +439,41 @@
         "name": "Magruda",
         "title": "Orator",
         "abilityWindow": "When a player exhausts a planet during the agenda phase",
-        "abilityText": "Exhaust this card to allow that player to treat the combined value of that planet's resources and influence as if it were resources or influence. Then, ready that planet. [Note: not automated in the bot yet. You can add votes with the modify votes button before final submission, and ready planet and exhaust agent with slash commands]",
+        "abilityText": "Exhaust this card to allow that player to treat the combined value of that planet's resources and influence as if it were resources or influence. Then, ready that planet.",
+        "notes": "Not automated in the bot yet. You can add votes with the modify votes button before final submission, and ready planet and exhaust agent with slash commands.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "kaltrimagent",
+        "faction": "kaltrim",
+        "type": "agent",
+        "name": "Keda Demas",
+        "title": "Rose of Kaltrim",
+        "abilityWindow": "After a player resolves the secondary ability of the “Politics” strategy card",
+        "abilityText": "You may exhaust this card to allow that player to gain 1 command token. If that player was another player, look at the top card of the agenda deck; you may discard that card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "sarcosaagent",
+        "faction": "sarcosa",
+        "type": "agent",
+        "name": "Drift-Yol Khas",
+        "title": "The Rat",
+        "abilityWindow": "ACTION",
+        "abilityText": "Exhaust this card to allow 1 player to place up to 2 neutral destroyers or 1 neutral cruiser in a system that is in or adjacent to a system that contains their units; resolve space combat in that system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "xinagent",
+        "faction": "xin",
+        "type": "agent",
+        "name": "Liu",
+        "title": "Court of Stars",
+        "abilityWindow": "When a player would resolve the secondary ability of a strategy card",
+        "abilityText": "You may exhaust this card to allow that player to resolve the secondary ability of any exhausted strategy card instead.",
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
@@ -670,7 +705,8 @@
         "name": "Hkot Tokal",
         "title": "Crystal Druid",
         "abilityWindow": "At the start of invasion in a system that contains 1 or more planets:",
-        "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system. [Note: this occurs even if you control all planets in the system]",
+        "abilityText": "You may place 1 infantry unit from your reinforcements in the active system's space area if you have unused capacity in that system.",
+        "notes": "This occurs even if you control all planets in the system.",
         "unlockCondition": "Win a ground combat on a planet you do not control.",
         "source": "ds"
     },
@@ -680,8 +716,9 @@
         "type": "commander",
         "name": "Assault Machina",
         "title": "Delta Shield",
-        "abilityWindow": "During movement [Note: any movement, not only the movement step]",
-        "abilityText": "For each infantry you transport, you may replace that unit with 1 fighter. \n\n [Note: not reliant on the first half of this ability] You may use the SPACE CANNON of 1 of your units against ships that are adjacent to that unit's system.",
+        "abilityWindow": "During movement",
+        "notes": "This triggers from any movement, not only the movement step. The SPACE CANNON ability may be used independent of the infantry/fighter ability.",
+        "abilityText": "For each infantry you transport, you may replace that unit with 1 fighter.\n\nYou may use the SPACE CANNON of 1 of your units against ships that are adjacent to that unit's system.",
         "unlockCondition": "Own 2 unit upgrade technologies.",
         "source": "ds"
     },
@@ -715,7 +752,8 @@
         "title": "High Inquisitor",
         "abilityWindow": "During combat:",
         "abilityText": "When 1 or more of your damaged units make a combat roll, up to 2 of those units may roll an additional combat die.",
-        "unlockCondition": "Have units in 2 different non-home anomalies. [Note, different means different types of anomaly, i.e. cannot be unlockeed via 2 asteroid fields]",
+        "unlockCondition": "Have units in 2 different non-home anomalies.",
+        "notes": "\"Different\" means different types of anomaly, e.g. cannot be unlocked via two asteroid fields.",
         "source": "ds"
     },
     {
@@ -823,8 +861,8 @@
         "type": "commander",
         "name": "Reides Lupaat",
         "title": "Gifted Telepath",
-        "abilityWindow": "During your turn",
-        "abilityText": "For each common deck, you may spend 1 trade good to look at the top card of that deck",
+        "abilityWindow": "Once during each of your turns",
+        "abilityText": "You may look at the top card of 1 non-objective common deck; you may spend 1 trade good or 1 commodity to place that card on the bottom of that deck.",
         "unlockCondition": "Lose control of a planet.",
         "source": "ds"
     },
@@ -857,8 +895,8 @@
         "name": "Baird Feraux",
         "title": "Reserved Strategist",
         "abilityWindow": "During each round of combat:",
-        "abilityText": "If your opponent controls more units participating in that combat than you, one of your units may roll 1 additional combat die",
-        "unlockCondition": "Gain a second Code card",
+        "abilityText": "One of your units may reroll 1 of its combat dice; if your opponent controls more units participating in that combat than you, that unit may roll 1 additional combat die instead",
+        "unlockCondition": "Have a Code card",
         "source": "ds"
     },
     {
@@ -881,6 +919,39 @@
         "abilityWindow": "Once per agenda phase, after an agenda is revealed",
         "abilityText": "You may predict aloud an outcome of that agenda. If you do not vote on that agenda, and your prediction is correct, gain 1 command token.",
         "unlockCondition": "Cast more votes for an outcome than any other player.",
+        "source": "ds"
+    },
+    {
+        "id": "kaltrimcommander",
+        "faction": "kaltrim",
+        "type": "commander",
+        "name": "Dain Thatch",
+        "title": "Lord Regent",
+        "abilityWindow": "When you roll a die",
+        "abilityText": "If the result is 1, you may reroll that die. You cannot reroll the new result.",
+        "unlockCondition": "Have the Kaltrim Crown on your faction sheet.",
+        "source": "ds"
+    },
+    {
+        "id": "sarcosacommander",
+        "faction": "sarcosa",
+        "type": "commander",
+        "name": "Yuri Hargon",
+        "title": "Greedy Navigator",
+        "abilityWindow": "After you activate a system",
+        "abilityText": "Choose 2 non-fracture systems that each contain your or neutral units. Your ships treat the chosen systems as adjacent to one another during this tactical action.",
+        "unlockCondition": "Have coexisting units on 2 planets.",
+        "source": "ds"
+    },
+    {
+        "id": "xincommander",
+        "faction": "xin",
+        "type": "commander",
+        "name": "Sun",
+        "title": "Court of Steel",
+        "abilityWindow": "Once per combat",
+        "abilityText": "You may repair 1 of your units participating in that combat. Players cannot use BOMBARDMENT against your coexisting units.",
+        "unlockCondition": "Have units on 3 planets that have different traits, and 1 legendary planet.",
         "source": "ds"
     },
     {
@@ -1336,7 +1407,7 @@
         "title": "Shield of Qhet",
         "abilityName": "Logistical Supremacy - War Unbound",
         "abilityWindow": "ACTION:",
-        "abilityText": " Place this card near the game board; until the end of this game round, after you win a combat, you may remove 1 of your command tokens from the active system or draw 1 action card.At the end of this game round, purge this card.",
+        "abilityText": " Place this card near the game board; until the end of this game round, when you win a combat, if your opponent has a control token on your faction sheet, remove 1 of your command tokens from the active system, if able. At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
@@ -1348,7 +1419,8 @@
         "title": "The Reaper",
         "abilityName": " Ace of Aces - Inspirational Pilot",
         "abilityWindow": "At the start of combat",
-        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters’ ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card. [Note: this hero does not purge]",
+        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters’ ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card.",
+        "notes": "This hero does not purge.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
@@ -1365,6 +1437,42 @@
         "source": "ds"
     },
     {
+        "id": "kaltrimhero",
+        "faction": "kaltrim",
+        "type": "hero",
+        "name": "Jodekan-Jodar",
+        "title": "Prince of Kaltrim",
+        "abilityName": "Starlight Crusade - A Long Journey",
+        "abilityWindow": "ACTION:",
+        "abilityText": "For each player that has fewer scored secret objectives than you, you may look at 1 Shrine token on a planet that player controls, or gain up to 2 command tokens. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "xinhero",
+        "faction": "xin",
+        "type": "hero",
+        "name": "Tsao",
+        "title": "Grand Administrator",
+        "abilityName": "Harmonic Resonance - Stone, Sky, and Flame",
+        "abilityWindow": "ACTION:",
+        "abilityText": "For each player who controls a planet that contains your units, you may resolve the secondary ability of 1 of their strategy cards without spending a command token, or look at their hand of secret objectives. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "sarcosahero",
+        "faction": "sarcosa",
+        "type": "hero",
+        "name": "Cardossa Flight",
+        "title": "Pirate Queen",
+        "abilityName": "Todlys Unbound - The Leviathan",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card to place 1 neutral war sun in a system that contains neutral units or move 1 neutral ship to an adjacent system; resolve space combat in that system. Neutral war suns have the abilities on the Leviathan ability card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
         "id": "toldarhero",
         "faction": "toldar",
         "type": "hero",
@@ -1372,7 +1480,7 @@
         "title": " Concordat Marshall",
         "abilityName": "Concord Renewed - Galactic Outreach",
         "abilityWindow": "ACTION:",
-        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player gains 2 command tokens.",
+        "abilityText": "Attach this card to a revealed objective. The players with the fewest victory points may score this objective without fulfilling its requirements; after a player scores this objective, the Toldar player draws 1 secret objective.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

@@ -1,16 +1,22 @@
 package ti4.commands.statistics;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.helper.GameHelper;
+import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.map.FractureService;
 
@@ -29,41 +35,37 @@ public class GameStatisticsFilterer {
     private static final String HAS_GALACTIC_EVENT_FILTER = "has_galactic_event";
     private static final String HAS_SCENARIO_FILTER = "has_scenario";
     private static final String FRACTURE_IN_PLAY_FILTER = "fracture_in_play";
+    private static final String STARTED_AFTER_FILTER = "started_after";
 
     private static final int MINIMUM_ROUND = 3;
+    private static final DateTimeFormatter STARTED_AFTER_FILTER_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT);
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
-        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter games by player count, e.g. 3-8"));
-        filters.add(new OptionData(
-                OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Filter games by minimum player count, e.g. 3-8"));
-        filters.add(new OptionData(
-                OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter games by victory point goal, e.g. 10-14"));
+        filters.add(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Player count e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, MIN_PLAYER_COUNT_FILTER, "Minimum player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Victory point goal, e.g. 10-14"));
         filters.add(new OptionData(
                         OptionType.STRING,
                         GAME_TYPES_FILTER,
-                        "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+                        "Game type, comma seperated, e.g. pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
         filters.add(new OptionData(
                         OptionType.STRING,
                         EXCLUDED_GAME_TYPES_FILTER,
-                        "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+                        "Excluded game types, comma seperated, e.g. pok, absol, ds, action_deck_2")
                 .setAutoComplete(true));
-        filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter games by if the game is a fog game"));
-        filters.add(
-                new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter games by if the game has any homebrew"));
-        filters.add(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter games by if the game has a winner"));
-        filters.add(new OptionData(
-                        OptionType.STRING,
-                        WINNING_FACTION_FILTER,
-                        "Filter games by if the game was won by said faction")
+        filters.add(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Is it a fog game?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Does it have homebrew?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Does it have a winner?"));
+        filters.add(new OptionData(OptionType.STRING, WINNING_FACTION_FILTER, "Did said faction win?")
                 .setAutoComplete(true));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Does it have a Galactic Event?"));
+        filters.add(new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Does it have a Scenario? e.g. Ordinian"));
+        filters.add(new OptionData(OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Is The Fracture in play?"));
         filters.add(new OptionData(
-                OptionType.BOOLEAN, HAS_GALACTIC_EVENT_FILTER, "Filter games by if the game has a galactic event"));
-        filters.add(
-                new OptionData(OptionType.BOOLEAN, HAS_SCENARIO_FILTER, "Filter games by if the game has a scenario"));
-        filters.add(new OptionData(
-                OptionType.BOOLEAN, FRACTURE_IN_PLAY_FILTER, "Filter games by if the fracture was in play"));
+                OptionType.STRING, STARTED_AFTER_FILTER, "Filter games by if they started after a date (YYYY-MM-DD)"));
         return filters;
     }
 
@@ -84,10 +86,13 @@ public class GameStatisticsFilterer {
         String gameTypesFilter = event.getOption(GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         String excludedGameTypesFilter = event.getOption(EXCLUDED_GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
+        String factionFilter = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         String winningFactionFilter = event.getOption(WINNING_FACTION_FILTER, null, OptionMapping::getAsString);
         Boolean galacticEventFilter = event.getOption(HAS_GALACTIC_EVENT_FILTER, null, OptionMapping::getAsBoolean);
         Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fractureInPlayFilter = event.getOption(FRACTURE_IN_PLAY_FILTER, null, OptionMapping::getAsBoolean);
+        String startedAfterFilter = event.getOption(STARTED_AFTER_FILTER, null, OptionMapping::getAsString);
+        LocalDate startedAfterDate = parseStartedAfterDate(startedAfterFilter, event);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -96,14 +101,30 @@ public class GameStatisticsFilterer {
                 .and(game -> filterOnGameTypes(gameTypesFilter, game))
                 .and(game -> filterOnExcludedGameTypes(excludedGameTypesFilter, game))
                 .and(game -> filterOnFogType(fogFilter, game))
+                .and(game -> filterOnFaction(factionFilter, game))
                 .and(game -> filterOnHomebrew(homebrewFilter, game))
                 .and(game -> filterOnHasWinner(hasWinnerFilter, game))
                 .and(game -> filterOnWinningFaction(winningFactionFilter, game))
                 .and(game -> filterOnGalacticEvent(galacticEventFilter, game))
                 .and(game -> filterOnScenario(scenarioFilter, game))
                 .and(game -> filterOnFractureInPlay(fractureInPlayFilter, game))
+                .and(game -> filterOnStartedAfter(startedAfterDate, game))
                 .and(GameStatisticsFilterer::filterAbortedGames)
                 .and(GameStatisticsFilterer::filterEarlyRounds);
+    }
+
+    private static LocalDate parseStartedAfterDate(String startedAfterDate, SlashCommandInteractionEvent event) {
+        if (startedAfterDate == null || startedAfterDate.isBlank()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(startedAfterDate, STARTED_AFTER_FILTER_FORMATTER);
+        } catch (Exception e) {
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(),
+                    "Unable to parse date '" + startedAfterDate + "'. Use format 'YYYY-MM-DD' instead.");
+            return null;
+        }
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
@@ -114,13 +135,20 @@ public class GameStatisticsFilterer {
                 .anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
     }
 
+    private static boolean filterOnFaction(String factionFilter, Game game) {
+        if (factionFilter == null) {
+            return true;
+        }
+        return game.getFactions().stream().anyMatch(faction -> faction.equalsIgnoreCase(factionFilter));
+    }
+
     public static Predicate<Game> getNormalFinishedGamesFilter(
             Integer playerCountFilter, Integer victoryPointGoalFilter) {
         return getFinishedGamesFilter(playerCountFilter, victoryPointGoalFilter)
                 .and(game -> filterOnIsNormal(Boolean.TRUE, game));
     }
 
-    public static Predicate<Game> getFinishedGamesFilter(Integer playerCountFilter, Integer victoryPointGoalFilter) {
+    private static Predicate<Game> getFinishedGamesFilter(Integer playerCountFilter, Integer victoryPointGoalFilter) {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
                 .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
@@ -151,7 +179,7 @@ public class GameStatisticsFilterer {
             case "base" -> game.isBaseGameMode();
             case "absol" -> game.isAbsolMode();
             case "ds" -> isDiscordantStarsGame(game);
-            case "pok" -> !game.isBaseGameMode();
+            case "pok" -> game.isProphecyOfKings();
             case "action_deck_2" -> game.isAcd2();
             case "franken" -> game.isFrankenGame();
             case "milty_mod" -> isMiltyModGame(game);
@@ -165,6 +193,9 @@ public class GameStatisticsFilterer {
             case "liberation" -> game.isLiberationC4Mode();
             case "ordinian" -> game.isOrdinianC1Mode();
             case "te" -> game.isThundersEdge();
+            case "tf" -> game.isTwilightsFallMode();
+            case "tedemo" -> game.isThundersEdgeDemo();
+            case "noswap" -> game.isNoSwapMode();
             default -> false;
         };
     }
@@ -204,7 +235,23 @@ public class GameStatisticsFilterer {
         if (galacticEventFilter == null) {
             return true;
         }
-        boolean hasEvent = game.isAgeOfExplorationMode()
+        boolean hasEvent = game.isAdventOfTheWarsunMode()
+                || game.isStellarAtomicsMode()
+                || game.isAgeOfFightersMode()
+                || game.isCivilizedSocietyMode()
+                || game.isDangerousWildsMode()
+                || game.isCallOfTheVoidMode()
+                || game.isHiddenAgendaMode()
+                || game.isWildWildGalaxyMode()
+                || game.isCulturalExchangeProgramMode()
+                || game.isCosmicPhenomenaeMode()
+                || game.isMercenariesForHireMode()
+                || game.isRapidMobilizationMode()
+                || game.isWeirdWormholesMode()
+                || game.isMonumentToTheAgesMode()
+                || game.isZealousOrthodoxyMode()
+                || game.isConventionsOfWarAbandonedMode()
+                || game.isAgeOfExplorationMode()
                 || game.isTotalWarMode()
                 || game.isAgeOfCommerceMode()
                 || game.isMinorFactionsMode();
@@ -215,12 +262,17 @@ public class GameStatisticsFilterer {
         if (scenarioFilter == null) {
             return true;
         }
-        boolean hasScenario = game.isLiberationC4Mode() || game.isOrdinianC1Mode();
+        boolean hasScenario = game.isLiberationC4Mode() || game.isOrdinianC1Mode() || game.isAllianceMode();
         return scenarioFilter == hasScenario;
     }
 
     private static boolean filterOnFractureInPlay(Boolean fractureInPlayFilter, Game game) {
         return fractureInPlayFilter == null || fractureInPlayFilter == FractureService.isFractureInPlay(game);
+    }
+
+    private static boolean filterOnStartedAfter(LocalDate startedAfterDate, Game game) {
+        return startedAfterDate == null
+                || GameHelper.getCreationDateAsLocalDate(game).isAfter(startedAfterDate);
     }
 
     private static boolean isDiscordantStarsGame(Game game) {

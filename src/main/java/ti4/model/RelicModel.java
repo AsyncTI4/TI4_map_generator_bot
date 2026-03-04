@@ -18,6 +18,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String shortName;
     private Boolean shrinkName;
     private String text;
+    private String notes;
     private String flavourText;
     private String flavourTextFormatted;
     private Boolean isFakeRelic;
@@ -29,6 +30,11 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
 
     public boolean isValid() {
         return alias != null && name != null && text != null && source != null;
+    }
+
+    public String getNameRepresentation() {
+        if (isFakeRelic()) return "_" + getName() + "_ " + source.emoji();
+        return ExploreEmojis.Relic + " _" + getName() + "_ " + source.emoji();
     }
 
     public String getSimpleRepresentation() {
@@ -87,6 +93,9 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(title.toString(), null);
 
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
         if (includeFlavourText && flavourText != null) eb.addField("", flavourText, false);
 
         // Colour

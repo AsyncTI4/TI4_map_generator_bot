@@ -1,6 +1,5 @@
 package ti4.spring.api.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -12,7 +11,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import ti4.json.JsonMapperManager;
 import ti4.website.EgressClientManager;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class RestDiscordClient {
@@ -21,7 +22,7 @@ public class RestDiscordClient {
     private static final String DISCORD_CLIENT_ID = System.getenv("DISCORD_CLIENT_ID");
     private static final String DISCORD_CLIENT_SECRET = System.getenv("DISCORD_CLIENT_SECRET");
 
-    private final ObjectMapper objectMapper = EgressClientManager.getObjectMapper();
+    private final JsonMapper jsonMapper = JsonMapperManager.basic();
     private final HttpClient httpClient = EgressClientManager.getHttpClient();
 
     public DiscordUserInfo getUserInfo(String bearerToken) throws IOException, InterruptedException {
@@ -35,7 +36,7 @@ public class RestDiscordClient {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == HttpStatus.OK.value()) {
-            return objectMapper.readValue(response.body(), DiscordUserInfo.class);
+            return jsonMapper.readValue(response.body(), DiscordUserInfo.class);
         }
 
         if (response.statusCode() == HttpStatus.UNAUTHORIZED.value()
@@ -90,6 +91,6 @@ public class RestDiscordClient {
                     "Discord token request failed: " + response.statusCode() + " - " + response.body());
         }
 
-        return objectMapper.readValue(response.body(), DiscordTokenResponse.class);
+        return jsonMapper.readValue(response.body(), DiscordTokenResponse.class);
     }
 }

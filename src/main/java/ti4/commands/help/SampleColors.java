@@ -42,17 +42,19 @@ class SampleColors extends Subcommand {
         int LINEHEIGHT = 12;
         Font bigFont = Storage.getFont12();
         Font smallFont = Storage.getFont8();
-        int PAGEWIDTH = 1600;
-        int PAGEHIGHT = 2400;
+        int PAGEWIDTH = 2400;
+        int PAGEHIGHT = 3600;
         BasicStroke stroke = new BasicStroke(2.0f);
 
         OptionMapping input = event.getOption(Constants.HUE);
         List<String> hues = new ArrayList<>();
+        int fewer = 0;
         if (input == null
-                || input.getAsString().equals(Constants.ALL)
+                || Constants.ALL.equals(input.getAsString())
                 || input.getAsString().isEmpty()) {
             hues = Arrays.asList(
-                    "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2");
+                    "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2", "MULTI3");
+            fewer = 3;
         } else {
             SPACING = 12;
             DREADWIDTH = 77 + 2 * SPACING;
@@ -62,7 +64,8 @@ class SampleColors extends Subcommand {
             bigFont = Storage.getFont16();
             smallFont = Storage.getFont12();
             if ("MULTI".equals(input.getAsString())) {
-                hues = Arrays.asList("MULTI1", "MULTI2");
+                hues = Arrays.asList("MULTI1", "MULTI2", "MULTI3");
+                fewer = 3;
             } else {
                 hues.add(input.getAsString());
             }
@@ -81,7 +84,7 @@ class SampleColors extends Subcommand {
         }
 
         int maxWidth = maxColorCount * DREADWIDTH;
-        int maxHeight = 2 * hues.size() * DREADTEXHIGHT;
+        int maxHeight = (2 * hues.size() - fewer) * DREADTEXHIGHT;
 
         int leftBound = PAGEWIDTH - maxWidth;
         int topBound = PAGEHIGHT - maxHeight;
@@ -100,6 +103,7 @@ class SampleColors extends Subcommand {
 
         for (String h : hues) {
             x = left;
+            boolean multi = h.contains("MULTI");
             for (ColorModel c : Mapper.getColors()) {
                 if (!c.getHue().equals(h)) {
                     continue;
@@ -136,13 +140,17 @@ class SampleColors extends Subcommand {
                         .getUnitFile(("lgy".equals(alias) ? "orca" : "split" + alias) + "_dn.png");
                 if (file != null) {
                     dread = ImageHelper.read(file);
-                    graphic.drawImage(dread, x + SPACING, y + SPACING + DREADTEXHIGHT, null);
+                    graphic.drawImage(
+                            dread,
+                            x + SPACING + (multi ? DREADWIDTH : 0),
+                            y + SPACING + (multi ? 0 : DREADTEXHIGHT),
+                            null);
                     graphic.setFont(bigFont);
                     DrawingUtil.superDrawString(
                             graphic,
                             ("lgy".equals(alias) ? "orca" : "split" + c.getName()),
-                            x + DREADWIDTH / 2,
-                            y + DREADTEXHIGHT + DREADSUBHIGHT + SPACING,
+                            x + (multi ? 3 : 1) * DREADWIDTH / 2,
+                            y + (multi ? 0 : DREADTEXHIGHT) + DREADSUBHIGHT + SPACING,
                             Color.WHITE,
                             MapGenerator.HorizontalAlign.Center,
                             MapGenerator.VerticalAlign.Top,
@@ -152,19 +160,20 @@ class SampleColors extends Subcommand {
                     DrawingUtil.superDrawString(
                             graphic,
                             ("lgy".equals(alias) ? "orca" : "split" + alias),
-                            x + DREADWIDTH / 2,
-                            y + DREADTEXHIGHT + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                            x + (multi ? 3 : 1) * DREADWIDTH / 2,
+                            y + (multi ? 0 : DREADTEXHIGHT) + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                             Color.WHITE,
                             MapGenerator.HorizontalAlign.Center,
                             MapGenerator.VerticalAlign.Top,
                             stroke,
                             Color.BLACK);
+                    x += (multi ? DREADWIDTH : 0);
                 }
 
                 x += DREADWIDTH;
             }
             right = Math.max(right, x);
-            y += 2 * DREADTEXHIGHT;
+            y += (multi ? 1 : 2) * DREADTEXHIGHT;
         }
         if (left == right) {
             MessageHelper.sendMessageToEventChannel(event, "No colours found. Something has probably gone wrong.");

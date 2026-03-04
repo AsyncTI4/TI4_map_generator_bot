@@ -41,7 +41,9 @@ class ChangeColor extends GameStateSubcommand {
             if (playerInfo != player) {
                 if (newColor.equals(playerInfo.getColor())) {
                     MessageHelper.sendMessageToEventChannel(
-                            event, "Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
+                            event,
+                            (game.isFowMode() ? "Someone" : "Player:" + playerInfo.getUserName())
+                                    + " already uses color:" + newColor);
                     return;
                 }
             }

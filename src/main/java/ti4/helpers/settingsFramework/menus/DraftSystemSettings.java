@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +10,7 @@ import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
@@ -30,7 +30,9 @@ import ti4.service.draft.draftables.SeatDraftable;
 import ti4.service.draft.draftables.SliceDraftable;
 import ti4.service.draft.draftables.SpeakerOrderDraftable;
 import ti4.service.draft.orchestrators.PublicSnakeDraftOrchestrator;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.milty.MiltyDraftSlice;
+import tools.jackson.databind.JsonNode;
 
 // TODO: A library of pre-made maps would be cool.
 
@@ -64,7 +66,7 @@ public class DraftSystemSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public DraftSystemSettings(Game game, JsonNode json) {
+    public DraftSystemSettings(@NotNull Game game, JsonNode json) {
         super(MENU_ID, "Draft Settings", "Edit draft settings, then start the draft!", null);
         this.game = game;
 
@@ -87,7 +89,9 @@ public class DraftSystemSettings extends SettingsMenu {
         draftOrchestrator.setShow(s -> s);
 
         // Load JSON if applicable
-        if (json != null && json.has("menuId") && json.get("menuId").asText("").equals(MENU_ID)) {
+        if (json != null
+                && json.has("menuId")
+                && MENU_ID.equals(json.get("menuId").asText(""))) {
             draftOrchestrator.initialize(json.get("draftOrchestrator"));
             draftablesList.initialize(json.get("draftablesList"));
             preset = json.get("preset") != null ? json.get("preset").asText(null) : null;
@@ -160,7 +164,9 @@ public class DraftSystemSettings extends SettingsMenu {
     protected List<Button> specialButtons() {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
-
+        if ("Twilights Fall (Andcat Draft)".equals(preset)) {
+            buttons.add(Buttons.blue(prefix + "tfTourney", "TF Tourney Prelims", MiscEmojis.tf_ability));
+        }
         buttons.add(Buttons.green(prefix + "startSetup", "Start Draft!"));
         return buttons;
     }
@@ -170,6 +176,7 @@ public class DraftSystemSettings extends SettingsMenu {
         String error =
                 switch (action) {
                     case "startSetup" -> startSetup(event);
+                    case "tfTourney" -> tfTourney(event);
                     default -> null;
                 };
         return (error == null ? "success" : error);
@@ -181,6 +188,22 @@ public class DraftSystemSettings extends SettingsMenu {
 
     public Set<String> getPlayerUserIds() {
         return gameSetupSettings.getGamePlayers().getKeys();
+    }
+
+    private String tfTourney(GenericInteractionCreateEvent event) {
+        mahactKingDraftableSettings.getNumFactions().setVal(7);
+        andcatReferenceCardsDraftableSettings.getNumPackages().setVal(7);
+
+        List<String> slices = new ArrayList<>(List.of(
+                "66,43,37,27,39",
+                "101,38,114,116,25",
+                "34,99,44,46,26",
+                "109,62,117,40,111",
+                "106,65,67,113,35",
+                "100,98,97,c41,115",
+                "79,42,75,76,110"));
+        String ttsString = String.join("|", slices);
+        return sliceSettings.setPresetSlices(ttsString);
     }
 
     private String startSetup(GenericInteractionCreateEvent event) {
@@ -204,15 +227,19 @@ public class DraftSystemSettings extends SettingsMenu {
             }
             settings.setupNucleusPreset();
         }
-        if ("_andcatPreset".equals(preset)) {
-
+        if (preset.startsWith("_andcatPreset")) {
             if (game.getPlayers().size() > 8) {
                 MessageHelper.sendMessageToEventChannel(
                         event,
                         "This draft supports at most 8 players; you'll need to remove excess players from the draft.");
             }
-            settings.setupAndcatTwilightsFallPreset();
-            ButtonHelper.deleteMessage(event);
+            if ("_andcatPresetMilty".equals(preset) || "_andcatPreset".equals(preset)) {
+                settings.setupAndcatMiltyTwilightsFallPreset();
+                ButtonHelper.deleteMessage(event);
+            } else if ("_andcatPresetNucleus".equals(preset)) {
+                settings.setupAndcatNucleusTwilightsFallPreset();
+                ButtonHelper.deleteMessage(event);
+            }
         }
         game.setDraftSystemSettings(settings);
         settings.postMessageAndButtons(event);
@@ -233,13 +260,25 @@ public class DraftSystemSettings extends SettingsMenu {
         setPreset("Nucleus Draft");
     }
 
-    public void setupAndcatTwilightsFallPreset() {
+    public void setupAndcatMiltyTwilightsFallPreset() {
         draftablesList.setKeys(List.of(
                 AndcatReferenceCardsDraftable.class.getSimpleName(),
                 SliceDraftable.class.getSimpleName(),
                 MahactKingDraftable.class.getSimpleName()));
         draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
         sliceSettings.getMapGenerationMode().setChosenKey("Milty");
+        sourceSettings.getTeDemo().setVal(true);
+        setPreset("Twilights Fall (Andcat Draft)");
+    }
+
+    public void setupAndcatNucleusTwilightsFallPreset() {
+        draftablesList.setKeys(List.of(
+                AndcatReferenceCardsDraftable.class.getSimpleName(),
+                SliceDraftable.class.getSimpleName(),
+                SeatDraftable.class.getSimpleName(),
+                MahactKingDraftable.class.getSimpleName()));
+        draftOrchestrator.setChosenKey(PublicSnakeDraftOrchestrator.class.getSimpleName());
+        sliceSettings.getMapGenerationMode().setChosenKey("Nucleus");
         sourceSettings.getTeDemo().setVal(true);
         setPreset("Twilights Fall (Andcat Draft)");
     }

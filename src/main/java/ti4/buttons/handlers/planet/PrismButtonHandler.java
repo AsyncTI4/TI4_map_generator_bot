@@ -4,12 +4,14 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.TechnologyModel;
 import ti4.service.turn.StartTurnService;
 
@@ -23,8 +25,8 @@ class PrismButtonHandler {
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation(false, false) + " has purged their _" + techM1.getNameRepresentation()
-                        + "_ technology.\n-# \"Purged\" means that it is completely gone from the game. "
+                player.getRepresentation(false, false) + " has purged their " + techM1.getNameRepresentation()
+                        + " technology.\n-# \"Purged\" means that it is completely gone from the game. "
                         + player.getRepresentation(false, false)
                         + " will not be able to gain it again at a later point.");
         MessageHelper.sendMessageToChannelWithButton(
@@ -32,7 +34,7 @@ class PrismButtonHandler {
                 player.getRepresentation() + ", please choose a technology to gain that also has "
                         + techM1.getRequirements().orElse("").length() + " prerequisites.",
                 Buttons.GET_A_FREE_TECH);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);

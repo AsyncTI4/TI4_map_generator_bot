@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -27,42 +28,53 @@ import ti4.service.turn.StartTurnService;
 @UtilityClass
 public class VisionariaSelectService {
 
-    private String visionariaRep() {
+    public String initialButtonHeader() {
+        return " - _" + visionariaName() + "_ was exhausted";
+    }
+
+    public String visionariaRep() {
         return Mapper.getBreakthrough("deepwroughtbt").getNameRepresentation();
     }
 
-    private String visionariaName() {
+    public String visionariaName() {
         return Mapper.getBreakthrough("deepwroughtbt").getName();
     }
 
     public void postInitialButtons(GenericInteractionCreateEvent event, Game game, Player player) {
-        String message = game.getPing() + " - " + visionariaName() + " breakthrough was exhausted"
+        String message = game.getPing() + initialButtonHeader()
                 + (!game.isFowMode() ? " by " + player.getRepresentationNoPing() : "") + ".";
-        message += "\n> Use the buttons to research, or decline.";
+        message += "\n> Use the buttons to research non-faction, non-unit upgrade technology, or decline.";
         message +=
-                "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a Promissory Note of your choice.";
+                "\n-# > Reminder: This research costs 3 trade goods, and you must give the Deepwrought player a promissory note of your choice.";
 
-        game.removeStoredValue("VisionariaResponded");
+        game.setStoredValue("VisionariaResponded", "|" + player.getFaction());
+
+        String factionEmoji = game.isFowMode() ? null : player.getFactionEmoji();
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("acquireATechWithDwsBt", "Research for 3 TGs", MiscEmojis.tg));
-        buttons.add(Buttons.green("giveVisionariaPN", "Give PN", CardEmojis.PN));
+        buttons.add(Buttons.green("acquireATechWithDwsBt", "Research For 3 Trade Goods", MiscEmojis.tg));
+        buttons.add(Buttons.green("giveVisionariaPN", "Give Promissory Note", CardEmojis.PN));
         buttons.add(Buttons.red("declineVisionaria", "Decline"));
         buttons.add(Buttons.gray(
-                player.finChecker() + "fleetLogAfterVisionaria",
-                "Wait until all have reacted",
-                (!game.isFowMode() ? player.getFactionEmoji() : null)));
+                player.finChecker() + "fleetLogAfterVisionaria", "Wait Until All Have Reacted", factionEmoji));
         buttons.add(Buttons.gray(
-                player.finChecker() + "endTurnAfterVisionaria",
-                "End turn after all have reacted",
-                (!game.isFowMode() ? player.getFactionEmoji() : null)));
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+                player.finChecker() + "endTurnAfterVisionaria", "End Turn After All Have Reacted", factionEmoji));
+        MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(), message, game, player, buttons);
+        for (Player player_ : game.getRealPlayers()) {
+            if (!player_.equals(player)) {
+                MessageHelper.sendMessageToChannel(
+                        player_.getCardsInfoThread(),
+                        player_.getRepresentationUnfogged()
+                                + ", this is a notice that " + visionariaName()
+                                + " was played, in case you would like to research a technology.");
+            }
+        }
     }
 
     @ButtonHandler("giveVisionariaPN")
     private void giveVisionariaPN(ButtonInteractionEvent event, Game game, Player player) {
         Player deepwrought = Helper.getPlayerFromUnlockedBreakthrough(game, "deepwroughtbt");
         String message = player.getRepresentationUnfogged()
-                + ", please choose which promissory note you wish to send for " + visionariaName();
+                + ", please choose which promissory note you wish to send for _" + visionariaName() + "_.";
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(), message, ButtonHelper.getForcedPNSendButtons(game, deepwrought, player));
     }
@@ -72,18 +84,18 @@ public class VisionariaSelectService {
     public static void presetMoveAlongAfterVisionaria(
             ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String msg = game.getPing()
-                + " the active player has elected to move the game along after everyone has finished resolving "
+                + ", the active player has elected to move the game along after everyone has finished resolving "
                 + visionariaRep() + ".";
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         game.setTemporaryPingDisable(true);
         game.setStoredValue(buttonID, player.getFaction());
-        ButtonHelper.deleteTheOneButton(event, "endTurnAfterVisionaria", true);
-        ButtonHelper.deleteTheOneButton(event, "fleetLogAfterVisionaria", true);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, "endTurnAfterVisionaria", true);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, "fleetLogAfterVisionaria", true);
     }
 
     @ButtonHandler("declineVisionaria")
     private void declineVisionaria(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = "-# " + player.getRepresentationNoPing() + " declined to use Visionaria Select.";
+        String msg = "declined to use _Visionaria Select_.";
         respondToVisionaria(event, game, player);
         ReactionService.addReaction(event, player.getGame(), player, msg);
     }
@@ -108,7 +120,7 @@ public class VisionariaSelectService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             if (player.getTg() > 2) {
                 MessageHelper.sendMessageToChannel(
-                        player.getCorrectChannel(), player.getRepresentation() + " automatically spent 3tg");
+                        player.getCorrectChannel(), player.getRepresentation() + " automatically spent 3 trade goods.");
                 player.setTg(player.getTg() - 3);
             }
             Player deepwrought = Helper.getPlayerFromUnlockedBreakthrough(game, "deepwroughtbt");
@@ -116,8 +128,8 @@ public class VisionariaSelectService {
 
                 // Send PN to DWS
                 List<Button> sendPNbuttons = ButtonHelper.getForcedPNSendButtons(game, deepwrought, player);
-                String dwsPromMsg = player.getRepresentation() + " choose a promissory note to send to "
-                        + deepwrought.getRepresentation(false, false) + " as part of" + visionariaName() + ":";
+                String dwsPromMsg = player.getRepresentation() + ", please choose a promissory note to send to "
+                        + deepwrought.getRepresentation(false, false) + " as part of _" + visionariaName() + "_.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), dwsPromMsg, sendPNbuttons);
             }
         } else {
@@ -125,7 +137,7 @@ public class VisionariaSelectService {
         }
         if (firstTime) {
             respondToVisionaria(event, game, player);
-            String msg = player.getRepresentationNoPing() + " is using Visionaria Select.";
+            String msg = player.getRepresentationNoPing() + " is using _Visionaria Select_.";
             ReactionService.addReaction(event, player.getGame(), player, msg);
         }
     }
@@ -137,24 +149,35 @@ public class VisionariaSelectService {
     }
 
     private boolean readyToMoveOn(Game game) {
-        String value = game.getStoredValue("VisionariaResponded");
-        for (Player p : game.getRealPlayers()) {
-            if (p.hasBreakthrough("deepwroughtbt")) continue;
-            if (value.contains("|" + p.getFaction())) continue;
-            return false;
-        }
-        return true;
+        return game.getRealPlayers().stream().allMatch(p -> hasRespondedToVisionaria(game, p));
+    }
+
+    public boolean hasRespondedToVisionaria(Game game, Player player) {
+        String val = game.getStoredValue("VisionariaResponded");
+        if (player.hasBreakthrough("deepwroughtbt")) return true;
+        if (val.isEmpty() || val.contains("|" + player.getFaction())) return true;
+        return false;
     }
 
     private void moveOnWhenDone(ButtonInteractionEvent event, Game game) {
         if (!readyToMoveOn(game)) return;
 
         Player activePlayer = game.getActivePlayer();
+        if (activePlayer == null) {
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(),
+                    "Could not find active player when trying to move on after _Visionaria Select_.");
+            game.removeStoredValue("endTurnAfterVisionaria");
+            game.removeStoredValue("fleetLogAfterVisionaria");
+            game.removeStoredValue("VisionariaResponded");
+            return;
+        }
         if (game.getStoredValue("endTurnAfterVisionaria").equals(activePlayer.getFaction())) {
             EndTurnService.endTurnAndUpdateMap(null, game, activePlayer);
 
         } else if (game.getStoredValue("fleetLogAfterVisionaria").equals(activePlayer.getFaction())) {
-            String message = activePlayer.getRepresentation() + " Use buttons to end turn or do another action.";
+            String message =
+                    activePlayer.getRepresentation() + ", please use these buttons to end turn or do another action.";
             List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(activePlayer, game, true, event);
             MessageHelper.sendMessageToChannelWithButtons(activePlayer.getCorrectChannel(), message, systemButtons);
         }
@@ -171,15 +194,16 @@ public class VisionariaSelectService {
             // DWS Copy Tech
             if (!deepwrought.hasTech(techID)) {
                 deepwrought.addTech(techID);
-                String dwsMsg = deepwrought.getRepresentation(false, false) + " also acquired the technology due to "
-                        + visionariaName() + ": " + techM.getRepresentation(false);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(deepwrought, techID, game);
+                String dwsMsg = deepwrought.getRepresentationUnfogged() + " also acquired "
+                        + techM.getRepresentation(false) + " due to _" + visionariaName() + "_.";
                 MessageHelper.sendMessageToChannel(deepwrought.getCorrectChannel(), dwsMsg);
             }
 
             // Send PN to DWS
             List<Button> sendPNbuttons = ButtonHelper.getForcedPNSendButtons(game, deepwrought, player);
-            String dwsPromMsg = player.getRepresentation() + " choose a promissory note to send to "
-                    + deepwrought.getRepresentation(false, false) + " as part of" + visionariaName() + ":";
+            String dwsPromMsg = player.getRepresentation() + ", please choose a promissory note to send to "
+                    + deepwrought.getColorIfCanSeeStats(player) + " as part of _" + visionariaName() + "_.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), dwsPromMsg, sendPNbuttons);
         }
     }

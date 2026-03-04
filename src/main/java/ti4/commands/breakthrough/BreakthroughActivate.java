@@ -1,40 +1,24 @@
 package ti4.commands.breakthrough;
 
+import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.thundersedge.BreakthroughCommandHelper;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
-import ti4.model.BreakthroughModel;
 
 class BreakthroughActivate extends GameStateSubcommand {
 
     BreakthroughActivate() {
-        super(Constants.BREAKTHROUGH_ACTIVATE, "Activate (or unactivate) breakthrough", true, true);
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
-        addOptions(
-                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
-                        .setAutoComplete(true));
+        super(Constants.BREAKTHROUGH_ACTIVATE, "Activate (or deactivate) breakthrough", true, true);
+        addOption(OptionType.STRING, Constants.BREAKTHROUGH, "Which breakthrough to (de-)activate", false, true);
+        addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction to activate their breakthrough", false, true);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
-        BreakthroughModel bt = player.getBreakthroughModel();
-        if (bt == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Player does not have a breakthrough");
-        } else {
-            boolean active = player.isBreakthroughActive();
-            player.setBreakthroughActive(!active);
-            String message = player.getRepresentation() + (active ? " de-" : " ") + "activated their breakthrough "
-                    + bt.getName();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        }
-    }
-
-    @Override
-    public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
+        List<String> ids = BreakthroughCommandHelper.getBreakthroughsFromEvent(event, player);
+        BreakthroughCommandHelper.activateBreakthroughs(event, player, ids);
     }
 }

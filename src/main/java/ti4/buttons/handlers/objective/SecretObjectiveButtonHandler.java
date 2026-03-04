@@ -3,8 +3,10 @@ package ti4.buttons.handlers.objective;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -19,6 +21,7 @@ import ti4.service.objectives.DiscardSecretService;
 import ti4.service.objectives.DrawSecretService;
 import ti4.settings.users.UserSettingsManager;
 
+@UtilityClass
 class SecretObjectiveButtonHandler {
 
     @ButtonHandler("SODISCARD_")
@@ -37,7 +40,7 @@ class SecretObjectiveButtonHandler {
             int soIndex = Integer.parseInt(soID);
 
             String msg = player.getRepresentation() + " discarded a secret objective";
-            if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 0) {
+            if (game.getRound() == 1 && !game.isFowMode() && player.getSo() > 1) {
                 int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.getSo() > 1) {
@@ -50,10 +53,22 @@ class SecretObjectiveButtonHandler {
                 }
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg + ".");
+            String oldSO = player.getSecret(soIndex).getAlias();
             DiscardSecretService.discardSO(player, soIndex, game);
 
             if (drawReplacement) {
                 DrawSecretService.drawSO(event, game, player);
+
+                if (player.getSecrets().containsKey(oldSO)
+                        && event.getUser().getId().equals(player.getUserID())) {
+                    event.getHook()
+                            .setEphemeral(true)
+                            .sendMessage("Oh no! You drew the same secret you discarded! How unlucky 😭😭😭!")
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + " drew a replacement secret objective.");
             }
             if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
@@ -70,7 +85,7 @@ class SecretObjectiveButtonHandler {
             BotLogger.error(new LogOrigin(event, player), "Could not parse SO ID: " + soID, e);
             event.getChannel()
                     .sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.")
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
         ButtonHelper.deleteMessage(event);

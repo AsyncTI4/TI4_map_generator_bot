@@ -42,7 +42,8 @@ class SetHomeSystemPosition extends GameStateSubcommand {
                 player.setPlayerStatsAnchorPosition(hsTileString);
                 MessageHelper.sendMessageToEventChannel(
                         event,
-                        "Home system set to " + hsTile.getRepresentation() + " for " + player.getRepresentation());
+                        "Home system set to " + hsTile.getRepresentation() + " for " + player.getRepresentation()
+                                + ".");
             }
         }
     }

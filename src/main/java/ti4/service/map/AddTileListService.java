@@ -28,7 +28,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.service.ShowGameService;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 import ti4.service.fow.GMService;
@@ -120,8 +119,7 @@ public class AddTileListService {
             MessageHelper.sendMessageToChannelWithButtons(
                     game.isFowMode() ? GMService.getGMChannel(game) : game.getMainGameChannel(),
                     "Press this button after every player is setup.",
-                    List.of(Buttons.green(
-                            "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
+                    List.of(Buttons.DEAL_2_SO));
 
             if (!game.isFowMode()
                     && game.getRealPlayers().size() < game.getPlayers().size()) {

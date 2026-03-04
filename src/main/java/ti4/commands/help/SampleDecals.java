@@ -46,7 +46,7 @@ class SampleDecals extends Subcommand {
 
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
         if (input != null
-                && !input.getAsString().equals(Constants.ALL)
+                && !Constants.ALL.equals(input.getAsString())
                 && !input.getAsString().isEmpty()) {
             if ("Other".equals(input.getAsString())) {
                 List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
@@ -57,16 +57,16 @@ class SampleDecals extends Subcommand {
                         .collect(Collectors.toList());
             }
         }
+        if (decals.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "No decals found. Something has probably gone wrong.");
+            return;
+        }
 
         String color = event.getOption(Constants.COLOR, "blue", OptionMapping::getAsString);
         if (!Mapper.isValidColor(color)) color = "blue";
         String colorID = Mapper.getColorID(color);
 
         Collections.sort(decals);
-        if (decals.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No decals found. Something has probably gone wrong.");
-            return;
-        }
 
         int SPACING = 24;
         int DREADWIDTH = 77 + 2 * SPACING;
@@ -75,8 +75,8 @@ class SampleDecals extends Subcommand {
         int DREADTEXHIGHT = DREADSUBHIGHT + 3 * LINEHEIGHT + 2 * SPACING;
         Font bigFont = Storage.getFont16();
         Font smallFont = Storage.getFont12();
-        int PAGEWIDTH = 1280;
-        int PAGEHIGHT = 1655;
+        int PAGEWIDTH = 2400;
+        int PAGEHIGHT = 3600;
         int PERROW = Math.min(PAGEWIDTH / DREADWIDTH, (int) Math.ceil(Math.sqrt(decals.size())));
 
         int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - PERROW * DREADWIDTH);

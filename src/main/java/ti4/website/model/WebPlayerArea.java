@@ -40,6 +40,8 @@ public class WebPlayerArea {
         private final String breakthroughId;
         private final boolean unlocked;
         private final boolean exhausted;
+        // TODO: MemePhilosopher uncomment this
+        // private final boolean active;
         private final int tradeGoodsStored;
     }
 
@@ -178,6 +180,7 @@ public class WebPlayerArea {
     private Map<String, Integer> debtTokens;
 
     // Breakthrough (Thunder's Edge)
+    // TODO: MemePhilosopher make this a list
     private BreakthroughInfo breakthrough;
 
     // Plot cards (Firmament/Obsidian)
@@ -188,6 +191,9 @@ public class WebPlayerArea {
 
     // Decal ID
     private String decalId;
+
+    // Nekro Z Assimilator targets (Thunder's Edge) - factions whose flagships have been assimilated
+    private List<String> valefarZTargets;
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -290,17 +296,7 @@ public class WebPlayerArea {
 
         // Planets
         webPlayerArea.setPlanets(player.getPlanets());
-        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
-        // Ensure Custodia Vigilia is in exhausted planets if the player has it
-        // (it's always exhausted when gained via gainCustodiaVigilia())
-        if (player.getPlanets().contains("custodiavigilia") && !exhaustedPlanets.contains("custodiavigilia")) {
-            exhaustedPlanets.add("custodiavigilia");
-        }
-        // Also handle custodiavigiliaplus if it exists
-        if (player.getPlanets().contains("custodiavigiliaplus") && !exhaustedPlanets.contains("custodiavigiliaplus")) {
-            exhaustedPlanets.add("custodiavigiliaplus");
-        }
-        webPlayerArea.setExhaustedPlanets(exhaustedPlanets);
+        webPlayerArea.setExhaustedPlanets(new ArrayList<>(player.getExhaustedPlanets()));
         webPlayerArea.setExhaustedPlanetAbilities(player.getExhaustedPlanetsAbilities());
 
         // Relics and fragments
@@ -358,15 +354,39 @@ public class WebPlayerArea {
         // Decal ID
         webPlayerArea.setDecalId(player.getDecalSet());
 
+        // Nekro Z Assimilator targets (Thunder's Edge)
+        // Parse valefarZ stored value which contains factions whose flagships have been assimilated
+        List<String> valefarZTargets = new ArrayList<>();
+        if (player.hasUnlockedBreakthrough("nekrobt")) {
+            String valefarZValue = game.getStoredValue("valefarZ");
+            if (!valefarZValue.isEmpty()) {
+                for (String faction : valefarZValue.split("\\|")) {
+                    if (!faction.isEmpty()) {
+                        valefarZTargets.add(faction);
+                    }
+                }
+            }
+        }
+        webPlayerArea.setValefarZTargets(valefarZTargets);
+
         // Breakthrough info (Thunder's Edge)
         if (game.isThundersEdge()) {
-            String breakthroughId = player.getBreakthroughID();
-            if (breakthroughId != null && !breakthroughId.isEmpty()) {
-                webPlayerArea.setBreakthrough(new BreakthroughInfo(
-                        breakthroughId,
-                        player.isBreakthroughUnlocked(),
-                        player.isBreakthroughExhausted(),
-                        player.getBreakthroughTGs()));
+            List<BreakthroughInfo> breakthroughs = new ArrayList<>();
+            for (String btID : player.getBreakthroughIDs()) {
+                boolean unl = player.isBreakthroughUnlocked(btID);
+                boolean exh = player.isBreakthroughExhausted(btID);
+                boolean act = player.isBreakthroughActive(btID);
+                int tgs = player.getBreakthroughTGs(btID);
+
+                // TODO: MemePhilosopher replace this ...
+                breakthroughs.add(new BreakthroughInfo(btID, unl, exh, tgs));
+                // ... with this
+                // breakthroughs.add(new BreakthroughInfo(btID, unl, exh, act, tgs));
+            }
+
+            // TODO: MemePhilosopher make this a list
+            if (!breakthroughs.isEmpty()) {
+                webPlayerArea.setBreakthrough(breakthroughs.getFirst());
             } else {
                 webPlayerArea.setBreakthrough(null);
             }
@@ -436,7 +456,7 @@ public class WebPlayerArea {
                     .flatMap(t -> t.getUnitHolders().values().stream())
                     .flatMap(uh -> uh.getTokenList().stream())
                     .filter(tok ->
-                            tok.equals(Constants.TOKEN_BREACH_ACTIVE) || tok.equals(Constants.TOKEN_BREACH_INACTIVE))
+                            Constants.TOKEN_BREACH_ACTIVE.equals(tok) || Constants.TOKEN_BREACH_INACTIVE.equals(tok))
                     .count();
             webPlayerArea.setBreachTokensReinf(Math.max(0, maxBreachTokens - totalBreaches));
         } else {

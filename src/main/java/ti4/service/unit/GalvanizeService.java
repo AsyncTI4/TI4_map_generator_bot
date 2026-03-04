@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -18,6 +19,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.regex.RegexService;
 
@@ -27,7 +29,7 @@ public class GalvanizeService {
     public static void postToggleGalvanizeTiles(Game game, Player player) {
         List<Button> buttons = ButtonHelper.getTilesWithUnitsForAction(player, game, "toggleGalvanize", true);
         String message = player.getRepresentationUnfogged()
-                + " Use the buttons to select the tile in which you wish to modify units. ";
+                + ", please choose the system containing the unit you with to galvanize. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -49,9 +51,9 @@ public class GalvanizeService {
             String uhName = unitHolder.getName();
             String uhRepresentation;
             if ("space".equalsIgnoreCase(uhName)) {
-                uhRepresentation = " in Space " + tile.getPosition();
+                uhRepresentation = " In Space " + tile.getPosition();
             } else {
-                uhRepresentation = " on " + Helper.getPlanetRepresentation(uhName, game);
+                uhRepresentation = " On " + Helper.getPlanetRepresentation(uhName, game);
             }
             for (UnitKey unit : unitHolder.getUnitsByState().keySet()) {
                 int total = unitHolder.getUnitCount(unit);
@@ -74,7 +76,7 @@ public class GalvanizeService {
                             unit.unitEmoji()));
             }
         }
-        buttons.add(Buttons.blue("deleteButtons", "Done galvanizing units"));
+        buttons.add(Buttons.blue("deleteButtons", "Done Galvanizing Units"));
         return buttons;
     }
 
@@ -129,6 +131,6 @@ public class GalvanizeService {
         if (systemButtons.size() > 25) systemButtons = systemButtons.subList(0, 25);
         event.getMessage()
                 .editMessageComponents(ActionRow.partitionOf(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

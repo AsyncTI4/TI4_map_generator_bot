@@ -1,0 +1,21 @@
+{
+    "id": "bannerhall1",
+    "name": "1st Banner",
+    "aliases": [
+        "bannerhall1",
+        "firstbanner",
+        "first banner",
+        "1stbanner",
+        "firstbannerhall",
+        "first bannerhall",
+        "1stbannerhall"
+    ],
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": [
+        "FAKE",
+        "FACTION"
+    ],
+    "flavourText": "Flavor text is the bane of all time-pressed devs.",
+    "source": "ds"
+}

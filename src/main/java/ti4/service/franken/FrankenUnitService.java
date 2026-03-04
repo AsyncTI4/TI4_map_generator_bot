@@ -13,19 +13,30 @@ import ti4.model.UnitModel;
 public class FrankenUnitService {
 
     public static void addUnits(
-            GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean allowDuplicates) {
+            GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean dupes) {
+        if (player.getGame().isVeiledHeartMode()) {
+            String msg = "Added a veiled card. Refresh your `#cards-info` thread to find a button to reveal it";
+            MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+
+            String key = "veiledCards" + player.getFaction();
+            String val = player.getGame().getStoredValue(key);
+            val += "_" + String.join("_", unitIDs);
+            player.getGame().setStoredValue(key, val);
+            return;
+        }
+
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
             if (player.getGame().isTwilightsFallMode()
                     && ("fs".equalsIgnoreCase(unitModel.getAsyncId()) || "mf".equalsIgnoreCase(unitModel.getAsyncId()))
                     && !unitID.contains("_")) {
-                allowDuplicates = true;
+                dupes = true;
             }
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
-                if (!allowDuplicates) {
+                if (!dupes) {
                     UnitModel oldBaseType;
                     while ((oldBaseType = player.getUnitByBaseType(unitModel.getBaseType())) != null) {
                         player.removeOwnedUnitByID(oldBaseType.getAlias());
@@ -40,7 +51,7 @@ public class FrankenUnitService {
             }
             sb.append("\n");
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 
     public static void removeUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {
@@ -63,6 +74,6 @@ public class FrankenUnitService {
                 player.removeOwnedUnitByID("naaz_mech_space");
             }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendEphemeralMessageToEventChannel(event, sb.toString());
     }
 }

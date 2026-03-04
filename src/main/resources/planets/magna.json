@@ -10,6 +10,7 @@
         "x": 170.0,
         "y": 128.0
     },
+    "radius": 95.0,
     "resources": 4,
     "influence": 4,
     "factionHomeworld": "atokera",

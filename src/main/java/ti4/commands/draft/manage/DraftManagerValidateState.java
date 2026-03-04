@@ -6,9 +6,9 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.service.draft.DraftManager;
 
-class DraftManagerValidate extends GameStateSubcommand {
+class DraftManagerValidateState extends GameStateSubcommand {
 
-    public DraftManagerValidate() {
+    DraftManagerValidateState() {
         super(Constants.DRAFT_MANAGE_VALIDATE, "Get any reason the draft is in a bad state", false, false);
     }
 

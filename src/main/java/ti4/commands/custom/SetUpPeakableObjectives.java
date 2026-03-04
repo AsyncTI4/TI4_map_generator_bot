@@ -28,11 +28,11 @@ class SetUpPeakableObjectives extends GameStateSubcommand {
         Game game = getGame();
         OptionMapping loc1 = event.getOption(Constants.NUMBER_OF_STAGE1_OBJECTIVES);
         if (loc1 != null) {
-            game.setUpPeakableObjectives(loc1.getAsInt(), 1);
+            game.setUpPeekableObjectives(loc1.getAsInt(), 1);
         }
         OptionMapping loc2 = event.getOption(Constants.NUMBER_OF_STAGE2_OBJECTIVES);
         if (loc2 != null) {
-            game.setUpPeakableObjectives(loc2.getAsInt(), 2);
+            game.setUpPeekableObjectives(loc2.getAsInt(), 2);
         }
         MessageHelper.sendMessageToChannel(
                 event.getChannel(), "Set up objective decks. Check map to confirm remaining unrevealed objectives.");

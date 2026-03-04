@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -30,9 +31,11 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 
 @UtilityClass
 public class CustomHyperlaneService {
+
     private static final String HYPERLANE_TILEID = "hl";
 
     private static final List<Button> HYPERLANE_BUTTONS = Arrays.asList(
@@ -79,12 +82,12 @@ public class CustomHyperlaneService {
             event.getMessageChannel()
                     .sendMessage(sb.toString())
                     .setComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         } else {
             ((ButtonInteractionEvent) event)
                     .getHook()
                     .editOriginalComponents(buttons)
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -112,7 +115,7 @@ public class CustomHyperlaneService {
     @ButtonHandler("customHyperlaneRefresh")
     public static void refreshHyperlaneButtons(ButtonInteractionEvent event, Game game) {
         offerManageHyperlaneButtons(game, event, null);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("customHyperlaneMore")
@@ -140,7 +143,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Hyperlane Data", data.build()))
                 .build();
 
-        event.replyModal(importDataModal).queue();
+        event.replyModal(importDataModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneImportSave")
@@ -198,7 +201,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Hyperlane Matrix (clear to delete)", data.build()))
                 .build();
 
-        event.replyModal(customHyperlaneModal).queue();
+        event.replyModal(customHyperlaneModal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneSave_")
@@ -241,7 +244,7 @@ public class CustomHyperlaneService {
                 .addComponents(Label.of("Static -> Custom", data1.build()), Label.of("Custom -> Static", data2.build()))
                 .build();
 
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("customHyperlaneTransformExecute")

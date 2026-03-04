@@ -2,6 +2,7 @@ package ti4.service.breakthrough;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -66,12 +67,12 @@ public class EidolonMaximumService {
     public void sendFlipButtonsToCardsInfo(Player player, Tile tile, List<UnitHolder> unitHolders) {
         String tileRep = tile.getRepresentationForButtons(player.getGame(), player);
         String msg = player.getRepresentation(true, false) + " you have 4 mechs in " + tileRep
-                + ". You can remove 3 of them to activate " + eidolonRep(true);
+                + ". You can remove 3 of them to activate " + eidolonRep(true) + ".";
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uh : unitHolders) {
             String id = "activateEidolonMaximum_" + tile.getPosition() + "_" + uh.getName();
-            String label = "Create in space";
-            if (!"space".equals(uh.getName())) label = "Create on " + Helper.getPlanetName(uh.getName());
+            String label = "Create In Space";
+            if (!"space".equals(uh.getName())) label = "Create On " + Helper.getPlanetName(uh.getName());
             buttons.add(Buttons.green(id, label));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -99,18 +100,36 @@ public class EidolonMaximumService {
             // Remove all other mechs
             UnitKey mech = Units.getUnitKey(UnitType.Mech, player.getColorID());
             for (UnitHolder uh : tile.getUnitHolders().values()) {
-                if (uh.getName().equals(keepUnitHolder)) {
+                if (uh.getName().equals(keepUnitHolder) || uh.getUnitCount(mech) == 4) {
                     uh.removeUnit(mech, uh.getUnitCount(mech) - 1);
                 } else {
                     uh.removeUnit(mech, uh.getUnitCount(mech));
                 }
             }
-            BreakthroughCommandHelper.activateBreakthrough(event, player);
+
+            List<String> quotes = new ArrayList<>(List.of(
+                    "> Ready to form Voltron!",
+                    "> Activate interlocks!",
+                    "> Dyna-therms connected.",
+                    "> Infra-cells up!",
+                    "> Mega-thrusters are go!",
+                    "> Let's go, Voltron Force!",
+                    "> Form feet and legs!",
+                    "> Form arms and body!",
+                    "> And I'll form the head!"));
+            for (String message : quotes) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (Exception ignored) {
+                }
+            }
+            BreakthroughCommandHelper.activateBreakthrough(event, player, "naazbt");
         });
         ButtonHelper.deleteMessage(event);
     }
 
     public void unflipEidolonMaximum(GenericInteractionCreateEvent event, Game game, Player player) {
-        if (playerHasActiveMax(player)) BreakthroughCommandHelper.deactivateBreakthrough(player);
+        if (playerHasActiveMax(player)) BreakthroughCommandHelper.deactivateBreakthrough(player, "naazbt");
     }
 }

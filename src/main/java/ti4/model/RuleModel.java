@@ -65,6 +65,10 @@ public class RuleModel implements ModelInterface, EmbeddableModel {
         return StringHelper.replaceWithEmojis(descr);
     }
 
+    public String getNameRepresentation() {
+        return "_" + getTitle() + "_";
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("**__" + getTitle() + ":__**");

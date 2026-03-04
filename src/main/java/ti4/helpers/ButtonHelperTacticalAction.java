@@ -15,7 +15,6 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperAbilities;
-import ti4.helpers.thundersedge.TeHelperGeneral;
 import ti4.helpers.thundersedge.TeHelperPromissories;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -38,6 +37,7 @@ import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.CheckUnitContainmentService;
@@ -45,8 +45,7 @@ import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperTacticalAction {
 
-    @ButtonHandler("doneWithTacticalAction")
-    public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+    public static void endOfTacticalActionThings(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
             RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
@@ -88,55 +87,64 @@ public class ButtonHelperTacticalAction {
             }
             if (player.hasAbility("miniaturization")) {
                 String msg = player.getRepresentation()
-                        + " You can land your structures on planets in any system you have floating structures using your ability Miniaturization:";
+                        + ", you may use **Miniaturization** to land any of your structures in the space area onto planets you control in this system.";
                 List<Button> buttons = TeHelperAbilities.miniLandingButtons(game, player);
                 if (!buttons.isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
             }
 
-            if (player.hasUnlockedBreakthrough("argentbt")) {
+            if (player.hasUnlockedBreakthrough("argentbt")
+                    && !game.getStoredValue("argentBTUse").isEmpty()) {
+                game.removeStoredValue("argentBTUse");
                 String msg = player.getRepresentation()
-                        + " You can use your breakthrough to move ships (and things they transport) between the active system and any adjacent system with only your units and your CC";
+                        + ", you may use _Wing Transfer_ to move ships (and things they transport) between the active system and any adjacent system with only your units and your command tokens.";
                 List<Button> buttons = ButtonHelperHeroes.argentBreakthroughStep1(
                         game, player, game.getTileByPosition(game.getActiveSystem()));
                 if (buttons.size() > 2) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                 }
             }
+            if (!game.isAbsolMode()
+                    && player.getRelics().contains("emphidia")
+                    && !player.getExhaustedRelics().contains("emphidia")) {
+                String message = player.getRepresentation()
+                        + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
+                List<Button> systemButtons2 = new ArrayList<>();
+                systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
+            }
+            if (game.isWarfareAction()) {
+                Button redistro = Buttons.blue(
+                        player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
+                String warfareDone = player.getRepresentationUnfogged()
+                        + ", your **Warfare** action is finished, you may redistribute your command tokens again.";
+                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
+            }
+            RoundStatsTracker.finalizeTactical(game, player);
+            resetStoredValuesForTacticalAction(game);
         }
+    }
 
-        if (!game.isAbsolMode()
-                && player.getRelics().contains("emphidia")
-                && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation()
-                    + ", you may use the button to explore a planet using _The Crown of Emphidia_.";
-            List<Button> systemButtons2 = new ArrayList<>();
-            systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
-        }
+    @ButtonHandler("doneWithTacticalAction")
+    public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+        endOfTacticalActionThings(player, game, event);
+
         if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
         }
-        if (game.isWarfareAction()) {
-            Button redistro = Buttons.blue(
-                    player.finChecker() + "redistributeCCButtons_deleteThisButton", "Redistribute Command Tokens");
-            String warfareDone = player.getRepresentationUnfogged()
-                    + " your Warfare action is finished, you can redistribute your command tokens again.";
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), warfareDone, redistro);
-        }
 
-        resetStoredValuesForTacticalAction(game);
         game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
-            LoreService.showSystemLore(player, game, game.getActiveSystem());
+            LoreService.showSystemLore(player, game, game.getActiveSystem(), LoreService.TRIGGER.CONTROLLED);
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
         ButtonHelper.deleteMessage(event);
+        player.resetOlradinPolicyFlags();
     }
 
     @ButtonHandler("tacticalActionBuild_")
@@ -168,7 +176,8 @@ public class ButtonHelperTacticalAction {
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
                         .contains(game.getTileByPosition(pos))) {
             String msg = player.getRepresentation()
-                    + " you have the Production Biomes (special spacedock) and so may spend a command counter to get 4tg (and give 2tg to someone else) that you can spend on this build.";
+                    + ", you have the Production Biomes spacedock unit upgrade, and so may spend a command counter to gain 4 trade goods that you can spend on this build."
+                    + " If you do, you will also choose another player, who will gain 2 trade goods.";
             List<Button> buttons2 = new ArrayList<>();
             buttons2.add(Buttons.blue("useProductionBiomes", "Use Production Biomes", FactionEmojis.Hacan));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons2);
@@ -219,7 +228,7 @@ public class ButtonHelperTacticalAction {
                     MessageHelper.sendMessageToChannel(
                             player.getCorrectChannel(),
                             player.getRepresentation()
-                                    + " use this button to resolve the ability of your yssaril infantry.",
+                                    + " use this button to resolve the ability of your Guild Agents.",
                             buttons);
                 }
             }
@@ -236,12 +245,12 @@ public class ButtonHelperTacticalAction {
 
         if (unitsWereMoved && game.isCallOfTheVoidMode() && tile.getPosition().contains("frac")) {
             String msg = player.getRepresentation()
-                    + " you should gain 1 command token due to moving in the fracture while the Call of the Void Galactic Event is in play.";
+                    + " you should gain 1 command token due to moving in The Fracture while the _Call of the Void_ galactic event is in play.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String trueIdentity = player.getRepresentationUnfogged();
             String message2 = trueIdentity + ", your current command tokens are " + player.getCCRepresentation()
-                    + ". Use buttons to gain 1 command tokens.";
+                    + ". Use these buttons to gain 1 command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
@@ -260,6 +269,8 @@ public class ButtonHelperTacticalAction {
         if (unitsWereMoved) {
             CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
             CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "cabal");
+            CommanderUnlockCheckService.checkAllPlayersInGame(game, "naalu");
             for (Player nonActivePlayer : game.getRealPlayers()) {
                 if (player == nonActivePlayer) {
                     continue;
@@ -294,7 +305,6 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.resolveEmpyCommanderCheck(player, game, tile, event);
             ButtonHelper.sendEBSWarning(player, game, tile.getPosition());
             ButtonHelper.checkForIonStorm(tile, player);
-            TeHelperGeneral.addStationsToPlayArea(event, game, tile);
             ButtonHelperFactionSpecific.checkForStymie(game, player, tile);
             ButtonHelper.checkFleetInEveryTile(player, game);
             if (!game.isFowMode()) {
@@ -323,7 +333,7 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButtons(
                         playerWithPds.getCorrectChannel(),
                         title + playerWithPds.getRepresentationUnfogged() + ", you have SPACE CANNON coverage in "
-                                + tile.getRepresentation() + ", use buttons to resolve:",
+                                + tile.getRepresentation() + "(" + tile.getPosition() + "), use buttons to resolve:",
                         spaceCannonButtons);
             }
         } else {
@@ -366,11 +376,14 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
 
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
         game.getTacticalActionDisplacement().clear();
+        for (Player player : game.getRealPlayers()) {
+            RoundStatsTracker.clearTacticalMarkers(game, player);
+        }
     }
 
     public static void beginTacticalAction(Game game, Player player) {
+        RoundStatsTracker.markTacticalStart(game, player);
         boolean prefersDistanceBasedTacticalActions =
                 UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
@@ -499,6 +512,7 @@ public class ButtonHelperTacticalAction {
                 }
             }
         } else {
+            LoreService.showSystemLore(player, game, pos, LoreService.TRIGGER.ACTIVATED);
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player
                         || !FoWHelper.getTilePositionsToShow(game, player_).contains(pos)) {
@@ -567,18 +581,18 @@ public class ButtonHelperTacticalAction {
         List<Button> button4 = ButtonHelperAgents.getTFAwakenButtons(game, tile, player);
         if (player.hasTech("tf-awaken") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged()
-                    + ", you can use these buttons to change an infantry into a PDS using awaken.";
+                    + ", you can use these buttons to change an infantry into a PDS using _Awaken_.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button4);
         }
 
-        if (tile.isAnomaly() && player.getActionCards().containsKey("harness")) {
+        if (tile.isAnomaly() && player.getPlayableActionCards().contains("harness")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation() + ", you activated an anomaly, and so could now play _Harness Energy_.");
         }
 
         if (FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
-                && player.getActionCards().containsKey("rally")) {
+                && player.getPlayableActionCards().contains("rally")) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
                     player.getRepresentation()
@@ -587,14 +601,16 @@ public class ButtonHelperTacticalAction {
 
         if (player.hasUnlockedBreakthrough("argentbt")
                 && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                && FoWHelper.playerHasUnitsInSystem(player, tile)
-                && ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+                && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            game.setStoredValue("argentBTUse", "yes");
             List<Button> button2 = ButtonHelper.argentBreakthroughResolution(player, tile, game);
-            MessageHelper.sendMessageToChannelWithButtons(
-                    player.getCorrectChannel(),
-                    player.getRepresentation()
-                            + ", you can use this button to place command tokens down via Argent breakthrough ability.",
-                    button2);
+            if (ButtonHelper.argentBreakthroughResolution(player, tile, game).size() > 1) {
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you can use this button to place command tokens down via _Wing Transfer_.",
+                        button2);
+            }
         }
 
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, tile, game);
@@ -604,12 +620,12 @@ public class ButtonHelperTacticalAction {
             if (game.isTwilightsFallMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", Please resolve a wavelength explore.",
+                        player.getRepresentation() + ", please resolve a _Wavelength_ exploration.",
                         button2);
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation() + ", Please resolve _Scanlink Drone Network_.",
+                        player.getRepresentation() + ", please resolve _Scanlink Drone Network_.",
                         button2);
             }
         }
@@ -651,19 +667,19 @@ public class ButtonHelperTacticalAction {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "flipBreach_" + pos, "Flip breach to " + label));
-                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                buttons.add(Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 String msg = player.getRepresentation()
-                        + " You can use the buttons to flip the breach in the active system:";
+                        + ", you may use the buttons to flip the Breach in the active system.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             }
             if (player.hasPlayablePromissoryInHand("nanolink")
                     && !activeSystem.getPlanetUnitHolders().isEmpty()
                     && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
-                        + " You can use Nano Link Permit to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                        + ", you may use _Nano-Link Permit_ to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system.";
                 List<Button> buttons = List.of(
-                        Buttons.green("startCourierTransport_" + pos, "Play Nano Link Permit"),
-                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                        Buttons.green("startCourierTransport_" + pos, "Play Nano-Link Permit"),
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
                                 .size()
                         > 1) {
@@ -674,10 +690,10 @@ public class ButtonHelperTacticalAction {
                     && !activeSystem.getPlanetUnitHolders().isEmpty()
                     && FoWHelper.playerHasPlanetsInSystem(player, activeSystem)) {
                 String msg = player.getRepresentation()
-                        + " You can use courier transport to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system. Do you want to use it?";
+                        + ", you may use _Courier Transport_ to move your structures from adjacent systems that do not contain your command tokens onto planets you control in this system.";
                 List<Button> buttons = List.of(
                         Buttons.green("startCourierTransport_" + pos, "Use Courier Transport"),
-                        Buttons.DONE_DELETE_BUTTONS.withLabel("No thanks"));
+                        Buttons.DONE_DELETE_BUTTONS.withLabel("No Thanks"));
                 if (TeHelperPromissories.getCourierTransportButtons(game, player, pos)
                                 .size()
                         > 1) {
@@ -736,7 +752,7 @@ public class ButtonHelperTacticalAction {
         }
         if (player.hasRelic("absol_plenaryorbital")
                 && !tile.isHomeSystem(game)
-                && !tile.isMecatol()
+                && !tile.isMecatol(game)
                 && !player.hasUnit("plenaryorbital")) {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, tile, player);
             if (!buttons4.isEmpty()) {

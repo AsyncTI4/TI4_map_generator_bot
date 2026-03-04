@@ -167,6 +167,9 @@ public class SecretObjectiveInfoService {
                                 .append(threshold)
                                 .append(")");
                     }
+                    if (soModel.getNotes() != null) {
+                        sb.append("\n> -# [").append(soModel.getNotes()).append("]");
+                    }
                     sb.append("\n");
                 }
             }
@@ -208,6 +211,9 @@ public class SecretObjectiveInfoService {
                 .append(soPhase)
                 .append(" Phase): ")
                 .append(soDescription);
+        if (so.getNotes() != null) {
+            sb.append("\n> -# [").append(so.getNotes()).append("]");
+        }
         if (newLine) {
             sb.append("\n");
         }

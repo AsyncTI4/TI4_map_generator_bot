@@ -16,11 +16,11 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
-import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.MapRenderPipeline;
@@ -30,11 +30,14 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
+import ti4.service.async.RoleService;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.statistics.game.WinningPathPersistenceService;
 import ti4.service.tigl.TiglReportService;
+import ti4.spring.api.image.GameImageService;
+import ti4.spring.context.SpringContext;
 import ti4.spring.jda.JdaService;
 
 @UtilityClass
@@ -62,6 +65,10 @@ public class EndGameService {
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), gameName);
+        for (Player player : game.getRealPlayers()) {
+            RoleService.checkIfNewUserIsInAnyGamesAndAddRole(player.getUser());
+        }
+
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(), "This game's channels' permissions have been updated.");
 
@@ -71,12 +78,12 @@ public class EndGameService {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
-            gameRole.delete().queue();
+            gameRole.delete().queue(Consumers.nop(), BotLogger::catchRestError);
 
             if (game.isFowMode()) {
                 List<Role> gmRoles = event.getGuild().getRolesByName(game.getName() + " GM", true);
                 if (!gmRoles.isEmpty()) {
-                    gmRoles.getFirst().delete().queue();
+                    gmRoles.getFirst().delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         }
@@ -138,12 +145,12 @@ public class EndGameService {
         // CLOSE THREADS IN CHANNELS
         if (tableTalkChannel != null) {
             for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
-                threadChannel.getManager().setArchived(true).queue();
+                threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
             if (!threadChannel.getName().contains("Cards Info")) {
-                threadChannel.getManager().setArchived(true).queue();
+                threadChannel.getManager().setArchived(true).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         }
         gameEndStuff(game, event, publish);
@@ -217,10 +224,30 @@ public class EndGameService {
                             gameEndText,
                             summaryChannel,
                             m -> { // POST INITIAL MESSAGE
-                                m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
+                                m.editMessageAttachments(fileUpload)
+                                        .queue(
+                                                success -> {
+                                                    // Save message ID to SQLite, same as show game
+                                                    SpringContext.getBean(GameImageService.class)
+                                                            .saveDiscordMessageId(
+                                                                    game,
+                                                                    success.getIdLong(),
+                                                                    success.getGuild()
+                                                                            .getIdLong(),
+                                                                    success.getChannel()
+                                                                            .getIdLong());
+                                                },
+                                                BotLogger::catchRestError); // ADD MAP FILE TO MESSAGE
                                 m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                                     sendFeedbackMessage(t, game);
                                     sendRoundSummariesToThread(t, game);
+                                    if (game.getBotMapUpdatesThreadID() != null && game.getGuild() != null) {
+                                        RepositoryDispatchEvent.generateVideo(
+                                                game.getName(),
+                                                game.getBotMapUpdatesThreadID(),
+                                                t.getId(),
+                                                game.getGuild().getId());
+                                    }
                                 });
                                 MessageHelper.sendMessageToChannel(
                                         event.getMessageChannel(),
@@ -286,10 +313,8 @@ public class EndGameService {
     private static TextChannel getGameSummaryChannel(Game game) {
         List<TextChannel> textChannels;
         if (game.isFowMode() && JdaService.guildFogOfWar != null) {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildFogOfWar);
             textChannels = JdaService.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
         } else {
-            ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
             textChannels = JdaService.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
         return textChannels.isEmpty() ? null : textChannels.getFirst();
@@ -384,6 +409,6 @@ public class EndGameService {
         inLimboCategory.getTextChannels().stream()
                 .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
                 .limit(channelCountToDelete)
-                .forEach(channel -> channel.delete().queue());
+                .forEach(channel -> channel.delete().queue(Consumers.nop(), BotLogger::catchRestError));
     }
 }

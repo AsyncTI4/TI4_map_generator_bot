@@ -1,8 +1,13 @@
 package ti4.service;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -15,7 +20,8 @@ import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 
@@ -31,18 +37,18 @@ public class VeiledHeartService {
 
         static Optional<VeiledCardType> fromCard(String card) {
             if (Mapper.getTech(card) != null) {
-                return Optional.of(VeiledCardType.ABILITY);
+                return Optional.of(ABILITY);
             }
             if (Mapper.getUnit(card) != null) {
-                return Optional.of(VeiledCardType.UNIT);
+                return Optional.of(UNIT);
             }
             LeaderModel leaderModel = Mapper.getLeader(card);
             if (leaderModel != null) {
                 if (Constants.AGENT.equalsIgnoreCase(leaderModel.getType())) {
-                    return Optional.of(VeiledCardType.GENOME);
+                    return Optional.of(GENOME);
                 }
                 if (Constants.HERO.equalsIgnoreCase(leaderModel.getType())) {
-                    return Optional.of(VeiledCardType.PARADIGM);
+                    return Optional.of(PARADIGM);
                 }
             }
             return Optional.empty();
@@ -100,11 +106,8 @@ public class VeiledHeartService {
             veiledCardsByType.put(cardType, new ArrayList<>());
         }
 
-        getVeiledCards(player).forEach(card -> {
-            VeiledCardType.fromCard(card).ifPresent(type -> {
-                veiledCardsByType.get(type).add(card);
-            });
-        });
+        getVeiledCards(player).forEach(card -> VeiledCardType.fromCard(card)
+                .ifPresent(type -> veiledCardsByType.get(type).add(card)));
         return veiledCardsByType;
     }
 
@@ -127,11 +130,20 @@ public class VeiledHeartService {
         };
     }
 
+    public static void sendVeiledButtons(VeiledCardAction action, Player player) {
+        for (VeiledCardType type : VeiledCardType.values()) {
+            sendVeiledButtons(action, type, player);
+        }
+    }
+
     private static void sendVeiledButtons(VeiledCardAction action, VeiledCardType type, Player player) {
         String buttonIdPrefix = "veiled_" + action + "_" + type + "_";
         List<Button> buttons = new ArrayList<>(getVeiledCards(type, player)
                 .map(card -> type.toButton(buttonIdPrefix + card, getRepresentation(type, card)))
                 .toList());
+        if (buttons.isEmpty()) {
+            return;
+        }
         buttons.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
@@ -150,30 +162,39 @@ public class VeiledHeartService {
         Stream.of(VeiledCardAction.values())
                 .filter(action -> actionString.equalsIgnoreCase(action.toString()))
                 .findAny()
-                .ifPresent(action -> {
-                    Stream.of(VeiledCardType.values())
-                            .filter(type -> typeString.equalsIgnoreCase(type.toString()))
-                            .findAny()
-                            .ifPresent(type -> {
-                                if (card.isEmpty()) {
-                                    sendVeiledButtons(action, type, player);
-                                } else {
-                                    doAction(action, type, player, card);
-                                }
-                            });
-                });
+                .ifPresent(action -> Stream.of(VeiledCardType.values())
+                        .filter(type -> typeString.equalsIgnoreCase(type.toString()))
+                        .findAny()
+                        .ifPresent(type -> {
+                            if (card.isEmpty()) {
+                                sendVeiledButtons(action, type, player);
+                            } else {
+                                doAction(action, type, player, card);
+                            }
+                        }));
         ButtonHelper.deleteMessage(event);
     }
 
     public static void doAction(VeiledCardAction action, VeiledCardType type, Player player, String card) {
-        if (action.equals(VeiledCardAction.DISCARD)) {
-            setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
-
-            MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(),
-                    player.getRepresentation() + " has secretly discarded a veiled "
-                            + type.toString().toLowerCase() + ".");
+        String msg;
+        switch (action) {
+            case DRAW -> {
+                setStoredValue(player, getStoredValue(player) + card + "_");
+                msg = player.getRepresentation() + " has secretly drawn a veiled "
+                        + type.toString().toLowerCase()
+                        + ". They may put it into play with a button in their cards info.";
+            }
+            case DISCARD -> {
+                setStoredValue(player, getStoredValue(player).replace(card + "_", ""));
+                msg = player.getRepresentation() + " has secretly discarded a veiled "
+                        + type.toString().toLowerCase() + ".";
+            }
+            default ->
+                msg = player.getRepresentation() + " tried to "
+                        + action.toString().toLowerCase() + " a veiled "
+                        + type.toString().toLowerCase() + ", but was unable to.";
         }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
     public static int veiledField(Graphics graphics, int x, int y, VeiledCardType type, int deltaX, Player player) {

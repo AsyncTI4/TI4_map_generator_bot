@@ -24,6 +24,7 @@ import ti4.helpers.CalendarHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
@@ -79,6 +80,7 @@ public class Tile {
             tileSpace.addUnitsWithStates(unit, space.getUnitsByState().get(unit));
         space.getCcList().forEach(tileSpace::addCC);
         space.getControlList().forEach(tileSpace::addControl);
+        space.getTokenList().forEach(tileSpace::addToken);
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -193,13 +195,6 @@ public class Tile {
         }
     }
 
-    public void removeControl(String tokenID, String spaceHolder) {
-        UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null) {
-            unitHolder.removeControl(tokenID);
-        }
-    }
-
     public void addToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
@@ -269,15 +264,6 @@ public class Tile {
         }
     }
 
-    public void addUnitDamage(String spaceHolder, UnitKey unitID, String count) {
-        try {
-            int unitCount = Integer.parseInt(count);
-            addUnitDamage(spaceHolder, unitID, unitCount);
-        } catch (Exception e) {
-            BotLogger.error("Could not parse unit count", e);
-        }
-    }
-
     @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection, Game game) {
         String property = Mapper.getHyperlaneData(tileID);
@@ -325,7 +311,7 @@ public class Tile {
             tileName = "S15_Cucumber.png";
         }
         if (("43".equals(tileID) || "80".equals(tileID))) {
-            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10000;
+            int baubleChance = CalendarHelper.isNearChristmas() ? 5 : 10_000;
             if (RandomHelper.isOneInX(baubleChance)) {
                 tileName = tileName.replace(".png", "_xmas.png");
             }
@@ -565,6 +551,20 @@ public class Tile {
     }
 
     @JsonIgnore
+    public boolean isNebula(Game game) {
+        if (hasAnyToken("token_ds_wound.png", "attachment_superweapon_availyn.png", "token_nebula_async.png"))
+            return true;
+        if (game != null) {
+            for (Player p : game.getPlayers().values()) {
+                if (p.hasUnlockedBreakthrough("veldyrbt") && p.getHomeSystemTile() == this) {
+                    return true;
+                }
+            }
+        }
+        return getTileModel().isNebula();
+    }
+
+    @JsonIgnore
     public boolean isGravityRift() {
         if (hasAnyToken("token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) return true;
         return getTileModel().isGravityRift() || hasCabalSpaceDockOrGravRiftToken();
@@ -579,6 +579,19 @@ public class Tile {
     @JsonIgnore
     public boolean isScar() {
         if (hasAnyToken("token_entropicscar_async.png")) return true;
+        return getTileModel().isScar();
+    }
+
+    @JsonIgnore
+    public boolean isScar(Game game) {
+        if (hasAnyToken("token_entropicscar_async.png")) return true;
+        if (game != null) {
+            for (Player p2 : game.getPlayers().values()) {
+                if (p2.hasUnlockedBreakthrough("nivynbt") && hasAnyToken("token_ds_wound.png")) {
+                    return true;
+                }
+            }
+        }
         return getTileModel().isScar();
     }
 
@@ -643,10 +656,16 @@ public class Tile {
 
     @JsonIgnore
     public boolean isAnomaly(Game game) {
-        if (isAsteroidField() || isSupernova() || isNebula() || isGravityRift(game) || isScar()) {
+        if (isAsteroidField() || isSupernova() || isNebula(game) || isGravityRift(game) || isScar(game)) {
             return true;
         }
         return hasAnyToken("token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png");
+    }
+
+    @JsonIgnore
+    public boolean isMecatol(Game game) {
+        return game.getMecatolTile() != null
+                && game.getMecatolTile().getPosition().equals(getPosition());
     }
 
     @JsonIgnore
@@ -667,7 +686,8 @@ public class Tile {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
-            if (game.getTileByPosition(position_) == null) {
+            Tile tile = game.getTileByPosition(position_);
+            if (tile == null || "silver_flame".equals(tile.tileID)) {
                 return true;
             }
         }
@@ -741,13 +761,9 @@ public class Tile {
         }
         TileModel tileM = TileHelper.getTileById(tileID);
         if (tileM != null) {
-            if (tileM.getTileBack() == TileBack.GREEN
-                    && !tileID.equalsIgnoreCase("17")
-                    && !tileID.equalsIgnoreCase("94")) {
-                return true;
-            } else {
-                return false;
-            }
+            return tileM.getTileBack() == TileBack.GREEN
+                    && !"17".equalsIgnoreCase(tileID)
+                    && !"94".equalsIgnoreCase(tileID);
         }
 
         for (UnitHolder unitHolder : unitHolders.values()) {
@@ -811,5 +827,31 @@ public class Tile {
         } else {
             return getTileModel().getEmoji();
         }
+    }
+
+    ///
+    /**
+     * Human-readable summary of the tile: position, tile name, and any added planets (TE, mirage, etc)
+     * present (using display names when available). Used for UI strings and logs.
+     */
+    @JsonIgnore
+    public String getDetailedDescription() {
+        var model = getTileModel();
+        var sb = new StringBuilder();
+        sb.append(getPosition());
+        sb.append(" (");
+        sb.append(model.getName());
+
+        if (model.getNumPlanets() == 0 && unitHolders.size() > 1) {
+            sb.append(" with ");
+            var planetDisplayNames = unitHolders.keySet().stream()
+                    .filter(key -> !"space".equals(key))
+                    .map(planetId -> Helper.getPlanetName(planetId))
+                    .filter(name -> name != null)
+                    .toList();
+            sb.append(String.join(", ", planetDisplayNames));
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }

@@ -23,7 +23,6 @@ import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.MessageHelper.MessageFunction;
 import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
@@ -69,7 +68,7 @@ public class MiltyDraftDisplayService {
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
-        MessageFunction func = clearOldPingsAndButtonsFunc(true, clearOldButtons);
+        Consumer<Message> func = clearOldPingsAndButtonsFunc(true, clearOldButtons);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, func);
     }
 
@@ -87,9 +86,9 @@ public class MiltyDraftDisplayService {
 
     private Consumer<MessageHistory> editDraftInfo(MiltyDraftManager manager, Game game, String category) {
         Predicate<String> isCategory = txt -> switch (category) {
-            case "slice" -> txt.equals(SLICES);
-            case "faction" -> txt.equals(FACTIONS);
-            case "order" -> txt.equals(POSITION);
+            case "slice" -> SLICES.equals(txt);
+            case "faction" -> FACTIONS.equals(txt);
+            case "order" -> POSITION.equals(txt);
             default -> false;
         };
         List<Button> categoryButtons =
@@ -119,7 +118,7 @@ public class MiltyDraftDisplayService {
                 if (!sliceImgDone && messageIsSliceImg(msg)) {
                     sliceImgDone = true;
                     FileUpload newImg = MiltyDraftHelper.generateImage(game);
-                    msg.editMessageAttachments(newImg).queue();
+                    msg.editMessageAttachments(newImg).queue(Consumers.nop(), BotLogger::catchRestError);
                 }
             }
         };
@@ -162,34 +161,34 @@ public class MiltyDraftDisplayService {
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings) msg.delete().queue();
+                if (removePings) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePings = true;
             }
 
             if (clearOldDraftInfo && msgTxt.startsWith(SUMMARY_START)) {
-                if (removeSummary) msg.delete().queue();
+                if (removeSummary) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeSummary = true;
             }
-            if (clearOldDraftInfo && msgTxt.equals(SLICES)) {
-                if (removeSliceMsgs) msg.delete().queue();
+            if (clearOldDraftInfo && SLICES.equals(msgTxt)) {
+                if (removeSliceMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeSliceMsgs = true;
             }
-            if (clearOldDraftInfo && msgTxt.equals(FACTIONS)) {
-                if (removeFactionMsgs) msg.delete().queue();
+            if (clearOldDraftInfo && FACTIONS.equals(msgTxt)) {
+                if (removeFactionMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeFactionMsgs = true;
             }
-            if (clearOldDraftInfo && msgTxt.equals(POSITION)) {
-                if (removePositionMsgs) msg.delete().queue();
+            if (clearOldDraftInfo && POSITION.equals(msgTxt)) {
+                if (removePositionMsgs) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePositionMsgs = true;
             }
             if (clearOldDraftInfo && messageIsSliceImg(msg)) {
-                if (removeImages) msg.delete().queue();
+                if (removeImages) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removeImages = true;
             }
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(boolean clearFirstPing, boolean clearOldDraftInfo) {
+    private Consumer<Message> clearOldPingsAndButtonsFunc(boolean clearFirstPing, boolean clearOldDraftInfo) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)
                 .queue(hist -> clearHistMessages(hist, clearFirstPing, clearOldDraftInfo), BotLogger::catchRestError);

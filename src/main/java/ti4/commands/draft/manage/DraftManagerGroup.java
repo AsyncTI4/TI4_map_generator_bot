@@ -11,7 +11,7 @@ public class DraftManagerGroup extends SubcommandGroup {
 
     private static final Map<String, Subcommand> subcommands = Stream.of(
                     new DraftManagerDebug(),
-                    new DraftManagerValidate(),
+                    new DraftManagerValidateState(),
                     new DraftManagerStartDraft(),
                     new DraftManagerCanEndDraft(),
                     new DraftManagerTryEndDraft(),

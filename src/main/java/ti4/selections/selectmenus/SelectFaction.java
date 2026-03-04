@@ -10,11 +10,13 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.ButtonHelper;
 import ti4.image.Mapper;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.FactionModel;
 import ti4.selections.Selection;
 import ti4.service.emoji.FactionEmojis;
@@ -71,7 +73,7 @@ public class SelectFaction implements Selection {
             event.getMessageChannel()
                     .sendMessage("")
                     .addComponents(ActionRow.of(menu))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

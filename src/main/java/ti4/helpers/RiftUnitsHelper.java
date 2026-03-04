@@ -9,12 +9,12 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.jda.JdaComponentHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -22,6 +22,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.UnitModel;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.unit.AddUnitService;
@@ -49,7 +50,7 @@ public class RiftUnitsHelper {
         event.getMessage()
                 .editMessage(message)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("wormholeUnit_")
@@ -64,14 +65,14 @@ public class RiftUnitsHelper {
         String unit = rest;
         for (int x = 0; x < amount; x++) {
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), ident + " " + wormholeUnit(unit, tile, game, event, player));
+                    player.getCorrectChannel(), ident + " " + wormholeUnit(unit, tile, game, event, player) + ".");
         }
         String message = event.getMessage().getContentRaw();
         List<Button> systemButtons = getButtonsForWormholingUnitsInSystem(player, game, tile);
         event.getMessage()
                 .editMessage(message)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("riftAllUnits_")
@@ -140,16 +141,7 @@ public class RiftUnitsHelper {
             event.getMessage()
                     .editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                    .queue();
-        } else {
-            boolean deletedMessage = JdaComponentHelper.removeComponentFromMessageAndDeleteIfEmpty(event);
-            if (!deletedMessage) {
-                String exhaustedMessage = event.getMessage().getContentRaw();
-                if ("".equalsIgnoreCase(exhaustedMessage)) {
-                    exhaustedMessage = "Rift";
-                }
-                event.getMessage().editMessage(exhaustedMessage).queue();
-            }
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
@@ -201,7 +193,7 @@ public class RiftUnitsHelper {
         event.getMessage()
                 .editMessage(message)
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static String riftUnit(
@@ -225,16 +217,38 @@ public class RiftUnitsHelper {
         if (d1.isSuccess()) {
             msg += " and survived. May you always be so lucky.";
         } else {
-            var parsedUnit = new ParsedUnit(unitKey);
-            RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
-            msg += " and failed. Condolences for your loss.";
-            if (cabal != null
-                    && cabal != player
-                    && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
-                    && !game.isTwilightsFallMode()) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
-            } else if (RiftSetModeService.isActive(game)) {
-                msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "kaltrimcommander") && d1.getResult() == 1) {
+                msg += " but due to Kaltrim's leadership, it rerolls!";
+                Die d2 = new Die(threshold);
+
+                msg += " It now rolled a " + d2.getGreenDieIfSuccessOrRedDieIfFailure();
+                if (d1.isSuccess()) {
+                    msg += " and survived. May you always be so lucky.";
+                } else {
+                    var parsedUnit = new ParsedUnit(unitKey);
+                    RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+                    msg += " and failed. Condolences for your loss.";
+                    if (cabal != null
+                            && cabal != player
+                            && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
+                            && !game.isTwilightsFallMode()) {
+                        ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+                    } else if (RiftSetModeService.isActive(game)) {
+                        msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
+                    }
+                }
+            } else {
+                var parsedUnit = new ParsedUnit(unitKey);
+                RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+                msg += " and failed. Condolences for your loss.";
+                if (cabal != null
+                        && cabal != player
+                        && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)
+                        && !game.isTwilightsFallMode()) {
+                    ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+                } else if (RiftSetModeService.isActive(game)) {
+                    msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
+                }
             }
         }
 
@@ -402,14 +416,14 @@ public class RiftUnitsHelper {
         buttons.add(Buttons.gray(finChecker + "wormholeAllShips_" + tile.getPosition(), "Wormhole All Ships"));
         buttons.add(
                 Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove", "Remove Excess Transported Units"));
-        buttons.add(Buttons.red("doneRifting", "Done Wormholing ships Units"));
+        buttons.add(Buttons.red("doneRifting", "Done Wormholing Ships"));
 
         return buttons;
     }
 
     @ButtonHandler("doneRifting")
     public static void doneRifting(Game game, Player player, ButtonInteractionEvent event) {
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         Tile tile = null;
         if (game.getActiveSystem() != null) {
             tile = game.getTileByPosition(game.getActiveSystem());
@@ -448,12 +462,12 @@ public class RiftUnitsHelper {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentationNoPing()
-                            + " is rifting some units. However, because of their Crucible tech, they do not roll.");
+                            + " is rifting some units. However, because of _Crucible_, they do not roll.");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(
                     channel,
                     player.getRepresentationNoPing()
-                            + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.",
+                            + " is rifting some units. Please use these buttons to choose the units you wish to risk in the gravity rift.",
                     getButtonsForRiftingUnitsInSystem(player, game, tile));
         }
     }
@@ -466,7 +480,7 @@ public class RiftUnitsHelper {
         MessageHelper.sendMessageToChannelWithButtons(
                 channel,
                 player.getRepresentationNoPing()
-                        + " is rolling for weird wormhole units. Please use the the buttons to choose the units that went through a wormhole.",
+                        + " is rolling for ships navigating the _Weird Wormholes_. Please use these buttons to choose the units that went through a wormhole.",
                 getButtonsForWormholingUnitsInSystem(player, game, tile));
     }
 }

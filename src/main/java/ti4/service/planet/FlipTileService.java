@@ -49,7 +49,7 @@ public class FlipTileService {
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return null;
             }
-            tile = new Tile(planetTileName, position);
+            tile = new Tile(planetTileName, position, tile.getSpaceUnitHolder());
             game.setTile(tile);
             flipped = true;
         } else if ("82ah".equals(tile.getTileID())) {
@@ -69,7 +69,7 @@ public class FlipTileService {
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return null;
             }
-            tile = new Tile(planetTileName, position);
+            tile = new Tile(planetTileName, position, tile.getSpaceUnitHolder());
             game.setTile(tile);
             flipped = true;
         } else if ("2025scptFinals".equals(game.getMapTemplateID())

@@ -10,7 +10,6 @@ import lombok.Setter;
 import ti4.helpers.ActionCardHelper.ACStatus;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
-import ti4.map.pojo.ExportableField;
 
 @Getter
 @Setter
@@ -18,17 +17,30 @@ public class GameProperties {
     // Game metadata
     private @ExportableField String ownerID;
     private @ExportableField String ownerName = "";
+
+    // can be removed?
+    // need to migrate old creationDate only games to creationDateTime (at midnight)
+    @Deprecated
     private @ExportableField String creationDate;
+
+    private @ExportableField long creationDateTime;
+
     private @ExportableField String name; // pbdXXXX
     private @ExportableField String customName = "";
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";
     private @ExportableField int maxSOCountPerPlayer = 3;
+
+    @Deprecated
     private @ExportableField int playerCountForMap = 6;
+
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
     private @ExportableField int vp = 10;
+
+    @Deprecated // can be removed?
     private @ExportableField long startedDate;
+
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;

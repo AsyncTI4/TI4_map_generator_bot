@@ -17,6 +17,7 @@
         "x": 236.0,
         "y": 156.0
     },
+    "radius": 55.0,
     "resources": 0,
     "influence": 3,
     "factionHomeworld": null,

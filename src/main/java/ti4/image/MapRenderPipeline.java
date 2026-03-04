@@ -30,8 +30,10 @@ public class MapRenderPipeline {
         if (CircuitBreaker.isOpen()) {
             return;
         }
-        var timedRunnable = new TimedRunnable(
-                "Render event task for " + renderEvent.game.getName(), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
+
+        String gameName = renderEvent.game.getName();
+        var timedRunnable =
+                new TimedRunnable("Render event task for " + gameName, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, () -> {
                     try (var mapGenerator =
                             new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
                         mapGenerator.draw();
@@ -103,7 +105,7 @@ public class MapRenderPipeline {
         }
     }
 
-    record RenderEvent(
+    private record RenderEvent(
             Game game,
             GenericInteractionCreateEvent event,
             DisplayType displayType,

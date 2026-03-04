@@ -1,16 +1,20 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.CardEmojis;
 import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
@@ -20,7 +24,7 @@ public class PlayerPreferenceHelper {
     @ButtonHandler(value = "offerPlayerPref", save = false)
     public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.ActionCard));
+        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.getACEmoji(player)));
         buttons.add(Buttons.gray("playerPref_afkTimes", "AFK Times"));
         buttons.add(Buttons.gray("playerPref_tacticalAction", "Distance-Based Tactical Action Preference"));
         buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Auto No Whens/Afters React", CardEmojis.Agenda));
@@ -93,6 +97,21 @@ public class PlayerPreferenceHelper {
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("wrongButtonEphemeral_")
+    public static void resolveWrongButtonEphemeralPreference(
+            Player player, ButtonInteractionEvent event, String buttonID) {
+        boolean prefersEphemeral = Boolean.parseBoolean(buttonID.split("_")[1]);
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        userSettings.setPrefersWrongButtonEphemeral(prefersEphemeral);
+        UserSettingsManager.save(userSettings);
+        String confirmation = "Preference saved. Future warnings will be "
+                + (prefersEphemeral ? "ephemeral." : "sent to the channel.");
+        event.getMessage()
+                .editMessage(confirmation)
+                .setComponents(Collections.emptyList())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void offerSetAutoPassOnSaboButtons(Game game, Player player2) {
@@ -243,7 +262,7 @@ public class PlayerPreferenceHelper {
         event.getMessage()
                 .editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler(value = "setHourAsAFK_", save = false)
@@ -254,7 +273,7 @@ public class PlayerPreferenceHelper {
         userSetting.addAfkHour(time);
         UserSettingsManager.save(userSetting);
 
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         MessageHelper.sendMessageToChannel(
                 event.getMessageChannel(),
                 player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");

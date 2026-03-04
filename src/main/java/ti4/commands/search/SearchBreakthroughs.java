@@ -4,13 +4,15 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.message.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 
 class SearchBreakthroughs extends SearchComponentModelSubcommand {
 
-    public SearchBreakthroughs() {
+    SearchBreakthroughs() {
         super(Constants.SEARCH_BREAKTHROUGHS, "List all breakthorughs the bot can use");
     }
 
@@ -23,7 +25,7 @@ class SearchBreakthroughs extends SearchComponentModelSubcommand {
         if (Mapper.isValidBreakthrough(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getBreakthrough(searchString).getRepresentationEmbed(true))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

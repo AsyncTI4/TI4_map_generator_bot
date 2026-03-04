@@ -1,1 +1,15 @@
-{"id":"s16","name":"Agnar Vath","aliases":["s16","agnarvath"],"imagePath":"S16_AgnarVath.png","planets":["agnarvath"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{
+    "id": "s16",
+    "name": "Agnar Vath",
+    "aliases": [
+        "s16",
+        "agnarvath"
+    ],
+    "imagePath": "S16_AgnarVath.png",
+    "planets": [
+        "agnarvath"
+    ],
+    "shipPositionsType": "TYPE04",
+    "tileBack": "blue",
+    "source": "somno"
+}

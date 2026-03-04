@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperUnits;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -24,7 +25,7 @@ public class PdsCoverageHelper {
      * @return Map of faction -> comprehensive PDS coverage data, null if no coverage
      */
     public static Map<String, PdsCoverage> calculatePdsCoverage(Game game, Tile tile) {
-        if (game.isFowMode() || tile.getTileModel().isHyperlane()) {
+        if (game.isFowMode() || tile.getTileModel().isHyperlane() || tile.isScar()) {
             return null;
         }
 
@@ -49,11 +50,17 @@ public class PdsCoverageHelper {
                 if (adjTile == null) {
                     continue;
                 }
+                if (adjTile.isScar()) {
+                    continue;
+                }
+                if (TeHelperUnits.affectedByQuietus(game, player, adjTile)) {
+                    continue;
+                }
                 boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);
 
                 for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                     // Check for Imperial II HQ on Mecatol Rex
-                    if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
+                    if (sameTile && game.mecatols().contains(unitHolder.getName())) {
                         if (player.controlsMecatol(false) && player.getPlanets().contains("custodiavigilia")) {
                             diceCount.add(5 - mod);
                         }
@@ -127,7 +134,7 @@ public class PdsCoverageHelper {
                 }
 
                 // Apply Argent Commander (duplicate best die)
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander") || player.hasTech("tf-zealous")) {
                     diceCount.addFirst(diceCount.getFirst());
                 }
 
@@ -146,7 +153,8 @@ public class PdsCoverageHelper {
             Player player = game.getPlayer(entry.getKey());
             List<Integer> diceList = entry.getValue();
             int numberOfDice = diceList.size();
-            boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander");
+            boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander")
+                    || player.hasTech("tf-tacticalbrilliance");
 
             float expectedHits;
             if (rerolls) {

@@ -27,7 +27,10 @@ class ForcePick extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (!"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES (case sensitive/full uppercase YES)");
+            MessageHelper.replyToMessage(
+                    event,
+                    "Must confirm with `YES`"
+                            + ("YES".equalsIgnoreCase(option.getAsString()) ? " - this is case sensitive" : "") + ".");
             return;
         }
 

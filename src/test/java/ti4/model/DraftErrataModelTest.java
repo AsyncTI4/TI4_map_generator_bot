@@ -6,12 +6,18 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
-import ti4.testUtils.BaseTi4Test;
 
-class DraftErrataModelTest extends BaseTi4Test {
+class DraftErrataModelTest extends ModelTest<DraftErrataModel> {
+
+    @Override
+    public void loadData() {
+        this.type = "DraftErrataModel";
+        models = Mapper.getFrankenErrata();
+    }
+
     @Test
     void testDraftErrata() {
-        for (DraftErrataModel model : Mapper.getFrankenErrata().values()) {
+        for (DraftErrataModel model : getModelList()) {
             assertTrue(model.isValid(), model.getAlias() + ": object is invalid");
             assertTrue(validateAlias(model), model.getAlias() + ": invalid Alias: ");
             assertTrue(validateAdditionalComponents(model), model.getAlias() + ": invalid Additional Components");
@@ -32,7 +38,7 @@ class DraftErrataModelTest extends BaseTi4Test {
     }
 
     private boolean validateAdditionalComponents(DraftErrataModel model) {
-        if (model.AdditionalComponents == null) {
+        if (model.getAdditionalComponents() == null) {
             return true;
         }
         List<String> draftItems =
@@ -41,6 +47,8 @@ class DraftErrataModelTest extends BaseTi4Test {
                 .map(DraftErrataModel::getAlias)
                 .toList();
 
+        List<String> expectAddlComps = List.of("COMMANDER:ghostcommander");
+        if (expectAddlComps.contains(model.getAlias()) && additionalComponents.isEmpty()) return false;
         if (draftItems.containsAll(additionalComponents)) {
             return true;
         }
@@ -52,7 +60,7 @@ class DraftErrataModelTest extends BaseTi4Test {
     }
 
     private boolean validateOptionalComponents(DraftErrataModel model) {
-        if (model.OptionalSwaps == null) {
+        if (model.getOptionalSwaps() == null) {
             return true;
         }
         List<String> draftItems =
@@ -61,6 +69,8 @@ class DraftErrataModelTest extends BaseTi4Test {
                 .map(DraftErrataModel::getAlias)
                 .toList();
 
+        List<String> expectOptSwaps = List.of("ABILITY:pillage");
+        if (expectOptSwaps.contains(model.getAlias()) && optionalComponents.isEmpty()) return false;
         if (draftItems.containsAll(optionalComponents)) {
             return true;
         }

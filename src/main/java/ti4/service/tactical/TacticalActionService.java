@@ -29,6 +29,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.movement.MoveAbilityButtons;
@@ -158,6 +159,7 @@ public class TacticalActionService {
         FinishMovementContext ctx = executeCoreFinishMovement(event, game, player, tile);
 
         // UI/message block: build message and buttons
+        LoreService.showSystemLore(player, game, tile.getPosition(), LoreService.TRIGGER.MOVED);
         String message = buildFinishMovementMessage(game, player, ctx);
         List<Button> systemButtons = buildFinishMovementButtons(event, game, player, ctx);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -259,7 +261,9 @@ public class TacticalActionService {
         List<Button> buttons = new ArrayList<>();
 
         int productionVal = Helper.getProductionValue(player, game, tile, false);
-        if (productionVal > 0 || ("18".equalsIgnoreCase(tile.getTileID()) && player.hasIIHQ())) {
+        if (productionVal > 0
+                || (("18".equalsIgnoreCase(tile.getTileID()) || "112".equalsIgnoreCase(tile.getTileID()))
+                        && player.hasIIHQ())) {
             buttons.add(createBuildButton(player, tile, productionVal));
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
@@ -329,7 +333,8 @@ public class TacticalActionService {
             boolean hasUnits = hasUnitsOrAlliedUnitsWithoutCC(player, game, event, tile);
             boolean canSelect = (movedFrom || hasUnits)
                     && (!CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game));
+                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game)
+                            || tile.getPosition().equalsIgnoreCase(game.getActiveSystem()));
             if (canSelect) {
                 out.add(Buttons.green(
                         player.finChecker() + "tacticalMoveFrom_" + tileEntry.getKey(),

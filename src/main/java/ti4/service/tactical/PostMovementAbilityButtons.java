@@ -17,6 +17,7 @@ import ti4.service.tactical.postmovement.SardakkCommanderButton;
 import ti4.service.tactical.postmovement.SardakkHeroButton;
 import ti4.service.tactical.postmovement.ShroudOfLithButton;
 import ti4.service.tactical.postmovement.TnelisAgentButton;
+import ti4.service.tactical.postmovement.VaylerianBTButton;
 import ti4.service.tactical.postmovement.WeirdWormholeButton;
 import ti4.service.tactical.postmovement.ZelianAgentButton;
 import ti4.service.tactical.postmovement.ZelianHeroButton;
@@ -39,6 +40,7 @@ public final class PostMovementAbilityButtons {
             new ZelianAgentButton(),
             new MoveAvernusButton(),
             new MuaatHeroButton(),
+            new VaylerianBTButton(),
             new ZelianHeroButton(),
             new SardakkHeroButton(),
             new AtokeraHeroButton(),

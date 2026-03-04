@@ -17,6 +17,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.buttons.Buttons;
+import ti4.buttons.handlers.statistics.StatsTrackingButtonHandler;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -79,6 +82,9 @@ class Replace extends GameStateSubcommand {
         }
 
         Guild guild = game.getGuild();
+        if (guild == null) {
+            guild = event.getGuild();
+        }
         Member newMember = guild.getMemberById(replacementUser.getId());
         if (newMember == null) {
             MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
@@ -89,7 +95,7 @@ class Replace extends GameStateSubcommand {
         Member oldMember = guild.getMemberById(replacedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (oldMember != null && roles.size() == 1) {
-            guild.removeRoleFromMember(oldMember, roles.getFirst()).queue();
+            guild.removeRoleFromMember(oldMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         var userSettings = UserSettingsManager.get(replacedPlayer.getUserID());
@@ -98,13 +104,26 @@ class Replace extends GameStateSubcommand {
 
         // ADD ROLE
         if (roles.size() == 1) {
-            guild.addRoleToMember(newMember, roles.getFirst()).queue();
+            guild.addRoleToMember(newMember, roles.getFirst()).queue(Consumers.nop(), BotLogger::catchRestError);
         }
 
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            // for custodians
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
+            if (removed) {
+                value.add(replacementUser.getId());
+            }
+            removed = value.remove(replacedPlayer.getUserID());
             if (removed) {
                 value.add(replacementUser.getId());
             }
@@ -139,48 +158,54 @@ class Replace extends GameStateSubcommand {
 
         // UPDATE FOW PERMISSIONS
         if (game.isFowMode()) {
-            long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+            long permission = Permission.PIN_MESSAGES.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
+            if (privateChannel != null) {
+                privateChannel.getMemberPermissionOverrides().stream()
+                        .filter(override -> Objects.equals(override.getMember(), oldMember))
+                        .findFirst()
+                        .ifPresent(
+                                oldOverride -> oldOverride.delete().queue(Consumers.nop(), BotLogger::catchRestError));
 
-            privateChannel.getMemberPermissionOverrides().stream()
-                    .filter(override -> Objects.equals(override.getMember(), oldMember))
-                    .findFirst()
-                    .ifPresent(oldOverride -> oldOverride.delete().queue());
+                // Update private channel
+                if (oldMember != null) {
+                    String newPrivateChannelName = privateChannel
+                            .getName()
+                            .replace(getNormalizedName(oldMember), getNormalizedName(newMember));
+                    privateChannel
+                            .getManager()
+                            .setName(newPrivateChannelName)
+                            .queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                privateChannel
+                        .getManager()
+                        .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
+                        .queue(success -> accessMessage(privateChannel, newMember));
 
-            // Update private channel
-            if (oldMember != null) {
-                String newPrivateChannelName =
-                        privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
-                privateChannel.getManager().setName(newPrivateChannelName).queue();
-            }
-            privateChannel
-                    .getManager()
-                    .putMemberPermissionOverride(newMember.getIdLong(), permission, 0)
-                    .queue(success -> accessMessage(privateChannel, newMember));
+                // Update Cards Info
+                ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
+                String newCardsInfoName = cardsInfo
+                        .getName()
+                        .replace(
+                                oldPlayerUserName.replace("/", ""),
+                                replacedPlayer.getUserName().replace("/", ""));
+                cardsInfo.getManager().setName(newCardsInfoName).queue(Consumers.nop(), BotLogger::catchRestError);
+                if (oldMember != null) {
+                    cardsInfo.removeThreadMember(oldMember).queue(Consumers.nop(), BotLogger::catchRestError);
+                }
+                cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
 
-            // Update Cards Info
-            ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
-            String newCardsInfoName = cardsInfo
-                    .getName()
-                    .replace(
-                            oldPlayerUserName.replace("/", ""),
-                            replacedPlayer.getUserName().replace("/", ""));
-            cardsInfo.getManager().setName(newCardsInfoName).queue();
-            if (oldMember != null) {
-                cardsInfo.removeThreadMember(oldMember).queue();
-            }
-            cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
+                // Update private threads
+                if (oldMember != null) {
+                    game.getMainGameChannel()
+                            .getThreadChannels()
+                            .forEach(thread -> updateThread(thread, oldMember, newMember));
 
-            // Update private threads
-            if (oldMember != null) {
-                game.getMainGameChannel()
-                        .getThreadChannels()
-                        .forEach(thread -> updateThread(thread, oldMember, newMember));
-
-                game.getMainGameChannel()
-                        .retrieveArchivedPrivateThreadChannels()
-                        .queue(archivedThreads ->
-                                archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
+                    game.getMainGameChannel()
+                            .retrieveArchivedPrivateThreadChannels()
+                            .queue(archivedThreads ->
+                                    archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
+                }
             }
         }
 
@@ -205,9 +230,23 @@ class Replace extends GameStateSubcommand {
 
         game.setReplacementMade(true);
 
+        if (!replacementUser.isBot()) {
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    "Should this game's stats be tracked for you, or the player you replaced?",
+                    List.of(
+                            Buttons.green(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId("me", replacementUser.getId()),
+                                    "Me"),
+                            Buttons.gray(
+                                    StatsTrackingButtonHandler.statsTrackingButtonId(
+                                            "replaced", replacementUser.getId()),
+                                    "Replaced Player")));
+        }
+
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: "
                 + replacementUser.getName();
-        if (FoWHelper.isPrivateGame(game)) {
+        if (FoWHelper.isPrivateGame(game) || game.getActionsChannel() == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);

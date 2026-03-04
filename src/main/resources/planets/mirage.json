@@ -23,9 +23,10 @@
         "unitHolderName": "mirage",
         "resourcesLocation": "BottomLeft",
         "centerPosition": {
-            "x": 70,
-            "y": 55
-        }
+            "x": 72,
+            "y": 58
+        },
+        "planetRadius": 52
     },
     "contrastColor": "orange",
     "flavourText": "*Exists on no known charts and appears deserted to those who stumble across it. However, secretive locals live in cloaked cities heavily defended by swarms of starfighters.*",

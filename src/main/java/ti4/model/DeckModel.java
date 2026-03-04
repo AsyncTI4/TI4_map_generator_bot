@@ -2,10 +2,11 @@ package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 
+@Data
 public class DeckModel implements ModelInterface, EmbeddableModel {
 
     private String alias;
@@ -94,22 +96,6 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
                 && source != null;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public DeckType getType() {
-        return type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
     public List<String> getNewDeck() {
         return new ArrayList<>(cardIDs);
     }
@@ -126,6 +112,10 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     protected void setCardIDs(List<String> cardIDs) { // This method is for Jackson
         this.cardIDs = Collections.unmodifiableList(cardIDs);
+    }
+
+    public String getNameRepresentation() {
+        return type.deckEmoji() + " _" + getName() + "_ " + source.emoji();
     }
 
     @Override
@@ -175,10 +165,6 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         return StringUtils.left(
                 StringUtils.substringBefore("[" + type + "] " + name + " --> " + description, "\n"), 100);
-    }
-
-    public ComponentSource getSource() {
-        return source;
     }
 
     private String getTypeEmoji() {

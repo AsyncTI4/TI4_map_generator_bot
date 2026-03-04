@@ -31,11 +31,11 @@ public class AddTileService {
     }
 
     public static void addCustodianToken(Tile tile, Game game) {
-        if (!tile.isMecatol() || game.isLiberationC4Mode()) {
+        if (!tile.isMecatol(game) || game.isLiberationC4Mode()) {
             return;
         }
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        for (String mecatol : Constants.MECATOLS) {
+        for (String mecatol : game.mecatols()) {
             UnitHolder unitHolder = unitHolders.get(mecatol);
             if (unitHolder instanceof Planet && mecatol.equals(unitHolder.getName())) {
                 unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);

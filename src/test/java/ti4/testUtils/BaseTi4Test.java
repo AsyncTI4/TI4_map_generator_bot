@@ -21,6 +21,7 @@ public class BaseTi4Test {
      */
     private static void globalBeforeAll() {
         // Use this to turn off random chance things that may impact testing
+        // and reroute all logging to the console
         JdaService.testingMode = true;
 
         // This is set when running tests within docker. However, this must be manually

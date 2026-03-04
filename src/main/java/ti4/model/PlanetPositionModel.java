@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -122,7 +122,7 @@ public class PlanetPositionModel {
                 case TYPE17 -> "Single planet, centered";
                 default -> "unknown";
 
-                    // Non-HS system layouts
+                // Non-HS system layouts
             };
         }
 
@@ -149,7 +149,7 @@ public class PlanetPositionModel {
 
         public Point getSpaceDockPos() {
             Point p = getPlanetCenterPos();
-            Point translate = null;
+            Point translate;
             switch (getTagPosition()) {
                 case TopLeft -> translate = new Point(0, 0);
                 case TopRight -> translate = new Point(0, 0);

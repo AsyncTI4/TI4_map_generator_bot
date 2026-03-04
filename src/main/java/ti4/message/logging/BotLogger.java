@@ -1,5 +1,7 @@
 package ti4.message.logging;
 
+import static ti4.helpers.discord.DiscordHelper.isDiscordServerError;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +17,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.cron.CronManager;
+import ti4.executors.CircuitBreaker;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.ThreadArchiveHelper;
@@ -29,7 +33,7 @@ import ti4.spring.jda.JdaService;
 @UtilityClass
 public class BotLogger {
 
-    private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10008;
+    private static final int DISCORD_UNKNOWN_ERROR_STATUS_CODE = 10_008;
     private static final Object LAST_SCHEDULED_WEBHOOK_LOCK = new Object();
     private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
     private static final int MAX_DISCORD_MESSAGE_SIZE = 2000;
@@ -41,7 +45,11 @@ public class BotLogger {
      * Initialize the BotLogger system. Should be called once at bot startup.
      */
     public static void init() {
-        getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+        if (!logToConsole()) getBotLogWebhookURL(); // Ensure webhook is created at startup if required
+    }
+
+    private static boolean logToConsole() {
+        return JdaService.testingMode;
     }
 
     /**
@@ -252,6 +260,14 @@ public class BotLogger {
         // Send off message
         String compiledMessage = msg.toString();
         int msgLength = compiledMessage.length();
+        if (logToConsole()) {
+            if (severity.isErrorOrHigher()) {
+                System.err.println(severity.name() + ": " + compiledMessage + "\n" + err);
+            } else {
+                System.out.println(severity.name() + ": " + compiledMessage);
+            }
+            return;
+        }
 
         List<String> messageChunks = new ArrayList<>();
         // Handle message length overflow. Overflow length is derived from previous implementation
@@ -270,7 +286,9 @@ public class BotLogger {
 
             if (err == null || !isLastChunk) { // If length could overflow or there is no error to trace
                 if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
-                else channel.sendMessage(msgChunk).queue(); // Send message on channel
+                else
+                    channel.sendMessage(msgChunk)
+                            .queue(Consumers.nop(), BotLogger::catchRestError); // Send message on channel
             } else { // Handle error on last send
                 ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
 
@@ -297,7 +315,7 @@ public class BotLogger {
             @Nullable Throwable err) {
         ThreadArchiveHelper.checkThreadLimitAndArchive(JdaService.guildPrimary);
         ThreadGetter.getThreadInChannel(channel, threadName, thread -> {
-            messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue());
+            messageChunks.forEach(chunk -> thread.sendMessage(chunk).queue(Consumers.nop(), BotLogger::catchRestError));
             if (err != null) {
                 MessageHelper.sendMessageToChannel(thread, ExceptionUtils.getStackTrace(err));
             }
@@ -387,6 +405,9 @@ public class BotLogger {
     }
 
     public static void catchRestError(Throwable e) {
+        if (isDiscordServerError(e)) {
+            CircuitBreaker.incrementThresholdCount("Discord server error during REST call: " + e.getMessage());
+        }
         // This has become too annoying, so we are limiting to testing mode/debug mode
         boolean debugMode =
                 GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);

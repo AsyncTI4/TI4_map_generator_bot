@@ -15,6 +15,6 @@ class ZelianHeroButtonHandler {
     public static void celestialImpact(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ZelianHeroService.secondHalfOfCelestialImpact(
                 player, event, game.getTileByPosition(buttonID.split("_")[1]), game);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 }

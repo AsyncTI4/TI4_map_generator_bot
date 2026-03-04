@@ -1,7 +1,7 @@
 package ti4.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,6 +20,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     private String name;
     private String phase;
     private String text;
+    private String notes;
     private Integer points;
     private String homebrewReplacesID;
     private String imageURL;
@@ -53,6 +54,10 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         }
     };
 
+    public String getNameRepresentation() {
+        return getObjectiveEmoji() + " _" + getName() + "_ " + source.emoji();
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }
@@ -66,6 +71,9 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();

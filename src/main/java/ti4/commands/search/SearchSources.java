@@ -14,10 +14,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 
@@ -71,7 +73,7 @@ class SearchSources extends Subcommand {
             SourceModel model = Mapper.getSource(sourceString);
             event.getChannel()
                     .sendMessageEmbeds(model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
-                    .queue(); // change getRepEmbed function here as well
+                    .queue(Consumers.nop(), BotLogger::catchRestError); // change getRepEmbed function here as well
             return;
         }
 
@@ -117,10 +119,6 @@ class SearchSources extends Subcommand {
         occurrences.put("Events", Mapper.getEventsSources(compSource).size());
         occurrences.put("Explores", Mapper.getExploresSources(compSource).size());
         occurrences.put("Factions", Mapper.getFactionsSources(compSource).size());
-        occurrences.put(
-                "Draft Errata",
-                Mapper.getDraftErratasSources(compSource)
-                        .size()); // Draft Errata is related to files in \data\franken_errata\*
         occurrences.put(
                 "Generic Cards", Mapper.getGenericCardsSources(compSource).size());
         occurrences.put("Leaders", Mapper.getLeadersSources(compSource).size());
@@ -170,7 +168,6 @@ class SearchSources extends Subcommand {
         List<String> eventSources = Mapper.getEventsSources(null);
         List<String> exploreSources = Mapper.getExploresSources(null);
         List<String> factionSources = Mapper.getFactionsSources(null);
-        List<String> drafterrataSources = Mapper.getDraftErratasSources(null);
         List<String> genericcardSources = Mapper.getGenericCardsSources(null);
         List<String> leaderSources = Mapper.getLeadersSources(null);
         // map_templates not sourced
@@ -195,7 +192,6 @@ class SearchSources extends Subcommand {
                         eventSources,
                         exploreSources,
                         factionSources,
-                        drafterrataSources,
                         genericcardSources,
                         leaderSources,
                         promissorynoteSources,

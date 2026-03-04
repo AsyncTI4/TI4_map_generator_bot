@@ -1,0 +1,12 @@
+{
+    "id": "silver_flame",
+    "name": "Remnants of The Silver Flame",
+    "aliases": [],
+    "imagePath": "silver_flame.png",
+    "shipPositionsType": null,
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [],
+    "source": "thunders_edge",
+    "tileBack": "black"
+}
