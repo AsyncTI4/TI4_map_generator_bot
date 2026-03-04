@@ -17,6 +17,7 @@ import ti4.game.Leader;
 import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
+import ti4.discord.interactions.buttons.handlers.agenda.EdictPhaseHandler;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -547,10 +548,7 @@ public class PlayHeroService {
                 }
             }
             case "voicehero" -> {
-                List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
-                if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
-                }
+                List<String> edicts = EdictPhaseHandler.getEdictDeck(game);
                 List<Button> buttons = new ArrayList<>();
                 List<MessageEmbed> embeds = new ArrayList<>();
                 Player tyrant = player;

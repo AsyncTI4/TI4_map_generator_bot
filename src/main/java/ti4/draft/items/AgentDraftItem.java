@@ -110,7 +110,7 @@ public class AgentDraftItem extends DraftItem {
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         String[] results = PatternHelper.FIN_SEPERATOR_PATTERN.split(game.getStoredValue("bannedLeaders"));
         if (game.isTwilightsFallMode()) {
-            DeckModel deck = Mapper.getDeck("tf_genome");
+            DeckModel deck = Mapper.getDeck(game.getGenomeSpliceDeckID());
             for (String leader : deck.getNewShuffledDeck()) {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;
