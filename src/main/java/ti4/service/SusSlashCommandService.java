@@ -80,13 +80,15 @@ public class SusSlashCommandService {
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
     }
 
-    private static void reportToSusSlashCommandLog(SlashCommandInteractionEvent event, String jumpUrl, String gameName) {
+    private static void reportToSusSlashCommandLog(
+            SlashCommandInteractionEvent event, String jumpUrl, String gameName) {
         TextChannel moderationLogChannel =
                 JdaService.guildPrimary.getTextChannelsByName("sus-slash-commands-log", true).stream()
                         .findFirst()
                         .orElse(null);
         if (moderationLogChannel == null) return;
-        String sb = event.getUser().getEffectiveName() + " (" + gameName + ") `" + event.getCommandString() + "` " + jumpUrl;
+        String sb = event.getUser().getEffectiveName() + " (" + gameName + ") `" + event.getCommandString() + "` "
+                + jumpUrl;
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
     }
 }
