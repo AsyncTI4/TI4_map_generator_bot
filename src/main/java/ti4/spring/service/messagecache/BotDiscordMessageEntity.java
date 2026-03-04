@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "bot_message_cache")
-class BotMessageRecord {
+@Table(name = "bot_discord_message")
+class BotDiscordMessageEntity {
 
     @Id
     private long messageId;

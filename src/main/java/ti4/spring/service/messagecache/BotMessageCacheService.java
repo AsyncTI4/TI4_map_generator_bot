@@ -15,14 +15,14 @@ public class BotMessageCacheService {
 
     private static final long RETENTION_MILLIS = Duration.ofHours(12).toMillis();
 
-    private final BotMessageCacheRepository botMessageCacheRepository;
+    private final BotDiscordMessageEntityRepository botDiscordMessageEntityRepository;
 
     public void cache(Message message) {
         if (!isImportantMessage(message)) return;
 
         long createdAtEpochMillis = message.getTimeCreated().toInstant().toEpochMilli();
-        var record = new BotMessageRecord(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
-        botMessageCacheRepository.save(record);
+        var record = new BotDiscordMessageEntity(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
+        botDiscordMessageEntityRepository.save(record);
     }
 
     private boolean isImportantMessage(Message message) {
@@ -35,9 +35,9 @@ public class BotMessageCacheService {
 
     @Nullable
     public String getContent(long messageId) {
-        return botMessageCacheRepository
+        return botDiscordMessageEntityRepository
                 .findById(messageId)
-                .map(BotMessageRecord::getContent)
+                .map(BotDiscordMessageEntity::getContent)
                 .orElse(null);
     }
 
@@ -45,7 +45,7 @@ public class BotMessageCacheService {
     @Transactional
     public void removeExpiredMessages() {
         long cutoff = System.currentTimeMillis() - RETENTION_MILLIS;
-        botMessageCacheRepository.deleteByCreatedAtEpochMillisLessThan(cutoff);
+        botDiscordMessageEntityRepository.deleteByCreatedAtEpochMillisLessThan(cutoff);
     }
 
     public static BotMessageCacheService getBean() {
