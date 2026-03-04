@@ -18,11 +18,19 @@ public class BotMessageCacheService {
     private final BotMessageCacheRepository botMessageCacheRepository;
 
     public void cache(Message message) {
-        if (message == null || message.isEphemeral() || !message.getAuthor().isBot()) return;
+        if (!isImportantMessage(message)) return;
 
         long createdAtEpochMillis = message.getTimeCreated().toInstant().toEpochMilli();
         var record = new BotMessageRecord(message.getIdLong(), message.getContentRaw(), createdAtEpochMillis);
         botMessageCacheRepository.save(record);
+    }
+
+    private boolean isImportantMessage(Message message) {
+        if (message == null || message.isEphemeral() || !message.getAuthor().isBot()) return false;
+        String content = message.getContentRaw();
+        return content.contains("privately used the command:")
+                || content.contains("A command string message was deleted.")
+                || content.contains("```fix");
     }
 
     @Nullable

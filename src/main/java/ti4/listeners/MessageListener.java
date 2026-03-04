@@ -72,7 +72,11 @@ public class MessageListener extends ListenerAdapter {
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
-            BotMessageCacheService.getBean().cache(message);
+            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            boolean isValidGameMessage = GameManager.isValid(gameName);
+            if (isValidGameMessage) {
+                BotMessageCacheService.getBean().cache(message);
+            }
 
             if (!event.getAuthor().isBot()) {
                 if (respondToBotHelperPing(message)) return;
@@ -88,8 +92,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                 }
 
-                String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-                if (GameManager.isValid(gameName)) {
+                if (isValidGameMessage) {
                     if (handleWhispers(event, message, gameName)) return;
                     if (endOfRoundSummary(event, message, gameName)) return;
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
