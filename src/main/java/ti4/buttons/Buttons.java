@@ -186,6 +186,11 @@ public final class Buttons {
         return makeButton(ButtonStyle.DANGER, buttonID, buttonLabel, emoji == null ? null : emoji.toString());
     }
 
+    public static Button rgToggle(boolean isDisable, String buttonID, String buttonLabel, TI4Emoji emoji) {
+        if (isDisable) return red(buttonID, "Disable " + buttonLabel, emoji);
+        return green(buttonID, "Enable " + buttonLabel, emoji);
+    }
+
     private static Button makeButton(ButtonStyle style, String id, String label, String emoji) {
         Emoji e = getEmoji(emoji);
         if (id == null || id.isBlank()) {
