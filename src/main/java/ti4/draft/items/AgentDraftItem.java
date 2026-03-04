@@ -109,7 +109,7 @@ public class AgentDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         if (game.isTwilightsFallMode()) {
-            DeckModel deck = Mapper.getDeck("tf_genome");
+            DeckModel deck = Mapper.getDeck(game.getGenomeSpliceDeckID());
             for (String leader : deck.getNewShuffledDeck()) {
                 allItems.add(generate(DraftCategory.AGENT, leader));
             }

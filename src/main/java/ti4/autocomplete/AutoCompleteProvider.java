@@ -832,7 +832,12 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);
             }
             case Constants.TF_PARADIGM -> {
-                List<String> paradigms = Mapper.getDeck("tf_paradigm").getNewDeck();
+                String deckID = "tf_paradigm";
+                if (GameManager.isValid(gameName)) {
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    deckID = game.getParadigmSpliceDeckID();
+                }
+                List<String> paradigms = Mapper.getDeck(deckID).getNewDeck();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 List<Command.Choice> options = mapTo25ChoicesThatContain(paradigms, enteredValue);
                 event.replyChoices(options).queue(Consumers.nop(), BotLogger::catchRestError);

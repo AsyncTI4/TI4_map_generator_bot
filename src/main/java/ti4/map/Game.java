@@ -24,7 +24,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -37,9 +43,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
@@ -69,6 +72,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
+import ti4.map.helper.TwilightFallDeckFuncs;
 import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
 import ti4.map.persistence.GameManager;
@@ -102,7 +106,8 @@ import ti4.spring.jda.JdaService;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-public class Game extends GameProperties {
+public class Game extends GameProperties
+    implements TwilightFallDeckFuncs {
 
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
@@ -601,18 +606,40 @@ public class Game extends GameProperties {
     public void setupTwilightsFallMode(GenericInteractionCreateEvent event) {
         setTwilightsFallMode(true);
         setThundersEdge(false);
-        validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_twilights_fall"));
-        validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
-        setStrategyCardSet("twilights_fall_sc");
-        removeSOFromGame("baf");
-        removeSOFromGame("dp");
-        removeSOFromGame("dtd");
-        removeSOFromGame("sb"); // get this stuff too
-        removeRelicFromGame("quantumcore");
-        removeRelicFromGame("mawofworlds");
-        removeRelicFromGame("prophetstears");
-        validateAndSetActionCardDeck(event, Mapper.getDeck("tf_action_deck"));
-        setTechnologyDeckID("techs_tf");
+
+        String agendaDeck = "agendas_twilights_fall";
+        String relicDeck = "relics_pok_te";
+        String stratCards = "twilights_fall_sc";
+        String acDeck = "tf_action_deck";
+        String techDeck = "techs_tf";
+        
+        // Initialize splice decks
+        setAbilitySpliceDeckID("techs_tf");
+        setGenomeSpliceDeckID("tf_genome");
+        setParadigmSpliceDeckID("tf_paradigm");
+        setUnitSpliceDeckID("tf_units");
+
+        // Overrides for TK mode
+        if (isTwilightKart()) {
+            agendaDeck = "agendas_twilight_kart";
+            acDeck = "action_cards_twilight_kart";
+            setUnitSpliceDeckID("twilight_kart_units");
+        }
+
+        // Set other normal decks
+        validateAndSetAgendaDeck(event, Mapper.getDeck(agendaDeck));
+        validateAndSetRelicDeck(Mapper.getDeck(relicDeck));
+        setStrategyCardSet(stratCards);
+        validateAndSetActionCardDeck(event, Mapper.getDeck(acDeck));
+        setTechnologyDeckID(techDeck);
+
+        // Remove the secrets we have to remove
+        List.of("sb" , "dtd", "dp", "baf")
+                .forEach(this::removeSOFromGame);
+        
+        // Remove the Relics we have to remove
+        List.of("quantumcore" , "mawofworlds", "prophetstears")
+                .forEach(this::removeRelicFromGame);
     }
 
     public void setPurgedPNs(List<String> purgedPN) {

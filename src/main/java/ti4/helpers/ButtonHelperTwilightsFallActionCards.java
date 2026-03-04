@@ -597,6 +597,7 @@ public final class ButtonHelperTwilightsFallActionCards {
         List<MessageEmbed> embeds = new ArrayList<>();
         List<String> allCards = new ArrayList<>();
         String unitT = buttonID.split("_")[1];
+
         Map<String, UnitModel> allUnits = Mapper.getUnits();
         for (Map.Entry<String, UnitModel> entry : allUnits.entrySet()) {
             UnitModel mod = entry.getValue();
