@@ -54,7 +54,7 @@
         "disablesPlanetaryShield": false,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players’ units in this system lose PLANETARY SHIELD. After you roll a die during a space combat in this system, spend any number of trade goods; apply +1 to the result for each trade good spent.",
+        "ability": "Other players' units in this system lose PLANETARY SHIELD. After you make a combat roll in this system, you may spend any number of trade goods to apply +1 to the result of that roll for each trade good spent.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-fallofkenara.png?raw=true",
         "source": "twilight_kart"
     },
@@ -167,7 +167,7 @@
         "disablesPlanetaryShield": false,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "When this unit moves, the move value of 1 of your non-fighter ships that begins movement in this system treats its move value as 3.",
+        "ability": "When you move this ship, you may apply +1 to the move value of 1 of your other ships during this tactical action.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-shadebringer.png?raw=true",
         "source": "twilight_kart"
     },
@@ -521,7 +521,7 @@
         "disablesPlanetaryShield": false,
         "canBeDirectHit": false,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card.",
+        "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/unit_upgrade/twilight_kart/tk-twilightlegionnaire.png?raw=true",
         "source": "twilight_kart"
     },
