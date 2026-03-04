@@ -30,6 +30,7 @@ import ti4.game.Player;
 import ti4.game.Tile;
 import ti4.game.UnitHolder;
 import ti4.helpers.thundersedge.TeHelperActionCards;
+import ti4.helpers.twilight_kart.TkHelperActionCards;
 import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
@@ -1704,6 +1705,7 @@ public class ActionCardHelper {
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
             TeHelperActionCards.resolveTeActionCard(actionCard, player, introMsg);
+            TkHelperActionCards.resolveTkActionCard(actionCard, player, introMsg);
 
             TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(
                     Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
