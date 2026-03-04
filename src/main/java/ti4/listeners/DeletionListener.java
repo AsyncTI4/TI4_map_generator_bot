@@ -18,7 +18,7 @@ public class DeletionListener extends ListenerAdapter {
 
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
-        if (!validateEvent(event)) {}
+        if (!validateEvent(event)) return;
         ExecutorServiceManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
     }
 
@@ -39,24 +39,22 @@ public class DeletionListener extends ListenerAdapter {
             if (deletionLogChannel == null) return;
             long messageId = event.getMessageIdLong();
             String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-            if (GameManager.isValid(gameName)) {
-                Game game = GameManager.getManagedGame(gameName).getGame();
-                GameMessageManager.getAll(gameName, GameMessageType.COMMAND_EVIDENCE).stream()
-                        .filter(gameMessage -> gameMessage.messageId().equals(String.valueOf(messageId)))
-                        .findFirst()
-                        .ifPresent(gameMessage -> {
-                            GameMessageManager.remove(gameName, gameMessage.messageId());
-                            MessageHelper.sendMessageToChannel(
-                                    deletionLogChannel,
-                                    "A command string message was deleted in game " + gameName + "."
-                                            + game.getMainGameChannel().getJumpUrl()
-                                            + ". Check audit logs for the culprit.");
-                            MessageHelper.sendMessageToChannel(
-                                    game.getActionsChannel(),
-                                    "A command string message was deleted. If someone confesses to doing this intentionally, nothing further needs to be done. The admins have been alerted.");
-                        });
-            }
-
+            if (!GameManager.isValid(gameName)) return;
+            Game game = GameManager.getManagedGame(gameName).getGame();
+            GameMessageManager.getAll(gameName, GameMessageType.COMMAND_EVIDENCE).stream()
+                    .filter(gameMessage -> gameMessage.messageId().equals(String.valueOf(messageId)))
+                    .findFirst()
+                    .ifPresent(gameMessage -> {
+                        GameMessageManager.remove(gameName, gameMessage.messageId());
+                        MessageHelper.sendMessageToChannel(
+                                deletionLogChannel,
+                                "A command string message was deleted in game " + gameName + ". "
+                                        + game.getMainGameChannel().getJumpUrl()
+                                        + ". Check audit logs for the culprit.");
+                        MessageHelper.sendMessageToChannel(
+                                game.getActionsChannel(),
+                                "A command string message was deleted. If someone confesses to doing this intentionally, nothing further needs to be done. The admins have been alerted.");
+                    });
         } catch (Exception e) {
             BotLogger.error("Error in handMessageDelete", e);
         }
