@@ -33,25 +33,28 @@ public class DeletionListener extends ListenerAdapter {
 
     private void handleMessageDelete(MessageDeleteEvent event) {
         try {
+            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
+            if (!GameManager.isValid(gameName)) return;
+
             TextChannel deletionLogChannel =
                     JdaService.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
                             .findFirst()
                             .orElse(null);
             if (deletionLogChannel == null) return;
 
-            String gameName = GameNameService.getGameNameFromChannel(event.getChannel());
-            if (!GameManager.isValid(gameName)) return;
+            long messageId = event.getMessageIdLong();
+            String cachedMessage = BotMessageCacheService.getBean().getContent(messageId);
+            if (cachedMessage == null) return;
 
             Game game = GameManager.getManagedGame(gameName).getGame();
-            long messageId = event.getMessageIdLong();
-            sendDeletionLog(event, deletionLogChannel, game, messageId);
+            sendDeletionLog(event, deletionLogChannel, game, cachedMessage);
         } catch (Exception e) {
             BotLogger.error("Error in handleMessageDelete", e);
         }
     }
 
     private void sendDeletionLog(
-            MessageDeleteEvent event, MessageChannel deletionLogChannel, Game game, long messageId) {
+            MessageDeleteEvent event, MessageChannel deletionLogChannel, Game game, String cachedMessage) {
         String channelLink = event.getJumpUrl();
         String tableTalkLink = Optional.ofNullable(game.getTableTalkChannel())
                 .map(TextChannel::getJumpUrl)
@@ -59,7 +62,6 @@ public class DeletionListener extends ListenerAdapter {
         String mainChannelLink = Optional.ofNullable(game.getMainGameChannel())
                 .map(TextChannel::getJumpUrl)
                 .orElse("Unavailable");
-        String cachedMessage = BotMessageCacheService.getBean().getContent(messageId);
 
         String logMessage =
                 String.format("""
@@ -71,5 +73,10 @@ public class DeletionListener extends ListenerAdapter {
                 Main game: %s""", cachedMessage, game.getName(), channelLink, tableTalkLink, mainChannelLink);
 
         MessageHelper.sendMessageToChannel(deletionLogChannel, logMessage);
+
+        MessageHelper.sendMessageToChannel(
+                game.getActionsChannel(),
+                "A command string message was deleted. If someone confesses to doing this intentionally, "
+                        + "nothing further needs to be done. The admins have been alerted.");
     }
 }
