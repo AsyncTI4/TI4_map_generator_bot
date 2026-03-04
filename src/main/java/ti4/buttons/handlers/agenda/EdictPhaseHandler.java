@@ -23,6 +23,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.DeckModel;
 import ti4.model.RelicModel;
 import ti4.service.VeiledHeartService;
 import ti4.service.emoji.CardEmojis;
@@ -36,10 +37,19 @@ public class EdictPhaseHandler {
             Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.TF_Action_Card),
             Buttons.blue("redistributeCCButtons", "Gain 1 Command Token"));
 
+    public List<String> getEdictDeck(Game game) {
+        DeckModel deck = Mapper.getDeck(game.getAgendaDeckID());
+        if (!deck.getSource().isTwilightFallish()) return null;
+
+        List<String> edicts = deck.getNewShuffledDeck();
+        edicts.removeIf(edict -> ButtonHelper.isLawInPlay(game, edict));
+        return edicts;
+    }
+
     @ButtonHandler("edictPhase")
     public static void edictPhase(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("agenda");
-        List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
+        List<String> edicts = getEdictDeck(game);
         List<Button> buttons = new ArrayList<>();
         List<MessageEmbed> embeds = new ArrayList<>();
         Player tyrant = game.getTyrant();
@@ -127,6 +137,8 @@ public class EdictPhaseHandler {
     @ButtonHandler("keepArtificeParadigm")
     public static void keepArtificeParadigm(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
         String paradigm = buttonID.split("_")[1];
+        List<String> drawn =
+                new ArrayList<>(List.of(game.getStoredValue("savedParadigms").split("_")));
         for (String paradigmToLose : game.getStoredValue("artificeParadigms").split("_")) {
             if (!paradigmToLose.equalsIgnoreCase(paradigm)) {
                 if (game.isVeiledHeartMode()) {
@@ -137,13 +149,11 @@ public class EdictPhaseHandler {
                             paradigmToLose);
                 }
                 player.removeLeader(paradigmToLose);
-                game.setStoredValue(
-                        "savedParadigms",
-                        game.getStoredValue("savedParadigms")
-                                .replace(paradigmToLose, "")
-                                .replace("__", "_"));
+                drawn.remove(paradigmToLose);
             }
         }
+        game.setStoredValue("savedParadigms", String.join("_", drawn));
+
         MessageHelper.sendMessageToChannel(
                 game.isVeiledHeartMode() ? player.getCardsInfoThread() : player.getCorrectChannel(),
                 player.getRepresentation() + " kept the _"
@@ -366,10 +376,7 @@ public class EdictPhaseHandler {
             if (!buttonID.contains("orangetf") && yellowFSPlayer != null) {
                 String msg2 = yellowFSPlayer.getRepresentation()
                         + ", after resolving the edict, use this button to resolve an additional edict from your flagship.";
-                List<String> edicts = Mapper.getShuffledDeck("agendas_twilights_fall");
-                if (ButtonHelper.isLawInPlay(game, "tf-censure")) {
-                    edicts.removeIf("tf-censure"::equalsIgnoreCase);
-                }
+                List<String> edicts = getEdictDeck(game);
                 Button proceedToStrategyPhase = Buttons.green(
                         yellowFSPlayer.getFinsFactionCheckerPrefix() + "resolveEdict_" + edicts.getFirst()
                                 + "_orangetf",

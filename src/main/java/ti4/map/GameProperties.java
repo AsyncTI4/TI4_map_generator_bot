@@ -58,6 +58,12 @@ public class GameProperties {
     private @ExportableField String scSetID = "te";
     private @ExportableField String eventDeckID = "";
 
+    // Twilight's Fall Splice Deck IDs
+    private @ExportableField String abilitySpliceDeckID = "techs_tf";
+    private @ExportableField String genomeSpliceDeckID = "tf_genome";
+    private @ExportableField String paradigmSpliceDeckID = "tf_paradigm";
+    private @ExportableField String unitSpliceDeckID = "tf_units";
+
     // Transient Game Data
     private String activeSystem;
     private String currentAgendaInfo = "";
@@ -162,6 +168,7 @@ public class GameProperties {
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
+    private @ExportableField boolean twilightKart;
 
     // Discord Snowflakes
     private @ExportableField String guildID;
