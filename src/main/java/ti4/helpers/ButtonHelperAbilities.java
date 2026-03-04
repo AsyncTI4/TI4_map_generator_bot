@@ -1,7 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -807,7 +806,7 @@ public class ButtonHelperAbilities {
                 myko.getCorrectChannel(), msg.append(".").toString());
     }
 
-    private static void offerBountyButtons(Game game, Player player) {
+    public static void offerBountyButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
             String id = player.getFinsFactionCheckerPrefix() + "bountyStep1_" + p2.getFaction();
@@ -825,7 +824,7 @@ public class ButtonHelperAbilities {
         String msg = player.getRepresentationUnfogged()
                 + ", please choose which player's ships you wish to place a bounty on. You may have up to 3 bounties at a time.";
         if (currentBounties.size() > 0) {
-            msg += " You currently have the following bounties: " + String.join(", ", currentBounties) + ".";
+            msg += "\nYou currently have the following bounties: " + String.join(", ", currentBounties) + ".";
         } else {
             msg += " You currently have no bounties.";
         }
@@ -947,6 +946,19 @@ public class ButtonHelperAbilities {
             }
         }
         return bounties;
+    }
+
+    public static void clearBountiesForPlayer(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            for (UnitType unitType : UnitType.values()) {
+                String storedValue = game.getStoredValue("bounties" + player.getFaction()
+                        + unitType.humanReadableName().toLowerCase());
+                if (!storedValue.isEmpty()) {
+                    game.removeStoredValue("bounties" + player.getFaction()
+                            + unitType.humanReadableName().toLowerCase());
+                }
+            }
+        }
     }
 
     @ButtonHandler("pillage_")

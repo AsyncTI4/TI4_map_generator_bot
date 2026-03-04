@@ -214,7 +214,7 @@ public class UnfiledButtonHandlers {
             message += "Minor Factions Mode. ";
             if (enable) {
                 message +=
-                        "You will need to decide how you wish to draft the minor factions. This site has a decent setup for it, "
+                        "Note that the bot does not currently handle the draft for minor factions very well. This site has a decent setup for it, "
                                 + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you can add 3 infantry to the minor faction planets with the provided button.";
                 List<Button> mfButtons = new ArrayList<>();
                 mfButtons.add(Buttons.blue("addMinorFactionsInfantry", "Add Minor Factions Infantry"));

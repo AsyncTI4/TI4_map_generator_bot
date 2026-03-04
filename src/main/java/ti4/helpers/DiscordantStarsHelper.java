@@ -46,7 +46,7 @@ public class DiscordantStarsHelper {
                         if (planet.hasGroundForces(game)
                                 && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                             planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                        } else if (!planet.hasGroundForces(game)) {
+                        } else if (!planet.hasGroundForces(game) && !planet.isSpaceStation()) {
                             planet.addToken(Constants.GARDEN_WORLDS_PNG);
                         }
                     } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {

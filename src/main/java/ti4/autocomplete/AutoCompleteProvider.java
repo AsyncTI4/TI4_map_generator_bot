@@ -1379,17 +1379,17 @@ public class AutoCompleteProvider {
 
             /* From \data\ */
             case Constants.SEARCH_ABILITIES ->
-                options = searchModels(event, Mapper.getAbilities().values(), source);
+                options = searchModels(event, Mapper.getAbilities().values(), source, true);
             case Constants.SEARCH_ACTION_CARDS ->
-                options = searchModels(event, Mapper.getActionCards().values(), source);
+                options = searchModels(event, Mapper.getActionCards().values(), source, true);
             case Constants.SEARCH_AGENDAS ->
-                options = searchModels(event, Mapper.getAgendas().values(), source);
+                options = searchModels(event, Mapper.getAgendas().values(), source, true);
             case Constants.SEARCH_GALACTIC_EVENTS ->
-                options = searchModels(event, Mapper.getGalacticEvents().values(), source);
+                options = searchModels(event, Mapper.getGalacticEvents().values(), source, true);
             case Constants.SEARCH_RULES ->
                 options = searchModels(event, Mapper.getRules().values(), source);
             case Constants.SEARCH_BREAKTHROUGHS ->
-                options = searchModels(event, Mapper.getBreakthroughs().values(), source);
+                options = searchModels(event, Mapper.getBreakthroughs().values(), source, true);
             case Constants.SEARCH_ATTACHMENTS ->
                 options = searchModels(event, Mapper.getAttachments().values(), source);
             // no /search colors yet, but there is /help sample_colors
@@ -1399,30 +1399,30 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_EVENTS ->
                 options = searchModels(event, Mapper.getEvents().values(), source);
             case Constants.SEARCH_EXPLORES ->
-                options = searchModels(event, Mapper.getExplores().values(), source);
+                options = searchModels(event, Mapper.getExplores().values(), source, true);
             case Constants.SEARCH_FACTIONS ->
                 options = searchModels(event, Mapper.getFactions().values(), source);
             // no /search franken_errata yet
             // no /search generic_cards yet
             case Constants.SEARCH_LEADERS, Constants.SEARCH_GENOMES, Constants.SEARCH_PARADIGMS ->
-                options = searchModels(event, Mapper.getLeaders().values(), source);
+                options = searchModels(event, Mapper.getLeaders().values(), source, true);
             // no /search map_templates yet
             case Constants.SEARCH_PROMISSORY_NOTES ->
-                options = searchModels(event, Mapper.getPromissoryNotes().values(), source);
+                options = searchModels(event, Mapper.getPromissoryNotes().values(), source, true);
             case Constants.SEARCH_PUBLIC_OBJECTIVES ->
-                options = searchModels(event, Mapper.getPublicObjectives().values(), source);
+                options = searchModels(event, Mapper.getPublicObjectives().values(), source, true);
             case Constants.SEARCH_RELICS ->
-                options = searchModels(event, Mapper.getRelics().values(), source);
+                options = searchModels(event, Mapper.getRelics().values(), source, true);
             case Constants.SEARCH_SECRET_OBJECTIVES ->
-                options = searchModels(event, Mapper.getSecretObjectives().values(), source);
+                options = searchModels(event, Mapper.getSecretObjectives().values(), source, true);
             // /search sources options are not populated from here
             // no /search strategy_card_sets yet
             case Constants.SEARCH_TECHS ->
-                options = searchModels(event, Mapper.getTechs().values(), source);
+                options = searchModels(event, Mapper.getTechs().values(), source, true);
             case Constants.SEARCH_TOKENS ->
                 options = searchModels(event, Mapper.getTokens().values(), source);
             case Constants.SEARCH_UNITS ->
-                options = searchModels(event, Mapper.getUnits().values(), source);
+                options = searchModels(event, Mapper.getUnits().values(), source, true);
 
             /* From \resources\ */
             // /search emojis options are not populated from here
@@ -1709,6 +1709,21 @@ public class AutoCompleteProvider {
         return models.stream()
                 .filter(model -> model.search(enteredValue, source))
                 .filter(model -> !model.getSource().isHiddenFromSearch())
+                .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
+                .limit(25)
+                .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
+                .toList();
+    }
+
+    private static <T extends ModelInterface & EmbeddableModel> List<Command.Choice> searchModels(
+            CommandAutoCompleteInteractionEvent event,
+            Collection<T> models,
+            ComponentSource source,
+            boolean limithomebrew) {
+        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+        return models.stream()
+                .filter(model -> model.search(enteredValue, source))
+                .filter(model -> !model.getSource().isHiddenFromSearch(source))
                 .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
                 .limit(25)
                 .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
