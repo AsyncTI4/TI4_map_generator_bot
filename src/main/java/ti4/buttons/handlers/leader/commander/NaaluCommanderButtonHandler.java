@@ -10,12 +10,12 @@ import ti4.service.leader.NaaluCommanderService;
 @UtilityClass
 class NaaluCommanderButtonHandler {
 
-    @ButtonHandler("naaluCommanderAgenda")
+    @ButtonHandler("naaluCommander")
     public static void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
         NaaluCommanderService.secondHalfOfNaaluCommander(event, game, player);
     }
 
-    @ButtonHandler("naaluCommanderPN")
+    @ButtonHandler("naaluCPN")
     public static void naaluCommanderPN(GenericInteractionCreateEvent event, Game game, Player player) {
         NaaluCommanderService.naaluCommanderPN(event, game, player);
     }

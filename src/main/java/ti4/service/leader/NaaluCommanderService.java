@@ -58,7 +58,7 @@ public class NaaluCommanderService {
                             + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         }
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.blue("naaluCommanderPN", "View Promissory Notes"));
+        buttons.add(Buttons.blue("naaluCPN", "View Promissory Notes"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         MessageHelper.sendMessageToEventChannelWithButtons(
                 event, "You can press this button if you wish to view your neighbors promissory notes", buttons);
