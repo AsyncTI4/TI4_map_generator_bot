@@ -43,6 +43,7 @@ public class MessageListener extends ListenerAdapter {
     private static final String BOTHELPER_MENTION_REMINDER_TEXT = """
         Friendly reminder in case you forgot, please include the specific reason for the ping (e.g. something is not working, there is a bug, or you're not sure how to do something) and any other relevant information. This will speed up the process by allowing the staff to know how they can help. Thanks!
         """;
+    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop");
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
@@ -66,8 +67,6 @@ public class MessageListener extends ListenerAdapter {
                 .findFirst()
                 .ifPresent(moderationLogChannel -> MessageHelper.sendMessageToChannel(moderationLogChannel, msg));
     }
-
-    private static final List<String> interestingMessages = Arrays.asList("gaslight", "please stop");
 
     private static void processMessage(@Nonnull MessageReceivedEvent event, Message message) {
         try {
