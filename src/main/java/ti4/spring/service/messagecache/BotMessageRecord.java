@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 class BotMessageRecord {
 
     @Id
-    private Long messageId;
+    private long messageId;
 
     @Column(columnDefinition = "TEXT")
     private String content;
