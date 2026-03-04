@@ -15,10 +15,11 @@
         "unitHolderName": "cresius",
         "resourcesLocation": "TopLeft",
         "centerPosition": {
-            "x": 135.0,
-            "y": 85.0
+            "x": 136.0,
+            "y": 87.0
         },
         "extraIcons": 1
     },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

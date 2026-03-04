@@ -107,7 +107,7 @@ class Info extends GameStateSubcommand {
                 .append("\n");
         sb.append("Decks: ").append("\n");
         sb.append("- ")
-                .append(CardEmojis.ActionCard)
+                .append(CardEmojis.getACEmoji(game))
                 .append("Action Card Deck: `")
                 .append(game.getAcDeckID())
                 .append("` ")
@@ -132,7 +132,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getPublicObjectives1DeckSize())
                 .append("/")
                 .append(game.getPublicObjectives1FullDeckSize());
-        sb.append(" (+").append(game.getPublicObjectives1Peakable().size()).append(" are staged/peekable)\n");
+        sb.append(" (+").append(game.getPublicObjectives1Peekable().size()).append(" are staged/peekable)\n");
         sb.append("- ")
                 .append(CardEmojis.Public2)
                 .append("Stage 2 Public Objective Deck: `")
@@ -141,7 +141,7 @@ class Info extends GameStateSubcommand {
                 .append(game.getPublicObjectives2DeckSize())
                 .append("/")
                 .append(game.getPublicObjectives2FullDeckSize());
-        sb.append(" (+").append(game.getPublicObjectives2Peakable().size()).append(" are staged/peekable)\n");
+        sb.append(" (+").append(game.getPublicObjectives2Peekable().size()).append(" are staged/peekable)\n");
         sb.append("- ")
                 .append(CardEmojis.Agenda)
                 .append("Agenda Deck: `")
@@ -297,9 +297,8 @@ class Info extends GameStateSubcommand {
             activeP = game.getActivePlayer().getRepresentationNoPing();
         }
         sb.append("Current Active Player: ").append(activeP).append("\n");
-        sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append("\n");
-        sb.append("Game Real Player Count: ")
-                .append(game.getRealPlayers().size())
+        sb.append("Game Player Count: ")
+                .append(game.getRealAndEliminatedPlayers().size())
                 .append("\n");
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append("\n");
         sb.append("TopMostTileOffset: `")

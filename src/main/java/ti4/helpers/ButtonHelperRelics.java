@@ -6,12 +6,14 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -42,29 +44,8 @@ public class ButtonHelperRelics {
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(), player.getFactionEmoji() + " is exhausting _The Prophet's Tears_.");
         if (buttonID.contains("AC")) {
-            String message;
-            if (player.hasAbility("scheming")) {
-                game.drawActionCard(player.getUserID());
-                game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji()
-                        + " drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCardsInfoThread(),
-                        player.getRepresentationUnfogged() + " use buttons to discard",
-                        ActionCardHelper.getDiscardActionCardButtons(player, false));
-            } else if (player.hasAbility("autonetic_memory")) {
-                ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-                message = player.getFactionEmoji() + " triggered **Autonetic Memory Option**.";
-            } else {
-                game.drawActionCard(player.getUserID());
-                message = player.getFactionEmoji() + " drew 1 action card.";
-                ActionCardHelper.sendActionCardInfo(game, player, event);
-            }
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.checkACLimit(game, player);
-            ButtonHelper.deleteTheOneButton(event);
+            ActionCardHelper.drawActionCards(player, 1);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         } else {
             String msg = " exhausted _The Prophet's Tears_.";
             String exhaustedMessage = event.getMessage().getContentRaw();
@@ -73,8 +54,8 @@ public class ButtonHelperRelics {
             } else {
                 exhaustedMessage = player.getRepresentation() + msg;
             }
-            event.getMessage().editMessage(exhaustedMessage).queue();
-            ButtonHelper.deleteTheOneButton(event);
+            event.getMessage().editMessage(exhaustedMessage).queue(Consumers.nop(), BotLogger::catchRestError);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
         }
     }
 
@@ -82,7 +63,7 @@ public class ButtonHelperRelics {
         List<Button> buttons = new ArrayList<>();
         for (String planetName : player.getPlanetsAllianceMode()) {
             Planet planet = game.getPlanetsInfo().get(planetName);
-            if (planet == null || planet.isFake()) {
+            if (planet == null || planet.isFake() || planet.isSpaceStation()) {
                 continue;
             }
             if (ButtonHelper.isPlanetLegendaryOrHome(planetName, game, false, null)) {
@@ -106,7 +87,7 @@ public class ButtonHelperRelics {
             String buttonLabel = Helper.getPlanetRepresentation(planetName, game);
             buttons.add(Buttons.green(buttonID, buttonLabel));
         }
-        String message = "Please choose which planet you wish to attach _Titans Hero_ to.";
+        String message = "Please choose which planet you wish to attach _Geoform_ to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
@@ -128,7 +109,7 @@ public class ButtonHelperRelics {
         planetReal.addToken("attachment_titanshero.png");
         MessageHelper.sendMessageToChannel(
                 event.getChannel(),
-                "Attached _Titans Hero_ to " + Helper.getPlanetRepresentation(planet, game) + " and readied it.");
+                "Attached _Geoform_ to " + Helper.getPlanetRepresentation(planet, game) + ", and readied it.");
         ButtonHelper.deleteMessage(event);
         player.refreshPlanet(planet);
         CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");

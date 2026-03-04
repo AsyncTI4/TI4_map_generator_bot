@@ -7,7 +7,7 @@ import ti4.service.statistics.game.CommunityStatisticsService;
 
 class CommunityStatistics extends Subcommand {
 
-    public CommunityStatistics() {
+    CommunityStatistics() {
         super(Constants.COMMUNITY, "Community Statistics");
     }
 

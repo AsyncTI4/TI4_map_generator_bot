@@ -26,13 +26,30 @@
         "name": "Echo of Something",
         "faction": "neutral",
         "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/echo_divergence.png?raw=true",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "echo_of_divergence",
+        "name": "Echo of Divergence",
+        "faction": "crimson",
+        "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/echo_divergence.png?raw=true",
+        "source": "twilights_fall"
+    },
+    {
+        "id": "echo_of_sacrifice",
+        "name": "Echo of Sacrifice",
+        "faction": "ghost",
+        "permanentEffect": "During your tactical actions, apply +1 to the move value of each of your ships that starts its movement in your home system.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/twilights_fall/king_units_misc/echo_sacrifice.png?raw=true",
         "source": "twilights_fall"
     },
     {
         "id": "predatory_ambush",
         "name": "Predatory Ambush",
         "faction": "arachian",
-        "permanentEffect": "After a player moves ships into a system that contains one of your Command Tokens and your units: Choose up to 2 adjacent systems. Move 1 of your non-fighter ships from each of those systems into the activated system.",
+        "permanentEffect": "At the start of each round of space combat where you are the defending player: If the system contains one of your command tokens, you may move one of your ships from an adjacent system into this system.",
         "source": "other"
     },
     {
@@ -40,6 +57,20 @@
         "name": "Strong Webs",
         "faction": "arachian",
         "permanentEffect": "During the status phase, you may choose not to return up to 3 Command Tokens from the board to your reinforcements.",
+        "source": "other"
+    },
+    {
+        "id": "grand_sequence",
+        "name": "Grand Sequence",
+        "faction": "zooid",
+        "permanentEffect": "When a public objective is revealed, draw one secret objective. You may have any number of scored or unscored secret objectives.",
+        "source": "other"
+    },
+    {
+        "id": "incomprehensible",
+        "name": "Incomprehensible",
+        "faction": "zooid",
+        "permanentEffect": "You cannot score public objectives. When you would be allowed to score a public objective, you may instead score a secret objective, if you fulfil its requirements.",
         "source": "other"
     },
     {

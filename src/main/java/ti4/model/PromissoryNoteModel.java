@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +28,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String attachment;
     private ComponentSource source;
     private String text;
+    private String notes;
     private String homebrewReplacesID;
     private String imageURL;
     private List<String> searchTags = new ArrayList<>();
@@ -69,7 +70,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         return alias != null && name != null && (faction != null || color != null) && text != null && source != null;
     }
 
-    public String getID() {
+    public String getId() {
         return alias;
     }
 
@@ -161,6 +162,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
         // DESCRIPTION
         eb.setDescription(text);
+        if (notes != null) {
+            eb.setDescription(text + "\n-# [" + notes + "]");
+        }
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
@@ -218,6 +222,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
             replaceText.append(pnOwner.getColor());
             formattedText = formattedText.replaceAll("<" + pnOwner.getColor() + ">", replaceText.toString());
+        }
+        if (notes != null) {
+            formattedText += "\n> -# [" + notes + "]";
         }
         return formattedText;
     }

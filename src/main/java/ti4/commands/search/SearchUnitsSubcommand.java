@@ -7,8 +7,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
+import ti4.message.logging.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.model.UnitModel;
 
@@ -32,7 +34,7 @@ class SearchUnitsSubcommand extends SearchComponentModelSubcommand {
         if (Mapper.isValidUnit(searchString)) {
             event.getChannel()
                     .sendMessageEmbeds(Mapper.getUnit(searchString).getRepresentationEmbed(includeAliases))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             return;
         }
 

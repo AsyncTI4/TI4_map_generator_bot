@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class Leave extends GameStateSubcommand {
@@ -25,7 +26,7 @@ public class Leave extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "You are a real player, and thus should not do `/game leave`."
-                            + " You should do `/game replace` or `/player stats npc:True` to set yourself as an NPC, depending on what you are looking for.");
+                            + " You should do `/game replace` or `/player stats npc:True` to set yourself as an NPC, depending on what you are looking for. Note that NPC is not allowed in TIGL games.");
             return;
         }
         game.removePlayer(user.getId());
@@ -43,6 +44,7 @@ public class Leave extends GameStateSubcommand {
 
     @Override
     public boolean isSuspicious(SlashCommandInteractionEvent event) {
-        return true;
+        Player p = getGame().getPlayer(event.getUser().getId());
+        return p != null && !p.isSpectator();
     }
 }

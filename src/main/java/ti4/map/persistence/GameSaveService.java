@@ -2,7 +2,6 @@ package ti4.map.persistence;
 
 import static ti4.map.persistence.GamePersistenceKeys.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -27,17 +26,21 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.PatternHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DraftSystemSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
-import ti4.json.ObjectMapperFactory;
+import ti4.json.JsonMapperManager;
+import ti4.json.UnitKeyMapKeyDeserializer;
+import ti4.json.UnitKeyMapKeySerializer;
 import ti4.map.Expeditions;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.helper.GameHelper;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
@@ -47,11 +50,19 @@ import ti4.service.draft.DraftSaveService;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.statistics.round.RoundStatsTracker;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 @UtilityClass
 class GameSaveService {
 
-    private static final ObjectMapper mapper = ObjectMapperFactory.build();
+    private static final JsonMapper mapper = JsonMapperManager.basic()
+            .rebuild()
+            .addModule(new SimpleModule()
+                    .addKeySerializer(Units.UnitKey.class, new UnitKeyMapKeySerializer())
+                    .addKeyDeserializer(Units.UnitKey.class, new UnitKeyMapKeyDeserializer()))
+            .build();
 
     static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
@@ -83,7 +94,8 @@ class GameSaveService {
             deleteTemporaryFileIfNeeded(temporarySavePath);
         }
 
-        GameUndoService.createUndoCopy(game.getName());
+        int undoIndex = GameUndoService.createUndoCopy(game.getName());
+        RoundStatsTracker.refreshOnSave(game, undoIndex);
         return true;
     }
 
@@ -127,7 +139,6 @@ class GameSaveService {
     }
 
     private static void saveGameInfo(Writer writer, Game game) throws IOException {
-        game.setStoredValue("loadedGame", "no");
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -318,13 +329,13 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_PN + " " + String.join(",", game.getPurgedPN()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", game.getPublicObjectives1Peakable()));
+        writer.write(Constants.PO1PEAKABLE + " " + String.join(",", game.getPublicObjectives1Peekable()));
         writer.write(System.lineSeparator());
         writer.write(Constants.SAVED_BUTTONS + " " + String.join(",", game.getSavedButtons()));
         writer.write(System.lineSeparator());
         writer.write(Constants.PINGED_SYSTEMS + " " + String.join(",", game.getListOfTilesPinged()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", game.getPublicObjectives2Peakable()));
+        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", game.getPublicObjectives2Peekable()));
         writer.write(System.lineSeparator());
 
         savePeekedPublicObjectives(writer, Constants.PO1PEEKED, game.getPublicObjectives1Peeked());
@@ -391,6 +402,11 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
+        writer.write(System.lineSeparator());
+
+        // TODO: this can be removed when we don't see these errors anymore.
+        GameHelper.updateCreationDateTimeIfNotSameDateAsCreationDateField(game);
+        writer.write(Constants.CREATION_DATE_TIME + " " + game.getCreationDateTime());
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
         writer.write(System.lineSeparator());
@@ -691,6 +707,17 @@ class GameSaveService {
         writer.write(Constants.PRIORITY_TRACK_MODE + " " + game.getPriorityTrackMode());
         writer.write(System.lineSeparator());
 
+        sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : game.getAllDebtPoolIcons().entrySet()) {
+            if (entry.getValue() == null) continue;
+            sb.append(entry.getKey().replace(" ", "_"))
+                    .append(",")
+                    .append(entry.getValue())
+                    .append(";");
+        }
+        writer.write(Constants.DEBT_POOL + " " + sb);
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -728,6 +755,13 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.STATS_ANCHOR_LOCATION + " " + player.getPlayerStatsAnchorPosition());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.STATS_TRACKED_USER_ID + " " + player.getStatsTrackedUserID());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.STATS_TRACKED_USER_NAME + " "
+                    + player.getStatsTrackedUserName().replace(" ", "----"));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.HS_TILE_POSITION + " " + player.getHomeSystemPosition());
@@ -805,6 +839,12 @@ class GameSaveService {
             writer.write(Constants.DISHONOR_COUNT + " " + player.getDishonorCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.STEELBALANCE_COUNT + " " + player.getSteelbalanceCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.STARBALANCE_COUNT + " " + player.getStarbalanceCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
@@ -825,8 +865,8 @@ class GameSaveService {
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
-            writeCards(player.getPlotCards(), writer, Constants.PLOT_CARDS);
-            writeCardsStringList(player.getPlotCardsFactions(), writer, Constants.PLOT_FACTIONS);
+            writeCards(player.getPlotCardsRaw(), writer, Constants.PLOT_CARDS);
+            writeCardsStringList(player.getPlotCardsFactionsRaw(), writer, Constants.PLOT_FACTIONS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -900,11 +940,13 @@ class GameSaveService {
             writer.write(Constants.ACTUAL_HITS + " " + player.getActualHits());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
+            for (Map.Entry<String, Map<String, Integer>> entry :
+                    player.getAllDebtTokens().entrySet()) {
+                writer.write(Constants.DEBT + "2 " + entry.getKey().replace(" ", "_") + "|"
+                        + getStringRepresentationOfMap(entry.getValue()));
+                writer.write(System.lineSeparator());
+            }
 
-            // old spot
-
-            writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
@@ -949,11 +991,17 @@ class GameSaveService {
                                     .toList()));
             writer.write(System.lineSeparator());
 
-            writeStrLine(writer, Constants.BREAKTHROUGH, player.getBreakthroughID());
-            writeBoolLine(writer, Constants.BREAKTHROUGH_UNL, player.isBreakthroughUnlocked());
-            writeBoolLine(writer, Constants.BREAKTHROUGH_EXH, player.isBreakthroughExhausted());
-            writeBoolLine(writer, Constants.BREAKTHROUGH_ACTV, player.isBreakthroughActive());
-            writeIntLine(writer, Constants.BREAKTHROUGH_TGS, player.getBreakthroughTGs());
+            writeStrStrMap(writer, Constants.PLAYER_STORED_VALUES, player.getStoredValueMap());
+
+            player.getBreakthroughUnlocked().remove(null);
+            player.getBreakthroughExhausted().remove(null);
+            player.getBreakthroughActive().remove(null);
+            player.getBreakthroughTGs().remove(null);
+            writeStrList(writer, Constants.BREAKTHROUGHS, player.getBreakthroughIDs());
+            writeStrBoolMap(writer, Constants.BREAKTHROUGH_UNL_MAP, player.getBreakthroughUnlocked());
+            writeStrBoolMap(writer, Constants.BREAKTHROUGH_EXH_MAP, player.getBreakthroughExhausted());
+            writeStrBoolMap(writer, Constants.BREAKTHROUGH_ACTV_MAP, player.getBreakthroughActive());
+            writeStrIntMap(writer, Constants.BREAKTHROUGH_TGS_MAP, player.getBreakthroughTGs());
 
             StringBuilder leaderInfo = new StringBuilder();
             if (player.getLeaders().isEmpty()) leaderInfo.append("none");
@@ -1051,15 +1099,54 @@ class GameSaveService {
         writer.write(System.lineSeparator());
     }
 
+    private static void writeStrList(Writer writer, String field, List<String> vals) throws IOException {
+        List<String> escaped = vals.stream()
+                .map(v -> v == null ? "" : v)
+                .map(StringHelper::escape)
+                .toList();
+        writer.write(field + " " + String.join(",", escaped));
+        writer.write(System.lineSeparator());
+    }
+
     private static void writeStrLine(Writer writer, String field, String str) throws IOException {
         String output = StringHelper.escape(str != null ? str : "");
         writer.write(field + " " + output);
         writer.write(System.lineSeparator());
     }
 
+    private static void writeIntLine(Writer writer, String field, int val) throws IOException {
+        writer.write(field + " " + val);
+        writer.write(System.lineSeparator());
+    }
+
     private static void writeBoolLine(Writer writer, String field, boolean bool) throws IOException {
         String output = bool ? "true" : "false";
         writer.write(field + " " + output);
+        writer.write(System.lineSeparator());
+    }
+
+    /** Assumes the map is already properly escaped */
+    private static void writeStrStrMap(Writer writer, String field, Map<String, String> map) throws IOException {
+        List<String> entries = map.entrySet().stream()
+                .map(e -> e.getKey() + "," + e.getValue())
+                .toList();
+        writer.write(field + " " + String.join(";", entries));
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrIntMap(Writer writer, String field, Map<String, Integer> map) throws IOException {
+        List<String> entries = map.entrySet().stream()
+                .map(e -> e.getKey() + "," + e.getValue().toString())
+                .toList();
+        writer.write(field + " " + String.join(";", entries));
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeStrBoolMap(Writer writer, String field, Map<String, Boolean> map) throws IOException {
+        List<String> entries = map.entrySet().stream()
+                .map(e -> e.getKey() + "," + (e.getValue() ? "true" : "false"))
+                .toList();
+        writer.write(field + " " + String.join(";", entries));
         writer.write(System.lineSeparator());
     }
 
@@ -1073,11 +1160,6 @@ class GameSaveService {
                     .append(";");
         }
         writer.write(saveID + " " + sb);
-        writer.write(System.lineSeparator());
-    }
-
-    private static void writeIntLine(Writer writer, String field, int val) throws IOException {
-        writer.write(field + " " + val);
         writer.write(System.lineSeparator());
     }
 

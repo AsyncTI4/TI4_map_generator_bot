@@ -7,13 +7,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.modals.Modal;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.message.logging.BotLogger;
 import ti4.settings.users.UserSettingsManager;
 
 class EditTrackRecord extends Subcommand {
 
-    public EditTrackRecord() {
+    EditTrackRecord() {
         super(Constants.EDIT_TRACK_RECORD, "Edit a users track record");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername").setRequired(true));
     }
@@ -37,6 +39,6 @@ class EditTrackRecord extends Subcommand {
         Modal modal = Modal.create(modalId, "Track Record")
                 .addComponents(Label.of("Edit user's track record", summary))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

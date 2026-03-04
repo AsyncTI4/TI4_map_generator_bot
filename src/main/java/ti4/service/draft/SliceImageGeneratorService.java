@@ -69,7 +69,7 @@ public class SliceImageGeneratorService {
         return generateImage(draftManager.getGame(), slices, getPlayerFromSlice, getFactionFromPlayer, uniqueKey);
     }
 
-    public static FileUpload generateImage(
+    private static FileUpload generateImage(
             Game game,
             List<MiltyDraftSlice> slices,
             Function<String, String> getPlayerFromSlice,

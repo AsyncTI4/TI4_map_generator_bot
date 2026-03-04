@@ -66,26 +66,27 @@ public class ListTechService {
             TechnologyModel model = Mapper.getTech(tech);
 
             String error = null;
-            boolean scepter = player.hasRelicReady("scepter") || player.hasRelicReady("absol_scepter");
+            boolean scepter = player.hasRelicReady("emelpar") || player.hasRelicReady("absol_emelpar");
             if (player.getStrategicCC() < 1 && !scepter) {
                 error = player.getRepresentation()
-                        + " You seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
+                        + ", you seem to have misplaced your strategy tokens, and cannot use the Entropic Scar anomaly.";
             } else if (model == null) {
                 error = "Could not find tech: " + tech;
             } else if (player.hasTech(tech)) {
-                error = player.getRepresentation() + " You already have " + model.getName();
+                error = player.getRepresentation() + ", you already have " + model.getName();
             } else {
-                String msg = player.getRepresentation() + " You gained " + model.getNameRepresentation()
+                String msg = player.getRepresentation() + ", you gained " + model.getNameRepresentation()
                         + " using the Entropic Scar anomaly.";
                 if (scepter) {
-                    msg += "\n> Exhausted the " + RelicHelper.sillySpelling();
+                    msg += " Exhausted the _" + RelicHelper.sillySpelling() + "_.";
                 } else {
-                    msg += "\n> Reduced Strategy CCs by 1 (" + player.getStrategicCC();
+                    msg += " Spent 1 token from their strategy pool (" + player.getStrategicCC();
                     player.setStrategicCC(player.getStrategicCC() - 1);
-                    msg += "->" + player.getStrategicCC() + ")";
+                    msg += "->" + player.getStrategicCC() + ").";
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
                 }
                 player.addTech(tech);
+                ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 ButtonHelper.deleteMessage(event);
             }

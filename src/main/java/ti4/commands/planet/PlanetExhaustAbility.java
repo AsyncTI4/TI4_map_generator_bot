@@ -74,16 +74,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.add(Buttons.green("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {
-                if (player.hasAbility("scheming")) {
-                    output =
-                            "Use buttons to drop 1 mech on a planet or to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
-                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
-                } else {
-                    output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
-                    buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
-                }
+                output = "Use buttons to drop 1 mech on a planet or to draw 1 action card.";
+                buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
             }
             case "primor" -> {
                 output = "Use buttons to drop 2 infantry on a planet.";
@@ -100,35 +93,35 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "mrte" -> {
                 channel = player.getCardsInfoThread();
                 output = player.getRepresentation()
-                        + " Choose a secret to discard, the bot will automatically draw a replacement:";
+                        + ", please choose a secret objective to discard - the bot will automatically draw a replacement:";
                 buttons.addAll(SecretObjectiveHelper.getSODiscardButtonsWithSuffix(player, "redraw"));
             }
             case "ordinianc4", "ordinian" -> {
-                ActionCardHelper.drawActionCards(game, player, 1, true);
+                ActionCardHelper.drawActionCards(player, 1);
                 String msg = "Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain 1 command token.";
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
             }
             case "faunus" -> {
-                output = player.getRepresentationUnfogged() + " Select a planet to gain control of:";
-                output += "\n> Non-home, non-legendary planet, with no units, and no attachments";
-                if (game.isFowMode()) output += "\n> Additionally, in Fog of War, you need vision of the planet";
+                output = player.getRepresentationUnfogged()
+                        + ", please choose a planet to gain control of, that is non-home, non-legendary planet, with no units, and has no attachments.";
+                if (game.isFowMode()) output += " Additionally, in Fog of War, you need vision of the planet.";
                 buttons = FaunusService.getFaunusButtons(game, player);
             }
             case "emelpar" -> {
-                output = player.getRepresentationUnfogged() + " select a component to ready:";
+                output = player.getRepresentationUnfogged() + " please choose a component to ready.";
                 buttons = EmelparService.getReadyComponentButtons(game, player);
             }
 
             case "industrex" -> {
-                output = "Choose a unit type to place:";
+                output = player.getRepresentationUnfogged() + " please choose a ship type to place.";
                 buttons.addAll(IndustrexService.getIndustrexButtonsPart1(game, player));
             }
             case "tempesta" -> {
                 PlanetModel tempesta = Mapper.getPlanet("tempesta");
                 output = player.getFactionEmojiOrColor() + " is using _" + tempesta.getLegendaryAbilityName()
-                        + "_ to apply +1 movement to a single ship.";
+                        + "_ to apply +1 movement to one ship.";
                 game.setStoredValue("tempestaUsed", player.getFaction());
             }
 
@@ -153,7 +146,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             //     buttons.addAll(ButtonHelper.customRexLegendary(player, game));
             // }
             case "avernus" -> {
-                output = "Select the tile you would like to starforge in:";
+                output = "Please choose the system where you wish to resolve **Star Forge** in.";
                 List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun);
                 for (Tile tile : tiles) {
                     buttons.add(Buttons.green(

@@ -54,7 +54,7 @@
         "requirements": "GGG",
         "faction": "arachian",
         "source": "other",
-        "text": "ACTION: Exhaust this card to perform a tactical action in a non-home system that contains your units and one of your Command Tokens. "
+        "text": "During your tactical actions, you can activate systems that contain your command tokens and no other player’s ships. Your systems can contain more than one of your command tokens."
     },
     {
         "alias": "araracy",
@@ -65,7 +65,29 @@
         "requirements": "Y",
         "faction": "arachian",
         "source": "other",
-        "text": "At the end of your turn, you may exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens. "
+        "text": "ACTION: Exhaust this card to place a Command Token from your reinforcement in up to 2 systems that are adjacent to a system that contains one of your command tokens."
+    },
+    {
+        "alias": "arzooig",
+        "name": "Psychic Disturbance",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "zooid",
+        "source": "other",
+        "text": "You may exhaust this card at the start of a ground combat on a planet you control. If your ground forces make 1 or more hits in the first combat round, move all your opponents ground forces on the planet to the space area. The combat ends in a draw."
+    },
+    {
+        "alias": "arzooiy",
+        "name": "Inscrutable Designs",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "zooid",
+        "source": "other",
+        "text": "When you activate a system that contains another player's units, you may allow both of you to either draw 1 action card or gain 1 trade good."
     },
     {
         "alias": "bakalodn",
@@ -100,7 +122,7 @@
         "faction": "lunarium",
         "baseUpgrade": "cv2",
         "source": "balacasi",
-        "text": "After you activate this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. Cost 3 Combat 9 Move 2 Capacity X"
+        "text": "At the end of a tactical action in this system, you may place 1 fighter in this system. This unit has capacity equal to the number of your scored secret objectives plus 6. Cost 3 Combat 9 Move 2 Capacity X"
     },
     {
         "alias": "balunag",
@@ -111,7 +133,7 @@
         "requirements": "GG",
         "faction": "lunarium",
         "source": "balacasi",
-        "text": "When another player activates a system that contains 1 or more of your ships, you may draw 1 secret objective or gain 2 command tokens. If you gained command tokens, exhaust this card."
+        "text": "After another player activates a system that contains 1 or more of your ships, you may draw 1 secret objective or gain 2 command tokens. If you gained command tokens, exhaust this card."
     },
     {
         "alias": "baconcy",
@@ -133,7 +155,7 @@
         "requirements": "G",
         "faction": "onyxxa",
         "source": "balacasi",
-        "text": "When you perform a strategic action, you may gain 1 command token instead of resolving any ability. While you do not have any control tokens on your commander, apply +1 to your units' combat rolls."
+        "text": "When you perform a strategic action, you may gain 1 command token instead of resolving any ability. While this card is readied, apply +1 to your units' combat rolls. After you resolve the primary ability of a strategy card, exhaust this card."
     },
     {
         "alias": "batyriy",
@@ -144,7 +166,7 @@
         "requirements": "Y",
         "faction": "tyris",
         "source": "balacasi",
-        "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 5 of your fighters from the game board and place them in 1 or more systems that contain your ships."
+        "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 6 of your fighters from the game board and place them in 1 or more systems that contain your ships."
     },
     {
         "alias": "batyriinf",

@@ -1,0 +1,103 @@
+name: Create Map Video
+
+on:
+  repository_dispatch:
+    types: [generate_video]
+  workflow_dispatch:
+    inputs:
+      map_id:
+        description: "Map ID to render into MP4"
+        required: true
+        type: string
+      channel_id:
+        description: "Discord channel ID to scan for image attachments (set either channel_id or thread_id)"
+        required: false
+        type: string
+      thread_id:
+        description: "Discord thread ID to scan for image attachments (set either thread_id or channel_id)"
+        required: false
+        type: string
+      max_messages:
+        description: "Maximum messages to scan (newest backward); default 1500"
+        required: false
+        default: "1500"
+        type: string
+      discord_auth_type:
+        description: "Discord token auth mode: bot or user"
+        required: false
+        default: "bot"
+        type: string
+      guild_id:
+        description: "Discord guild (server) ID to search for image attachments"
+        required: true
+        type: string
+      post_to_thread_id:
+        description: "Discord thread ID to post the finished video into (optional)"
+        required: false
+        type: string
+
+jobs:
+  create-map-video:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install -r scripts/video/requirements.txt
+
+      - name: Install system dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y imagemagick ffmpeg
+
+      - name: Generate map video
+        id: generate
+        env:
+          MAP_ID: ${{ inputs.map_id || github.event.client_payload.map_id }}
+          CHANNEL_ID: ${{ inputs.channel_id || github.event.client_payload.channel_id }}
+          THREAD_ID: ${{ inputs.thread_id || github.event.client_payload.thread_id }}
+          MAX_MESSAGES: ${{ inputs.max_messages || github.event.client_payload.max_messages || '1500' }}
+          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type || github.event.client_payload.discord_auth_type || 'bot' }}
+          GUILD_ID: ${{ inputs.guild_id || github.event.client_payload.guild_id }}
+        run: |
+          set -euo pipefail
+          if [[ "${MAP_ID,,}" == fow* ]]; then
+            echo "Can't generate videos for Fog of War at this time"
+            exit 1
+          fi
+          output="$(bash scripts/video/run_video_create.sh "$MAP_ID" "$CHANNEL_ID" "$THREAD_ID" "$MAX_MESSAGES" "$DISCORD_AUTH_TYPE")"
+          echo "$output" >> "$GITHUB_OUTPUT"
+
+      - name: Upload map video artifact
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.generate.outputs.artifact_name }}
+          path: ${{ steps.generate.outputs.output_file }}
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Post video to Discord thread
+        if: ${{ inputs.post_to_thread_id != '' || github.event.client_payload.post_to_thread_id != '' }}
+        env:
+          POST_TO_THREAD_ID: ${{ inputs.post_to_thread_id || github.event.client_payload.post_to_thread_id }}
+          DISCORD_AUTH_TYPE: ${{ inputs.discord_auth_type || github.event.client_payload.discord_auth_type || 'bot' }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+        run: |
+          set -euo pipefail
+          python3 scripts/video/post_to_discord_thread.py \
+            --thread-id "$POST_TO_THREAD_ID" \
+            --file "${{ steps.generate.outputs.output_file }}" \
+            --token-env "DISCORD_TOKEN" \
+            --auth-type "$DISCORD_AUTH_TYPE" \
+            --artifact-url "$ARTIFACT_URL"

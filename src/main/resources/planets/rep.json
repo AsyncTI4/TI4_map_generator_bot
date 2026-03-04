@@ -1,1 +1,37 @@
-{"id":"rep","tileId":"93","name":"Rep Lo Orz Qet","shortName":"Rep Lo","shrinkNamePNAttach":true,"aliases":["reploorzqet","rep","lo","orz","qet","rep","lo","orz","rep","lo","rep","replo","reploorz"],"resources":1,"influence":3,"factionHomeworld":"ralnel","planetTypes":["FACTION"],"planetLayout":{"unitHolderName":"rep","resourcesLocation":"TopLeft","centerPosition":{"x":225.0,"y":205.0}},"source":"thunders_edge"}
+{
+    "id": "rep",
+    "tileId": "93",
+    "name": "Rep Lo Orz Qet",
+    "shortName": "Rep Lo",
+    "shrinkNamePNAttach": true,
+    "aliases": [
+        "reploorzqet",
+        "rep",
+        "lo",
+        "orz",
+        "qet",
+        "rep",
+        "lo",
+        "orz",
+        "rep",
+        "lo",
+        "rep",
+        "replo",
+        "reploorz"
+    ],
+    "resources": 1,
+    "influence": 3,
+    "factionHomeworld": "ralnel",
+    "planetTypes": [
+        "FACTION"
+    ],
+    "planetLayout": {
+        "unitHolderName": "rep",
+        "resourcesLocation": "TopLeft",
+        "centerPosition": {
+            "x": 226,
+            "y": 203
+        }
+    },
+    "source": "thunders_edge"
+}

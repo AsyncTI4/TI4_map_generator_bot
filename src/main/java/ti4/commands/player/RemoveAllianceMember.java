@@ -3,17 +3,19 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
 class RemoveAllianceMember extends GameStateSubcommand {
 
-    public RemoveAllianceMember() {
+    RemoveAllianceMember() {
         super(Constants.REMOVE_ALLIANCE_MEMBER, "Remove an alliance member", true, true);
         addOptions(new OptionData(
                         OptionType.STRING,
@@ -43,11 +45,11 @@ class RemoveAllianceMember extends GameStateSubcommand {
 
         player.getCardsInfoThread()
                 .removeThreadMember(JdaService.jda.getUserById(targetPlayer.getUserID()))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         targetPlayer
                 .getCardsInfoThread()
                 .removeThreadMember(JdaService.jda.getUserById(player.getUserID()))
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
 
         MessageHelper.sendMessageToEventChannel(
                 event,

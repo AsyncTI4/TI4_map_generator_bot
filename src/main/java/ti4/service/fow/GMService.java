@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.modals.Modal;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -25,12 +26,14 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.ShowGameService;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.emoji.CardEmojis;
@@ -56,6 +59,8 @@ public class GMService {
             Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies/Briberies", CardEmojis.ActionCard),
             Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
             Buttons.gray("gmCheckPlayerHands_secret", "Unscored SOs", CardEmojis.SecretObjective),
+            Buttons.gray("gmCheckPlayerHands_acs", "All ACs", CardEmojis.ActionCard),
+            Buttons.gray("gmCheckPlayerHands_pns", "All PNs", CardEmojis.PN),
             Buttons.DONE_DELETE_BUTTONS);
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
@@ -153,7 +158,7 @@ public class GMService {
     @ButtonHandler("gmRefresh")
     public static void refreshGMButtons(ButtonInteractionEvent event, Game game) {
         showGMButtons(game);
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ButtonHandler("gmShowGameAs_")
@@ -239,6 +244,34 @@ public class GMService {
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
+            case "acs" -> {
+                StringBuilder acs = new StringBuilder();
+                for (Player player : game.getRealPlayers()) {
+                    acs.append("__")
+                            .append(player.getRepresentationUnfoggedNoPing())
+                            .append("__\n");
+                    player.getActionCards().forEach((key, value) -> acs.append("> ")
+                            .append(Mapper.getActionCard(key).getNameRepresentation())
+                            .append(" (")
+                            .append(value)
+                            .append(")\n"));
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), acs.toString());
+            }
+            case "pns" -> {
+                StringBuilder pns = new StringBuilder();
+                for (Player player : game.getRealPlayers()) {
+                    pns.append("__")
+                            .append(player.getRepresentationUnfoggedNoPing())
+                            .append("__\n");
+                    player.getPromissoryNotes().entrySet().stream().forEach(entry -> pns.append("> ")
+                            .append(Mapper.getPromissoryNote(entry.getKey()).getNameRepresentation())
+                            .append(" (")
+                            .append(entry.getValue())
+                            .append(")\n"));
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), pns.toString());
+            }
             default ->
                 MessageHelper.sendMessageToChannelWithButtons(
                         event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
@@ -254,7 +287,7 @@ public class GMService {
         Modal modal = Modal.create("gmWhoCanSeeResolve", "Who Can See Position")
                 .addComponents(Label.of("Position", position))
                 .build();
-        event.replyModal(modal).queue();
+        event.replyModal(modal).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     @ModalHandler("gmWhoCanSeeResolve")
@@ -355,6 +388,6 @@ public class GMService {
                 event.getChannel(),
                 "Created private channel for " + player.getUserName() + ": "
                         + player.getPrivateChannel().getAsMention());
-        ButtonHelper.deleteTheOneButton(event, buttonID, false);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event, false);
     }
 }

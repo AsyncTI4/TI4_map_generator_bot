@@ -14,6 +14,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.thundersedge.TeHelperTechs;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -36,9 +37,9 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveEngineer(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("engineerACSplice", "take_remove_remove");
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(),
+                player.getCorrectChannel(),
                 player.getRepresentation()
-                        + " added 2 more cards to the splice and you should be prompted to discard 2 cards after choosing yours.");
+                        + " added 2 more cards to the splice. You should be prompted to discard 2 cards from the splice after choosing yours.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -78,7 +79,7 @@ public class ButtonHelperTwilightsFallActionCards {
         }
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " choose the infantry to start the locust.",
+                player.getRepresentation() + ", please choose the infantry to start the _Locust_ swarm.",
                 buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -93,8 +94,8 @@ public class ButtonHelperTwilightsFallActionCards {
         Die d1 = new Die(3);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentation() + " chose to hit the " + color + " " + UnitEmojis.infantry + " on Tile "
-                        + tileP + " on " + uHName + " and rolled a " + d1.getResult());
+                player.getRepresentation() + " chose to hit the " + color + " " + UnitEmojis.infantry + " in the "
+                        + tileP + " system on " + uHName + ", and rolled " + d1.getResult() + ".");
         if (d1.isSuccess()) {
             UnitKey key = Units.getUnitKey(UnitType.Infantry, color);
             DestroyUnitService.destroyUnit(
@@ -125,7 +126,7 @@ public class ButtonHelperTwilightsFallActionCards {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     player.getRepresentation()
-                            + " choose the next infantry to locust. You must choose a different player to hit if possible.",
+                            + ", please choose the next infantry to locust. You must choose a different player from last time, if possible.",
                     buttons);
         }
 
@@ -136,7 +137,7 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveReverseTF(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue("reverseSpliceOrder", "True");
         MessageHelper.sendMessageToChannel(
-                player.getCardsInfoThread(), player.getRepresentation() + " reversed the order of the splice.");
+                player.getCorrectChannel(), player.getRepresentation() + " has reversed the order of the ɘɔilqƨ.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -163,10 +164,10 @@ public class ButtonHelperTwilightsFallActionCards {
             if (p2.getRelics().isEmpty()) {
                 continue;
             }
-            buttons.add(
-                    Buttons.gray("unravelStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(Buttons.gray("unravelStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " choose the player who owns the relic you wish to unravel.";
+        String msg =
+                player.getRepresentation() + ", please choose the player who owns the relic you wish to _Unravel_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -183,7 +184,7 @@ public class ButtonHelperTwilightsFallActionCards {
                     "unravelStep3_" + p2.getFaction() + "_" + relic,
                     Mapper.getRelic(relic).getName()));
         }
-        String msg = player.getRepresentation() + " choose the relic you wish to unravel.";
+        String msg = player.getRepresentation() + ", please choose the relic you wish to _Unravel_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -193,21 +194,22 @@ public class ButtonHelperTwilightsFallActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String relic = buttonID.split("_")[2];
         p2.removeRelic(relic);
-        RelicHelper.resolveRelicLossEffects(event, game, player, relic);
-        String msg = player.getRepresentation() + " chose to unravel "
-                + Mapper.getRelic(relic).getName() + " owned by " + p2.getRepresentation();
+        RelicHelper.resolveRelicLossEffects(game, player, relic);
+        String msg = player.getRepresentation() + " has chosen for _"
+                + Mapper.getRelic(relic).getName() + "_, owned by " + p2.getRepresentation() + ", to be _Unravel_'d.";
         if (p2 == player) {
             if (!FractureService.isFractureInPlay(game)) {
                 FractureService.spawnFracture(event, game);
-                FractureService.spawnIngressTokens(event, game, player, false);
+                FractureService.spawnIngressTokens(event, game, player, null);
             }
+            TeHelperTechs.initializePlanesplitterStep1(game, player);
         } else {
             Integer poIndex =
                     game.addCustomPO("Unravel " + Mapper.getRelic(relic).getName(), 1);
             game.scorePublicObjective(p2.getUserID(), poIndex);
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
-                    p2.getRepresentation() + " scored a victory point for the relic they lost.");
+                    p2.getRepresentation() + " has scored a victory point for the relic they lost.");
             Helper.checkEndGame(game, p2);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -218,10 +220,10 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveTranspose(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(Buttons.gray(
-                    "transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(
+                    Buttons.gray("transposeStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " choose the player you wish to transpose with.";
+        String msg = player.getRepresentation() + ", please choose the player you wish to _Transpose_ with.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -230,10 +232,9 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveCoerce(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            buttons.add(
-                    Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(Buttons.gray("coerceStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " choose the player you wish to coerce.";
+        String msg = player.getRepresentation() + ", please choose the player you wish to _Coerce_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -249,9 +250,10 @@ public class ButtonHelperTwilightsFallActionCards {
             }
             buttons.add(Buttons.gray(
                     p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability,
-                    tech.getAutoCompleteName()));
+                    tech.getName()));
         }
-        String msg = p2.getRepresentation() + " choose the ability you wish to give to " + player.getRepresentation();
+        String msg = p2.getRepresentationUnfogged() + ", please choose the ability you wish to give to "
+                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getRepresentation()) + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -263,9 +265,10 @@ public class ButtonHelperTwilightsFallActionCards {
         TechnologyModel tech1 = Mapper.getTech(ability1);
         player.removeTech(ability1);
         p2.addTech(ability1);
-        String msg = player.getRepresentation() + " lost " + tech1.getName() + " to " + p2.getFactionNameOrColor();
-        String msg2 =
-                p2.getRepresentation() + " you gained " + tech1.getName() + " from " + player.getFactionNameOrColor();
+        String msg = player.getRepresentation() + " has lost _" + tech1.getName() + "_ to "
+                + (game.isFowMode() ? p2.getColorIfCanSeeStats(player) : p2.getFactionNameOrColor()) + ".";
+        String msg2 = p2.getRepresentation() + ", you gained _" + tech1.getName() + "_ from "
+                + player.getFactionNameOrColor() + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -274,10 +277,10 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolvePoison(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayersExcludingThis(player)) {
-            buttons.add(Buttons.gray(
-                    "poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(
+                    Buttons.gray("poisonHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " choose the player you wish to poison.";
+        String msg = player.getRepresentation() + ", please choose the player you wish to poison.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -290,9 +293,9 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
-            buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
+            buttons.add(Buttons.gray("poisonHeroStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
-        String msg = player.getRepresentation() + " choose the ability you wish to try to steal.";
+        String msg = player.getRepresentation() + ", please choose the ability you wish to try to steal.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -305,11 +308,11 @@ public class ButtonHelperTwilightsFallActionCards {
         TechnologyModel tech1 = Mapper.getTech(ability1);
         buttons.add(Buttons.gray(
                 p2.getFinsFactionCheckerPrefix() + "coerceStep3_" + player.getFaction() + "_" + ability1,
-                "Give" + tech1.getAutoCompleteName()));
+                "Give" + tech1.getName()));
         buttons.add(Buttons.gray(
                 p2.getFinsFactionCheckerPrefix() + "poisonHeroStep4_" + player.getFaction(), "Give 2 Abilities"));
         String msg = p2.getRepresentation()
-                + " you have been hit with the poison paradigm and now much choose to either give them the ability they want or give them 2 of the abilities you choose.";
+                + ", you have been hit with _Poison of the Nefishh_, and now much choose to either give them the ability they named, or give them 2 of the abilities of you choice.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -331,9 +334,9 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
-            buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getAutoCompleteName()));
+            buttons.add(Buttons.gray("transposeStep3_" + p2.getFaction() + "_" + ability, tech.getName()));
         }
-        String msg = player.getRepresentation() + " choose the ability you wish to lose.";
+        String msg = player.getRepresentation() + ", please choose the ability you wish to lose.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -348,10 +351,13 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
-            buttons.add(Buttons.gray(
-                    "transposeStep4_" + p2.getFaction() + "_" + ability1 + "_" + ability, tech.getAutoCompleteName()));
+            if (p2.getSingularityTechs().contains(ability)) {
+                continue;
+            }
+            buttons.add(
+                    Buttons.gray("transposeStep4_" + p2.getFaction() + "_" + ability1 + "_" + ability, tech.getName()));
         }
-        String msg = player.getRepresentation() + " choose the ability you wish to steal.";
+        String msg = player.getRepresentation() + ", please choose the ability you wish to steal.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -368,10 +374,11 @@ public class ButtonHelperTwilightsFallActionCards {
         player.addTech(ability2);
         p2.addTech(ability1);
 
-        String msg = player.getRepresentation() + " choose to exchange " + tech1.getAutoCompleteName() + " with "
-                + tech2.getAutoCompleteName() + " via transposing with " + p2.getFactionNameOrColor();
-        String msg2 = p2.getRepresentation() + " you exchanged " + tech2.getAutoCompleteName() + " for "
-                + tech1.getAutoCompleteName() + " via transposing with " + player.getFactionNameOrColor();
+        String msg = player.getRepresentationUnfogged() + " choose to exchange _" + tech1.getName() + "_ with _"
+                + tech2.getName() + "_ via a _Transpose_ with " + p2.getFactionNameOrColor() + ".";
+        String msg2 = p2.getRepresentationUnfogged() + ", you exchanged _" + tech2.getName() + "_ for _"
+                + tech1.getName() + "_ via a _Transpose_ with "
+                + (game.isFowMode() ? player.getColorIfCanSeeStats(p2) : player.getFactionNameOrColor()) + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -385,21 +392,22 @@ public class ButtonHelperTwilightsFallActionCards {
             if (tech.getFaction().isEmpty()) {
                 continue;
             }
-            String faction = tech.getFaction().get();
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (player.getSingularityTechs().contains(ability)) {
+                continue;
             }
+            String faction = tech.getFaction().get();
+            if (faction.contains("keleres")) {
+                faction = "keleres";
+            }
+            factions.merge(faction, 1, Integer::sum);
         }
         for (String leaderID : player.getLeaderIDs()) {
             LeaderModel lead = Mapper.getLeader(leaderID);
             String faction = lead.getFaction();
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         for (String unit : player.getUnitsOwned()) {
             UnitModel unitM = Mapper.getUnit(unit);
@@ -410,21 +418,25 @@ public class ButtonHelperTwilightsFallActionCards {
             if (faction.equalsIgnoreCase(player.getFaction())) {
                 continue;
             }
-            if (factions.containsKey(faction)) {
-                factions.put(faction, factions.get(faction) + 1);
-            } else {
-                factions.put(faction, 1);
+            if (faction.contains("keleres")) {
+                faction = "keleres";
             }
+            factions.merge(faction, 1, Integer::sum);
         }
         int max = 0;
-        for (Integer i : factions.values()) {
-            max = Math.max(i, max);
+        String bestFaction = "";
+        for (Map.Entry<String, Integer> entry : factions.entrySet()) {
+            Integer v = entry.getValue();
+            if (v > max) {
+                max = v;
+                bestFaction = entry.getKey();
+            }
         }
 
         String gainMsg = player.gainTG(max * 2, true);
         ButtonHelperAgents.resolveArtunoCheck(player, max * 2);
-        String msg = player.getRepresentation() + " gained " + (max * 2) + " tgs " + gainMsg + " from having " + max
-                + " of the same faction symbols";
+        String msg = player.getRepresentation() + " gained " + (max * 2) + " trade goods " + gainMsg + " from having "
+                + max + " faction symbol" + (max == 1 ? "" : "s") + " from " + bestFaction + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -433,10 +445,10 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveGenophage(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : player.getNeighbouringPlayers(false)) {
-            buttons.add(Buttons.gray(
-                    "genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+            buttons.add(
+                    Buttons.gray("genophageStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " choose the neighbor you wish to genophage.";
+        String msg = player.getRepresentation() + ", please choose the neighbor you wish to _Genophage_.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -445,9 +457,9 @@ public class ButtonHelperTwilightsFallActionCards {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             buttons.add(
-                    Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.getFactionEmoji()));
+                    Buttons.gray("lawsHeroStep2_" + p2.getFaction(), p2.getFactionNameOrColor(), p2.fogSafeEmoji()));
         }
-        String msg = player.getRepresentation() + " choose the player you wish to purge an ability from.";
+        String msg = player.getRepresentation() + ", please choose the player you wish to purge an ability from.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
 
@@ -462,7 +474,7 @@ public class ButtonHelperTwilightsFallActionCards {
             }
             buttons.add(Buttons.gray("lawsHeroStep3_" + p2.getFaction() + "_" + tech, techM.getName()));
         }
-        String msg = player.getRepresentation() + " choose the ability that you wish to purge.";
+        String msg = player.getRepresentation() + ", please choose the ability that you wish to purge.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -474,10 +486,10 @@ public class ButtonHelperTwilightsFallActionCards {
         game.setStoredValue("purgedAbilities", game.getStoredValue("purgedAbilities") + "_" + agent);
         TechnologyModel lead = Mapper.getTech(agent);
         p2.removeTech(agent);
-        String msg = player.getRepresentation() + " choose to remove " + lead.getAutoCompleteName() + " from "
-                + p2.getFactionNameOrColor();
-        String msg2 = p2.getRepresentation() + " you lost " + lead.getAutoCompleteName() + " to a laws paradigm by "
-                + player.getFactionNameOrColor();
+        String msg = player.getRepresentation() + " has chosen to purge " + lead.getNameRepresentation() + " from "
+                + p2.getFactionNameOrColor() + ".";
+        String msg2 = p2.getRepresentation() + ", you lost " + lead.getNameRepresentation()
+                + " to _The Laws Unwritten_ by " + player.getFactionNameOrColor() + "; it has been purged.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -493,9 +505,10 @@ public class ButtonHelperTwilightsFallActionCards {
                 continue;
             }
             LeaderModel lead = Mapper.getLeader(agent);
-            buttons.add(Buttons.gray("genophageStep3_" + p2.getFaction() + "_" + agent, lead.getAutoCompleteName()));
+            buttons.add(Buttons.gray("genophageStep3_" + p2.getFaction() + "_" + agent, lead.getName()));
         }
-        String msg = player.getRepresentation() + " choose the genome of your neighbor that you wish to remove.";
+        String msg =
+                player.getRepresentation() + ", please choose the genome of your neighbor that you wish to remove.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -506,10 +519,10 @@ public class ButtonHelperTwilightsFallActionCards {
         String agent = buttonID.split("_")[2];
         LeaderModel lead = Mapper.getLeader(agent);
         p2.removeLeader(agent);
-        String msg = player.getRepresentation() + " choose to remove " + lead.getAutoCompleteName() + " from "
-                + p2.getFactionNameOrColor();
-        String msg2 = p2.getRepresentation() + " you lost " + lead.getAutoCompleteName() + " to a genophage by "
-                + player.getFactionNameOrColor();
+        String msg = player.getRepresentation() + " has chosen to remove _" + lead.getNameRepresentation() + "_ from "
+                + p2.getFactionNameOrColor() + ".";
+        String msg2 = p2.getRepresentation() + ", you lost _" + lead.getNameRepresentation() + "_ to a _Genophage_ by "
+                + player.getFactionNameOrColor() + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
@@ -542,7 +555,7 @@ public class ButtonHelperTwilightsFallActionCards {
         for (String unit : units) {
             buttons.add(Buttons.gray("irradiateStep2_" + unit, StringUtils.capitalize(unit)));
         }
-        String msg = player.getRepresentation() + " choose the unit type you wish to search for.";
+        String msg = player.getRepresentation() + ", please choose the unit type you wish to search for.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -552,7 +565,7 @@ public class ButtonHelperTwilightsFallActionCards {
         List<Button> buttons = new ArrayList<>();
         if (player.getTacticalCC() <= 0) {
             String msg = player.getRepresentation()
-                    + " does not have enough tactical command counters to place a tactic token.";
+                    + " does not have enough command tokens in their tactics pool to place a command token.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             ButtonHelper.deleteMessage(event);
             return;
@@ -562,7 +575,7 @@ public class ButtonHelperTwilightsFallActionCards {
                 buttons.add(Buttons.gray("ignisStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));
             }
         }
-        String msg = player.getRepresentation() + " choose the tile you wish to place a tactic token in.";
+        String msg = player.getRepresentation() + ", please choose the tile you wish to place a command token in.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -574,7 +587,7 @@ public class ButtonHelperTwilightsFallActionCards {
         CommandCounterHelper.addCC(event, player, tile);
         List<Button> buttons = ButtonHelperModifyUnits.getOpposingUnitsToHit(player, game, tile, true);
 
-        String msg = player.getRepresentation() + " choose the opposing unit you wish to destroy.";
+        String msg = player.getRepresentation() + ", please choose the enemy unit you wish to destroy.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -599,6 +612,16 @@ public class ButtonHelperTwilightsFallActionCards {
                 allCards.remove(unit);
             }
         }
+        if (game.isVeiledHeartMode()) {
+            List<String> someCardList = new ArrayList<>(allCards);
+            for (String card : someCardList) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (game.getStoredValue("veiledCards" + p2.getFaction()).contains(card)) {
+                        allCards.remove(card);
+                    }
+                }
+            }
+        }
         String found = "nothing applicable";
         Collections.shuffle(allCards);
         for (String card : allCards) {
@@ -616,11 +639,11 @@ public class ButtonHelperTwilightsFallActionCards {
                     }
                 }
                 player.addOwnedUnitByID(card);
-                found = Mapper.getUnit(card).getAutoCompleteName() + "\nIt has been automatically gained";
+                found = Mapper.getUnit(card).getNameRepresentation() + ". It has been automatically gained.";
                 break;
             }
         }
-        String msg = player.getRepresentation() + " searched through the following cards and found: " + found;
+        String msg = player.getRepresentation() + " searched through the following cards and found " + found;
         MessageHelper.sendMessageToChannelWithEmbeds(player.getCorrectChannel(), msg, embeds);
         ButtonHelper.deleteMessage(event);
     }
@@ -634,9 +657,9 @@ public class ButtonHelperTwilightsFallActionCards {
                     buttons.add(Buttons.red(
                             player.getFinsFactionCheckerPrefix() + "getDamageButtons_" + pos + "_"
                                     + "deleteThis_combat",
-                            "Destroy Units in " + tile2.getRepresentationForButtons()));
-                    String msg = player.getRepresentation() + " use this button to destroy units in "
-                            + tile2.getRepresentationForButtons();
+                            "Destroy Units In " + tile2.getRepresentationForButtons()));
+                    String msg = player.getRepresentation() + ", please use this button to destroy units in "
+                            + tile2.getRepresentationForButtons() + ".";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
                 }
             }
@@ -652,7 +675,7 @@ public class ButtonHelperTwilightsFallActionCards {
                 buttons.add(Buttons.gray("starFlareStep2_" + tile.getPosition(), tile.getRepresentationForButtons()));
             }
         }
-        String msg = player.getRepresentation() + " choose the supernova you wish to have erupt.";
+        String msg = player.getRepresentation() + ", please choose the supernova you wish to have erupt.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -660,7 +683,8 @@ public class ButtonHelperTwilightsFallActionCards {
     @ButtonHandler("resolveConverge")
     public static void resolveConverge(Game game, Player player, ButtonInteractionEvent event) {
         game.setStoredValue(player.getFaction() + "graviton", "true");
-        String msg = player.getRepresentation() + " will auto target non-fighter ships/mechs in auto assigment.";
+        String msg = "Hits that " + player.getRepresentation()
+                + " produces will auto target non-fighter ships and/or mechs in the auto hit assignment.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -669,17 +693,18 @@ public class ButtonHelperTwilightsFallActionCards {
     public static void resolveAtomize(Game game, Player player, ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (tile != null) {
-            UnitHolder uh = tile.getSpaceUnitHolder();
-            for (Player player_ : game.getPlayers().values()) {
-                DestroyUnitService.destroyAllPlayerNonStructureUnits(event, game, player_, tile, uh, true);
+            for (UnitHolder uh : tile.getUnitHolders().values()) {
+                for (Player player_ : game.getPlayers().values()) {
+                    DestroyUnitService.destroyAllPlayerUnits(event, game, player_, tile, uh, true);
+                }
             }
-            String msg = player.getRepresentation() + " purged their flagship and destroyed all units in "
-                    + tile.getRepresentationForButtons();
+            String msg = player.getRepresentation() + " purged their flagship to destroy all units in "
+                    + tile.getRepresentationForButtons() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ButtonHelper.deleteMessage(event);
             player.setUnitCap("fs", 0);
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Couldnt find the active system.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Couldn't find the active system.");
         }
     }
 
@@ -688,8 +713,8 @@ public class ButtonHelperTwilightsFallActionCards {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         sendDestroyButtonsForSpecificTileAndSurrounding(game, tile);
         String msg =
-                player.getRepresentation() + " everyone should now destroy 3 units in each tile in and adjacent to "
-                        + tile.getRepresentationForButtons();
+                player.getRepresentation() + ", everyone should now destroy 3 units in each tile in and adjacent to "
+                        + tile.getRepresentationForButtons() + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }

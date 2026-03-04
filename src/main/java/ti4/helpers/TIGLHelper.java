@@ -1,17 +1,22 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -23,52 +28,50 @@ import ti4.spring.jda.JdaService;
 public class TIGLHelper {
 
     public enum TIGLRank {
-        UNRANKED("Async Rank - Unranked", 0), // <- because current formatter settings will oneline this list
-        MINISTER("Async Rank - Minister", 1), //
-        AGENT("Async Rank - Agent", 2), //
-        COMMANDER("Async Rank - Commander", 3), //
-        HERO("Async Rank - Hero", 4), //
+        UNRANKED("TIGL - Unranked", 0), // <- because current formatter settings will oneline this list
+        MINISTER("TIGL - Minister", 1), //
+        AGENT("TIGL - Agent", 2), //
+        COMMANDER("TIGL - Commander", 3), //
+        HERO("TIGL - Hero", 4), //
         EMPEROR(
-                "Async Rank - Galactic Emperor",
+                "TIGL - Galactic Emperor",
                 99), // this is only obtainable once per TIGL season, not per HERO rankup game
-        HERO_ARBOREC("Async Rank - Letani Miasmiala", -1), //
-        HERO_ARGENT("Async Rank - Mirik Aun Sissiri", -1), //
-        HERO_CABAL("Async Rank - It Feeds on Carrion", -1), //
-        HERO_EMPYREAN("Async Rank - Conservator Procyon", -1), //
-        HERO_GHOST("Async Rank - Riftwalker Meian", -1), //
-        HERO_HACAN("Async Rank - Harrugh Gefhara", -1), //
-        HERO_JOLNAR("Async Rank - Rin, The Master's Legacy", -1), //
-        HERO_KELERESA("Async Rank - Kuuasi Aun Jalatai", -1), //
-        HERO_KELERESM("Async Rank - Harka Leeds", -1), //
-        HERO_KELERESX("Async Rank - Odlynn Myrr", -1), //
-        HERO_L1Z1X("Async Rank - The Helmsman", -1), //
-        HERO_LETNEV("Async Rank - Darktalon Treilla", -1), //
-        HERO_MAHACT("Async Rank - Airo Shir Aur", -1), //
-        HERO_MENTAK("Async Rank - Ipswitch, Loose Cannon", -1), //
-        HERO_MUAAT("Async Rank - Adjudicator Ba'al", -1), //
-        HERO_NAALU("Async Rank - The Oracle", -1), //
-        HERO_NAAZ("Async Rank - Hesh and Prit", -1), //
-        HERO_NEKRO("Async Rank - UNIT.DSGN.FLAYESH", -1), //
-        HERO_NOMAD("Async Rank - Ahk-Syl Siven", -1), //
-        HERO_SAAR("Async Rank - Gurno Aggero", -1), //
-        HERO_SARDAKK("Async Rank - Sh'val, Harbinger", -1), //
-        HERO_SOL("Async Rank - Jace X, 4th Air Legion", -1), //
-        HERO_TITANS("Async Rank - Ul the Progenitor", -1), //
-        HERO_WINNU("Async Rank - Mathis Mathinus", -1), //
-        HERO_XXCHA("Async Rank - Xxekir Grom", -1), //
-        HERO_YIN("Async Rank - Dannel of the Tenth", -1), //
-        HERO_YSSARIL("Async Rank - Kyver, Blade and Key", -1);
+        HERO_ARBOREC("TIGL - Letani Miasmiala", -1), //
+        HERO_ARGENT("TIGL - Mirik Aun Sissiri", -1), //
+        HERO_CABAL("TIGL - It Feeds on Carrion", -1), //
+        HERO_EMPYREAN("TIGL - Conservator Procyon", -1), //
+        HERO_GHOST("TIGL - Riftwalker Meian", -1), //
+        HERO_HACAN("TIGL - Harrugh Gefhara", -1), //
+        HERO_JOLNAR("TIGL - Rin, The Master's Legacy", -1), //
+        HERO_KELERESA("TIGL - Kuuasi Aun Jalatai", -1), //
+        HERO_KELERESM("TIGL - Harka Leeds", -1), //
+        HERO_KELERESX("TIGL - Odlynn Myrr", -1), //
+        HERO_L1Z1X("TIGL - The Helmsman", -1), //
+        HERO_LETNEV("TIGL - Darktalon Treilla", -1), //
+        HERO_MAHACT("TIGL - Airo Shir Aur", -1), //
+        HERO_MENTAK("TIGL - Ipswitch, Loose Cannon", -1), //
+        HERO_MUAAT("TIGL - Adjudicator Ba'al", -1), //
+        HERO_NAALU("TIGL - The Oracle", -1), //
+        HERO_NAAZ("TIGL - Hesh and Prit", -1), //
+        HERO_NEKRO("TIGL - UNIT.DSGN.FLAYESH", -1), //
+        HERO_NOMAD("TIGL - Ahk-Syl Siven", -1), //
+        HERO_SAAR("TIGL - Gurno Aggero", -1), //
+        HERO_SARDAKK("TIGL - Sh'val, Harbinger", -1), //
+        HERO_SOL("TIGL - Jace X, 4th Air Legion", -1), //
+        HERO_TITANS("TIGL - Ul the Progenitor", -1), //
+        HERO_WINNU("TIGL - Mathis Mathinus", -1), //
+        HERO_XXCHA("TIGL - Xxekir Grom", -1), //
+        HERO_YIN("TIGL - Dannel of the Tenth", -1), //
+        HERO_YSSARIL("TIGL - Kyver, Blade and Key", -1);
 
+        @Getter
         private final String name;
+
         private final Integer index;
 
         TIGLRank(String name, int index) {
             this.name = name;
             this.index = index;
-        }
-
-        public String getName() {
-            return name;
         }
 
         public String getShortName() {
@@ -103,6 +106,13 @@ public class TIGLHelper {
             };
         }
 
+        public static List<TIGLRank> getSortedRanks() {
+            return Stream.of(values())
+                    .filter(rank -> rank.index >= 0)
+                    .sorted(Comparator.comparing(TIGLRank::getIndex))
+                    .toList();
+        }
+
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
          *
@@ -110,6 +120,7 @@ public class TIGLHelper {
          * @return the SimpleStatistics enum value, or null if not found
          */
         public static TIGLRank fromString(String id) {
+            if (isBlank(id)) return null;
             for (TIGLRank rank : values()) {
                 if (id.equals(rank.toString())) {
                     return rank;
@@ -135,7 +146,7 @@ public class TIGLHelper {
             BotLogger.warning("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
             tiglProblem = true;
         }
-        if (!JdaService.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
+        if (!Constants.ASYNCTI4_HUB_SERVER_ID.equals(JdaService.guildPrimaryID)) {
             return tiglProblem;
         }
         for (TIGLRank rank : TIGLRank.values()) {
@@ -148,7 +159,16 @@ public class TIGLHelper {
     }
 
     public static void initializeTIGLGame(Game game) {
+        initializeTIGLGame(game, isFracturedTIGLGame(game));
+    }
+
+    public static void initializeTIGLGame(Game game, boolean isFractured) {
         game.setCompetitiveTIGLGame(true);
+        if (isFractured) {
+            addFracturedTag(game);
+        } else {
+            removeFracturedTag(game);
+        }
         sendTIGLSetupText(game);
         List<User> users =
                 game.getPlayers().values().stream().map(Player::getUser).toList();
@@ -168,11 +188,9 @@ public class TIGLHelper {
     public static void sendTIGLSetupText(Game game) {
         String message = "# " + MiscEmojis.TIGL
                 + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n"
-                + "Please ensure you have all:\n"
-                + "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6) - there is no need to confirm your signup was successful\n"
-                + "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n"
-                + "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n"
-                + "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct";
+                + "Please ensure you have all read the TIGL [Code of Conduct](https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0#heading=h.v2yzcvem3ohu)\n"
+                + "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct.\n\n"
+                + "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n and the [Rules Document](https://docs.google.com/document/d/1WoFPiluIz5cw80x1-WxUeckADIdYszNFZFTb6d648tk/edit?tab=t.0)";
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
     }
 
@@ -252,7 +270,9 @@ public class TIGLHelper {
     private static void promoteUser(User user, TIGLRank toRank) {
         TIGLRank currentRank = getUsersHighestTIGLRank(user);
         if (toRank.getIndex() - currentRank.getIndex() == 1) {
-            JdaService.guildPrimary.addRoleToMember(user, toRank.getRole()).queue();
+            JdaService.guildPrimary
+                    .addRoleToMember(user, toRank.getRole())
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
             // JdaService.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5,
             // TimeUnit.SECONDS);
         }
@@ -282,7 +302,9 @@ public class TIGLHelper {
                     .removeRoleFromMember(member, heroRank.getRole())
                     .queueAfter(10, TimeUnit.SECONDS);
         }
-        JdaService.guildPrimary.addRoleToMember(user, heroRank.getRole()).queue();
+        JdaService.guildPrimary
+                .addRoleToMember(user, heroRank.getRole())
+                .queue(Consumers.nop(), BotLogger::catchRestError);
         MessageHelper.sendMessageToChannel(
                 getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
         MessageHelper.sendMessageToChannel(getTIGLChannel(), sb.toString());
@@ -336,5 +358,22 @@ public class TIGLHelper {
             }
         }
         return thread;
+    }
+
+    // Fractured
+    public static boolean isFracturedTIGLGame(Game game) {
+        return game.getTags().contains(Constants.TIGL_FRACTURED_TAG);
+    }
+
+    public static void addFracturedTag(Game game) {
+        if (!isFracturedTIGLGame(game)) {
+            game.addTag(Constants.TIGL_FRACTURED_TAG);
+        }
+    }
+
+    public static void removeFracturedTag(Game game) {
+        if (isFracturedTIGLGame(game)) {
+            game.removeTag(Constants.TIGL_FRACTURED_TAG);
+        }
     }
 }

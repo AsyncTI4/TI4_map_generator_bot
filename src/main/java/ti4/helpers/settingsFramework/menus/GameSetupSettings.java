@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.menus;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -11,8 +10,10 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
+import ti4.helpers.settingsFramework.settings.BooleanSettingWithCustomAction;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -21,6 +22,7 @@ import ti4.map.Player;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import tools.jackson.databind.JsonNode;
 
 @Getter
 public class GameSetupSettings extends SettingsMenu {
@@ -34,7 +36,8 @@ public class GameSetupSettings extends SettingsMenu {
     private final IntegerSetting stage1s;
     private final IntegerSetting stage2s;
     private final IntegerSetting secrets;
-    private final BooleanSetting tigl;
+    private final BooleanSettingWithCustomAction tigl;
+    private final BooleanSettingWithCustomAction tiglFractured;
     private final BooleanSetting alliance;
     // Categories
     private final DeckSettings decks;
@@ -47,18 +50,21 @@ public class GameSetupSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
     // ---------------------------------------------------------------------------------------------------------------------------------
-    public GameSetupSettings(Game game, JsonNode json, SettingsMenu parent) {
+    GameSetupSettings(@NotNull Game game, JsonNode json, SettingsMenu parent) {
         super(MENU_ID, "Game setup settings", "Edit core game setup rules", parent);
         this.game = game;
 
         // Initialize Settings to default values
-        int defaultVP = game == null ? 10 : game.getVp();
+        int defaultVP = game.getVp();
         pointTotal = new IntegerSetting("Points", "Point Total", defaultVP, 1, 20, 1);
         stage1s = new IntegerSetting("Stage1s", "number of Stage 1 public objectives", 5, 1, 20, 1);
         stage2s = new IntegerSetting("Stage2s", "number of Stage 2 public objectives", 5, 1, 20, 1);
         secrets = new IntegerSetting("Secrets", "Max number of secret objectives", 3, 1, 10, 1);
-        boolean defaultTigl = game != null && game.isCompetitiveTIGLGame();
-        tigl = new BooleanSetting("TIGL", "TIGL Game", defaultTigl);
+        boolean defaultTigl = game.isCompetitiveTIGLGame();
+        tigl = new BooleanSettingWithCustomAction(
+                "TIGL", "TIGL Game", defaultTigl, (value) -> ensureTIGLConsistency(true, false));
+        tiglFractured = new BooleanSettingWithCustomAction(
+                "TIGL Fractured", "TIGL Fractured Game", false, (value) -> ensureTIGLConsistency(false, true));
         alliance = new BooleanSetting("Alliance", "Alliance Mode", false);
 
         // Initialize values & keys for gamePlayers
@@ -76,23 +82,27 @@ public class GameSetupSettings extends SettingsMenu {
         stage2s.setEmoji(CardEmojis.Public2);
         secrets.setEmoji(CardEmojis.SecretObjective);
         tigl.setEmoji(MiscEmojis.TIGL);
+        tiglFractured.setEmoji(MiscEmojis.TIGL);
         alliance.setEmoji(SourceEmojis.StrategicAlliance);
 
         // Other init
         gamePlayers.setShow(Player::getUserName);
 
         // Load JSON if applicable
-        if (json != null && json.has("menuId") && json.get("menuId").asText("").equals(MENU_ID)) {
+        if (json != null
+                && json.has("menuId")
+                && MENU_ID.equals(json.get("menuId").asText(""))) {
             pointTotal.initialize(json.get("pointTotal"));
             stage1s.initialize(json.get("stage1s"));
             stage2s.initialize(json.get("stage2s"));
             secrets.initialize(json.get("secrets"));
             tigl.initialize(json.get("tigl"));
+            tiglFractured.initialize(json.get("tiglFractured"));
             alliance.initialize(json.get("alliance"));
             gamePlayers.initialize(json.get("gamePlayers"));
         }
 
-        decks = new DeckSettings(json, this, Optional.ofNullable(game));
+        decks = new DeckSettings(json, this, game);
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -115,6 +125,7 @@ public class GameSetupSettings extends SettingsMenu {
         settings.add(stage2s);
         settings.add(secrets);
         settings.add(tigl);
+        settings.add(tiglFractured);
         settings.add(alliance);
         return settings;
     }
@@ -142,6 +153,20 @@ public class GameSetupSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
+    private void ensureTIGLConsistency(boolean userToggleTIGL, boolean userToggleTIGLFractured) {
+        if (userToggleTIGL) {
+            boolean tiglStatus = tigl.isVal();
+            if (!tiglStatus) {
+                tiglFractured.setVal(false); // keep fractured off if TIGL is turned off
+            }
+        }
+        if (userToggleTIGLFractured) {
+            boolean fracturedStatus = tiglFractured.isVal();
+            if (fracturedStatus) {
+                tigl.setVal(true); // keep TIGL on if fractured is on
+            }
+        }
+    }
 
     private String preset444() {
         pointTotal.setVal(12);

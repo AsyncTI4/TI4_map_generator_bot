@@ -1,13 +1,5 @@
-# Application configuration:
-# - What: Configures server port and Spring Boot Actuator Prometheus exposure.
-# - How: 'server.port' sets the HTTP port; 'management.*' configures actuator endpoints and metrics export.
-
 server:
   port: 8081
-  error:
-    include-message: always
-    include-binding-errors: never
-    include-stacktrace: never
 
 management:
   endpoints:
@@ -20,18 +12,27 @@ spring:
     url: "jdbc:sqlite:${DB_PATH:./}/tibot.db"
     driver-class-name: org.sqlite.JDBC
     hikari:
-      maximum-pool-size: 10
+      # SQLite permits only one writer at a time; extra pooled connections increase lock contention.
+      maximum-pool-size: 1
       connection-init-sql: |
-        PRAGMA busy_timeout=5000;
+        PRAGMA journal_mode=WAL;
+        PRAGMA busy_timeout=30000;
         PRAGMA synchronous=NORMAL;
   jpa:
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
       ddl-auto: update
     properties:
-      hibernate.jdbc.time_zone: UTC
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: UTC
+          batch_size: 100
+          order_inserts: true
+          order_updates: true
+          generate_statistics: false
     open-in-view: false
-  data:
-    jdbc:
-      repositories:
-        enabled: false
+  web:
+    error:
+      include-stacktrace: never
+      include-binding-errors: never
+      include-message: always

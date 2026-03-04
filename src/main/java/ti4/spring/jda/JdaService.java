@@ -1,5 +1,6 @@
 package ti4.spring.jda;
 
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
@@ -14,12 +15,15 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.apache.commons.lang3.function.Consumers;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.stereotype.Service;
 import ti4.commands.CommandManager;
@@ -34,10 +38,10 @@ import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.LongExecutionHistoryCron;
 import ti4.cron.OldUndoFileCleanupCron;
+import ti4.cron.PersistToSqlCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
-import ti4.cron.ThreadArchiveCron;
 import ti4.cron.UploadRecentStatsCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCron;
@@ -60,6 +64,7 @@ import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
+import ti4.listeners.ThreadCreateListener;
 import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
 import ti4.map.persistence.GameManager;
@@ -99,6 +104,8 @@ public class JdaService {
     private static Guild guildDecenary;
     private static Guild guildUndenary;
     private static Guild guildDuodenary;
+    private static Guild guildTredenary;
+    private static Guild guildQuadrodenary;
     public static Guild guildFogOfWar;
     public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
@@ -142,20 +149,22 @@ public class JdaService {
                 new UserJoinServerListener(),
                 new AutoCompleteListener(),
                 new BanListener(),
+                new ThreadCreateListener(),
 
                 // Non-Priority Listeners
                 new DeletionListener(),
                 new SelectionMenuListener(),
                 new ChannelCreationListener(),
                 new UserLeaveServerListener(),
-                ModalListener.getInstance() // ModalListener has a long init time
-                );
+                // ModalListener has a long init time
+                ModalListener.getInstance());
 
         BotLogger.info("AWAITING JDA READY");
         try {
             jda.awaitReady();
-        } catch (InterruptedException e) {
-            BotLogger.error("Error waiting for bot to get ready", e);
+        } catch (Throwable t) {
+            BotLogger.critical("Error waiting for bot to get ready", t);
+            return;
         }
 
         jda.getPresence()
@@ -165,100 +174,109 @@ public class JdaService {
 
         // Primary HUB Server
         guildPrimaryID = args[2];
-        initGuild(args[2], false);
+        tryToInitGuild(args[2], false);
+
+        if (guildPrimary == null) {
+            BotLogger.critical("Failed to start the bot on the primary guild. Aborting.");
+            return;
+        }
 
         // Community Plays TI
         if (args.length >= 4) {
-            guildCommunityPlays = initGuild(args[3], false);
+            guildCommunityPlays = tryToInitGuild(args[3], false);
         }
 
         // Async: FOW Chapter
         if (args.length >= 5) {
-            guildFogOfWar = initGuild(args[4], false);
-            fowServers.add(guildFogOfWar);
+            guildFogOfWar = tryToInitGuild(args[4], false);
+            if (guildFogOfWar != null) fowServers.add(guildFogOfWar);
         }
 
         // Async: Stroter's Paradise
         if (args.length >= 6) {
-            guildSecondary = initGuild(args[5], true);
+            guildSecondary = tryToInitGuild(args[5], true);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
-            guildTertiary = initGuild(args[6], true);
+            guildTertiary = tryToInitGuild(args[6], true);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
-            guildQuaternary = initGuild(args[7], true);
+            guildQuaternary = tryToInitGuild(args[7], true);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
-            guildQuinary = initGuild(args[8], true);
+            guildQuinary = tryToInitGuild(args[8], true);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
-            guildSenary = initGuild(args[9], true);
+            guildSenary = tryToInitGuild(args[9], true);
         }
 
         // Async: Duder's Domain
         if (args.length >= 11) {
-            guildSeptenary = initGuild(args[10], true);
+            guildSeptenary = tryToInitGuild(args[10], true);
         }
 
         // Async: What's up Dock
         if (args.length >= 12) {
-            guildOctonary = initGuild(args[11], true);
+            guildOctonary = tryToInitGuild(args[11], true);
         }
 
         // Async: Megagame server
         if (args.length >= 13) {
-            guildMegagame = initGuild(args[12], false);
+            guildMegagame = tryToInitGuild(args[12], false);
         }
 
         // Async: Ship Flag
         if (args.length >= 14) {
-            guildNonary = initGuild(args[13], true);
+            guildNonary = tryToInitGuild(args[13], true);
         }
 
         // Async: FOW Chapter Secondary
         if (args.length >= 15) {
-            guildFogOfWarSecondary = initGuild(args[14], false);
-            fowServers.add(guildFogOfWarSecondary);
+            guildFogOfWarSecondary = tryToInitGuild(args[14], false);
+            if (guildFogOfWarSecondary != null) fowServers.add(guildFogOfWarSecondary);
         }
 
         // Async: Tournament Server 1
         if (args.length >= 16) {
-            guildTourney = initGuild(args[15], false);
+            guildTourney = tryToInitGuild(args[15], false);
         }
 
         // Async: Great Carrier Reef
         if (args.length >= 17) {
-            guildDecenary = initGuild(args[16], true);
+            guildDecenary = tryToInitGuild(args[16], true);
         }
 
         // Async: PDStrians
         if (args.length >= 18) {
-            guildUndenary = initGuild(args[17], true);
+            guildUndenary = tryToInitGuild(args[17], true);
         }
 
-        // Async: 12th Server
+        // Async: Stroaty McStroatface
         if (args.length >= 19) {
-            guildDuodenary = initGuild(args[18], true);
+            guildDuodenary = tryToInitGuild(args[18], true);
         }
 
-        if (guildPrimary == null || guilds.isEmpty()) {
-            BotLogger.info("Failed to start the bot on the primary guild. Aborting.");
-            BotLogger.warning("Failed to start the bot on the primary guild. Aborting.");
-            BotLogger.error("Failed to start the bot on the primary guild. Aborting.");
-            return;
+        // Async: Planetary Duck System
+        if (args.length >= 20) {
+            guildTredenary = tryToInitGuild(args[19], true);
+        }
+
+        // Async: Dannel's Camp Ground
+        if (args.length >= 21) {
+            guildQuadrodenary = tryToInitGuild(args[20], true);
         }
 
         BotLogger.info("FINISHED INITIALIZING SERVERS\n> "
-                + guilds.size() + " servers connected\n> "
-                + serversToCreateNewGamesOn.size() + " servers for new games");
+                + guilds.size() + " total servers connected\n> "
+                + serversToCreateNewGamesOn.size() + " Overflow servers for new games\n> "
+                + fowServers.size() + " Fog of War servers");
 
         // Attempt to start a "Search Only" version of the bot on eligible servers
         for (Guild searchGuild : jda.getGuilds()) {
@@ -307,6 +325,7 @@ public class JdaService {
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCron.register();
+        PersistToSqlCron.register();
         UploadStatsCron.register();
         UploadRecentStatsCron.register();
         OldUndoFileCleanupCron.register();
@@ -316,7 +335,6 @@ public class JdaService {
         SabotageAutoReactCron.register();
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        ThreadArchiveCron.register();
         InteractionLogCron.register();
         LongExecutionHistoryCron.register();
         CategoryCleanupCron.register();
@@ -327,7 +345,22 @@ public class JdaService {
         updatePresence();
     }
 
+    private static Guild tryToInitGuild(String guildID, boolean addToNewGameServerList) {
+        try {
+            return initGuild(guildID, addToNewGameServerList);
+        } catch (Throwable t) {
+            BotLogger.critical("Failed to initialize guild " + guildID + ". Skipping.", t);
+            return null;
+        }
+    }
+
     private static Guild initGuild(String guildID, boolean addToNewGameServerList) {
+        if (!guildID.matches("\\b[0-9]+\\b")) {
+            BotLogger.error(
+                    "Invalid Guild ID provided: `" + guildID
+                            + "` - If this is running in Production, please correct the ID [here](https://github.com/AsyncTI4/TI4_map_generator_bot/settings/variables/actions/GUILDID_LIST)");
+            return null;
+        }
         Guild guild = jda.getGuildById(guildID);
         if (guild == null) {
             BotLogger.error("JDA FAILED TO FIND GUILD with ID: `" + guildID
@@ -355,7 +388,7 @@ public class JdaService {
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.register(commands));
-            commands.queue();
+            commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
@@ -370,7 +403,7 @@ public class JdaService {
         // are still in
         if (guild == null) return false;
         if (System.getenv("TESTING") != null) return false;
-        if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
+        if (Constants.ASYNCTI4_HUB_SERVER_ID.equals(guild.getId())) return false;
 
         // Disable this for now
         if (true) return false;
@@ -378,7 +411,7 @@ public class JdaService {
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
-            commands.queue();
+            commands.queue(Consumers.nop(), BotLogger::catchRestError);
             BotLogger.info("SEARCH-ONLY BOT STARTED UP: " + guild.getName());
             guilds.add(guild);
         } catch (Exception e) {
@@ -416,14 +449,17 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1434632452097446046")); // Async Tourney
         adminRoles.add(jda.getRoleById("1434180793139204204")); // Async Decenary (Great Carrier Reef)
         adminRoles.add(jda.getRoleById("1434181175944941655")); // Async Undenary (PDStrians)
-        adminRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
+        adminRoles.add(jda.getRoleById("1458844879709929540")); // Async Duodenary (Stroaty McStroatface)
+        adminRoles.add(jda.getRoleById("1458845770672377997")); // Async Tredenary (Planetary Duck System)
+        adminRoles.add(jda.getRoleById("1458845518393246040")); // Async Quadrodenary (Dannel's Camp Ground)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1429853811899502675")); // FoW Server Chapter 2
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
         adminRoles.add(jda.getRoleById("1218342096474341396")); // Megagame Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
+        adminRoles.add(jda.getRoleById("1443842222922530929")); // Spice & Thyme's Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
-        adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
+        adminRoles.add(jda.getRoleById("1072366828879355935")); // Jazz's Server
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
         adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.add(jda.getRoleById("824111008863092757")); // Fireseal's Server
@@ -439,6 +475,8 @@ public class JdaService {
         adminRoles.add(jda.getRoleById("1378475691531567185")); // Hadouken's Server
         adminRoles.add(jda.getRoleById("1149705227625316352")); // Will's server
         adminRoles.add(jda.getRoleById("1335330636935987343")); // Jabberwocky's server
+        adminRoles.add(jda.getRoleById("1465619434839347276")); // Ariel's server
+
         adminRoles.removeIf(Objects::isNull);
 
         // DEVELOPER ROLES
@@ -456,7 +494,9 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1434632452097446045")); // Async Tourney
         developerRoles.add(jda.getRoleById("1434180793139204203")); // Async Decenary (Great Carrier Reef)
         developerRoles.add(jda.getRoleById("1434181175944941654")); // Async Undenary (PDStrians)
-        developerRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
+        developerRoles.add(jda.getRoleById("1458844879709929538")); // Async Duodenary (Stroaty McStroatface)
+        developerRoles.add(jda.getRoleById("1458845770672377995")); // Async Tredenary (Planetary Duck System)
+        developerRoles.add(jda.getRoleById("1458845518393246038")); // Async Quadrodenary (Dannel's Camp Ground)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.add(jda.getRoleById("1429853811882594528")); // FoW Server Chapter 2
         developerRoles.add(jda.getRoleById("1395072365389680711")); // Megagame Server
@@ -471,6 +511,8 @@ public class JdaService {
         developerRoles.add(jda.getRoleById("1378475796301217792")); // Hadouken's Server
         developerRoles.add(jda.getRoleById("1406188584163213332")); // Will's server
         developerRoles.add(jda.getRoleById("1335330959767375902")); // Jabberwocky's server
+        developerRoles.add(jda.getRoleById("1465619572718567526")); // Ariel's server
+
         developerRoles.removeIf(Objects::isNull);
 
         // BOTHELPER ROLES
@@ -489,7 +531,9 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1434632452097446043")); // Async Tourney
         bothelperRoles.add(jda.getRoleById("1434180793139204201")); // Async Decenary (Great Carrier Reef)
         bothelperRoles.add(jda.getRoleById("1434181175944941652")); // Async Undenary (PDStrians)
-        bothelperRoles.add(jda.getRoleById("0000000000000000000")); // Async Duodenary (TBD)
+        bothelperRoles.add(jda.getRoleById("1458844879709929536")); // Async Duodenary (Stroaty McStroatface)
+        bothelperRoles.add(jda.getRoleById("1458845770672377993")); // Async Tredenary (Planetary Duck System)
+        bothelperRoles.add(jda.getRoleById("1458845518393246036")); // Async Quadrodenary (Dannel's Camp Ground)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1429853811891241128")); // FoW Server Chapter 2 Bothelper
@@ -507,6 +551,8 @@ public class JdaService {
         bothelperRoles.add(jda.getRoleById("1378475822528204901")); // Hadouken's Server
         bothelperRoles.add(jda.getRoleById("1150031360610799676")); // Will's server
         bothelperRoles.add(jda.getRoleById("1335331011147595929")); // Jabberwocky's Server
+        bothelperRoles.add(jda.getRoleById("1465619810577678442")); // Ariel's server
+
         bothelperRoles.removeIf(Objects::isNull);
     }
 
@@ -528,6 +574,15 @@ public class JdaService {
 
     public static boolean isValidGuild(String guildId) {
         return guilds.stream().anyMatch(g -> g.getId().equals(guildId));
+    }
+
+    @Nullable
+    public static String getUsername(String userId) {
+        Member member = guildPrimary.getMemberById(userId);
+        if (member != null) return member.getEffectiveName();
+        User user = jda.getUserById(userId);
+        if (user != null) return user.getEffectiveName();
+        return null;
     }
 
     @PreDestroy

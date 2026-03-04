@@ -92,7 +92,11 @@ public class FactionRecordOfTechService {
                     startingTech = factionModel.getStartingTech();
                 }
                 if (startingTech != null && !startingTech.contains(tech)) {
-                    String techName = Mapper.getTech(tech).getName();
+                    var techModel = Mapper.getTech(tech);
+                    if (techModel == null) {
+                        continue;
+                    }
+                    String techName = techModel.getName();
                     if (techsResearched.containsKey(techName)) {
                         techsResearched.put(techName, techsResearched.get(techName) + 1);
                     } else {

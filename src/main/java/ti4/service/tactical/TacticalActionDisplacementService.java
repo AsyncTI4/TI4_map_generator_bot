@@ -78,6 +78,11 @@ public class TacticalActionDisplacementService {
         if (player.hasAbility("miniaturization")) {
             movableFromPlanets.addAll(List.of(UnitType.Spacedock, UnitType.Pds));
         }
+        if (player.hasTech("dsmirvpds")
+                || player.hasUnlockedBreakthrough("mirvedabt")
+                || player.hasUnit("mirveda_pds")) {
+            movableFromPlanets.add(UnitType.Pds);
+        }
 
         Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

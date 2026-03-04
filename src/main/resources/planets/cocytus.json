@@ -5,12 +5,17 @@
     "aliases": ["cocy", "cody", "cocytus", "codytct"],
     "resources": 3,
     "influence": 0,
-    "planetTypes": ["NONE"],
+    "planetTypes": ["LIGHTNING"],
     "planetLayout": {
         "unitHolderName": "cocytus",
         "resourcesLocation": "BottomLeft",
         "centerPosition": { "x": 170.0, "y": 150.0 },
         "extraIcons": 1
     },
+    "positionInTile": {
+        "x": 172.0,
+        "y": 150.0
+    },
+    "contrastColor": "orange",
     "source": "thunders_edge"
 }

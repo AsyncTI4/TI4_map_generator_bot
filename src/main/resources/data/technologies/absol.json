@@ -262,7 +262,8 @@
         ],
         "requirements": "R",
         "source": "absol",
-        "text": "You may produce 1 additional mech for their cost. [Note: think of mechs as now similar to fighters and infantry, buy 2 for the price of 1]\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
+        "text": "You may produce 1 additional mech for their cost.\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
+        "notes": "Think of mechs as now similar to fighters and infantry, buy 2 for the price of 1.",
         "homebrewReplacesID": "sar",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/SelfAssemblyRoutines.png?raw=true"
     },
@@ -1016,7 +1017,8 @@
         "requirements": "Y",
         "faction": "keleres",
         "source": "absol",
-        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\n\n[Custodia Vigilia is a 2/3 legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Custodians VP using Imperial Primary.]",
+        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.",
+        "notes": "Custodia Vigilia is a 2r/3i legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores the Mecatol Rex VP using Imperial Primary.",
         "homebrewReplacesID": "iihq",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/iihq_modernization.jpg?raw=true"
     },

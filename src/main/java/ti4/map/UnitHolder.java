@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.Getter;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
@@ -35,23 +37,37 @@ import ti4.model.UnitModel;
 @Data
 public abstract class UnitHolder {
 
+    @Getter
     private final String name;
+
     private final Point holderCenterPosition;
 
-    private final Map<UnitKey, List<Integer>> unitsByState = new HashMap<>();
+    private final Map<UnitKey, List<Integer>> unitsByState = new LinkedHashMap<>();
     private final Set<String> ccList = new LinkedHashSet<>();
     private final Set<String> controlList = new LinkedHashSet<>();
     protected final Set<String> tokenList = new LinkedHashSet<>();
 
-    public String getName() {
-        return name;
+    protected UnitHolder(String name, Point holderCenterPosition) {
+        this.name = name;
+        this.holderCenterPosition = holderCenterPosition;
     }
 
     @JsonCreator
     protected UnitHolder(
-            @JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
+            @JsonProperty("name") String name,
+            @JsonProperty("holderCenterPosition") Point holderCenterPosition,
+            @JsonProperty("unitsByState") Map<UnitKey, List<Integer>> unitsByState,
+            @JsonProperty("ccList") Set<String> ccList,
+            @JsonProperty("controlList") Set<String> controlList,
+            @JsonProperty("tokenList") Set<String> tokenList) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
+
+        // Fill the final collections if data exists in JSON
+        if (unitsByState != null) this.unitsByState.putAll(unitsByState);
+        if (ccList != null) this.ccList.addAll(ccList);
+        if (controlList != null) this.controlList.addAll(controlList);
+        if (tokenList != null) this.tokenList.addAll(tokenList);
     }
 
     public abstract String getRepresentation(Game game);
@@ -243,7 +259,7 @@ public abstract class UnitHolder {
         return unitsByState.entrySet().stream()
                 .filter(e -> getTotalUnitCount(e.getValue()) > 0)
                 .map(Entry::getKey)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Deprecated

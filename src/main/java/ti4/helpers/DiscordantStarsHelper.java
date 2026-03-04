@@ -8,6 +8,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -18,9 +19,11 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.GenericCardModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -43,7 +46,7 @@ public class DiscordantStarsHelper {
                         if (planet.hasGroundForces(game)
                                 && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                             planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                        } else if (!planet.hasGroundForces(game)) {
+                        } else if (!planet.hasGroundForces(game) && !planet.isSpaceStation()) {
                             planet.addToken(Constants.GARDEN_WORLDS_PNG);
                         }
                     } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
@@ -55,25 +58,33 @@ public class DiscordantStarsHelper {
     }
 
     public static void checkTFTerraform(Game game) {
-        List<String> planets = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            if (player.hasTech("tf-terraform")) {
-
+        if (game.isTwilightsFallMode()) {
+            for (Player player : game.getRealPlayers()) {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder instanceof Planet planet) {
                             if (player.getPlanets().contains(planet.getName())) {
-                                if (!planet.hasStructures(game)
-                                        && planet.getTokenList().contains("attachment_threetraits.png")) {
-                                    planet.removeToken("attachment_threetraits.png");
-                                } else if (planet.hasStructures(game)) {
-                                    planet.addToken("attachment_threetraits.png");
-                                    planets.add(planet.getName());
+                                if (planet.getTokenList().contains("attachment_threetraits.png")) {
+                                    if (!game.isMinorFactionsMode()
+                                            || tile.getTileModel().getTileBack() != TileBack.GREEN
+                                            || tile.isHomeSystem(game)) {
+                                        planet.removeToken("attachment_threetraits.png");
+                                    }
                                 }
-                            } else if (planet.getTokenList().contains("attachment_threetraits.png")
-                                    && !planets.contains(planet.getName())) {
-
-                                planet.removeToken("attachment_threetraits.png");
+                            }
+                        }
+                    }
+                }
+                if (player.hasTech("tf-terraform")) {
+                    for (Tile tile : game.getTileMap().values()) {
+                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                            if (unitHolder instanceof Planet planet) {
+                                if (player.getPlanets().contains(planet.getName())) {
+                                    if (planet.hasStructures(game)
+                                            && !planet.getTokenList().contains("attachment_threetraits.png")) {
+                                        planet.addToken("attachment_threetraits.png");
+                                    }
+                                }
                             }
                         }
                     }
@@ -375,7 +386,7 @@ public class DiscordantStarsHelper {
                 player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> "
                         + tileToPullFromUnshuffled);
 
-        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ids.size() == 1) {
             ButtonHelper.starChartStep1(game, player, ids.getFirst());
         }
@@ -412,7 +423,7 @@ public class DiscordantStarsHelper {
                 player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
-        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue(Consumers.nop(), BotLogger::catchRestError);
         if (ids.size() == 1) {
             ButtonHelper.starChartStep1(game, player, ids.getFirst());
 
@@ -529,6 +540,9 @@ public class DiscordantStarsHelper {
                 .toList();
         for (String planetId : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetId);
+            if (planet == null) {
+                continue;
+            }
             int mechsOnPlanet = planet.getUnitCount(UnitType.Mech, player);
             if (mechsOnPlanet == 0) {
                 continue;

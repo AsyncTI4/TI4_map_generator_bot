@@ -36,11 +36,18 @@ public class SusSlashCommandService {
         boolean isNotGameChannel = event.getMessageChannel() != managedGame.getActionsChannel()
                 && event.getMessageChannel() != managedGame.getTableTalkChannel()
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
+        boolean isSinglePlayerGame = managedGame.getRealPlayers().size() <= 1;
 
         if (isReplaceOrLeaveCommand(event)) {
             reportToModerationLog(event, jumpUrl);
-        } else if (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread) {
+        } else if (!managedGame.isFowMode()
+                && !isSinglePlayerGame
+                && (isPrivateThread || isNotGameChannel)
+                && !isPublicThread) {
             reportToSusSlashCommandLog(event, jumpUrl);
+            String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
+                    + event.getFullCommandName() + "`";
+            MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
         }
 
         if (managedGame.isFowMode()) {

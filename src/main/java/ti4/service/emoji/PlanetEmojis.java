@@ -48,6 +48,7 @@ public enum PlanetEmojis implements TI4Emoji {
     Retillion,
     Shalloq, // Yssaril
     SpaceStation, // Space Station
+    Lightning, // TE and Fracture
     // Base/PoK non-home
     Ang,
     ArchonVail,
@@ -112,6 +113,52 @@ public enum PlanetEmojis implements TI4Emoji {
     Abaddon,
     Ashtroth,
     Loki, //
+
+    CustodiaVigilia,
+
+    // TE
+    Ordinian,
+    Revelation,
+    MezLoOrzFeiZsha,
+    RepLoOrzQet,
+    Ikatena,
+    Cronos,
+    CronosHollow,
+    Tallin,
+    TallinHollow,
+    Faunus,
+    Garbozia,
+    Emelpar,
+    Tempesta,
+    Olergodt,
+    Andeara,
+    ViraPicsIII,
+    Lesab,
+    NewTerra,
+    Tinnes,
+    Cresius,
+    LazulRex,
+    Tiamat,
+    Hercalor,
+    Kostboth,
+    Capha,
+    Bellatrix,
+    TsionStation,
+    ElNath,
+    Horizon,
+    LuthenVI,
+    Tarana,
+    OluzStation,
+    Industrex,
+    Lemox,
+    TheWatchtower,
+    AhkCreuxx,
+    ThundersEdge,
+    Avernus,
+    Cocytus,
+    Lethe,
+    Phlegethon,
+    Styx,
 
     // DS
     Derbrae,
@@ -335,7 +382,7 @@ public enum PlanetEmojis implements TI4Emoji {
             case "lor" -> Lor;
             case "maaluuk" -> Maaluuk;
             case "mallice", "lockedmallice", "hexmallice", "hexlockedmalice" -> Mallice;
-            case "mr" -> Mecatol;
+            case "mr", "mrte" -> Mecatol;
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
@@ -413,6 +460,52 @@ public enum PlanetEmojis implements TI4Emoji {
             case "tarrock" -> Tarrock;
             case "troac" -> Troac;
             case "vioss" -> Vioss;
+
+            case "custodiavigilia" -> CustodiaVigilia;
+
+            // TE
+            case "ordinian", "ordinianc4" -> Ordinian;
+            case "revelation" -> Revelation;
+            case "mez" -> MezLoOrzFeiZsha;
+            case "rep" -> RepLoOrzQet;
+            case "ikatena" -> Ikatena;
+            case "cronos" -> Cronos;
+            case "cronoshollow" -> CronosHollow;
+            case "tallin" -> Tallin;
+            case "tallinhollow" -> TallinHollow;
+            case "faunus" -> Faunus;
+            case "garbozia" -> Garbozia;
+            case "emelpar" -> Emelpar;
+            case "tempesta" -> Tempesta;
+            case "olergodt" -> Olergodt;
+            case "andeara" -> Andeara;
+            case "virapicsiii" -> ViraPicsIII;
+            case "lesab" -> Lesab;
+            case "neutera" -> NewTerra;
+            case "tinnes" -> Tinnes;
+            case "cresius" -> Cresius;
+            case "lazulrex" -> LazulRex;
+            case "tiamat" -> Tiamat;
+            case "hercalor" -> Hercalor;
+            case "kostboth" -> Kostboth;
+            case "capha" -> Capha;
+            case "bellatrix" -> Bellatrix;
+            case "tsionstation" -> TsionStation;
+            case "elnath" -> ElNath;
+            case "horizon" -> Horizon;
+            case "luthieniv" -> LuthenVI;
+            case "tarana" -> Tarana;
+            case "oluzstation" -> OluzStation;
+            case "industrex" -> Industrex;
+            case "lemox" -> Lemox;
+            case "thewatchtower" -> TheWatchtower;
+            case "ahkcreuxx" -> AhkCreuxx;
+            case "thundersedge" -> ThundersEdge;
+            case "avernus" -> Avernus;
+            case "cocytus" -> Cocytus;
+            case "lethe" -> Lethe;
+            case "phlegethon" -> Phlegethon;
+            case "styx" -> Styx;
 
             // Eronous' Planets
             case "adoriah" -> Adoriah;

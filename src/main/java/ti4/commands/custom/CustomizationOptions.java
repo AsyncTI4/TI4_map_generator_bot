@@ -9,10 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.message.MessageHelper;
+import ti4.service.map.SpinService;
 
 class CustomizationOptions extends GameStateSubcommand {
 
@@ -45,23 +44,28 @@ class CustomizationOptions extends GameStateSubcommand {
                 .addChoices(onOff));
         addOptions(new OptionData(
                         OptionType.STRING,
+                        Constants.BOT_ALL_REACTS,
+                        "Turn ON or OFF the bot leaving your faction, colour and strategy card react on messages")
+                .addChoices(onOff));
+        addOptions(new OptionData(
+                        OptionType.STRING,
                         Constants.BOT_FACTION_REACTS,
-                        "Turn ON or OFF the bot leaving your faction react on msgs")
+                        "Turn ON or OFF the bot leaving your faction react on messages")
                 .addChoices(onOff));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.BOT_COLOR_REACTS,
-                        "Turn ON or OFF the bot leaving your color react on msgs")
+                        "Turn ON or OFF the bot leaving your color react on messages")
                 .addChoices(onOff));
         addOptions(new OptionData(
                         OptionType.STRING,
                         Constants.BOT_STRAT_REACTS,
-                        "Turn ON or OFF the bot leaving your strategy card react on msgs")
+                        "Turn ON or OFF the bot leaving your strategy card react on messages")
                 .addChoices(onOff));
         addOptions(new OptionData(
                 OptionType.STRING,
                 Constants.SPIN_MODE,
-                "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
+                "Spins rings at status cleanup. ON for Fin logic, OFF to turn off. /spin for advanced settings"));
         addOptions(
                 new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
@@ -103,61 +107,46 @@ class CustomizationOptions extends GameStateSubcommand {
 
         OptionMapping stratPings = event.getOption(Constants.STRAT_PINGS);
         if (stratPings != null) {
-            String stratP = stratPings.getAsString();
-            if ("ON".equalsIgnoreCase(stratP)) {
-                game.setStratPings(true);
-            } else if ("OFF".equalsIgnoreCase(stratP)) {
-                game.setStratPings(false);
-            }
+            game.setStratPings("ON".equalsIgnoreCase(stratPings.getAsString()));
         }
 
         OptionMapping ccNPlastic = event.getOption(Constants.CC_N_PLASTIC_LIMIT);
         if (ccNPlastic != null) {
-            String ccNP = ccNPlastic.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setCcNPlasticLimit(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setCcNPlasticLimit(false);
+            game.setCcNPlasticLimit("ON".equalsIgnoreCase(ccNPlastic.getAsString()));
+        }
+
+        OptionMapping allReacts = event.getOption(Constants.BOT_ALL_REACTS);
+        if (allReacts != null) {
+            String val = allReacts.getAsString();
+            if ("ON".equalsIgnoreCase(val)) {
+                game.setBotFactionReacts(true);
+                game.setBotColorReacts(true);
+                game.setBotStratReacts(true);
+            } else {
+                game.setBotFactionReacts(false);
+                game.setBotColorReacts(false);
+                game.setBotStratReacts(false);
             }
         }
         OptionMapping factReacts = event.getOption(Constants.BOT_FACTION_REACTS);
         if (factReacts != null) {
-            String ccNP = factReacts.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotFactionReacts(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotFactionReacts(false);
-            }
+            game.setBotFactionReacts("ON".equalsIgnoreCase(factReacts.getAsString()));
         }
         OptionMapping colorReacts = event.getOption(Constants.BOT_COLOR_REACTS);
         if (colorReacts != null) {
-            String ccNP = colorReacts.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotColorReacts(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotColorReacts(false);
-            }
+            game.setBotColorReacts("ON".equalsIgnoreCase(colorReacts.getAsString()));
         }
-
         OptionMapping stratReacts = event.getOption(Constants.BOT_STRAT_REACTS);
         if (stratReacts != null) {
-            String ccNP = stratReacts.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotStratReacts(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotStratReacts(false);
-            }
+            game.setBotStratReacts("ON".equalsIgnoreCase(stratReacts.getAsString()));
         }
-        OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
-        if (shushing != null) {
-            String ccNP = shushing.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)
-                    || "OFF".equalsIgnoreCase(ccNP)
-                    || SpinRingsHelper.validateSpinSettings(ccNP)) {
+
+        OptionMapping spin = event.getOption(Constants.SPIN_MODE);
+        if (spin != null) {
+            String ccNP = spin.getAsString();
+            if ("ON".equalsIgnoreCase(ccNP) || "OFF".equalsIgnoreCase(ccNP)) {
                 game.setSpinMode(ccNP.toUpperCase());
-                MessageHelper.replyToMessage(event, "Spin mode set to `" + ccNP + "`");
-            } else {
-                MessageHelper.replyToMessage(event, "Invalid spin settings: " + ccNP);
+                SpinService.listSpinSettings(event, game);
             }
         }
 

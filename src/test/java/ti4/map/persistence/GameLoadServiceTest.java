@@ -8,13 +8,13 @@ import ti4.testUtils.BaseTi4Test;
 
 class GameLoadServiceTest extends BaseTi4Test {
 
-    private static final String GAME_NAME = "pbd10972";
+    private static final String GAME_NAME = "pbd15036";
 
     @Test
     void shouldLoadGameFromFile() {
         Game game = GameLoadService.load(GAME_NAME);
 
         assertThat(game).isNotNull();
-        assertThat(game.getName()).isEqualTo("pbd10972");
+        assertThat(game.getName()).isEqualTo(GAME_NAME);
     }
 }

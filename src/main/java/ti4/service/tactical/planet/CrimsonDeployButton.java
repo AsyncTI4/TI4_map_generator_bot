@@ -23,7 +23,7 @@ public final class CrimsonDeployButton implements PlanetAbilityButton {
 
     public List<Button> build(LandingContext ctx) {
         String id = "revenantDeploy_" + ctx.planetName;
-        String label = "Deploy Mech on " + ctx.planetRep;
+        String label = "Deploy Mech On " + ctx.planetRep;
         return List.of(Buttons.green(id, label, FactionEmojis.Crimson));
     }
 }

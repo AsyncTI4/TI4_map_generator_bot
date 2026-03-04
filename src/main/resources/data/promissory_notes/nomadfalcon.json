@@ -1,0 +1,32 @@
+[
+    {
+        "alias": "nfpnexpl",
+        "name": "Unified Exploration",
+        "faction": "explanetary",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "nomadfalcon",
+        "text": "Action: place this card in your play area. While this card is in your play area after the Explantaery allience or you explore a planet you each gain 1 trade good or 2 comodities. If you activate a system that contains 1 or more of the allience units return this card to the allience player."
+    },
+    {
+        "alias": "nfpneroc",
+        "name": "Wealth Agreement",
+        "faction": "erock",
+        "color": "",
+        "playArea": false,
+        "playImmediately": false,
+        "source": "nomadfalcon",
+        "text": "When the Er'ock player replensishes commodidtes, gain trade goods equal to their commodity value."
+    },
+    {
+        "alias": "nfpncoun",
+        "name": "Diplomatic Base",
+        "faction": "councilors",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "nomadfalcon",
+        "text": "When you recive this card you must immediatly attach this card to 1 non-home planet you control. Its Influence value is increses by 3. This planet may not have more then 3 infantry and 1 mech of each player. Excess units on this planet are returned to the space area. This planet may be traded as part of a transaction."
+    }
+]

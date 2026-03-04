@@ -101,6 +101,10 @@ public class SpaceTokenModel implements TokenModelInterface, EmbeddableModel {
         return (isAnomaly != null && isAnomaly) || isRift() || isNebula() || isNova() || isAsteroids() || isScar();
     }
 
+    public String getNameRepresentation() {
+        return "_" + getAlias() + "_ " + source.emoji();
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }

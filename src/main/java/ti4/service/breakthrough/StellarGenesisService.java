@@ -20,6 +20,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.combat.StartCombatService;
 import ti4.service.map.TokenPlanetService;
 import ti4.service.planet.AddPlanetService;
 
@@ -40,7 +41,7 @@ public class StellarGenesisService {
         Predicate<Tile> nonHomeAndAdj = nonHome.and(adjToPlanetTiles::contains);
         List<Button> avernusLocations =
                 ButtonHelper.getTilesWithPredicateForAction(player, game, "placeAvernus", nonHomeAndAdj, false);
-        String message = "Choose a tile to place Avernus:";
+        String message = "Please choose which system you wish to place Avernus in.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, avernusLocations);
     }
 
@@ -71,7 +72,15 @@ public class StellarGenesisService {
             String destination = matcher.group("destination");
             Tile tile = game.getTileByPosition(destination);
             TokenPlanetService.moveTokenPlanet(game, player, tile, Constants.AVERNUS);
-            ButtonHelper.deleteTheOneButton(event);
+            ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
+            List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
+            if (playersWithPds2.contains(player)) {
+                List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        "If Avernus had PDS on it, you may fire the PDS with this button if this is the appropriate time to do so.",
+                        spaceCannonButtons);
+            }
         }
     }
 }

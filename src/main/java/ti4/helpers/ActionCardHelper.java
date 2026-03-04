@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,11 +38,13 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.agenda.IsPlayerElectedService;
+import ti4.service.breakthrough.DeepgloomService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
@@ -49,6 +52,18 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ActionCardHelper {
+
+    private static final Set<String> WAR_MACHINE_IDS = Set.of(
+            "war_machine1",
+            "war_machine2",
+            "war_machine3",
+            "war_machine4",
+            "war_machine_ds",
+            "war_machine1_acd2",
+            "war_machine2_acd2",
+            "war_machine3_acd2",
+            "war_machine4_acd2");
+
     public enum ACStatus {
         ralnelbt,
         garbozia,
@@ -69,7 +84,7 @@ public class ActionCardHelper {
         if (game.isWildWildGalaxyMode()) {
             MessageHelper.sendMessageToChannel(
                     player.getCardsInfoThread(),
-                    "This is a reminder that in Wild Wild Galaxy mode, each of the 4 of a type Action Cards are modified in some way. The text you see may not be entirely accurate as a result.");
+                    "This is a reminder that in Wild, Wild Galaxy mode, each of the four-of-a-type action cards are modified in some way. The text you see may not be entirely accurate as a result.");
         }
 
         sendTrapCardInfo(player);
@@ -89,7 +104,7 @@ public class ActionCardHelper {
         // ACTION CARDS
         sb.append("### ")
                 .append(MiscEmojis.LegendaryPlanet)
-                .append(" **Garbozia Action Cards:**")
+                .append(" _Dok 'N Pic's Salvage Yard_ Action Cards:")
                 .append("\n");
 
         Map<String, Integer> actionCards = game.getDiscardActionCards();
@@ -116,7 +131,7 @@ public class ActionCardHelper {
         return sb.toString();
     }
 
-    static Map<String, Integer> getGarboziaActionCards(Game game) {
+    public static Map<String, Integer> getGarboziaActionCards(Game game) {
         Map<String, Integer> cards = new HashMap<>();
         for (Entry<String, ACStatus> discard : game.getDiscardACStatus().entrySet()) {
             if (discard.getValue() != ACStatus.garbozia) continue;
@@ -135,7 +150,7 @@ public class ActionCardHelper {
             if (status == ACStatus.garbozia) {
                 String id = Constants.AC_PLAY_FROM_HAND + ident;
                 String label = Mapper.getActionCard(card.getKey()).getName();
-                buttons.add(Buttons.red(id, label, CardEmojis.ActionCard));
+                buttons.add(Buttons.red(id, label, CardEmojis.getACEmoji(game)));
             }
         }
         return buttons;
@@ -242,13 +257,13 @@ public class ActionCardHelper {
                 .forEachOrdered(plotEntry -> {
                     GenericCardModel plot = plotEntry.getValue();
                     String buttonID = "removeFactionTokenFromPlot_" + plot.getAlias();
-                    String buttonText = "Remove from " + plot.getName();
+                    String buttonText = "Remove From " + plot.getName();
                     List<String> factions = player.getPuppetedFactionsForPlot(plot.getAlias());
                     if (factions != null && !factions.isEmpty()) {
                         buttons.add(Buttons.red(buttonID, buttonText));
                     }
                 });
-        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players Secrets"));
+        buttons.add(Buttons.blue("scoreOtherPlayersSecrets", "Score Other Players' Secrets (Max 5)"));
         return buttons;
     }
 
@@ -268,7 +283,7 @@ public class ActionCardHelper {
     }
 
     private static String getPlotCardInfo(Game game, Player player) {
-        StringBuilder sb = new StringBuilder("### **__Plot Cards:__**\n");
+        StringBuilder sb = new StringBuilder("### __Plot Cards:__\n");
         player.getPlotCards().entrySet().stream()
                 .map(plot -> Map.entry(plot.getValue(), Mapper.getPlot(plot.getKey())))
                 .sorted(Comparator.comparingInt(Entry::getKey))
@@ -288,7 +303,7 @@ public class ActionCardHelper {
             List<String> factionEmojis = factions.stream()
                     .map(game::getPlayerFromColorOrFaction)
                     .filter(Objects::nonNull)
-                    .map(Player::getFactionEmoji)
+                    .map(Player::fogSafeEmoji)
                     .toList();
             sb.append("> ").append(String.join(", ", factionEmojis)).append("\n");
         }
@@ -321,7 +336,8 @@ public class ActionCardHelper {
             if (actionCard == null) {
                 sb.append("Something broke here");
             } else {
-                sb.append(CardEmojis.ActionCard)
+                sb.append(CardEmojis.getACEmoji(game))
+                        .append(actionCard.isWild(game) ? CardEmojis.Event : "")
                         .append(" _")
                         .append(actionCard.getName())
                         .append("_ `(")
@@ -331,6 +347,9 @@ public class ActionCardHelper {
                         .append(": ")
                         .append(actionCard.getText())
                         .append("\n");
+                if (actionCard.getNotes() != null) {
+                    sb.append("> -# [").append(actionCard.getNotes()).append("]\n");
+                }
             }
         }
         return sb.toString();
@@ -349,7 +368,7 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
                 acButtons.add(Buttons.red(
-                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                        Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.getACEmoji(game)));
             }
         }
         if (IsPlayerElectedService.isPlayerElected(game, player, "censure")
@@ -373,7 +392,7 @@ public class ActionCardHelper {
         List<String> prePlayable = List.of(
                 "coup",
                 "crisis",
-                "stasis",
+                "tf-stasis",
                 "extremeduress",
                 "disgrace",
                 "special_session",
@@ -396,13 +415,13 @@ public class ActionCardHelper {
             for (Entry<String, Integer> ac : garboziaCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
+                String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
                 if ("action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
                             Constants.AC_PLAY_FROM_HAND + value,
-                            "(" + value + ") " + ac_name,
+                            "(" + value + ") " + acName,
                             MiscEmojis.LegendaryPlanet));
                 }
             }
@@ -426,7 +445,9 @@ public class ActionCardHelper {
                 String actionCardWindow = actionCard.getWindow();
                 if ("action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + acName,
+                            CardEmojis.getACEmoji(player)));
                 }
             }
         }
@@ -471,7 +492,9 @@ public class ActionCardHelper {
                         || actionCardWindow.contains("roll")
                         || actionCardWindow.contains("hit")) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value,
+                            "(" + value + ") " + acName,
+                            CardEmojis.getACEmoji(player)));
                 }
             }
         }
@@ -479,9 +502,15 @@ public class ActionCardHelper {
         return acButtons;
     }
 
-    public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
-        List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
-        String msg = player.getRepresentationUnfogged() + " use buttons to discard an action card.";
+    public static void sendACDiscardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtons(player, false);
+        String msg = player.getRepresentationUnfogged() + ", discard 1 action card.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void sendSchemingDiscardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtons(player, false);
+        String msg = player.getRepresentationUnfogged() + ", discard an action card due to **Scheming**.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -506,7 +535,9 @@ public class ActionCardHelper {
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
                 acButtons.add(Buttons.blue(
-                        "ac_discard_from_hand_" + value + suffix, "(" + value + ") " + acName, CardEmojis.ActionCard));
+                        "ac_discard_from_hand_" + value + suffix,
+                        "(" + value + ") " + acName,
+                        CardEmojis.getACEmoji(player)));
             }
         }
         return acButtons;
@@ -520,8 +551,8 @@ public class ActionCardHelper {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String acName = Mapper.getActionCard(key).getName();
-                acButtons.add(
-                        Buttons.red("takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.ActionCard));
+                acButtons.add(Buttons.red(
+                        "takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.getACEmoji(player)));
             }
         }
         return acButtons;
@@ -578,51 +609,54 @@ public class ActionCardHelper {
         sendActionCardInfo(game, player);
     }
 
-    public static void drawActionCards(Game game, Player player, int count, boolean resolveAbilities) {
+    public static void drawActionCards(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, true, true, false);
+    }
+
+    public static void drawActionCardsNoAutonetic(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, true, false, false);
+    }
+
+    public static void drawActionCardsNoAbilities(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, false, false, false);
+    }
+
+    public static void drawActionCardsSilent(Player player, int count) {
+        drawActionCards(player.getGame(), player, count, true, true, true);
+    }
+
+    private static void drawActionCards(
+            Game game, Player player, int count, boolean scheming, boolean autonetic, boolean silent) {
         if (count > 10) {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
+        if (autonetic && player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            return;
+        }
+
         String message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s") + ".";
-        if (resolveAbilities && player.hasAbility("scheming")) {
+        if (scheming && player.hasAbility("scheming")) {
             count++;
             message = player.getRepresentation() + " drew " + count + " action card" + (count == 1 ? "" : "s")
                     + " (including one extra because of **Scheming**).";
-        }
-        if (resolveAbilities && player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
-            return;
         }
         game.drawActionCard(player.getUserID(), count);
 
         sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, player);
-        if (resolveAbilities && player.hasAbility("scheming")) sendDiscardActionCardButtons(player, false);
+        if (scheming && player.hasAbility("scheming")) {
+            DeepgloomService.spendOneDebt(game, player, "scheming");
+            sendSchemingDiscardButtons(player);
+        }
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-    }
 
-    public static String playACFromGarbozia(
-            GenericInteractionCreateEvent event, Game game, Player player, String value) {
-        String acID = null;
-        int acIndex = -1;
-        try {
-            acIndex = Integer.parseInt(value);
-            for (Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
-                if (ac.getValue().equals(acIndex)) {
-                    acID = ac.getKey();
-                }
-            }
-        } catch (Exception e) {
-            return "Error parsing ID";
+        if (!silent) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
-
-        if (acID == null) {
-            return "No such Action Card ID found, please retry";
-        }
-        return resolveActionCard(event, game, player, acID, acIndex, null);
     }
 
     public static String resolveActionCard(
@@ -647,7 +681,8 @@ public class ActionCardHelper {
 
         if ("blackmarketdealing".equals(acID)
                 && game.getPhaseOfGame().toLowerCase().contains("agenda")
-                && game.isHiddenAgendaMode()) {
+                && game.isHiddenAgendaMode()
+                && !game.getStoredValue("executiveOrder").isEmpty()) {
             return "You cannot make transactions during the agenda phase in Hidden Agenda mode. Cancelling this action card automatically";
         }
 
@@ -662,31 +697,12 @@ public class ActionCardHelper {
                     + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
                     + " You may discard the action cards and manually resolve if you need to.";
         }
-        if ("agenda".equalsIgnoreCase(actionCard.getPhase())
-                && game.getPhaseOfGame() != null
-                && !game.isTwilightsFallMode()
-                && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            if (!"edyn".equalsIgnoreCase(player.getFaction())
-                    && !player.getFaction().contains("franken")) {
-                return player.getRepresentationUnfogged()
-                        + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
-            }
-        }
         if (game.isStellarAtomicsMode()
                 && "agenda".equalsIgnoreCase(actionCard.getPhase())
                 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
             if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
                 return player.getRepresentationUnfogged() + ", the bot thinks you have committed some light war crimes,"
                         + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
-            }
-        }
-        if ("action".equalsIgnoreCase(actionCard.getPhase())
-                && game.getPhaseOfGame() != null
-                && !game.isTwilightsFallMode()
-                && game.getPhaseOfGame().contains("agenda")) {
-            if (!actionCard.getName().toLowerCase().contains("war machine")) {
-                return player.getRepresentationUnfogged()
-                        + ", the bot thinks it is the Agenda Phase and this is an Action Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
 
@@ -712,19 +728,26 @@ public class ActionCardHelper {
             game.discardActionCard(player.getUserID(), acIndex);
         }
 
-        String message = game.getPing() + ", " + (game.isFowMode() ? "someone" : player.getRepresentation());
+        boolean actionCardIsCancelable = isActionCardCancelable(actionCard);
+
+        String pingGame = actionCardIsCancelable ? game.getPing() + ", " : "";
+        String message = pingGame + (game.isFowMode() ? "someone" : player.getRepresentation());
         message += fromGarbozia ? " purged " : " played ";
         message += "the action card _" + actionCardTitle + "_";
-        message += fromGarbozia ? " using Garbozia." : ".";
+        message += fromGarbozia ? " using _Dok 'N Pic's Salvage Yard_." : ".";
 
         List<Button> buttons = new ArrayList<>();
-        Button sabotageButton = Buttons.red(
-                "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
-                "Cancel Action Card With Sabotage",
-                MiscEmojis.Sabotage);
-        buttons.add(sabotageButton);
 
-        if (!"blackmarketdealing".equals(acID)) {
+        boolean actionCardIsSabotageOrShatter = isSabotageOrShatter(acID);
+        if (actionCardIsCancelable && !actionCardIsSabotageOrShatter) {
+            Button sabotageButton = Buttons.red(
+                    "sabotage_ac_" + actionCardTitle + "_" + player.getFaction(),
+                    "Cancel Action Card With Sabotage",
+                    MiscEmojis.Sabotage);
+            buttons.add(sabotageButton);
+        }
+
+        if (actionCardIsCancelable) {
             Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
             if (empy != null
                     && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy)
@@ -741,7 +764,7 @@ public class ActionCardHelper {
                         empy.getCardsInfoThread(),
                         empy.getRepresentationUnfogged()
                                 + "You have one or more mechs adjacent to some units of the player who played _"
-                                + actionCardTitle + "_. Use buttons to decide whether to Sabo this action card.",
+                                + actionCardTitle + "_. Use these buttons to decide whether to Sabo this action card.",
                         empyButtons);
             }
             Player tfTriune = Helper.getPlayerFromUnit(game, "tf-triune");
@@ -757,8 +780,9 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(
                         tfTriune.getCardsInfoThread(),
                         tfTriune.getRepresentationUnfogged()
-                                + "You have three fighters adjacent to some units of the player who played _"
-                                + actionCardTitle + "_. Use buttons to decide whether to Shatter this action card.",
+                                + "You have at least 3 Triune fighters adjacent to some units of the player who played _"
+                                + actionCardTitle
+                                + "_. Use these buttons to decide whether to cancel this action card.",
                         tfButtons);
             }
             String instinctTrainingID = "it";
@@ -776,7 +800,7 @@ public class ActionCardHelper {
                             player2.getCardsInfoThread(),
                             player2.getRepresentationUnfogged()
                                     + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
-                                    + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.",
+                                    + " Use these buttons to decide whether to Sabo _" + actionCardTitle + "_.",
                             xxchaButtons);
                 }
             }
@@ -787,52 +811,59 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithEmbed(bEvent.getChannel(), message, acEmbed);
             }
         }
-        if (acID.contains("sabo") || acID.contains("shatter")) {
+        if (actionCardIsSabotageOrShatter) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
             if (game.isWildWildGalaxyMode()) {
                 Button codex1 = Buttons.green("codexCardPick_1", "Card #1");
                 MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
                         player.getRepresentation()
-                                + " You can use this button to pick up the sabod card from the discard, per Wild Wild Galaxy",
+                                + ", please pick up the Sabo'd card from the discard, per the _Wild, Wild Galaxy_ galactic event.",
                         List.of(codex1));
             }
         } else {
             String buttonLabel = "Resolve " + actionCardTitle;
             String automationID = actionCard.getAutomationID();
 
-            if (SabotageService.isSaboAllowed(game, player)) {
-                String cancelName = "Sabotage";
-                if (game.isTwilightsFallMode()) {
-                    cancelName = "Shatter";
-                }
-                buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
-                buttons.add(Buttons.gray(
-                        player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle,
-                        "Pause Timer While Waiting For " + cancelName));
-                MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
-                        mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
-            } else {
+            if (!actionCardIsCancelable) {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
-                StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
-                boolean it = false, watcher = false, triune = false;
-                for (Player p : game.getRealPlayers()) {
-                    if (p == player) continue;
-                    if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to **Instinct Training**, so watch out.");
-                        it = true;
+            } else {
+                if (SabotageService.isSaboAllowed(game, player)) {
+                    String cancelName = "Sabotage";
+                    if (game.isTwilightsFallMode()) {
+                        cancelName = "Shatter";
                     }
-                    if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
-                        noSabosMessage.append("\n> A player may have access to a Watcher mech, so *watch* out.");
-                        watcher = true;
+                    buttons.add(Buttons.blue("no_sabotage", "No " + cancelName, MiscEmojis.NoSabo));
+                    buttons.add(Buttons.gray(
+                            player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_"
+                                    + actionCardTitle,
+                            "Pause Timer While Waiting For " + cancelName));
+                    MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(
+                            mainGameChannel, message, game, player, Collections.singletonList(acEmbed), buttons, true);
+                } else {
+                    MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
+                    StringBuilder noSabosMessage = new StringBuilder("> " + SabotageService.noSaboReason(game, player));
+                    boolean it = false, watcher = false, triune = false;
+                    for (Player p : game.getRealPlayers()) {
+                        if (p == player) continue;
+                        if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
+                            noSabosMessage.append(
+                                    "\n> A player may have access to **Instinct Training**, so watch out.");
+                            it = true;
+                        }
+                        if (!watcher && (game.isFowMode() || p.hasUnit("empyrean_mech"))) {
+                            noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
+                            watcher = true;
+                        }
+                        if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
+                            noSabosMessage.append("\n> A player may have access to 3 Triune fighters, so watch out.");
+                            triune = true;
+                        }
                     }
-                    if (!triune && (game.isFowMode() || p.hasUnit("tf-triune"))) {
-                        noSabosMessage.append("\n> A player may have access to a Triune fighter cancel, so watch out.");
-                        triune = true;
-                    }
+                    MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
                 }
-                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
             }
+
             MessageChannel channel2 = player.getCorrectChannel();
             if ("investments".equals(automationID)) {
                 List<Button> scButtons = new ArrayList<>();
@@ -895,8 +926,8 @@ public class ActionCardHelper {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, acbuttons);
             }
-
-            String introMsg = player.getRepresentation() + ", after checking for Sabos, please use buttons to resolve _"
+            String cancelReminder = actionCardIsCancelable ? ", after checking for Sabos" : "";
+            String introMsg = player.getRepresentation() + cancelReminder + ", please use buttons to resolve _"
                     + actionCardTitle + "_.";
             String targetMsg =
                     " A reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
@@ -1018,6 +1049,12 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if ("alliance_rider".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "allianceRiderRandomAlly", "Random Ally"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("innovation".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1052,6 +1089,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(),
                         buttonLabel));
+                if (player.hasTechReady("gls")) {
+                    codedButtons.add(Buttons.gray(
+                            "exhaustTech_gls", "Exhaust Graviton Laser System", TechEmojis.CyberneticTech));
+                }
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2,
                         introMsg
@@ -1172,6 +1213,11 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planets"), codedButtons);
             }
 
+            if ("oracle".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveOracle", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("ancient_trade_routes".equals(automationID)) {
                 codedButtons.add(
                         Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAncientTradeRoutes", buttonLabel));
@@ -1228,6 +1274,18 @@ public class ActionCardHelper {
                         channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
             }
 
+            if ("cache".equals(automationID)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveCache", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        channel2, introMsg + String.format(targetMsg, "planet"), codedButtons);
+            }
+
+            if ("simulacrum".equals(automationID)) {
+                codedButtons.add(
+                        Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSimulacrum", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if ("harness".equals(automationID)) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveHarness", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -1251,7 +1309,7 @@ public class ActionCardHelper {
             }
 
             if ("summit".equals(automationID)) {
-                codedButtons.add(Buttons.green("resolveSummit", buttonLabel));
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveSummit", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -1408,9 +1466,9 @@ public class ActionCardHelper {
 
             if ("tf-rise".equals(automationID)) {
                 codedButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", "1 infantry on every planet"));
+                        player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", "1 Infantry On Every Planet"));
                 codedButtons.add(Buttons.green(
-                        player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 fighter with every ship"));
+                        player.getFinsFactionCheckerPrefix() + "fighterConscription", "1 Fighter With Every Ship"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
             if ("tf-mutate1".equals(automationID) || "tf-mutate2".equals(automationID)) {
@@ -1602,11 +1660,6 @@ public class ActionCardHelper {
                         channel2, String.format(targetMsg, "planet (if multiple)"), codedButtons);
             }
 
-            // if (automationID.equals("reverse_engineer")) {
-            //     MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if
-            // multiple)"), codedButtons);
-            // }
-
             if ("ghost_squad".equals(automationID)) {
                 MessageHelper.sendMessageToChannelWithButtons(
                         channel2, String.format(targetMsg, "ground forces"), codedButtons);
@@ -1625,9 +1678,6 @@ public class ActionCardHelper {
 
             if (actionCardWindow.contains("After an agenda is revealed")
                     || actionCardWindow.contains("After the first agenda of this agenda phase is revealed")) {
-                List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No
-                // Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
                 AutoPingMetadataManager.delayPing(game.getName());
 
                 String finChecker = "FFCC_" + player.getFaction() + "_";
@@ -1653,7 +1703,7 @@ public class ActionCardHelper {
                     List<Button> hackButtons = List.of(resetHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(
                             mainGameChannel,
-                            "The player who played hack election will now vote last."
+                            "The election hacker will now vote last."
                                     + " Please hit this button if _Hack Election_ is Sabo'd.",
                             game,
                             player,
@@ -1683,12 +1733,6 @@ public class ActionCardHelper {
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
                 AutoPingMetadataManager.delayPing(game.getName());
-                // List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
-                // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate \"No Whens\"
-                // again.", game, whenButtons, GameMessageType.AGENDA_WHEN);
-                // List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                // MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
-                //     "Please indicate \"No Afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
 
             if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) == player) {
@@ -1708,16 +1752,23 @@ public class ActionCardHelper {
                 }
                 serveReverseEngineerButtons(game, player, List.of(acID));
                 serveTwinningButtons(game, player, List.of(acID));
+            } else {
+                if (player.hasAbility("matters_of_state")) {
+                    String message2 = player.getRepresentationUnfogged()
+                            + " if the AC is not sabod, please gain or flip 1 balance token.";
+                    List<Button> buttons2 = ButtonHelper.getBalanceButtons(player);
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
+                }
             }
         }
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.ActionCard + ": _"
-                    + actionCardTitle + "_.";
+            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.getACEmoji(game)
+                    + ": _" + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(
-                    player, game, "Played action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.");
+                    player, game, "Played action card " + CardEmojis.getACEmoji(game) + ": _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray(
@@ -1736,96 +1787,106 @@ public class ActionCardHelper {
         return null;
     }
 
+    public static boolean isSabotageOrShatter(String acID) {
+        return acID.contains("sabo") || acID.contains("shatter");
+    }
+
+    private static boolean isActionCardCancelable(ActionCardModel actionCard) {
+        return !actionCard.getText().contains("cannot be canceled");
+    }
+
     public static void serveReverseEngineerButtons(Game game, Player discardingPlayer, List<String> actionCards) {
         for (Player player : game.getRealPlayers()) {
             if (player == discardingPlayer) continue;
-            if (IsPlayerElectedService.isPlayerElected(game, player, "censure")) continue;
-            if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
 
             String reverseEngineerID = "reverse_engineer";
-            if (player.getActionCards().containsKey(reverseEngineerID)) {
-                StringBuilder msg =
-                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
-                if (actionCards.size() > 1) msg.append("one of the following cards:");
+            if (!player.getPlayableActionCards().contains(reverseEngineerID)) continue;
 
-                List<String> ralnel = new ArrayList<>();
-                List<Button> reverseButtons = new ArrayList<>();
-                String reversePrefix =
-                        Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_reverse_";
+            StringBuilder msg =
+                    new StringBuilder(player.getRepresentationUnfogged() + " you can use _Reverse Engineer_ on ");
+            if (actionCards.size() > 1) msg.append("one of the following cards:");
 
-                for (String acID : actionCards) {
-                    ActionCardModel model = Mapper.getActionCard(acID);
-                    if (!model.getWindow().toLowerCase().startsWith("action")) {
-                        continue;
-                    }
+            List<String> notInDiscard = new ArrayList<>();
+            List<Button> reverseButtons = new ArrayList<>();
 
-                    if (game.getDiscardACStatus().get(acID) != null) {
-                        if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
-                        continue; // on RN bt or garbozia or purged
-                    }
+            Integer reverseEngineerValue = player.getActionCards().get(reverseEngineerID);
+            if (reverseEngineerValue == null) {
+                reverseEngineerValue = game.getDiscardActionCards().get(reverseEngineerID);
+            }
+            String reversePrefix = Constants.AC_PLAY_FROM_HAND + reverseEngineerValue + "_reverse_";
 
-                    String id = reversePrefix + model.getName();
-                    String label = "Reverse Engineer " + model.getName();
-                    reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
-                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+            Set<String> cardNames = new HashSet<>();
+            for (String acID : actionCards) {
+                ActionCardModel model = Mapper.getActionCard(acID);
+                if (!model.getWindow().toLowerCase().startsWith("action")) {
+                    continue;
                 }
+                ACStatus discardStatus = game.getDiscardACStatus().get(acID);
+                if (discardStatus != null) {
+                    notInDiscard.add(acID);
+                    continue;
+                }
+                cardNames.add(model.getName());
+            }
+            for (String name : cardNames) {
+                String id = reversePrefix + name;
+                String label = "Reverse Engineer " + name;
+                reverseButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
+                if (actionCards.size() == 1) msg.append(name).append(".");
+            }
 
-                if (!reverseButtons.isEmpty()) {
-                    reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), msg.toString(), reverseButtons);
-                }
-                if (!ralnel.isEmpty()) {
-                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
-                }
+            if (!reverseButtons.isEmpty()) {
+                reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(), msg.toString(), reverseButtons);
+            }
+            if (!notInDiscard.isEmpty()) {
+                String error =
+                        "The action cards were not placed in the discard pile: " + String.join(", ", notInDiscard);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
             }
         }
     }
 
-    public static void serveTwinningButtons(Game game, Player discardingPlayer, List<String> actionCards) {
+    private static void serveTwinningButtons(Game game, Player discardingPlayer, List<String> actionCards) {
         for (Player player : game.getRealPlayers()) {
             if (player == discardingPlayer) continue;
-            if (IsPlayerElectedService.isPlayerElected(game, player, "censure")) continue;
-            if (IsPlayerElectedService.isPlayerElected(game, player, "absol_censure")) continue;
 
-            String reverseEngineerID = "tf-twinning";
-            if (player.getActionCards().containsKey(reverseEngineerID)) {
+            String twinningId = "tf-twinning";
+            if (!player.getPlayableActionCards().contains(twinningId)) continue;
+
+            List<Button> twinningButtons = new ArrayList<>();
+
+            Integer twinningValue = player.getActionCards().get(twinningId);
+            if (twinningValue == null) {
+                twinningValue = game.getDiscardActionCards().get(twinningId);
+            }
+            String twinningPrefix = Constants.AC_PLAY_FROM_HAND + twinningValue + "_twinning_";
+
+            String lastCardName = null;
+            for (String acID : actionCards) {
+                ActionCardModel model = Mapper.getActionCard(acID);
+                if (!model.getWindow().toLowerCase().startsWith("action")) {
+                    continue;
+                }
+
+                String id = twinningPrefix + model.getName();
+                String label = "Twin " + model.getName();
+                lastCardName = model.getName();
+                twinningButtons.add(Buttons.green(id, label, CardEmojis.getACEmoji(game)));
+            }
+
+            if (!twinningButtons.isEmpty()) {
                 StringBuilder msg =
-                        new StringBuilder(player.getRepresentationUnfogged() + " you can use _Twinning_ on ");
-                if (actionCards.size() > 1) msg.append("one of the following cards:");
-
-                List<String> ralnel = new ArrayList<>();
-                List<Button> reverseButtons = new ArrayList<>();
-                String reversePrefix =
-                        Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_twinning_";
-
-                for (String acID : actionCards) {
-                    ActionCardModel model = Mapper.getActionCard(acID);
-                    if (!model.getWindow().toLowerCase().startsWith("action")) {
-                        continue;
-                    }
-
-                    if (game.getDiscardACStatus().get(acID) != null) {
-                        if (game.getDiscardACStatus().get(acID) == ACStatus.ralnelbt) ralnel.add(acID);
-                        continue; // on RN bt or garbozia or purged
-                    }
-
-                    String id = reversePrefix + model.getName();
-                    String label = "Twin " + model.getName();
-                    reverseButtons.add(Buttons.green(id, label, CardEmojis.ActionCard));
-                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
+                        new StringBuilder(player.getRepresentationUnfogged() + ", you may use _Twinning_ on ");
+                if (twinningButtons.size() > 1) {
+                    msg.append("one of the following cards.");
+                } else {
+                    msg.append("_").append(lastCardName).append("_.");
                 }
-
-                if (!reverseButtons.isEmpty()) {
-                    reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                            player.getCardsInfoThread(), msg.toString(), reverseButtons);
-                }
-                if (!ralnel.isEmpty()) {
-                    String error = "The action cards were not placed in the discard pile: " + String.join(", ", ralnel);
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), error);
-                }
+                twinningButtons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(), msg.toString(), twinningButtons);
             }
         }
     }
@@ -1922,6 +1983,7 @@ public class ActionCardHelper {
 
         player.removeActionCard(handIndex);
         p2.setActionCard(acID);
+        ButtonHelper.checkACLimit(game, p2);
         sendActionCardInfo(game, player);
         sendActionCardInfo(game, p2);
     }
@@ -1937,7 +1999,7 @@ public class ActionCardHelper {
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, player, player_, CardEmojis.ActionCard + " Action Card", null);
+                    game, event, player, player_, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
@@ -2009,6 +2071,9 @@ public class ActionCardHelper {
     public static void pickACardFromDiscardStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : game.getDiscardActionCards().keySet()) {
+            if (!isDiscardActionCardPickable(game, acStringID)) {
+                continue;
+            }
             buttons.add(Buttons.green(
                     "pickFromDiscard_" + acStringID,
                     Mapper.getActionCard(acStringID).getName()));
@@ -2032,6 +2097,10 @@ public class ActionCardHelper {
             Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
         String acID = buttonID.replace("pickFromDiscard_", "");
+        if (!isDiscardActionCardPickable(game, acID)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            return;
+        }
         boolean picked = game.pickActionCard(
                 player.getUserID(), game.getDiscardActionCards().get(acID));
         if (!picked) {
@@ -2086,6 +2155,11 @@ public class ActionCardHelper {
         sendActionCardInfo(game, player);
     }
 
+    private static boolean isDiscardActionCardPickable(Game game, String acId) {
+        ACStatus status = game.getDiscardACStatus().get(acId);
+        return status == null;
+    }
+
     @ButtonHandler("riseOfAMessiah")
     public static void riseOfAMessiah(ButtonInteractionEvent event, Player player, Game game) {
         doRise(player, event, game);
@@ -2131,7 +2205,7 @@ public class ActionCardHelper {
         } else if (count > 5) {
             sb.append("\n> Total of ").append(count);
         }
-        CommanderUnlockCheckService.checkPlayer(player, "obsidian");
+        CommanderUnlockCheckService.checkPlayer(player, "obsidian", "arborec");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
     }
 
@@ -2212,5 +2286,9 @@ public class ActionCardHelper {
         }
         msg = msgBuilder.toString();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+
+    static boolean playerHasWarMachine(Player player) {
+        return player.getPlayableActionCards().stream().anyMatch(WAR_MACHINE_IDS::contains);
     }
 }

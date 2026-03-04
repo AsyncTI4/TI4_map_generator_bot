@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.json.PersistenceManager;
 import ti4.message.logging.BotLogger;
 
@@ -206,5 +208,9 @@ public class GameMessageManager {
     private record GameMessages(Map<String, List<GameMessage>> gameNameToMessages) {}
 
     public record GameMessage(
-            String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime) {}
+            String messageId, GameMessageType type, LinkedHashSet<String> factionsThatReacted, long gameSaveTime) {
+        public String asJumpLink(TextChannel channel) {
+            return String.format(Message.JUMP_URL, channel.getGuild().getId(), channel.getId(), messageId);
+        }
+    }
 }

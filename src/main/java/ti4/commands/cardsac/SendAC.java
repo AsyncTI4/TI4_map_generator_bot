@@ -54,7 +54,7 @@ class SendAC extends GameStateSubcommand {
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(
-                    game, event, player, playerToSendTo, CardEmojis.ActionCard + " Action Card", null);
+                    game, event, player, playerToSendTo, CardEmojis.getACEmoji(game) + " Action Card", null);
         }
 
         ActionCardHelper.sendActionCard(event, game, player, playerToSendTo, acID);

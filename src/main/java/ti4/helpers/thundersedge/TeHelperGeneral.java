@@ -7,9 +7,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.ButtonHelper;
@@ -24,11 +26,14 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.relic.TriadService;
 import ti4.service.tech.BastionTechService;
 import ti4.service.unit.AddUnitService;
 
+@UtilityClass
 public class TeHelperGeneral {
 
     public static void checkTransientInfo(Game game) {
@@ -38,11 +43,17 @@ public class TeHelperGeneral {
 
     public static void checkCoexistTransfer(Game game) {
         for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("evasive")) {
+                continue;
+            }
             List<String> susPlanets = new ArrayList<>();
             for (String planet : game.getPlanetsPlayerIsCoexistingOn(player)) {
                 UnitHolder uH = game.getUnitHolderFromPlanet(planet);
                 boolean otherPresent = false;
-                for (Player p2 : game.getRealPlayersExcludingThis(player)) {
+                for (Player p2 : game.getRealPlayersNNeutral()) {
+                    if (p2 == player) {
+                        continue;
+                    }
                     if (FoWHelper.playerHasUnitsOnPlanet(p2, uH)) {
                         otherPresent = true;
                         break;
@@ -69,7 +80,7 @@ public class TeHelperGeneral {
         String info = game.getExpeditions().printExpeditionInfo(game, player);
         List<Button> butts = game.getExpeditions().getRemainingExpeditionButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), info, butts);
-        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteButtonAndDeleteMessageIfEmpty(event);
     }
 
     public static void addStationsToPlayArea(GenericInteractionCreateEvent event, Game game, Tile tile) {
@@ -88,10 +99,13 @@ public class TeHelperGeneral {
             if (prevOwner != null && FoWHelper.playerHasActualShipsInSystem(prevOwner, tile)) continue;
 
             AddPlanetService.addPlanet(newOwner, station.getName(), game, event, false);
+            if (prevOwner != null) {
+                prevOwner.setCommodities(prevOwner.getCommodities());
+            }
             MessageHelper.sendMessageToChannel(
                     newOwner.getCorrectChannel(),
                     newOwner.getRepresentation() + " acquired control of the " + station.getRepresentation(game)
-                            + " trade station.");
+                            + " space station.");
         }
     }
 
@@ -117,17 +131,19 @@ public class TeHelperGeneral {
                     .map(t -> Buttons.green(
                             "placeThundersEdge_" + t.getPosition(), t.getRepresentationForButtons(game, player)))
                     .forEach(newButtons::add);
-            newMessage = player.getRepresentation() + " You can place Thunder's Edge on any of the following tiles:";
+            newMessage =
+                    player.getRepresentation() + ", please choose which system you wish to place Thunder's Edge in.";
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             String pos = matcher.group("pos");
             Tile tile = game.getTileByPosition(pos);
             String prefix = player.getFinsFactionCheckerPrefix() + "placeThundersEdge_" + pos + "_";
 
-            newMessage = player.getRepresentation() + " You are placing place Thunder's Edge on "
-                    + tile.getRepresentationForButtons(game, player);
-            newMessage +=
-                    "\nYou must select one of the players with the most completed expeditions to place infantry on Thunder's Edge:";
+            int most = exp.getMostCompleteByAny();
+            newMessage = player.getRepresentation() + ", you are placing place Thunder's Edge in "
+                    + tile.getRepresentationForButtons(game, player) + ".";
+            newMessage += "\nYou must select one of the players with the most completed expeditions to place " + most
+                    + " infantry on Thunder's Edge.";
             exp.getFactionsWithMostComplete().forEach(faction -> {
                 Player p2 = game.getPlayerFromColorOrFaction(faction);
                 if (p2 != null) newButtons.add(Buttons.blue(prefix + faction, p2.getFactionNameOrColor()));
@@ -149,6 +165,10 @@ public class TeHelperGeneral {
                 String message = "Placed Thunder's Edge in " + tile.getRepresentationForButtons(game, player)
                         + " and added " + most + " " + p2.getRepresentation() + " infantry.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                CommanderUnlockCheckService.checkPlayer(
+                        p2, "arborec", "sol", "ghost", "naalu", "sardakk", "xxcha", "cabal");
+                CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
+                CommanderUnlockCheckService.checkPlayer(p2, "cymiae", "kyro", "nivyn");
             }
         }
 
@@ -157,7 +177,7 @@ public class TeHelperGeneral {
             event.getMessage()
                     .editMessage(newMessage)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(newButtons))
-                    .queue();
+                    .queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 }

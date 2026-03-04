@@ -2,10 +2,6 @@ package ti4.service.tigl;
 
 import static ti4.helpers.Constants.TIGL_FRACTURED_TAG;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,19 +11,16 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
+import ti4.spring.jda.JdaService;
 import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
 public class TiglReportService {
-
-    private static final DateTimeFormatter CREATION_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
     public static void handleTiglReporting(Game game, GenericInteractionCreateEvent event) {
         if (!game.isCompetitiveTIGLGame() || game.getWinner().isEmpty()) {
@@ -35,17 +28,8 @@ public class TiglReportService {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
-        TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
 
-        if (!game.isReplacementMade()) {
-            UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(),
-                    "This game had a replacement. Please report the results manually: "
-                            + "https://www.ti4ultimate.com/community/tigl/report-game");
-        }
+        UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
     }
 
     private static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
@@ -53,15 +37,14 @@ public class TiglReportService {
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑")
                 .append(game.getWinner().get().getPing())
-                .append(", please [report the results](https://forms.gle/aACA16qcyG6j5NwV8):\n");
-        sb.append("```\nMatch Start Date: ")
+                .append(" is the winner!\n");
+        sb.append("```\nMatch End Date: ")
                 .append(Helper.getDateRepresentationTIGL(game.getEndedDate()))
-                .append(" (TIGL wants Game End Date for Async)\n");
-        sb.append("Match Start Time: 00:00\n\n");
+                .append("\n");
         sb.append("Players:").append("\n");
         int index = 1;
-        for (Player player : game.getRealPlayers()) {
-            int playerVP = player.getTotalVictoryPoints();
+        for (Player player : game.getRealAndEliminatedPlayers()) {
+            int playerVP = player.isEliminated() ? 0 : player.getTotalVictoryPoints();
             Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
             sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
@@ -96,16 +79,16 @@ public class TiglReportService {
         report.setEvents(getEnabledGalacticEvents(game));
 
         List<Player> winners = Optional.ofNullable(game.getWinners()).orElse(List.of());
-        var tiglPlayerResults = game.getRealPlayers().stream()
+        var tiglPlayerResults = game.getRealAndEliminatedPlayers().stream()
                 .map(player -> {
                     var tiglPlayerResult = new TiglPlayerResult();
-                    tiglPlayerResult.setScore(player.getTotalVictoryPoints());
+                    tiglPlayerResult.setScore(player.isEliminated() ? 0 : player.getTotalVictoryPoints());
                     if (player.getFactionModel() != null) {
                         tiglPlayerResult.setFaction(player.getFactionModel().getFactionName());
                     } else {
                         tiglPlayerResult.setFaction(player.getFaction());
                     }
-                    tiglPlayerResult.setDiscordId(parseDiscordId(player.getUserID()));
+                    tiglPlayerResult.setDiscordId(parseDiscordId(player.getStatsTrackedUserID()));
                     tiglPlayerResult.setDiscordTag(resolveDiscordTag(player));
                     tiglPlayerResult.setWinner(winners.contains(player));
                     return tiglPlayerResult;
@@ -121,26 +104,11 @@ public class TiglReportService {
     }
 
     private static long determineStartTimestamp(Game game) {
-        if (game.getStartedDate() > 0) {
-            return game.getStartedDate();
-        }
-        return parseCreationDate(game.getCreationDate());
+        return game.getCreationDateTime();
     }
 
     private static long determineEndTimestamp(Game game) {
         return game.getEndedDate();
-    }
-
-    private static long parseCreationDate(String creationDate) {
-        if (StringUtils.isBlank(creationDate)) {
-            return 0L;
-        }
-        try {
-            LocalDate date = LocalDate.parse(creationDate, CREATION_DATE_FORMATTER);
-            return date.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli();
-        } catch (DateTimeParseException ignored) {
-            return 0L;
-        }
     }
 
     private static Long parseDiscordId(String userId) {
@@ -155,11 +123,12 @@ public class TiglReportService {
     }
 
     private static String resolveDiscordTag(Player player) {
-        User user = player.getUser();
-        if (user != null) {
-            return user.getEffectiveName();
+        Long userId = parseDiscordId(player.getStatsTrackedUserID());
+        if (userId == null) {
+            return player.getStatsTrackedUserName();
         }
-        return player.getUserName();
+        User user = JdaService.jda.getUserById(userId);
+        return user == null ? player.getStatsTrackedUserName() : user.getName();
     }
 
     private static String determineLeague(Game game) {

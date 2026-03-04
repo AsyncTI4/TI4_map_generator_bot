@@ -49,7 +49,7 @@ public class UserJoinServerListener extends ListenerAdapter {
                             formattedMemberCount = "**" + formattedMemberCount + "**";
                         } else if (memberCount % 1000 == 0) {
                             formattedMemberCount = "***" + formattedMemberCount + "***";
-                        } else if (memberCount % 10000 == 0) {
+                        } else if (memberCount % 10_000 == 0) {
                             formattedMemberCount = "\n# ***#" + formattedMemberCount + "***";
                         }
                         MessageHelper.sendMessageToChannel(

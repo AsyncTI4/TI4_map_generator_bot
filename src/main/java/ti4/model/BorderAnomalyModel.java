@@ -1,5 +1,7 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +44,25 @@ public class BorderAnomalyModel {
 
         public String toSearchString() {
             return toString().toLowerCase().replace("_", "");
+        }
+
+        @JsonValue
+        public String toJson() {
+            return name();
+        }
+
+        @JsonCreator
+        public static BorderAnomalyType fromJson(String value) {
+            if (value == null) {
+                return null;
+            }
+
+            for (BorderAnomalyType type : values()) {
+                if (type.name().equalsIgnoreCase(value)) {
+                    return type;
+                }
+            }
+            return valueOf(value);
         }
     }
 

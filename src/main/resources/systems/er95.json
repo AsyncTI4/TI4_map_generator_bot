@@ -1,11 +1,23 @@
 {
-  "id": "er95",
-  "name": "Kytos/Prymis",
-  "aliases": ["er95", "er_95", "kytos", "prymis", "primis"],
-  "imagePath": "er_95_async.png",
-  "planets": ["kytos", "prymis"],
-  "shipPositionsType": "TYPE05",
-  "wormholes": ["ALPHA", "BETA"],
-  "tileBack": "blue",
-  "source": "eronous"
+    "id": "er95",
+    "name": "Kytos/Prymis",
+    "aliases": [
+        "er95",
+        "er_95",
+        "kytos",
+        "prymis",
+        "primis"
+    ],
+    "imagePath": "er_95_async.png",
+    "planets": [
+        "kytos",
+        "prymis"
+    ],
+    "shipPositionsType": "TYPE05",
+    "wormholes": [
+        "ALPHA",
+        "BETA"
+    ],
+    "tileBack": "blue",
+    "source": "eronous"
 }

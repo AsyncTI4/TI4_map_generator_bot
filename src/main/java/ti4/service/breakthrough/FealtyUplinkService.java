@@ -34,9 +34,9 @@ public class FealtyUplinkService {
                 player.finChecker() + "fealtyUplink_" + planetName,
                 "Use Fealty Uplink on " + prettyPlanet,
                 FactionEmojis.L1Z1X));
-        String message = "When you gain control of a planet, you can use " + fealtyRep();
+        String message = "When you gain control of a planet, you may use " + fealtyRep();
         message +=
-                " to place infantry equal to that planet's influence.\n-# > You may choose to do this either before or after exploring.";
+                " to place infantry equal to that planet's influence.\n-# You may choose to do this either before or after exploring.";
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCorrectChannel(), message, buttons);
     }
 

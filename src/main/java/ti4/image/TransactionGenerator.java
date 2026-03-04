@@ -27,7 +27,7 @@ public class TransactionGenerator {
 
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
-    private static final double NINETY_DEGREES_RADIANS = 1.5707963267948966;
+    private static final double NINETY_DEGREES_RADIANS = 1.570_796_326_794_896_6;
     private static final double NEGATIVE_NINETY_DEGREES_RADIANS = -NINETY_DEGREES_RADIANS;
 
     public static BufferedImage drawTransactableStuffImage(Player p1, Player p2) {
@@ -93,9 +93,9 @@ public class TransactionGenerator {
                 || p2.hasTech("tf-guildships")) {
             x += emojiSize + 5;
             drawEmojiWithCenteredInt(
-                    g2, CardEmojis.ActionCard, p1.getActionCards().size(), x, y);
+                    g2, CardEmojis.getACEmoji(p1), p1.getActionCards().size(), x, y);
             drawEmojiWithCenteredInt(
-                    g2, CardEmojis.ActionCard, p2.getActionCards().size(), width - x - emojiSize, y);
+                    g2, CardEmojis.getACEmoji(p2), p2.getActionCards().size(), width - x - emojiSize, y);
         }
 
         // Second Line, Frags
@@ -193,7 +193,7 @@ public class TransactionGenerator {
                     }
                     case "ACs" -> {
                         Integer amt = amountToTransact == 1 ? null : amountToTransact;
-                        drawEmojiWithCenteredInt(g2, CardEmojis.ActionCard, amt, emojiX, emojiRow);
+                        drawEmojiWithCenteredInt(g2, CardEmojis.getACEmoji(game), amt, emojiX, emojiRow);
                         if (!skipYShift) y += 55;
                     }
                     case "PNs" -> {

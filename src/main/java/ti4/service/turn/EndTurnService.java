@@ -10,7 +10,9 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -24,6 +26,7 @@ import ti4.map.Tile;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -122,7 +125,7 @@ public class EndTurnService {
             }
         }
         if (game.isFowMode()) {
-            FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
+            FowCommunicationThreadService.checkNewCommPartners(game, mainPlayer);
             MessageHelper.sendMessageToChannel(
                     mainPlayer.getPrivateChannel(),
                     "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
@@ -146,8 +149,8 @@ public class EndTurnService {
         }
 
         // First, check for the ralnel hero and play it if it has been preset
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)
-                && game.getStoredValue("ralnelHero") != null) {
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)
+                && !game.getStoredValue("ralnelHero").isEmpty()) {
             String value = game.getStoredValue("ralnelHero");
             Matcher matcher = Pattern.compile(RegexHelper.factionRegex(game)).matcher(value);
             if (matcher.find()) {
@@ -160,11 +163,30 @@ public class EndTurnService {
             }
         }
 
-        if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
+        // Next, check if puppets on a string has been pre-played
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)
+                && !game.getStoredValue("Puppets On A String").isEmpty()) {
+            String value = game.getStoredValue("Puppets On A String");
+            Player puppeteer = game.getPlayerFromColorOrFaction(value);
+            if (puppeteer != null && puppeteer.getPlayableActionCards().contains("puppetsonastring")) {
+                game.removeStoredValue("Puppets On A String");
+                ActionCardHelper.playAC(event, game, puppeteer, "puppetsonastring", game.getMainGameChannel());
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("startScoring", "Puppets On A String Sabo'd - Start Status Phase"));
+                buttons.add(Buttons.gray("deleteButtons", "Was Not Sabo'd"));
+                MessageHelper.sendMessageToChannel(
+                        puppeteer.getCorrectChannel(),
+                        "If _Puppets On A String_ is sabo'd, please use these buttons to start the status phase.",
+                        buttons);
+                return;
+            }
+        }
+
+        if (game.getRealPlayers().stream().allMatch(Player::isPassed)) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(
                         mainPlayer.getCardsInfoThread(),
-                        "You were the last player to pass, and so you can score _Prove Endurance_.");
+                        "You were the last player to pass, and so you may score _Prove Endurance_.");
             }
             CommanderUnlockCheckService.checkPlayer(mainPlayer, "ralnel");
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event)) {
@@ -180,7 +202,7 @@ public class EndTurnService {
             GameMessageManager.remove(game.getName(), GameMessageType.TURN)
                     .ifPresent(messageId -> game.getMainGameChannel()
                             .deleteMessageById(messageId)
-                            .queue());
+                            .queue(Consumers.nop(), BotLogger::catchRestError));
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {

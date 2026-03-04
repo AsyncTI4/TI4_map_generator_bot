@@ -76,10 +76,10 @@ class ExploreUse extends GameStateSubcommand {
             }
         }
         Player player = getPlayer();
-        String messageText = player.getRepresentation() + " used exploration card: " + id;
+        String messageText = player.getRepresentation() + " is resolving the `" + id + "` exploration card.";
         if (force)
             messageText +=
-                    "\nTHIS CARD WAS DRAWN FORCEFULLY (if the card wasn't in the deck, it was created from thin air)";
+                    "\nThis card was drawn __forcefully__ (if the card wasn't in the deck, it was created from thin air).";
         ExploreService.resolveExplore(event, id, tile, planetName, messageText, player, game);
     }
 }

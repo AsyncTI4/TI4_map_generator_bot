@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
@@ -32,7 +33,7 @@ public class DrumrollService {
         return sb.toString();
     }
 
-    private MessageHelper.MessageFunction drumrollFunction(
+    private Consumer<Message> drumrollFunction(
             List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve) {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + seconds * 1000L;
@@ -100,7 +101,7 @@ public class DrumrollService {
         }
 
         String initialDrumroll = drumrollString(msg, 0);
-        MessageHelper.MessageFunction function = drumrollFunction(bonusMessages, sec, msg, gameName, resolve);
+        Consumer<Message> function = drumrollFunction(bonusMessages, sec, msg, gameName, resolve);
         MessageHelper.splitAndSentWithAction(initialDrumroll, main, function);
     }
 }

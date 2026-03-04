@@ -147,9 +147,6 @@ public class FactionDraftable extends SinglePickDraftable {
             }
             String choiceKey = factionAlias;
             String buttonText = factionName;
-            if (factionName.toLowerCase().contains("naalu")) {
-                buttonText += " (Uses New Agent and Mech)";
-            }
             String buttonEmoji = faction.getFactionEmoji();
             String unformattedName = factionName;
             String formattedName = faction.getFactionEmoji() + " **" + factionName + "**";
@@ -447,7 +444,7 @@ public class FactionDraftable extends SinglePickDraftable {
             message = "*Hrrnnggh*\n" + player.getPing()
                     + " This is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!";
         } else {
-            message = player.getPing() + " choose a flavor of keleres:";
+            message = player.getPing() + ", please choose a flavor of Keleres";
         }
 
         message += "\n\n" + String.join("\n\n", summarizeFlavors);
@@ -477,7 +474,7 @@ public class FactionDraftable extends SinglePickDraftable {
         List<String> leaderNames = keleres.getLeaders();
         List<LeaderModel> leaders = leaderNames.stream().map(Mapper::getLeader).toList();
         Optional<LeaderModel> heroOpt =
-                leaders.stream().filter(l -> l.getType().equals(Constants.HERO)).findFirst();
+                leaders.stream().filter(l -> Constants.HERO.equals(l.getType())).findFirst();
         if (heroOpt.isPresent()) {
             LeaderModel hero = heroOpt.get();
             summaryParts.add(hero.getLeaderEmoji() + " " + hero.getName() + " - *" + hero.getAbilityWindow() + "* "
@@ -503,9 +500,31 @@ public class FactionDraftable extends SinglePickDraftable {
                     factions.stream().map(FactionModel::fancyEmbed).toList();
             for (MessageEmbed e : embeds) {
                 String message = "";
-                if (first) message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
+                if (first) message = player.getRepresentationUnfogged() + ", here is an overview of the factions.";
                 MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                 first = false;
+            }
+            Game game = player.getGame();
+            if (!game.isTwilightsFallMode() && game.isThundersEdge()) {
+                List<MessageEmbed> teEmbeds = new ArrayList<>();
+                for (FactionModel faction : factions) {
+                    String btId = faction.getID() + "bt";
+                    if (btId.contains("keleres")) {
+                        btId = "keleresbt";
+                    }
+                    if (Mapper.getBreakthrough(btId) != null) {
+                        teEmbeds.add(Mapper.getBreakthrough(btId).getRepresentationEmbed());
+                    }
+                }
+                first = true;
+                for (MessageEmbed e : teEmbeds) {
+                    String message = "";
+                    if (first)
+                        message = player.getRepresentationUnfogged()
+                                + ", here is an overview of the faction breakthroughs.";
+                    MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
+                    first = false;
+                }
             }
         }
     }

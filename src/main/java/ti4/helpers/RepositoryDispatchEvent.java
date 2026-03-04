@@ -17,13 +17,33 @@ public class RepositoryDispatchEvent {
     private final RespositoryDispatchClientPayload payload;
 
     /**
-     * https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
+     * <a href="https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event">...</a>
      *
      * @param eventType - can be anything, as long as it's caught on github actions side
      */
     public RepositoryDispatchEvent(String eventType, Map<String, String> payloadMap) {
         this.eventType = eventType;
         payload = new RespositoryDispatchClientPayload(payloadMap);
+    }
+
+    /**
+     * Triggers the video generation workflow, which will compile images from the game's bot thread
+     * into a video and publish it to the chronicles thread for the game.
+     *
+     * @param mapId - the game/map ID (game name)
+     * @param botThreadId - ID of the bot-map-updates thread used as the image source
+     * @param chroniclesThreadId - ID of the thread in the chronicles channel where the video will be posted
+     * @param guildId - ID of the Discord guild (server) that contains the bot thread
+     */
+    public static void generateVideo(String mapId, String botThreadId, String chroniclesThreadId, String guildId) {
+        new RepositoryDispatchEvent(
+                        "generate_video",
+                        Map.of(
+                                "map_id", mapId,
+                                "thread_id", botThreadId,
+                                "post_to_thread_id", chroniclesThreadId,
+                                "guild_id", guildId))
+                .sendEvent();
     }
 
     public void sendEvent() {

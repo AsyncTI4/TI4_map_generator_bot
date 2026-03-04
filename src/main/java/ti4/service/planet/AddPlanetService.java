@@ -41,6 +41,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
+import ti4.service.statistics.round.RoundStatsTracker;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.CheckUnitContainmentService;
 
@@ -68,7 +69,7 @@ public class AddPlanetService {
                 return;
             }
         }
-        if (game.getRevealedPublicObjectives().size() < 2 || (unitHolder != null && unitHolder.isSpaceStation())) {
+        if (game.getRevealedPublicObjectives().size() < 3 || (unitHolder != null && unitHolder.isSpaceStation())) {
             setup = true;
         }
         if ("avernus".equalsIgnoreCase(planet)) {
@@ -91,8 +92,42 @@ public class AddPlanetService {
                     player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
 
-        List<String> mecatols = Constants.MECATOLS;
-        if (mecatols.contains(planet) && player.hasIIHQ()) {
+        int shrineCount = 0;
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine1.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine2.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine3.png") ? 1 : 0);
+        shrineCount += (unitHolder.getTokenList().contains("token_kaltrimshrine4.png") ? 1 : 0);
+        if ((shrineCount >= 1) && player.hasAbility("questing_prince")) {
+            unitHolder.removeToken("token_kaltrimshrine1.png");
+            unitHolder.removeToken("token_kaltrimshrine2.png");
+            unitHolder.removeToken("token_kaltrimshrine3.png");
+            unitHolder.removeToken("token_kaltrimshrine4.png");
+            if (game.getStoredValue("kaltrimcrownplanet").equalsIgnoreCase(planet)) {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you reclaimed your Crown Shrine from "
+                                + Helper.getPlanetRepresentation(planet, game)
+                                + " with your **The Questing Prince** ability. Congratz!");
+                String kalt = "Kaltrim Crown Token";
+                Integer id = game.addCustomPO(kalt, 1);
+                game.scorePublicObjective(player.getUserID(), id);
+                String message2 = "Custom public objective \"_" + kalt + "_\" has been added.\n"
+                        + player.getRepresentation() + " scored \"_" + kalt + "_\".";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
+                CommanderUnlockCheckService.checkPlayer(player, "kaltrim");
+            } else {
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentation()
+                                + ", you reclaimed " + (shrineCount == 1 ? "a Shrine" : shrineCount + " Shrines")
+                                + " from "
+                                + Helper.getPlanetRepresentation(planet, game)
+                                + " with your **The Questing Prince** ability, but did not find the Crown token.");
+            }
+        }
+
+        if (game.mecatols().contains(planet) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -151,6 +186,7 @@ public class AddPlanetService {
                     }
                     for (String relic : relics) {
                         if (relic.contains("shard")
+                                && player.isRealPlayer()
                                 && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
                                 && !doubleCheck) {
                             String msg2 = player_.getRepresentation()
@@ -199,19 +235,26 @@ public class AddPlanetService {
                     }
                     if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
-                                + " lost the planet of "
+                                + " lost control of "
                                 + Mapper.getPlanet(planet).getName()
-                                + " (and could perhaps resolve some applicable ability).";
+                                + (player_.isNeutral() ? "" : " (and could perhaps resolve some applicable ability)")
+                                + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                        if (game.isFowMode() && player_.isRealPlayer()) {
+                            MessageHelper.sendMessageToChannel(
+                                    player_.getPrivateChannel(),
+                                    player_.getRepresentationUnfogged() + ", you lost control of "
+                                            + Mapper.getPlanet(planet).getName() + ".");
+                        }
                         if (player_.isRealPlayer()
-                                && player_.getPlanetsAllianceMode().isEmpty()
+                                && player_.getNumberOfRealPlanetsAllianceMode() == 0
                                 && CheckUnitContainmentService.getTilesContainingPlayersUnits(
                                                 game, player_, UnitType.Infantry, UnitType.Mech, UnitType.Spacedock)
                                         .isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.red(
                                     "eliminatePlayer_" + player_.getFaction(),
-                                    "Eliminate " + player_.getDisplayName()));
+                                    "Eliminate " + player_.getFlexibleDisplayName()));
                             msg = player_.getRepresentation()
                                     + ", the game believes that you ought to be eliminated. Press the button if this is accurate (anyone can press the button).";
                             MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), msg, buttons);
@@ -242,6 +285,9 @@ public class AddPlanetService {
                     + ". Click to confirm a valid combat occurred and to draw 1 action card or delete these buttons (note: this technology is max once per action).";
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(), msg10, ButtonHelper.getScavengerExosButtons(player));
+        }
+        if (!setup && player.isRealPlayer()) {
+            RoundStatsTracker.recordPlanetTaken(game, player, alreadyOwned);
         }
         if (!alreadyOwned
                 && game.isMinorFactionsMode()
@@ -327,9 +373,9 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_relictoken.png") && player.isRealPlayer()) {
             unitHolder.removeToken("token_relictoken.png");
             if (!alreadyOwned) {
-                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw a relic");
+                Button draw = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawRelic", "Draw A Relic");
                 String message = player.getRepresentation()
-                        + " has gained control of a planet which allows them to draw a relic!\nUse the button AFTER you have resolved ALL ground combats:";
+                        + " has gained control of a planet which allows them to draw a relic!\nUse the button __after__ you have resolved __all__ ground combats.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, draw);
             }
         }
@@ -367,6 +413,30 @@ public class AddPlanetService {
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        }
+
+        if ((game.getPhaseOfGame().contains("agenda")
+                        || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
+                && player.hasUnlockedBreakthrough("zealotsbt")
+                && unitHolder != null
+                && tile != null
+                && (tile.getPosition().contains("frac") || unitHolder.isLegendary())
+                && !doubleCheck
+                && !setup) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("removeCCFromBoard_zealotsbt_" + tile.getPosition(), "Remove Command Token"));
+            buttons.add(Buttons.gray("acquireATech_deleteThisMessage", "Research a Technology"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + " is resolving _Rhodun's Reliquary_ to either research a technology or remove the command token from the system.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", please choose whether you want to __research__ a technology or remove the command token from the system (or neither).",
+                    buttons);
         }
 
         if ((game.getPhaseOfGame().contains("agenda")
@@ -421,7 +491,7 @@ public class AddPlanetService {
                     FactionEmojis.Bastion));
             MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    "Resolve Liberate on " + planetName + " (Before OR after exploration)",
+                    "Please resolve **Liberate** on " + planetName + " (before __or__ after exploration).",
                     liberateButtons);
         }
 
@@ -444,7 +514,8 @@ public class AddPlanetService {
         if (game.getActivePlayerID() != null
                 && !("".equalsIgnoreCase(game.getActivePlayerID()))
                 && player.hasAbility("enslave")
-                && !setup) {
+                && !setup
+                && tile != null) {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             tile.getUnitHolders().get(planet).addUnit(infKey, 1);
             MessageHelper.sendMessageToChannel(
@@ -578,7 +649,7 @@ public class AddPlanetService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
-        if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
+        if (game.mecatols().contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
         if (player.isRealPlayer() && "styx".equalsIgnoreCase(planet)) {
@@ -587,15 +658,15 @@ public class AddPlanetService {
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("styx", null);
             if (id == null) id = game.getRevealedPublicObjectives().getOrDefault("Styx", null);
 
-            String message = null;
+            String message;
             if (id != null) {
                 game.scorePublicObjective(player.getUserID(), id);
                 message = player.getRepresentation() + " scored '" + marrow + "'";
             } else {
                 id = game.addCustomPO(marrow, 1);
                 game.scorePublicObjective(player.getUserID(), id);
-                message = "Custom PO '" + marrow + "' has been added.\n" + player.getRepresentation() + " scored '"
-                        + marrow + "'";
+                message = "Custom public objective \"_" + marrow + "_\" has been added.\n" + player.getRepresentation()
+                        + " scored \"_" + marrow + "_\".";
             }
             for (Player p : game.getRealPlayers()) {
                 if (p.is(player)) continue;
@@ -606,8 +677,8 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
 
-        if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer() && !player.isBreakthroughUnlocked()) {
-            BreakthroughCommandHelper.unlockBreakthrough(game, player);
+        if ("thundersedge".equalsIgnoreCase(planet) && player.isRealPlayer()) {
+            BreakthroughCommandHelper.unlockAllBreakthroughs(game, player);
         }
         ButtonHelperAbilities.oceanBoundCheck(game);
     }

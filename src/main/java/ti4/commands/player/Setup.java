@@ -16,7 +16,7 @@ import ti4.service.milty.MiltyService;
 
 class Setup extends GameStateSubcommand {
 
-    public Setup() {
+    Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name")
                 .setRequired(true)

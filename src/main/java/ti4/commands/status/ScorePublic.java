@@ -22,7 +22,7 @@ class ScorePublic extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int poID = event.getOption(Constants.PO_ID).getAsInt();
-        ScorePublicObjectiveService.scorePO(event, event.getChannel(), getGame(), getPlayer(), poID);
+        ScorePublicObjectiveService.scorePO(event, getGame(), getPlayer(), poID);
     }
 
     @Override

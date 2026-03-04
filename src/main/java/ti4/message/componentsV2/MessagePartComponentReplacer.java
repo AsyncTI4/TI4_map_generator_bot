@@ -49,7 +49,7 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
      * in the message's component tree. If the input component is returned, nothing happens.
      * If null is returned, the component is removed. If a different component is returned,
      * the component is replaced.
-     *
+     * <p>
      * This also populates the changedMessages set when any action is performed; this
      * allows the caller to know if any changes were made at all. (to help save on PATCH
      * requests)
@@ -132,6 +132,10 @@ public class MessagePartComponentReplacer implements TrackingComponentReplacer {
             } else if (replacement.getType() == MessagePartType.MEDIA_GALLERY
                     && curComponent instanceof MediaGallery mediaGallery) {
                 if (matchText(mediaGallery, replacement.getReplaceKey())) {
+                    return replacement;
+                }
+            } else if (replacement.getPred() != null) {
+                if (replacement.getPred().test(curComponent)) {
                     return replacement;
                 }
             }

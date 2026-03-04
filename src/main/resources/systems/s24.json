@@ -1,1 +1,17 @@
-{"id":"s24","name":"Evita XL/Gryphon III","aliases":["s24","evitaxl","gryphoniii"],"imagePath":"S24_EvitaXL.png","planets":["evitaxl","gryphoniii"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{
+    "id": "s24",
+    "name": "Evita XL/Gryphon III",
+    "aliases": [
+        "s24",
+        "evitaxl",
+        "gryphoniii"
+    ],
+    "imagePath": "S24_EvitaXL.png",
+    "planets": [
+        "evitaxl",
+        "gryphoniii"
+    ],
+    "shipPositionsType": "TYPE05",
+    "tileBack": "blue",
+    "source": "somno"
+}

@@ -25,7 +25,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.message.MessageHelper.MessageFunction;
 import ti4.message.logging.BotLogger;
 import ti4.spring.jda.JdaService;
 
@@ -109,7 +108,7 @@ public class PublicDraftInfoService {
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
-        MessageFunction clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
+        Consumer<Message> clearOldFunc = clearOldPingsAndButtonsFunc(true, clearMessageHeaders, clearAttachments);
         MessageHelper.splitAndSentWithAction(msg, channel, buttons, clearOldFunc);
     }
 
@@ -261,7 +260,8 @@ public class PublicDraftInfoService {
                             if (atch.getFileName().contains(uniqueKey)) {
                                 keyDone = uniqueKey;
                                 FileUpload draftableImage = entry.getValue();
-                                msg.editMessageAttachments(draftableImage).queue();
+                                msg.editMessageAttachments(draftableImage)
+                                        .queue(Consumers.nop(), BotLogger::catchRestError);
                                 break;
                             }
                         }
@@ -308,14 +308,14 @@ public class PublicDraftInfoService {
         for (Message msg : hist.getRetrievedHistory()) {
             String msgTxt = msg.getContentRaw();
             if (msgTxt.contains("is up to draft")) {
-                if (removePings) msg.delete().queue();
+                if (removePings) msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 removePings = true;
             }
 
             for (String header : removeHeaders) {
                 if (msgTxt.startsWith(header)) {
                     if (seenHeader.contains(header)) {
-                        msg.delete().queue();
+                        msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                     } else {
                         seenHeader.add(header);
                     }
@@ -325,7 +325,7 @@ public class PublicDraftInfoService {
 
             if (msgTxt.contains(SUMMARY_START)) {
                 if (seenHeader.contains(SUMMARY_START)) {
-                    msg.delete().queue();
+                    msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                 } else {
                     seenHeader.add(SUMMARY_START);
                 }
@@ -335,7 +335,7 @@ public class PublicDraftInfoService {
                 for (String attachName : removeAttachments) {
                     if (atch.getFileName().contains(attachName)) {
                         if (seenAttachment.contains(attachName)) {
-                            msg.delete().queue();
+                            msg.delete().queue(Consumers.nop(), BotLogger::catchRestError);
                         } else {
                             seenAttachment.add(attachName);
                         }
@@ -346,7 +346,7 @@ public class PublicDraftInfoService {
         }
     }
 
-    private MessageFunction clearOldPingsAndButtonsFunc(
+    private Consumer<Message> clearOldPingsAndButtonsFunc(
             boolean clearFirstPing, List<String> clearMessageHeaders, List<String> clearAttachments) {
         return msg -> msg.getChannel()
                 .getHistoryBefore(msg, 100)

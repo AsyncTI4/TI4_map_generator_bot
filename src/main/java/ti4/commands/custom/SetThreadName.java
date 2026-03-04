@@ -5,10 +5,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.game.GameNameService;
 
 class SetThreadName extends Subcommand {
@@ -27,9 +29,9 @@ class SetThreadName extends Subcommand {
         if (event.getMessageChannel() instanceof ThreadChannel channel) {
             ThreadChannelManager manager = channel.getManager();
             if (GameManager.isValid(gameName)) {
-                manager.setName(gameName + "-" + name).queue();
+                manager.setName(gameName + "-" + name).queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
-                manager.setName(name).queue();
+                manager.setName(name).queue(Consumers.nop(), BotLogger::catchRestError);
             }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Run this command in the thread you are changing");

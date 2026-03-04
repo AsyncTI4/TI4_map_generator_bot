@@ -227,9 +227,10 @@ public class TacticalActionOutputService {
         if (moveValue == 0) return "";
 
         String output = "";
+        int maxBonus = 0;
         if (distance > moveValue && distance < 90) {
             output += " (distance exceeds move value (" + distance + " > " + moveValue + ")";
-            int maxBonus = 0;
+
             if (player.hasTech("gd")) {
                 maxBonus++;
                 output += ", used _Gravity Drive_)";
@@ -239,7 +240,8 @@ public class TacticalActionOutputService {
             if (player.hasUnlockedBreakthrough("winnubt")
                     && game.getTileByPosition(game.getActiveSystem()).hasLegendary()) {
                 maxBonus++;
-                output += " (has Winnu Breakthrough for +1 movement for one ship when moving to a legendary tile)";
+                output +=
+                        " (has _Imperator_ for +1 movement for one ship when moving into a legendary planet's system)";
             }
             if (player.getTechs().contains("dsgledb")) {
                 maxBonus++;
@@ -250,9 +252,12 @@ public class TacticalActionOutputService {
                 output += " (gravity rifts along a path could add +" + (distance - riftDistance) + " movement if used)";
                 game.setStoredValue("possiblyUsedRift", "yes");
             }
-            if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
-                GMService.logPlayerActivity(game, player, output);
-            }
+        }
+        if ((distance > (moveValue + maxBonus)) && game.isFowMode()) {
+            GMService.logPlayerActivity(game, player, output);
+        }
+        if (distance > 90 && player.hasAbility("sundered")) {
+            output += " (__Warning__: has **Sundered**, and so cannot use wormholes)";
         }
         if (riftDistance < distance) {
             game.setStoredValue("possiblyUsedRift", "yes");
@@ -279,7 +284,7 @@ public class TacticalActionOutputService {
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
-        if (tile.isNebula()
+        if (tile.isNebula(game)
                 && !player.hasAbility("voidborn")
                 && !player.hasAbility("celestial_being")
                 && !player.hasTech("absol_amd")
@@ -325,7 +330,10 @@ public class TacticalActionOutputService {
             bonusMoveValue++;
         }
 
-        if (player.hasAbility("song_of_something") && movingFromHome) {
+        if ((player.hasAbility("song_of_something")
+                        || player.hasAbility("echo_of_divergence")
+                        || player.hasAbility("echo_of_sacrifice"))
+                && movingFromHome) {
             bonusMoveValue++;
         }
         if (!game.getStoredValue("crucibleBoost").isEmpty()) {

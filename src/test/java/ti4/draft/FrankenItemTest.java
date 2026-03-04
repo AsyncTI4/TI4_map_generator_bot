@@ -29,7 +29,7 @@ class FrankenItemTest extends BaseTi4Test {
         List<DraftItem> cards = DraftItem.generateAllDraftableCards();
         for (DraftItem card : cards) {
             try {
-                assert !card.getLongDescription().isEmpty() : card.getAlias();
+                assert !card.getShortDescription().isEmpty() : card.getAlias();
             } catch (Exception e) {
                 Assertions.fail(card.getAlias() + " threw an exception: " + e);
             }

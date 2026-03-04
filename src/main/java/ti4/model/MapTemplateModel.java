@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -104,7 +104,7 @@ public class MapTemplateModel implements ModelInterface {
     public List<Point> tileDisplayCoords() {
         List<String> emulate = emulatedTiles();
         List<Point> displayCoords = new ArrayList<>();
-        int minx = 10000, miny = 10000;
+        int minx = 10_000, miny = 10_000;
         for (String pos : emulate) {
             Point p = PositionMapper.getTilePosition(pos);
             if (p == null) continue;
@@ -193,7 +193,7 @@ public class MapTemplateModel implements ModelInterface {
             }
         }
         for (int i = 1; i <= nucleusSliceCount; i++) {
-            if (sliceTileCounts.getOrDefault(i, 0) != tilesPerNucleusSlice) return false;
+            if (!Objects.equals(sliceTileCounts.getOrDefault(i, 0), tilesPerNucleusSlice)) return false;
         }
         return true;
     }

@@ -99,7 +99,7 @@ public class ParseUnitService {
             ParsedUnit parsedUnit, Tile tile, String unitListToken, GenericInteractionCreateEvent event) {
         boolean isValidUnit = parsedUnit.getUnitKey() != null;
         boolean isValidUnitHolder =
-                parsedUnit.getLocation().equals(Constants.SPACE) || tile.isSpaceHolderValid(parsedUnit.getLocation());
+                Constants.SPACE.equals(parsedUnit.getLocation()) || tile.isSpaceHolderValid(parsedUnit.getLocation());
 
         if (isValidUnit && isValidUnitHolder) {
             return true;

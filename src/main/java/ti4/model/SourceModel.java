@@ -28,6 +28,10 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         return source.toString();
     }
 
+    public String getNameRepresentation() {
+        return "_" + getName() + "_ " + source.emoji();
+    }
+
     @Override
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(null);

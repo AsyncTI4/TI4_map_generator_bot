@@ -14,9 +14,7 @@ public class AutoCompleteListener extends ListenerAdapter {
     @Override
     public void onCommandAutoCompleteInteraction(@Nonnull CommandAutoCompleteInteractionEvent event) {
         if (!JdaService.isReadyToReceiveCommands()
-                && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.replyChoice("Please try again in a moment. The bot is not ready to serve AutoComplete.", 0)
-                    .queue();
+                && !event.getInteraction().getFullCommandName().startsWith("developer")) {
             return;
         }
 

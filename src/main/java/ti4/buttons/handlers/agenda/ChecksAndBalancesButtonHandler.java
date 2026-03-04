@@ -5,12 +5,14 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.handlers.strategycard.PickStrategyCardButtonHandler;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.service.game.StartPhaseService;
 import ti4.service.player.PlayerStatsService;
 
@@ -35,7 +37,7 @@ class ChecksAndBalancesButtonHandler {
                     player.getCorrectChannel(),
                     p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scPicked, game) + ".");
         }
-        event.getMessage().delete().queue();
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
         List<Button> buttons = PickStrategyCardButtonHandler.getPlayerOptionsForChecksNBalances(player, game, scPicked);
         if (buttons.isEmpty()) {
             StartPhaseService.startActionPhase(event, game);

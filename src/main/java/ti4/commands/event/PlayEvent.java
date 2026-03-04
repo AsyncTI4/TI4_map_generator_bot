@@ -7,12 +7,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.message.logging.BotLogger;
 import ti4.model.EventModel;
 
 class PlayEvent extends GameStateSubcommand {
@@ -70,7 +72,7 @@ class PlayEvent extends GameStateSubcommand {
 
         game.getActionsChannel()
                 .sendMessageEmbeds(eventModel.getRepresentationEmbed())
-                .queue();
+                .queue(Consumers.nop(), BotLogger::catchRestError);
 
         Integer discardedEventNumericalID = game.getDiscardedEvents().get(eventModel.getAlias());
 

@@ -5,22 +5,18 @@
         "elokphi",
         "eloknu",
         "phi",
-        "nu", 
+        "nu",
         "ephi",
         "enu"
     ],
     "imagePath": "er_10_async.png",
     "planets": [
-
         "elokphi",
         "eloknu"
     ],
     "shipPositionsType": "TYPE02",
-    "wormholes": [
-        null
-    ],
+    "wormholes": [],
     "isNebula": true,
     "tileBack": "red",
     "source": "eronous"
 }
-

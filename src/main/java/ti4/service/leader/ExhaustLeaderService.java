@@ -21,7 +21,7 @@ public class ExhaustLeaderService {
     public static void exhaustLeader(Game game, Player player, Leader leader, Integer tgCount) {
         leader.setExhausted(true);
         LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
-        String message = player.getRepresentation() + " exhausted: ";
+        String message = "Exhausted: ";
         if (leaderModel != null) {
             MessageHelper.sendMessageToChannelWithEmbed(
                     player.getCorrectChannel(),
@@ -35,7 +35,7 @@ public class ExhaustLeaderService {
             StringBuilder sb = new StringBuilder();
             leader.setTgCount(tgCount);
             String leaderName = leaderModel.getName();
-            if ("nomadagentartuno".equals(leaderModel.getID())) {
+            if ("nomadagentartuno".equals(leaderModel.getId())) {
                 leaderName = "Artuno the Betrayer, a Nomad agent";
             }
 
@@ -61,6 +61,13 @@ public class ExhaustLeaderService {
             MessageHelper.sendMessageToChannel(
                     player.getCorrectChannel(),
                     "Combat modifier will be applied next time you push the combat roll button.");
+        }
+        if (game.isTwilightsFallMode()) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    "### Note that in Twilight's Fall, genomes can be cancelled by the _Shatter_ action card."
+                            + " You are encouraged to ping the table and ask for any *Shatter*s if this genome is important, and likely to be _Shatter_'d."
+                            + " Otherwise, just assume no _Shatter_ and fix later if necessary.");
         }
     }
 }

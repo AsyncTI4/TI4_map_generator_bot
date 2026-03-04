@@ -44,7 +44,8 @@ public class DraftManager extends DraftPlayerManager {
     public enum CommandSource {
         BUTTON,
         SLASH_COMMAND,
-        DETERMINISTIC_PICK
+        DETERMINISTIC_PICK,
+        QUEUED_PICK
     }
 
     public static boolean hasDraftManager(Game game) {
@@ -249,7 +250,7 @@ public class DraftManager extends DraftPlayerManager {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     game.getPing()
-                            + "The draft has ended. Some additional setup needs to happen before the game can start. Check your cards info threads for details.");
+                            + ", the draft has ended. Some additional setup needs to happen before the game can start. Check your `#cards-info` threads for details.");
         } else {
             trySetupPlayers(event);
         }
@@ -353,25 +354,19 @@ public class DraftManager extends DraftPlayerManager {
     public void validateState() {
         // Errors that can't be fixed with slash commands, and should never happen
         super.validateState();
-        if (game == null) {
-            throw new IllegalStateException("Game not set");
-        }
-        if (draftables == null) {
-            throw new IllegalStateException("Draftables not set");
-        }
 
         MessageChannel issueChannel = game.getMainGameChannel();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`)");
+                    issueChannel, "Draft problem: Nothing to draft (try `/draft manage add_draftable`).");
         }
         if (orchestrator == null) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`)");
+                    issueChannel, "Draft problem: No way to draft (try `/draft manage set_orchestrator`).");
         }
         if (playerStates.isEmpty()) {
             MessageHelper.sendMessageToChannel(
-                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`)");
+                    issueChannel, "Draft problem: No players in draft (try `/draft manage add_all_game_players`).");
         }
         if (orchestrator != null) {
             String validationError = orchestrator.validateState(this);

@@ -1,0 +1,56 @@
+[
+    {
+        "alias": "bepndream",
+        "name": "Visions",
+        "faction": "dream",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "At the start of a tactical action: You may return this card to the Dreaming Throne player to remove 1 nexus token from a system containing a planet you control."
+    },
+    {
+        "alias": "bepncryst",
+        "name": "Fragmentation",
+        "faction": "crystellum",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "After 1 of your non-fighter ships in the active system is destroyed during combat against a player other than the Crystellum: Place 1 fighter from your reinforcements. Then, return this card to the Crystellum player."
+    },
+    {
+        "alias": "bepnashen",
+        "name": "From the Ashes",
+        "faction": "ashen",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "During a combat against a player other than the Ashen Legion player: When 1 of your units is destroyed during ground combat, place that unit immediately back into combat. Then, return this card to the Ashen Legion player."
+    },
+    {
+        "alias": "bepniron",
+        "name": "Ejection",
+        "faction": "iron",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "During a combat against a player other than the Iron Tide player: When one of your mechs is destroyed, you may place 1 infantry from your reinforcements on that planet. If you do, return this card to the Iron Tide player."
+    },
+    {
+        "alias": "bepnta",
+        "name": "Advanced Structural Engineering",
+        "faction": "ta",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "ACTION: Attach this card to a non-home planet you control. This planet gains PRODUCTION X as if it were a unit, with X being the resource value of that planet."
+    },
+    {
+        "alias": "bepnnetrunners",
+        "name": "Shared Network Access",
+        "faction": "netrunners",
+        "color": "",
+        "playArea": false,
+        "source": "beans",
+        "text": "At the start of the Net-Runners player's turn: You may place any combination of up to 2 fighters or infantry from your reinforcements in any system that contains one of your structures. Then, return this card to the Net-Runners player."
+    }
+]

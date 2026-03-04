@@ -6,6 +6,19 @@
         "source": "ds"
     },
     {
+        "id": "beansnexus",
+        "imagePath": "token_beans_nexus.png",
+        "spaceOrPlanet": "space",
+        "source": "beans"
+    },
+    {
+        "id": "compromised",
+        "imagePath": "token_beans_compromised.png",
+        "spaceOrPlanet": "planet",
+        "placement": "center",
+        "source": "beans"
+    },
+    {
         "id": "wound",
         "imagePath": "token_ds_wound.png",
         "spaceOrPlanet": "space",

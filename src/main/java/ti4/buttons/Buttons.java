@@ -2,14 +2,12 @@ package ti4.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.logging.BotLogger;
 import ti4.service.emoji.CardEmojis;
@@ -35,7 +33,10 @@ public class Buttons {
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
+    public static final Button CANCEL = gray("deleteButtons", "Cancel");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
+    public static final Button DEAL_2_SO =
+            green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt);
 
     // Cards Info Buttons
     public static final Button EDIT_SUMMARIES = blue("editEndOfRoundSummaries", "Edit Summaries");
@@ -43,10 +44,14 @@ public class Buttons {
     public static final Button POST_NOTEPAD = blue("notepadPost", "Post Notes");
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
     private static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
+    private static final Button REFRESH_AC_INFO_TF =
+            green("refreshACInfo", "Action Card Info", CardEmojis.TF_Action_Card);
     private static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
     private static final Button REFRESH_SO_INFO =
             green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     private static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
+    private static final Button REFRESH_BREAKTHROUGH_INFO =
+            green(Constants.REFRESH_BREAKTHROUGH_INFO, "Breakthrough Info");
     public static final Button REFRESH_RELIC_INFO =
             green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
     public static final Button REFRESH_LEADER_INFO =
@@ -78,55 +83,28 @@ public class Buttons {
             REFRESH_TECH_INFO,
             REFRESH_PLANET_INFO,
             FACTION_EMBED);
-
-    /**
-     * Check if a game is standard PoK or only uses 4/4/4 homebrew
-     */
-    private static boolean isStandardPoKOrOnly444(Game game) {
-        if (game == null) return false;
-
-        // FIRST: Check that NO other homebrew elements are present
-        if (game.isHomebrew() // explicit homebrew flag
-                || game.isExtraSecretMode()
-                || game.isFowMode()
-                || game.isAgeOfExplorationMode()
-                || game.isFacilitiesMode()
-                || game.isMinorFactionsMode()
-                || game.isLightFogMode()
-                || game.isRedTapeMode()
-                || game.isDiscordantStarsMode()
-                || game.isFrankenGame()
-                || game.isMiltyModMode()
-                || game.isAbsolMode()
-                || game.isVotcMode()
-                || game.isPromisesPromisesMode()
-                || game.isFlagshippingMode()
-                || game.isAllianceMode()
-                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
-                || game.isHomebrewSCMode()
-                || game.isCommunityMode()
-                || game.getPlayerCountForMap() < 3
-                || game.getPlayerCountForMap() > 8) {
-
-            return false; // Has other homebrew elements, not standard
-        }
-
-        // Check decks, tiles, and factions are official
-        try {
-            if (!game.checkAllDecksAreOfficial()
-                    || !game.checkAllTilesAreOfficial()
-                    || game.getFactions().stream()
-                            .map(Mapper::getFaction)
-                            .filter(Objects::nonNull)
-                            .anyMatch(faction -> !faction.getSource().isOfficial())) {
-                return false;
-            }
-        } catch (Exception e) {
-            return false; // If we can't verify, assume not standard
-        }
-
-        return true;
-    }
+    public static final List<Button> REFRESH_INFO_BUTTONS_TE = List.of(
+            REFRESH_AC_INFO,
+            REFRESH_PN_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_BREAKTHROUGH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
+    public static final List<Button> REFRESH_INFO_BUTTONS_TF = List.of(
+            REFRESH_AC_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
 
     public static List<Button> mapImageButtons(Game game) {
         List<Button> buttonsWeb = new ArrayList<>();
@@ -139,7 +117,7 @@ public class Buttons {
         }
         buttonsWeb.add(REFRESH_CARDS_INFO);
         buttonsWeb.add(SHOW_DECKS);
-        if (game.isTwilightsFallMode()) {
+        if (game != null && game.isTwilightsFallMode()) {
             buttonsWeb.add(green("showSpliceDecks", "Show Twilight Fall Decks"));
         }
         buttonsWeb.add(REFRESH_MAP);
@@ -217,6 +195,13 @@ public class Buttons {
         if (e == null && (label == null || label.isBlank())) {
             // BotLogger.log("Button sanitized: " + id);
             return Button.of(style, id, " ", null);
+        }
+        if (label != null && label.length() > 80 && label.contains("Mez Lo Orz Fei Zsha/Rep Lo Orz Qet")) {
+            label = label.replace("Mez Lo Orz Fei Zsha/Rep Lo Orz Qet", "Mez Lo O.F.Z./Rep Lo O.Q.");
+        }
+        if (label != null && label.length() > 80) {
+            BotLogger.info("Button [" + id + "] label too long (" + label.length() + "), truncating: " + label);
+            label = label.substring(0, 77) + "...";
         }
         return Button.of(style, id, label, e);
     }

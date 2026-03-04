@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import ti4.helpers.Constants;
@@ -41,12 +40,13 @@ public class Planet extends UnitHolder {
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
     private String contrastColor;
+    private float radius;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         super(name, holderCenterPosition);
         PlanetModel planetInfo = Mapper.getPlanet(name);
-        if (Optional.ofNullable(planetInfo).isPresent()) {
+        if (planetInfo != null) {
             if (planetInfo.getPlanetTypes() != null) {
                 planetType.addAll(planetInfo.getPlanetTypes().stream()
                         .map(PlanetTypeModel.PlanetType::toString)
@@ -62,26 +62,38 @@ public class Planet extends UnitHolder {
             if (planetInfo.getContrastColor() != null) {
                 contrastColor = planetInfo.getContrastColor();
             }
-            if (!Optional.ofNullable(planetInfo.getTechSpecialties())
-                    .orElse(new ArrayList<>())
-                    .isEmpty()) {
-                originalTechSpeciality =
-                        planetInfo.getTechSpecialties().getFirst().toString();
-                techSpeciality.addAll(planetInfo.getTechSpecialties().stream()
+            List<TechSpecialtyModel.TechSpecialty> techSpecialties = planetInfo.getTechSpecialties();
+            if (techSpecialties != null && !techSpecialties.isEmpty()) {
+                originalTechSpeciality = techSpecialties.getFirst().toString();
+                techSpeciality.addAll(techSpecialties.stream()
                         .map(TechSpecialtyModel.TechSpecialty::toString)
                         .toList());
             }
             if (!isBlank(planetInfo.getLegendaryAbilityName())) hasAbility = true;
+            radius = planetInfo.getRadius();
         }
         resetOriginalPlanetResInf();
     }
 
     private void resetOriginalPlanetResInf() {
         PlanetModel planetInfo = Mapper.getPlanet(getName());
-        if (Optional.ofNullable(planetInfo).isPresent()) {
+        if (planetInfo != null) {
             resourcesOriginal = planetInfo.getResources();
             influenceOriginal = planetInfo.getInfluence();
         }
+    }
+
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
+    private boolean isRealAttachmentToken(String token) {
+        AttachmentModel attach = Mapper.getAttachmentInfo(token);
+        if (attach != null && attach.isFakeAttachment()) return false;
+        if (token.contains("superweapon")) return false;
+        if (token.contains("token_tomb")) return false;
+        if (token.contains("facility")) return false;
+        if (token.contains("sleeper")) return false;
+        if (token.contains("dmz_large")) return false;
+        if (token.contains("custodiavigilia")) return false;
+        return !Helper.isFakeAttachment(token);
     }
 
     private void addTechSpec(String techSpec) {
@@ -95,17 +107,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public boolean hasAttachment() {
-        return tokenList.stream().anyMatch(token -> {
-            AttachmentModel attach = Mapper.getAttachmentInfo(token);
-            if (attach != null && attach.isFakeAttachment()) return false;
-            if (token.contains("superweapon")) return false;
-            if (token.contains("token_tomb")) return false;
-            if (token.contains("facility")) return false;
-            if (token.contains("sleeper")) return false;
-            if (token.contains("dmz_large")) return false;
-            if (token.contains("custodiavigilia")) return false;
-            return !Helper.isFakeAttachment(token);
-        });
+        return tokenList.stream().anyMatch(this::isRealAttachmentToken);
     }
 
     public void updateTriadStats(Player player) {
@@ -119,22 +121,22 @@ public class Planet extends UnitHolder {
         }
     }
 
+    public void updateGroveStats(Player player) {
+        if ("grove".equals(getName())) {
+
+            influenceModifier =
+                    player.getGame().getPlanetsPlayerIsCoexistingOn(player).size();
+            resourcesModifier = 0;
+            if (influenceModifier == 0) {
+                resourcesModifier = -2;
+            }
+        }
+    }
+
     @JsonIgnore
     @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public List<String> getAttachments() {
-        return tokenList.stream()
-                .filter(token -> {
-                    AttachmentModel attach = Mapper.getAttachmentInfo(token);
-                    if (attach != null && attach.isFakeAttachment()) return false;
-                    if (token.contains("superweapon")) return false;
-                    if (token.contains("token_tomb")) return false;
-                    if (token.contains("facility")) return false;
-                    if (token.contains("sleeper")) return false;
-                    if (token.contains("dmz_large")) return false;
-                    if (token.contains("custodiavigilia")) return false;
-                    return !Helper.isFakeAttachment(token);
-                })
-                .toList();
+        return tokenList.stream().filter(this::isRealAttachmentToken).toList();
     }
 
     public String getRepresentation(Game game) {
@@ -188,7 +190,7 @@ public class Planet extends UnitHolder {
     }
 
     private void addTokenData(String tokenFileName) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+        if (Constants.GLEDGE_CORE_PNG.equals(tokenFileName)) { // THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
             resourcesOriginal = 2;
             influenceOriginal = 0;
         }
@@ -196,6 +198,20 @@ public class Planet extends UnitHolder {
         if (attachment != null) {
             resourcesModifier += attachment.getResourcesModifier();
             influenceModifier += attachment.getInfluenceModifier();
+            int originalRes = resourcesOriginal + resourcesModifier;
+            int originalInf = influenceOriginal + influenceModifier;
+            if ("designtranspose".equalsIgnoreCase(attachment.getAlias())) {
+                resourcesModifier += originalInf - originalRes;
+                influenceModifier += originalRes - originalInf;
+            }
+            if ("designgrand".equalsIgnoreCase(attachment.getAlias())) {
+                resourcesModifier += originalRes;
+                influenceModifier += originalInf;
+            }
+            if ("designcombine".equalsIgnoreCase(attachment.getAlias())) {
+                resourcesModifier += originalInf;
+                influenceModifier += originalRes;
+            }
             for (String planetType : attachment.getPlanetTypes()) {
                 addType(planetType);
             }
@@ -210,7 +226,7 @@ public class Planet extends UnitHolder {
     }
 
     private void removeTokenData(String tokenFileName) {
-        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) {
+        if (Constants.GLEDGE_CORE_PNG.equals(tokenFileName)) {
             resetOriginalPlanetResInf();
         }
 
@@ -396,5 +412,9 @@ public class Planet extends UnitHolder {
 
     public String getContrastColor() {
         return contrastColor;
+    }
+
+    public float getRadius() {
+        return radius;
     }
 }

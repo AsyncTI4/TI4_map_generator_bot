@@ -117,9 +117,7 @@ class SCPick extends GameStateSubcommand {
 
         // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
-            String fail = "User for next faction not found. Report to ADMIN";
-            String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
+            MessageHelper.sendMessageToChannel(privatePlayer.getPrivateChannel(), msgExtra);
             game.updateActivePlayer(privatePlayer);
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");

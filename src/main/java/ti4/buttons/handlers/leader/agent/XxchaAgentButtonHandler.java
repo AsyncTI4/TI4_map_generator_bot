@@ -23,13 +23,13 @@ class XxchaAgentButtonHandler {
         ButtonHelper.deleteMessage(event);
         RemoveUnitService.removeUnits(
                 event, game.getTileFromPlanet(planet), game, p2.getColor(), "1 infantry " + planet);
-        ButtonHelper.resolveInfantryRemoval(p2, 1);
+        ButtonHelper.resolveInfantryRemoval(p2, 1, game.getTileFromPlanet(planet));
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you removed 1 infantry from " + planetRep);
+                player.getRepresentationUnfogged() + ", you removed 1 infantry from " + planetRep);
         MessageHelper.sendMessageToChannel(
                 p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + " 1 infantry of yours on " + planetRep
+                p2.getRepresentationUnfogged() + ", 1 infantry of yours on " + planetRep
                         + " was removed via the Ggrocuto Rinn, the Xxcha agent.");
     }
 }

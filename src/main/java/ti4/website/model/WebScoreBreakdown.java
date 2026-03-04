@@ -144,13 +144,13 @@ public class WebScoreBreakdown {
 
                 // Handle custodians - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.CUSTODIAN.equals(poKey)) {
-                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
+                    addMultiScoredEntries(player, scoringPlayers, EntryType.CUSTODIAN, game, custodianEntries);
                     continue;
                 }
 
                 // Handle imperial - can be multi-scored (check BEFORE the Mapper check)
                 if (Constants.IMPERIAL_RIDER.equals(poKey)) {
-                    addMultiScoredEntries(player, poKey, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
+                    addMultiScoredEntries(player, scoringPlayers, EntryType.IMPERIAL, game, imperialEntries);
                     continue;
                 }
 
@@ -235,6 +235,11 @@ public class WebScoreBreakdown {
                 // Skip custodian/imperial/relics which we already handled as specific types
                 // Note: Shard can appear as both relic ID and custom PO name in the map
                 if (KNOWN_RELIC_AND_SPECIAL_KEYS.contains(key) || key.startsWith(CUSTOM_PO_SHARD_PREFIX)) {
+                    continue;
+                }
+
+                // Skip Firmament/Obsidian "(Plotted)" secrets - these are 0 VP plot card triggers, not real scores
+                if (key.startsWith("(Plotted)")) {
                     continue;
                 }
 
@@ -751,7 +756,6 @@ public class WebScoreBreakdown {
 
     private static void addMultiScoredEntries(
             Player player,
-            String poKey,
             List<String> scoringPlayers,
             EntryType type,
             Game game,
