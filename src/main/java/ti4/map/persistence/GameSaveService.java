@@ -1,6 +1,23 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.*;
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -635,6 +652,12 @@ class GameSaveService {
         writer.write(Constants.EXPLORATION_DECK_ID + " " + game.getExplorationDeckID());
         writer.write(System.lineSeparator());
 
+        writeStrLine(writer, Constants.ABILITY_DECK_ID, game.getAbilitySpliceDeckID());
+        writeStrLine(writer, Constants.GENOME_DECK_ID, game.getGenomeSpliceDeckID());
+        writeStrLine(writer, Constants.PARADIGM_DECK_ID, game.getParadigmSpliceDeckID());
+        writeStrLine(writer, Constants.UNITUPGRADE_DECK_ID, game.getUnitSpliceDeckID());
+        writeBoolLine(writer, Constants.TWILIGHT_KART, game.isTwilightKart());
+
         writer.write(Constants.BAG_DRAFT + " "
                 + (game.getActiveBagDraft() == null
                         ? ""
@@ -1109,8 +1132,7 @@ class GameSaveService {
     }
 
     private static void writeStrLine(Writer writer, String field, String str) throws IOException {
-        String output = StringHelper.escape(str != null ? str : "");
-        writer.write(field + " " + output);
+        writer.write(field + " " + str);
         writer.write(System.lineSeparator());
     }
 

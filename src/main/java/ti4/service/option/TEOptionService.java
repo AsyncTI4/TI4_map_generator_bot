@@ -4,14 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.container.Container;
+import net.dv8tion.jda.api.components.container.ContainerChildComponent;
+import net.dv8tion.jda.api.components.section.Section;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.draft.TwilightsFallFrankenDraft;
 import ti4.helpers.ButtonHelper;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.message.componentsV2.MessageV2Builder;
+import ti4.model.SourceModel;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
@@ -53,16 +59,27 @@ public class TEOptionService {
     @ButtonHandler("editTFHomebrew")
     private static void postTwilightFallHomebrewOptions(ButtonInteractionEvent event, Game game) {
         String msg = "Use the buttons to enable or disable various homebrew options:";
-        List<Button> buttons = getTFHomebrewButtons(game);
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
+        List<ContainerChildComponent> sections = getTFHomebrewInfo(game);
+        MessageV2Builder builder = new MessageV2Builder(game.getMainGameChannel());
+        builder.append(msg);
+        builder.append(Container.of(sections));
+        builder.append(Buttons.DONE_DELETE_BUTTONS);
+        builder.send();
+
+        // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, buttons);
     }
 
-    private static List<Button> getTFHomebrewButtons(Game game) {
+    private static List<ContainerChildComponent> getTFHomebrewInfo(Game game) {
         String idPre = "toggleTFHomebrew_";
-        List<Button> bs = new ArrayList<>();
-        bs.add(Buttons.rgToggle(game.isTwilightKart(), idPre + "tk", "Twilight Kart", SourceEmojis.TwilightKart));
-        bs.add(Buttons.DONE_DELETE_BUTTONS);
-        return bs;
+        List<ContainerChildComponent> sections = new ArrayList<>();
+
+        SourceModel tk = Mapper.getSource("twilight_kart");
+        String tkId = idPre + "twilightkart";
+        Button button = Buttons.rgToggle(game.isTwilightKart(), tkId, "Twilight Kart", SourceEmojis.TwilightKart);
+        sections.add(Section.of(button, tk.getRepresentationTextDisplays()));
+        // sections.add(Separator.create(true, Spacing.LARGE));
+
+        return sections;
     }
 
     @ButtonHandler("toggleTFHomebrew")
