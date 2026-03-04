@@ -1,10 +1,12 @@
 package ti4.model;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.textdisplay.TextDisplay;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
 
@@ -63,6 +65,27 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         }
 
         return eb.build();
+    }
+
+    public List<TextDisplay> getRepresentationTextDisplays() {
+        List<TextDisplay> components = new ArrayList<>();
+
+        // Title
+        components.add(TextDisplay.of("### " + source.emoji() + " __" + name + "__"));
+
+        // Body
+        StringBuilder content = new StringBuilder();
+        if (description != null) content.append("*").append(description).append("*\n");
+        if (data != null) content.append(getDataFormatted()).append("\n");
+        if (!content.isEmpty()) {
+            components.add(TextDisplay.of(content.toString()));
+        }
+
+        // Footer
+        if (credits != null && !credits.isBlank()) {
+            components.add(TextDisplay.of("-# Credits: " + credits));
+        }
+        return components;
     }
 
     /**

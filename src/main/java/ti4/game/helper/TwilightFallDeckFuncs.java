@@ -1,4 +1,4 @@
-package ti4.map.helper;
+package ti4.game.helper;
 
 import java.util.List;
 import ti4.image.Mapper;
@@ -83,8 +83,7 @@ public interface TwilightFallDeckFuncs {
                 }
             }
             if (shouldRemove) {
-                if ("hacanhero".equalsIgnoreCase(card))
-                    allCards.remove("sanctionhero");
+                if ("hacanhero".equalsIgnoreCase(card)) allCards.remove("sanctionhero");
                 allCards.remove(card);
             }
         }

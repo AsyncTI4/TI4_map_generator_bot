@@ -24,13 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.components.buttons.Button;
@@ -43,6 +37,9 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -76,7 +73,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.JsonMapperManager;
-import ti4.map.helper.TwilightFallDeckFuncs;
+import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
@@ -105,8 +102,7 @@ import ti4.service.statistics.round.RoundStatsTracker;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-public class Game extends GameProperties
-    implements TwilightFallDeckFuncs {
+public class Game extends GameProperties implements TwilightFallDeckFuncs {
 
     private static final JsonMapper mapper = JsonMapperManager.basic();
 
@@ -611,7 +607,7 @@ public class Game extends GameProperties
         String stratCards = "twilights_fall_sc";
         String acDeck = "tf_action_deck";
         String techDeck = "techs_tf";
-        
+
         // Initialize splice decks
         setAbilitySpliceDeckID("techs_tf");
         setGenomeSpliceDeckID("tf_genome");
@@ -633,12 +629,10 @@ public class Game extends GameProperties
         setTechnologyDeckID(techDeck);
 
         // Remove the secrets we have to remove
-        List.of("sb" , "dtd", "dp", "baf")
-                .forEach(this::removeSOFromGame);
-        
+        List.of("sb", "dtd", "dp", "baf").forEach(this::removeSOFromGame);
+
         // Remove the Relics we have to remove
-        List.of("quantumcore" , "mawofworlds", "prophetstears")
-                .forEach(this::removeRelicFromGame);
+        List.of("quantumcore", "mawofworlds", "prophetstears").forEach(this::removeRelicFromGame);
     }
 
     public void setPurgedPNs(List<String> purgedPN) {
