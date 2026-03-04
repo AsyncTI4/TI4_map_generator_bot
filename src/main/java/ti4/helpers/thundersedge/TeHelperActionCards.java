@@ -14,6 +14,7 @@ import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
@@ -309,8 +310,11 @@ public class TeHelperActionCards {
         }
 
         String message = player.getRepresentationUnfogged() + ", please resolve _Strategize_ using these buttons."
-                + " You __must__ spend a token from your strategy pool, unless you are resolving **Leadership**.";
-        buttons.add(Buttons.blue("spendAStratCC", "Spend a Strategy Token"));
+                + " A strategy token was auto deducted (if possible) due to so many people forgetting to do so. If you end up resolving leadership, please gain it back (the bot wont make you pay for it).";
+        if (player.getStrategicCC() > 0) {
+            player.setStrategicCC(player.getStrategicCC() - 1);
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+        }
         buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);

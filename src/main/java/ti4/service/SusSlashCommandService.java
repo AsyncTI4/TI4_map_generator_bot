@@ -45,6 +45,9 @@ public class SusSlashCommandService {
                 && (isPrivateThread || isNotGameChannel)
                 && !isPublicThread) {
             reportToSusSlashCommandLog(event, jumpUrl);
+            String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
+                    + event.getFullCommandName() + "`";
+            MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
         }
 
         if (managedGame.isFowMode()) {

@@ -187,7 +187,10 @@ public class PublicSnakeDraftOrchestrator extends DraftOrchestrator {
             sb.append("(automatically) ");
         } else if (source == CommandSource.SLASH_COMMAND) {
             sb.append("(forcefully) ");
+        } else if (source == CommandSource.QUEUED_PICK) {
+            sb.append("(from queue) ");
         }
+
         sb.append(choice.getFormattedName()).append("!");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 

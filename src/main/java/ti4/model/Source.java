@@ -148,6 +148,12 @@ public class Source {
             };
         }
 
+        public boolean isHiddenFromSearch(ComponentSource source) {
+            if (source != null && this == source) return false;
+
+            return !isOfficial();
+        }
+
         public String emoji() {
             TI4Emoji emoji =
                     switch (this) {
