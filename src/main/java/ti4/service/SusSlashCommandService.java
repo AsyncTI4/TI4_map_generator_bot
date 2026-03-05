@@ -48,6 +48,9 @@ public class SusSlashCommandService {
             String sb = event.getUser().getEffectiveName() + " privately used the command: " + "`"
                     + event.getFullCommandName() + "`";
             MessageHelper.sendMessageToChannel(managedGame.getMainGameChannel(), sb);
+            String sb2 = event.getUser().getAsMention()
+                    + " this is a reminder that you should use most commands that alter the game state in the game channels, not in private threads. This is so that all players can track the game state accurately. Your command has been reported to the admins, but no action will be taken unless it's determined to be a violation.";
+            MessageHelper.sendMessageToChannel(event.getChannel(), sb2);
         }
 
         if (managedGame.isFowMode()) {
