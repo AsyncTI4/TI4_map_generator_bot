@@ -3,6 +3,7 @@ package ti4.helpers.twilight_kart;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,6 @@ import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.EdictPhaseHandler;
-import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -21,21 +21,28 @@ import ti4.helpers.Helper;
 import ti4.helpers.NewStuffHelper;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.thundersedge.TeHelperActionCards;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-import ti4.model.ColorModel;
+import ti4.model.UnitModel;
 import ti4.service.RemoveCommandCounterService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.regex.RegexService;
 import ti4.service.tech.PlayerTechService;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class TkHelperActionCards {
@@ -52,45 +59,21 @@ public class TkHelperActionCards {
         String ffcc = player.finChecker();
         List<Button> buttons = new ArrayList<>();
 
-        // Done
-        // tk-amalgamate
-        // tk-avenge
-        // tk-bestow
-        // tk-commission
-        // tk-conscript
-        // tk-daunt // this is just intercept + rout, neither of which need automation
-        // tk-evade 2x
-        // tk-exhort 2x
-        // tk-fortify
-        // tk-initiate
-        // tk-oppress // mageon
-        // tk-orchestrate // also add preset
-        // tk-posture
-        // tk-preside
-        // tk-raze
-        // tk-riposte
-        // tk-thwart
-
-        // kinda 1
-        // tk-graft
-
-        // TODO 5
-        // tk-contract
+        // TODO ACTION CARDS
+        // tk-graft (about ~half done)
         // tk-incubate
         // tk-ordain
         // tk-spite
         // tk-succor
 
         switch (card.getAutomationID()) {
-            case "tk-amalgamate" -> buttons.add(Buttons.green(ffcc + "drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
+            case "tk-amalgamate" ->
+                buttons.add(Buttons.green(ffcc + "drawSingularNewSpliceCard_genome", "Draw 1 Genome (Agent)"));
             case "tk-avenge" -> buttons.add(Buttons.green(ffcc + "courageousStarter", resolve));
             case "tk-bestow" -> buttons.addAll(getTkBestowButtons(player, resolve));
             case "tk-commission" -> buttons.add(Buttons.green(ffcc + "tkCommission_page0", resolve));
             case "tk-conscript" -> buttons.add(Buttons.green(ffcc + "beginTkConscript", resolve));
-            case "tk-contract" -> {
-                // TODO
-                nop();
-            }
+            case "tk-contract" -> buttons.add(Buttons.green(ffcc + "beginTkContract", resolve));
             case "tk-daunt" -> nop(); // No automation required, just ignore or force the retreat
             case "tk-evade" -> nop(); // No automation required, just ignore the hits :)
             case "tk-exhort" -> nop(); // Automated via the Combat Modifier system
@@ -104,10 +87,7 @@ public class TkHelperActionCards {
                 introMsg += "\n-# NOTE: This is currently using Black Market automation.";
                 introMsg += " Resolve trading spliced cards manually.";
             }
-            case "tk-incubate" -> {
-                // TODO
-                nop();
-            }
+            case "tk-incubate" -> nop(); // Button is automatically served upon being activated
             case "tk-initiate" -> buttons.addAll(getTkInitiateButtons(game, player));
             case "tk-oppress" -> buttons.addAll(PlayerTechService.getMageonImplantsButtons(game, player));
             case "tk-orchestrate" -> {
@@ -124,10 +104,7 @@ public class TkHelperActionCards {
                 buttons.add(Buttons.green(ffcc + "resolveEdict_" + edicts.getFirst(), "Resolve 1 Edict"));
             }
             case "tk-raze" -> buttons.add(Buttons.green(ffcc + "resolveRaze_" + game.getActiveSystem(), resolve));
-            case "tk-riposte" -> {
-                // TODO
-                nop();
-            }
+            case "tk-riposte" -> nop(); // Button is automatically served upon being activated
             case "tk-spite" -> {
                 // TODO
                 nop();
@@ -191,14 +168,6 @@ public class TkHelperActionCards {
 
         String prefix = player.finChecker() + "resolveTkCommission__";
         String message = player.getRepresentation() + ", please choose a planet to place 1 neutral mech on.";
-        Player neutral = game.getPlayerFromColorOrFaction("neutral");
-        if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
-        }
         NewStuffHelper.checkAndHandlePaginationChange(
                 event, player.getCorrectChannel(), buttons, message, prefix, buttonID);
         ButtonHelper.deleteMessage(event);
@@ -234,14 +203,6 @@ public class TkHelperActionCards {
     @ButtonHandler("resolveTkConscript_")
     private static void resolvePirateContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "resolveTkConscript_" + RegexHelper.posRegex();
-        Player neutral = game.getPlayerFromColorOrFaction("neutral");
-        if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
-        }
         RegexService.runMatcher(regex, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
             TeHelperActionCards.resolvePiratesGeneric(event, game, player, tile, "dd, 2 ff");
@@ -251,6 +212,50 @@ public class TkHelperActionCards {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(event);
         });
+    }
+
+    @ButtonHandler("beginTkContract")
+    private static void beginTkContract(ButtonInteractionEvent event, Game game, Player player) {
+        Predicate<Tile> hasThreeShips = tile -> tile.getSpaceUnitHolder()
+            .countPlayersUnitsWithModelCondition(player, UnitModel::isNonFighterShip) <= 3;
+        List<Button> buttons =
+                ButtonHelper.getTilesWithPredicateForAction(player, game, "resolveTkContract", hasThreeShips, false);
+        String message =
+                player.getRepresentationUnfogged() + " choose a system to replace your ships with neutral ships.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveTkContract_")
+    private static void resolveTkContract(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String pos = buttonID.replace("resolveTkContract_", "");
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder space = tile.getSpaceUnitHolder();
+
+        int cost = 0;
+        List<String> unitStrs = new ArrayList<>();
+        List<String> unitDescrs = new ArrayList<>();
+        for (UnitKey key : space.getUnitKeysForPlayer(player)) {
+            UnitModel model = player.getUnitByType(key.getUnitType());
+
+            int amt = space.getUnitCount(key);
+            unitStrs.add(amt + " " + key.getUnitType().getValue());
+            unitDescrs.add(amt + "x " + model.getUnitEmoji() + " " + model.getUnitType().humanReadableName());
+
+            if (model.getIsShip() && !key.getUnitType().equals(UnitType.Fighter)) {
+                cost += amt * model.getCost();
+            }
+        }
+
+        String unitStr = String.join(", ", unitStrs);
+        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), unitStr);
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), unitStr);
+
+        String msg = player.getRepresentationUnfogged() + " contracted away some ships to be used by the \"pirates\",";
+        msg += " gaining "+cost+" trade goods "+player.gainTG(cost, true)+":";
+        msg += "\n> " + String.join("\n> ", unitDescrs);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        ButtonHelperAgents.resolveArtunoCheck(player, cost);
     }
 
     private static List<Button> getTkInitiateButtons(Game game, Player player) {
@@ -295,6 +300,48 @@ public class TkHelperActionCards {
                     idPre + "hazardous", "Ready Hazardous for (" + hr + "/" + hi + ")", ExploreEmojis.Hazardous));
         buttons.add(Buttons.gray(idPre + "tgs", "Gain " + tgs + " Trade Goods", MiscEmojis.tg));
         return buttons;
+    }
+
+    @ButtonHandler("resolveIncubate_")
+    private static void resolveIncubate(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String pos = buttonID.replace("resolveIncubate_", "");
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder space = tile.getSpaceUnitHolder();
+
+        List<Button> buttons = new ArrayList<>();
+        for (UnitKey key : space.getUnitKeysForPlayer(player)) {
+            UnitModel model = player.getUnitFromUnitKey(key);
+            if (!model.isNonFighterShip()) continue;
+            
+            for (UnitState state : UnitState.values()) {
+                if (space.getUnitCountForState(key, state) == 0) continue;
+                String unitStateStr = key.getUnitType().getValue() + "_" + state.name();
+                String stateStr = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+                
+                String id = player.finChecker() + "incubateUnit_" + pos + "_" + unitStateStr;
+                String label = "Replace 1 " + stateStr + key.getUnitType().humanReadableName();
+                buttons.add(Buttons.blue(id, label, model.getUnitEmoji()));
+            }
+        }
+    }
+
+    @ButtonHandler("incubateUnit_")
+    private static void incubateUnit(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String pattern = "incubateUnit_" + RegexHelper.posRegex() + "_" + RegexHelper.unitTypeRegex("type") + "_" + RegexHelper.unitStateRegex();
+        RegexService.runMatcher(pattern, buttonID, matcher -> {
+            Tile tile = game.getTileByPosition(matcher.group("pos"));
+            UnitType type = Units.findUnitType(matcher.group("type"));
+            UnitState state = Units.findUnitState(matcher.group("state"));
+            UnitHolder space = tile.getSpaceUnitHolder();
+
+            RemoveUnitService.removeUnit(event, tile, game, player, space, type, 1, state);
+            AddUnitService.addUnits(event, tile, game, player.getColor(), "dn");
+
+            String stateMsg = state.humanDescr() + (state.equals(UnitState.none) ? "" : " ");
+            String message = player.getRepresentationUnfogged() + " replaced 1 " + stateMsg + type.humanReadableName() + " on ";
+            message += tile.getRepresentationForButtons(game, player) + " with a Dreadnought from their reinforcements.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        });
     }
 
     @ButtonHandler("tkInitiate_")
@@ -354,8 +401,9 @@ public class TkHelperActionCards {
 
     @ButtonHandler("resolveRiposte_")
     public static void resolveRiposte(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
-        String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
+        String pos = buttonID.split("_")[1];
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(pos), game);
+        String message = player.getFactionEmoji() + " removed their command token from tile " + pos
                 + " using _Riposte_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);

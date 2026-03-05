@@ -24,7 +24,13 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.MessageTopLevelComponent;
@@ -1792,11 +1798,29 @@ public class ButtonHelper {
                         Constants.AC_PLAY_FROM_HAND + riposteValue + "_riposte_" + activeSystem.getPosition(),
                         "Riposte in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
                 reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
-                String cyberMessage = nonActivePlayer.getRepresentationUnfogged()
+                String msg = nonActivePlayer.getRepresentationUnfogged()
                         + ", a reminder that you may use _Riposte_ in "
                         + activeSystem.getRepresentationForButtons(game, nonActivePlayer) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(
-                        nonActivePlayer.getCardsInfoThread(), cyberMessage, reverseButtons);
+                        nonActivePlayer.getCardsInfoThread(), msg, reverseButtons);
+            }
+            boolean hasNonFF = activeSystem.getSpaceUnitHolder()
+                .countPlayersUnitsWithModelCondition(nonActivePlayer, model -> model.getIsShip() && !model.getUnitType().equals(UnitType.Fighter)) > 0;
+            if (nonActivePlayer.getPlayableActionCards().contains("tk-incubate") && hasNonFF) {
+                List<Button> buttons = new ArrayList<>();
+                String key = "tk-incubate";
+                Integer incubateValue = nonActivePlayer.getActionCards().get(key);
+                if (incubateValue == null) {
+                    incubateValue = game.getDiscardActionCards().get(key);
+                }
+                buttons.add(Buttons.green(
+                        Constants.AC_PLAY_FROM_HAND + incubateValue + "_incubate_" + activeSystem.getPosition(),
+                        "Incubate in " + activeSystem.getRepresentationForButtons(game, nonActivePlayer)));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                String msg = nonActivePlayer.getRepresentationUnfogged()
+                        + ", a reminder that you may use _Incubate_ in "
+                        + activeSystem.getRepresentationForButtons(game, nonActivePlayer) + ".";
+                MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCardsInfoThread(), msg, buttons);
             }
             if (nonActivePlayer.ownsUnit("nivyn_mech")
                     && CheckUnitContainmentService.getTilesContainingPlayersUnits(game, nonActivePlayer, UnitType.Mech)
@@ -2508,30 +2532,20 @@ public class ButtonHelper {
                     event.getChannel(), "Set up all real players before pressing this button.");
             return;
         }
-        Player neutral = game.getPlayerFromColorOrFaction("neutral");
-        if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
-        }
+        String neutral = game.getNeutralColor();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isHomeSystem() && !tile.isHomeSystem(game)) {
                 int size = tile.getPlanetUnitHolders().size();
 
                 for (UnitHolder planet : tile.getPlanetUnitHolders()) {
                     if (size == 3) {
-                        AddUnitService.addUnits(
-                                event, tile, game, neutral.getColor(), "1 infantry " + planet.getName());
+                        AddUnitService.addUnits(event, tile, game, neutral, "1 infantry " + planet.getName());
                     }
                     if (size == 1) {
-                        AddUnitService.addUnits(
-                                event, tile, game, neutral.getColor(), "3 infantry " + planet.getName());
+                        AddUnitService.addUnits(event, tile, game, neutral, "3 infantry " + planet.getName());
                     }
                     if (size == 2) {
-                        AddUnitService.addUnits(
-                                event, tile, game, neutral.getColor(), "2 infantry " + planet.getName());
+                        AddUnitService.addUnits(event, tile, game, neutral, "2 infantry " + planet.getName());
                         size = 3;
                     }
                 }
@@ -4804,8 +4818,8 @@ public class ButtonHelper {
             if (tile.getPlanetUnitHolders().isEmpty()) {
                 AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
             }
-            if (game.isDangerousWildsMode() && game.getPlayerFromColorOrFaction("neutral") != null) {
-                Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (game.isDangerousWildsMode()) {
+                Player neutral = game.getNeutral();
                 boolean added = false;
                 for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                     if (getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
@@ -5799,12 +5813,14 @@ public class ButtonHelper {
         return getTilesWithShipsForAction(player, game, "domnaStepOne", false);
     }
 
+    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
     public static List<Button> getTilesWithUnitsForAction(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
         return getTilesWithPredicateForAction(player, game, action, hasPlayerUnits, includeDelete);
     }
 
+    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
     public static List<Button> getTilesWithShipsForAction(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerShips =
@@ -5812,11 +5828,13 @@ public class ButtonHelper {
         return getTilesWithPredicateForAction(player, game, action, hasPlayerShips, includeDelete);
     }
 
+    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
     public static List<Button> getAllTilesToModify(Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> tRue = tile -> true;
         return getTilesWithPredicateForAction(player, game, action, tRue, includeDelete);
     }
 
+    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
     private static List<Button> getTilesWithUnitsForModifyUnitsButton(
             Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
@@ -5826,7 +5844,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    /** Returns a list of buttons with id: {@code finchecker_<action>_<position>} */
+    /** @returns a list of buttons with id: {@code finchecker_<action>_<position>} */
     public static List<Button> getTilesWithPredicateForAction(
             Player player, Game game, String action, Predicate<Tile> predicate, boolean includeDelete) {
         String finChecker = player.finChecker();

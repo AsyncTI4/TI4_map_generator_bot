@@ -1023,12 +1023,7 @@ public class ButtonHelperSCs {
     @ButtonHandler("placeAgesMonument_")
     public static void placeAgesMonument(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
-        AddUnitService.addUnits(
-                event,
-                game.getTileFromPlanet(planet),
-                game,
-                game.getPlayerFromColorOrFaction("neutral").getColor(),
-                "1 sd " + planet);
+        AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, game.getNeutralColor(), "1 sd " + planet);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, false) + " dropped a monument on "

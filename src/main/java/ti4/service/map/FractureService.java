@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
@@ -21,7 +20,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.TechnologyModel.TechnologyType;
 import ti4.service.breakthrough.AlRaithService;
 import ti4.service.emoji.DiceEmojis;
@@ -79,14 +77,7 @@ public class FractureService {
                 "fracture1", "fracture2", "fracture3", "fracture4", "fracture5", "fracture6", "fracture7");
         List<String> positions = Arrays.asList("frac1", "frac2", "frac3", "frac4", "frac5", "frac6", "frac7");
 
-        Player neutral = game.getPlayerFromColorOrFaction("neutral");
-        if (neutral == null) {
-            List<String> unusedColors =
-                    game.getUnusedColors().stream().map(ColorModel::getName).toList();
-            String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-            game.setupNeutralPlayer(color);
-            neutral = game.getPlayerFromColorOrFaction("neutral");
-        }
+        Player neutral = game.getNeutral();
         String neutralColorID = neutral.getColorID();
         List<String> units =
                 Arrays.asList("2 ca, 2 inf c", "", "", "2 dn, 1 dd, 3 inf s", "", "", "1 cv, 4 ff, 1 inf l, 1 inf p");

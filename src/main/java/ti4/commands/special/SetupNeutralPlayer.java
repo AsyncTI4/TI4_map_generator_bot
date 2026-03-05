@@ -46,7 +46,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
                         + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
     }
 
-    public String pickNeutralColor(List<String> unusedColors) {
+    public static String pickNeutralColor(List<String> unusedColors) {
         if (unusedColors.contains("aberration")) {
             return "aberration";
         }

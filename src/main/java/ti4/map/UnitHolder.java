@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.awt.Point;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -259,6 +260,17 @@ public abstract class UnitHolder {
         return unitsByState.entrySet().stream()
                 .filter(e -> getTotalUnitCount(e.getValue()) > 0)
                 .map(Entry::getKey)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /** Return the set unit keys that are actually on this unitholder (quantity > 0) */
+    @JsonIgnore
+    public Set<UnitKey> getUnitKeysForPlayer(Player p) {
+        return unitsByState.entrySet().stream()
+                .filter(e -> p.unitBelongsToPlayer(e.getKey()))
+                .filter(e -> getTotalUnitCount(e.getValue()) > 0)
+                .map(Entry::getKey)
+                .sorted(Comparator.comparing(uk -> uk.getUnitType()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
