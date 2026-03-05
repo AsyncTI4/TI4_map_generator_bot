@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -3070,25 +3070,24 @@ public class Game extends GameProperties {
         return false;
     }
 
-    public boolean shuffleActionCardFromHandIntoDeck(String userID, Integer acIDNumber) {
+    public boolean shuffleActionCardFromHandIntoDeck(String userID, Integer acIdNumber) {
         Player player = getPlayer(userID);
-        if (player != null) {
-            Map<String, Integer> actionCards = player.getActionCards();
-            String acID = "";
-            for (Entry<String, Integer> ac : actionCards.entrySet()) {
-                if (ac.getValue().equals(acIDNumber)) {
-                    acID = ac.getKey();
-                    break;
-                }
-            }
-            if (!acID.isEmpty()) {
-                player.removeActionCard(acIDNumber);
-                getActionCards().add(acID);
-                Collections.shuffle(getActionCards());
-                return true;
+        if (player == null) return false;
+
+        Map<String, Integer> actionCards = player.getActionCards();
+        String acId = "";
+        for (Entry<String, Integer> ac : actionCards.entrySet()) {
+            if (ac.getValue().equals(acIdNumber)) {
+                acId = ac.getKey();
+                break;
             }
         }
-        return false;
+        if (acId.isEmpty()) return false;
+
+        player.removeActionCard(acIdNumber);
+        getActionCards().add(acId);
+        Collections.shuffle(getActionCards());
+        return true;
     }
 
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {

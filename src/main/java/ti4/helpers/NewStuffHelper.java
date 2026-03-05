@@ -146,7 +146,7 @@ public class NewStuffHelper {
             String msg = player.getRepresentation() + " picked up " + acModel.getName()
                     + " from the discard and placed it on _Doc 'N Pic's Salvage Yard_.";
             msg +=
-                    "You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";
+                    " You can check the cards on _Doc 'N Pic's Salvage Yard_ at any time by looking at the action card discard pile in the bot map thread.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             ActionCardHelper.sendActionCardInfo(game, player, event);
             ButtonHelper.deleteMessage(event);

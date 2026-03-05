@@ -13,12 +13,8 @@ import ti4.message.MessageHelper;
 
 class ShuffleACFromHand extends GameStateSubcommand {
 
-    public ShuffleACFromHand() {
-        super(
-                Constants.SHUFFLE_AC_FROM_HAND,
-                "Shuffle an action card from your hand back into the deck.",
-                true,
-                true);
+    ShuffleACFromHand() {
+        super(Constants.SHUFFLE_AC_FROM_HAND, "Shuffle an action card from your hand back into the deck.", true, true);
         addOptions(new OptionData(
                         OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
                 .setRequired(true));
@@ -46,10 +42,8 @@ class ShuffleACFromHand extends GameStateSubcommand {
                     event.getChannel(), "No such action card ID found in your hand, please retry.");
             return;
         }
-        String sb = "Game: " + game.getName() + " " + "Player: "
-                + player.getUserName() + "\n" + "Card shuffled back into deck from hand: "
-                + Mapper.getActionCard(acID).getRepresentation()
-                + "\n";
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
+        String message = "Card shuffled back into deck from hand: "
+                + Mapper.getActionCard(acID).getRepresentation();
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 }
