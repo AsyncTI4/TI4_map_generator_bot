@@ -1600,5 +1600,50 @@
         "text": "Place 3 neutral fighters in a non-home anomaly; space combat is resolved in that system if it contains non-neutral ships.",
         "flavorText": "\"Them void-rats cost an arm and a leg,\" Ipswitch said with disgust. \"Ah, well. Not my arm or my leg.\"",
         "source": "deprecated"
+    },
+    {
+        "alias": "invasion",
+        "name": "Invasion",
+        "phase": "Action",
+        "window": "ACTION",
+        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system outside of The Fracture that contains no ships and place 2 neutral cruisers in that system.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency1",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency2",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency3",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
+        "source": "deprecated"
+    },
+    {
+        "alias": "efficiency4",
+        "name": "Efficiency",
+        "phase": "Any",
+        "window": "When 1 or more of your units use PRODUCTION",
+        "text": "Reduce the combined cost of the produced units by 3.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
+        "source": "deprecated"
     }
 ]

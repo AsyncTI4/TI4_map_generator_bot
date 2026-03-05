@@ -307,42 +307,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "efficiency1",
-        "name": "Efficiency",
-        "phase": "Any",
-        "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by 3.",
-        "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "efficiency2",
-        "name": "Efficiency",
-        "phase": "Any",
-        "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by 3.",
-        "flavorText": "I48S traced the bottleneck to a single, catastrophically obsolete employee. Their termination shocked the other linemen, but he assured them they would be properly recycled.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "efficiency3",
-        "name": "Efficiency",
-        "phase": "Any",
-        "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by 3.",
-        "flavorText": "Dart nearly fell over as they crested the lip of the ancient crater to find three massive, entangled ships jutting from the earth below. Tai gave a self-satisfied hmph.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "efficiency4",
-        "name": "Efficiency",
-        "phase": "Any",
-        "window": "When 1 or more of your units use PRODUCTION",
-        "text": "Reduce the combined cost of the produced units by 3.",
-        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "smuggler_routes",
         "name": "Smuggler Routes",
         "phase": "Action",
@@ -526,6 +490,42 @@
         "text": "That unit is not destroyed instead.",
         "notes": "Combat hits are assigned simultaneously, and thus excess hits will not destroy this unit.",
         "flavorText": "Harrugh tumbled down the dune to a chorus of laughter—until the ridge he'd been standing on a heartbeat earlier erupted in plasma. The laughter died as their savior rose among them.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "mobilization1",
+        "name": "Mobilization",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "flavorText": "Dart grabbed the new cadet by his Naaz. \"Any more backtalk from you and it'll be a clout in the ear!\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "mobilization2",
+        "name": "Mobilization",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "flavorText": "The new squadron leader gasped as the simulation ended. For the fifth time today, Dart had bested them like it was cub's play.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "mobilization3",
+        "name": "Mobilization",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "flavorText": "Tai gave a self-satisfied *hmph* as he looked over the recruitment reports. “If you build it, they will come, they say.” The Alliance’s new war sun was proof enough.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "mobilization4",
+        "name": "Mobilization",
+        "phase": "Action",
+        "window": "At the start of your turn",
+        "text": "Place 2 infantry from your reinforcements on any planets you control and place 2 fighters from your reinforcements in any systems that contain your ships.",
+        "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
         "source": "action_deck_2"
     },
     {
@@ -1152,15 +1152,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "invasion",
-        "name": "Invasion",
-        "phase": "Action",
-        "window": "ACTION",
-        "text": "Put The Fracture into play if it is not already. Then, move 1 ingress token into a non-home system outside of The Fracture that contains no ships and place 2 neutral cruisers in that system.",
-        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the void, raining destruction upon the unsuspecting convoy.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "opportunists",
         "name": "Opportunists",
         "phase": "Action",
@@ -1295,6 +1286,15 @@
         "window": "After you pass",
         "text": "Resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token.",
         "flavorText": "\"With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "truce",
+        "name": "Truce",
+        "phase": "Action",
+        "window": "At the start of a ground combat you are participating in on a planet you control",
+        "text": "Place each of your units on that planet into coexistence and end that combat.",
+        "flavorText": "",
         "source": "action_deck_2"
     }
 ]
