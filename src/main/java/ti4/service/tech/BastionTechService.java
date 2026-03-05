@@ -1,6 +1,6 @@
 package ti4.service.tech;
 
-import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,8 +108,8 @@ public class BastionTechService {
             }
 
             Player p2 = null;
-            for (Player p : game.getRealPlayersExcludingThis(p1)) {
-                if (p1.isPlayerMemberOfAlliance(p)) continue;
+            for (Player p : game.getRealPlayersNNeutral()) {
+                if (p1.isPlayerMemberOfAlliance(p) || p1 == p) continue;
                 if (FoWHelper.playerHasUnitsOnPlanet(p, planet)) {
                     p2 = p;
                     break;

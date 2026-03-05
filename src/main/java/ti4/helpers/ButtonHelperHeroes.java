@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -62,7 +61,6 @@ import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
-@UtilityClass
 public class ButtonHelperHeroes {
 
     public static void argentHeroStep1(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -75,6 +73,37 @@ public class ButtonHelperHeroes {
         String msg = player.getRepresentation()
                 + ", please choose the system you wish to move stuff to using Mirik Aun Sissiri, the Argent hero.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+    }
+
+    public static List<Button> getShrineButtons(Player player, Player p2, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getPlanets()) {
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (uH != null && uH.getTokenList().contains("token_kaltrimshrine1.png")) {
+                buttons.add(Buttons.green("shrineView_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Gain 2 CC instead"));
+
+        return buttons;
+    }
+
+    @ButtonHandler("shrineView_")
+    public static void resolveShrineView(
+            Player player, Player p2, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("shrineView_", "");
+        ButtonHelper.deleteMessage(event);
+        if (planet.equalsIgnoreCase(game.getStoredValue("kaltrimcrownplanet"))) {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", the planet " + Helper.getPlanetRepresentation(planet, game)
+                            + " has the Kaltrim Crown on it.");
+        } else {
+            MessageHelper.sendMessageToChannel(
+                    player.getCardsInfoThread(),
+                    player.getRepresentation() + ", the planet " + Helper.getPlanetRepresentation(planet, game)
+                            + " does not have the Kaltrim Crown on it.");
+        }
     }
 
     public static List<Button> argentBreakthroughStep1(Game game, Player player, Tile activeSystem) {
