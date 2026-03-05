@@ -68,17 +68,14 @@ public class RoundOneService {
             game.removeRelicFromGame("thesilverflame");
         }
         if (game.isThundersEdge() && !game.isTwilightsFallMode()) {
-            Player neutral = game.getPlayerFromColorOrFaction("neutral");
-            if (neutral == null) {
-                String color = SetupNeutralPlayer.pickNeutralColor(game);
-                game.setupNeutralPlayer(color);
-            }
+            game.setupNeutralPlayer();
             game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok_te"));
             game.validateAndSetActionCardDeck(event, Mapper.getDeck(getTeActionCardDeckAlias(game)));
             game.setStrategyCardSet("te");
         }
         if (game.isTwilightsFallMode()) {
             ButtonHelperTwilightsFall.fixMahactColors(game, event);
+            game.setupNeutralPlayer();
             game.setupTwilightsFallMode(event);
         }
         if (game.isThundersEdge() || game.getStoredValue("useOldPok").isEmpty() || game.isTwilightsFallMode()) {

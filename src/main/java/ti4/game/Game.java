@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.discord.JdaService;
 import ti4.discord.interactions.commands.planet.PlanetRemove;
+import ti4.discord.interactions.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
@@ -77,18 +78,8 @@ import ti4.game.helper.TwilightFallDeckFuncs;
 import ti4.logging.BotLogger;
 import ti4.logging.LogOrigin;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.BorderAnomalyModel;
-import ti4.model.DeckModel;
-import ti4.model.ExploreModel;
-import ti4.model.FactionModel;
-import ti4.model.PublicObjectiveModel;
+import ti4.model.*;
 import ti4.model.Source.ComponentSource;
-import ti4.model.StrategyCardModel;
-import ti4.model.StrategyCardSetModel;
-import ti4.model.TechnologyModel;
-import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.agenda.IsPlayerElectedService;
 import ti4.service.draft.DraftLoadService;
@@ -383,6 +374,23 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
         neutral.addTech("cr2");
         neutral.addTech("ws");
         return neutral;
+    }
+
+    public Player setupNeutralPlayer() {
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral != null) return neutral;
+        return setupNeutralPlayer(SetupNeutralPlayer.pickNeutralColor(this));
+    }
+
+    @NotNull
+    public Player getNeutral() {
+        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
+        return getPlayerFromColorOrFaction("neutral");
+    }
+
+    @NotNull
+    public String getNeutralColor() {
+        return getNeutral().getColor();
     }
 
     private int getNumberOfSOsInTheDeck() {
