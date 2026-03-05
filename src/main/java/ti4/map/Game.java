@@ -3070,6 +3070,27 @@ public class Game extends GameProperties {
         return false;
     }
 
+    public boolean shuffleActionCardFromHandIntoDeck(String userID, Integer acIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            Map<String, Integer> actionCards = player.getActionCards();
+            String acID = "";
+            for (Entry<String, Integer> ac : actionCards.entrySet()) {
+                if (ac.getValue().equals(acIDNumber)) {
+                    acID = ac.getKey();
+                    break;
+                }
+            }
+            if (!acID.isEmpty()) {
+                player.removeActionCard(acIDNumber);
+                getActionCards().add(acID);
+                Collections.shuffle(getActionCards());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
