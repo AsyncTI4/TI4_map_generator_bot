@@ -54,12 +54,9 @@ class Info extends GameStateSubcommand {
             sb.append("> Date Ended: ")
                     .append(Helper.getDateRepresentation(game.getEndedDate()))
                     .append("\n");
-        sb.append("Game Completed: `")
-                .append(game.getWinner().isPresent())
-                .append("`")
-                .append("\n");
+        List<Player> winners = game.getWinners();
+        sb.append("Game Completed: `").append(!winners.isEmpty()).append("`").append("\n");
         if (game.hasWinner()) {
-            List<Player> winners = game.getWinners();
             sb.append("Winner(s): ");
             for (int i = 0; i < winners.size(); i++) {
                 if (i > 0) sb.append(", ");
