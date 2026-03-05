@@ -67,7 +67,7 @@ public class DeletionListener extends ListenerAdapter {
 
         String logMessage =
                 String.format("""
-                Bot message deleted.
+                **Bot message deleted.**
                 Message: %s
                 Game: %s
                 Deleted from: %s

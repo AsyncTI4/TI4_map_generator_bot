@@ -111,7 +111,9 @@ public class SlashCommandListener extends ListenerAdapter {
         Member member = event.getMember();
         if (member == null) return;
 
-        String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
+        var command = CommandManager.getCommand(event.getInteraction().getName());
+        String susPrefix = command.isSuspicious(event) ? "sus" : "notSus";
+        String commandText = "```" + susPrefix + "\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
         event.getChannel()
                 .sendMessage(commandText)
                 .queue(
