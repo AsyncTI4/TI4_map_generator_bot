@@ -655,7 +655,7 @@ public final class StatusHelper {
         if (!game.isMonumentToTheAgesMode()) {
             return;
         }
-        Player neutral = game.getPlayerFromColorOrFaction("neutral");
+        Player neutral = game.getNeutral();
         for (Tile tile : game.getTileMap().values()) {
             for (Planet planet : tile.getPlanetUnitHolders()) {
                 if (planet.getUnitCount(UnitType.Spacedock, neutral) > 0) {

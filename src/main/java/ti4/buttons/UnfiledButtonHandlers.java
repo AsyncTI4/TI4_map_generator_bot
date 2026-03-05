@@ -33,7 +33,6 @@ import ti4.ResourceHelper;
 import ti4.buttons.handlers.phases.TurnEndButtonHandler;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -78,7 +77,6 @@ import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
 import ti4.message.logging.LogOrigin;
 import ti4.model.BreakthroughModel;
-import ti4.model.ColorModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -293,14 +291,7 @@ public class UnfiledButtonHandlers {
             game.setMonumentToTheAgesMode(enable);
             message += "Monuments to the Ages Mode. Nothing more needs to be done.";
             if (enable) {
-                Player neutral = game.getPlayerFromColorOrFaction("neutral");
-                if (neutral == null) {
-                    List<String> unusedColors = game.getUnusedColors().stream()
-                            .map(ColorModel::getName)
-                            .toList();
-                    String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-                    game.setupNeutralPlayer(color);
-                }
+                game.getNeutral();
             }
         }
         if ("RapidMobilization".equalsIgnoreCase(mode)) {

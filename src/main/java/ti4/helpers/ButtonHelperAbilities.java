@@ -20,7 +20,6 @@ import org.apache.commons.lang3.function.Consumers;
 import org.springframework.util.StringUtils;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
-import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -33,7 +32,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.message.logging.BotLogger;
-import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
@@ -364,8 +362,7 @@ public final class ButtonHelperAbilities {
                 }
             }
         }
-        AddUnitService.addUnits(
-                event, tile, game, game.getPlayerFromColorOrFaction("neutral").getColor(), asyncID);
+        AddUnitService.addUnits(event, tile, game, game.getNeutralColor(), asyncID);
         MessageHelper.sendMessageToChannel(
                 player.getCorrectChannel(),
                 player.getRepresentation() + " replaced the only ship owned by " + op.getRepresentation() + " in "
@@ -2360,15 +2357,7 @@ public final class ButtonHelperAbilities {
             }
         }
         if (game.isDangerousWildsMode()) {
-            Player neutral = game.getPlayerFromColorOrFaction("neutral");
-            if (neutral == null) {
-                List<String> unusedColors =
-                        game.getUnusedColors().stream().map(ColorModel::getName).toList();
-                String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-                game.setupNeutralPlayer(color);
-                neutral = game.getPlayerFromColorOrFaction("neutral");
-            }
-
+            Player neutral = game.getNeutral();
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                     if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {

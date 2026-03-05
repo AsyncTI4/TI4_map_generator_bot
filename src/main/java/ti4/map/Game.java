@@ -41,6 +41,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetRemove;
+import ti4.commands.special.SetupNeutralPlayer;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftCategory;
 import ti4.draft.FrankenDraft;
@@ -384,6 +385,26 @@ public class Game extends GameProperties implements TwilightFallDeckFuncs {
         neutral.addTech("cr2");
         neutral.addTech("ws");
         return neutral;
+    }
+
+    public Player setupNeutralPlayer() {
+        Player neutral = getPlayerFromColorOrFaction("neutral");
+        if (neutral != null) return neutral;
+
+        List<String> unusedColors =
+                getUnusedColors().stream().map(ColorModel::getName).toList();
+        return setupNeutralPlayer(SetupNeutralPlayer.pickNeutralColor(unusedColors));
+    }
+
+    @NotNull
+    public Player getNeutral() {
+        if (getPlayerFromColorOrFaction("neutral") == null) return setupNeutralPlayer();
+        return getPlayerFromColorOrFaction("neutral");
+    }
+
+    @NotNull
+    public String getNeutralColor() {
+        return getNeutral().getColor();
     }
 
     private int getNumberOfSOsInTheDeck() {

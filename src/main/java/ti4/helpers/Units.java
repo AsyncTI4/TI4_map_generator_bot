@@ -276,7 +276,7 @@ public class Units {
                 case none -> "";
                 case dmg -> "Damaged";
                 case glv -> "Galvanized";
-                case dmg_glv -> "Dmg+Glv";
+                case dmg_glv -> "Dmg+Galv";
             };
         }
 
